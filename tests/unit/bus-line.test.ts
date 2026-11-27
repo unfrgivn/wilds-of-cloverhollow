@@ -117,6 +117,7 @@ describe("the lands", () => {
       "east-hall": "cloverhollow", "art-room": "cloverhollow", music: "cloverhollow",
       gym: "cloverhollow", field: "cloverhollow", clubhouse: "forest", lodge: "pass",
       plaza: "cloverhollow", park: "cloverhollow", school: "cloverhollow", woods: "forest",
+      "milo-house": "cloverhollow", "rosie-cottage": "cloverhollow",
       bay: "bay", "sue-cottage": "bay", pass: "pass", "jordan-cabin": "pass",
       cavern: "pass", trail: "trail", mist: "enchanted",
       enchanted: "enchanted", hills: "hills", sanctuary: "hills",

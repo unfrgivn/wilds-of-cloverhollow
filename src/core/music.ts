@@ -99,6 +99,8 @@ const areaTracks: Record<string, MusicTrack> = {
   market: "home",
   parlor: "cafe",
   park: "home",
+  "milo-house": "home",
+  "rosie-cottage": "home",
   hills: "hills",
   sanctuary: "sanctuary",
   school: "school",

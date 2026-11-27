@@ -90,6 +90,8 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 -> DONE
 
 === journal ===
+{rosie_cottage_visited: I visited Rosie's flower cottage by Meadow Park! She showed off her pressed-clover bookmarks and shared a Sunlit Clover Tea Snack. # speaker: Fae}
+{milo_loft_visited: I visited Milo's sunlit sketch loft beside Meadow Park! His desk is covered in rocket watercolor comics and a jar of Star Racer tokens. # speaker: Fae}
 {parlor_visited: I visited Sweet Scoop Ice Cream Parlor! Scooper Penny whipped up a free Cloverhollow Dream Sundae and scoops Berry Swirl Cones and Cozy Cocoa Sundaes. # speaker: Fae}
 {market_visited: I stepped inside Cloverhollow Grocery Market! Grocer Pippin shared a crisp orchard apple sample and stocks Orchard Apples and Fish Crackers for our critter friends. # speaker: Fae}
 {jordan_cabin_visited: I visited Jordan's timber cabin along the west trail at Pinecone Pass! He shared hot cocoa and his grandma's Pressed Alpine Clover. # speaker: Fae}
@@ -4461,4 +4463,106 @@ Aw, thank you, Custodian Bert! # speaker: Fae
 = studio_gift
 You inspired a whole shelf of calm-critter sculptures, Fae! Take ten shiny studio coins and a crunchy art-room snack! # speaker: Theo # gift: coins 10 # gift: snack 1 # sound: chime-green
 Whoa, thank you, Theo! # speaker: Fae
+-> DONE
+
+// Milo's Sketch Loft & Rosie's Flower Cottage (Meadow Park neighborhood homes).
+VAR milo_loft_visited = false
+VAR milo_desk_checked = false
+VAR milo_loft_glow_read = false
+VAR rosie_cottage_visited = false
+VAR rosie_clover_gift = false
+VAR rosie_cottage_glow_read = false
+
+=== milo_desk ===
+~ milo_loft_visited = true
+{milo_desk_checked: -> again}
+~ milo_desk_checked = true
+Open watercolor sketchbooks spill across the desk—pages of speeding rockets, comic panels of Cloverhollow classmates, and rows of bright colored markers! # speaker: Fae
+Beside the sketchbook sits a clinking glass jar brimming with golden Star Racer tokens, and a neat little coin pouch labeled \"EMERGENCY COMIC FUND.\" # speaker: Fae
+Whoa, someone left ten stray coins tucked under a note that says \"For visiting friends!\" # speaker: Fae # gift: coins 10 # sound: chime-yellow
+{sue_joined: Look at these rocket comics! Whoever drew these has awesome paneling skills! # speaker: Sue}
+{jordan_joined: Check out the little constellations penciled into the margins—super tidy detail. # speaker: Jordan}
+-> DONE
+= again
+Watercolor rocket sketches, classmate comic panels, bright colored markers, and a clinking jar of golden Star Racer tokens crowd the sunny art desk. # speaker: Fae
+-> DONE
+
+=== milo_bed ===
+A periwinkle-and-plum striped quilt is smoothed neatly across the bed, with a worn pocket sketchbook tucked right under the pillow! # speaker: Fae
+He keeps a sketchbook under his pillow just like I keep my journal under mine. # speaker: Fae
+-> DONE
+
+=== milo_comics ===
+A stout wooden crate overflows with colorful space-adventure comics, right beside a skateboard shelf and two gleaming Cloverhollow school trophies! # speaker: Fae
+Issue #12 is bookmarked with a folded paper star. # speaker: Fae
+-> DONE
+
+=== milo_cushion ===
+A cozy woven floor cushion sits beside a tall stack of notebooks filled with half-finished watercolor drawings of Meadow Park's big tree! # speaker: Fae
+{has_lantern: Wait—a tiny rocket doodle on the top notebook margin points toward the starry rug edge, marked \"glow ink!\" Let's try Jordan's blacklight lantern! # speaker: Fae|A tiny rocket doodle on the top notebook margin points toward the starry rug edge with the note \"glow ink!\" Maybe a special lantern can read it! # speaker: Fae}
+-> DONE
+
+=== milo_loft_glow ===
+{milo_loft_glow_read: -> again}
+~ milo_loft_glow_read = true
+Under Jordan's blacklight lantern, a softly glowing invisible-ink rocket sketch lights up along the floorboards near the starry rug! # speaker: Fae
+\"I just wanted to draw something cool enough that nobody would ever leave me behind...\" # speaker: Glow Note
+Aw... whoever wrote this really pours their whole heart into their drawings. I want to make sure every friend in Cloverhollow knows they're never left out! # speaker: Fae
+And ten shiny coins are taped neatly beneath the starry margin doodle! # speaker: Fae # sound: chime-blue # gift: coins 10
+-> DONE
+= again
+The invisible-ink rocket margin note still shimmers softly: \"I just wanted to draw something cool enough that nobody would ever leave me behind...\" # speaker: Fae
+-> DONE
+
+=== milo_loft_talk ===
+Hey Fae! Welcome to my sketch loft—for real this time! # speaker: Milo
+Thank you for listening to me under the Ancient Tree. Drawing comics feels way better when you're sharing them with friends instead of trying to show off! # speaker: Milo
+{sue_joined: Your rocket panels are seriously legendary, Milo! Next time draw Maddie piloting a sea-glass submarine! # speaker: Sue}
+{jordan_joined: And let's sketch a field guide to Pinecone Pass together sometime—you've got the best ink lines in Cloverhollow! # speaker: Jordan}
+Let's paint a giant watercolor mural of our whole crew! My art desk is always open whenever you want to hang out, Fae! # speaker: Milo
+-> DONE
+
+=== rosie_home ===
+{rosie_cottage_visited: -> again}
+~ rosie_cottage_visited = true
+Fae! You found my flower cottage! Come on in and smell the pressed clover! # speaker: Rosie
+I've been pressing Meadow Park daisies into bookmarks and sorting all my pastel ribbons by rainbow shade. # speaker: Rosie
+Here, I steeped a warm Sunlit Clover Tea Snack just in case a friend stopped by! # speaker: Rosie # gift: snack 1 # sound: chime-green
+Mmm, it smells like honey and sunny wildflowers! Thank you, Rosie! # speaker: Fae
+{(visited_hills or sanctuary_visited) and not rosie_clover_gift: -> clover_gift}
+-> DONE
+= again
+{(visited_hills or sanctuary_visited) and not rosie_clover_gift: -> clover_gift}
+Welcome back to my flower cottage, Fae! # speaker: Rosie
+{sanctuary_visited: I heard Ranger Fern's Wildlife Sanctuary east of Clover Hills is blooming brighter than ever! Every calm critter makes the whole valley happier. # speaker: Rosie|{visited_hills: Have you spotted the sunny east trail out of Clover Hills yet? Rumor says there's a whole Wildlife Sanctuary tucked past the wildflowers! # speaker: Rosie|Meadow Park's wildflowers are extra bright today! If you head past the play tower, the path opens right out into Clover Hills! # speaker: Rosie}}
+-> DONE
+= clover_gift
+~ rosie_clover_gift = true
+Wait—you've been out exploring {sanctuary_visited:the Wildlife Sanctuary|Clover Hills} already?! That's SO exciting! # speaker: Rosie
+Here, let me weave you a lucky pressed-clover meadow ribbon—and take fifteen shiny craft-fair coins for your adventure pouch! # speaker: Rosie # gift: coins 15 # sound: chime-yellow
+Whoa, it's braided with tiny four-leaf clovers! You're the best, Rosie! # speaker: Fae
+-> DONE
+
+=== rosie_table ===
+Pressing books weighted with smooth pebbles, pastel watercolor pans, glass floral cloches, and nine colorful ribbon spools cover Rosie's craft table! # speaker: Fae
+-> DONE
+
+=== rosie_bed ===
+A sunny peach-and-rose patchwork quilt is folded neatly over Rosie's bed, smelling faintly of dried lavender and fresh meadow air! # speaker: Fae
+-> DONE
+
+=== rosie_plants ===
+Four wooden shelves hold nineteen tiny terracotta pots bursting with clover, daisies, and plump little succulents! # speaker: Fae
+{has_lantern: Tucked behind a tiny clover pot is a pastel tag: \"Shine a blacklight by the sunlit window for my secret fairy doodle!\" # speaker: Fae|Tucked behind a tiny clover pot is a pastel tag mentioning an invisible-ink fairy doodle near the sunlit window! # speaker: Fae}
+-> DONE
+
+=== rosie_cottage_glow ===
+{rosie_cottage_glow_read: -> again}
+~ rosie_cottage_glow_read = true
+Under Jordan's blacklight lantern, Rosie's shimmering invisible-ink Four-Leaf Clover Fairy Doodle lights up beside the floral rug! # speaker: Fae
+\"CLOVER FAIRY FIELD NOTE: Glowing wildflowers sleep deep past Whispering Woods—follow the bluebell light if you ever wander into the Enchanted Forest!\" # speaker: Glow Note
+Ooh, what a pretty fairy sketch! And ten lucky cottage coins sparkle right beside the doodle! # speaker: Fae # sound: chime-yellow # gift: coins 10
+-> DONE
+= again
+Rosie's shimmering Four-Leaf Clover Fairy Doodle glows softly by the sunlit window, reminding Fae to follow the bluebell light toward the Enchanted Forest! # speaker: Fae
 -> DONE

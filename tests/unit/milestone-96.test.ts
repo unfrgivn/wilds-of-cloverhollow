@@ -118,7 +118,7 @@ describe("Milestone 96: 8-Keepsake Showcase, 9 Resting Areas & core/battle Extra
     }
   });
 
-  it("every REST_SPOTS entry across all 18 areas sits inside walkable and outside blockers", () => {
+  it("every REST_SPOTS entry across all 20 areas sits inside walkable and outside blockers", () => {
     const areas = new Set(REST_SPOTS.map((spot) => spot.area));
     expect([...areas].sort()).toEqual([
       "bay",
@@ -131,10 +131,12 @@ describe("Milestone 96: 8-Keepsake Showcase, 9 Resting Areas & core/battle Extra
       "kitchen",
       "lodge",
       "market",
+      "milo-house",
       "park",
       "parlor",
       "pass",
       "plaza",
+      "rosie-cottage",
       "sanctuary",
       "sue-cottage",
       "trail",

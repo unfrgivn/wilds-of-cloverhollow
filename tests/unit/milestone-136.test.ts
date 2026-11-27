@@ -231,9 +231,9 @@ describe("Milestone 136: Photo Mode Postcard Companion Stamp", () => {
 });
 
 describe("Milestone 136: Modular Atmosphere Split", () => {
-  it("produces deterministic valid particles across all 28 playable areas", () => {
+  it("produces deterministic valid particles across all 30 playable areas", () => {
     const playable = Object.values(world.areas).filter((area) => area.id !== "harness");
-    expect(playable).toHaveLength(28);
+    expect(playable).toHaveLength(30);
     expect(evaluateAtmosphere("harness", 1200, 800, 120)).toEqual([]);
 
     let outdoorCount = 0;
@@ -275,7 +275,7 @@ describe("Milestone 136: Modular Atmosphere Split", () => {
       expect(reduced0, `area ${area.id} reducedMotion steady`).toEqual(reduced240);
     }
     expect(outdoorCount).toBe(12);
-    expect(indoorCount).toBe(16);
+    expect(indoorCount).toBe(18);
   });
 
   it("keeps atmosphere-recipes.ts under 120 lines and all atmosphere modules Pixi-free", () => {

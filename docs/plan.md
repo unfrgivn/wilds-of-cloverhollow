@@ -5757,7 +5757,6 @@ the old trail, the owl, and the clubhouse claim.
   `CLOVERHOLLOW_E2E_PORT=4491 just e2e` (1,160 passed, 2 skipped, 0 snapshot
   diffs across Chromium & WebKit).
 
-<<<<<<< HEAD
 ## Milestone 130: Cloverhollow Grocery Market & Sweet Scoop Ice Cream Parlor **Status:** ✅ Completed (2026-11-27)
 - Completed all five enterable buildings on Cloverhollow Town Plaza
   (`NOTES.md: 42`: Fae's House, Grocery Market, Ice Cream Parlor, Bon Appetit
@@ -6338,6 +6337,45 @@ the old trail, the owl, and the clubhouse claim.
   real-key `@smoke` Playwright suite `tests/e2e/living-npcs.spec.ts` (3 tests
   across Chromium & WebKit), and `vision`-verified review captures in
   `art/review/living-npcs-*.jpg` plus visual audit of refreshed baselines.
+## Milestone 145: Milo's Sketch Loft & Rosie's Flower Cottage (Complete Other Kids' Houses) **Status:** ✅ Completed (2026-11-27)
+- Completed all remaining "Other Kids' Houses" from `NOTES.md: 34` (31 total
+  playable areas, 18 indoor rooms, 20 companion resting areas), branching off
+  Meadow Park's two unused northwest sunlit fence gaps (`content/areas/park.json`
+  `triggers` & `spawns` only; zero changes to all 68 earlier recorded sims):
+  - **Milo's Sketch Loft (`milo-house`, 1200x800 cutaway, `land: "cloverhollow"`)**:
+    entered via Meadow Park's WNW fence gap (`x=110..165, y=445..510`, return
+    spawn `(235, 465)` facing right). Painted cutaway (`paper #fcf3ea`),
+    depth-sorted `cushion-stack` alpha-WebP kit (`28 KB`, `rebuilt vs painting
+    0.00%`), `wood` + `carpet` surfaces, warm arched-window sunbeams & floating
+    stardust motes (`src/render/atmosphere-indoor.ts`), `milo-starry-rug`
+    companion rest spot (`src/render/companions.ts`), `"home"` / `"none"`
+    audio, 4 Look interactables (`milo-desk` with `+10` coins & subtle
+    foreshadowing keeping Milo's twist 100% unspoiled before the finale,
+    `milo-bed`, `milo-comics`, `milo-cushion`), blacklight `milo-loft-glow`
+    (`+10` coins, poignant invisible-ink rocket note), and post-finale
+    unmasked Milo (`visibleWhile: "milo_revealed"`, `milo_loft_talk`).
+  - **Rosie's Flower Cottage (`rosie-cottage`, 1200x800 cutaway, `land: "cloverhollow"`)**:
+    entered via Meadow Park's NNW sunlit meadow gap (`x=430..500, y=244..292`,
+    return spawn `(490, 340)` facing down). Painted botanical cutaway (`paper`
+    `#faf3ea`), depth-sorted `rattan-stool` alpha-WebP kit (`15 KB`, `rebuilt
+    vs painting 0.00%`), `wood` + `carpet` surfaces, floral window sunbeams &
+    pastel petal motes, `rosie-floral-rug` companion rest spot, `"home"` /
+    `"none"` audio, Rosie NPC (`visibleWhile: "hall_pass"`, gifting a Sunlit
+    Clover Tea Snack `+1 snack` + a Pressed Clover Craft `+15 coins` ribbon
+    once `visited_hills` or `sanctuary_visited`), 3 Look spots (`rosie-table`,
+    `rosie-bed`, `rosie-plants`), and blacklight `rosie-cottage-glow` (`+10`
+    coins, Four-Leaf Clover Fairy Doodle).
+- Evidence: `tests/unit/milo-rosie-houses.test.ts`,
+  `tests/unit/milo-rosie-replay.test.ts`, recorded run
+  `tests/sim/scripts/new-game/milo-rosie.json` (12,834 ticks), real-key
+  `tests/e2e/milo-rosie.spec.ts` matching Bun's exact hash at 1280x720 and
+  874x402, and `vision`-verified `art/review/{milo-house,rosie-cottage}-{overlay,depth}.jpg`
+  and `art/review/milo-rosie-gameplay.jpg`.
+- Gates: `just check` (207 unit files / 1,510 tests, 70 sims with zero shifted
+  prior runs, 23 QA packs, purity, lint), `just build` (zero chunk warnings,
+  production and harness hook checks), and full `CLOVERHOLLOW_E2E_PORT=4215
+  just e2e` (1,188 passed, 2 skipped, 0 failed across Chromium & WebKit +
+  post-rebase `milo-rosie.spec` & `park.spec` verified).
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.

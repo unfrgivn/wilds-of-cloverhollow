@@ -1,0 +1,36 @@
+{
+  "frames": {
+    "rattan-stool": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 180,
+        "h": 203
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 180,
+        "h": 203
+      },
+      "sourceSize": {
+        "w": 180,
+        "h": 203
+      },
+      "anchor": {
+        "x": 0.49444,
+        "y": 0.9803
+      }
+    }
+  },
+  "meta": {
+    "image": "props-0.webp",
+    "size": {
+      "w": 2048,
+      "h": 203
+    },
+    "scale": "1"
+  }
+}

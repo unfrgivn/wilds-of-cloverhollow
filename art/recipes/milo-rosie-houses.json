@@ -1,0 +1,21 @@
+{
+  "asset": "milo-rosie-houses",
+  "date": "2026-11-27",
+  "summary": "Remaining Other Kids' Houses off Meadow Park (NOTES.md: 34): Milo's Sketch Loft (`milo-house`, 1200x800 cutaway, paper #fcf3ea, 28 KB alpha-WebP cushion-stack kit) and Rosie's Flower Cottage (`rosie-cottage`, 1200x800 cutaway, paper #faf3ea, 15 KB alpha-WebP rattan-stool kit).",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 6,
+  "references": [
+    "art/source/areas/lodge/lodge-final.png",
+    "art/source/areas/classroom/classroom-final.png",
+    "art/source/areas/art-room/art-room-final.png"
+  ],
+  "kept": {
+    "milo-house": "art/source/areas/milo-house/painting/ground.json",
+    "rosie-cottage": "art/source/areas/rosie-cottage/painting/ground.json"
+  },
+  "commands": [
+    "bun tools/art/kit.ts milo-house gen && masks && fill && pack",
+    "bun tools/art/kit.ts rosie-cottage gen && masks && fill && pack",
+    "convert props-0.png -> props-0.webp (quality 92, alpha-quality 100)"
+  ]
+}

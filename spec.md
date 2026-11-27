@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 144)
+Last updated: 2026-11-27 (Milestone 145)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -581,9 +581,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   paper tooth. In non-harness areas, a `shadowLayer` sits directly above `ground`
   and below `depth` (with a pooled `footstepLayer` above it) to ground Fae, party
   members, visible NPCs (hover shadows under the four fairies, skipping the
-  painted `bus-stop`, soft indoor `0.24` alpha across all 14 indoor rooms in
-  `INDOOR_AREAS` including `cafe`, `market`, `parlor`, `sue-cottage`, and
-  `jordan-cabin` vs `0.30` outdoors, and `52 px` adult contact shadows / `132 px`
+  painted `bus-stop`, soft indoor `0.24` alpha across all 18 indoor rooms in
+  `INDOOR_AREAS` including `cafe`, `market`, `parlor`, `sue-cottage`,
+  `jordan-cabin`, `milo-house`, and `rosie-cottage` vs `0.30` outdoors, and `52 px` adult contact shadows / `132 px`
   adult emote head clearance across all 15 adult townspeople in `ADULT_NPCS`:
   `mom`, `dad`, `teacher`, `nurse`, `coach`, `music-teacher`, `fern`, `chef`,
   `barnaby`, `bree`, `buster`, `bay-keeper`, `pass-keeper`, `pippin`, and
@@ -1548,6 +1548,56 @@ ios/            Capacitor iOS project (from Milestone 4).
     cocoa kettle (890, 360) and brass camp lantern (1080, 380), and rising warm
     cocoa-steam wisps; its soundtrack plays `"pass"` ("Pinecone Snowfall") with
     `"hearth"` ambience.
+  - `milo-house`, "Milo's Sketch Loft", in the `cloverhollow` land, a 1200x800
+    painted isometric cutaway entered from Meadow Park's west-northwest fence
+    gap (`park` trigger `milo-house` at x=110..165, y=445..510 ->
+    `milo-house.door`; return spawn `park.milo-house` at (235, 465) facing
+    right). Inside, the back-left door returns to `park.milo-house` (`door`
+    spawn at (290, 545) facing right). Its 1-prop alpha-WebP kit lifts the
+    depth-sorted woven `cushion-stack` at (780, 686); its floor surface is wood
+    with carpet polygons for the starry center rug and starry doormat. Four Look
+    spots cover `milo-desk` (`milo_desk`: rocket watercolor sketchbooks,
+    classmate comic panels, colored markers, and Star Racer token jar, sets
+    `milo_loft_visited` & `milo_desk_checked`, one-time `gift: coins 10` with
+    `chime-yellow`), `milo-bed` (`milo_bed`: periwinkle-and-plum striped quilt
+    with sketchbook under the pillow), `milo-comics` (`milo_comics`: space
+    comics crate, skateboard shelf, and school trophies), and `milo-cushion`
+    (`milo_cushion`: floor reading nook hinting at glow ink), plus one
+    blacklight lantern glow `milo-loft-glow` (`frame: "ink_note"`,
+    `milo_loft_glow`: subtle invisible-ink rocket margin note with zero
+    hooded-kid spoilers before `calmed("hooded-kid")`, sets
+    `milo_loft_glow_read`, one-time `gift: coins 10` with `chime-blue`). After
+    `milo_revealed` is true, Milo stands on his starry rug at (670, 518) facing
+    down (`milo_loft_talk`) for a post-finale watercolor hangout. Its fixture
+    `milo-house` starts at `door` with Maddie, Sue, Jordan, and the blacklight
+    lantern; its atmosphere adds 2 arched-window sunbeams and 10 stardust motes;
+    its soundtrack plays `"home"` ("Cloverhollow Town") with `"none"` ambience.
+  - `rosie-cottage`, "Rosie's Flower Cottage", in the `cloverhollow` land, a
+    1200x800 painted isometric cutaway entered from Meadow Park's
+    north-northwest sunlit meadow gap (`park` trigger `rosie-cottage` at
+    x=430..500, y=244..292 -> `rosie-cottage.door`; return spawn
+    `park.rosie-cottage` at (490, 340) facing down). Inside, the back-left
+    rose-wood door returns to `park.rosie-cottage` (`door` spawn at (295, 540)
+    facing right). Its 1-prop alpha-WebP kit lifts the depth-sorted
+    `rattan-stool` at (891, 607); its floor surface is wood with carpet polygons
+    for the oval floral center rug and daisy doormat. Once `hall_pass` is true,
+    Rosie stands in front of her craft table at (775, 495) facing down
+    (`rosie_home`: welcomes Fae on first visit with `rosie_cottage_visited` and
+    a Sunlit Clover Tea Snack `gift: snack 1` with `chime-green`, awards a
+    Pressed Clover Craft lucky ribbon `gift: coins 15` with `chime-yellow` via
+    `rosie_clover_gift` once `visited_hills` or `sanctuary_visited` is true, and
+    shares neighborhood tips on revisits). Three Look spots cover `rosie-table`
+    (`rosie_table`: pressed flowers, watercolors, cloches, and ribbon spools),
+    `rosie-bed` (`rosie_bed`: lavender-scented peach-and-rose patchwork quilt),
+    and `rosie-plants` (`rosie_plants`: potted clover, daisies, and succulents
+    hinting at a window fairy doodle), plus one blacklight lantern glow
+    `rosie-cottage-glow` (`frame: "bluebell_4"`, `rosie_cottage_glow`: Rosie's
+    Four-Leaf Clover Fairy Doodle hinting at Enchanted Forest wildflowers, sets
+    `rosie_cottage_glow_read`, one-time `gift: coins 10` with `chime-yellow`).
+    Its fixture `rosie-cottage` starts at `door` with Maddie, Sue, Jordan, the
+    blacklight lantern, and `hall_pass`; its atmosphere adds 2 floral-window
+    sunbeams and 10 pastel petal/sunbeam motes; its soundtrack plays `"home"`
+    ("Cloverhollow Town") with `"none"` ambience.
 - The lifeguard (Milestone 64): once Sue has joined (`sue_joined`), the bay's
   picnic leads on (`bay_picnic.back`): a whistle blasts, and the picnic's
   owner, Ms. Coral, the bay's lifeguard, is back and fizzy (`lifeguard_back`),
@@ -1624,8 +1674,9 @@ ios/            Capacitor iOS project (from Milestone 4).
     `emoteHeart` + pastel `sparkle` puffs, and a synthesized species affection
     cue via `AudioController.playEffect`), or relax at curated painted benches,
     chairs, rugs, picnic blanket, glades, overlooks, and the Clubhouse beanbag
-    across 18 areas (`plaza`, `park`, `bay`, `cafe`, `market`, `parlor`,
-    `lodge`, `clubhouse`, `sue-cottage`, `jordan-cabin`, `sanctuary`,
+    across 20 areas (`plaza`, `park`, `bay`, `cafe`, `market`, `parlor`,
+    `lodge`, `clubhouse`, `sue-cottage`, `jordan-cabin`, `milo-house`,
+    `rosie-cottage`, `sanctuary`,
     `bedroom`, `kitchen`, `pass`, `trail`, `woods`, `hills`, `enchanted`), settling into a cozy seated-rest
     pose with a warm harp chord and lazily drifting `emoteNote` (`♪`) until any
     movement, cancel, menu, or confirm input stands her back up.

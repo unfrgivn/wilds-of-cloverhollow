@@ -10,8 +10,10 @@ import {
   HEARTH_MOTE_TINTS,
   INDOOR_SUNLIT,
   MARKET_MOTE_TINTS,
+  MILO_MOTE_TINTS,
   PARLOR_MOTE_TINTS,
   pickTint,
+  ROSIE_MOTE_TINTS,
   SUNLIT_MOTE_TINTS,
   wrap,
   type AtmosphereOptions,
@@ -337,6 +339,76 @@ export function evaluateIndoorAtmosphere(
         tint: 0xfff5e8,
       });
     }
+    return out;
+  }
+
+  if (areaId === "milo-house") {
+    // 2 soft sunlit arched-window beams slanting across Milo's floorboards.
+    const beams: readonly [number, number, number][] = [
+      [395, 365, 1.85],
+      [465, 435, 1.65],
+    ];
+    beams.forEach(([bx, by, scale], i) => {
+      const alpha = 0.058 + 0.008 * Math.sin(tick * 0.017 + i * 2.1);
+      out.push({
+        layer: "over",
+        texture: "sunbeam",
+        blend: "add",
+        x: bx,
+        y: by,
+        scaleX: scale,
+        scaleY: scale,
+        rotation: 0,
+        alpha: clamp01(alpha),
+        tint: 0xfff4d6,
+      });
+    });
+    // 10 gentle floating stardust and sunlit sketch-loft motes.
+    addFloatingMotes(out, seed + 665, width, height, tick, 10, MILO_MOTE_TINTS, {
+      marginX: 190,
+      marginY: 200,
+      driftX: 0.07,
+      driftY: -0.06,
+      minScale: 0.16,
+      maxScale: 0.32,
+      minAlpha: 0.16,
+      maxAlpha: 0.4,
+    });
+    return out;
+  }
+
+  if (areaId === "rosie-cottage") {
+    // 2 warm floral-window sunbeams streaming across Rosie's flower cottage.
+    const beams: readonly [number, number, number][] = [
+      [400, 355, 1.85],
+      [465, 425, 1.65],
+    ];
+    beams.forEach(([bx, by, scale], i) => {
+      const alpha = 0.06 + 0.008 * Math.sin(tick * 0.017 + i * 2.2);
+      out.push({
+        layer: "over",
+        texture: "sunbeam",
+        blend: "add",
+        x: bx,
+        y: by,
+        scaleX: scale,
+        scaleY: scale,
+        rotation: 0,
+        alpha: clamp01(alpha),
+        tint: 0xfff5dc,
+      });
+    });
+    // 10 soft pastel petal and sunbeam motes drifting through the flower cottage.
+    addFloatingMotes(out, seed + 670, width, height, tick, 10, ROSIE_MOTE_TINTS, {
+      marginX: 190,
+      marginY: 200,
+      driftX: 0.06,
+      driftY: -0.07,
+      minScale: 0.17,
+      maxScale: 0.33,
+      minAlpha: 0.17,
+      maxAlpha: 0.41,
+    });
     return out;
   }
 

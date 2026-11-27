@@ -97,6 +97,18 @@ describe("area surface maps", () => {
       point: spawn("parlor", "door"), surface: "tile" },
     { area: "parlor", what: "the scalloped cream doormat", point: { x: 185, y: 520 },
       surface: "carpet" },
+    { area: "milo-house", what: "the sketch-loft floorboards",
+      point: spawn("milo-house", "door"), surface: "wood" },
+    { area: "milo-house", what: "the starry loft rug", point: { x: 540, y: 565 },
+      surface: "carpet" },
+    { area: "milo-house", what: "the starry doormat", point: { x: 196, y: 520 },
+      surface: "carpet" },
+    { area: "rosie-cottage", what: "the flower-cottage floorboards",
+      point: spawn("rosie-cottage", "door"), surface: "wood" },
+    { area: "rosie-cottage", what: "the floral oval rug", point: { x: 595, y: 580 },
+      surface: "carpet" },
+    { area: "rosie-cottage", what: "the daisy doormat", point: { x: 205, y: 515 },
+      surface: "carpet" },
   ];
   it.each(truths)("$area: $what is $surface", ({ area, point, surface }) => {
     expect(surfaceAt(mapOf(area), point)).toBe(surface);

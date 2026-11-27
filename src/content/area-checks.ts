@@ -444,6 +444,14 @@ export function areaConnectionErrors(
           `${area.id}: interactable ${interactable.id} is unreachable`,
         );
     }
+    const staticSolidsForNpc = (npcId: string): Area["blockers"] => [
+      ...area.blockers,
+      ...(area.crossings ?? []).map((crossing) => crossing.polygon),
+      ...area.props.flatMap((prop) =>
+        possibleStates(prop, closedScenario(area)).flatMap((state) => state.footprint),
+      ),
+      ...area.npcs.filter((other) => other.id !== npcId).map((other) => other.footprint),
+    ];
     for (const npc of area.npcs) {
       const range = tunables.interact.range;
       const reachableNpc = reachable.some((point) => {
@@ -453,6 +461,38 @@ export function areaConnectionErrors(
       });
       if (!reachableNpc)
         errors.push(`${area.id}: npc ${npc.id} is unreachable`);
+      if (npc.stroll !== undefined) {
+        const solids = staticSolidsForNpc(npc.id);
+        const waypoints = npc.stroll.waypoints;
+        for (let index = 0; index < waypoints.length; index += 1) {
+          const current = waypoints[index];
+          const next = waypoints[(index + 1) % waypoints.length];
+          if (current === undefined || next === undefined) continue;
+          const midpoint = {
+            x: (current.x + next.x) / 2,
+            y: (current.y + next.y) / 2,
+          };
+          const samples: [string, Point][] = [
+            [`waypoint ${index}`, current],
+            [`segment ${index} midpoint`, midpoint],
+          ];
+          for (const [label, sample] of samples) {
+            if (!pointInPolygon(sample, area.walkable)) {
+              errors.push(`${area.id}: npc ${npc.id} stroll ${label} is outside walkable`);
+            } else if (solids.some((blocker) => pointInPolygon(sample, blocker))) {
+              errors.push(`${area.id}: npc ${npc.id} stroll ${label} hits a solid blocker`);
+            }
+          }
+          const waypointReachable = reachable.some((point) => {
+            const dx = point.x - current.x;
+            const dy = point.y - current.y;
+            return dx * dx + dy * dy <= range * range;
+          });
+          if (!waypointReachable) {
+            errors.push(`${area.id}: npc ${npc.id} stroll waypoint ${index} is unreachable`);
+          }
+        }
+      }
     }
     for (const critter of area.critters) {
       const config = critter.id;

@@ -4256,6 +4256,39 @@
           "text": "Wait till Milo joins our next hangout!"
         }
       ]
+    },
+    {
+      "id": "party-summit-vista",
+      "area": "summit",
+      "tone": "banter",
+      "turns": [
+        {
+          "speaker": "sue",
+          "text": "Look! Bubblegum Bay sparkles way down there!"
+        },
+        {
+          "speaker": "jordan",
+          "text": "And Cloverhollow looks like a toy town!"
+        }
+      ]
+    },
+    {
+      "id": "party-summit-celebration",
+      "area": "summit",
+      "tone": "warm",
+      "when": {
+        "calmed": "hooded-kid"
+      },
+      "turns": [
+        {
+          "speaker": "jordan",
+          "text": "Wait till Milo sees this peak view with us!"
+        },
+        {
+          "speaker": "sue",
+          "text": "Every hill from here to the bay feels calm!"
+        }
+      ]
     }
   ],
   "toolEvents": [
@@ -4367,6 +4400,23 @@
         {
           "speaker": "coach",
           "text": "Look at that rainbow lasso form, Fae!"
+        }
+      ]
+    },
+    {
+      "id": "summit-aurora-lantern",
+      "area": "summit",
+      "trigger": "lantern",
+      "radius": 420,
+      "tone": "lantern",
+      "turns": [
+        {
+          "speaker": "jordan",
+          "text": "Whoa! The summit cairn runes are glowing!"
+        },
+        {
+          "speaker": "sue",
+          "text": "Like a purple ribbon right across the peaks!"
         }
       ]
     }

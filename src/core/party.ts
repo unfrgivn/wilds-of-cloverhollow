@@ -12,6 +12,7 @@ import type {
 } from "./types";
 import { distance, distanceToPolygon, pointInPolygon, resolveMove } from "./geometry";
 import { levelForXp } from "./levels";
+import { npcLivePoint } from "./npc-stroll";
 import { sceneryArea } from "./props";
 
 // Fae's feet-anchored body box (spec 5): what her followers hide behind.
@@ -605,7 +606,10 @@ export function syncParty(world: World, state: State): State {
         box: partyContent(world, member.id).box,
       })),
     ];
-    const point = critter ?? person?.point ??
+    const personPoint = person === undefined ? undefined : npcLivePoint(state, person);
+    const point = critter ?? (personPoint === undefined
+      ? undefined
+      : { x: personPoint.x, y: personPoint.y }) ??
       visibleFollowerSlot(
         sceneryArea(world, state.ink, area),
         leader,

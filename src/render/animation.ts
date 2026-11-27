@@ -1,4 +1,5 @@
 import {
+  npcLivePoint,
   npcVisible,
   presentCritters,
   type Direction,
@@ -24,7 +25,10 @@ export function dialoguePartner(world: World, state: State): Point | null {
   const knot = state.dialogue.knot;
   const area = world.areas[state.area];
   const npc = area?.npcs.find((item) => npcVisible(world, state, item) && item.knot === knot);
-  if (npc !== undefined) return npc.point;
+  if (npc !== undefined) {
+    const live = npcLivePoint(state, npc);
+    return { x: live.x, y: live.y };
+  }
   const calm = presentCritters(world, state)
     .filter((item) => item.mood === "calm" && item.kind.calmKnot === knot)
     .sort((a, b) =>

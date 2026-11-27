@@ -60,6 +60,7 @@ import {
   type TextSpeed,
 } from "./battle";
 import { levelUpDelta } from "./levels";
+import { npcLiveFootprint, npcLivePoint } from "./npc-stroll";
 import { openArcade, stepArcade, isArcadeGameId, type ArcadeGameId } from "./arcade";
 
 export {
@@ -217,12 +218,15 @@ export function targetInteractable(
     }));
   const people = area.npcs
     .filter((npc) => npcVisible(world, state, npc))
-    .map((npc) => ({
-      id: `npc:${npc.id}`,
-      knot: npc.knot,
-      point: npc.point,
-      prompt: npc.prompt,
-    }));
+    .map((npc) => {
+      const live = npcLivePoint(state, npc);
+      return {
+        id: `npc:${npc.id}`,
+        knot: npc.knot,
+        point: { x: live.x, y: live.y },
+        prompt: npc.prompt,
+      };
+    });
   const glows = state.lantern
     ? area.glows.filter((glow): glow is Area["glows"][number] & { knot: string } =>
       glow.knot !== undefined).map((glow) => ({ ...glow, id: `glow:${glow.id}` }))
@@ -250,18 +254,20 @@ function solidArea(world: World, state: State, area: Area): Area {
       ...scenery.blockers,
       ...area.npcs
         .filter((npc) => npcVisible(world, state, npc))
-        .map((npc) => npc.footprint),
+        .map((npc) => npcLiveFootprint(npc, npcLivePoint(state, npc))),
     ],
   };
 }
 
 // Which way a person in the area looks: toward Fae while she talks to them
-// (along the larger axis of the gap between them), otherwise as authored.
+// (along the larger axis of the gap between them), otherwise along their live
+// stroll facing (or as authored when stationary).
 export function npcFacing(state: State, npc: Npc): Direction {
+  const live = npcLivePoint(state, npc);
   if (state.dialogue === null || state.dialogue.knot !== npc.knot)
-    return npc.facing;
-  const dx = state.player.x - npc.point.x;
-  const dy = state.player.y - npc.point.y;
+    return live.facing;
+  const dx = state.player.x - live.x;
+  const dy = state.player.y - live.y;
   if (Math.abs(dx) > Math.abs(dy)) return dx > 0 ? "right" : "left";
   return dy > 0 ? "down" : "up";
 }
@@ -278,6 +284,7 @@ function dialogueState(
   result: ReturnType<typeof runInk>,
   carried?: { area: string; spawn: string },
   carriedPlay?: { game: ArcadeGameId; price: number },
+  carriedPartnerPoint?: Point,
 ): State["dialogue"] {
   const tag = result.line?.tags.find((item) => item.startsWith("travel:"));
   const play = result.line?.tags.map((item) =>
@@ -305,6 +312,7 @@ function dialogueState(
     ...(playValue === undefined ? {} : { play: playValue }),
     ...(ending ? { ending: true } : {}),
     ...(credits ? { credits: true } : {}),
+    ...(carriedPartnerPoint === undefined ? {} : { partnerPoint: carriedPartnerPoint }),
   };
 }
 
@@ -355,12 +363,22 @@ function afterArrival(world: World, state: State): State {
 // Its opening line's item tags act at once (spec 7).
 function openTalk(world: World, state: State, input: ActionFrame, knot: string): State {
   const result = runInk(world.story, state.ink, { type: "start", knot }, inkFacts(world, state));
+  const area = world.areas[state.area];
+  const partnerNpc = area?.npcs.find(
+    (npc) => npc.knot === knot && npc.stroll !== undefined && npcVisible(world, state, npc),
+  );
+  const partnerPoint = partnerNpc === undefined
+    ? undefined
+    : (() => {
+        const live = npcLivePoint(state, partnerNpc);
+        return { x: live.x, y: live.y };
+      })();
   return applyItemTags({
     ...state,
     tick: state.tick + 1,
     ink: result.ink,
     previousInput: { ...input },
-    dialogue: dialogueState(knot, result),
+    dialogue: dialogueState(knot, result, undefined, undefined, partnerPoint),
     motion: { ...state.motion, moving: false },
     party: haltedParty(state.party),
   }, result.line?.tags ?? []);
@@ -477,7 +495,13 @@ function dialogueStep(
     );
     const following = result.line === null && result.choices.length === 0
       ? null
-      : dialogueState(dialogue.knot, result, dialogue.travel, dialogue.play);
+      : dialogueState(
+          dialogue.knot,
+          result,
+          dialogue.travel,
+          dialogue.play,
+          dialogue.partnerPoint,
+        );
     const advanced = applyItemTags({ ...next, ink: result.ink }, result.line?.tags ?? []);
     return following === null
       ? closeDialogue(world, advanced)
@@ -500,7 +524,13 @@ function dialogueStep(
     );
     const following = result.line === null && result.choices.length === 0
       ? null
-      : dialogueState(dialogue.knot, result, dialogue.travel, dialogue.play);
+      : dialogueState(
+          dialogue.knot,
+          result,
+          dialogue.travel,
+          dialogue.play,
+          dialogue.partnerPoint,
+        );
     const advanced = applyItemTags({ ...next, ink: result.ink }, result.line?.tags ?? []);
     return following === null
       ? closeDialogue(world, advanced)

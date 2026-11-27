@@ -8,21 +8,35 @@ import {
   inkFacts,
   journalNotes,
   matchesNpcCondition,
+  npcFacing,
+  npcLiveFootprint,
+  npcLivePoint,
+  npcStrollAt,
+  npcStrollCycleTicks,
   npcVisible,
   npcWorldSituation,
+  pointInPolygon,
   reactionRippleTicks,
   runInk,
   setInkVariables,
   startDialogue,
   step,
+  targetInteractable,
   type ActionFrame,
   type NpcAttention,
   type NpcEmoteKind,
   type NpcLifeMemory,
   type NpcPersonality,
+  type NpcStroll,
   type State,
 } from "../../src/core";
-import { loadContent, npcScheduleErrors, parseNpcProfiles } from "../../src/content/load";
+import {
+  loadContent,
+  npcScheduleErrors,
+  parseNpcProfiles,
+  parseNpcStroll,
+} from "../../src/content/load";
+import { areaConnectionErrors } from "../../src/content/area-checks";
 import { voiceForSpeaker } from "../../src/platform/voices";
 import { speakerAccent, speakerPortraitSource } from "../../src/ui/portraits";
 import { npcLivingPose } from "../../src/render/motion";
@@ -1710,5 +1724,259 @@ describe("Party companion banter and interactive tool micro-events (Milestone 14
     const calmForestLife = evaluateNpcLife(world, calmForest, settledMemory);
     expect(calmForestLife.chatter?.npcId).toBe("jordan");
     expect(calmForestLife.chatter?.text).toContain("Milo");
+  });
+});
+
+describe("Kinetic Strolling NPCs & Alpine Summit Living Support (Milestone 151)", () => {
+  it("computes deterministic periodic npcStrollAt poses, pauses, facings, and distances", () => {
+    const stroll: NpcStroll = {
+      waypoints: [
+        { x: 100, y: 200 },
+        { x: 160, y: 200 },
+        { x: 160, y: 140 },
+      ],
+      speed: 1,
+      pauseTicks: 60,
+    };
+    // Segment 0: 60u right (60 ticks), Segment 1: 60u up (60 ticks),
+    // Segment 2: sqrt(7200) ~= 84.85u (85 ticks, dx=-60, dy=60 -> left).
+    const cycle = npcStrollCycleTicks(stroll);
+    expect(cycle).toBe(60 + 60 + 60 + 60 + 60 + 85);
+
+    // Pause at waypoints[0] holds position & facing "down" for ticks 0..59.
+    expect(npcStrollAt(stroll, 0)).toEqual({
+      x: 100, y: 200, facing: "down", moving: false, distance: 0,
+    });
+    expect(npcStrollAt(stroll, 59)).toEqual({
+      x: 100, y: 200, facing: "down", moving: false, distance: 0,
+    });
+
+    // Tick 60 begins linear glide right; tick 89 is halfway; tick 119 arrives at (160, 200).
+    const step1 = npcStrollAt(stroll, 60);
+    expect(step1.moving).toBe(true);
+    expect(step1.facing).toBe("right");
+    expect(step1.x).toBeCloseTo(101, 6);
+    expect(step1.y).toBe(200);
+    expect(step1.distance).toBeCloseTo(1, 6);
+
+    const endSeg0 = npcStrollAt(stroll, 119);
+    expect(endSeg0.moving).toBe(true);
+    expect(endSeg0.x).toBeCloseTo(160, 6);
+    expect(endSeg0.y).toBe(200);
+    expect(endSeg0.distance).toBeCloseTo(60, 6);
+
+    // Pause at waypoints[1] holds incoming segment facing ("right").
+    const pause1 = npcStrollAt(stroll, 120);
+    expect(pause1).toEqual({
+      x: 160, y: 200, facing: "right", moving: false, distance: 60,
+    });
+
+    // Segment 1 moves up and accumulates distance smoothly past 60.
+    const upMid = npcStrollAt(stroll, 209);
+    expect(upMid.moving).toBe(true);
+    expect(upMid.facing).toBe("up");
+    expect(upMid.x).toBe(160);
+    expect(upMid.y).toBeCloseTo(170, 6);
+    expect(upMid.distance).toBeCloseTo(90, 6);
+
+    // Pause at waypoints[2] holds incoming facing ("up").
+    expect(npcStrollAt(stroll, 240)).toMatchObject({
+      x: 160, y: 140, facing: "up", moving: false,
+    });
+
+    // Exact periodicity over full cycle.
+    for (const sample of [0, 35, 60, 119, 150, 210, 320]) {
+      expect(npcStrollAt(stroll, sample + cycle)).toEqual(npcStrollAt(stroll, sample));
+      expect(npcStrollAt(stroll, sample + cycle * 3)).toEqual(npcStrollAt(stroll, sample));
+    }
+  });
+
+  it("freezes strolling NPCs during multi-line dialogue and translates live footprints", () => {
+    const sunny = findNpc("hills", "sunny");
+    expect(sunny.stroll).toBeDefined();
+    if (sunny.stroll === undefined) throw new Error("Expected sunny.stroll");
+
+    // Step past Sunny's pauseTicks so she is mid-stroll away from waypoints[0].
+    const base = makeState("hills", "park");
+    const midTick = sunny.stroll.pauseTicks + 35;
+    const midPose = npcStrollAt(sunny.stroll, midTick);
+    expect(midPose.moving).toBe(true);
+    expect(midPose.x).toBeGreaterThan(sunny.point.x + 15);
+
+    const nearSunny: State = {
+      ...base,
+      tick: midTick,
+      wild: [],
+      player: { x: midPose.x, y: midPose.y + 42 },
+      facing: "up",
+    };
+    expect(targetInteractable(world, nearSunny)?.id).toBe("npc:sunny");
+
+    // Live footprint translates cleanly with Sunny's live position.
+    const liveFootprint = npcLiveFootprint(sunny, midPose);
+    expect(pointInPolygon(midPose, liveFootprint)).toBe(true);
+    expect(pointInPolygon(sunny.point, liveFootprint)).toBe(false);
+
+    // Starting dialogue pins partnerPoint so Sunny stays frozen across ticks and lines.
+    const opened = step(world, nearSunny, { ...none, confirm: true }).state;
+    expect(opened.dialogue?.knot).toBe("npc_sunny");
+    expect(opened.dialogue?.partnerPoint).toEqual({ x: midPose.x, y: midPose.y });
+    expect(npcLivePoint(opened, sunny)).toMatchObject({
+      x: midPose.x,
+      y: midPose.y,
+      moving: false,
+    });
+    expect(npcFacing(opened, sunny)).toBe("down");
+
+    let talking = opened;
+    for (let i = 0; i < 45; i += 1) {
+      talking = step(world, talking, none).state;
+    }
+    expect(talking.dialogue?.partnerPoint).toEqual({ x: midPose.x, y: midPose.y });
+    expect(npcLivePoint(talking, sunny)).toMatchObject({
+      x: midPose.x,
+      y: midPose.y,
+      moving: false,
+    });
+
+    // Idle evaluateNpcLife preserves travel facing while moving.
+    const farState: State = {
+      ...base,
+      tick: midTick,
+      wild: [],
+      player: { x: 180, y: 650 },
+    };
+    const farLife = evaluateNpcLife(world, farState, settledMemory);
+    const sunnyEntry = farLife.npcs.find((entry) => entry.id === "sunny");
+    expect(sunnyEntry?.moving).toBe(true);
+    expect(sunnyEntry?.attention).toBe("idle");
+    expect(sunnyEntry?.facing).toBe(midPose.facing);
+    expect(sunnyEntry?.x).toBeCloseTo(midPose.x, 6);
+    expect(sunnyEntry?.y).toBeCloseTo(midPose.y, 6);
+
+    // Zero-move gentle push prevents a strolling NPC from clipping through stationary Fae.
+    const overlapped: State = {
+      ...base,
+      tick: midTick,
+      wild: [],
+      player: { x: midPose.x, y: midPose.y },
+    };
+    const pushed = step(world, overlapped, none).state;
+    expect(pointInPolygon(pushed.player, npcLiveFootprint(sunny, midPose))).toBe(false);
+  });
+
+  it("validates stroll schemas strictly and confirms all 7 strolling NPCs pass area checks", () => {
+    const home = { x: 100, y: 200 };
+    expect(parseNpcStroll(undefined, home, "test.json", "stroll")).toBeUndefined();
+    expect(
+      parseNpcStroll(
+        { waypoints: [home, { x: 140, y: 200 }], speed: 0.65, pauseTicks: 180 },
+        home,
+        "test.json",
+        "stroll",
+      ),
+    ).toEqual({ waypoints: [home, { x: 140, y: 200 }], speed: 0.65, pauseTicks: 180 });
+
+    expect(() =>
+      parseNpcStroll({ waypoints: [home], speed: 0.6, pauseTicks: 120 }, home, "t.json", "stroll"),
+    ).toThrow(/waypoints/);
+    expect(() =>
+      parseNpcStroll(
+        { waypoints: [{ x: 105, y: 200 }, { x: 140, y: 200 }], speed: 0.6, pauseTicks: 120 },
+        home,
+        "t.json",
+        "stroll",
+      ),
+    ).toThrow(/must match npc\.point/);
+    expect(() =>
+      parseNpcStroll(
+        { waypoints: [home, { x: 140, y: 200 }], speed: 0, pauseTicks: 120 },
+        home,
+        "t.json",
+        "stroll",
+      ),
+    ).toThrow(/speed/);
+    expect(() =>
+      parseNpcStroll(
+        { waypoints: [home, { x: 140, y: 200 }], speed: 2.5, pauseTicks: 120 },
+        home,
+        "t.json",
+        "stroll",
+      ),
+    ).toThrow(/speed/);
+    expect(() =>
+      parseNpcStroll(
+        { waypoints: [home, { x: 140, y: 200 }], speed: 0.6, pauseTicks: 29 },
+        home,
+        "t.json",
+        "stroll",
+      ),
+    ).toThrow(/pauseTicks/);
+
+    const strollingIds = [
+      ["bay", "sal"],
+      ["bay", "nora"],
+      ["hills", "sunny"],
+      ["hills", "bram"],
+      ["pass", "tuck"],
+      ["woods", "wren"],
+      ["field", "leo"],
+    ] as const;
+    for (const [areaId, npcId] of strollingIds) {
+      expect(findNpc(areaId, npcId).stroll, `${areaId}.${npcId}`).toBeDefined();
+    }
+    expect(
+      areaConnectionErrors(world.areas, world.tunables, world.critters, world.party),
+    ).toEqual([]);
+  });
+
+  it("supports Alpine Summit Overlook partyBanter and summit-aurora-lantern toolEvent", () => {
+    const summitBase = makeState("summit", "lift-top", { has_lantern: true }, [
+      "maddie",
+      "sue",
+      "jordan",
+    ]);
+
+    // Pre-finale summit party banter: Sue -> Jordan, zero Milo spoilers.
+    const vistaTurn0 = evaluateNpcLife(world, { ...summitBase, tick: 30 }, settledMemory);
+    expect(vistaTurn0.chatter?.npcId).toBe("sue");
+    expect(vistaTurn0.chatter?.text).toContain("Bubblegum Bay");
+    expect(vistaTurn0.chatter?.text).not.toMatch(/\bmilo\b/i);
+
+    const vistaTurn1 = evaluateNpcLife(world, { ...summitBase, tick: 150 }, settledMemory);
+    expect(vistaTurn1.chatter?.npcId).toBe("jordan");
+    expect(vistaTurn1.chatter?.text).toContain("Cloverhollow");
+    expect(vistaTurn1.chatter?.text).not.toMatch(/\bmilo\b/i);
+
+    // Post-finale summit celebration banter unlocks when hooded-kid is calmed.
+    const summitCalm: State = {
+      ...summitBase,
+      tick: 390,
+      critters: { ...summitBase.critters, "hooded-kid": "calm" },
+    };
+    const celebTurn0 = evaluateNpcLife(world, summitCalm, settledMemory);
+    expect(celebTurn0.chatter?.npcId).toBe("jordan");
+    expect(celebTurn0.chatter?.tone).toBe("warm");
+    expect(celebTurn0.chatter?.text).toContain("Milo");
+
+    // Summit aurora lantern tool micro-event (Jordan -> Sue) works with party-only speakers!
+    const lanternTurn0 = evaluateNpcLife(
+      world,
+      { ...summitBase, tick: 24, lantern: true },
+      { ...settledMemory, areaTicks: 8, lanternOnTick: 2 },
+    );
+    expect(lanternTurn0.activeToolEventId).toBe("summit-aurora-lantern");
+    expect(lanternTurn0.chatter?.npcId).toBe("jordan");
+    expect(lanternTurn0.chatter?.tone).toBe("lantern");
+    expect(lanternTurn0.chatter?.text).toBe("Whoa! The summit cairn runes are glowing!");
+
+    const lanternTurn1 = evaluateNpcLife(
+      world,
+      { ...summitBase, tick: 120, lantern: true },
+      { ...settledMemory, areaTicks: 8, lanternOnTick: 2 },
+    );
+    expect(lanternTurn1.activeToolEventId).toBe("summit-aurora-lantern");
+    expect(lanternTurn1.chatter?.npcId).toBe("sue");
+    expect(lanternTurn1.chatter?.text).toBe("Like a purple ribbon right across the peaks!");
   });
 });

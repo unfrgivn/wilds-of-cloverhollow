@@ -517,6 +517,32 @@ export function spawnFootstepPuffs(
   ];
 }
 
+export function spawnNpcFootstepPuff(
+  pos: Point,
+  facing: Direction,
+  surface: Surface,
+  stride: number,
+  tick: number,
+): FootstepPuff {
+  const style = SURFACE_PUFFS[surface];
+  const back = facingBackVector(facing);
+  const side = stride % 2 === 0 ? 1 : -1;
+  const perpX = -back.y;
+  const perpY = back.x;
+  return {
+    x: pos.x + back.x * 7 + perpX * side * 5,
+    y: pos.y - 1 + back.y * 4 + perpY * side * 2.5,
+    vx: back.x * 0.32 + perpX * side * 0.18,
+    vy: back.y * 0.18 - 0.25,
+    bornTick: tick,
+    life: 16,
+    tint: style.tint,
+    baseAlpha: style.alpha * 0.72,
+    baseScale: 0.19,
+    rotation: (stride * 0.9 + 0.5) % (Math.PI * 2),
+  };
+}
+
 export function computeLanternMote(
   index: number,
   count: number,

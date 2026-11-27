@@ -25,6 +25,7 @@ import {
   type PartyBanterOutcome,
   type PartyLifeEntry,
 } from "./npc-events";
+import { npcLivePoint } from "./npc-stroll";
 import {
   bossesCalmedCount,
   calmedFact,
@@ -64,6 +65,7 @@ export type NpcLifeEntry = {
   x: number;
   y: number;
   facing: Direction;
+  moving: boolean;
   attention: NpcAttention;
   personality: NpcPersonality;
   adult: boolean;
@@ -186,7 +188,14 @@ export function matchesNpcCondition(
   memory: NpcLifeMemory,
   condition: NpcCondition | undefined,
 ): boolean {
-  return matchesConditionAt(world, state, situation, npc.point, memory, condition);
+  return matchesConditionAt(
+    world,
+    state,
+    situation,
+    npcLivePoint(state, npc),
+    memory,
+    condition,
+  );
 }
 
 type ActiveBanter = {
@@ -213,14 +222,16 @@ function selectActiveBanter(
     const second = byId.get(pair.speakers[1]);
     if (first === undefined || second === undefined) continue;
     if (!matchesNpcCondition(world, state, situation, first, memory, pair.when)) continue;
+    const firstLive = npcLivePoint(state, first);
+    const secondLive = npcLivePoint(state, second);
     const mid = {
-      x: (first.point.x + second.point.x) / 2,
-      y: (first.point.y + second.point.y) / 2,
+      x: (firstLive.x + secondLive.x) / 2,
+      y: (firstLive.y + secondLive.y) / 2,
     };
     const range = Math.min(
       dist(state.player, mid),
-      dist(state.player, first.point),
-      dist(state.player, second.point),
+      dist(state.player, firstLive),
+      dist(state.player, secondLive),
     );
     if (range <= BANTER_RANGE) eligible.push({ pair, first, second, range });
   }
@@ -310,11 +321,15 @@ function evaluateChatter(
     return empty;
 
   const byNearest = visibleNpcs
-    .map((npc) => ({
-      npc,
-      profile: profileForNpc(world, npc),
-      gap: dist(state.player, npc.point),
-    }))
+    .map((npc) => {
+      const live = npcLivePoint(state, npc);
+      return {
+        npc,
+        live,
+        profile: profileForNpc(world, npc),
+        gap: dist(state.player, live),
+      };
+    })
     .sort((a, b) => a.gap - b.gap);
 
   // 1a. Interactive Lantern tool micro-event (high priority, bypasses arrival grace).
@@ -348,7 +363,7 @@ function evaluateChatter(
       if (rule !== undefined) {
         return {
           chatter: makeNpcBubble(
-            item.npc, item.profile, rule.text, "lantern", rule.emote ?? "sparkle",
+            item.npc, item.live, item.profile, rule.text, "lantern", rule.emote ?? "sparkle",
             (state.tick % 120) / 120, 1,
           ),
           activeToolEvent: null,
@@ -371,7 +386,7 @@ function evaluateChatter(
       if (rule !== undefined) {
         return {
           chatter: makeNpcBubble(
-            item.npc, item.profile, rule.text, "warm", rule.emote ?? "heart",
+            item.npc, item.live, item.profile, rule.text, "warm", rule.emote ?? "heart",
             elapsed / JUST_CALMED_WINDOW,
             envelopeAlpha(elapsed, JUST_CALMED_WINDOW),
           ),
@@ -410,7 +425,7 @@ function evaluateChatter(
       if (rule !== undefined) {
         return {
           chatter: makeNpcBubble(
-            item.npc, item.profile, rule.text, "music", rule.emote ?? "note",
+            item.npc, item.live, item.profile, rule.text, "music", rule.emote ?? "note",
             elapsed / RECENT_FLUTE_WINDOW,
             envelopeAlpha(elapsed, RECENT_FLUTE_WINDOW),
           ),
@@ -428,7 +443,7 @@ function evaluateChatter(
       for (const item of byNearest) {
         if (item.gap > CHAOS_CHATTER_RANGE) break;
         const nearChaos = chaos.some(
-          (critter) => dist(item.npc.point, critter.point) <= CHAOS_NPC_RANGE,
+          (critter) => dist(item.live, critter.point) <= CHAOS_NPC_RANGE,
         );
         if (!nearChaos) continue;
         const rule = bestMatchingRule(
@@ -438,7 +453,7 @@ function evaluateChatter(
         if (rule !== undefined) {
           return {
             chatter: makeNpcBubble(
-              item.npc, item.profile, rule.text, "worry", rule.emote ?? "worry",
+              item.npc, item.live, item.profile, rule.text, "worry", rule.emote ?? "worry",
               phase / WORRY_ON_TICKS,
               envelopeAlpha(phase, WORRY_ON_TICKS),
             ),
@@ -477,7 +492,7 @@ function evaluateChatter(
         if (rule !== undefined) {
           return {
             chatter: makeNpcBubble(
-              item.npc, item.profile, rule.text, "warm", rule.emote ?? "heart",
+              item.npc, item.live, item.profile, rule.text, "warm", rule.emote ?? "heart",
               phase / PARTY_ON_TICKS,
               envelopeAlpha(phase, PARTY_ON_TICKS),
             ),
@@ -493,6 +508,7 @@ function evaluateChatter(
   if (banter !== null && banter.phase < BANTER_SECOND_END) {
     if (banter.speakerIndex === null) return empty;
     const speaker = banter.speakerIndex === 0 ? banter.first : banter.second;
+    const speakerLive = npcLivePoint(state, speaker);
     const profile = profileForNpc(world, speaker);
     const text = banter.pair.lines[banter.speakerIndex];
     const local = banter.speakerIndex === 0
@@ -500,7 +516,7 @@ function evaluateChatter(
       : banter.phase - BANTER_SECOND_START;
     return {
       chatter: makeNpcBubble(
-        speaker, profile, text, "banter", "note",
+        speaker, speakerLive, profile, text, "banter", "note",
         local / BANTER_SPEAK_TICKS,
         envelopeAlpha(local, BANTER_SPEAK_TICKS),
       ),
@@ -545,7 +561,7 @@ function evaluateChatter(
             : "normal";
         return {
           chatter: makeNpcBubble(
-            item.npc, item.profile, rule.text, tone, rule.emote ?? null,
+            item.npc, item.live, item.profile, rule.text, tone, rule.emote ?? null,
             phase / AMBIENT_ON_TICKS,
             envelopeAlpha(phase, AMBIENT_ON_TICKS),
           ),
@@ -594,24 +610,39 @@ export function evaluateNpcLife(
 
   const npcs: NpcLifeEntry[] = visibleNpcs.map((npc) => {
     const profile = profileForNpc(world, npc);
-    const playerGap = dist(state.player, npc.point);
+    const live = npcLivePoint(state, npc);
+    const playerGap = dist(state.player, live);
     const ripple = reactionRippleTicks(playerGap);
     const inDialogue = state.dialogue !== null && state.dialogue.knot === npc.knot;
     const inActiveTool = activeTool !== null && toolSpeakerIds.has(npc.id);
+    const makeEntry = (
+      facing: Direction,
+      attention: NpcAttention,
+      emote: NpcEmoteKind | null,
+      attentionStrength: number,
+      focusTarget: Point | null,
+    ): NpcLifeEntry => ({
+      id: npc.id,
+      x: live.x,
+      y: live.y,
+      facing,
+      moving: live.moving,
+      attention,
+      personality: profile.personality,
+      adult: profile.adult,
+      emote,
+      attentionStrength,
+      focusTarget,
+    });
 
     if (inDialogue) {
-      return {
-        id: npc.id,
-        x: npc.point.x,
-        y: npc.point.y,
-        facing: npcFacing(state, npc),
-        attention: "dialogue",
-        personality: profile.personality,
-        adult: profile.adult,
-        emote: null,
-        attentionStrength: 1,
-        focusTarget: { x: state.player.x, y: state.player.y },
-      };
+      return makeEntry(
+        npcFacing(state, npc),
+        "dialogue",
+        null,
+        1,
+        { x: state.player.x, y: state.player.y },
+      );
     }
 
     const lanternReady =
@@ -624,18 +655,13 @@ export function evaluateNpcLife(
       const range = inActiveTool && activeTool !== null
         ? Math.max(LANTERN_RANGE, activeTool.radius)
         : LANTERN_RANGE;
-      return {
-        id: npc.id,
-        x: npc.point.x,
-        y: npc.point.y,
-        facing: facingToward(npc.point, state.player, npc.facing),
-        attention: "lantern-awe",
-        personality: profile.personality,
-        adult: profile.adult,
-        emote: "sparkle",
-        attentionStrength: clamp01(1 - playerGap / (range + 25)),
-        focusTarget: { x: state.player.x, y: state.player.y },
-      };
+      return makeEntry(
+        facingToward(live, state.player, live.facing),
+        "lantern-awe",
+        "sparkle",
+        clamp01(1 - playerGap / (range + 25)),
+        { x: state.player.x, y: state.player.y },
+      );
     }
 
     if (
@@ -644,18 +670,13 @@ export function evaluateNpcLife(
       playerGap <= CELEBRATE_RANGE &&
       state.tick - memory.lastCalmedTick >= ripple
     ) {
-      return {
-        id: npc.id,
-        x: npc.point.x,
-        y: npc.point.y,
-        facing: facingToward(npc.point, state.player, npc.facing),
-        attention: "celebrate",
-        personality: profile.personality,
-        adult: profile.adult,
-        emote: celebrationEmoteFor(profile.personality),
-        attentionStrength: clamp01(1 - playerGap / (CELEBRATE_RANGE + 30)),
-        focusTarget: { x: state.player.x, y: state.player.y },
-      };
+      return makeEntry(
+        facingToward(live, state.player, live.facing),
+        "celebrate",
+        celebrationEmoteFor(profile.personality),
+        clamp01(1 - playerGap / (CELEBRATE_RANGE + 30)),
+        { x: state.player.x, y: state.player.y },
+      );
     }
 
     if (
@@ -666,84 +687,53 @@ export function evaluateNpcLife(
       const range = inActiveTool && activeTool !== null
         ? Math.max(FLUTE_RANGE, activeTool.radius)
         : FLUTE_RANGE;
-      return {
-        id: npc.id,
-        x: npc.point.x,
-        y: npc.point.y,
-        facing: facingToward(npc.point, state.player, npc.facing),
-        attention: "music-delight",
-        personality: profile.personality,
-        adult: profile.adult,
-        emote: "note",
-        attentionStrength: clamp01(1 - playerGap / (range + 30)),
-        focusTarget: { x: state.player.x, y: state.player.y },
-      };
+      return makeEntry(
+        facingToward(live, state.player, live.facing),
+        "music-delight",
+        "note",
+        clamp01(1 - playerGap / (range + 30)),
+        { x: state.player.x, y: state.player.y },
+      );
     }
 
     const grace = npc.id === "mom" ? IDLE_LOOK_GRACE_TICKS : ARRIVAL_GRACE_TICKS;
     if (memory.areaTicks < grace) {
-      return {
-        id: npc.id,
-        x: npc.point.x,
-        y: npc.point.y,
-        facing: npc.facing,
-        attention: "idle",
-        personality: profile.personality,
-        adult: profile.adult,
-        emote: null,
-        attentionStrength: 0,
-        focusTarget: null,
-      };
+      return makeEntry(live.facing, "idle", null, 0, null);
     }
 
-    const nearChaos = nearestCritterTo(chaos, npc.point);
+    const nearChaos = nearestCritterTo(chaos, live);
     if (nearChaos !== null) {
-      const chaosGap = dist(npc.point, nearChaos.point);
+      const chaosGap = dist(live, nearChaos.point);
       if (chaosGap <= CHAOS_NPC_RANGE) {
-        return {
-          id: npc.id,
-          x: npc.point.x,
-          y: npc.point.y,
-          facing: facingToward(npc.point, nearChaos.point, npc.facing),
-          attention: "chaos-worry",
-          personality: profile.personality,
-          adult: profile.adult,
-          emote: "worry",
-          attentionStrength: clamp01(1 - chaosGap / (CHAOS_NPC_RANGE + 20)),
-          focusTarget: { x: nearChaos.point.x, y: nearChaos.point.y },
-        };
+        return makeEntry(
+          facingToward(live, nearChaos.point, live.facing),
+          "chaos-worry",
+          "worry",
+          clamp01(1 - chaosGap / (CHAOS_NPC_RANGE + 20)),
+          { x: nearChaos.point.x, y: nearChaos.point.y },
+        );
       }
     }
 
     if (inActiveTool && activeTool !== null && activeTool.trigger === "lasso") {
-      return {
-        id: npc.id,
-        x: npc.point.x,
-        y: npc.point.y,
-        facing: facingToward(npc.point, state.player, npc.facing),
-        attention: "player-greet",
-        personality: profile.personality,
-        adult: profile.adult,
-        emote: "heart",
-        attentionStrength: clamp01(1 - playerGap / (activeTool.radius + 30)),
-        focusTarget: { x: state.player.x, y: state.player.y },
-      };
+      return makeEntry(
+        facingToward(live, state.player, live.facing),
+        "player-greet",
+        "heart",
+        clamp01(1 - playerGap / (activeTool.radius + 30)),
+        { x: state.player.x, y: state.player.y },
+      );
     }
 
     const hasFavCompanion = profile.favoriteParty.some((id) => situation.partyIds.includes(id));
     if (hasFavCompanion && playerGap <= profile.greetRange + 35) {
-      return {
-        id: npc.id,
-        x: npc.point.x,
-        y: npc.point.y,
-        facing: facingToward(npc.point, state.player, npc.facing),
-        attention: "companion-greet",
-        personality: profile.personality,
-        adult: profile.adult,
-        emote: "heart",
-        attentionStrength: clamp01(1 - playerGap / (profile.greetRange + 55)),
-        focusTarget: { x: state.player.x, y: state.player.y },
-      };
+      return makeEntry(
+        facingToward(live, state.player, live.facing),
+        "companion-greet",
+        "heart",
+        clamp01(1 - playerGap / (profile.greetRange + 55)),
+        { x: state.player.x, y: state.player.y },
+      );
     }
 
     const festiveFinale =
@@ -751,23 +741,19 @@ export function evaluateNpcLife(
     const festiveEmote = celebrationEmoteFor(profile.personality);
 
     if (playerGap <= profile.greetRange) {
-      return {
-        id: npc.id,
-        x: npc.point.x,
-        y: npc.point.y,
-        facing: facingToward(npc.point, state.player, npc.facing),
-        attention: "player-greet",
-        personality: profile.personality,
-        adult: profile.adult,
-        emote: state.dialogue === null ? (festiveFinale ? festiveEmote : "wave") : null,
-        attentionStrength: clamp01(1 - playerGap / (profile.greetRange + 25)),
-        focusTarget: { x: state.player.x, y: state.player.y },
-      };
+      return makeEntry(
+        facingToward(live, state.player, live.facing),
+        "player-greet",
+        state.dialogue === null ? (festiveFinale ? festiveEmote : "wave") : null,
+        clamp01(1 - playerGap / (profile.greetRange + 25)),
+        { x: state.player.x, y: state.player.y },
+      );
     }
 
     if (banter !== null && banter.phase < BANTER_SECOND_END &&
         (banter.first.id === npc.id || banter.second.id === npc.id)) {
       const partner = banter.first.id === npc.id ? banter.second : banter.first;
+      const partnerLive = npcLivePoint(state, partner);
       const isSpeaker =
         (banter.speakerIndex === 0 && banter.first.id === npc.id) ||
         (banter.speakerIndex === 1 && banter.second.id === npc.id);
@@ -777,35 +763,27 @@ export function evaluateNpcLife(
             ? "note"
             : "heart"
           : null;
-      return {
-        id: npc.id,
-        x: npc.point.x,
-        y: npc.point.y,
-        facing: facingToward(npc.point, partner.point, npc.facing),
-        attention: "social-chat",
-        personality: profile.personality,
-        adult: profile.adult,
-        emote: isSpeaker ? "note" : listenerEmote,
-        attentionStrength: isSpeaker ? 0.85 : 0.55,
-        focusTarget: { x: partner.point.x, y: partner.point.y },
-      };
+      return makeEntry(
+        facingToward(live, partnerLive, live.facing),
+        "social-chat",
+        isSpeaker ? "note" : listenerEmote,
+        isSpeaker ? 0.85 : 0.55,
+        { x: partnerLive.x, y: partnerLive.y },
+      );
     }
 
-    const facing = memory.areaTicks >= IDLE_LOOK_GRACE_TICKS
-      ? idleLookDirection(npc, state.tick, profile.lookAroundTicks)
-      : npc.facing;
-    return {
-      id: npc.id,
-      x: npc.point.x,
-      y: npc.point.y,
+    const facing = live.moving
+      ? live.facing
+      : memory.areaTicks >= IDLE_LOOK_GRACE_TICKS
+        ? idleLookDirection(npc, state.tick, profile.lookAroundTicks)
+        : live.facing;
+    return makeEntry(
       facing,
-      attention: "idle",
-      personality: profile.personality,
-      adult: profile.adult,
-      emote: state.dialogue === null && festiveFinale ? festiveEmote : null,
-      attentionStrength: festiveFinale ? 0.35 : 0,
-      focusTarget: null,
-    };
+      "idle",
+      state.dialogue === null && festiveFinale ? festiveEmote : null,
+      festiveFinale ? 0.35 : 0,
+      null,
+    );
   });
 
   const party = evaluatePartyLife(world, state, memory, chatterResult.activePartyBanter);

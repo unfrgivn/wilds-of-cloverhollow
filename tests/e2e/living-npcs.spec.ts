@@ -725,3 +725,140 @@ test(
     expect(errors).toEqual([]);
   },
 );
+
+test(
+  "kinetic strolling NPCs walk smoothly along sunlit waypoints, freeze during dialogue, " +
+    "and calm under reduced motion",
+  { tag: "@smoke" },
+  async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+
+    await page.setViewportSize({ width: 1280, height: 720 });
+
+    // 1. Clover Hills (?qa=hills-lookout): Sunny & Bram rest at waypoints[0], then stroll smoothly.
+    await openQaPaused(page, "hills-lookout");
+    expect((await readState(page)).area).toBe("hills");
+    assertNpcsRendered((await renderInfo(page)).npcs, ["sunny", "bram"]);
+
+    const initialInfo = await renderInfo(page);
+    const sunnyStart = initialInfo.npcLife.npcs.find((n) => n.id === "sunny");
+    const bramStart = initialInfo.npcLife.npcs.find((n) => n.id === "bram");
+    expect(sunnyStart).toMatchObject({ x: 880, y: 280, moving: false });
+    expect(bramStart).toMatchObject({ x: 580, y: 420, moving: false });
+
+    // Step past both pauseTicks (175 / 195) into live strolling.
+    await step(page, 210);
+    const midInfo = await renderInfo(page);
+    const sunnyMid = midInfo.npcLife.npcs.find((n) => n.id === "sunny");
+    const bramMid = midInfo.npcLife.npcs.find((n) => n.id === "bram");
+    expect(sunnyMid?.moving).toBe(true);
+    expect(sunnyMid?.x).toBeGreaterThan(895);
+    expect(bramMid?.moving).toBe(true);
+    expect(bramMid?.x).toBeGreaterThan(585);
+
+    // Step further and verify smooth forward progression.
+    await step(page, 20);
+    const laterInfo = await renderInfo(page);
+    const sunnyLater = laterInfo.npcLife.npcs.find((n) => n.id === "sunny");
+    const bramLater = laterInfo.npcLife.npcs.find((n) => n.id === "bram");
+    expect(sunnyLater?.moving).toBe(true);
+    expect(sunnyLater?.x ?? 0).toBeGreaterThan(sunnyMid?.x ?? 0);
+    expect(bramLater?.moving).toBe(true);
+    expect(bramLater?.x ?? 0).toBeGreaterThan(bramMid?.x ?? 0);
+
+    // Toggle Reduced Motion ON: both strolling NPCs stay calmly paused at home with zero puffs.
+    await page.evaluate(() => {
+      window.__cloverhollow?.settings.setReducedMotion(true);
+    });
+    await step(page, 2);
+    const reducedInfo = await renderInfo(page);
+    expect(reducedInfo.npcLife.npcs.find((n) => n.id === "sunny")).toMatchObject({
+      x: 880,
+      y: 280,
+      moving: false,
+    });
+    expect(reducedInfo.npcLife.npcs.find((n) => n.id === "bram")).toMatchObject({
+      x: 580,
+      y: 420,
+      moving: false,
+    });
+    expect(reducedInfo.footstepPuffs).toBe(0);
+
+    // Toggle Reduced Motion back OFF and approach Sunny mid-stroll to verify dialogue freeze.
+    await page.evaluate(() => {
+      window.__cloverhollow?.settings.setReducedMotion(false);
+    });
+    await step(page, 2);
+    const resumedSunny = (await renderInfo(page)).npcLife.npcs.find((n) => n.id === "sunny");
+    expect(resumedSunny?.moving).toBe(true);
+
+    // Walk down and left to stand cleanly below Sunny's live strolling spot, face up, press Z.
+    await walk(page, "y", 320);
+    const liveBeforeTalk = (await renderInfo(page)).npcLife.npcs.find((n) => n.id === "sunny");
+    const targetX = Math.round(liveBeforeTalk?.x ?? 920);
+    await walk(page, "x", targetX);
+    await page.keyboard.down("ArrowUp");
+    await step(page, 2);
+    await page.keyboard.up("ArrowUp");
+    await step(page, 2);
+
+    await page.keyboard.press("z");
+    await step(page, 4);
+    const talkState = await readState(page);
+    expect(talkState.dialogue?.knot).toBe("npc_sunny");
+    expect(talkState.dialogue?.partnerPoint).toBeDefined();
+
+    const frozenInfo = await renderInfo(page);
+    const sunnyFrozen = frozenInfo.npcLife.npcs.find((n) => n.id === "sunny");
+    expect(sunnyFrozen?.moving).toBe(false);
+    const frozenX = sunnyFrozen?.x ?? 0;
+    const frozenY = sunnyFrozen?.y ?? 0;
+
+    // Step 30 ticks while talking: Sunny remains completely frozen in place.
+    await step(page, 30);
+    const stillFrozen = (await renderInfo(page)).npcLife.npcs.find((n) => n.id === "sunny");
+    expect(stillFrozen?.moving).toBe(false);
+    expect(stillFrozen?.x).toBe(frozenX);
+    expect(stillFrozen?.y).toBe(frozenY);
+    await finishDialogue(page);
+
+    // 2. Alpine Summit Overlook (summit): party banter & summit-aurora-lantern via real L key.
+    await openHarness(page);
+    await resetPaused(page, "summit");
+    expect((await readState(page)).area).toBe("summit");
+
+    const summitBanter = await stepUntilChatter(
+      page,
+      (bubble) => bubble.npcId === "sue" || bubble.npcId === "jordan",
+      420,
+    );
+    expect(["Sue", "Jordan"]).toContain(summitBanter.speakerName);
+    expect(summitBanter.text).not.toMatch(/\bmilo\b/i);
+    await assertChatterContrast(page);
+    await assertChatterInViewport(page, 1280, 720);
+
+    await page.keyboard.press("l");
+    await step(page, 24);
+    expect((await readState(page)).lantern).toBe(true);
+
+    const summitLantern0 = await renderInfo(page);
+    expect(summitLantern0.npcLife.activeToolEventId).toBe("summit-aurora-lantern");
+    expect(summitLantern0.npcLife.chatter?.npcId).toBe("jordan");
+    expect(summitLantern0.npcLife.chatter?.text).toBe("Whoa! The summit cairn runes are glowing!");
+    await expect(page.locator(".npc-chatter")).toBeVisible();
+    await expect(page.locator(".npc-chatter")).toHaveAttribute("data-tone", "lantern");
+    await assertChatterContrast(page);
+    await assertChatterInViewport(page, 1280, 720);
+
+    await step(page, 100);
+    const summitLantern1 = await renderInfo(page);
+    expect(summitLantern1.npcLife.activeToolEventId).toBe("summit-aurora-lantern");
+    expect(summitLantern1.npcLife.chatter?.npcId).toBe("sue");
+    expect(summitLantern1.npcLife.chatter?.text).toBe(
+      "Like a purple ribbon right across the peaks!",
+    );
+
+    expect(errors).toEqual([]);
+  },
+);

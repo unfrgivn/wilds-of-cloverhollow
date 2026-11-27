@@ -204,7 +204,7 @@ export {
   critterErrors, feelingErrors, parseBattleContent, parseCritter, parseLevels, parsePartyMember,
   parseStickers, parseTreats, partyErrors, partyJoinErrors, talkErrors,
 } from "./battle-parsers";
-export { npcScheduleErrors, parseNpcProfiles } from "./npc-parsers";
+export { npcScheduleErrors, parseNpcProfiles, parseNpcStroll } from "./npc-parsers";
 export { endingContentErrors, parseStoryJson, storyTagErrors, storyTags } from "./story-checks";
 
 export function loadContent(): {

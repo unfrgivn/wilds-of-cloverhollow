@@ -26,4 +26,5 @@ export * from "./comet";
 export * from "./credits";
 export * from "./music";
 export * from "./treasures";
+export * from "./npc-stroll";
 export * from "./npc-context";

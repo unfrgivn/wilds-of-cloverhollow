@@ -504,6 +504,7 @@ export class GameView {
       canInterpolate ? previousState : undefined,
       alpha,
       livingMotion,
+      reducedMotion,
     );
     this.entities.renderNpcs(state, shadowAlpha, livingMotion);
     this.effects.renderClubhouseDisplay(state, area, reducedMotion);
@@ -516,9 +517,10 @@ export class GameView {
       alpha,
       activePet,
       activeRest,
+      reducedMotion,
     );
     this.effects.renderTimeOfDay(state, this.viewportRect);
-    this.renderGlows(state, playerPos, paused);
+    this.renderGlows(state, playerPos, paused, reducedMotion);
     this.effects.updateStarGemGlints(state, reducedMotion);
     this.atmosphere.update(
       area.id,
@@ -601,7 +603,12 @@ export class GameView {
     };
   }
 
-  private renderGlows(state: State, playerPos: Point, snapLantern = false): void {
+  private renderGlows(
+    state: State,
+    playerPos: Point,
+    snapLantern = false,
+    reducedMotion = false,
+  ): void {
     const area = this.areaView?.area;
     const sheet = Assets.get<Spritesheet>("glow-sheet");
     const on = state.lantern && state.battle === null && state.arcade === null;
@@ -626,8 +633,10 @@ export class GameView {
       const centerY = playerPos.y - 46;
       this.lanternSpotlight.position.set(centerX, centerY);
       this.lanternSpotlight.alpha =
-        (0.36 + 0.04 * Math.sin(state.tick / 16)) * this.lanternBlend;
-      this.effects.updateLanternMotes(centerX, centerY, state.tick, this.lanternBlend);
+        (reducedMotion ? 0.36 : 0.36 + 0.04 * Math.sin(state.tick / 16)) * this.lanternBlend;
+      this.effects.updateLanternMotes(
+        centerX, centerY, state.tick, this.lanternBlend, reducedMotion,
+      );
     }
 
     const drawn: string[] = [];
@@ -640,7 +649,7 @@ export class GameView {
         sprite.texture = texture;
         sprite.position.set(glow.point.x, glow.point.y);
         const transform = computeGlowTransform(
-          glow, state.player, state.tick, index, this.lanternBlend,
+          glow, state.player, state.tick, index, this.lanternBlend, reducedMotion,
         );
         sprite.scale.set(transform.scaleX, transform.scaleY);
         sprite.alpha = transform.alpha;

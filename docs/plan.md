@@ -6106,6 +6106,39 @@ the old trail, the owl, and the clubhouse claim.
   e2e across Chromium (637 passed) & WebKit (542 passed; 1,179 total passed,
   2 skipped, 0 snapshot diffs).
 
+## Milestone 139: 100% Overworld Reduced-Motion Parity (Emotes, Pet/Rest Particles, Lantern Motes & Flyers) + Universal Safari/iOS Tap-Selection Hygiene **Status:** ✅ Completed (2026-11-27)
+- Zero `src/core` changes and zero replay hash shifts across all 68 recorded
+  sims.
+- 100% Overworld Reduced-Motion Parity (`src/render/emotes.ts`,
+  `src/render/overworld-render.ts`, `src/render/overworld-effects.ts`,
+  `src/render/entity-layer.ts`, `src/render/view.ts`):
+  - `evaluateOverworldEmotes` accepts optional `reducedMotion` (default `false`):
+    when `true`, `?` / `!` / `♪` / `Zzz` / `♥` stay upright (`rotation = 0`)
+    with zero bob, bounce, sway, or vertical drift (`♪` and `Zzz` at steady
+    `scale = 0.66`, `alpha = 0.85`; `♥` gently fading in/out at `x = talk.x`),
+    while `reducedMotion = false` remains bit-for-bit identical.
+  - `computeCompanionEmoteSpecs`, `computeLanternMote`, and
+    `computeGlowTransform` accept optional `reducedMotion = false`: when `true`,
+    pet hearts/sparkles, rest notes, blacklight lantern motes, spotlight pulse,
+    glow shimmer, clubhouse keepsake sparkles, and chaos critter auras stay
+    calm, upright, and steady.
+  - `OverworldEntityLayer.renderAmbient` evaluates `flyerAt(flyer, 0)` with
+    steady `frame: 0` and steady firefly halo when `reducedMotion === true` so
+    butterflies and fireflies stay serene instead of sweeping across the screen.
+- Universal Safari / iOS Tap-Selection Hygiene (`src/ui/title.css`,
+  `src/ui/battle.css`, `src/ui/journal.css`, `src/ui/sticker.css`,
+  `src/ui/touch-controls.css`, `src/ui/credits.css`):
+  - Adds `user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;`
+    to all interactive game UI buttons and tap surfaces (never `.qa-console-*`
+    or `<input>`/`<textarea>`) with zero visual pixel changes.
+- Evidence: `tests/unit/milestone-139.test.ts` (5 tests) and real-key checks in
+  `tests/e2e/accessibility.spec.ts` (`@smoke`, Chromium & WebKit).
+- Gates: `just check` (199 unit files / 1,454 tests, all 68 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  `CLOVERHOLLOW_E2E_PORT=4581/4582 just e2e` (638 Chromium + 543 WebKit = 1,181
+  passed, 2 skipped, 0 failed, 0 snapshot diffs).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

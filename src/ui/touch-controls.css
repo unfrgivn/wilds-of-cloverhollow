@@ -28,6 +28,9 @@
   z-index: 10;
   pointer-events: auto;
   touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .touch-stick {
@@ -41,6 +44,9 @@
   background: #fff4d6aa;
   box-shadow: 0 4px 8px #513b3240;
   pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .touch-trace { position: fixed; z-index: 2; touch-action: none; pointer-events: auto; }
 
@@ -52,6 +58,13 @@
   align-items: end;
   gap: var(--touch-gap);
   pointer-events: auto;
+}
+
+.touch-button,
+.touch-arrow {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .touch-button {

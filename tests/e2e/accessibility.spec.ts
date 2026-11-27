@@ -323,3 +323,84 @@ test(
     await page.evaluate(() => window.__cloverhollow?.settings.setReducedMotion(false));
   },
 );
+
+test(
+  "Reduced Motion calms Meadow Park flyers & lantern, and interactive UI disables tap selection",
+  { tag: "@smoke" },
+  async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    const readUserSelect = async (selector: string): Promise<string> =>
+      page.locator(selector).first().evaluate((el) => {
+        const style = getComputedStyle(el);
+        return style.userSelect || style.getPropertyValue("-webkit-user-select");
+      });
+
+    // 1) Title screen interactive option disables accidental text selection.
+    await page.goto("./");
+    await expect(page.locator(".title-option").first()).toBeVisible();
+    expect(await readUserSelect(".title-option")).toBe("none");
+
+    // 2) Meadow Park (qa=flute has ambient butterflies + Blacklight Lantern):
+    //    flyers drift normally when Reduced Motion is off, then stay calmly perched
+    //    across ticks with lantern lit once Reduced Motion is turned on via Journal OPTIONS.
+    await page.goto("./?qa=flute");
+    await page.waitForFunction(() => Boolean(window.__cloverhollow));
+    await page.evaluate(() => {
+      window.__cloverhollow?.pause();
+      window.__cloverhollow?.settings.setReducedMotion(false);
+    });
+    await step(page, 2);
+
+    const movingBefore = (await renderInfo(page)).ambient;
+    expect(movingBefore.length).toBeGreaterThan(0);
+    await step(page, 35);
+    const movingAfter = (await renderInfo(page)).ambient;
+    expect(movingAfter).not.toEqual(movingBefore);
+
+    // Open Journal with real key, verify .journal-tab user-select is none, enable Reduced Motion.
+    await page.keyboard.press("j");
+    await step(page, 2);
+    await expect(page.locator(".journal-tab").first()).toBeVisible();
+    expect(await readUserSelect(".journal-tab")).toBe("none");
+    await page.keyboard.press("BracketLeft");
+    await expect(page.locator(".journal-book")).toHaveAttribute("data-journal-page", "options");
+    const reducedBtn = page.locator(".journal-option-reduced-motion");
+    await reducedBtn.click();
+    await expect(reducedBtn).toHaveText("on");
+    await page.keyboard.press("Escape");
+    await step(page, 2);
+
+    // Light the Blacklight Lantern with real key L and verify flyers stay steady across ticks.
+    await page.keyboard.down("l");
+    await step(page, 1);
+    await page.keyboard.up("l");
+    await step(page, 2);
+    expect((await renderInfo(page)).lantern.on).toBe(true);
+
+    const calmBefore = (await renderInfo(page)).ambient;
+    expect(calmBefore.length).toBeGreaterThan(0);
+    for (const flyer of calmBefore) {
+      expect(flyer.frame).toBe(0);
+    }
+    await step(page, 40);
+    const calmAfter = (await renderInfo(page)).ambient;
+    expect(calmAfter).toEqual(calmBefore);
+
+    // 3) Real-key dialogue choice (.sticker-choice) disables tap selection cleanly.
+    await openHarness(page);
+    await resetPaused(page, "new-game");
+    await hold(page, "ArrowRight", 28);
+    await hold(page, "ArrowUp", 18);
+    await page.keyboard.press("z");
+    await step(page, 2);
+    await page.keyboard.press("z");
+    await step(page, 2);
+    await page.keyboard.press("z");
+    await step(page, 100);
+    await expect(page.locator(".sticker-choice").first()).toBeVisible();
+    expect(await readUserSelect(".sticker-choice")).toBe("none");
+
+    // Restore default cleanly.
+    await page.evaluate(() => window.__cloverhollow?.settings.setReducedMotion(false));
+  },
+);

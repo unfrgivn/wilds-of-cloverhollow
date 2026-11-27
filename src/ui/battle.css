@@ -275,6 +275,9 @@
   line-height: 1;
   white-space: nowrap;
   touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   transition: transform 100ms ease-out;
 }
 @media (min-width: 1000px) {
@@ -414,6 +417,9 @@
 .battle-calm {
   right: calc(78px + var(--safe-right));
   width: min(280px, calc(100vw - 350px));
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .battle-calm.is-peekable {
   pointer-events: auto;
@@ -589,6 +595,9 @@
   font-size: 14px;
   font-weight: 700;
   text-align: left;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   transition: transform 110ms ease-out, background-color 110ms ease-out;
 }
 @media (min-width: 1000px) {
@@ -782,6 +791,9 @@
   font-weight: 700;
   text-align: left;
   touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .battle-treat-item.is-back {
   background: var(--sticker-border);
@@ -842,6 +854,9 @@
   pointer-events: auto;
   cursor: pointer;
   touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   background: transparent;
 }
 .battle-ring-rim,
@@ -909,6 +924,9 @@
   pointer-events: auto;
   text-align: center;
   touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   transform: translate(-50%, -50%);
 }
 .battle-reward-title {
@@ -1437,6 +1455,9 @@
   line-height: 1;
   white-space: nowrap;
   touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   transition: transform 80ms ease-out, box-shadow 80ms ease-out;
 }
 .battle-echo[data-phase="demo"] .battle-echo-chime {
@@ -1755,6 +1776,9 @@
   line-height: 1;
   cursor: pointer;
   touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .battle-peek-close:hover {
   background: #fff3c4;

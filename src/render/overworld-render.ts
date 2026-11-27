@@ -519,10 +519,20 @@ export function computeLanternMote(
   centerY: number,
   tick: number,
   blend: number,
+  reducedMotion = false,
 ): { x: number; y: number; scale: number; alpha: number } {
+  const baseRadius = 46 + ((index * 53) % 165);
+  if (reducedMotion) {
+    const angle = (index / count) * Math.PI * 2;
+    return {
+      x: centerX + Math.cos(angle) * baseRadius,
+      y: centerY + Math.sin(angle) * baseRadius * 0.72,
+      scale: 0.24 + (index % 3) * 0.11,
+      alpha: 0.42 * blend,
+    };
+  }
   const speed = 0.012 + (index % 4) * 0.004;
   const angle = (index / count) * Math.PI * 2 + tick * speed * (index % 2 === 0 ? 1 : -1);
-  const baseRadius = 46 + ((index * 53) % 165);
   const radius = baseRadius + Math.sin(tick * 0.03 + index * 1.7) * 16;
   const twinkle = 0.5 + 0.5 * Math.sin(tick * 0.08 + index * 1.9);
   return {
@@ -539,6 +549,7 @@ export function computeCompanionEmoteSpecs(
   petElapsed: number | null,
   playerPos: Point,
   restElapsed: number | null,
+  reducedMotion = false,
 ): CompanionEmoteSpec[] {
   const items: CompanionEmoteSpec[] = [];
   if (petPos !== null && petElapsed !== null) {
@@ -551,9 +562,32 @@ export function computeCompanionEmoteSpecs(
       const age = petElapsed - delay;
       const life = PET_REACTION_DURATION - delay;
       if (age < 0 || age >= life) return;
-      const progress = age / life;
       const fadeIn = Math.min(1, (age + 1) / 5);
       const fadeOut = Math.min(1, (life - age) / 10);
+      if (reducedMotion) {
+        items.push({
+          textureKey: "emoteHeart",
+          x: petPos.x + dx,
+          y: petPos.y - petHeight - 18,
+          scale: baseScale,
+          alpha: 0.96 * fadeIn * fadeOut,
+          rotation: 0,
+          tint: 0xffffff,
+          blend: "normal",
+        });
+        items.push({
+          textureKey: "sparkle",
+          x: petPos.x - dx * 1.1,
+          y: petPos.y - petHeight - 8,
+          scale: 0.5,
+          alpha: 0.94 * fadeIn * fadeOut,
+          rotation: 0,
+          tint: PET_SPARKLE_TINTS[idx % PET_SPARKLE_TINTS.length] ?? 0xff9ebc,
+          blend: "normal",
+        });
+        return;
+      }
+      const progress = age / life;
       items.push({
         textureKey: "emoteHeart",
         x: petPos.x + dx + Math.sin(progress * Math.PI * 2 + idx) * 4,
@@ -577,18 +611,31 @@ export function computeCompanionEmoteSpecs(
     });
   }
   if (restElapsed !== null) {
-    const cycle = (restElapsed % 90) / 90;
-    const envelope = Math.sin(cycle * Math.PI);
-    items.push({
-      textureKey: "emoteNote",
-      x: playerPos.x + 12 + Math.sin(cycle * Math.PI * 2) * 6,
-      y: playerPos.y - faeBox.height - 18 - cycle * 22,
-      scale: 0.56 + 0.18 * envelope,
-      alpha: 0.9 * envelope,
-      rotation: Math.sin(cycle * Math.PI * 2) * 0.14,
-      tint: 0xffffff,
-      blend: "normal",
-    });
+    if (reducedMotion) {
+      items.push({
+        textureKey: "emoteNote",
+        x: playerPos.x + 12,
+        y: playerPos.y - faeBox.height - 22,
+        scale: 0.66,
+        alpha: 0.85,
+        rotation: 0,
+        tint: 0xffffff,
+        blend: "normal",
+      });
+    } else {
+      const cycle = (restElapsed % 90) / 90;
+      const envelope = Math.sin(cycle * Math.PI);
+      items.push({
+        textureKey: "emoteNote",
+        x: playerPos.x + 12 + Math.sin(cycle * Math.PI * 2) * 6,
+        y: playerPos.y - faeBox.height - 18 - cycle * 22,
+        scale: 0.56 + 0.18 * envelope,
+        alpha: 0.9 * envelope,
+        rotation: Math.sin(cycle * Math.PI * 2) * 0.14,
+        tint: 0xffffff,
+        blend: "normal",
+      });
+    }
   }
   return items;
 }
@@ -655,13 +702,14 @@ export function computeGlowTransform(
   tick: number,
   index: number,
   lanternBlend: number,
+  reducedMotion = false,
 ): { scaleX: number; scaleY: number; alpha: number } {
   const dx = glow.point.x - player.x;
   const dy = glow.point.y - player.y;
   const dist = Math.sqrt(dx * dx + dy * dy);
   const proximity = dist >= 320 ? 0.78 : 0.78 + 0.22 * (1 - dist / 320);
-  const pulse = 0.84 + Math.sin(tick / 24 + index * 1.15) * 0.12;
-  const s = 0.5 * (1 + 0.025 * Math.sin(tick / 18 + index * 1.15));
+  const pulse = reducedMotion ? 0.88 : 0.84 + Math.sin(tick / 24 + index * 1.15) * 0.12;
+  const s = reducedMotion ? 0.5 : 0.5 * (1 + 0.025 * Math.sin(tick / 18 + index * 1.15));
   return {
     scaleX: glow.flip === true ? -s : s,
     scaleY: s,

@@ -713,7 +713,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   contented drifting `emoteNote` (`♪`) on a 90-tick loop over calmed critters
   within 185 units of Fae, sleepy `emoteZzz` on a 100-tick loop over napping
   Maddie (`stillTicks >= 240`), and a rising warm `emoteHeart` for 38 ticks
-  after finishing a chat with an NPC or calm critter.
+  after finishing a chat with an NPC or calm critter. When `reducedMotion` is
+  `true` (Milestone 139), every overworld emote holds upright (`rotation = 0`)
+  at a steady anchor without bob, bounce, sway, or vertical drift (`emoteNote`
+  and `emoteZzz` at fixed `scale: 0.66`, `alpha: 0.85`; `emoteHeart` keeping
+  gentle fade in/out at `x = talk.x`).
 - Idle: 1 to 4 frames per direction.
 - Fae is about 140 units tall (about 280 source pixels).
 - Sprite sheets: one WebP atlas (lossless alpha, generated from lossless PNG
@@ -1719,8 +1723,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   `fairy_light` fireflies cast warm-gold additive halos (`0xffe484`,
   `size * 2.6`, pulsing alpha `0.34..0.58` from a deterministic id phase or
   steady `0.44` under Reduced Motion) onto `emissiveLayer` above twilight and
-  blacklight dusk (hidden on `harness` and outside the overworld). They never
-  enter simulation state, hashes, or saves.
+  blacklight dusk (hidden on `harness` and outside the overworld). Under
+  Reduced Motion (Milestone 139), `OverworldEntityLayer.renderAmbient`
+  evaluates `flyerAt(flyer, 0)` with steady `frame: 0` so butterflies and
+  fireflies stay calmly perched/hovering instead of sweeping across the scene.
+  They never enter simulation state, hashes, or saves.
 - Canopies: a prop with `canopy: true` is a tree Fae can walk under (a palm,
   crown and trunk cut whole, its front edge at the trunk's foot). While it
   draws over more than 5% of her body box (its picture, in the columns where
@@ -2531,10 +2538,23 @@ trunks keep its two exits.
     with `snap = true`, zero look-ahead swing), holds overworld figures in
     grounded stillness (skipping `walkPose` bounce/squash, `idleBreathing`,
     `fairyHover` tilt, `roamerHop`, `companionIdlePose`, and `petReaction`
-    shake while keeping contact shadows), and calms battle presentation
+    shake while keeping contact shadows), holds overworld emotes, companion
+    pet/rest particles (`computeCompanionEmoteSpecs`), blacklight lantern
+    motes/spotlight/glows (`computeLanternMote`, `computeGlowTransform`),
+    clubhouse keepsake sparkles, chaos critter auras, and ambient flyers
+    (`flyerAt(flyer, 0)`, steady `frame: 0`) calm, upright, and tick-invariant
+    (Milestone 139), and calms battle presentation
     (skipping `battleIntro` slide/zoom, zeroing `stageShake`, holding
     `battleSunburst` at steady orientation, and freezing ambient mood wash
     drift/pulse in `src/render/battle-view.ts`).
+  - **Universal Safari / iOS Tap-Selection Hygiene** (Milestone 139):
+    interactive game UI controls and tap surfaces across `src/ui/title.css`,
+    `src/ui/battle.css`, `src/ui/journal.css`, `src/ui/sticker.css`,
+    `src/ui/touch-controls.css`, and `src/ui/credits.css` declare
+    `user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;`
+    so rapid taps and long-presses on Safari/WebKit and iOS never trigger
+    accidental text selection or link callouts, while keeping dev QA console
+    output and text inputs selectable.
 - Every critter kind has a content `level`; `content/levels.json` maps it to
   `calmMax`, burst base/big strength, and calm XP. Soothe and a friend's command
   use the actor's Power (20 at level 1, +2 per level), with Magic (+1) on great

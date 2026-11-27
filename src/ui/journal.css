@@ -115,6 +115,9 @@
   font: 800 11px var(--sticker-font);
   white-space: nowrap;
   cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .journal-audio::after {
   content: "";
@@ -151,6 +154,9 @@
   color: var(--sticker-ink);
   font: inherit;
   cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .journal-volume-value {
   min-width: 44px;
@@ -289,6 +295,9 @@
 .journal-slot {
   min-width: 0;
   text-align: center;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .journal-slot.is-inspectable {
   cursor: pointer;
@@ -513,6 +522,9 @@ html[data-reduced-motion="on"] .journal-slot.is-inspectable:focus-visible {
   color: var(--sticker-ink);
   cursor: pointer;
   font: 700 24px var(--sticker-font);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .journal-map-page {
   position: absolute;
@@ -606,6 +618,9 @@ html[data-reduced-motion="on"] .journal-slot.is-inspectable:focus-visible {
   font-size: 13px;
   font-weight: 800;
   text-shadow: 0 1px #fbf6e9, 1px 0 #fbf6e9, -1px 0 #fbf6e9, 0 -1px #fbf6e9;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .journal-map-land.is-revealed {
   cursor: pointer;
@@ -764,6 +779,9 @@ html[data-reduced-motion="on"] .journal-slot.is-inspectable:focus-visible {
   white-space: nowrap;
   cursor: pointer;
   touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .journal-treasures-btn:hover,
 .journal-treasures-btn:focus-visible {
@@ -850,6 +868,9 @@ html[data-reduced-motion="on"] .journal-slot.is-inspectable:focus-visible {
   cursor: pointer;
   font: 900 24px/1 var(--sticker-font);
   touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .journal-jukebox-prev {
   border-right: 2px solid var(--sticker-ink);
@@ -882,6 +903,9 @@ html[data-reduced-motion="on"] .journal-slot.is-inspectable:focus-visible {
   -webkit-appearance: none;
   cursor: default;
   touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .journal-now-playing.is-browsing {
   cursor: pointer;
@@ -967,6 +991,9 @@ html[data-reduced-motion="on"] .journal-slot.is-inspectable:focus-visible {
   color: var(--sticker-ink);
   font: 800 13px var(--sticker-font);
   cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .journal-opt-toggle {
   background: #e6f4dc;
@@ -1056,6 +1083,9 @@ html[data-reduced-motion="on"] .journal-slot.is-inspectable:focus-visible {
   white-space: nowrap;
   writing-mode: vertical-rl;
   transform: rotate(180deg);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .journal-book[data-journal-page="notes"] .journal-notes-tab,
 .journal-book[data-journal-page="map"] .journal-map-tab,
@@ -1120,6 +1150,9 @@ html[data-reduced-motion="on"] .journal-slot.is-inspectable:focus-visible {
   cursor: pointer;
   font: 700 22px var(--sticker-font);
   touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .journal-field-left {
   display: flex;
@@ -1405,6 +1438,9 @@ html[data-reduced-motion="on"] .journal-slot.is-inspectable:focus-visible {
   cursor: pointer;
   font: 700 22px var(--sticker-font);
   touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .journal-treasures-head {
   display: flex;

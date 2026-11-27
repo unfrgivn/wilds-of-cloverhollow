@@ -25,6 +25,9 @@
   color: var(--sticker-ink);
   font-family: var(--sticker-font);
   pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 /* The wordmark plate: a stitched cream die-cut sticker, gently tilted. */
@@ -127,6 +130,9 @@
   font-size: 18px;
   font-weight: 700;
   text-align: center;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   transition: transform 110ms ease-out, background-color 110ms ease-out,
     box-shadow 110ms ease-out;
 }

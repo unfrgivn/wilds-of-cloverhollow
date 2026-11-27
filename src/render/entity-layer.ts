@@ -368,6 +368,7 @@ export class OverworldEntityLayer {
     previousState: State | undefined,
     alpha: number,
     livingMotion: boolean,
+    reducedMotion = false,
   ): void {
     const present = hasArea ? presentCritters(this.world, state) : [];
     this.syncCritters(present);
@@ -421,8 +422,8 @@ export class OverworldEntityLayer {
         flipX,
       );
       aura.zIndex = point.y - 0.5;
-      aura.alpha = 0.65 + Math.sin(state.tick / 18) * 0.2;
-      aura.rotation = state.tick / 180;
+      aura.alpha = reducedMotion ? 0.65 : 0.65 + Math.sin(state.tick / 18) * 0.2;
+      aura.rotation = reducedMotion ? 0 : state.tick / 180;
       frames.push({ id, kind: content.id, frame, x: logicalPoint.x, y: logicalPoint.y });
     }
     this.critterFrames = frames;
@@ -508,7 +509,12 @@ export class OverworldEntityLayer {
     const frames: AmbientFrameInfo[] = [];
     for (const { flyer, sprite, shadow, glow } of this.ambientSprites) {
       const names = sheet?.data.animations?.[flyer.animation] ?? [];
-      const position = flyerAt(flyer, state.tick, Math.max(1, names.length));
+      const rawPosition = flyerAt(
+        flyer,
+        reducedMotion ? 0 : state.tick,
+        Math.max(1, names.length),
+      );
+      const position = reducedMotion ? { ...rawPosition, frame: 0 } : rawPosition;
       const frameName = names[position.frame] ?? names[0];
       const texture = frameName === undefined ? undefined : sheet?.textures[frameName];
       sprite.visible = texture !== undefined;
@@ -521,7 +527,12 @@ export class OverworldEntityLayer {
       sprite.position.set(position.x, position.y);
       const scale = flyer.size / 96;
       sprite.scale.set(position.flip ? -scale : scale, scale);
-      const visual = computeFlyerVisual(flyer, position, state.tick, reducedMotion);
+      const visual = computeFlyerVisual(
+        flyer,
+        position,
+        reducedMotion ? 0 : state.tick,
+        reducedMotion,
+      );
       if (shadow !== null) {
         shadow.visible = showEffects && visual.shadow !== null;
         if (visual.shadow !== null) applyShadow(shadow, visual.shadow);

@@ -270,12 +270,18 @@ export class OverworldEffectsController {
     }
   }
 
-  updateLanternMotes(centerX: number, centerY: number, tick: number, blend: number): void {
+  updateLanternMotes(
+    centerX: number,
+    centerY: number,
+    tick: number,
+    blend: number,
+    reducedMotion = false,
+  ): void {
     for (let i = 0; i < this.lanternMotes.length; i += 1) {
       const mote = this.lanternMotes[i];
       if (mote === undefined) continue;
       const spec = computeLanternMote(
-        i, this.lanternMotes.length, centerX, centerY, tick, blend,
+        i, this.lanternMotes.length, centerX, centerY, tick, blend, reducedMotion,
       );
       mote.position.set(spec.x, spec.y);
       mote.scale.set(spec.scale);
@@ -401,7 +407,7 @@ export class OverworldEffectsController {
         this.clubhouseKeepsakePool.push(entry);
       }
       const phase = state.tick * 0.055 + keepsakeShown * 1.4;
-      const pulse = 0.5 + 0.5 * Math.sin(phase);
+      const pulse = reducedMotion ? 0.5 : 0.5 + 0.5 * Math.sin(phase);
       entry.container.visible = true;
       entry.container.label = `clubhouse:keepsake:${placement.id}`;
       entry.container.position.set(placement.x, placement.y);
@@ -422,8 +428,8 @@ export class OverworldEffectsController {
       entry.item.position.set(0, 0);
 
       entry.sparkle.position.set(
-        10 * placement.scale + Math.sin(phase * 0.9) * 3,
-        -24 * placement.scale + Math.cos(phase * 1.1) * 2.5,
+        10 * placement.scale + (reducedMotion ? 0 : Math.sin(phase * 0.9) * 3),
+        -24 * placement.scale + (reducedMotion ? 0 : Math.cos(phase * 1.1) * 2.5),
       );
       entry.sparkle.tint = placement.sparkleTint;
       entry.sparkle.scale.set(0.32 + 0.16 * pulse);
@@ -471,6 +477,7 @@ export class OverworldEffectsController {
     alpha: number,
     activePet: { id: string; elapsed: number } | null,
     activeRest: { spot: RestSpot; elapsed: number } | null,
+    reducedMotion = false,
   ): void {
     const active = area.id !== "harness" &&
       state.battle === null &&
@@ -560,6 +567,7 @@ export class OverworldEffectsController {
       calmedCritters,
       nappingMembers,
       recentTalk,
+      reducedMotion,
     });
 
     const items: EmoteSpriteItem[] = emotes.map((emote) => ({
@@ -587,7 +595,12 @@ export class OverworldEffectsController {
       }
     }
     for (const spec of computeCompanionEmoteSpecs(
-      petPos, petHeight, activePet?.elapsed ?? null, playerPos, activeRest?.elapsed ?? null,
+      petPos,
+      petHeight,
+      activePet?.elapsed ?? null,
+      playerPos,
+      activeRest?.elapsed ?? null,
+      reducedMotion,
     )) {
       items.push({
         texture: this.vfx[spec.textureKey],

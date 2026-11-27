@@ -285,6 +285,7 @@ describe("Milestone 89: Companion petting & cozy resting", () => {
       "milo-house": "down",
       "rosie-cottage": "down",
       summit: "down",
+      island: "down",
     };
 
     for (const spot of REST_SPOTS) {

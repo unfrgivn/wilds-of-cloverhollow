@@ -118,7 +118,8 @@ describe("the lands", () => {
       gym: "cloverhollow", field: "cloverhollow", clubhouse: "forest", lodge: "pass",
       plaza: "cloverhollow", park: "cloverhollow", school: "cloverhollow", woods: "forest",
       "milo-house": "cloverhollow", "rosie-cottage": "cloverhollow",
-      bay: "bay", "sue-cottage": "bay", pass: "pass", summit: "pass", "jordan-cabin": "pass",
+      bay: "bay", island: "bay", "sue-cottage": "bay", pass: "pass", summit: "pass",
+      "jordan-cabin": "pass",
       cavern: "pass", trail: "trail", mist: "enchanted",
       enchanted: "enchanted", hills: "hills", sanctuary: "hills",
     };
@@ -210,10 +211,10 @@ describe("the bus line", () => {
     const source = readFileSync("content/story/main.ink", "utf8");
     const targets = [...new Set([...source.matchAll(/#\s*travel:\s*([^\s#]+)/g)]
       .map((match) => match[1] ?? ""))].sort();
-    // The buses, the old oak's branch across the playing field's creek, and the ski lift.
+    // The buses, the old oak's branch across the playing field's creek, ski lift, and rowboat.
     expect(targets).toEqual([
-      "bay.bus-stop", "field.east-bank", "mist.stones", "pass.bus", "pass.ski-lift",
-      "plaza.bus-stop", "summit.lift-top",
+      "bay.boats", "bay.bus-stop", "field.east-bank", "island.pier", "mist.stones", "pass.bus",
+      "pass.ski-lift", "plaza.bus-stop", "summit.lift-top",
     ]);
     for (const target of targets) {
       const [area, spawn] = target.split(".");

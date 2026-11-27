@@ -40,6 +40,8 @@ import rosieCottageData from "../../content/areas/rosie-cottage.json";
 import rosieCottagePropsData from "../../content/props/rosie-cottage.json";
 import summitData from "../../content/areas/summit.json";
 import summitPropsData from "../../content/props/summit.json";
+import islandData from "../../content/areas/island.json";
+import islandPropsData from "../../content/props/island.json";
 import artRoomData from "../../content/areas/art-room.json";
 import enchantedPropsData from "../../content/props/enchanted.json";
 import arcadeGameData from "../../content/arcade.json";
@@ -75,6 +77,7 @@ import jordanCabinSurfaceData from "../../content/surfaces/jordan-cabin.json";
 import miloHouseSurfaceData from "../../content/surfaces/milo-house.json";
 import rosieCottageSurfaceData from "../../content/surfaces/rosie-cottage.json";
 import summitSurfaceData from "../../content/surfaces/summit.json";
+import islandSurfaceData from "../../content/surfaces/island.json";
 import artRoomSurfaceData from "../../content/surfaces/art-room.json";
 import plazaPropsData from "../../content/props/plaza.json";
 import bedroomPropsData from "../../content/props/bedroom.json";
@@ -129,6 +132,7 @@ import jordanCabinFixtureData from "../../content/fixtures/jordan-cabin.json";
 import miloHouseFixtureData from "../../content/fixtures/milo-house.json";
 import rosieCottageFixtureData from "../../content/fixtures/rosie-cottage.json";
 import summitFixtureData from "../../content/fixtures/summit.json";
+import islandFixtureData from "../../content/fixtures/island.json";
 import tunableData from "../../content/tunables.json";
 import storyData from "../../content/story/main.ink.json";
 import fountainFrogData from "../../content/critters/fountain-frog.json";
@@ -602,6 +606,7 @@ export function loadContent(): {
   const miloHouse = loadArea(miloHouseData, miloHousePropsData, "milo-house");
   const rosieCottage = loadArea(rosieCottageData, rosieCottagePropsData, "rosie-cottage");
   const summit = loadArea(summitData, summitPropsData, "summit");
+  const island = loadArea(islandData, islandPropsData, "island");
   const artRoom = loadArea(artRoomData, artRoomPropsData, "art-room");
   field(
     Array.isArray(landsData) &&
@@ -725,6 +730,7 @@ export function loadContent(): {
     "milo-house": loadFixture(miloHouseFixtureData, "milo-house"),
     "rosie-cottage": loadFixture(rosieCottageFixtureData, "rosie-cottage"),
     summit: loadFixture(summitFixtureData, "summit"),
+    island: loadFixture(islandFixtureData, "island"),
   };
   for (const [name, fixture] of Object.entries(fixtures))
     for (const id of fixture.party ?? [])
@@ -763,6 +769,7 @@ export function loadContent(): {
     [miloHouse.id]: miloHouse,
     [rosieCottage.id]: rosieCottage,
     [summit.id]: summit,
+    [island.id]: island,
   };
   const surfaceData: Record<string, unknown> = {
     harness: harnessSurfaceData, bedroom: bedroomSurfaceData, plaza: plazaSurfaceData,
@@ -784,6 +791,7 @@ export function loadContent(): {
     "milo-house": miloHouseSurfaceData,
     "rosie-cottage": rosieCottageSurfaceData,
     summit: summitSurfaceData,
+    island: islandSurfaceData,
     "art-room": artRoomSurfaceData,
   };
   const surfaces = completeSurfaceMaps(areas, surfaceData);

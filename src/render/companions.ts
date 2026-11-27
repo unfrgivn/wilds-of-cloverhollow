@@ -246,6 +246,16 @@ export const REST_SPOTS: readonly RestSpot[] = [
     seatY: 856,
     facing: "down",
   },
+  {
+    id: "island-mat",
+    area: "island",
+    x: 1150,
+    y: 796,
+    radius: 56,
+    seatX: 1150,
+    seatY: 792,
+    facing: "down",
+  },
 ];
 
 const FACING_VECTORS: Readonly<Record<Direction, Point>> = {

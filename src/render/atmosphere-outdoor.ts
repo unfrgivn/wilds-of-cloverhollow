@@ -15,6 +15,8 @@ import {
   FIREFLY_TINTS,
   FOREST_MOTE_TINTS,
   hash01,
+  ISLAND_BEACON_TINTS,
+  ISLAND_SHORE_GLINTS,
   LILAC_TINTS,
   MEADOW_AREAS,
   MEADOW_TINTS,
@@ -300,6 +302,64 @@ export function evaluateOutdoorAtmosphere(
     addFloatingMotes(out, seed + 500, width, height, tick, 10, WATER_TINTS, {
       driftX: -0.32,
       driftY: 0.08,
+      minScale: 0.2,
+      maxScale: 0.38,
+      minAlpha: 0.18,
+      maxAlpha: 0.44,
+    });
+    return out;
+  }
+
+  if (areaId === "island") {
+    // Emissive golden Lighthouse Beacon Halo pulsing softly at the brass lantern (1260, 152).
+    const pulse = Math.sin(tick * 0.032);
+    const outerPulse = Math.sin(tick * 0.022 + 1.1);
+    out.push({
+      layer: "emissive",
+      texture: "softGlow",
+      blend: "add",
+      x: 1260,
+      y: 152,
+      scaleX: 2.35 + 0.16 * outerPulse,
+      scaleY: 2.15 + 0.14 * outerPulse,
+      rotation: 0,
+      alpha: clamp01(0.28 + 0.07 * (0.5 + 0.5 * outerPulse)),
+      tint: pickTint(ISLAND_BEACON_TINTS, 1),
+    });
+    out.push({
+      layer: "emissive",
+      texture: "softGlow",
+      blend: "add",
+      x: 1260,
+      y: 152,
+      scaleX: 1.25 + 0.1 * pulse,
+      scaleY: 1.15 + 0.08 * pulse,
+      rotation: 0,
+      alpha: clamp01(0.42 + 0.1 * (0.5 + 0.5 * pulse)),
+      tint: pickTint(ISLAND_BEACON_TINTS, 0),
+    });
+    // 14 shimmering turquoise bay water glints around the island shoreline & NW tide pool.
+    ISLAND_SHORE_GLINTS.forEach(([gx, gy], i) => {
+      const h2 = hash01(seed + i * 29 + 3);
+      const shimmer = Math.sin(tick * (0.055 + h2 * 0.04) + i * 1.5);
+      const scale = i >= 10 ? 0.36 + h2 * 0.28 : 0.48 + h2 * 0.42;
+      out.push({
+        layer: "under",
+        texture: "waterGlint",
+        blend: "add",
+        x: gx + Math.sin(tick * 0.022 + i) * (i >= 10 ? 3 : 6),
+        y: gy,
+        scaleX: scale,
+        scaleY: scale * 0.85,
+        rotation: 0,
+        alpha: clamp01(0.14 + shimmer * shimmer * 0.44),
+        tint: pickTint(WATER_TINTS, i),
+      });
+    });
+    // 10 sunlit drifting coastal sparkle/sea-breeze motes.
+    addFloatingMotes(out, seed + 540, width, height, tick, 10, WATER_TINTS, {
+      driftX: -0.28,
+      driftY: 0.06,
       minScale: 0.2,
       maxScale: 0.38,
       minAlpha: 0.18,

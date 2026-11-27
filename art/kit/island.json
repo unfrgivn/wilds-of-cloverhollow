@@ -1,0 +1,50 @@
+{
+  "area": "island",
+  "subjects": [
+    {
+      "id": "lighthouse",
+      "crop": [1160, 42, 200, 408],
+      "seed": [1260, 260],
+      "home": [1260, 426],
+      "painted": true,
+      "canopy": false,
+      "ground": "the grassy hilltop of the northeast headland",
+      "object": "the complete coral-and-cream striped miniature storybook lighthouse tower, including its golden brass finial, dome, glowing lantern gallery, striped tower, arched wooden door, and warm-brown ink outline down to its curved base; not the sky, distant water, or grass",
+      "footprint": [[[1186, 392], [1222, 360], [1298, 360], [1334, 392], [1298, 424], [1222, 424]]]
+    },
+    {
+      "id": "driftwood-log",
+      "crop": [1148, 634, 242, 172],
+      "seed": [1265, 720],
+      "home": [1270, 782],
+      "painted": true,
+      "canopy": false,
+      "ground": "the warm cream beach sand",
+      "object": "the complete weathered brown driftwood log resting diagonally on the sand in the middle of the crop, including its knotted wood ends and warm-brown ink outline; not the beach mat, glass bottle, or sand",
+      "footprint": [[[1174, 706], [1192, 668], [1362, 742], [1332, 780]]]
+    },
+    {
+      "id": "west-palm",
+      "crop": [36, 232, 265, 336],
+      "seed": [210, 420],
+      "home": [254, 546],
+      "painted": true,
+      "canopy": true,
+      "ground": "the warm cream beach sand and turquoise water edge",
+      "object": "the complete leaning west palm tree, including all green palm fronds in its crown, curved brown trunk, coconuts, and warm-brown ink outline down to its sandy base; not the red seashell, water, or sand",
+      "footprint": [[[232, 526], [276, 526], [276, 546], [232, 546]]]
+    },
+    {
+      "id": "east-palm",
+      "crop": [1372, 386, 262, 358],
+      "seed": [1460, 560],
+      "home": [1429, 722],
+      "painted": true,
+      "canopy": true,
+      "core": 2,
+      "ground": "the warm cream beach sand and turquoise water edge",
+      "object": "the complete leaning east palm tree, including all green palm fronds in its crown, curved brown trunk, and warm-brown ink outline down to its sandy base; not the rocks, water, or sand",
+      "footprint": [[[1412, 704], [1446, 704], [1446, 722], [1412, 722]]]
+    }
+  ]
+}

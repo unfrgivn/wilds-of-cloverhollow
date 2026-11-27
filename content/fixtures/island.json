@@ -1,0 +1,15 @@
+{
+  "area": "island",
+  "spawn": "pier",
+  "seed": 1,
+  "party": [
+    "maddie",
+    "sue",
+    "jordan"
+  ],
+  "variables": {
+    "sue_joined": true,
+    "has_lantern": true,
+    "has_flute": true
+  }
+}

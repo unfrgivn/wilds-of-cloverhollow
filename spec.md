@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 150)
+Last updated: 2026-11-27 (Milestone 152)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -630,7 +630,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   warms the Morning Wake-Up finale (`state.finale !== null`);
   `enchanted-twilight` washes `mist` and fizzy `enchanted`; `golden-meadow`
   warms calmed `enchanted` (`forest_fizzy === false`); `golden-hour` bathes outdoor
-  adventure areas (`plaza`, `park`, `bay`, `pass`, `summit`, `trail`, `woods`, `hills`,
+  adventure areas (`plaza`, `park`, `bay`, `island`, `pass`, `summit`, `trail`, `woods`, `hills`,
   `sanctuary`, `field`) once `has_lantern` is set; and `morning` washes `bedroom` and
   `kitchen` before any sticker is earned and before `has_lantern`.
 - Photo / Showcase mode (Milestone 90), Postcard Camera (Milestone 107),
@@ -1067,7 +1067,9 @@ ios/            Capacitor iOS project (from Milestone 4).
     reactive companion banter (`sue_joined`, `jordan_joined`, `pup_with_me` /
     Maddie). The first sunny cove cruise sets `bay_boat_charm = true`, awards
     `+10` coins (`chime-blue`) for finding a Sea-Glass Clover, and logs a
-    Journal note; revisits cruise peacefully without repeating coins.
+    Journal note; revisits cruise peacefully without repeating coins. Once
+    `sue_joined` holds, choice 1 (`[Row out to Starlight Island!]`) glides
+    across Bubblegum Bay to `island.pier` with `chime-blue`.
   - **Pinecone Pass Wildlife Sanctuary** (`pass-sanctuary` interactable in
     `content/areas/pass.json` at `(1400, 640)`, knot `pass_sanctuary`, prompt
     `Look`): carved pine trail board tallying Fae's calmed mountain and
@@ -1659,6 +1661,42 @@ ios/            Capacitor iOS project (from Milestone 4).
   curtains (`y = 70..220`), 22 mountain snowflakes, and 6 warming-hut chimney
   smoke wisps from `(1458, 380)`; its soundtrack plays `"pass"` with
   `"mountain-wind"` ambience; its rest spot `summit-bench` sits at (1335, 860).
+- Starlight Island & Bubblegum Bay Rowboat Crossing: `island`,
+  "Starlight Island", in the `bay` land, is a 1650x1100 sunlit coastal islet
+  with a coral-striped Tide-Pool Lighthouse reached by rowing from Bubblegum
+  Bay's south pier (`bay_boats` keeps choice 0 sunny cove unchanged, and once
+  `sue_joined` holds, offers choice 1 rowing to `island.pier` at (560, 700)
+  facing right with `sound: chime-blue`; returning via `island-boat` at (365,
+  830) on the SW landing pier, knot `island_boat`, glides back to `bay.boats`
+  at (1450, 685) facing left, >250u clear of every bay den). Its 4-prop
+  alpha-WebP kit lifts the depth-sorted `lighthouse` at (1260, 426),
+  `driftwood-log` at (1270, 782), and fading canopy palms `west-palm` at (254,
+  546) and `east-palm` at (1429, 722); blockers cover the NW sparkling tide
+  pool, all 4 giant pastel seashells, the east tide-pool rocks, and the north
+  palm trunk. Its floor surface is sand with wood along the SW landing pier
+  deck, carpet over the SE woven beach mat, and grass across the central clover
+  meadow and NE lighthouse bluff; 4 looping ambient butterflies (`butterfly_pink`
+  and `butterfly_blue`) glide over the meadow and shells. Four Look spots cover
+  `island-boat` (`island_boat`), `island-shells` at (545, 472) (`island_shells`:
+  4-note pastel seashell chime puzzle playing `chime-red`, `chime-yellow`,
+  `chime-green`, `chime-blue` with a silver-flute harmony bonus when `has_flute`
+  holds, setting `island_shells_solved` and awarding one-time `gift: coins 20`
+  from the Tide-Pool Pearl Cache, plus a playful random-chord try-again option
+  and post-solve replay), `island-lighthouse` at (1205, 432) (`island_lighthouse`:
+  sets `island_visited` & `island_lighthouse_checked` and awards one-time
+  `gift: snack 2` with `chime-yellow` from the Lighthouse Sea-Breeze Snack Tin),
+  and `island-bottle` at (1255, 825) (`island_bottle`: sets `island_bottle_found`
+  and awards one-time `gift: coins 15` with `chime-green` from an old Bubblegum
+  Bay explorer's note). A blacklight rune trail (`island-star-1..2` using
+  `bluebell_1..2` leading to `island-beacon-glow` at (980, 440),
+  `frame: "bluebell_4"`, knot `island_beacon_glow`) reveals the bioluminescent
+  Starlight Beacon Verse (`island_glow_read`, one-time `gift: coins 10` with
+  `chime-red`). Its fixture `island` starts at `pier` with Maddie, Sue, Jordan,
+  `sue_joined`, `has_lantern`, and `has_flute`; its outdoor atmosphere emits a
+  2-layer emissive golden Lighthouse Beacon Halo at `(1260, 152)`, 14 turquoise
+  bay/tide-pool `waterGlint`s, and 10 drifting sea-breeze sparkle motes; its
+  soundtrack plays `"bay"` with `"ocean"` ambience; its rest spot `island-mat`
+  sits at (1150, 796) on the SE woven beach mat.
 - The lifeguard (Milestone 64): once Sue has joined (`sue_joined`), the bay's
   picnic leads on (`bay_picnic.back`): a whistle blasts, and the picnic's
   owner, Ms. Coral, the bay's lifeguard, is back and fizzy (`lifeguard_back`),
@@ -1735,7 +1773,7 @@ ios/            Capacitor iOS project (from Milestone 4).
     `emoteHeart` + pastel `sparkle` puffs, and a synthesized species affection
     cue via `AudioController.playEffect`), or relax at curated painted benches,
     chairs, rugs, picnic blanket, glades, overlooks, and the Clubhouse beanbag
-    across 21 areas (`plaza`, `park`, `bay`, `cafe`, `market`, `parlor`,
+    across 22 areas (`plaza`, `park`, `bay`, `island`, `cafe`, `market`, `parlor`,
     `lodge`, `clubhouse`, `sue-cottage`, `jordan-cabin`, `milo-house`,
     `rosie-cottage`, `sanctuary`,
     `bedroom`, `kitchen`, `pass`, `summit`, `trail`, `woods`, `hills`, `enchanted`), settling into a cozy seated-rest

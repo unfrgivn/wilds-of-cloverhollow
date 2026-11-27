@@ -117,6 +117,16 @@ describe("area surface maps", () => {
       surface: "stone" },
     { area: "summit", what: "the ski-lift wooden unloading deck", point: { x: 410, y: 865 },
       surface: "wood" },
+    { area: "island", what: "the sandy landing beach", point: spawn("island", "pier"),
+      surface: "sand" },
+    { area: "island", what: "the wooden landing pier", point: { x: 365, y: 830 },
+      surface: "wood" },
+    { area: "island", what: "the woven beach mat", point: { x: 1160, y: 796 },
+      surface: "carpet" },
+    { area: "island", what: "the central clover meadow", point: { x: 820, y: 580 },
+      surface: "grass" },
+    { area: "island", what: "the lighthouse grassy bluff", point: { x: 1180, y: 440 },
+      surface: "grass" },
   ];
   it.each(truths)("$area: $what is $surface", ({ area, point, surface }) => {
     expect(surfaceAt(mapOf(area), point)).toBe(surface);

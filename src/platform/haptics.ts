@@ -1,3 +1,5 @@
+import { isReducedMotionActive } from "./reduced-motion";
+
 // Tactile haptics progressive enhancement: Capacitor Haptics when available,
 // Web Vibration API fallback on supported browsers, silent no-op otherwise.
 
@@ -54,8 +56,7 @@ function hasWebVibrate(): boolean {
 }
 
 function prefersReducedMotion(): boolean {
-  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return false;
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  return isReducedMotionActive();
 }
 
 export function createHaptics(): Haptics {

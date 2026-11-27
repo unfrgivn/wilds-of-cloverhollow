@@ -6,7 +6,11 @@ export type CreditsEntryView = {
   name: string;
   image: AtlasImage | null;
 };
-export type CreditsView = { visible: boolean; entries: CreditsEntryView[] };
+export type CreditsView = {
+  visible: boolean;
+  entries: CreditsEntryView[];
+  summary?: readonly string[];
+};
 
 export function createCredits(root: HTMLElement): { render: (view: CreditsView) => void } {
   const screen = document.createElement("section");
@@ -21,12 +25,16 @@ export function createCredits(root: HTMLElement): { render: (view: CreditsView) 
   friendsList.className = "credits-list";
   const met = document.createElement("h2");
   met.textContent = "MET ALONG THE WAY";
+  const summaryList = document.createElement("ul");
+  summaryList.className = "credits-summary";
+  summaryList.setAttribute("aria-label", "Journey summary");
+  summaryList.hidden = true;
   const thanks = document.createElement("p");
   thanks.className = "credits-thanks";
   thanks.textContent = "Thank you for playing!";
   const metList = document.createElement("ul");
   metList.className = "credits-list";
-  screen.append(title, friends, friendsList, met, metList, thanks);
+  screen.append(title, friends, friendsList, met, metList, summaryList, thanks);
   root.append(screen);
   // The list is rebuilt only when what it shows changes: the shell renders
   // every frame while the credits are up, and they hold still.
@@ -40,11 +48,21 @@ export function createCredits(root: HTMLElement): { render: (view: CreditsView) 
       atlases = [];
       return;
     }
-    const key = JSON.stringify(view.entries);
+    const summary = view.summary ?? [];
+    const key = JSON.stringify({ entries: view.entries, summary });
     if (key === shown) return;
     shown = key;
     friends.hidden = !view.entries.some((entry) => entry.section === "friends");
     met.hidden = !view.entries.some((entry) => entry.section === "met");
+    summaryList.hidden = summary.length === 0;
+    summaryList.replaceChildren(
+      ...summary.map((text) => {
+        const item = document.createElement("li");
+        item.className = "credits-summary-pill";
+        item.textContent = text;
+        return item;
+      }),
+    );
     const renderEntry = (entry: CreditsEntryView): HTMLLIElement => {
       const item = document.createElement("li");
       item.className = `credits-entry credits-entry-${entry.section}`;

@@ -17,6 +17,7 @@ import {
   arcadeView,
   targetInteractable,
   creditEntries,
+  creditsSummary,
   levelForXp,
   levelUpLine,
   journalNotes,
@@ -546,7 +547,10 @@ async function boot(): Promise<void> {
       { paused, alpha: paused ? 1 : alpha, previousState },
     );
     prompt.render(
-      state.battle === null && state.arcade === null
+      state.battle === null &&
+        state.arcade === null &&
+        state.finale !== "credits" &&
+        titleMode === null
         ? view.promptView(state)
         : { visible: false, label: "", x: 0, y: 0 },
     );
@@ -648,6 +652,7 @@ async function boot(): Promise<void> {
             image: assets.atlasFrame(entry.image.atlas, entry.image.frame),
           }))
         : [],
+      summary: creditsOpen ? creditsSummary(content.world, state) : [],
     });
     logTitle(titleMode);
     if (titleMode !== null) document.documentElement.dataset.title = "open";
@@ -1098,6 +1103,18 @@ async function boot(): Promise<void> {
   let accumulator = 0;
   app.ticker.add(() => {
     gamepad.poll();
+    const bumperStep = gamepad.consumeBumperStep();
+    if (
+      bumperStep !== 0 &&
+      state.journalOpen &&
+      titleMode === null &&
+      !qaMenuOpen &&
+      !qaConsoleOpen
+    ) {
+      journal.stepPage(bumperStep);
+      sound.play("choice-move", state.tick);
+      invalidate();
+    }
     const now = performance.now();
     accumulator += Math.min(now - last, 250);
     last = now;
@@ -1131,6 +1148,22 @@ async function boot(): Promise<void> {
     if (event.repeat) return;
     if (event.target instanceof HTMLElement &&
         event.target.closest("input, textarea") !== null) return;
+    if (state.journalOpen && titleMode === null && !qaMenuOpen && !qaConsoleOpen) {
+      if (event.code === "BracketLeft" || event.code === "PageUp") {
+        event.preventDefault();
+        journal.stepPage(-1);
+        sound.play("choice-move", state.tick);
+        invalidate();
+        return;
+      }
+      if (event.code === "BracketRight" || event.code === "PageDown") {
+        event.preventDefault();
+        journal.stepPage(1);
+        sound.play("choice-move", state.tick);
+        invalidate();
+        return;
+      }
+    }
     if (event.code === "KeyP") {
       if (!canPhotoMode()) return;
       event.preventDefault();

@@ -371,6 +371,31 @@ export function journalProgress(
   };
 }
 
+/** Compact journey progress pills for the credits screen, omitting zero categories. */
+export function creditsSummary(
+  world: Pick<World, "stickers" | "arcade" | "storyVariable">,
+  state: Pick<State, "stickers" | "prizes" | "caughtFish" | "ink">,
+): string[] {
+  const progress = journalProgress(world, state);
+  const pills: string[] = [];
+  if (progress.stickers.owned > 0) {
+    pills.push(`${progress.stickers.owned}/${progress.stickers.total} Stickers`);
+  }
+  if (progress.gems.owned > 0) {
+    pills.push(`${progress.gems.owned}/${progress.gems.total} Star Gems`);
+  }
+  if (progress.fish.owned > 0) {
+    pills.push(`${progress.fish.owned}/${progress.fish.total} Fish`);
+  }
+  if (progress.keepsakes.owned > 0) {
+    pills.push(`${progress.keepsakes.owned}/${progress.keepsakes.total} Keepsakes`);
+  }
+  if (progress.prizes.owned > 0) {
+    pills.push(`${progress.prizes.owned}/${progress.prizes.total} Prizes`);
+  }
+  return pills;
+}
+
 export function autosaveNeeded(previous: State, next: State): boolean {
   if (previous.finale !== null || next.finale !== null) return false;
   return (

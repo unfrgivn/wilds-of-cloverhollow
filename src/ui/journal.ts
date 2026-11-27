@@ -111,6 +111,15 @@ type KeepsakeSlot = {
 type MapLand = JournalView["lands"][number];
 
 const journalPages: readonly JournalPage[] = ["notes", "map", "options"];
+
+/** Steps cleanly across Journal tabs with wrap-around in either direction. */
+export function stepJournalPage(current: JournalPage, delta: -1 | 1): JournalPage {
+  const index = journalPages.indexOf(current);
+  const start = index === -1 ? 0 : index;
+  const nextIndex = (start + delta + journalPages.length) % journalPages.length;
+  return journalPages[nextIndex] ?? "notes";
+}
+
 const svgNamespace = "http://www.w3.org/2000/svg";
 
 function syncSlider(slider: HTMLButtonElement, valueNode: HTMLElement, level: AudioLevel): void {
@@ -350,6 +359,7 @@ function makeOptionRow(
 export function createJournal(root: HTMLElement): {
   render: (view: JournalView) => void;
   setPage: (page: JournalPage) => void;
+  stepPage: (delta: -1 | 1) => void;
   onClose: (callback: () => void) => void;
   onToggleAudio: (callback: () => void) => void;
   onSetAudioLevel: (callback: (level: AudioLevel) => void) => void;
@@ -994,6 +1004,10 @@ export function createJournal(root: HTMLElement): {
     optionsPage.hidden = page !== "options";
   };
 
+  const stepPage = (delta: -1 | 1): void => {
+    setPage(stepJournalPage(page, delta));
+  };
+
   notesTab.addEventListener("click", () => setPage("notes"));
   mapTab.addEventListener("click", () => setPage("map"));
   optionsTab.addEventListener("click", () => setPage("options"));
@@ -1065,6 +1079,7 @@ export function createJournal(root: HTMLElement): {
   const keepsakeSlots: KeepsakeSlot[] = [];
   return {
     setPage,
+    stepPage,
     onClose: (callback) => {
       onClose = callback;
     },

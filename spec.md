@@ -136,7 +136,14 @@ ios/            Capacitor iOS project (from Milestone 4).
   re-exported through `src/core/sim.ts` and `src/core/index.ts` (Milestones 91,
   96).
 - Battle stage mood washes, Flute Friend on-stage cameo poses, and battle VFX
-  anchor resolution live in `src/render/battle-stage.ts` (Milestone 91).
+  anchor resolution live in `src/render/battle-stage.ts` (Milestone 91). The
+  Pixi battle stage container, sprites, backdrop blur, check geometry, and
+  `renderBattle` orchestration live in `BattleViewController`
+  (`src/render/battle-view.ts`, mounted by `GameView` in `src/render/view.ts`),
+  and the eight active battle timing-check DOM overlays (`ring`, `charge`,
+  `chain`, `catch`, `lean`, `trace`, `peekaboo`, `echo`) live in
+  `src/ui/battle-checks.ts` (re-exported through `src/ui/battle.ts`, Milestone
+  105).
 - Lazy DOM atlas metadata caching, single-decode image warming, frame crop
   resolvers (`stickerArt`, `prizeArt`, `speakerPortrait`, `fishArt`, `toyArt`),
   per-area close-up overlays (`ensureClawOverlay`, `ensureSkeeOverlay`,
@@ -150,8 +157,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   enhancement with zero new npm dependencies. `createHaptics()` checks for a
   native Capacitor Haptics plugin (`Capacitor.Plugins.Haptics`) via strict type
   guards and falls back to `navigator.vibrate` (`light: 10`, `medium: 18`,
-  `celebrate: [14, 40, 22]`), respecting `prefers-reduced-motion: reduce` and
-  no-oping safely on unsupported browsers or during synthetic harness steps.
+  `celebrate: [14, 40, 22]`), respecting both OS
+  `prefers-reduced-motion: reduce` and the in-game Reduced Motion toggle via
+  `isReducedMotionActive()` (`src/platform/reduced-motion.ts`) and no-oping
+  safely on unsupported browsers or during synthetic harness steps.
   Wired in `src/main.ts` on `GREAT!` battle checks (`"medium"`), `Together!` /
   `soothed` / `prize-won` / `fish-catch` (`"celebrate"`), and `claw-grab` /
   `mole-boop` / `fish-bite` / companion pet (`"light"`).
@@ -1892,7 +1901,10 @@ trunks keep its two exits.
 - The credits (`src/ui/credits.ts`) are a paper sheet over everything
   (`--z-credits` and shared `--sticker-*` tokens, with `.die-cut` on entry
   images and centred desktop layout from 1000 px wide): "THE END", FRIENDS,
-  MET ALONG THE WAY, and "Thank you for playing!", from `creditEntries` (`src/core/credits.ts`). FRIENDS is each roster member who
+  MET ALONG THE WAY, an optional Journey Summary ribbon (`.credits-summary`,
+  populated from pure `creditsSummary` in `src/core/journal.ts` with compact
+  pills for each non-zero collection category among Stickers, Star Gems, Fish,
+  Keepsakes, and Prizes, hidden when empty), and "Thank you for playing!", from `creditEntries` (`src/core/credits.ts`). FRIENDS is each roster member who
   starts with Fae or whose `befriended` (else `joins`) variable is true, in
   roster order, on the frame `down_idle_01`. MET is each sticker in
   `state.stickers`, by its name, on its critter's atlas at the sticker's
@@ -2158,10 +2170,19 @@ trunks keep its two exits.
     and `"instant"` reveals each line in full immediately.
   - **In-Game Reduced Motion** (`reducedMotion` in `src/platform/game-settings.ts`,
     default `false`): synced to `document.documentElement.dataset.reducedMotion`
-    (`"on"` / `"off"`), collapsing UI CSS animations/transitions
-    (`:root[data-reduced-motion="on"]`) and calming battle stage shake and
-    ambient mood wash drift/pulse in `src/render/view.ts` (alongside OS
-    `prefers-reduced-motion: reduce`).
+    (`"on"` / `"off"`) and checked alongside OS
+    `prefers-reduced-motion: reduce` via `isReducedMotionActive()`
+    (`src/platform/reduced-motion.ts`). When active, it collapses UI CSS
+    animations/transitions (`:root[data-reduced-motion="on"]`), silences
+    haptics (`src/platform/haptics.ts`), keeps door transitions as calm opacity
+    fades (`transitionZoom = 1`), snaps camera follow (`smoothFollowCamera`
+    with `snap = true`, zero look-ahead swing), holds overworld figures in
+    grounded stillness (skipping `walkPose` bounce/squash, `idleBreathing`,
+    `fairyHover` tilt, `roamerHop`, `companionIdlePose`, and `petReaction`
+    shake while keeping contact shadows), and calms battle presentation
+    (skipping `battleIntro` slide/zoom, zeroing `stageShake`, holding
+    `battleSunburst` at steady orientation, and freezing ambient mood wash
+    drift/pulse in `src/render/battle-view.ts`).
 - Every critter kind has a content `level`; `content/levels.json` maps it to
   `calmMax`, burst base/big strength, and calm XP. Soothe and a friend's command
   use the actor's Power (20 at level 1, +2 per level), with Magic (+1) on great
@@ -3240,6 +3261,12 @@ trunks keep its two exits.
   `Lantern: L`, `Flute: F`, `Lasso: R`). Both pages
   fit without scrolling or overlap at 667x375, 874x402, 1180x820, and 1280x720
   (switching Gameplay into a 2x2 touch tile grid at `max-height: 500px`).
+  While the Journal is open (outside Title / QA overlays), pressing `[` /
+  `PageUp` or `]` / `PageDown`, or Gamepad `LB` (button 4) / `RB` (button 5),
+  cycles tabs with wrap-around via `stepJournalPage` / `journal.stepPage`
+  (`notes` -> `map` -> `options` -> `notes`), closes any open Field Note or
+  Field Treasures card, and plays the in-key `choice-move` page-flip ping
+  without intercepting `ArrowLeft` / `ArrowRight` slider navigation.
 - **Interactive Field Treasures Card** (`treasuresSummary` in
   `src/core/treasures.ts`, `src/ui/journal.ts`): summarizes Fae's Star-Line
   Stamp Card (`buster_quest`, `stamp_bay`, `stamp_pass`, `buster_reward`),

@@ -4852,6 +4852,58 @@ the old trail, the owl, and the clubhouse claim.
   `CLOVERHOLLOW_E2E_PORT=4325 just e2e` (1,088 passed, 2 skipped, 0 failed in
   4.7 min).
 
+## Milestone 105: End-to-End Reduced Motion Parity, Credits Journey Summary Ribbon, Keyboard/Gamepad Journal Tab Flipping & `battle-checks.ts` / `battle-view.ts` Modularization **Status:** ✅ Completed (2026-11-27)
+- Complete End-to-End Reduced Motion Parity (`src/platform/reduced-motion.ts`,
+  `src/platform/haptics.ts`, `src/render/view.ts`, `src/render/battle-view.ts`):
+  - Shared `isReducedMotionActive()` checks both the in-game toggle
+    (`document.documentElement.dataset.reducedMotion === "on"`) and OS
+    `prefers-reduced-motion: reduce`.
+  - Updated `src/platform/haptics.ts` so in-game Reduced Motion silences
+    haptics alongside OS reduced motion.
+  - Applied reduced motion across the entire Pixi renderer: calm door fades
+    (`transitionZoom = 1`), snapped camera follow (no look-ahead swing),
+    grounded overworld stillness (skipping walk bounce, idle breathing, fairy
+    hover, roamer hop, companion idle pose, and pet shake while keeping contact
+    shadows), and calm battles (no intro slide/zoom, zero stage shake, steady
+    sunburst orientation, frozen mood wash drift).
+- Credits Journey Summary Ribbon (`src/core/journal.ts`, `src/ui/credits.ts`,
+  `src/ui/credits.css`, `src/main.ts`):
+  - Added pure `creditsSummary(world, state)` in `src/core/journal.ts`
+    (re-exported from `src/core/index.ts`), emitting compact pills only for
+    non-zero categories across Stickers, Star Gems, Fish, Keepsakes, and Prizes.
+  - Added optional `summary?: readonly string[]` on `CreditsView` and a compact
+    high-contrast pill strip `<ul class="credits-summary">` above
+    `.credits-thanks` (hidden when empty so `ui-gallery` `credits` /
+    `credits-short` baselines remain pixel-identical), and hid the overworld
+    `TALK` prompt during `state.finale === "credits"` and `titleMode !== null`
+    after `vision` spotted a stray `TALK` bubble leaking over Credits.
+- Keyboard & Gamepad Journal Tab Flipping (`src/ui/journal.ts`,
+  `src/platform/gamepad.ts`, `src/main.ts`):
+  - Exported pure `stepJournalPage(current, delta)` and exposed
+    `journal.stepPage(delta)` (dismissing any open Field Note or Field
+    Treasures card).
+  - Wired `[`/`PageUp`, `]`/`PageDown`, and Gamepad `LB` (button 4) / `RB`
+    (button 5) edge presses while the Journal is open to flip tabs with the
+    in-key `choice-move` ping without intercepting `ArrowLeft` / `ArrowRight`.
+- Modularization (`src/ui/battle-checks.ts`, `src/render/battle-view.ts`):
+  - Extracted the 8 active timing-check DOM overlays and grade/hint rendering
+    into `src/ui/battle-checks.ts` (re-exported through `src/ui/battle.ts`),
+    trimming `src/ui/battle.ts` from 1,500 to 801 lines.
+  - Extracted Pixi battle stage, backdrop blur, layout, check geometry, and
+    `renderBattle` orchestration into `BattleViewController`
+    (`src/render/battle-view.ts`), trimming `src/render/view.ts` from 2,489 to
+    1,670 lines.
+- Evidence: `tests/unit/milestone-105.test.ts` (4 tests), real-key `[`/`]`/
+  `PageUp`/`PageDown` Journal tab + Reduced Motion e2e in
+  `tests/e2e/accessibility.spec.ts`, and `art/review/m105-ending-credits.jpg`
+  verified with `vision` (zero stray prompts or overlays).
+- Gates: `just check` (164 unit files / 1,265 tests, all 67 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  `CLOVERHOLLOW_E2E_PORT=4331 just e2e` (1,090 passed, 2 skipped) plus
+  `ending.spec.ts` re-verified across Chromium & WebKit after fixing the
+  Credits prompt leak.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

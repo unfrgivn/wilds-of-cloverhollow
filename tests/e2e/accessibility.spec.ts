@@ -236,3 +236,57 @@ test(
     await expect(page.locator(".journal-map-detail")).toContainText("/5 stickers");
   },
 );
+
+test(
+  "Journal [, ], PageUp, PageDown tab flipping wraps cleanly and Reduced Motion toggles cleanly",
+  { tag: "@smoke" },
+  async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await openHarness(page);
+    await resetPaused(page, "plaza");
+
+    await page.keyboard.press("j");
+    await step(page, 2);
+    const book = page.locator(".journal-book");
+    await expect(book).toHaveAttribute("data-journal-page", "notes");
+
+    // Forward wrap: notes -> map -> options -> notes via ] and PageDown.
+    await page.keyboard.press("BracketRight");
+    await expect(book).toHaveAttribute("data-journal-page", "map");
+    await page.keyboard.press("PageDown");
+    await expect(book).toHaveAttribute("data-journal-page", "options");
+    await page.keyboard.press("BracketRight");
+    await expect(book).toHaveAttribute("data-journal-page", "notes");
+
+    // Backward wrap: notes -> options -> map -> notes via [ and PageUp.
+    await page.keyboard.press("BracketLeft");
+    await expect(book).toHaveAttribute("data-journal-page", "options");
+    await page.keyboard.press("PageUp");
+    await expect(book).toHaveAttribute("data-journal-page", "map");
+    await page.keyboard.press("BracketLeft");
+    await expect(book).toHaveAttribute("data-journal-page", "notes");
+
+    // Toggle Reduced Motion via OPTIONS and verify dataset sync + clean overworld render.
+    await page.keyboard.press("BracketLeft");
+    await expect(book).toHaveAttribute("data-journal-page", "options");
+    const reducedBtn = page.locator(".journal-option-reduced-motion");
+    await expect(reducedBtn).toHaveText("off");
+    await reducedBtn.click();
+    await expect(reducedBtn).toHaveText("on");
+    await expect
+      .poll(() => page.evaluate(() => document.documentElement.dataset.reducedMotion))
+      .toBe("on");
+
+    // Close journal and walk under reduced motion to verify smooth grounded stepping.
+    await page.keyboard.press("Escape");
+    await step(page, 2);
+    await hold(page, "ArrowDown", 10);
+    expect((await readState(page)).player.y).toBeGreaterThan(0);
+
+    // Restore default cleanly.
+    await page.evaluate(() => window.__cloverhollow?.settings.setReducedMotion(false));
+    await expect
+      .poll(() => page.evaluate(() => document.documentElement.dataset.reducedMotion))
+      .toBe("off");
+  },
+);

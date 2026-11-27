@@ -3924,7 +3924,11 @@ trunks keep its two exits.
   is active), Star-Line bus stop status (`cloverhollow`, `bay`, `pass`), and
   iconic land highlights, while keeping the default un-selected `"Here: ..."`
   line unchanged.
-- The OPTIONS spread is a two-page open-book layout matching NOTES/STICKERS:
+- The OPTIONS spread (extracted into `src/ui/journal-options.ts` via
+  `createJournalOptionsPage`, with `journalControlsLines`, `formatJukeboxLabel`,
+  `JournalControlsTools`, `JournalControlsLines`, `JournalInputMode`, and
+  `JukeboxMeta` re-exported from `src/ui/journal.ts`, Milestone 146) is a
+  two-page open-book layout matching NOTES/STICKERS:
   the left page (`SOUND & MUSIC`) shows the interactive Music Box pill
   (`.journal-jukebox`: `role="group"`, 44 px `‹` `.journal-jukebox-prev` and `›`
   `.journal-jukebox-next` buttons flanking the interactive `.journal-now-playing`
@@ -3941,7 +3945,8 @@ trunks keep its two exits.
   `Instant`), and Reduced Motion (`Off` / `On`, stored under
   `cloverhollow-settings`, upgrading legacy preferences cleanly) above a compact
   adaptive Controls reference card (`journalControlsLines` in
-  `src/ui/journal.ts`, Milestone 122): in default `"keyboard"` mode it displays
+  `src/ui/journal-options.ts`, re-exported from `src/ui/journal.ts`,
+  Milestone 122 / Milestone 146): in default `"keyboard"` mode it displays
   `Move: Arrows / WASD · Talk: Z · Journal: J · Mute: M` plus unlocked tools
   (`Lantern: L`, `Flute: F`, `Lasso: R`); when a gamepad is active (`"gamepad"`
   mode) it switches cleanly to
@@ -4122,6 +4127,19 @@ trunks keep its two exits.
       (`keepsakeIcon` in `.journal-field-charm`), name, `"Clubhouse Keepsake"`,
       `Found in: <source>`, `Displayed: <displaySpot>`, and Fae's 1-line
       memory (`JournalKeepsake.memory`).
+    - **Interactive Scrapbook Specimen Browser** (Milestone 146, pure
+      `inspectableShelfIds` & `stepInspectedItem` in `src/ui/journal-field-note.ts`,
+      wired via `journal.stepOverlay` / `journal.onOverlayStep` and
+      `src/shell/input-shortcuts.ts`): when at least 2 inspectable entries are
+      owned on the open card's shelf (`sticker`, `prize`, `fish`, or
+      `keepsake`), a compact storybook pager (`.journal-field-pager`: `‹`
+      `.journal-field-prev`, `aria-live="polite"` `.journal-field-counter`
+      showing `1 / N`, and `›` `.journal-field-next`, hidden whenever fewer than
+      2 entries are owned) renders beneath the specimen portrait / `Old Friend`
+      pill. Clicking `‹` / `›`, pressing `ArrowLeft` / `ArrowRight`, or flicking
+      Gamepad D-Pad / Left Stick Left or Right flips directly across owned
+      entries on that shelf with wrap-around, firing `"page-turn"` foley and a
+      light haptic without leaving the card.
   - **Completion Ribbons & MAP Footer Pills**: `STICKERS` and `PRIZES` headings
     also show the golden `★ Complete!` ribbon once every entry in their shelf is
     owned. The MAP footer dynamically attaches `Fish N/6` and `Keepsakes N/8`

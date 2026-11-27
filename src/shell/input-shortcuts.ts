@@ -33,6 +33,7 @@ export type ShortcutKeyEvent = {
 export type ShortcutJournalControl = {
   hasOpenOverlay: () => boolean;
   dismissOverlay: () => boolean;
+  stepOverlay: (delta: -1 | 1) => boolean;
   stepPage: (delta: -1 | 1) => void;
   scrollActivePage: (deltaY: number) => boolean;
   navigateFocus: (direction: JournalNavDirection) => boolean;
@@ -361,7 +362,14 @@ export function createInputShortcuts(
       deps.journal.stepPage(bumperStep);
       deps.invalidate();
     }
-    if (journalActive && !deps.journal.hasOpenOverlay()) {
+    if (journalActive && deps.journal.hasOpenOverlay()) {
+      if (
+        (navStep === "left" || navStep === "right") &&
+        deps.journal.stepOverlay(navStep === "right" ? 1 : -1)
+      ) {
+        deps.invalidate();
+      }
+    } else if (journalActive) {
       const scrollDelta = computeJournalScrollDelta(deps.gamepad.rightStickY());
       if (scrollDelta !== 0 && deps.journal.scrollActivePage(scrollDelta)) {
         deps.invalidate();

@@ -6377,6 +6377,44 @@ the old trail, the owl, and the clubhouse claim.
   just e2e` (1,188 passed, 2 skipped, 0 failed across Chromium & WebKit +
   post-rebase `milo-rosie.spec` & `park.spec` verified).
 
+## Milestone 146: Interactive Scrapbook Specimen Browser + `src/ui/journal-options.ts` Modular Extraction **Status:** ✅ Completed (2026-11-27)
+- Interactive Scrapbook Specimen Browser (`src/ui/journal-field-note.ts`,
+  `src/ui/journal.css`, `src/ui/journal.ts`, `src/shell/input-shortcuts.ts`,
+  `src/main.ts`):
+  - Exports pure `inspectableShelfIds(view, kind)` and
+    `stepInspectedItem(view, current, delta)` supporting wrap-around prev/next
+    browsing across all 4 collection shelves (`sticker`, `prize`, `fish`,
+    `keepsake`) while skipping unowned entries and returning `null` when fewer
+    than 2 inspectable items are owned.
+  - Mounts a compact `.journal-field-pager` (`‹` `.journal-field-prev`,
+    `aria-live="polite"` `.journal-field-counter`, `›` `.journal-field-next`,
+    hidden when `< 2` owned entries) inside `.journal-field-left` with warm
+    cream/ink contrast (`>= 9:1`) and responsive `max-height: 460px` phone
+    sizing.
+  - Supports flipping via click/tap, keyboard `ArrowLeft` / `ArrowRight`, and
+    Gamepad D-Pad / Left Stick Left & Right (`journal.stepOverlay`), firing
+    `"page-turn"` foley and light haptic feedback (`journal.onOverlayStep`).
+- Modular `src/ui/journal-options.ts` Extraction (`src/ui/journal-options.ts`,
+  `src/ui/journal.ts`):
+  - Extracts `createJournalOptionsPage`, `journalControlsLines`,
+    `formatJukeboxLabel`, slider helpers, and OPTIONS types into
+    `src/ui/journal-options.ts`, re-exporting public helpers and types
+    identically from `src/ui/journal.ts` and trimming `src/ui/journal.ts` cleanly
+    below 700 lines with zero DOM changes or breadcrumbs.
+- Stationary Choice Hit-Box Polish (`src/ui/sticker.css`):
+  - Removed the vertical `translate: 0 5px` shift from `@keyframes choice-pop-in`
+    (keeping the smooth `150ms` opacity fade) so dialogue choice buttons keep a
+    100% stationary hit-box from frame 0 on WebKit/Safari.
+- Zero `src/core` changes and zero replay hash shifts across all 70 recorded
+  sims.
+- Evidence: `tests/unit/milestone-146.test.ts` (4 tests), real-input
+  `tests/e2e/milestone-146.spec.ts` (`@smoke`, Chromium & WebKit), and
+  `art/review/m146-specimen-browser.jpg` verified with `vision`.
+- Gates: `just check` (208 unit files / 1,514 tests, all 70 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  e2e across Chromium & WebKit (0 failed, 0 snapshot diffs).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

@@ -396,8 +396,8 @@
 }
 
 @keyframes choice-pop-in {
-  from { opacity: 0; translate: 0 5px; }
-  to { opacity: 1; translate: 0 0; }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes portrait-bob {

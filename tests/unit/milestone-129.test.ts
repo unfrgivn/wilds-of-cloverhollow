@@ -404,6 +404,7 @@ describe("Milestone 129: Overworld Pointer Steering & Input Shortcuts", () => {
           hasJournalOverlay = false;
           return true;
         },
+        stepOverlay: () => false,
         stepPage: (delta) => pageSteps.push(delta),
         scrollActivePage: () => true,
         navigateFocus: (dir) => {

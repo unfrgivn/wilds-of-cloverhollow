@@ -57,6 +57,7 @@ export type JournalFieldOverlays = {
   openTreasures: (view: JournalFieldNoteSource | null) => void;
   syncFieldNote: (view: JournalFieldNoteSource) => void;
   syncTreasures: (view: JournalFieldNoteSource) => void;
+  stepFieldNote: (delta: -1 | 1) => boolean;
   closeFieldNote: () => void;
   closeTreasures: () => void;
   closeAll: () => void;
@@ -64,6 +65,47 @@ export type JournalFieldOverlays = {
   dismiss: () => boolean;
   handleKeydown: (event: KeyboardEvent) => boolean;
 };
+
+/** Lists the inspectable owned entry IDs for a given Journal collection shelf in display order. */
+export function inspectableShelfIds(
+  view: JournalFieldNoteSource,
+  kind: InspectedJournalItem["kind"],
+): string[] {
+  if (kind === "sticker") {
+    return view.stickers
+      .filter((s) => s.owned && s.fieldNote !== null && s.fieldNote !== undefined)
+      .map((s) => s.id);
+  }
+  if (kind === "prize") {
+    return (view.prizes ?? [])
+      .filter((p) => p.owned && p.image !== null)
+      .map((p) => p.id);
+  }
+  if (kind === "fish") {
+    return (view.fish ?? []).filter((f) => f.owned).map((f) => f.id);
+  }
+  return (view.keepsakes ?? []).filter((k) => k.owned).map((k) => k.id);
+}
+
+/** Steps backward or forward with wrap-around across owned entries on the same Journal shelf. */
+export function stepInspectedItem(
+  view: JournalFieldNoteSource,
+  current: InspectedJournalItem,
+  delta: -1 | 1,
+): { next: InspectedJournalItem; index: number; total: number } | null {
+  const ids = inspectableShelfIds(view, current.kind);
+  if (ids.length < 2) return null;
+  const idx = ids.indexOf(current.id);
+  if (idx === -1) return null;
+  const nextIndex = (((idx + delta) % ids.length) + ids.length) % ids.length;
+  const nextId = ids[nextIndex];
+  if (nextId === undefined) return null;
+  return {
+    next: { kind: current.kind, id: nextId },
+    index: nextIndex,
+    total: ids.length,
+  };
+}
 
 const CLAW_ORIGIN = "Claw Machine · Mr. Pip's Arcade";
 const COUNTER_ORIGIN = "Ticket Counter · Mr. Pip's Arcade";
@@ -172,6 +214,7 @@ export function fieldNoteBlurb(note: CritterFieldNote): string {
 
 export function createJournalFieldOverlays(options?: {
   onVisibilityChange?: (open: boolean) => void;
+  onStep?: () => void;
 }): JournalFieldOverlays {
   const fieldBackdrop = element("div", "journal-field-backdrop");
   fieldBackdrop.hidden = true;
@@ -194,7 +237,20 @@ export function createJournalFieldOverlays(options?: {
   const fieldOldFriend = element("span", "journal-field-old-friend");
   fieldOldFriend.textContent = "★ Old Friend";
   fieldOldFriend.hidden = true;
-  fieldLeft.append(fieldSpecimen, fieldOldFriend);
+  const fieldPager = element("div", "journal-field-pager");
+  fieldPager.hidden = true;
+  const fieldPrev = element("button", "journal-field-nav journal-field-prev");
+  fieldPrev.type = "button";
+  fieldPrev.setAttribute("aria-label", "Previous entry");
+  fieldPrev.textContent = "‹";
+  const fieldCounter = element("span", "journal-field-counter");
+  fieldCounter.setAttribute("aria-live", "polite");
+  const fieldNext = element("button", "journal-field-nav journal-field-next");
+  fieldNext.type = "button";
+  fieldNext.setAttribute("aria-label", "Next entry");
+  fieldNext.textContent = "›";
+  fieldPager.append(fieldPrev, fieldCounter, fieldNext);
+  fieldLeft.append(fieldSpecimen, fieldOldFriend, fieldPager);
   const fieldBody = element("div", "journal-field-body");
   const fieldName = element("h3", "journal-field-name");
   const fieldSub = element("div", "journal-field-sub");
@@ -272,8 +328,10 @@ export function createJournalFieldOverlays(options?: {
   let fieldSignature = "";
   let treasuresSignature = "";
   let inspectedItem: InspectedJournalItem | null = null;
+  let latestView: JournalFieldNoteSource | null = null;
   let treasuresOpen = false;
   const onVisibilityChange = options?.onVisibilityChange;
+  const onStep = options?.onStep;
 
   const hasOpen = (): boolean => treasuresOpen || inspectedItem !== null;
 
@@ -282,10 +340,26 @@ export function createJournalFieldOverlays(options?: {
     if (nowOpen !== wasOpen) onVisibilityChange?.(nowOpen);
   };
 
+  const syncPager = (view: JournalFieldNoteSource | null): void => {
+    if (inspectedItem === null || view === null) {
+      fieldPager.hidden = true;
+      return;
+    }
+    const ids = inspectableShelfIds(view, inspectedItem.kind);
+    const index = ids.indexOf(inspectedItem.id);
+    if (ids.length < 2 || index === -1) {
+      fieldPager.hidden = true;
+      return;
+    }
+    fieldPager.hidden = false;
+    setText(fieldCounter, `${index + 1} / ${ids.length}`);
+  };
+
   const clearFieldNote = (): void => {
     if (inspectedItem === null && fieldBackdrop.hidden) return;
     inspectedItem = null;
     fieldSignature = "";
+    fieldPager.hidden = true;
     fieldBackdrop.hidden = true;
   };
 
@@ -387,9 +461,13 @@ export function createJournalFieldOverlays(options?: {
     );
   };
 
-  const renderPrizeNote = (prize: JournalFieldNotePrize): void => {
+  const renderPrizeNote = (
+    prize: JournalFieldNotePrize,
+    view: JournalFieldNoteSource | null,
+  ): void => {
     const meta = prizeFieldNote(prize.id);
     fieldBackdrop.hidden = false;
+    syncPager(view);
     const signature = [
       "prize",
       prize.id,
@@ -421,7 +499,9 @@ export function createJournalFieldOverlays(options?: {
   };
 
   const syncFieldNote = (view: JournalFieldNoteSource): void => {
+    latestView = view;
     if (inspectedItem === null) {
+      fieldPager.hidden = true;
       if (!fieldBackdrop.hidden) fieldBackdrop.hidden = true;
       return;
     }
@@ -436,6 +516,7 @@ export function createJournalFieldOverlays(options?: {
         return;
       }
       fieldBackdrop.hidden = false;
+      syncPager(view);
       const signature = [
         "sticker",
         sticker.id,
@@ -490,7 +571,7 @@ export function createJournalFieldOverlays(options?: {
         clearFieldNote();
         return;
       }
-      renderPrizeNote(prize);
+      renderPrizeNote(prize, view);
       return;
     }
     if (inspectedItem.kind === "fish") {
@@ -502,6 +583,7 @@ export function createJournalFieldOverlays(options?: {
         return;
       }
       fieldBackdrop.hidden = false;
+      syncPager(view);
       const signature = [
         "fish",
         fish.id,
@@ -541,6 +623,7 @@ export function createJournalFieldOverlays(options?: {
       return;
     }
     fieldBackdrop.hidden = false;
+    syncPager(view);
     const signature = [
       "keepsake",
       keepsake.id,
@@ -569,6 +652,18 @@ export function createJournalFieldOverlays(options?: {
     setText(fieldBlurb, keepsake.memory);
   };
 
+  const stepFieldNote = (delta: -1 | 1): boolean => {
+    if (fieldBackdrop.hidden || inspectedItem === null || latestView === null) return false;
+    const stepped = stepInspectedItem(latestView, inspectedItem, delta);
+    if (stepped === null) return false;
+    inspectedItem = stepped.next;
+    syncFieldNote(latestView);
+    onStep?.();
+    return true;
+  };
+
+  fieldPrev.addEventListener("click", () => { stepFieldNote(-1); });
+  fieldNext.addEventListener("click", () => { stepFieldNote(1); });
   fieldClose.addEventListener("click", closeFieldNote);
   fieldBackdrop.addEventListener("click", (event) => {
     if (event.target === fieldBackdrop) closeFieldNote();
@@ -611,7 +706,7 @@ export function createJournalFieldOverlays(options?: {
       if (view !== undefined && view !== null) {
         syncFieldNote(view);
       } else {
-        renderPrizeNote(prize);
+        renderPrizeNote(prize, null);
       }
       notifyVisibility(wasOpen);
     },
@@ -624,6 +719,7 @@ export function createJournalFieldOverlays(options?: {
     },
     syncFieldNote,
     syncTreasures,
+    stepFieldNote,
     closeFieldNote,
     closeTreasures,
     closeAll,
@@ -643,6 +739,12 @@ export function createJournalFieldOverlays(options?: {
           event.preventDefault();
           event.stopPropagation();
           closeFieldNote();
+        } else if (
+          !fieldBackdrop.hidden &&
+          (event.key === "ArrowLeft" || event.key === "ArrowRight")
+        ) {
+          event.preventDefault();
+          stepFieldNote(event.key === "ArrowRight" ? 1 : -1);
         }
         return true;
       }

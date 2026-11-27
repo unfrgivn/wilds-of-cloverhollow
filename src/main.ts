@@ -163,10 +163,9 @@ async function boot(): Promise<void> {
     });
   const journal = createJournal(uiRoot);
   let jukeboxTrack: JukeboxTrack | null = null;
-  journal.onPageChange(() => {
-    sound.playEffect("page-turn");
-    lightHaptic();
-  });
+  const playPageTurn = (): void => { sound.playEffect("page-turn"); lightHaptic(); };
+  journal.onPageChange(playPageTurn);
+  journal.onOverlayStep(playPageTurn);
   journal.onOverlayChange((open) => {
     sound.playEffect(open ? "card-open" : "card-close");
     if (open) lightHaptic();

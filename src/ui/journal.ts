@@ -2,104 +2,37 @@ import "./journal.css";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
 import { element, setAttribute, setText, syncAttachedAfter } from "./dom";
 import {
-  coinMarkup,
-  cookieMarkup,
-  gemMarkup,
-  heartMarkup,
-  icon,
-  keepsakeIcon,
-  ticketMarkup,
+  coinMarkup, cookieMarkup, gemMarkup, heartMarkup, icon, keepsakeIcon, ticketMarkup,
 } from "./icons";
-import { createJournalFieldOverlays } from "./journal-field-note";
+import {
+  createJournalFieldOverlays,
+  type JournalFieldNoteFish,
+  type JournalFieldNoteSticker,
+} from "./journal-field-note";
 import { createJournalMapPage } from "./journal-map";
 import { createJournalNavController, cycleIndex, type JournalNavDirection } from "./journal-nav";
-import { AUDIO_LEVELS, type AudioLevel } from "../platform/audio-settings";
+import {
+  createJournalOptionsPage, makeJournalButton, makeSliderButton, syncSlider, wireSlider,
+  type JournalOptionsHandlers, type JournalOptionsView,
+} from "./journal-options";
 import { formatArcadeRecordPills, type MinigameRecords } from "../platform/minigame-records";
 import type {
-  BusRoute,
-  CarriedTreat,
-  CritterFieldNote,
-  JournalKeepsake,
-  KeepsakeId,
-  LandProgress,
+  BusRoute, CarriedTreat, JournalKeepsake, KeepsakeId, LandProgress,
 } from "../core/journal";
 import type { LevelStats } from "../core/levels";
-import type { TextSpeed } from "../core/sim";
 import type { TreasuresSummary } from "../core/treasures";
 
+export {
+  formatJukeboxLabel, journalControlsLines, type JournalControlsLines,
+  type JournalControlsTools, type JournalControlTools, type JournalInputMode, type JukeboxMeta,
+} from "./journal-options";
+
 export type JournalPage = "notes" | "map" | "options";
-
-export type JournalSticker = {
-  id: string;
-  name: string;
-  owned: boolean;
-  image: AtlasImage | null;
-  fieldNote?: CritterFieldNote | null;
-};
+export type JournalSticker = JournalFieldNoteSticker;
 export type JournalPrize = JournalSticker;
-export type JournalFishEntry = {
-  id: string;
-  name: string;
-  image: AtlasImage | null;
-  owned: boolean;
-  rare: boolean;
-  coins: number;
-  snacks: number;
-  blurb: string;
-};
+export type JournalFishEntry = JournalFieldNoteFish;
 
-export type JukeboxMeta = {
-  active: boolean;
-  index: number;
-  total: number;
-};
-
-export type JournalInputMode = "keyboard" | "gamepad";
-
-export type JournalControlTools = {
-  hasLantern: boolean;
-  hasFlute: boolean;
-  hasLasso: boolean;
-};
-
-/** Formats the Journal OPTIONS Controls reference lines for keyboard or gamepad play. */
-export function journalControlsLines(
-  inputMode: JournalInputMode,
-  tools: JournalControlTools,
-): { primary: string; tools: string } {
-  if (inputMode === "gamepad") {
-    const toolParts: string[] = [];
-    if (tools.hasLantern) toolParts.push("Lantern: X");
-    if (tools.hasFlute) toolParts.push("Flute: RB");
-    if (tools.hasLasso) toolParts.push("Lasso: LB");
-    toolParts.push("Photo / Guide: View");
-    return {
-      primary: "Move: Stick / D-Pad · Talk: A · Back: B · Journal: Y",
-      tools: toolParts.join(" · "),
-    };
-  }
-  const toolParts: string[] = [];
-  if (tools.hasLantern) toolParts.push("Lantern: L");
-  if (tools.hasFlute) toolParts.push("Flute: F");
-  if (tools.hasLasso) toolParts.push("Lasso: R");
-  return {
-    primary: "Move: Arrows / WASD · Talk: Z · Journal: J · Mute: M",
-    tools: toolParts.join(" · "),
-  };
-}
-
-/** Formats the accessible label and tooltip for the Music Box now-playing pill. */
-export function formatJukeboxLabel(nowPlaying: string, meta?: JukeboxMeta): string {
-  if (meta !== undefined && meta.active && meta.total > 0) {
-    return (
-      `Track ${meta.index + 1} of ${meta.total}: ${nowPlaying} ` +
-      "— press Left or Right to browse, Enter to return to area theme"
-    );
-  }
-  return `Now playing: ${nowPlaying} — press Left or Right to browse Music Box`;
-}
-
-export type JournalView = {
+export type JournalView = JournalOptionsView & {
   visible: boolean;
   /** Newest first; the game decides the order. */
   notes: string[];
@@ -123,22 +56,7 @@ export type JournalView = {
   snacks: number;
   gems?: { found: number; total: number };
   valleyComplete?: boolean;
-  muted: boolean;
-  level: AudioLevel;
-  musicMuted: boolean;
-  musicLevel: AudioLevel;
-  ambienceMuted: boolean;
-  nowPlaying: string;
-  jukebox?: JukeboxMeta;
-  gentleTiming: boolean;
-  keyHints: boolean;
-  textSpeed: TextSpeed;
-  reducedMotion: boolean;
   treasures?: TreasuresSummary;
-  hasLantern: boolean;
-  hasFlute: boolean;
-  hasLasso?: boolean;
-  inputMode?: JournalInputMode;
   members: {
     id: string;
     name: string;
@@ -176,62 +94,6 @@ export function stepJournalPage(current: JournalPage, delta: -1 | 1): JournalPag
 }
 
 const svgNamespace = "http://www.w3.org/2000/svg";
-
-function syncSlider(slider: HTMLButtonElement, valueNode: HTMLElement, level: AudioLevel): void {
-  const percent = String(Math.round(level * 100));
-  setAttribute(slider, "aria-valuenow", percent);
-  setAttribute(slider, "aria-valuetext", `${percent}%`);
-  setText(valueNode, `${percent}%`);
-}
-
-function wireSlider(
-  slider: HTMLButtonElement,
-  valueNode: HTMLElement,
-  onChange: () => (level: AudioLevel) => void,
-): (direction: -1 | 1) => void {
-  const apply = (next: AudioLevel): void => {
-    syncSlider(slider, valueNode, next);
-    onChange()(next);
-  };
-  const stepLevel = (direction: -1 | 1): void => {
-    const current = Number(slider.getAttribute("aria-valuenow"));
-    const index = AUDIO_LEVELS.findIndex((candidate) => candidate * 100 === current);
-    const start = index === -1 ? AUDIO_LEVELS.length - 1 : index;
-    const nextIndex = (start + direction + AUDIO_LEVELS.length) % AUDIO_LEVELS.length;
-    const next = AUDIO_LEVELS[nextIndex];
-    if (next !== undefined) apply(next);
-  };
-  slider.addEventListener("click", () => stepLevel(1));
-  slider.addEventListener("keydown", (event) => {
-    if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
-      event.preventDefault();
-      stepLevel(-1);
-    } else if (event.key === "ArrowRight" || event.key === "ArrowUp") {
-      event.preventDefault();
-      stepLevel(1);
-    } else if (event.key === "Home" || event.key === "End") {
-      event.preventDefault();
-      apply(event.key === "Home" ? AUDIO_LEVELS[0] : AUDIO_LEVELS[3]);
-    }
-  });
-  return stepLevel;
-}
-
-function makeSliderButton(className: string, ariaLabel: string): {
-  button: HTMLButtonElement;
-  value: HTMLSpanElement;
-} {
-  const button = element("button", className);
-  button.type = "button";
-  button.setAttribute("role", "slider");
-  button.setAttribute("aria-label", ariaLabel);
-  button.setAttribute("aria-valuemin", "25");
-  button.setAttribute("aria-valuemax", "100");
-  button.setAttribute("aria-valuestep", "25");
-  const value = element("span", "journal-volume-value");
-  button.append(value);
-  return { button, value };
-}
 
 function wireInspectable(root: HTMLElement, onInspect?: () => void): void {
   if (onInspect === undefined) return;
@@ -307,20 +169,6 @@ function makeCompleteRibbon(): HTMLSpanElement {
   return ribbon;
 }
 
-function makeButton(className: string, ariaLabel: string, text?: string): HTMLButtonElement {
-  const button = element("button", className);
-  button.type = "button";
-  button.setAttribute("aria-label", ariaLabel);
-  if (text !== undefined) button.textContent = text;
-  return button;
-}
-
-function syncOptionToggle(button: HTMLButtonElement, enabled: boolean): void {
-  setText(button, enabled ? "on" : "off");
-  button.classList.toggle("is-muted", !enabled);
-  setAttribute(button, "aria-pressed", String(enabled));
-}
-
 function syncSlotVisual(
   slot: Slot,
   owned: boolean,
@@ -379,34 +227,7 @@ function supply(kind: keyof typeof supplyMarkup, label: string): {
   return { root, count };
 }
 
-function textSpeedLabel(speed: TextSpeed): string {
-  if (speed === "brisk") return "Brisk";
-  if (speed === "instant") return "Instant";
-  return "Cozy";
-}
-
-function makeOptionRow(
-  titleText: string,
-  subtitleText: string | null,
-  controls: HTMLElement[],
-): HTMLDivElement {
-  const row = element("div", "journal-opt-row");
-  const copy = element("div", "journal-opt-copy");
-  const title = element("div", "journal-opt-label");
-  title.textContent = titleText;
-  copy.append(title);
-  if (subtitleText !== null) {
-    const sub = element("div", "journal-opt-sub");
-    sub.textContent = subtitleText;
-    copy.append(sub);
-  }
-  const right = element("div", "journal-opt-controls");
-  right.append(...controls);
-  row.append(copy, right);
-  return row;
-}
-
-export function createJournal(root: HTMLElement): {
+export type JournalControl = JournalOptionsHandlers & {
   render: (view: JournalView) => void;
   setPage: (page: JournalPage) => void;
   stepPage: (delta: -1 | 1) => void;
@@ -415,27 +236,20 @@ export function createJournal(root: HTMLElement): {
   activateFocused: () => boolean;
   hasOpenOverlay: () => boolean;
   dismissOverlay: () => boolean;
+  stepOverlay: (delta: -1 | 1) => boolean;
   onPageChange: (callback: (page: JournalPage) => void) => void;
   onOverlayChange: (callback: (open: boolean) => void) => void;
+  onOverlayStep: (callback: () => void) => void;
   onClose: (callback: () => void) => void;
-  onToggleAudio: (callback: () => void) => void;
-  onSetAudioLevel: (callback: (level: AudioLevel) => void) => void;
-  onToggleMusic: (callback: () => void) => void;
-  onSetMusicLevel: (callback: (level: AudioLevel) => void) => void;
-  onToggleAmbience: (callback: () => void) => void;
-  onStepTrack: (callback: (delta: -1 | 1) => void) => void;
-  onResetJukebox: (callback: () => void) => void;
-  onToggleGentleTiming: (callback: () => void) => void;
-  onToggleKeyHints: (callback: () => void) => void;
-  onCycleTextSpeed: (callback: () => void) => void;
-  onToggleReducedMotion: (callback: () => void) => void;
-} {
+};
+
+export function createJournal(root: HTMLElement): JournalControl {
   const book = element("section", "journal-book");
   book.setAttribute("aria-label", "Journal");
   book.hidden = true;
   const label = element("div", "journal-label");
   label.textContent = "JOURNAL";
-  const close = makeButton("journal-close", "Close journal", "×");
+  const close = makeJournalButton("journal-close", "Close journal", "×");
 
   const notesPage = element("section", "journal-page journal-notes-page");
   const notesHead = element("div", "journal-notes-head");
@@ -446,7 +260,7 @@ export function createJournal(root: HTMLElement): {
   const snacks = supply("snacks", "Snacks");
   const gems = supply("gems", "Gems");
   supplies.append(coins.root, snacks.root);
-  const audio = makeButton("journal-audio", "Toggle sound");
+  const audio = makeJournalButton("journal-audio", "Toggle sound");
   supplies.append(audio);
   const volumeLabel = element("label", "journal-volume");
   volumeLabel.setAttribute("aria-label", "Sound volume");
@@ -492,108 +306,33 @@ export function createJournal(root: HTMLElement): {
   let latestView: JournalView | null = null;
   let onPageChange: (page: JournalPage) => void = () => undefined;
   let onOverlayChange: (open: boolean) => void = () => undefined;
+  let onOverlayStep: () => void = () => undefined;
+  let onClose: () => void = () => undefined;
+
   const fieldOverlays = createJournalFieldOverlays({
     onVisibilityChange: (open) => onOverlayChange(open),
+    onStep: () => onOverlayStep(),
   });
   const mapPage = createJournalMapPage(() => fieldOverlays.openTreasures(latestView));
-
-  // Two-page open-book OPTIONS spread: Sound & Music on the left, Gameplay on the right.
-  const optionsPage = element("section", "journal-options-page");
-  const soundPage = element("section", "journal-options-sound-page");
-  const optionsHead = element("div", "journal-options-head");
-  const optionsHeading = element("h2", "journal-heading");
-  optionsHeading.textContent = "SOUND & MUSIC";
-  const jukebox = element("div", "journal-jukebox");
-  jukebox.setAttribute("role", "group");
-  jukebox.setAttribute("aria-label", "Music Box");
-  jukebox.tabIndex = -1;
-  const prevTrack = makeButton("journal-jukebox-btn journal-jukebox-prev", "Previous track", "‹");
-  const nowPlaying = element("button", "journal-now-playing");
-  nowPlaying.type = "button";
-  nowPlaying.setAttribute("aria-live", "polite");
-  const nextTrack = makeButton("journal-jukebox-btn journal-jukebox-next", "Next track", "›");
-  jukebox.append(prevTrack, nowPlaying, nextTrack);
-  optionsHead.append(optionsHeading, jukebox);
-
-  const soundList = element("div", "journal-options-list");
-  const optSfx = makeButton("journal-opt-toggle journal-opt-sfx", "Toggle sound effects");
-  const optSfxSlider = makeSliderButton(
-    "journal-opt-slider journal-opt-sfx-slider",
-    "Sound effects volume",
-  );
-  const optMusic = makeButton("journal-opt-toggle journal-opt-music", "Toggle music");
-  const musicSlider = makeSliderButton("journal-opt-slider journal-music-slider", "Music volume");
-  const optAmbience = makeButton("journal-opt-toggle journal-opt-ambience", "Toggle ambience");
-  soundList.append(
-    makeOptionRow("Sound Effects", null, [optSfx, optSfxSlider.button]),
-    makeOptionRow("Music", null, [optMusic, musicSlider.button]),
-    makeOptionRow("Ambience", "Waves, wind, birds & hearth", [optAmbience]),
-  );
-  soundPage.append(optionsHead, soundList);
-
-  const playPage = element("section", "journal-options-play-page");
-  const playHead = element("div", "journal-options-play-head");
-  const playHeading = element("h2", "journal-heading");
-  playHeading.textContent = "GAMEPLAY";
-  playHead.append(playHeading);
-
-  const playList = element("div", "journal-options-list");
-  const optGentle = makeButton("journal-opt-toggle journal-opt-gentle", "Toggle gentle timing");
-  const optHints = makeButton("journal-opt-toggle journal-opt-hints", "Toggle key hints");
-  const optTextSpeed = makeButton(
-    "journal-opt-toggle journal-option-text-speed",
-    "Cycle text speed",
-  );
-  const optReducedMotion = makeButton(
-    "journal-opt-toggle journal-option-reduced-motion",
-    "Toggle reduced motion",
-  );
-  playList.append(
-    makeOptionRow("Gentle Timing", "Wider windows in calm-downs", [optGentle]),
-    makeOptionRow("Key Hints", "Show keys while exploring", [optHints]),
-    makeOptionRow("Text Speed", "How fast story and battle lines appear", [optTextSpeed]),
-    makeOptionRow(
-      "Reduced Motion",
-      "Calms animations, shakes, and fluttering effects",
-      [optReducedMotion],
-    ),
-  );
-
-  const controlsCard = element("div", "journal-controls-card");
-  const controlsTitle = element("div", "journal-controls-title");
-  controlsTitle.textContent = "CONTROLS";
-  const controlsLine = element("div", "journal-controls-line");
-  const controlsTools = element("div", "journal-controls-line journal-controls-tools");
-  controlsTools.hidden = true;
-  controlsCard.append(controlsTitle, controlsLine, controlsTools);
-  playPage.append(playHead, playList, controlsCard);
-
-  optionsPage.append(soundPage, playPage);
+  const sliderSteppers = new Map<EventTarget, (direction: -1 | 1) => void>();
+  const optionsPage = createJournalOptionsPage({
+    sliderSteppers,
+    onMirrorAudioLevel: (next) => syncSlider(volume.button, volume.value, next),
+  });
 
   const tabs = element("div", "journal-tabs");
-  const notesTab = makeButton("journal-tab journal-notes-tab", "Notes and stickers", "NOTES");
-  const mapTab = makeButton("journal-tab journal-map-tab", "Map", "MAP");
-  const optionsTab = makeButton("journal-tab journal-options-tab", "Options", "OPTIONS");
+  const notesTab = makeJournalButton(
+    "journal-tab journal-notes-tab", "Notes and stickers", "NOTES",
+  );
+  const mapTab = makeJournalButton("journal-tab journal-map-tab", "Map", "MAP");
+  const optionsTab = makeJournalButton("journal-tab journal-options-tab", "Options", "OPTIONS");
   tabs.append(notesTab, mapTab, optionsTab);
 
   book.append(
-    label, close, notesPage, stickersPage, mapPage.root, optionsPage, tabs,
+    label, close, notesPage, stickersPage, mapPage.root, optionsPage.root, tabs,
     fieldOverlays.fieldBackdrop, fieldOverlays.treasuresBackdrop,
   );
   root.append(book);
-
-  let onClose: () => void = () => undefined;
-  let onToggleAudio: () => void = () => undefined;
-  let onSetAudioLevel: (level: AudioLevel) => void = () => undefined;
-  let onToggleMusic: () => void = () => undefined;
-  let onSetMusicLevel: (level: AudioLevel) => void = () => undefined;
-  let onToggleAmbience: () => void = () => undefined;
-  let onStepTrack: (delta: -1 | 1) => void = () => undefined;
-  let onResetJukebox: () => void = () => undefined;
-  let onToggleGentleTiming: () => void = () => undefined;
-  let onToggleKeyHints: () => void = () => undefined;
-  let onCycleTextSpeed: () => void = () => undefined;
-  let onToggleReducedMotion: () => void = () => undefined;
 
   let page: JournalPage = "notes";
   let wasVisible = false;
@@ -609,7 +348,7 @@ export function createJournal(root: HTMLElement): {
     notesPage.hidden = page !== "notes";
     stickersPage.hidden = page !== "notes";
     mapPage.root.hidden = page !== "map";
-    optionsPage.hidden = page !== "options";
+    optionsPage.root.hidden = page !== "options";
     if (notify && changed) onPageChange(page);
   };
 
@@ -620,66 +359,27 @@ export function createJournal(root: HTMLElement): {
   mapTab.addEventListener("click", () => setPage("map"));
   optionsTab.addEventListener("click", () => setPage("options"));
 
-  const sliderSteppers = new Map<EventTarget, (direction: -1 | 1) => void>();
   const nav = createJournalNavController({
-    book, notesPage, stickersPage, optionsPage, soundPage, playPage, jukebox,
+    book, notesPage, stickersPage,
+    optionsPage: optionsPage.root,
+    soundPage: optionsPage.soundPage,
+    playPage: optionsPage.playPage,
+    jukebox: optionsPage.jukebox,
     mapRoot: mapPage.root, sliderSteppers, getPage: () => page, setPage,
     hasOpenOverlay: () => fieldOverlays.hasOpen(),
     handleOverlayKeydown: (event) => fieldOverlays.handleKeydown(event),
     stepMapLandFocus: (delta) => mapPage.stepLandFocus(delta),
-    stepTrack: (delta) => onStepTrack(delta),
+    stepTrack: (delta) => optionsPage.stepTrack(delta),
   });
   document.addEventListener("keydown", nav.handleKeydown);
   applyPage("notes", false);
 
   close.addEventListener("click", () => onClose());
-  audio.addEventListener("click", () => onToggleAudio());
-  optSfx.addEventListener("click", () => onToggleAudio());
-  optMusic.addEventListener("click", () => onToggleMusic());
-  optAmbience.addEventListener("click", () => onToggleAmbience());
-  prevTrack.addEventListener("click", () => onStepTrack(-1));
-  nextTrack.addEventListener("click", () => onStepTrack(1));
-  nowPlaying.addEventListener("click", () => {
-    if (latestView?.jukebox?.active === true) onResetJukebox();
-  });
-  nowPlaying.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      event.stopPropagation();
-      if (latestView?.jukebox?.active === true) onResetJukebox();
-    }
-  });
-  jukebox.addEventListener("keydown", (event) => {
-    if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      event.stopPropagation();
-      onStepTrack(-1);
-    } else if (event.key === "ArrowRight") {
-      event.preventDefault();
-      event.stopPropagation();
-      onStepTrack(1);
-    }
-  });
-  optGentle.addEventListener("click", () => onToggleGentleTiming());
-  optHints.addEventListener("click", () => onToggleKeyHints());
-  optTextSpeed.addEventListener("click", () => onCycleTextSpeed());
-  optReducedMotion.addEventListener("click", () => onToggleReducedMotion());
-
-  const bindSlider = (
-    pair: { button: HTMLButtonElement; value: HTMLSpanElement },
-    onChange: () => (level: AudioLevel) => void,
-  ): void => {
-    sliderSteppers.set(pair.button, wireSlider(pair.button, pair.value, onChange));
-  };
-  bindSlider(volume, () => (next) => {
-    syncSlider(optSfxSlider.button, optSfxSlider.value, next);
-    onSetAudioLevel(next);
-  });
-  bindSlider(optSfxSlider, () => (next) => {
-    syncSlider(volume.button, volume.value, next);
-    onSetAudioLevel(next);
-  });
-  bindSlider(musicSlider, () => onSetMusicLevel);
+  audio.addEventListener("click", () => optionsPage.toggleAudio());
+  sliderSteppers.set(
+    volume.button,
+    wireSlider(volume.button, volume.value, () => optionsPage.setAudioLevel),
+  );
 
   const slots: Slot[] = [];
   const prizeSlots: Slot[] = [];
@@ -693,20 +393,12 @@ export function createJournal(root: HTMLElement): {
     activateFocused: nav.activateFocused,
     hasOpenOverlay: () => fieldOverlays.hasOpen(),
     dismissOverlay: () => fieldOverlays.dismiss(),
+    stepOverlay: (delta) => fieldOverlays.stepFieldNote(delta),
     onPageChange: (cb) => { onPageChange = cb; },
     onOverlayChange: (cb) => { onOverlayChange = cb; },
+    onOverlayStep: (cb) => { onOverlayStep = cb; },
     onClose: (cb) => { onClose = cb; },
-    onToggleAudio: (cb) => { onToggleAudio = cb; },
-    onSetAudioLevel: (cb) => { onSetAudioLevel = cb; },
-    onToggleMusic: (cb) => { onToggleMusic = cb; },
-    onSetMusicLevel: (cb) => { onSetMusicLevel = cb; },
-    onToggleAmbience: (cb) => { onToggleAmbience = cb; },
-    onStepTrack: (cb) => { onStepTrack = cb; },
-    onResetJukebox: (cb) => { onResetJukebox = cb; },
-    onToggleGentleTiming: (cb) => { onToggleGentleTiming = cb; },
-    onToggleKeyHints: (cb) => { onToggleKeyHints = cb; },
-    onCycleTextSpeed: (cb) => { onCycleTextSpeed = cb; },
-    onToggleReducedMotion: (cb) => { onToggleReducedMotion = cb; },
+    ...optionsPage.handlers,
     render: (view) => {
       latestView = view;
       book.hidden = !view.visible;
@@ -732,33 +424,7 @@ export function createJournal(root: HTMLElement): {
       setText(audio, view.muted ? "♪ off" : "♪ on");
       audio.classList.toggle("is-muted", view.muted);
       syncSlider(volume.button, volume.value, view.level);
-      setText(nowPlaying, `♫ ${view.nowPlaying}`);
-      const jukeboxBrowsing = view.jukebox?.active === true;
-      const jukeboxLabel = formatJukeboxLabel(view.nowPlaying, view.jukebox);
-      nowPlaying.classList.toggle("is-browsing", jukeboxBrowsing);
-      setAttribute(nowPlaying, "data-browsing", String(jukeboxBrowsing));
-      setAttribute(nowPlaying, "aria-label", jukeboxLabel);
-      setAttribute(nowPlaying, "title", jukeboxLabel);
-      syncOptionToggle(optSfx, !view.muted);
-      syncSlider(optSfxSlider.button, optSfxSlider.value, view.level);
-      syncOptionToggle(optMusic, !view.musicMuted);
-      syncSlider(musicSlider.button, musicSlider.value, view.musicLevel);
-      syncOptionToggle(optAmbience, !view.ambienceMuted);
-
-      syncOptionToggle(optGentle, view.gentleTiming);
-      syncOptionToggle(optHints, view.keyHints);
-      setText(optTextSpeed, textSpeedLabel(view.textSpeed));
-      setAttribute(optTextSpeed, "data-speed", view.textSpeed);
-      syncOptionToggle(optReducedMotion, view.reducedMotion);
-
-      const controls = journalControlsLines(view.inputMode ?? "keyboard", {
-        hasLantern: view.hasLantern,
-        hasFlute: view.hasFlute,
-        hasLasso: view.hasLasso === true,
-      });
-      setText(controlsLine, controls.primary);
-      controlsTools.hidden = controls.tools.length === 0;
-      setText(controlsTools, controls.tools);
+      optionsPage.render(view);
 
       const treats = view.treats ?? [];
       const nextTreatsSignature = treats.map((item) => `${item.id}:${item.count}`).join("|");

@@ -52,6 +52,8 @@ export const INDOOR_AREAS = new Set([
   "parlor",
   "sue-cottage",
   "jordan-cabin",
+  "milo-house",
+  "rosie-cottage",
 ]);
 
 export const ADULT_NPCS = new Set([

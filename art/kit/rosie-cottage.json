@@ -1,0 +1,16 @@
+{
+  "area": "rosie-cottage",
+  "subjects": [
+    {
+      "id": "rattan-stool",
+      "crop": [822, 485, 138, 148],
+      "seed": [891, 540],
+      "home": [891, 607],
+      "painted": true,
+      "canopy": false,
+      "ground": "the warm honey-wood floorboards",
+      "object": "the complete freestanding round wooden stool with woven rattan seat and all four splayed wooden legs with warm-brown ink outlines down to the floor; not the floorboards, craft table, or plant shelf",
+      "footprint": [[[851, 588], [892, 572], [930, 591], [890, 607]]]
+    }
+  ]
+}

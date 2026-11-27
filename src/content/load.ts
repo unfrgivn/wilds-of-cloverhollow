@@ -34,6 +34,10 @@ import sueCottageData from "../../content/areas/sue-cottage.json";
 import sueCottagePropsData from "../../content/props/sue-cottage.json";
 import jordanCabinData from "../../content/areas/jordan-cabin.json";
 import jordanCabinPropsData from "../../content/props/jordan-cabin.json";
+import miloHouseData from "../../content/areas/milo-house.json";
+import miloHousePropsData from "../../content/props/milo-house.json";
+import rosieCottageData from "../../content/areas/rosie-cottage.json";
+import rosieCottagePropsData from "../../content/props/rosie-cottage.json";
 import artRoomData from "../../content/areas/art-room.json";
 import enchantedPropsData from "../../content/props/enchanted.json";
 import arcadeGameData from "../../content/arcade.json";
@@ -67,6 +71,8 @@ import marketSurfaceData from "../../content/surfaces/market.json";
 import parlorSurfaceData from "../../content/surfaces/parlor.json";
 import sueCottageSurfaceData from "../../content/surfaces/sue-cottage.json";
 import jordanCabinSurfaceData from "../../content/surfaces/jordan-cabin.json";
+import miloHouseSurfaceData from "../../content/surfaces/milo-house.json";
+import rosieCottageSurfaceData from "../../content/surfaces/rosie-cottage.json";
 import artRoomSurfaceData from "../../content/surfaces/art-room.json";
 import plazaPropsData from "../../content/props/plaza.json";
 import bedroomPropsData from "../../content/props/bedroom.json";
@@ -118,6 +124,8 @@ import parlorFixtureData from "../../content/fixtures/parlor.json";
 import sanctuaryFixtureData from "../../content/fixtures/sanctuary.json";
 import sueCottageFixtureData from "../../content/fixtures/sue-cottage.json";
 import jordanCabinFixtureData from "../../content/fixtures/jordan-cabin.json";
+import miloHouseFixtureData from "../../content/fixtures/milo-house.json";
+import rosieCottageFixtureData from "../../content/fixtures/rosie-cottage.json";
 import tunableData from "../../content/tunables.json";
 import storyData from "../../content/story/main.ink.json";
 import fountainFrogData from "../../content/critters/fountain-frog.json";
@@ -738,6 +746,8 @@ export function loadContent(): {
   const parlor = loadArea(parlorData, parlorPropsData, "parlor");
   const sueCottage = loadArea(sueCottageData, sueCottagePropsData, "sue-cottage");
   const jordanCabin = loadArea(jordanCabinData, jordanCabinPropsData, "jordan-cabin");
+  const miloHouse = loadArea(miloHouseData, miloHousePropsData, "milo-house");
+  const rosieCottage = loadArea(rosieCottageData, rosieCottagePropsData, "rosie-cottage");
   const artRoom = loadArea(artRoomData, artRoomPropsData, "art-room");
   field(
     Array.isArray(landsData) &&
@@ -858,6 +868,8 @@ export function loadContent(): {
     sanctuary: loadFixture(sanctuaryFixtureData, "sanctuary"),
     "sue-cottage": loadFixture(sueCottageFixtureData, "sue-cottage"),
     "jordan-cabin": loadFixture(jordanCabinFixtureData, "jordan-cabin"),
+    "milo-house": loadFixture(miloHouseFixtureData, "milo-house"),
+    "rosie-cottage": loadFixture(rosieCottageFixtureData, "rosie-cottage"),
   };
   for (const [name, fixture] of Object.entries(fixtures))
     for (const id of fixture.party ?? [])
@@ -893,6 +905,8 @@ export function loadContent(): {
     [parlor.id]: parlor,
     [sueCottage.id]: sueCottage,
     [jordanCabin.id]: jordanCabin,
+    [miloHouse.id]: miloHouse,
+    [rosieCottage.id]: rosieCottage,
   };
   const surfaceData: Record<string, unknown> = {
     harness: harnessSurfaceData, bedroom: bedroomSurfaceData, plaza: plazaSurfaceData,
@@ -911,6 +925,8 @@ export function loadContent(): {
     parlor: parlorSurfaceData,
     "sue-cottage": sueCottageSurfaceData,
     "jordan-cabin": jordanCabinSurfaceData,
+    "milo-house": miloHouseSurfaceData,
+    "rosie-cottage": rosieCottageSurfaceData,
     "art-room": artRoomSurfaceData,
   };
   const surfaces = completeSurfaceMaps(areas, surfaceData);

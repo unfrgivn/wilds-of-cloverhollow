@@ -1,0 +1,15 @@
+{
+  "area": "milo-house",
+  "spawn": "door",
+  "seed": 1,
+  "party": [
+    "maddie",
+    "sue",
+    "jordan"
+  ],
+  "variables": {
+    "sue_joined": true,
+    "jordan_joined": true,
+    "has_lantern": true
+  }
+}

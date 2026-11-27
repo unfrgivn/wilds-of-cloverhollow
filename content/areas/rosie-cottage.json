@@ -1,0 +1,178 @@
+{
+  "id": "rosie-cottage",
+  "name": "Rosie's Flower Cottage",
+  "land": "cloverhollow",
+  "ground": "rosie-cottage",
+  "width": 1200,
+  "height": 800,
+  "walkable": [
+    [
+      62,
+      533
+    ],
+    [
+      416,
+      375
+    ],
+    [
+      416,
+      405
+    ],
+    [
+      540,
+      460
+    ],
+    [
+      685,
+      392
+    ],
+    [
+      690,
+      426
+    ],
+    [
+      895,
+      498
+    ],
+    [
+      960,
+      462
+    ],
+    [
+      966,
+      473
+    ],
+    [
+      1090,
+      523
+    ],
+    [
+      1134,
+      503
+    ],
+    [
+      1138,
+      512
+    ],
+    [
+      582,
+      768
+    ]
+  ],
+  "blockers": [],
+  "glows": [
+    {
+      "id": "rosie-cottage-glow",
+      "frame": "bluebell_4",
+      "point": {
+        "x": 420,
+        "y": 530
+      },
+      "knot": "rosie_cottage_glow",
+      "prompt": "Look"
+    }
+  ],
+  "triggers": [
+    {
+      "id": "door",
+      "polygon": [
+        [
+          110,
+          512
+        ],
+        [
+          220,
+          462
+        ],
+        [
+          248,
+          478
+        ],
+        [
+          138,
+          528
+        ]
+      ],
+      "target": {
+        "area": "park",
+        "spawn": "rosie-cottage"
+      }
+    }
+  ],
+  "spawns": {
+    "door": {
+      "x": 295,
+      "y": 540,
+      "facing": "right"
+    }
+  },
+  "interactables": [
+    {
+      "id": "rosie-table",
+      "knot": "rosie_table",
+      "point": {
+        "x": 695,
+        "y": 432
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "rosie-bed",
+      "knot": "rosie_bed",
+      "point": {
+        "x": 475,
+        "y": 430
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "rosie-plants",
+      "knot": "rosie_plants",
+      "point": {
+        "x": 1030,
+        "y": 500
+      },
+      "prompt": "Look"
+    }
+  ],
+  "npcs": [
+    {
+      "id": "rosie",
+      "point": {
+        "x": 775,
+        "y": 495
+      },
+      "facing": "down",
+      "knot": "rosie_home",
+      "prompt": "Talk",
+      "visibleWhile": "hall_pass",
+      "footprint": [
+        [
+          760,
+          485
+        ],
+        [
+          790,
+          485
+        ],
+        [
+          790,
+          505
+        ],
+        [
+          760,
+          505
+        ]
+      ]
+    }
+  ],
+  "critters": [],
+  "props": [
+    {
+      "id": "rattan-stool",
+      "prop": "rattan-stool",
+      "x": 891,
+      "y": 607
+    }
+  ]
+}

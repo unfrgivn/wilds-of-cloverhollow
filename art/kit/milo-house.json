@@ -1,0 +1,17 @@
+{
+  "area": "milo-house",
+  "subjects": [
+    {
+      "id": "cushion-stack",
+      "crop": [645, 535, 265, 175],
+      "seed": [815, 600],
+      "home": [780, 686],
+      "painted": true,
+      "canopy": false,
+      "keepPieces": true,
+      "ground": "the warm wooden floorboards",
+      "object": "the complete round woven tan floor cushion together with the small stack of three notebooks sitting directly beside its lower-left edge, including their warm-brown ink outlines down to the floor; not the starry rug or floorboards",
+      "footprint": [[[670, 661], [755, 595], [820, 585], [886, 615], [820, 645], [726, 688]]]
+    }
+  ]
+}

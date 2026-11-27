@@ -1,0 +1,191 @@
+{
+  "id": "milo-house",
+  "name": "Milo's Sketch Loft",
+  "land": "cloverhollow",
+  "ground": "milo-house",
+  "width": 1200,
+  "height": 800,
+  "walkable": [
+    [
+      55,
+      542
+    ],
+    [
+      385,
+      395
+    ],
+    [
+      385,
+      413
+    ],
+    [
+      518,
+      472
+    ],
+    [
+      700,
+      392
+    ],
+    [
+      705,
+      422
+    ],
+    [
+      887,
+      491
+    ],
+    [
+      922,
+      488
+    ],
+    [
+      982,
+      511
+    ],
+    [
+      1024,
+      493
+    ],
+    [
+      1103,
+      526
+    ],
+    [
+      1144,
+      507
+    ],
+    [
+      1156,
+      517
+    ],
+    [
+      582,
+      782
+    ]
+  ],
+  "blockers": [],
+  "glows": [
+    {
+      "id": "milo-loft-glow",
+      "frame": "ink_note",
+      "point": {
+        "x": 850,
+        "y": 532
+      },
+      "knot": "milo_loft_glow",
+      "prompt": "Look"
+    }
+  ],
+  "triggers": [
+    {
+      "id": "door",
+      "polygon": [
+        [
+          96,
+          522
+        ],
+        [
+          204,
+          475
+        ],
+        [
+          232,
+          492
+        ],
+        [
+          124,
+          540
+        ]
+      ],
+      "target": {
+        "area": "park",
+        "spawn": "milo-house"
+      }
+    }
+  ],
+  "spawns": {
+    "door": {
+      "x": 290,
+      "y": 545,
+      "facing": "right"
+    }
+  },
+  "interactables": [
+    {
+      "id": "milo-desk",
+      "knot": "milo_desk",
+      "point": {
+        "x": 795,
+        "y": 458
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "milo-bed",
+      "knot": "milo_bed",
+      "point": {
+        "x": 455,
+        "y": 442
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "milo-comics",
+      "knot": "milo_comics",
+      "point": {
+        "x": 960,
+        "y": 502
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "milo-cushion",
+      "knot": "milo_cushion",
+      "point": {
+        "x": 730,
+        "y": 645
+      },
+      "prompt": "Look"
+    }
+  ],
+  "npcs": [
+    {
+      "id": "milo",
+      "point": {
+        "x": 670,
+        "y": 518
+      },
+      "facing": "down",
+      "knot": "milo_loft_talk",
+      "prompt": "Talk",
+      "visibleWhile": "milo_revealed",
+      "footprint": [
+        [
+          655,
+          508
+        ],
+        [
+          685,
+          508
+        ],
+        [
+          685,
+          528
+        ],
+        [
+          655,
+          528
+        ]
+      ]
+    }
+  ],
+  "critters": [],
+  "props": [
+    {
+      "id": "cushion-stack",
+      "prop": "cushion-stack",
+      "x": 780,
+      "y": 686
+    }
+  ]
+}

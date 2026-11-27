@@ -72,6 +72,8 @@ describe("soundtrackFor", () => {
       market: ["home", "cafe-murmur"],
       parlor: ["cafe", "cafe-murmur"],
       park: ["home", "town-breeze"],
+      "milo-house": ["home", "none"],
+      "rosie-cottage": ["home", "none"],
       hills: ["hills", "town-breeze"],
       sanctuary: ["sanctuary", "forest"],
       school: ["school", "none"],

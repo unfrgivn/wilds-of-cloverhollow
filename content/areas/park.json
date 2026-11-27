@@ -412,6 +412,56 @@
         "area": "hills",
         "spawn": "park"
       }
+    },
+    {
+      "id": "milo-house",
+      "polygon": [
+        [
+          110,
+          455
+        ],
+        [
+          160,
+          445
+        ],
+        [
+          165,
+          500
+        ],
+        [
+          115,
+          510
+        ]
+      ],
+      "target": {
+        "area": "milo-house",
+        "spawn": "door"
+      }
+    },
+    {
+      "id": "rosie-cottage",
+      "polygon": [
+        [
+          430,
+          248
+        ],
+        [
+          500,
+          244
+        ],
+        [
+          500,
+          292
+        ],
+        [
+          430,
+          292
+        ]
+      ],
+      "target": {
+        "area": "rosie-cottage",
+        "spawn": "door"
+      }
     }
   ],
   "interactables": [
@@ -480,6 +530,16 @@
       "x": 1300,
       "y": 450,
       "facing": "left"
+    },
+    "milo-house": {
+      "x": 235,
+      "y": 465,
+      "facing": "right"
+    },
+    "rosie-cottage": {
+      "x": 490,
+      "y": 340,
+      "facing": "down"
     }
   },
   "critters": [],

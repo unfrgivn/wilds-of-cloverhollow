@@ -1,0 +1,36 @@
+{
+  "frames": {
+    "cushion-stack": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 450,
+        "h": 273
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 450,
+        "h": 273
+      },
+      "sourceSize": {
+        "w": 450,
+        "h": 273
+      },
+      "anchor": {
+        "x": 0.50222,
+        "y": 0.95971
+      }
+    }
+  },
+  "meta": {
+    "image": "props-0.webp",
+    "size": {
+      "w": 2048,
+      "h": 273
+    },
+    "scale": "1"
+  }
+}

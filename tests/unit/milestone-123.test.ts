@@ -30,7 +30,7 @@ function makeNpc(id: string): Npc {
 }
 
 describe("Milestone 123: Adult NPC & indoor shadow calibration + journal-map extraction", () => {
-  it("classifies all 16 indoor rooms in INDOOR_AREAS and excludes all 12 outdoor areas", () => {
+  it("classifies all 18 indoor rooms in INDOOR_AREAS and excludes all 12 outdoor areas", () => {
     const expectedIndoor = [
       "bedroom",
       "kitchen",
@@ -48,6 +48,8 @@ describe("Milestone 123: Adult NPC & indoor shadow calibration + journal-map ext
       "parlor",
       "sue-cottage",
       "jordan-cabin",
+      "milo-house",
+      "rosie-cottage",
     ] as const;
 
     const expectedOutdoor = [

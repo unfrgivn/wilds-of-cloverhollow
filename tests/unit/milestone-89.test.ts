@@ -282,6 +282,8 @@ describe("Milestone 89: Companion petting & cozy resting", () => {
       trail: "up",
       market: "left",
       parlor: "right",
+      "milo-house": "down",
+      "rosie-cottage": "down",
     };
 
     for (const spot of REST_SPOTS) {

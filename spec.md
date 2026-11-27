@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 100)
+Last updated: 2026-11-27 (Milestone 101)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -727,6 +727,30 @@ ios/            Capacitor iOS project (from Milestone 4).
   `price`/`energy`/`calm`/`favouriteCalm` (`favouriteCalm >= calm`), and
   non-empty `favourites` species lists covering every critter species in the
   game (six treats total).
+- Living World Landmarks (Milestone 94):
+  - **Nurse Holly's Clinic Care** (`nurse` stitch `thanks` in
+    `content/story/main.ink`): keeps the pre-`hall_pass` hall-pass quest
+    byte-identical; once `hall_pass` is true, Nurse Holly reacts to story
+    progress (`milo_revealed` / `calmed("hooded-kid")`, `calmed("principal")`,
+    `art_open` / `calmed("art-teacher")` / `has_flute`, or a warm default
+    check-in) and offers a free cozy apple-juice & cracker pack (`+2` snacks,
+    `chime-green`) via sticky choice whenever `snacks() < 2`, or a warm
+    stocked-backpack check-in when `snacks() >= 2`.
+  - **Bubblegum Bay Boat Rental** (`bay-boats` interactable in
+    `content/areas/bay.json` at `(1350, 650)`, knot `bay_boats`, prompt
+    `Look`): free community pastel rowboats beside the south pier rail with
+    reactive companion banter (`sue_joined`, `jordan_joined`, `pup_with_me` /
+    Maddie). The first sunny cove cruise sets `bay_boat_charm = true`, awards
+    `+10` coins (`chime-blue`) for finding a Sea-Glass Clover, and logs a
+    Journal note; revisits cruise peacefully without repeating coins.
+  - **Pinecone Pass Wildlife Sanctuary** (`pass-sanctuary` interactable in
+    `content/areas/pass.json` at `(1400, 640)`, knot `pass_sanctuary`, prompt
+    `Look`): carved pine trail board tallying Fae's calmed mountain and
+    woodland species (`hamster`, `penguin`, `owl`, `squirrel`, `lamb`,
+    `hedgehog`, `bat`, `crystal-mole`, out of 8). Calming at least 3 species
+    awards a one-time Sanctuary Ranger Basket (`sanctuary_gift = true`, `+12`
+    coins, `+2` snacks, `chime-yellow`) and logs a Journal note; reaching 8 of
+    8 adds a valley celebration line.
 - The arcade (Milestone 29): `arcade`, "Cloverhollow Arcade", a 1200x800
   painted cutaway from `arcade_interior.png` (arcade cabinets, the ticket
   counter, a claw machine, a skee-ball lane, a gumball machine). Its door is on the back-left

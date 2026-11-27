@@ -4728,6 +4728,37 @@ the old trail, the owl, and the clubhouse claim.
 - Gates: `just check` (152 unit files / 1,207 tests, all 65 sims, 23 QA packs,
   purity, lint), `just build`, and 58/58 targeted Chromium + WebKit e2e tests.
 
+## Milestone 97: Living World Landmarks — Nurse Holly Clinic Care, Bubblegum Bay Rowboat Cruise & Pinecone Pass Wildlife Sanctuary **Status:** ✅ Completed (2026-11-27)
+- Completes the remaining cozy `NOTES.md` biome & school touchpoints with zero
+  `src/core` changes, zero save-version bumps, and zero replay hash drift
+  across all 65 recorded sims.
+- Nurse Holly's Clinic Care (`content/story/main.ink` -> `=== nurse ===` / `= thanks`):
+  - Pre-`hall_pass` clinic dialogue kept byte-identical; post-`hall_pass` visits
+    now react to school & story milestones (`milo_revealed`, `principal`,
+    `art-teacher`, `has_flute`) and offer a free cozy apple-juice & cracker
+    refill (`+2` snacks, `chime-green`) whenever `snacks() < 2` so players never
+    get stuck without snacks.
+- Bubblegum Bay Boat Rental (`content/areas/bay.json`, `content/story/main.ink`):
+  - Added interactable `bay-boats` at `(1350, 650)` (`knot: "bay_boats"`,
+    `prompt: "Look"`) by the south pier railing with free community pastel
+    rowboat trips across the sunny cove, reactive companion banter (Sue, Jordan,
+    Pond Pup / Maddie), one-time Sea-Glass Clover discovery (`bay_boat_charm`,
+    `+10` coins, `chime-blue`), peaceful revisits, and a Journal note.
+- Pinecone Pass Wildlife Sanctuary (`content/areas/pass.json`, `content/story/main.ink`):
+  - Added interactable `pass-sanctuary` at `(1400, 640)` (`knot: "pass_sanctuary"`,
+    `prompt: "Look"`) along the eastern alpine pines dynamically tallying calmed
+    mountain, woodland, and cavern critters via `EXTERNAL calmed(id)` (`0..8`),
+    awarding the one-time Sanctuary Ranger Basket at `>= 3` (`sanctuary_gift`,
+    `+12` coins, `+2` snacks, `chime-yellow`) plus a Journal note and full `8/8`
+    valley celebration line.
+- Evidence: `tests/unit/milestone-94.test.ts` (7 tests), updated
+  `tests/unit/school.test.ts`, and `tests/e2e/milestone-94.spec.ts` (`@smoke`
+  Chromium + WebKit); all 3 review captures (`art/review/m94-bay-boats-1280.jpg`,
+  `m94-pass-sanctuary-1280.jpg`, `m94-nurse-holly-1280.jpg`) independently
+  verified via `vision`.
+- Gates: `just check` (153 unit files / 1,214 tests, all 65 sims, 23 QA packs,
+  purity, lint), `just build`, and 17/17 targeted Chromium + WebKit e2e tests.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

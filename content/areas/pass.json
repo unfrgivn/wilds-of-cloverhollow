@@ -537,6 +537,15 @@
         "y": 950
       },
       "prompt": "Look"
+    },
+    {
+      "id": "pass-sanctuary",
+      "knot": "pass_sanctuary",
+      "point": {
+        "x": 1400,
+        "y": 640
+      },
+      "prompt": "Look"
     }
   ],
   "spawns": {

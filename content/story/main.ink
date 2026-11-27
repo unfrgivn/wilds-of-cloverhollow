@@ -87,6 +87,8 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 {sue_cottage_visited: I visited Sue's mint-green beach cottage up the cove at Bubblegum Bay! She gave me her Sea-Glass Compass and a tip for catching the Golden Starfish Crown. # speaker: Fae}
 {sanctuary_reward_14: Ranger Fern wove me a Sanctuary Clover Wreath for welcoming so many calm critters to the Wildlife Sanctuary! # speaker: Fae}
 {sanctuary_visited and not sanctuary_reward_14: I found the Wildlife Sanctuary east of Clover Hills! Ranger Fern looks after every calm animal who visits the meadow. # speaker: Fae}
+{bay_boat_charm: I took a pastel rowboat out across Bubblegum Bay and found a shimmering Sea-Glass Clover! # speaker: Fae}
+{sanctuary_gift: The Pinecone Pass Wildlife Sanctuary rangers left me a cozy thank-you basket for helping calm the valley's mountain and woodland critters! # speaker: Fae}
 {buster_reward: I filled Buster's Star-Line Stamp Card at Bubblegum Bay and Pinecone Pass, and earned his Golden Star-Line Whistle! # speaker: Fae}
 {buster_quest and not buster_reward: {stamp_bay and stamp_pass: Both stamps are on Buster's Star-Line Stamp Card! Time to show Buster back at the plaza bus stop.|{stamp_bay: I got the Bubblegum Bay wave stamp on Buster's Star-Line Stamp Card! Next: Pinecone Pass's mountain stand.|{stamp_pass: I got the Pinecone Pass pine stamp on Buster's Star-Line Stamp Card! Next: Bubblegum Bay's seaside stand.|Buster gave me a Star-Line Stamp Card! Collect a wave stamp at Bubblegum Bay and a pine stamp at Pinecone Pass.}}} # speaker: Fae}
 {calmed("taco-chef"): I calmed Chef Mateo in Clover Hills by talking about Cloverhollow's taco favorites! He sells crispy taco snacks for 4 coins. # speaker: Fae}
@@ -906,8 +908,26 @@ Hi Fae! Is everything all right? # speaker: Nurse Holly
 - -> DONE
 
 = thanks
-Thanks for helping, Fae! # speaker: Nurse Holly
--> DONE
+{
+- milo_revealed or calmed("hooded-kid"):
+    You helped Milo find his calm again, Fae! I'm so proud of how kind and steady you were. # speaker: Nurse Holly
+- calmed("principal"):
+    Haha, thank goodness you calmed Mr. Bell down, Fae! His voice finally got a rest from that megaphone. # speaker: Nurse Holly
+- art_open or calmed("art-teacher") or has_flute:
+    What a busy day across the school halls, Fae! Remember to take a breather whenever you need one. # speaker: Nurse Holly
+- else:
+    Thanks again for delivering that note, Fae! My clinic door is always open if you need a breather. # speaker: Nurse Holly
+}
+{snacks() >= 2:
+    Your backpack's already stocked with snacks! Come see me anytime you run low, Fae. # speaker: Nurse Holly
+    -> DONE
+}
+Looks like your backpack is running low on snacks, kiddo! Want a quick clinic refill? # speaker: Nurse Holly
++ [Take a cozy apple juice & cracker pack (free)]
+    Here you go, sweetie, two crisp apple-juice snacks and a star-shaped band-aid just in case! # speaker: Nurse Holly # gift: snack 2 # sound: chime-green
++ [I'm feeling great, thanks!]
+    That's the spirit! Drink plenty of water out there, Fae! # speaker: Nurse Holly
+- -> DONE
 
 === school_doors ===
 The front doors stay shut during class. # speaker: Fae
@@ -2990,3 +3010,72 @@ Welcome to the Pinecone Pass mountain stand! Warm Maple Pine Brittle and snowy k
 + [Not now]
     Stay warm out on the snow trails, Fae! # speaker: Pass keeper
 - -> DONE
+
+// Living World Landmarks: Bubblegum Bay Boat Rental & Pinecone Pass Wildlife Sanctuary (Milestone 94).
+VAR bay_boat_charm = false
+VAR sanctuary_gift = false
+
+=== bay_boats ===
+Pastel wooden rowboats bob gently beside the south pier, ready for a sunny harbor ride! # speaker: Fae
+A painted harbor tag says: "Free community boats - just bring the oars back tidy!" # speaker: Fae
++ [Take a row out to the sunny cove]
+    -> cruise
++ [Stay by the pier]
+    Maybe after a little more exploring! # speaker: Fae
+    -> DONE
+= cruise
+Splash, splash! The pastel rowboat glides out across Bubblegum Bay's sparkling water. # speaker: Fae
+{sue_joined: Sue dips her fingers into the warm waves and grins. "Best cove on the whole coast, Fae!" # speaker: Sue}
+{jordan_joined: Jordan squints out past the sunlit ripples. "Whoa, you can see the pebbles down there!" # speaker: Jordan}
+{pup_with_me: The Pond Pup leans over the bow with flapping ears, barking at every glittery splash! # speaker: Fae|Maddie curls up on the dry bow bench, blinking lazily in the warm sea breeze. # speaker: Fae}
+{not bay_boat_charm:
+    ~ bay_boat_charm = true
+    Ooh! Something shimmers on a smooth pebble bar... a Sea-Glass Clover and ten shiny coins! # speaker: Fae # gift: coins 10 # sound: chime-blue
+    What a lucky harbor treasure! I'll write this sunny cove row in my journal. # speaker: Fae
+- else:
+    Golden ripples dance below the oars while tiny silver minnows dart under the boat! # speaker: Fae
+}
+-> DONE
+
+=== pass_sanctuary ===
+~ temp friends = 0
+{calmed("hamster"):
+    ~ friends += 1
+}
+{calmed("penguin"):
+    ~ friends += 1
+}
+{calmed("owl"):
+    ~ friends += 1
+}
+{calmed("squirrel"):
+    ~ friends += 1
+}
+{calmed("lamb"):
+    ~ friends += 1
+}
+{calmed("hedgehog"):
+    ~ friends += 1
+}
+{calmed("bat"):
+    ~ friends += 1
+}
+{calmed("crystal-mole"):
+    ~ friends += 1
+}
+A carved pine trail board stands along the snowy ridge: "PINECONE PASS WILDLIFE SANCTUARY!" # speaker: Fae
+Logged mountain & woodland friends in the snow tracks: {friends} of 8! # speaker: Fae
+{friends >= 3 and not sanctuary_gift:
+    ~ sanctuary_gift = true
+    Tucked under the trail board is a ribbon-tied Sanctuary Ranger Basket with a cozy thank-you note! # speaker: Fae
+    Inside are twelve shiny coins and two warm trail snacks! # speaker: Fae # gift: coins 12 # gift: snack 2 # sound: chime-yellow
+    {friends == 8: All eight mountain and woodland species left cozy pawprints around the board! What a peaceful valley! # speaker: Fae}
+    -> DONE
+}
+{sanctuary_gift:
+    The Sanctuary Ranger Basket sits empty save for fresh snowy pawprints crisscrossing the snow. # speaker: Fae
+    {friends == 8: All eight mountain and woodland friends visited the sanctuary! What a cozy valley! # speaker: Fae}
+    -> DONE
+}
+Calm 3 mountain or woodland critters and check back for a Sanctuary Ranger thank-you basket! # speaker: Fae
+-> DONE

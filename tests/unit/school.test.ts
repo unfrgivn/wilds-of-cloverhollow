@@ -38,7 +38,11 @@ describe("school day story", () => {
       "Oh, you're a star! Could you take this note to the front office?",
       "Here's a hall pass, so nobody stops you on the way.",
     ]);
-    expect(play(help.ink, "nurse").lines).toEqual(["Thanks for helping, Fae!"]);
+    expect(play(help.ink, "nurse").lines).toEqual([
+      "Thanks again for delivering that note, Fae! " +
+        "My clinic door is always open if you need a breather.",
+      "Your backpack's already stocked with snacks! Come see me anytime you run low, Fae.",
+    ]);
     expect(play(help.ink, "teacher").lines)
       .toEqual(["A hall pass? All right. Be back in time for story time!"]);
   });

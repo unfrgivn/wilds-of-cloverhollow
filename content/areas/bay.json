@@ -242,6 +242,15 @@
         "y": 760
       },
       "prompt": "Look"
+    },
+    {
+      "id": "bay-boats",
+      "knot": "bay_boats",
+      "point": {
+        "x": 1350,
+        "y": 650
+      },
+      "prompt": "Look"
     }
   ],
   "critters": [

@@ -3860,8 +3860,9 @@ trunks keep its two exits.
     focused) scrolls `.journal-stickers-page` (or `.journal-notes-page`) by
     `±72 px` while keeping Fae frozen; Gamepad right stick Y scrolls smoothly
     every tick; focusing any `.journal-slot.is-inspectable` (or pressing Gamepad
-    D-Pad / Left Stick) cycles focus across visible Critter, Fish, and Keepsake
-    slots (`Enter` / `Space` / `A` opens the Field Note card).
+    D-Pad / Left Stick) cycles focus across visible Critter, Arcade Prize,
+    Fish, and Keepsake slots (`Enter` / `Space` / `A` opens the Field Note
+    card).
   - `MAP`: revealed land pins (`.journal-map-land.is-revealed`) are keyboard
     focusable (`tabindex="0"`, `role="button"`) with crisp `:focus-visible`
     outlines; `ArrowUp` / `ArrowDown` (and `ArrowLeft` / `ArrowRight` once a
@@ -3988,13 +3989,25 @@ trunks keep its two exits.
     `.journal-keepsakes` grid rendering hand-crafted inline SVG charms
     (`keepsakeIcon` in `src/ui/icons.ts`, zero `<text>` nodes) + names for owned
     keepsakes or dashed `?` for locked keepsakes.
-  - **Interactive Fish Catch & Keepsake Memory Cards**: owned slots in
-    `.journal-fish` and `.journal-keepsakes` are clickable and
-    keyboard-focusable (`role="button"`, `tabindex="0"`, Enter/Space or
+  - **Interactive Collection Field Note Cards (all 4 shelves: Critters, Arcade
+    Prizes, Fish, and Keepsakes)**: owned slots in `.journal-stickers`,
+    `.journal-prizes`, `.journal-fish`, and `.journal-keepsakes` are clickable
+    and keyboard-focusable (`role="button"`, `tabindex="0"`, Enter/Space or
     click/tap, subtle reduced-motion-guarded hover/focus lift) and reuse the
     die-cut `.journal-field-note` card centered inside `.journal-book`
-    (`Escape`, `×`, backdrop click, tab switch, or closing the journal
-    dismisses only the card):
+    (`Escape`, `X`, Gamepad `B`, `×`, backdrop click, tab switch, or closing
+    the journal dismisses only the card and fires `"card-open"` /
+    `"card-close"` paper foley):
+    - Owned Arcade Prizes (`kind: "prize"`, `prizeFieldNote` in
+      `src/ui/journal-field-note.ts`, `data-prize`, `data-owned`,
+      `aria-label="Inspect <Name> prize note"`, Milestone 143): displays the
+      prize's zoomed `AtlasImage` via `applyAtlasCrop`, name,
+      `"Arcade Prize"`, `Found: <origin>` (`"Claw Machine · Mr. Pip's Arcade"`
+      for the 9 claw plushies, `"Ticket Counter · Mr. Pip's Arcade"` for the 4
+      counter toys, with graceful fallback for unknown IDs),
+      `Home: Clubhouse Shelf`, and a bespoke storybook `blurb`. Unowned prizes
+      remain non-inspectable `?` slots, and losing ownership closes an active
+      prize card cleanly.
     - Caught Fish (`kind: "fish"`): displays the fish's `AtlasImage` (with a
       golden specimen ring when `rare`), name, `"Bubblegum Bay · Rare Catch"`
       or `"Bubblegum Bay · Bay Catch"`, `Found in: Bubblegum Bay Dock`,

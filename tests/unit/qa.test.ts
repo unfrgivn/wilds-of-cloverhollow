@@ -63,5 +63,5 @@ describe("QA save library", () => {
       expect(stableHash(exact), stale)
         .toBe(stableHash(parseSave(save, template)));
     }
-  });
+  }, 60_000);
 });

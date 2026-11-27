@@ -288,12 +288,12 @@ function addKeepsakeSlot(grid: HTMLElement, onInspect?: () => void): KeepsakeSlo
   return { root: s.root, charm: s.media, unknown: s.unknown, name: s.name, iconId: null };
 }
 
-function syncInspectableSlot(root: HTMLElement, inspectable: boolean, name: string): void {
+function syncInspectableSlot(root: HTMLElement, inspectable: boolean, ariaLabel: string): void {
   root.classList.toggle("is-inspectable", inspectable);
   if (inspectable) {
     setAttribute(root, "tabindex", "0");
     setAttribute(root, "role", "button");
-    setAttribute(root, "aria-label", `Inspect ${name}`);
+    setAttribute(root, "aria-label", ariaLabel);
   } else {
     for (const attr of ["tabindex", "role", "aria-label"]) {
       if (root.hasAttribute(attr)) root.removeAttribute(attr);
@@ -846,20 +846,29 @@ export function createJournal(root: HTMLElement): {
         const image = sticker.owned ? sticker.image : null;
         const inspectable = image !== null && sticker.fieldNote != null;
         syncSlotVisual(slot, image !== null, sticker.name, image);
-        syncInspectableSlot(slot.root, inspectable, sticker.name);
+        syncInspectableSlot(slot.root, inspectable, `Inspect ${sticker.name}`);
       });
       const allStickersOwned =
         view.stickers.length > 0 && view.stickers.every((sticker) => sticker.owned);
       stickersHeading.classList.toggle("is-complete", allStickersOwned);
       syncChild(stickersHeading, stickersComplete, allStickersOwned);
 
-      while (prizeSlots.length < view.prizes.length) prizeSlots.push(addSlot(prizesGrid));
+      while (prizeSlots.length < view.prizes.length) {
+        const slotIndex = prizeSlots.length;
+        prizeSlots.push(addSlot(prizesGrid, () => {
+          const current = latestView?.prizes[slotIndex];
+          if (current === undefined || !current.owned || current.image === null) return;
+          fieldOverlays.openPrize(current, latestView);
+        }, "A prize still to win"));
+      }
       while (prizeSlots.length > view.prizes.length) prizeSlots.pop()?.root.remove();
       view.prizes.forEach((prize, index) => {
         const slot = prizeSlots[index];
         if (slot === undefined) return;
         const image = prize.owned ? prize.image : null;
+        setAttribute(slot.root, "data-prize", prize.id);
         syncSlotVisual(slot, image !== null, prize.name, image);
+        syncInspectableSlot(slot.root, image !== null, `Inspect ${prize.name} prize note`);
       });
       const allPrizesOwned =
         view.prizes.length > 0 && view.prizes.every((prize) => prize.owned);
@@ -916,7 +925,7 @@ export function createJournal(root: HTMLElement): {
           const image = item.owned ? item.image : null;
           setAttribute(slot.root, "data-fish", item.id);
           slot.root.classList.toggle("is-rare", item.owned && item.rare);
-          syncInspectableSlot(slot.root, item.owned, item.name);
+          syncInspectableSlot(slot.root, item.owned, `Inspect ${item.name}`);
           syncSlotVisual(slot, item.owned, item.name, image);
         });
       }
@@ -952,7 +961,7 @@ export function createJournal(root: HTMLElement): {
           setText(slot.name, item.owned ? item.name : "");
           setAttribute(slot.root, "data-owned", String(item.owned));
           setAttribute(slot.root, "data-keepsake", item.id);
-          syncInspectableSlot(slot.root, item.owned, item.name);
+          syncInspectableSlot(slot.root, item.owned, `Inspect ${item.name}`);
           if (item.owned) {
             setAttribute(slot.root, "title", item.source);
             setAttribute(slot.charm, "aria-label", item.name);

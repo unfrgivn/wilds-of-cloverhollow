@@ -5,8 +5,14 @@ import type { CritterFieldNote, JournalKeepsake } from "../core/journal";
 import type { TreasuresSummary } from "../core/treasures";
 
 export type InspectedJournalItem = {
-  kind: "sticker" | "fish" | "keepsake";
+  kind: "sticker" | "prize" | "fish" | "keepsake";
   id: string;
+};
+
+export type PrizeFieldNoteMeta = {
+  origin: string;
+  displayNote: string;
+  blurb: string;
 };
 
 export type JournalFieldNoteSticker = {
@@ -15,6 +21,13 @@ export type JournalFieldNoteSticker = {
   owned: boolean;
   image: AtlasImage | null;
   fieldNote?: CritterFieldNote | null;
+};
+
+export type JournalFieldNotePrize = {
+  id: string;
+  name: string;
+  owned: boolean;
+  image: AtlasImage | null;
 };
 
 export type JournalFieldNoteFish = {
@@ -30,6 +43,7 @@ export type JournalFieldNoteFish = {
 
 export type JournalFieldNoteSource = {
   stickers: readonly JournalFieldNoteSticker[];
+  prizes?: readonly JournalFieldNotePrize[];
   fish?: readonly JournalFieldNoteFish[];
   keepsakes?: readonly JournalKeepsake[];
   treasures?: TreasuresSummary;
@@ -39,6 +53,7 @@ export type JournalFieldOverlays = {
   fieldBackdrop: HTMLDivElement;
   treasuresBackdrop: HTMLDivElement;
   inspect: (item: InspectedJournalItem, view: JournalFieldNoteSource | null) => void;
+  openPrize: (prize: JournalFieldNotePrize, view?: JournalFieldNoteSource | null) => void;
   openTreasures: (view: JournalFieldNoteSource | null) => void;
   syncFieldNote: (view: JournalFieldNoteSource) => void;
   syncTreasures: (view: JournalFieldNoteSource) => void;
@@ -49,6 +64,98 @@ export type JournalFieldOverlays = {
   dismiss: () => boolean;
   handleKeydown: (event: KeyboardEvent) => boolean;
 };
+
+const CLAW_ORIGIN = "Claw Machine · Mr. Pip's Arcade";
+const COUNTER_ORIGIN = "Ticket Counter · Mr. Pip's Arcade";
+const PRIZE_HOME = "Clubhouse Shelf";
+
+const PRIZE_FIELD_NOTES: Readonly<Record<string, PrizeFieldNoteMeta>> = {
+  "frog-plush": {
+    origin: CLAW_ORIGIN,
+    displayNote: PRIZE_HOME,
+    blurb:
+      "Squishy moss-green frog with a big stitched grin; Maddie swears it squeaks on rainy nights.",
+  },
+  "pup-plush": {
+    origin: CLAW_ORIGIN,
+    displayNote: PRIZE_HOME,
+    blurb: "Floppy-eared puppy with a velvet nose, rescued right from the top of the claw heap.",
+  },
+  "raccoon-plush": {
+    origin: CLAW_ORIGIN,
+    displayNote: PRIZE_HOME,
+    blurb:
+      "A delightfully smug bandit in plush form, guarding the clubhouse shelf with tiny paws.",
+  },
+  "cat-plush": {
+    origin: CLAW_ORIGIN,
+    displayNote: PRIZE_HOME,
+    blurb:
+      "Soft ginger tabby stitched with a curled tail, always ready for a sunlit afternoon nap.",
+  },
+  "bunny-plush": {
+    origin: CLAW_ORIGIN,
+    displayNote: PRIZE_HOME,
+    blurb:
+      "Long pastel ears and a cotton-puff tail that feels like hugging a sunny meadow cloud.",
+  },
+  "bluebird-plush": {
+    origin: CLAW_ORIGIN,
+    displayNote: PRIZE_HOME,
+    blurb: "Plump sky-blue songbird with stitched wings that brighten up the whole clubhouse.",
+  },
+  "hamster-plush": {
+    origin: CLAW_ORIGIN,
+    displayNote: PRIZE_HOME,
+    blurb: "Round golden cheeks packed tight with stuffing, looking ready to stash a warm snack.",
+  },
+  "squirrel-plush": {
+    origin: CLAW_ORIGIN,
+    displayNote: PRIZE_HOME,
+    blurb:
+      "Fluffy chestnut tail curled taller than its head, like a tiny friend from Pinecone Pass.",
+  },
+  "owl-plush": {
+    origin: CLAW_ORIGIN,
+    displayNote: PRIZE_HOME,
+    blurb: "Wide starry button eyes watching gently over Fae's clubhouse adventures after dusk.",
+  },
+  pinwheel: {
+    origin: COUNTER_ORIGIN,
+    displayNote: PRIZE_HOME,
+    blurb: "Spinning pastel petals that whirl into a rainbow whenever a breeze drifts by.",
+  },
+  "bouncy-ball": {
+    origin: COUNTER_ORIGIN,
+    displayNote: PRIZE_HOME,
+    blurb:
+      "Clear speckled bouncy ball with a tiny gold star floating right in the bouncy center.",
+  },
+  "toy-rocket": {
+    origin: COUNTER_ORIGIN,
+    displayNote: PRIZE_HOME,
+    blurb:
+      "Tin-painted red-and-cream comet cruiser ready for pretend launches past the marquee.",
+  },
+  "star-racer-keychain": {
+    origin: COUNTER_ORIGIN,
+    displayNote: PRIZE_HOME,
+    blurb:
+      "Mr. Pip's legendary 80-ticket champ prize, the very Star Racer charm Milo dreamed about.",
+  },
+};
+
+const FALLBACK_PRIZE_NOTE: PrizeFieldNoteMeta = {
+  origin: "Mr. Pip's Arcade",
+  displayNote: PRIZE_HOME,
+  blurb:
+    "A treasured prize won at Mr. Pip's Arcade and tucked proudly onto the clubhouse shelf.",
+};
+
+/** Returns handcrafted Cloverhollow field-note lore for an Arcade Prize. */
+export function prizeFieldNote(prizeId: string): PrizeFieldNoteMeta {
+  return PRIZE_FIELD_NOTES[prizeId] ?? FALLBACK_PRIZE_NOTE;
+}
 
 export function fieldNoteBlurb(note: CritterFieldNote): string {
   if (note.oldFriend) return "An old friend! Waves happily whenever Fae walks by.";
@@ -280,6 +387,39 @@ export function createJournalFieldOverlays(options?: {
     );
   };
 
+  const renderPrizeNote = (prize: JournalFieldNotePrize): void => {
+    const meta = prizeFieldNote(prize.id);
+    fieldBackdrop.hidden = false;
+    const signature = [
+      "prize",
+      prize.id,
+      prize.name,
+      meta.origin,
+      meta.displayNote,
+      meta.blurb,
+      prize.image !== null,
+    ].join("|");
+    if (signature === fieldSignature) return;
+    fieldSignature = signature;
+    setAttribute(fieldCard, "aria-label", "Arcade prize note");
+    setAttribute(fieldCard, "data-field-kind", "prize");
+    fieldSpecimen.classList.toggle("is-rare", false);
+    fieldPortrait.hidden = prize.image === null;
+    fieldCharm.hidden = true;
+    if (prize.image !== null) applyAtlasCrop(fieldPortrait, prize.image);
+    setAttribute(fieldPortrait, "aria-label", prize.name);
+    setText(fieldName, prize.name);
+    setText(fieldSub, "Arcade Prize");
+    fieldOldFriend.hidden = true;
+    setText(fieldFoundRow.key, "Found");
+    setText(fieldLands, meta.origin);
+    setText(fieldDetailRow.key, "Home");
+    setText(fieldCalms, meta.displayNote);
+    fieldFeelingsRow.row.hidden = true;
+    fieldLovesRow.row.hidden = true;
+    setText(fieldBlurb, meta.blurb);
+  };
+
   const syncFieldNote = (view: JournalFieldNoteSource): void => {
     if (inspectedItem === null) {
       if (!fieldBackdrop.hidden) fieldBackdrop.hidden = true;
@@ -318,6 +458,7 @@ export function createJournalFieldOverlays(options?: {
       setText(fieldName, note.name);
       setText(fieldSub, `Lv ${note.level} · ${note.chaosName}`);
       fieldOldFriend.hidden = !note.oldFriend;
+      setText(fieldFoundRow.key, "Found in");
       setText(fieldLands, note.lands.join(", "));
       setText(fieldDetailRow.key, "Calmed");
       setText(fieldCalms, `${note.calms} ${note.calms === 1 ? "time" : "times"}`);
@@ -338,6 +479,18 @@ export function createJournalFieldOverlays(options?: {
         }),
       );
       setText(fieldBlurb, fieldNoteBlurb(note));
+      return;
+    }
+    if (inspectedItem.kind === "prize") {
+      const prize = (view.prizes ?? []).find(
+        (candidate) =>
+          candidate.id === inspectedItem?.id && candidate.owned && candidate.image !== null,
+      );
+      if (prize === undefined) {
+        clearFieldNote();
+        return;
+      }
+      renderPrizeNote(prize);
       return;
     }
     if (inspectedItem.kind === "fish") {
@@ -370,6 +523,7 @@ export function createJournalFieldOverlays(options?: {
       setText(fieldName, fish.name);
       setText(fieldSub, fish.rare ? "Bubblegum Bay · Rare Catch" : "Bubblegum Bay · Bay Catch");
       fieldOldFriend.hidden = true;
+      setText(fieldFoundRow.key, "Found in");
       setText(fieldLands, "Bubblegum Bay Dock");
       setText(fieldDetailRow.key, "Reward");
       const snackBonus = fish.snacks > 0 ? `, +${fish.snacks} snack` : "";
@@ -406,6 +560,7 @@ export function createJournalFieldOverlays(options?: {
     setText(fieldName, keepsake.name);
     setText(fieldSub, "Clubhouse Keepsake");
     fieldOldFriend.hidden = true;
+    setText(fieldFoundRow.key, "Found in");
     setText(fieldLands, keepsake.source);
     setText(fieldDetailRow.key, "Displayed");
     setText(fieldCalms, keepsake.displaySpot);
@@ -447,6 +602,17 @@ export function createJournalFieldOverlays(options?: {
       const wasOpen = hasOpen();
       inspectedItem = item;
       if (view !== null) syncFieldNote(view);
+      notifyVisibility(wasOpen);
+    },
+    openPrize: (prize, view) => {
+      if (!prize.owned || prize.image === null) return;
+      const wasOpen = hasOpen();
+      inspectedItem = { kind: "prize", id: prize.id };
+      if (view !== undefined && view !== null) {
+        syncFieldNote(view);
+      } else {
+        renderPrizeNote(prize);
+      }
       notifyVisibility(wasOpen);
     },
     openTreasures: (view) => {

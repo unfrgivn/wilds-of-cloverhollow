@@ -6254,6 +6254,36 @@ the old trail, the owl, and the clubhouse claim.
   `CLOVERHOLLOW_E2E_PORT=4611/4613 just e2e` (640 Chromium + 545 WebKit = 1,185
   passed, 2 skipped, 0 failed, 0 snapshot diffs).
 
+## Milestone 143: Interactive Arcade Prize Field Note Cards + `qa.test.ts` Timeout Hardening **Status:** ✅ Completed (2026-11-27)
+- Completes interactive specimen inspection across all 4 Journal collection
+  shelves (Critters + Arcade Prizes + Fish + Keepsakes = 4/4):
+  - Exports `PrizeFieldNoteMeta` and pure `prizeFieldNote(prizeId)` in
+    `src/ui/journal-field-note.ts` with handcrafted Cloverhollow lore for all
+    13 Arcade Prizes (9 Claw Machine plushies and 4 Ticket Counter toys, plus a
+    safe fallback for unknown IDs).
+  - Extends `createJournalFieldOverlays` (`kind: "prize"` / `openPrize`) to
+    render owned prizes inside the shared cream `.journal-field-note` dialog
+    with zoomed `applyAtlasCrop` art, `"Arcade Prize"` subtitle, `Found` /
+    `Home` rows, italicized blurb, identical `×` / backdrop / `Escape` / `X` /
+    Gamepad `B` dismissal, and `"card-open"` / `"card-close"` paper foley.
+  - Wires `prizeSlots` in `src/ui/journal.ts` (`data-prize`, `data-owned`,
+    `is-inspectable`, `tabindex="0"`, `role="button"`,
+    `aria-label="Inspect <Name> prize note"`) with zero DOM churn, zero
+    baseline diffs, automatic keyboard/gamepad focus cycling, and `< 1,000`
+    lines across every implementation `.ts` file in `src/`.
+- Hardens `tests/unit/qa.test.ts` with a `60_000` ms Vitest timeout so all 23
+  back-to-back simulation replays stay resilient under warm CPU.
+- Zero `src/core` changes and zero replay hash shifts across all 68 recorded sims.
+- Evidence: `tests/unit/milestone-143.test.ts` (2 tests covering all 13 prizes
+  and fallback), real-input `tests/e2e/milestone-143.spec.ts` (`@smoke`,
+  Chromium & WebKit), and `art/review/m143-prize-field-note.jpg` verified with
+  `vision`.
+- Gates: `just check` (203 unit files / 1,471 tests, all 68 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  `CLOVERHOLLOW_E2E_PORT=4621/4622 just e2e` (641 Chromium + 546 WebKit = 1,187
+  passed, 2 skipped, 0 failed, 0 snapshot diffs).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

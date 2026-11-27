@@ -1,4 +1,9 @@
 import "./claw.css";
+import {
+  classifyClawPopup,
+  createArcadePopupLayer,
+  type ClawPopupOutcome,
+} from "./arcade-popups";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
 import { clawLook, layoutClaw, type ClawLayout, type Line } from "./claw-layout";
 import {
@@ -6,6 +11,20 @@ import {
 } from "./dom";
 import { bindPointerHold } from "./pointer-hold";
 import type { ClawCalibration, ClawView } from "../core";
+
+function clawViewOutcome(view: ClawView): ClawPopupOutcome | null {
+  if (view.prize !== null || view.plushes.some((item) => item.held)) return "grabbed";
+  if (view.plushes.some((item) => item.tug)) return "stuck";
+  if (
+    view.phase === "lifting" ||
+    view.phase === "returning" ||
+    view.phase === "releasing" ||
+    view.phase === "result"
+  ) {
+    return "empty";
+  }
+  return null;
+}
 
 function drawLine(node: SVGLineElement, line: Line): void {
   setAttribute(node, "x1", String(line.x1));
@@ -65,6 +84,7 @@ export function createClaw(
     (held) => onConfirmHold(held),
     () => !overlay.hidden,
   );
+  const popups = createArcadePopupLayer(overlay);
   const machine = element("div", "arcade-machine", overlay);
   machine.style.backgroundImage = `url("${cabinet}")`;
   const scene = element("div", "arcade-scene", machine);
@@ -100,6 +120,7 @@ export function createClaw(
   const plushes = new Map<string, HTMLDivElement>();
   let lastKey = "";
   let lastView: ClawView | null = null;
+  let prevPhase: string | null = null;
 
   const plush = (id: string, frame: string): HTMLDivElement => {
     const existing = plushes.get(id);
@@ -198,8 +219,13 @@ export function createClaw(
       if (view === null) {
         pointerHold.release();
         lastKey = "";
+        prevPhase = null;
+        popups.clear();
         return;
       }
+      const popup = classifyClawPopup(prevPhase, view.phase, clawViewOutcome(view));
+      prevPhase = view.phase;
+      if (popup !== null) popups.spawn(popup);
       // The cabinet is as large as the overlay's padded box allows (the safe
       // areas, and the touch buttons' column on the right), keeping its shape.
       const style = getComputedStyle(overlay);

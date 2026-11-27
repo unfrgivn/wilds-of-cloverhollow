@@ -148,7 +148,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   views), all re-exported through `src/core/sim.ts` and `src/core/index.ts`
   (Milestones 91, 96, 125).
 - Battle stage mood washes, Flute Friend on-stage cameo poses, and battle VFX
-  anchor resolution live in `src/render/battle-stage.ts` (Milestone 91). The
+  anchor resolution live in `src/render/battle-stage.ts` (Milestone 91), while
+  pure battle VFX particle/theater builders (`SnackTheaterKind`,
+  `classifySnackTheater`, `isTalkTheater`, `radialBurst`, `applyTalkTheater`,
+  `applySnackTheater`, `applyTogetherReady`, `applyTogetherActive`,
+  `applyWindUpAndFizzle`, `applySoothedAndReward`) live in Pixi-free
+  `src/render/battle-vfx.ts` (re-exported through
+  `src/render/battle-choreography.ts`, Milestone 137). The
   Pixi battle stage container, sprites, backdrop blur, check geometry, and
   `renderBattle` orchestration live in `BattleViewController`
   (`src/render/battle-view.ts`, mounted by `GameView` in `src/render/view.ts`),
@@ -161,13 +167,16 @@ ios/            Capacitor iOS project (from Milestone 4).
   identically through `src/ui/battle.ts`, Milestone 134).
 - Lazy DOM atlas metadata caching, single-decode image warming, frame crop
   resolvers (`stickerArt`, `prizeArt`, `speakerPortrait`, `fishArt`, `toyArt`),
-  per-area close-up overlays (`ensureClawOverlay`, `ensureSkeeOverlay`,
+  and per-area close-up overlays (`ensureClawOverlay`, `ensureSkeeOverlay`,
   `ensureMoleOverlay`, `ensureCometOverlay`, `ensureArcadeOverlay`,
   `ensureCookOverlay`, `ensureFishOverlay`, `warmAreaOverlays`,
-  `warmAreaMedia`, `warmJournalAssets`, `warmBattlePortraits`), and shell view
-  projectors (`battleCheckOverlay`, `buildBattleHudView`, `buildCreditsView`,
-  `buildDialogueView`, `buildHudHintsView`, `buildJournalView`,
-  `buildRewardStickerView`) live in `src/shell/assets.ts`; pure gameplay
+  `warmAreaMedia`, `warmJournalAssets`, `warmBattlePortraits`) live in
+  `src/shell/assets.ts`, while the pure shell UI view-model projectors
+  (`cropCreditFrame`, `battleCheckOverlay`, `buildBattleHudView`,
+  `buildCreditsView`, `buildDialogueView`, `buildHudHintsView`,
+  `buildJournalView`, `buildRewardStickerView`) live in Pixi-free
+  `src/shell/view-models.ts` (re-exported identically through
+  `src/shell/assets.ts`, Milestone 137); pure gameplay
   feedback and outcome helpers (`petEffectForCompanion`, `hapticForTick`,
   `buildSoundContext`, `resolveArcadeOutcome`, `collectLevelUpNotices`,
   `shouldClearRest`, `isOverworldConfirm`, `stepJukeboxTrack`,
@@ -2218,7 +2227,8 @@ trunks keep its two exits.
   Milestone 120), and "Thank you for playing!", from `creditEntries` (`src/core/credits.ts`). FRIENDS is each roster member who
   starts with Fae or whose `befriended` (else `joins`) variable is true, in
   roster order, on the frame `down_idle_01`; small animal party frames
-  (`<= 280x280`, via `cropCreditFrame` in `src/shell/assets.ts`) tightly crop
+  (`<= 280x280`, via `cropCreditFrame` in `src/shell/view-models.ts`,
+  re-exported through `src/shell/assets.ts`) tightly crop
   to their lower-centre figure so they match Sue, Jordan, and critters in scale.
   MET is each sticker in `state.stickers`, by its name, on its critter's atlas
   at the sticker's frame. Each entry is a small sticker over its name; the
@@ -3078,8 +3088,9 @@ trunks keep its two exits.
   slowly drifting sinusoidal watercolour mood washes (`battleMoodWaveA`,
   `battleMoodWaveB`) tinted dynamically by `battleStageMood` (`"calm-normal"`,
   `"windup"`, `"together-ready"`, `"together-active"`, `"soothed"`).
-  `computeBattleChoreography` (`src/render/battle-choreography.ts`, Milestones
-  73, 82, 135, and 136) drives deterministic Paper Mario / EarthBound combat poses,
+  `computeBattleChoreography` (`src/render/battle-choreography.ts`, paired with
+  pure theater VFX helpers in `src/render/battle-vfx.ts`, Milestones
+  73, 82, 135, 136, and 137) drives deterministic Paper Mario / EarthBound combat poses,
   `stageMood`, `hitStop`, and pooled `battleVfxLayer` particles (`sparkle`,
   `heart`, `energyRing`, `puff`, `petal`, `softGlow`): staggered breathing,
   highlighted actor step-forward on command selection, Heart-to-Heart `Talk`
@@ -3575,7 +3586,8 @@ trunks keep its two exits.
   `.touch-button:active` tactile squash, and subtle inner-label float on
   `.sticker-prompt` keeping its arrow tip anchored.
 - Tactile Minigame Personal Bests & Die-Cut Arcade Score Popups (Milestone 112,
-  extended to Clubhouse Microwave in Milestone 118):
+  extended to Clubhouse Microwave in Milestone 118 and completed across all 6/6
+  minigames with Claw Machine popups in Milestone 137):
   persistent local personal bests (`src/platform/minigame-records.ts`, stored
   outside the save slot via `@capacitor/preferences` under
   `"cloverhollow-records"` with keys `skee`, `mole`, `comet`, consecutive
@@ -3585,10 +3597,12 @@ trunks keep its two exits.
   bump) and live Paper-Mario die-cut arcade score popups (`src/ui/arcade-popups.ts`
   and `src/ui/arcade-popups.css`). Pure classifiers (`classifySkeePopup`,
   `classifyMolePopup`, `classifyCometPopup`, `classifyFishPopup`,
-  `classifyCookPopup`) stay silent on
+  `classifyCookPopup`, `classifyClawPopup`) stay silent on
   initial open, reset, or static `ui-gallery` renders, and spawn crisp
   `#47321f`-inked `.arcade-popup` pills (`+N`, `+50!`, `+100 ★!`, `BOOP! +2`,
-  `★ +1`, `NICE CATCH!`, `★ RARE!`, `★ GOLDEN!`) in the upper-right margin on live gains.
+  `★ +1`, `NICE CATCH!`, `★ RARE!`, `★ GOLDEN!`, `GOT IT! ★`, `TUG!`,
+  `★ PRIZE!`) in the upper-right margin on live gains or Claw Machine lift/prize
+  transitions.
   When a live round enters `phase === "result"`, the minigame renders a die-cut
   `.arcade-best-badge` pill (`★ NEW BEST! <best>` in gold when beating a
   non-zero record, or `Best: <best>` in warm cream otherwise) in the vacated

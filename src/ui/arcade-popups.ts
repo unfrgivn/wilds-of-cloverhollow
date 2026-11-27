@@ -76,6 +76,26 @@ export function classifyCookPopup(
   return rating === "golden" ? { kind: "rare", text: "★ GOLDEN!" } : null;
 }
 
+export type ClawPopupOutcome = "grabbed" | "stuck" | "empty";
+
+export function classifyClawPopup(
+  prevPhase: string | null,
+  nextPhase: string,
+  outcome: ClawPopupOutcome | null,
+): ArcadePopupSpec | null {
+  if (prevPhase === null || prevPhase === nextPhase) return null;
+  if (nextPhase === "lifting" && outcome === "grabbed") {
+    return { kind: "star", text: "GOT IT! ★" };
+  }
+  if (nextPhase === "lifting" && outcome === "stuck") {
+    return { kind: "normal", text: "TUG!" };
+  }
+  if (nextPhase === "result" && outcome === "grabbed") {
+    return { kind: "rare", text: "★ PRIZE!" };
+  }
+  return null;
+}
+
 export function formatArcadeBestText(record: ArcadeRecordBadge): string {
   return record.isNewBest ? `★ NEW BEST! ${record.best}` : `Best: ${record.best}`;
 }

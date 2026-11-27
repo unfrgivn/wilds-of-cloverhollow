@@ -6026,6 +6026,45 @@ the old trail, the owl, and the clubhouse claim.
   passed, 2 skipped, 0 failed; only `kid-talk` and `m81-mateo-talk` baselines
   updated for the new Talk climax hearts & warm glow).
 
+## Milestone 137: Claw Machine Die-Cut Popups (`classifyClawPopup`, 6/6 Minigames), `src/render/battle-vfx.ts` Split & `src/shell/view-models.ts` Split **Status:** ✅ Completed (2026-11-27)
+- Zero `src/core` changes and zero replay hash shifts across all 68 recorded
+  sims.
+- Claw Machine Die-Cut Popups (`src/ui/arcade-popups.ts`, `src/ui/claw.ts`):
+  - Exports `ClawPopupOutcome` (`"grabbed" | "stuck" | "empty"`) and pure
+    `classifyClawPopup(prevPhase, nextPhase, outcome)` completing Paper-Mario
+    celebratory popups across all 6/6 minigames: silent on initial open or
+    steady frames, spawning `"GOT IT! ★"` (`kind: "star"`) on lifting a grabbed
+    plush, `"TUG!"` (`kind: "normal"`) on lifting a stuck plush, and
+    `"★ PRIZE!"` (`kind: "rare"`) when a grabbed plush reaches `result`.
+  - Mounts `createArcadePopupLayer(overlay)` in `src/ui/claw.ts` matching all
+    five sibling minigames, derives `ClawPopupOutcome` cleanly from `ClawView`
+    (`prize`, `held`, `tug`, `phase`) without touching `src/core`, and clears
+    on close.
+- Pure Battle VFX Extraction (`src/render/battle-vfx.ts`,
+  `src/render/battle-choreography.ts`):
+  - Extracts pure Pixi-free battle VFX types, palettes, classifiers
+    (`SnackTheaterKind`, `classifySnackTheater`, `isTalkTheater`), `radialBurst`,
+    and self-contained theater builders (Heart-to-Heart Talk, Snack/Treat,
+    `Together!` ready/active, wind-up/fizzle, soothed/reward petals) into
+    `src/render/battle-vfx.ts`, re-exporting public types and classifiers
+    identically from `src/render/battle-choreography.ts`.
+- Pure Shell View-Model Extraction (`src/shell/view-models.ts`,
+  `src/shell/assets.ts`):
+  - Extracts pure Pixi-free UI view-model builders (`cropCreditFrame`,
+    `battleCheckOverlay`, `buildRewardStickerView`, `buildJournalView`,
+    `buildDialogueView`, `buildHudHintsView`, `buildBattleHudView`,
+    `buildCreditsView`) into `src/shell/view-models.ts`, keeping Pixi/DOM asset
+    loading and close-up overlays in `src/shell/assets.ts` with identical
+    re-exports for existing callers.
+- Evidence: `tests/unit/milestone-137.test.ts` (6 tests) and real-input
+  `tests/e2e/milestone-137.spec.ts` (`@smoke`, Chromium & WebKit).
+- Gates: `just check` (197 unit files / 1,443 tests, all 68 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  e2e across Chromium (636 passed) & WebKit (541 passed; 1,177 total passed,
+  2 skipped, 0 snapshot diffs, plus 45/45 WebKit repeat check on
+  `milestone-126.spec.ts`).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

@@ -1110,6 +1110,19 @@ export class GameView {
     this.critterFrames = frames;
   }
 
+  /** Fae's current feet anchor in CSS pixels, or null before the first render. */
+  playerScreenPoint(state: State): Point | null {
+    if (this.previousCamera === undefined) return null;
+    return worldToScreen(
+      state.player,
+      this.previousCamera,
+      this.viewWidth,
+      this.viewHeight,
+      window.innerWidth,
+      window.innerHeight,
+    );
+  }
+
   /** The interaction prompt for this frame, anchored at the target in CSS px. */
   promptView(state: State): {
     visible: boolean;

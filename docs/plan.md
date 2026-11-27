@@ -5721,6 +5721,42 @@ the old trail, the owl, and the clubhouse claim.
   `CLOVERHOLLOW_E2E_PORT=4481 just e2e` (1,158 passed, 2 skipped, 0 failed,
   zero snapshot diffs across Chromium & WebKit in 5.7 min).
 
+## Milestone 129: Overworld Mouse/Pen Press-and-Hold Steering & Shell Input Shortcuts Extraction **Status:** ✅ Completed (2026-11-27)
+- Zero `src/core` changes and zero replay hash shifts across all 67 recorded
+  sims; zero visual pixel changes across all existing Playwright snapshots.
+- Overworld Mouse/Pen Press-and-Hold Steering (`src/shell/overworld-pointer.ts`,
+  `src/render/view.ts`, `src/platform/touch.ts`, `src/main.ts`):
+  - Adds read-only `GameView.playerScreenPoint(state)` returning Fae's screen
+    position via `worldToScreen` when a camera is active (`null` before first
+    render).
+  - Exports pure `computeOverworldSteer(pointer, player, deadRadius = 18,
+    rampRadius = 64)` (zero inside `deadRadius`, smooth linear ramp along the
+    unit direction up to `rampRadius`) and sticky-proof
+    `bindOverworldPointerSteer(options)` responding strictly to primary mouse
+    or pen presses (`button === 0`, never touch), refreshing every tick via
+    `sync()`, and releasing idempotently on `pointerup`, `pointercancel`,
+    `lostpointercapture`, `window` `blur`, `visibilitychange` (hidden), harness
+    reset, or leaving free overworld play.
+  - Preserves clamped `-1..1` analog steering vectors in
+    `TouchInput.setPointerArrow` without interfering with touch arrow stickers.
+- Shell Input Shortcuts Extraction (`src/shell/input-shortcuts.ts`,
+  `src/main.ts`):
+  - Extracts overlay/steering gates (`canPhotoMode`, `canBattlePeek`,
+    `canOverworldSteer`, `isJournalShortcutActive`, `isOverworldFree`,
+    `isBannerEligible`) plus keyboard shortcut handling, optional QA key
+    handling, layered cancel-edge dismissal, and per-frame gamepad
+    overlay/journal shortcut dispatch into unit-testable
+    `src/shell/input-shortcuts.ts`, trimming `src/main.ts` from 1,425 lines
+    to 1,199 lines.
+- Evidence: `tests/unit/milestone-129.test.ts` (4 tests) and real-mouse
+  `tests/e2e/milestone-129.spec.ts` (`@smoke`, zero keyboard presses, Chromium
+  & WebKit).
+- Gates: `just check` (188 unit files / 1,403 tests, all 67 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  `CLOVERHOLLOW_E2E_PORT=4491 just e2e` (1,160 passed, 2 skipped, 0 snapshot
+  diffs across Chromium & WebKit).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

@@ -139,9 +139,12 @@ export class TouchInput {
 
   /** Holds or clears a stage-pointer directional vector without clobbering touch arrows. */
   setPointerArrow(direction: Point | null): void {
-    this.pointerArrow = direction === null
-      ? { x: 0, y: 0 }
-      : { x: Math.sign(direction.x), y: Math.sign(direction.y) };
+    if (direction === null) {
+      this.pointerArrow = { x: 0, y: 0 };
+      return;
+    }
+    const clamp = (value: number): number => Math.max(-1, Math.min(1, value));
+    this.pointerArrow = { x: clamp(direction.x), y: clamp(direction.y) };
   }
 
   /** Lets go of every arrow, taps included, as the shell does outside a catch, a lean,

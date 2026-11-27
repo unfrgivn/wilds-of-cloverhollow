@@ -169,8 +169,14 @@ ios/            Capacitor iOS project (from Milestone 4).
   `buildSoundContext`, `resolveArcadeOutcome`, `collectLevelUpNotices`,
   `shouldClearRest`, `isOverworldConfirm`, `stepJukeboxTrack`,
   `resolveSoundtrack`, `createAreaBannerTracker`, `createJournalNotesCache`,
-  `captureAreaPostcard`) live in `src/shell/feedback.ts` so `src/main.ts` stays
-  focused on composition and lifecycle.
+  `captureAreaPostcard`) live in `src/shell/feedback.ts`; desktop mouse/pen
+  overworld press-and-hold steering (`computeOverworldSteer`,
+  `bindOverworldPointerSteer`) lives in `src/shell/overworld-pointer.ts`; and
+  shell keyboard/gamepad overlay & journal shortcut orchestration
+  (`canPhotoMode`, `canBattlePeek`, `canOverworldSteer`,
+  `isJournalShortcutActive`, `isOverworldFree`, `isBannerEligible`,
+  `createInputShortcuts`) lives in `src/shell/input-shortcuts.ts` so
+  `src/main.ts` stays focused on composition and lifecycle.
 - Tactile haptics (`src/platform/haptics.ts`, Milestones 91, 121 & 122):
   progressive enhancement with zero new npm dependencies. `createHaptics()`
   checks for a native Capacitor Haptics plugin (`Capacitor.Plugins.Haptics`) via
@@ -243,6 +249,18 @@ ios/            Capacitor iOS project (from Milestone 4).
   non-zero movement.
   When devices provide different movement vectors, touch wins, then keyboard,
   then gamepad.
+- Overworld desktop mouse/pen steering (`src/shell/overworld-pointer.ts`,
+  Milestone 129): pressing and holding the primary mouse or pen button
+  (`(pointerType === "mouse" || pointerType === "pen") && button === 0`) on the
+  overworld canvas steers Fae toward the cursor via `computeOverworldSteer`
+  using `GameView.playerScreenPoint(state)` (18 px dead radius so Fae stops
+  cleanly beside the cursor without jitter; smooth linear speed ramp out to
+  64 px at full stride, fed through `TouchInput.setPointerArrow` clamped to
+  `-1..1` without interfering with touch virtual-stick controls). Active holds
+  recompute per tick via `sync()` and release idempotently on pointer end, lost
+  capture, window blur, hidden visibility, harness reset, or opening any
+  overlay, transition, battle, dialogue, arcade game, journal, photo mode,
+  title, or QA panel (`canOverworldSteer` in `src/shell/input-shortcuts.ts`).
 
 ### 3.2.1 iOS shell decisions (Milestone 4)
 - WKWebView exposes the Gamepad API when the web view is first responder. With

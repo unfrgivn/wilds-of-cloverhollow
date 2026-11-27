@@ -34,7 +34,6 @@ import {
   createRewardSticker,
 } from "./ui/battle";
 import { createJournal } from "./ui/journal";
-import { computeJournalScrollDelta } from "./ui/journal-nav";
 import { createTitleScreen, type TitleChoiceId } from "./ui/title";
 import { createCredits } from "./ui/credits";
 import {
@@ -80,13 +79,23 @@ import { createGameSettings } from "./platform/game-settings";
 import { createMinigameRecords } from "./platform/minigame-records";
 import type { ArcadeRecordBadge } from "./ui/arcade-popups";
 import { createAreaBanner } from "./ui/area-banner";
-import { createHudHints, type HudInputMode } from "./ui/hud-hints";
+import { createHudHints } from "./ui/hud-hints";
 import { createSaveToast } from "./ui/save-toast";
 import {
   createPhotoTouchBar,
   createShutterFlash,
   type PostcardCapture,
 } from "./ui/postcard";
+import {
+  canBattlePeek,
+  canOverworldSteer,
+  canPhotoMode,
+  createInputShortcuts,
+  isBannerEligible,
+  isOverworldFree,
+  type OverlayGateContext,
+} from "./shell/input-shortcuts";
+import { bindOverworldPointerSteer } from "./shell/overworld-pointer";
 import { qaFlow } from "./shell/qa-flow";
 import { shouldFlushSaveOnHide, shouldFreezeLiveLoop } from "./shell/lifecycle";
 import type { PackState } from "./dev/qa";
@@ -185,47 +194,32 @@ async function boot(): Promise<void> {
   const invalidate = (): void => {
     drawPending = true;
   };
+  const withInvalidate = <Args extends unknown[]>(
+    fn: (...args: Args) => void,
+  ): ((...args: Args) => void) => (...args: Args): void => {
+    fn(...args);
+    invalidate();
+  };
   const syncReducedMotion = (): void => {
     document.documentElement.dataset.reducedMotion = gameSettings.reducedMotion() ? "on" : "off";
   };
-  const gameSettings = createGameSettings(() => {
-    syncReducedMotion();
-    invalidate();
-  });
-  const minigameRecords = createMinigameRecords(() => {
-    invalidate();
-  });
+  const gameSettings = createGameSettings(withInvalidate(syncReducedMotion));
+  const minigameRecords = createMinigameRecords(invalidate);
   let activeArcadeRecord: ArcadeRecordBadge | null = null;
   let fishStreak = 0;
   syncReducedMotion();
   const hudHints = createHudHints(uiRoot);
-  let lastInputMode: HudInputMode = "keyboard";
   const saveToast = createSaveToast(uiRoot);
   const areaBanner = createAreaBanner(uiRoot);
   const shutterFlash = createShutterFlash(uiRoot);
   const bannerTracker = createAreaBannerTracker();
   const journal = createJournal(uiRoot);
-  journal.onToggleAudio(() => {
-    sound.toggle();
-    invalidate();
-  });
-  journal.onSetAudioLevel((level: AudioLevel) => {
-    sound.setLevel(level);
-    invalidate();
-  });
-  journal.onToggleMusic(() => {
-    sound.toggleMusic();
-    invalidate();
-  });
-  journal.onSetMusicLevel((level: AudioLevel) => {
-    sound.setMusicLevel(level);
-    invalidate();
-  });
+  journal.onToggleAudio(withInvalidate(() => sound.toggle()));
+  journal.onSetAudioLevel(withInvalidate((level: AudioLevel) => sound.setLevel(level)));
+  journal.onToggleMusic(withInvalidate(() => sound.toggleMusic()));
+  journal.onSetMusicLevel(withInvalidate((level: AudioLevel) => sound.setMusicLevel(level)));
   let jukeboxTrack: JukeboxTrack | null = null;
-  journal.onToggleAmbience(() => {
-    sound.toggleAmbience();
-    invalidate();
-  });
+  journal.onToggleAmbience(withInvalidate(() => sound.toggleAmbience()));
   journal.onStepTrack((delta) => {
     if (!state.journalOpen) return;
     const nextTrack = stepJukeboxTrack(
@@ -244,34 +238,15 @@ async function boot(): Promise<void> {
     jukeboxTrack = null;
     invalidate();
   });
-  journal.onToggleGentleTiming(() => {
-    gameSettings.toggleGentleTiming();
-    invalidate();
-  });
-  journal.onToggleKeyHints(() => {
-    gameSettings.toggleKeyHints();
-    invalidate();
-  });
-  journal.onCycleTextSpeed(() => {
-    gameSettings.cycleTextSpeed();
-    invalidate();
-  });
-  journal.onToggleReducedMotion(() => {
-    gameSettings.toggleReducedMotion();
-    invalidate();
-  });
+  journal.onToggleGentleTiming(withInvalidate(() => gameSettings.toggleGentleTiming()));
+  journal.onToggleKeyHints(withInvalidate(() => gameSettings.toggleKeyHints()));
+  journal.onCycleTextSpeed(withInvalidate(() => gameSettings.cycleTextSpeed()));
+  journal.onToggleReducedMotion(withInvalidate(() => gameSettings.toggleReducedMotion()));
   const title = createTitleScreen(uiRoot);
   const qaMenu = qaTools === null ? null : qaTools.createQaMenu(uiRoot, qaEntries);
   const qaBadge = qaTools === null ? null : qaTools.createQaBadge(uiRoot);
   if (qaTools !== null && qaError !== null) qaTools.createQaError(uiRoot, qaError);
   const credits = createCredits(uiRoot);
-  const input = createInputSource(() => {
-    return combineInputFrames(
-      keyboard.frame(),
-      touch.sample(),
-      gamepad.frame(),
-    );
-  });
   dialogueBox.onChoose((index) => touch.tapChoice(index));
   dialogueBox.onAdvance(() => touch.tapButton("confirm"));
   prompt.onActivate(() => touch.tapButton("confirm"));
@@ -334,17 +309,9 @@ async function boot(): Promise<void> {
       saveDirty = false;
     }
   };
-  title.onChoose((id) =>
-    applyTitle({
-      up: false,
-      down: false,
-      left: false,
-      right: false,
-      confirm: false,
-      cancel: false,
-      choose: id,
-    }),
-  );
+  title.onChoose((choose) => applyTitle({
+    up: false, down: false, left: false, right: false, confirm: false, cancel: false, choose,
+  }));
   saveStore.setLoaded(
     restored === null ? null : { tick: restored.tick, hash: stableHash(restored) },
   );
@@ -416,11 +383,13 @@ async function boot(): Promise<void> {
     saveToast.hide();
     titleMode = null;
     qaJustPicked = true;
+    overworldPointer.release();
     swallowed.add("confirm");
   };
   const openQa = (): void => {
     if (qaTools === null || qaBlocked || qaEntries.length === 0 || titleMode === null) return;
     qaReturnMode = titleMode; qaMenuOpen = true;
+    overworldPointer.release();
   };
   title.onQa(openQa);
   // The QA console (spec 11): open with the backtick key or a tap on the QA
@@ -460,6 +429,7 @@ async function boot(): Promise<void> {
     if (qaConsole === null || qaConsoleOpen || qaActivePack === null ||
         titleMode !== null || qaMenuOpen) return;
     qaConsoleOpen = true;
+    overworldPointer.release();
   };
   qaBadge?.onOpen(openQaConsole);
   qaMenu?.onChoose(pickQa);
@@ -525,37 +495,30 @@ async function boot(): Promise<void> {
   let wasBattleOpen = false;
   let photoMode = false;
   document.documentElement.dataset.photo = "off";
-  const canPhotoMode = (): boolean =>
-    titleMode === null &&
-    !qaMenuOpen &&
-    !qaConsoleOpen &&
-    !qaBlocked &&
-    state.dialogue === null &&
-    state.battle === null &&
-    state.arcade === null &&
-    !state.journalOpen &&
-    state.finale === null;
+  const overlayContext = (): OverlayGateContext => ({
+    state,
+    titleMode,
+    qaMenuOpen,
+    qaConsoleOpen,
+    qaBlocked,
+    photoMode,
+  });
   const setPhotoMode = (on: boolean): void => {
-    const next = on && canPhotoMode();
+    const next = on && canPhotoMode(overlayContext());
     photoMode = next;
     document.documentElement.dataset.photo = next ? "on" : "off";
     view.setPhotoMode(next);
-    if (next) saveToast.hide();
-    else shutterFlash.hide();
+    if (next) {
+      overworldPointer.release();
+      saveToast.hide();
+    } else {
+      shutterFlash.hide();
+    }
     invalidate();
   };
   let battlePeekOpen = false;
-  const canBattlePeek = (): boolean =>
-    titleMode === null &&
-    !qaMenuOpen &&
-    !qaConsoleOpen &&
-    !qaBlocked &&
-    !state.journalOpen &&
-    state.battle !== null &&
-    state.battle.phase === "command" &&
-    (state.battle.talk === undefined || state.battle.talk === null);
   const setBattlePeek = (on: boolean): void => {
-    const next = on && canBattlePeek();
+    const next = on && canBattlePeek(overlayContext());
     if (next === battlePeekOpen) return;
     battlePeekOpen = next;
     sound.play("choice-move", state.tick);
@@ -563,6 +526,40 @@ async function boot(): Promise<void> {
   };
   battleHud.onPeekToggle(() => setBattlePeek(!battlePeekOpen));
   battleHud.onPeekClose(() => setBattlePeek(false));
+  // Buttons held when the title closed stay hidden from the game until they're
+  // released, so the press that starts the game can't also act in it.
+  const swallowed = new Set<"confirm" | "cancel" | "menu">();
+  const overworldPointer = bindOverworldPointerSteer({
+    canvas: app.canvas,
+    canSteer: () => canOverworldSteer(overlayContext()),
+    playerScreen: () => view.playerScreenPoint(state),
+    onMove: (dir) => touch.setPointerArrow(dir.x === 0 && dir.y === 0 ? null : dir),
+  });
+  const input = createInputSource(() => {
+    overworldPointer.sync();
+    return combineInputFrames(keyboard.frame(), touch.sample(), gamepad.frame());
+  });
+  const inputShortcuts = createInputShortcuts({
+    getContext: overlayContext,
+    getBattlePeekOpen: () => battlePeekOpen,
+    setBattlePeek,
+    setPhotoMode,
+    snapPostcard: () => { void snapPostcard({ download: true }); },
+    journal,
+    gamepad,
+    clearKeyboardTaps: () => keyboard.clearTaps(),
+    swallow: (button) => swallowed.add(button),
+    playChoiceMove: () => { sound.play("choice-move", state.tick); },
+    invalidate,
+    ...(qaEnabled ? {
+      qa: {
+        openMenu: openQa,
+        isConsoleOpen: () => qaConsoleOpen,
+        setConsoleOpen: (open: boolean) => { qaConsoleOpen = open; },
+        openConsole: openQaConsole,
+      },
+    } : {}),
+  });
   const syncOpenFlag = (
     name: "arcade" | "qaConsole" | "title" | "credits" | "battle" | "talk" | "journal",
     open: boolean,
@@ -571,15 +568,15 @@ async function boot(): Promise<void> {
     else delete document.documentElement.dataset[name];
   };
   const render = (alpha = 1): void => {
-    if (photoMode && !canPhotoMode()) {
+    const gate = overlayContext();
+    if (!canOverworldSteer(gate)) overworldPointer.release();
+    if (photoMode && !canPhotoMode(gate)) {
       photoMode = false;
       document.documentElement.dataset.photo = "off";
       view.setPhotoMode(false);
       shutterFlash.hide();
     }
-    if (battlePeekOpen && !canBattlePeek()) {
-      battlePeekOpen = false;
-    }
+    if (battlePeekOpen && !canBattlePeek(gate)) battlePeekOpen = false;
     if (!state.journalOpen || titleMode !== null || qaMenuOpen) jukeboxTrack = null;
     const { soundtrack, jukebox } = resolveSoundtrack(
       content.world,
@@ -638,41 +635,30 @@ async function boot(): Promise<void> {
     if (fluteButton !== null)
       fluteButton.hidden = !hasFlute;
     const touchActive = document.documentElement.dataset.touch === "on";
-    const overworldFree =
-      titleMode === null &&
-      !qaMenuOpen &&
-      !qaConsoleOpen &&
-      !qaBlocked &&
-      state.dialogue === null &&
-      state.battle === null &&
-      state.arcade === null &&
-      !state.journalOpen &&
-      state.finale !== "credits" &&
-      levelUpNotices.length === 0;
+    const hasLevelUpNotice = levelUpNotices.length > 0;
     hudHints.render(
       buildHudHintsView({
         world: content.world,
         state,
         keyHints: gameSettings.keyHints(),
         touchActive,
-        overworldFree,
+        overworldFree: isOverworldFree(gate, hasLevelUpNotice),
         isResting: view.isResting(),
         hasLantern,
         hasFlute,
         muted: sound.muted(),
-        canPhoto: canPhotoMode() && !photoMode,
-        canBattlePeek: canBattlePeek(),
-        inputMode: lastInputMode,
+        canPhoto: canPhotoMode(gate) && !photoMode,
+        canBattlePeek: canBattlePeek(gate),
+        inputMode: inputShortcuts.inputMode(),
       }),
     );
-    const bannerEligible =
-      titleMode === null &&
-      !qaMenuOpen &&
-      !qaConsoleOpen &&
-      !qaBlocked &&
-      levelUpNotices.length === 0;
     areaBanner.render(
-      bannerTracker.view(content.world, state, bannerEligible, qaActivePack !== null),
+      bannerTracker.view(
+        content.world,
+        state,
+        isBannerEligible(gate, hasLevelUpNotice),
+        qaActivePack !== null,
+      ),
     );
     title.render({
       visible: titleMode !== null && !qaMenuOpen,
@@ -701,10 +687,17 @@ async function boot(): Promise<void> {
     else delete document.documentElement.dataset.check;
     // An arrow held as a catch, a lean, or a round of Boop-a-Mole or Comet
     // Cruise ends is hidden mid-press and may never see its pointer lifted:
-    // outside one, it lets go.
-    if (checkKind !== "catch" && checkKind !== "lean" && checkKind !== "echo" &&
-        state.arcade?.game !== "mole" && state.arcade?.game !== "comet")
+    // outside one, it lets go unless desktop overworld steering is active.
+    if (
+      checkKind !== "catch" &&
+      checkKind !== "lean" &&
+      checkKind !== "echo" &&
+      state.arcade?.game !== "mole" &&
+      state.arcade?.game !== "comet" &&
+      !overworldPointer.isActive()
+    ) {
       touch.releaseArrows();
+    }
     if (activeBattle && !wasBattleOpen) void assets.warmBattlePortraits(state).then(invalidate);
     wasBattleOpen = activeBattle;
     battleHud.render(
@@ -714,7 +707,7 @@ async function boot(): Promise<void> {
         battle,
         partyCommands,
         paused,
-        canPeek: canBattlePeek(),
+        canPeek: canBattlePeek(gate),
         peekOpen: battlePeekOpen,
         speakerPortrait: assets.speakerPortrait,
       }),
@@ -773,7 +766,7 @@ async function boot(): Promise<void> {
         hasLantern,
         hasFlute,
         hasLasso,
-        inputMode: lastInputMode,
+        inputMode: inputShortcuts.inputMode(),
       }),
     );
     syncOpenFlag("journal", state.journalOpen);
@@ -798,9 +791,6 @@ async function boot(): Promise<void> {
   let lastFinale: State["finale"] = null;
   let endingSnapshot: State | null = null;
   let creditsTicks = 0;
-  // Buttons held when the title closed stay hidden from the game until they're
-  // released, so the press that starts the game can't also act in it.
-  const swallowed = new Set<"confirm" | "cancel" | "menu">();
   let cancelDown = false;
   // The area a door's fade-out is warming. Cleared when the transition ends or
   // the game resets, so every crossing prefetches exactly once.
@@ -866,27 +856,7 @@ async function boot(): Promise<void> {
       if (!frame[button]) swallowed.delete(button);
     const cancelEdge = frame.cancel && !cancelDown;
     cancelDown = frame.cancel;
-    if (
-      cancelEdge &&
-      !swallowed.has("cancel") &&
-      state.journalOpen &&
-      journal.hasOpenOverlay()
-    ) {
-      journal.dismissOverlay();
-      swallowed.add("cancel");
-      sound.play("choice-move", state.tick);
-      invalidate();
-    }
-    if (
-      cancelEdge &&
-      !swallowed.has("cancel") &&
-      battlePeekOpen &&
-      titleMode === null &&
-      !qaMenuOpen &&
-      !qaConsoleOpen
-    ) {
-      setBattlePeek(false);
-      swallowed.add("cancel");
+    if (cancelEdge && inputShortcuts.handleCancelEdge(swallowed.has("cancel")) === "consume-tick") {
       return;
     }
     const input: ActionFrame = {
@@ -1050,7 +1020,7 @@ async function boot(): Promise<void> {
   const snapPostcard = async (
     options?: { download?: boolean },
   ): Promise<PostcardCapture | null> => {
-    if (!photoMode || !canPhotoMode()) return null;
+    if (!photoMode || !canPhotoMode(overlayContext())) return null;
     sound.playEffect("camera-shutter");
     shutterFlash.trigger();
     if (!harnessStepping) haptics.trigger("light");
@@ -1071,9 +1041,7 @@ async function boot(): Promise<void> {
     );
   };
   createPhotoTouchBar(uiRoot, {
-    onSnap: () => {
-      void snapPostcard({ download: true });
-    },
+    onSnap: () => { void snapPostcard({ download: true }); },
     onClose: () => setPhotoMode(false),
   });
   for (const type of ["resize", "pointerdown", "pointerup"])
@@ -1081,68 +1049,7 @@ async function boot(): Promise<void> {
   let last = performance.now();
   let accumulator = 0;
   app.ticker.add(() => {
-    gamepad.poll();
-    if (gamepad.consumeActivity() && lastInputMode !== "gamepad") {
-      lastInputMode = "gamepad";
-      invalidate();
-    }
-    const photoAction = gamepad.consumePhotoAction();
-    if (photoAction === "toggle") {
-      if (canBattlePeek()) {
-        setBattlePeek(!battlePeekOpen);
-      } else if (canPhotoMode() && state.transition === null) {
-        setPhotoMode(!photoMode);
-      }
-    } else if (photoAction === "snap" && photoMode && canPhotoMode()) {
-      swallowed.add("confirm");
-      gamepad.clearTaps();
-      void snapPostcard({ download: true });
-    } else if (photoAction === "exit") {
-      if (photoMode) {
-        setPhotoMode(false);
-        swallowed.add("cancel");
-        gamepad.clearTaps();
-      } else if (battlePeekOpen) {
-        setBattlePeek(false);
-        swallowed.add("cancel");
-        gamepad.clearTaps();
-      }
-    }
-
-    const bumperStep = gamepad.consumeBumperStep();
-    const navStep = gamepad.consumeNavStep();
-    const journalConfirmEdge = gamepad.consumeConfirmEdge();
-    if (
-      bumperStep !== 0 &&
-      state.journalOpen &&
-      titleMode === null &&
-      !qaMenuOpen &&
-      !qaConsoleOpen
-    ) {
-      journal.stepPage(bumperStep);
-      sound.play("choice-move", state.tick);
-      invalidate();
-    }
-    if (
-      state.journalOpen &&
-      titleMode === null &&
-      !qaMenuOpen &&
-      !qaConsoleOpen &&
-      !journal.hasOpenOverlay()
-    ) {
-      const scrollDelta = computeJournalScrollDelta(gamepad.rightStickY());
-      if (scrollDelta !== 0 && journal.scrollActivePage(scrollDelta)) {
-        invalidate();
-      }
-      if (navStep !== null && journal.navigateFocus(navStep)) {
-        sound.play("choice-move", state.tick);
-        invalidate();
-      }
-      if (journalConfirmEdge && journal.activateFocused()) {
-        sound.play("choice-move", state.tick);
-        invalidate();
-      }
-    }
+    inputShortcuts.pollGamepad();
     const now = performance.now();
     accumulator += Math.min(now - last, 250);
     last = now;
@@ -1179,6 +1086,7 @@ async function boot(): Promise<void> {
     if (document.hidden) {
       keyboard.clearAll();
       gamepad.clearTaps();
+      overworldPointer.release();
       touch.releaseArrows();
       accumulator = 0;
       flushSaveOnHide();
@@ -1188,123 +1096,9 @@ async function boot(): Promise<void> {
       invalidate();
     }
   });
-  window.addEventListener("pagehide", () => {
-    flushSaveOnHide();
-  });
+  window.addEventListener("pagehide", flushSaveOnHide);
   render();
-  // Photo / showcase mode (spec 4): P hides overworld chrome for unobstructed
-  // storybook views; Enter/Space snaps a framed Postcard PNG; Escape exits cleanly.
-  window.addEventListener("keydown", (event) => {
-    if (event.target instanceof HTMLElement &&
-        event.target.closest("input, textarea") !== null) return;
-    if (lastInputMode !== "keyboard") {
-      lastInputMode = "keyboard";
-      invalidate();
-    }
-    if (
-      state.journalOpen &&
-      titleMode === null &&
-      !qaMenuOpen &&
-      !qaConsoleOpen &&
-      !journal.hasOpenOverlay()
-    ) {
-      const target = event.target instanceof HTMLElement ? event.target : null;
-      const inSlider =
-        target !== null && target.closest(".journal-opt-slider, .journal-volume-slider") !== null;
-      if ((event.code === "ArrowUp" || event.code === "ArrowDown") && !inSlider) {
-        if (journal.navigateFocus(event.code === "ArrowUp" ? "up" : "down")) {
-          event.preventDefault();
-          invalidate();
-        }
-        return;
-      }
-      if (
-        !event.repeat &&
-        (event.code === "ArrowLeft" || event.code === "ArrowRight") &&
-        !inSlider &&
-        target !== null &&
-        target.closest(".journal-jukebox") === null &&
-        target.closest(".journal-map-page, .journal-slot.is-inspectable") !== null
-      ) {
-        if (journal.navigateFocus(event.code === "ArrowLeft" ? "left" : "right")) {
-          event.preventDefault();
-          invalidate();
-        }
-        return;
-      }
-    }
-    if (event.repeat) return;
-    if (state.journalOpen && titleMode === null && !qaMenuOpen && !qaConsoleOpen) {
-      if (event.code === "BracketLeft" || event.code === "PageUp") {
-        event.preventDefault();
-        journal.stepPage(-1);
-        sound.play("choice-move", state.tick);
-        invalidate();
-        return;
-      }
-      if (event.code === "BracketRight" || event.code === "PageDown") {
-        event.preventDefault();
-        journal.stepPage(1);
-        sound.play("choice-move", state.tick);
-        invalidate();
-        return;
-      }
-    }
-    if (event.code === "KeyI" && canBattlePeek()) {
-      event.preventDefault();
-      setBattlePeek(!battlePeekOpen);
-      return;
-    }
-    if (event.code === "Escape" && battlePeekOpen) {
-      event.preventDefault();
-      event.stopPropagation();
-      setBattlePeek(false);
-      swallowed.add("cancel");
-      keyboard.clearTaps();
-      return;
-    }
-    if (event.code === "KeyP") {
-      if (!canPhotoMode()) return;
-      event.preventDefault();
-      setPhotoMode(!photoMode);
-      return;
-    }
-    if ((event.code === "Enter" || event.code === "Space") && photoMode && canPhotoMode()) {
-      event.preventDefault();
-      swallowed.add("confirm");
-      keyboard.clearTaps();
-      void snapPostcard({ download: true });
-      return;
-    }
-    if (event.code === "Escape" && photoMode) {
-      event.preventDefault();
-      setPhotoMode(false);
-    }
-  });
-  // The QA keys: Q opens the save library on the title, and the backtick key
-  // toggles the QA console while a pack is active (spec 11). Opening or
-  // closing redraws, so the console appears over a game the harness paused.
-  if (qaEnabled) window.addEventListener("keydown", (event) => {
-    if (event.code === "KeyQ") {
-      if (event.target instanceof HTMLElement &&
-          event.target.closest("input, textarea") !== null) return;
-      event.preventDefault();
-      openQa();
-      return;
-    }
-    if (event.code === "Backquote") {
-      event.preventDefault();
-      if (qaConsoleOpen) qaConsoleOpen = false;
-      else openQaConsole();
-      invalidate();
-      return;
-    }
-    if (event.code === "Escape" && qaConsoleOpen) {
-      event.preventDefault();
-      qaConsoleOpen = false;
-      invalidate();
-    }
-  });
+  inputShortcuts.bind();
   if (import.meta.env.DEV || import.meta.env.MODE === "harness") {
     const { installHook } = await import("./dev/hook");
     installHook({
@@ -1312,20 +1106,14 @@ async function boot(): Promise<void> {
       get: () => state,
       tick,
       ensureArea,
-      render: () => {
-        render();
-        invalidate();
-      },
+      render: () => { render(); invalidate(); },
       paused: () => paused,
-      setPaused: (value) => {
-        paused = value;
-      },
-      setStepping: (value) => {
-        harnessStepping = value;
-      },
+      setPaused: (value) => { paused = value; },
+      setStepping: (value) => { harnessStepping = value; },
       reset: async (options) => {
         keyboard.clearTaps();
         gamepad.clearTaps();
+        overworldPointer.release();
         const name = options.fixture ?? "new-game";
         const fixture = content.fixtures[name];
         if (fixture === undefined)
@@ -1353,7 +1141,7 @@ async function boot(): Promise<void> {
         activeArcadeRecord = null;
         fishStreak = 0;
         setPhotoMode(false);
-        lastInputMode = "keyboard";
+        inputShortcuts.resetInputMode();
         cancelDown = false;
         levelUpNotices.length = 0;
         swallowed.clear();
@@ -1384,29 +1172,15 @@ async function boot(): Promise<void> {
       },
       settings: {
         gentleTiming: gameSettings.gentleTiming,
-        setGentleTiming: (on) => {
-          gameSettings.setGentleTiming(on);
-          invalidate();
-        },
+        setGentleTiming: withInvalidate((on: boolean) => gameSettings.setGentleTiming(on)),
         keyHints: gameSettings.keyHints,
-        setKeyHints: (on) => {
-          gameSettings.setKeyHints(on);
-          invalidate();
-        },
+        setKeyHints: withInvalidate((on: boolean) => gameSettings.setKeyHints(on)),
         textSpeed: gameSettings.textSpeed,
-        setTextSpeed: (speed) => {
-          gameSettings.setTextSpeed(speed);
-          invalidate();
-        },
+        setTextSpeed: withInvalidate((speed) => gameSettings.setTextSpeed(speed)),
         reducedMotion: gameSettings.reducedMotion,
-        setReducedMotion: (on) => {
-          gameSettings.setReducedMotion(on);
-          invalidate();
-        },
+        setReducedMotion: withInvalidate((on: boolean) => gameSettings.setReducedMotion(on)),
         photoMode: () => photoMode,
-        setPhotoMode: (on) => {
-          setPhotoMode(on);
-        },
+        setPhotoMode: (on) => setPhotoMode(on),
         snapPostcard,
         minigameRecords: () => minigameRecords.records(),
       },

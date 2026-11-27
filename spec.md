@@ -55,10 +55,20 @@ reference material only.
 - Ship target: iOS (iPhone and iPad, landscape only) via Capacitor 8.
   Development and tests run in desktop Chrome/Chromium. `index.html` links a
   standalone landscape web app manifest (`public/manifest.webmanifest`,
-  `#f8edcf` paper theme/background), iOS web-app shell meta tags
+  `#f8edcf` paper theme/background, referencing `icons/icon-512.png` alongside
+  the inline SVG icon), iOS web-app shell meta tags
   (`apple-mobile-web-app-capable`, `apple-mobile-web-app-status-bar-style`,
-  `apple-mobile-web-app-title`, `theme-color`, `description`), and an inline
-  four-leaf clover SVG favicon matching the title plate emblem (Milestone 97).
+  `apple-mobile-web-app-title`, `theme-color`, `description`),
+  `<link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png">`,
+  and an inline four-leaf clover SVG favicon matching the title plate emblem
+  (Milestone 97, expanded with bespoke storybook PNGs in Milestone 112). The
+  deterministic generator `tools/art/build-brand-icons.ts` builds the custom
+  hand-inked storybook four-leaf clover iOS App Icon
+  (`ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png`,
+  1024x1024 opaque 24-bit RGB PNG with zero alpha channel), the seamless
+  `#f8edcf` iOS Launch Splash medallion (`Splash.imageset/splash-2732x2732*.png`,
+  2732x2732 opaque RGB PNGs), and the PWA icons (`public/icons/icon-512.png`,
+  512x512; `public/icons/apple-touch-icon.png`, 180x180).
 - Nintendo Switch: deferred. It would be a separate port, so keep content
   portable (Ink, JSON, PNG).
 - Language: TypeScript with `strict`. No `any`; avoid `as` casts by modeling
@@ -2231,8 +2241,17 @@ trunks keep its two exits.
     `spring + 1`), larger `trace` reach (+35%), brush speed (+20%), and dry
     time (+40%), gentler `peekaboo` (`warningTicks + 6` cap 28, `graceTicks + 5`
     cap 10, `goal * 0.78`), and slower `echo` (`demoTicks + 4`,
-    `inputTicks + 36`). When `gentleTiming` is `false` or omitted, `step()` is
-    bit-for-bit identical to standard timing.
+    `inputTicks + 36`), plus all six minigames threaded through `stepArcade` /
+    `arcadeView` (`src/core/arcade.ts`, Milestone 112): Claw Machine (+35% grab
+    reach on both `stepClaw` and `clawView`, 0.75x aiming gantry speed, and
+    unpinned plush priority inside reach), Skee-Ball (0.72x aim sweep and power
+    meter speed), Boop-a-Mole (+35% `moleWindow` stay-up ticks), Comet Cruise
+    (0.78x scroll speed and +22% star collection tolerance without widening rock
+    collisions), Microwave Cooking (+35% clamped golden window half-width in
+    both `stepCook` and `cookView`, reflected in `goldenWindow`, `darkness`, and
+    `zone`), and Bubblegum Bay Fishing (+20 tick bite window, +0.08 catch zone
+    half-width, halved reel drain). When `gentleTiming` is `false` or omitted,
+    `step()` is bit-for-bit identical to standard timing.
   - **Dialogue & Battle Text Speed** (`TextSpeed = "cozy" | "brisk" | "instant"`,
     `revealCharacters`, and `StepOptions.textSpeed` in `src/core/sim.ts`): an
     optional preference (default `"cozy"`, stored under `cloverhollow-settings`
@@ -3162,11 +3181,13 @@ trunks keep its two exits.
   each dish frozen, then under, golden, and over, then burnt, then the stop;
   every way out pays at least one.
 - Its view (`cookView`): the dish's `label`, the `display` (m:ss of the
-  seconds cooked) and `boxTime`, how the food looks (`frost` 1 to 0 by the
-  frozen time; `steam` from then; `darkness` 0 to 1 from golden's end to
-  burnt; `smoke` once burnt), `cooking` (the light on, the button held),
-  `cooked`, the `zone` once it's dinged, the `hint` (the start line while
-  ready, the frozen line while paused), and the message.
+  seconds cooked) and `boxTime`, the normalized `goldenWindow` (`start`/`end` in
+  `[0, 1]` relative to `dish.stop`, widened by +35% under Gentle Timing), how
+  the food looks (`frost` 1 to 0 by the frozen time; `steam` from then;
+  `darkness` 0 to 1 from golden's end to burnt; `smoke` once burnt), `cooking`
+  (the light on, the button held), `cooked`, the `zone` once it's dinged, the
+  `hint` (the start line while ready, the frozen line while paused), and the
+  message.
 - The close-up (`src/ui/cook.ts`, laid out by `layoutCook`): the painted
   microwave on the clubhouse's navy fridge (`public/assets/arcade/
   microwave.webp`, 1600x1048, cut by `tools/art/build-microwave.ts`), fit to

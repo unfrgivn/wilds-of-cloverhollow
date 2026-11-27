@@ -41,23 +41,49 @@ function squaredDistance(plush: HeapPlush, x: number, z: number): number {
   return (x - plush.x) * (x - plush.x) + (z - plush.z) * (z - plush.z);
 }
 
+export const GENTLE_CLAW_REACH_SCALE = 1.35;
+export const GENTLE_CLAW_SPEED_SCALE = 0.75;
+
+export function clawReach(claw: ClawContent, gentleTiming = false): number {
+  return gentleTiming ? claw.reach * GENTLE_CLAW_REACH_SCALE : claw.reach;
+}
+
 // The plush the claw comes down on at (x, z): of those still in the heap
 // within reach on the floor, the highest in the pile, then the nearest, then
-// the first in content order.
+// the first in content order. Under Gentle Timing, reach widens by 35% and an
+// unpinned plush in reach takes priority over one pinned beneath others.
 export function topPlush(
   claw: ClawContent,
   state: State,
   x: number,
   z: number,
+  gentleTiming = false,
 ): HeapPlush | null {
+  const reach = clawReach(claw, gentleTiming);
   let best: HeapPlush | null = null;
+  let bestFree = false;
   for (const plush of claw.heap) {
-    if (!inHeap(state, plush) || squaredDistance(plush, x, z) > claw.reach * claw.reach)
+    if (!inHeap(state, plush) || squaredDistance(plush, x, z) > reach * reach)
       continue;
-    if (best === null || plush.level > best.level ||
-      (plush.level === best.level &&
-        squaredDistance(plush, x, z) < squaredDistance(best, x, z)))
+    const free = gentleTiming ? !heldDown(claw, state, plush.prize) : false;
+    if (best === null) {
       best = plush;
+      bestFree = free;
+      continue;
+    }
+    if (gentleTiming && free !== bestFree) {
+      if (free) {
+        best = plush;
+        bestFree = true;
+      }
+      continue;
+    }
+    if (plush.level > best.level ||
+      (plush.level === best.level &&
+        squaredDistance(plush, x, z) < squaredDistance(best, x, z))) {
+      best = plush;
+      bestFree = free;
+    }
   }
   return best;
 }
@@ -81,10 +107,12 @@ export function stepClaw(
   state: State,
   game: ClawGame,
   input: ActionFrame,
+  gentleTiming = false,
 ): ArcadeOwned {
   const prizes = state.prizes;
   const tickets = state.tickets;
   const claw = world.arcade.claw;
+  const aimSpeed = gentleTiming ? claw.speed * GENTLE_CLAW_SPEED_SCALE : claw.speed;
   const press = input.confirm && !state.previousInput.confirm;
   const to = (phase: ClawPhase, changes: Partial<ClawGame> = {}): ArcadeOwned =>
     ({ arcade: { ...game, ...changes, phase, phaseTicks: 0 }, prizes, tickets });
@@ -95,14 +123,14 @@ export function stepClaw(
       return press ? to("sliding") : stay();
     case "sliding": {
       if (!input.confirm) return to("aiming");
-      const x = Math.min(claw.railRight, game.x + claw.speed);
+      const x = Math.min(claw.railRight, game.x + aimSpeed);
       return x === claw.railRight ? to("aiming", { x }) : stay({ x });
     }
     case "aiming":
       return press ? to("pushing") : stay();
     case "pushing": {
       if (!input.confirm) return to("dropping");
-      const z = Math.min(claw.depthBack, game.z + claw.speed);
+      const z = Math.min(claw.depthBack, game.z + aimSpeed);
       return z === claw.depthBack ? to("dropping", { z }) : stay({ z });
     }
     case "returning": {
@@ -130,7 +158,7 @@ export function stepClaw(
     case "dropping":
       return to("grabbing");
     case "grabbing": {
-      const top = topPlush(claw, state, game.x, game.z);
+      const top = topPlush(claw, state, game.x, game.z, gentleTiming);
       const outcome: ClawOutcome = top === null ? "empty"
         : heldDown(claw, state, top.prize) ? "stuck" : "grabbed";
       return to("lifting", { target: top?.prize ?? null, outcome });
@@ -193,7 +221,12 @@ export type ClawView = {
 
 const openPhases: ClawPhase[] = ["ready", "sliding", "aiming", "pushing", "dropping", "releasing"];
 
-export function clawView(world: World, state: State, game: ClawGame): ClawView {
+export function clawView(
+  world: World,
+  state: State,
+  game: ClawGame,
+  gentleTiming = false,
+): ClawView {
   const claw = world.arcade.claw;
   const catalogue = world.arcade.prizes;
   const held = game.outcome === "grabbed" ? game.target : null;
@@ -214,7 +247,7 @@ export function clawView(world: World, state: State, game: ClawGame): ClawView {
       fall: isHeld && game.phase === "releasing" ? game.phaseTicks / claw.releaseTicks : 0,
     };
   });
-  const top = topPlush(claw, state, game.x, game.z);
+  const top = topPlush(claw, state, game.x, game.z, gentleTiming);
   const drop = game.phase === "dropping" ? game.phaseTicks / claw.dropTicks
     : game.phase === "grabbing" ? 1
       : game.phase === "lifting" ? 1 - game.phaseTicks / claw.liftTicks : 0;
@@ -226,7 +259,7 @@ export function clawView(world: World, state: State, game: ClawGame): ClawView {
     box: { ...claw.box },
     rail: { left: claw.railLeft, right: claw.railRight },
     depth: { front: claw.depthFront, back: claw.depthBack },
-    reach: claw.reach,
+    reach: clawReach(claw, gentleTiming),
     claw: {
       x: game.x, z: game.z, drop,
       stop: top === null ? 0 : top.level + 1,

@@ -9,6 +9,12 @@
   "theme_color": "#f8edcf",
   "icons": [
     {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
       "src": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2040%2044%22%3E%3Crect%20width%3D%2240%22%20height%3D%2244%22%20rx%3D%2210%22%20fill%3D%22%23f8edcf%22%2F%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%2211%22%20r%3D%228%22%20fill%3D%22%23a2ce8f%22%20stroke%3D%22%2347321f%22%20stroke-width%3D%222%22%2F%3E%3Ccircle%20cx%3D%2229%22%20cy%3D%2220%22%20r%3D%228%22%20fill%3D%22%23a2ce8f%22%20stroke%3D%22%2347321f%22%20stroke-width%3D%222%22%2F%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%2229%22%20r%3D%228%22%20fill%3D%22%23a2ce8f%22%20stroke%3D%22%2347321f%22%20stroke-width%3D%222%22%2F%3E%3Ccircle%20cx%3D%2211%22%20cy%3D%2220%22%20r%3D%228%22%20fill%3D%22%23a2ce8f%22%20stroke%3D%22%2347321f%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M20%2021%20C21%2030%2025%2037%2031%2042%22%20fill%3D%22none%22%20stroke%3D%22%2347321f%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E",
       "sizes": "any",
       "type": "image/svg+xml",

@@ -58,15 +58,15 @@ export function stepArcade(
     return { arcade: null, prizes: state.prizes, tickets: state.tickets, snacks };
   switch (game.game) {
     case "claw":
-      return { ...stepClaw(world, state, game, input), snacks };
+      return { ...stepClaw(world, state, game, input, gentleTiming), snacks };
     case "skee":
-      return { ...stepSkee(world, state, game, input), snacks };
+      return { ...stepSkee(world, state, game, input, gentleTiming), snacks };
     case "mole":
-      return { ...stepMole(world, state, game, input), snacks };
+      return { ...stepMole(world, state, game, input, gentleTiming), snacks };
     case "comet":
-      return { ...stepComet(world, state, game, input), snacks };
+      return { ...stepComet(world, state, game, input, gentleTiming), snacks };
     case "cook":
-      return stepCook(world, state, game, input);
+      return stepCook(world, state, game, input, gentleTiming);
     case "fish":
       return stepFish(world, state, game, input, gentleTiming);
   }
@@ -81,7 +81,7 @@ export function arcadeView(
   if (game === null) return null;
   switch (game.game) {
     case "claw":
-      return clawView(world, state, game);
+      return clawView(world, state, game, gentleTiming);
     case "skee":
       return skeeView(world, game);
     case "mole":
@@ -89,7 +89,7 @@ export function arcadeView(
     case "comet":
       return cometView(world, game);
     case "cook":
-      return cookView(world, game);
+      return cookView(world, game, gentleTiming);
     case "fish":
       return fishView(world, state, game, gentleTiming);
   }

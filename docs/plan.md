@@ -5114,6 +5114,46 @@ the old trail, the owl, and the clubhouse claim.
   `CLOVERHOLLOW_E2E_PORT=4361 just e2e` (1,106 passed, 2 skipped, 0 failed in
   5.0 min).
 
+## Milestone 112: Complete 6-Minigame Gentle Timing Accessibility & Hand-Crafted Storybook iOS App Icon, Launch Splash & PWA Icon Kit **Status:** ✅ Completed (2026-11-27)
+- Complete Gentle Timing across all 6 minigames (`src/core/{arcade,claw,skee,mole,comet,cook}.ts`):
+  - Threaded `gentleTiming = false` through `stepArcade` and `arcadeView` into
+    all five remaining minigames alongside Fishing, preserving bit-for-bit
+    identical behavior (zero replay hash shifts across all 67 recorded sims)
+    whenever `gentleTiming` is `false` or omitted.
+  - Claw Machine (`src/core/claw.ts`): +35% grab reach (`clawReach`) on both
+    `stepClaw` and `clawView`, 0.75x aiming speed during `sliding`/`pushing`,
+    and unpinned plush priority inside reach.
+  - Skee-Ball (`src/core/skee.ts`): 0.72x aim arrow sweep and power-meter fill
+    rate while keeping `skeeView` ghost target alignment exact.
+  - Boop-a-Mole (`src/core/mole.ts`): +35% stay-up duration (`moleWindow`).
+  - Comet Cruise (`src/core/comet.ts`): 0.78x scroll speed (`elapsed`) and +22%
+    star collection tolerance (early/late arrival and lane-slide margin) while
+    keeping space rock collisions fair.
+  - Microwave Cooking (`src/core/cook.ts`): +35% golden window half-width
+    (`cookGoldenHalf`, clamped cleanly between frozen and burnt) on both
+    `stepCook` and `cookView` (`goldenWindow`, `darkness`, and `zone`).
+- Bespoke Storybook Brand Icon & Launch Splash Kit (`tools/art/build-brand-icons.ts`,
+  `ios/App/App/Assets.xcassets/`, `public/icons/`, `public/manifest.webmanifest`,
+  `index.html`):
+  - Deterministic headless-Chromium SVG + ImageMagick generator producing the
+    hand-inked four-leaf clover storybook App Icon (`AppIcon-512@2x.png`,
+    1024x1024 strictly opaque 24-bit RGB PNG with zero alpha channel), seamless
+    `#f8edcf` Launch Splash medallion (`splash-2732x2732*.png`, 2732x2732),
+    PWA icons (`public/icons/icon-512.png`, `public/icons/apple-touch-icon.png`),
+    and the 1200x640 review sheet (`art/review/m112-brand-icons.jpg`).
+  - Linked `icons/icon-512.png` in `public/manifest.webmanifest` and
+    `./icons/apple-touch-icon.png` in `index.html`.
+- Evidence: `tests/unit/milestone-112.test.ts` (7 tests) and
+  `art/review/m112-brand-icons.jpg` verified with `vision` (crisp storybook
+  clover readability down to 29px Spotlight size and zero squircle clipping).
+- Gates: `just check` (171 unit files / 1,310 tests, all 67 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green),
+  `just ios-device-build` (`Release-iphoneos/App.app` unsigned arm64 built
+  cleanly with the new App Icon & Launch Splash), and full
+  `CLOVERHOLLOW_E2E_PORT=4371 just e2e` (1,106 passed, 2 skipped, 0 failed in
+  6.9 min).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

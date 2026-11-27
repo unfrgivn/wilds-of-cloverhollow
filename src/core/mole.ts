@@ -53,11 +53,15 @@ export function newMole(mole: MoleContent, state: State): [MoleGame, State] {
   }, current];
 }
 
+export const GENTLE_MOLE_UP_SCALE = 1.35;
+
 // How long the `index`th mole of the round stays up: from `upFirst` for the
-// first down to `upLast` for the last, in even steps, rounded.
-export function moleWindow(mole: MoleContent, index: number): number {
+// first down to `upLast` for the last, in even steps, rounded (+35% under
+// Gentle Timing).
+export function moleWindow(mole: MoleContent, index: number, gentleTiming = false): number {
   const share = mole.moles <= 1 ? 0 : index / (mole.moles - 1);
-  return Math.round(mole.upFirst + (mole.upLast - mole.upFirst) * share);
+  const base = Math.round(mole.upFirst + (mole.upLast - mole.upFirst) * share);
+  return gentleTiming ? Math.round(base * GENTLE_MOLE_UP_SCALE) : base;
 }
 
 // The hole this tick's input boops, if any: a fresh press (down now, not on
@@ -79,6 +83,7 @@ export function stepMole(
   state: State,
   game: MoleGame,
   input: ActionFrame,
+  gentleTiming = false,
 ): ArcadeOwned {
   const mole = world.arcade.mole;
   const kept = { prizes: state.prizes, tickets: state.tickets };
@@ -116,7 +121,7 @@ export function stepMole(
   const to = (stage: MoleStage): MoleGame => ({ ...played, stage, stageTicks: 0 });
   const lasts: Record<MoleStage, number> = {
     rising: mole.riseTicks,
-    up: moleWindow(mole, game.mole),
+    up: moleWindow(mole, game.mole, gentleTiming),
     booped: mole.boopTicks,
     giggling: mole.duckTicks,
     ducking: mole.duckTicks,

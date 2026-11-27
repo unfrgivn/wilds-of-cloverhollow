@@ -101,8 +101,12 @@ export function cometObjectProgress(
   return (elapsed - object.spawn) / cometTravel(content, object.index);
 }
 
+export const GENTLE_COMET_SPEED_SCALE = 0.78;
+export const GENTLE_COMET_STAR_TOLERANCE = 0.22;
+
 export function stepComet(
   world: World, state: State, game: CometGame, input: ActionFrame,
+  gentleTiming = false,
 ): ArcadeOwned {
   const content = world.arcade.comet;
   const kept = { prizes: state.prizes, tickets: state.tickets };
@@ -123,7 +127,13 @@ export function stepComet(
   const raw = Math.max(0, Math.min(2, game.lane + move));
   const lane: CometLane = raw === 0 ? 0 : raw === 1 ? 1 : 2;
   const moved = lane !== game.lane;
-  const elapsed = game.elapsed + 1;
+  const from = moved ? cometRocketPosition(content, game) : game.from;
+  const moveTicks = moved ? content.moveTicks : Math.max(0, game.moveTicks - 1);
+  const rocketPos = lane + (from - lane) * (moveTicks / content.moveTicks);
+  const elapsed = gentleTiming ? game.elapsed + GENTLE_COMET_SPEED_SCALE : game.elapsed + 1;
+  const starPad = GENTLE_COMET_STAR_TOLERANCE / 2;
+  const nearStarLane = (objectLane: CometLane): boolean =>
+    objectLane === lane || Math.abs(rocketPos - objectLane) <= GENTLE_COMET_STAR_TOLERANCE;
   let caught = game.caught;
   let letGo = game.letGo;
   let bumps = game.bumps;
@@ -131,6 +141,17 @@ export function stepComet(
   let wobbleTicks = Math.max(0, game.wobbleTicks - 1);
   const objects = game.objects.map((object) => {
     const progress = cometObjectProgress(content, object, elapsed);
+    if (gentleTiming && object.kind === "star") {
+      if (object.status === "coming" && progress >= 1 - starPad && nearStarLane(object.lane)) {
+        caught += 1; tickets += content.ticketsPerStar;
+        return { ...object, status: "caught" as const, statusTicks: 0 };
+      }
+      if (object.status === "passing" && progress <= 1 + starPad && nearStarLane(object.lane)) {
+        letGo = Math.max(0, letGo - 1);
+        caught += 1; tickets += content.ticketsPerStar;
+        return { ...object, status: "caught" as const, statusTicks: 0 };
+      }
+    }
     if (object.status === "coming" && progress >= 1) {
       if (object.lane === lane && object.kind === "star") {
         caught += 1; tickets += content.ticketsPerStar;
@@ -153,9 +174,7 @@ export function stepComet(
   const last = game.objects.length - 1;
   const done = elapsed >= last * content.gapTicks + cometTravel(content, last) + content.passTicks;
   const next: CometGame = { ...game, phaseTicks: game.phaseTicks + 1, lane,
-    from: moved ? cometRocketPosition(content, game) : game.from,
-    moveTicks: moved ? content.moveTicks : Math.max(0, game.moveTicks - 1),
-    objects, elapsed, caught, letGo, bumps, tickets, wobbleTicks };
+    from, moveTicks, objects, elapsed, caught, letGo, bumps, tickets, wobbleTicks };
   if (!done) return owned(next);
   const message = content.lines.result.replace("{stars}", String(caught))
     .replace("{total}", String(content.stars)).replace("{tickets}", String(tickets));

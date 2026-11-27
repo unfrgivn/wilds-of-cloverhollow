@@ -70,6 +70,8 @@ function total(throws: SkeeThrow[]): number {
   return throws.reduce((sum, ball) => sum + ball.points, 0);
 }
 
+export const GENTLE_SKEE_SPEED_SCALE = 0.72;
+
 // One tick of a skee-ball game. Like the claw, it returns only what the game
 // owns; the simulation keeps the world around it frozen.
 export function stepSkee(
@@ -77,6 +79,7 @@ export function stepSkee(
   state: State,
   game: SkeeGame,
   input: ActionFrame,
+  gentleTiming = false,
 ): ArcadeOwned {
   const skee = world.arcade.skee;
   const press = input.confirm && !state.previousInput.confirm;
@@ -96,19 +99,23 @@ export function stepSkee(
   };
   const timed = (ticks: number, next: () => ArcadeOwned): ArcadeOwned =>
     game.phaseTicks + 1 < ticks ? stay() : next();
+  const sweepStep = gentleTiming ? skee.sweepStep * GENTLE_SKEE_SPEED_SCALE : skee.sweepStep;
+  const powerRate = gentleTiming ? GENTLE_SKEE_SPEED_SCALE : 1;
   switch (game.phase) {
     case "aiming": {
       if (press) return to("winding");
       // Back and forth between the lane's edges, turning at each.
-      const aim = Math.max(-edge, Math.min(edge, game.aim + game.sweep * skee.sweepStep));
+      const aim = Math.max(-edge, Math.min(edge, game.aim + game.sweep * sweepStep));
       const sweep = aim === edge ? -1 : aim === -edge ? 1 : game.sweep;
       return stay({ aim, sweep });
     }
     case "winding":
-      return press ? to("powering", { held: 1 }) : stay();
+      return press ? to("powering", { held: powerRate }) : stay();
     case "powering": {
       if (!input.confirm) return roll(game.held);
-      const held = game.held + 1;
+      const held = gentleTiming
+        ? Math.min(skee.powerTicks, game.held + powerRate)
+        : game.held + 1;
       return held >= skee.powerTicks ? roll(held) : stay({ held });
     }
     case "rolling":

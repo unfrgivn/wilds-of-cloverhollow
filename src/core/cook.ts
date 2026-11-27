@@ -26,12 +26,32 @@ export function newCook(dish: CookDish): CookGame {
     revealed: 0 };
 }
 
+export const GENTLE_COOK_GOLDEN_SCALE = 1.35;
+
+// Half-width of the golden window in seconds (+35% under Gentle Timing,
+// clamped cleanly inside the dish's frozen-to-burnt range).
+export function cookGoldenHalf(
+  cook: CookContent,
+  dish: CookDish,
+  gentleTiming = false,
+): number {
+  if (!gentleTiming) return cook.golden;
+  const spec = cook.dishes[dish];
+  const maxSafe = Math.min(spec.time - spec.frozen, Math.max(0, spec.burnt - spec.time - 0.5));
+  return Math.min(cook.golden * GENTLE_COOK_GOLDEN_SCALE, maxSafe);
+}
+
 // How a dish came out, cooked `cooked` ticks (past its frozen time).
-export function cookZone(cook: CookContent, dish: CookDish, cooked: number): CookZone {
+export function cookZone(
+  cook: CookContent,
+  dish: CookDish,
+  cooked: number,
+  gentleTiming = false,
+): CookZone {
   const seconds = cooked / cook.ticksPerSecond;
   const { time, burnt } = cook.dishes[dish];
   if (seconds >= burnt) return "burnt";
-  if (Math.abs(seconds - time) <= cook.golden) return "golden";
+  if (Math.abs(seconds - time) <= cookGoldenHalf(cook, dish, gentleTiming)) return "golden";
   return seconds < time ? "under" : "over";
 }
 
@@ -48,6 +68,7 @@ export function stepCook(
   state: State,
   game: CookGame,
   input: ActionFrame,
+  gentleTiming = false,
 ): ArcadeStep {
   const cook = world.arcade.cook;
   const dish = cook.dishes[game.dish];
@@ -72,7 +93,7 @@ export function stepCook(
     case "ding": {
       if (game.phaseTicks + 1 < cook.dingTicks) return stay();
       // Out it comes: the snacks it makes go in Fae's backpack.
-      const zone = cookZone(cook, game.dish, game.cooked);
+      const zone = cookZone(cook, game.dish, game.cooked, gentleTiming);
       const paid = cook.snacks[zone];
       const message = cook.lines[zone].replace("{snacks}", String(paid));
       return {
@@ -102,6 +123,8 @@ export type CookView = {
   // The timer, as the display shows it, and the box's time.
   display: string;
   boxTime: string;
+  // Normalized golden window bounds in [0, 1] relative to the dish's stop time.
+  goldenWindow: { start: number; end: number };
   // Frosted until it's half done (1 to 0), steaming from then on, darkening
   // past golden (0 to 1 at burnt), and smoking once it's burnt.
   frost: number;
@@ -119,11 +142,12 @@ export type CookView = {
   revealed: number;
 };
 
-export function cookView(world: World, game: CookGame): CookView {
+export function cookView(world: World, game: CookGame, gentleTiming = false): CookView {
   const cook = world.arcade.cook;
   const dish = cook.dishes[game.dish];
   const seconds = game.cooked / cook.ticksPerSecond;
-  const golden = dish.time + cook.golden;
+  const goldenHalf = cookGoldenHalf(cook, game.dish, gentleTiming);
+  const golden = dish.time + goldenHalf;
   const boxTime = cookTime(dish.time);
   return {
     game: "cook",
@@ -132,6 +156,10 @@ export function cookView(world: World, game: CookGame): CookView {
     phase: game.phase,
     display: cookTime(seconds),
     boxTime,
+    goldenWindow: {
+      start: Math.max(0, Math.min(1, (dish.time - goldenHalf) / dish.stop)),
+      end: Math.max(0, Math.min(1, (dish.time + goldenHalf) / dish.stop)),
+    },
     frost: Math.max(0, 1 - seconds / dish.frozen),
     steam: seconds >= dish.frozen,
     darkness: Math.min(1, Math.max(0, (seconds - golden) / (dish.burnt - golden))),
@@ -139,7 +167,7 @@ export function cookView(world: World, game: CookGame): CookView {
     cooking: game.phase === "cooking",
     cooked: game.cooked,
     zone: game.phase === "ding" || game.phase === "result"
-      ? cookZone(cook, game.dish, game.cooked) : null,
+      ? cookZone(cook, game.dish, game.cooked, gentleTiming) : null,
     hint: game.phase === "ready" ? cook.lines.start.replace("{time}", boxTime)
       : game.phase === "paused" ? cook.lines.frozen : null,
     message: game.message,

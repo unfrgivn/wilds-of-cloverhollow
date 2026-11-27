@@ -112,10 +112,13 @@ import {
   walkPose,
   type MotionPose,
 } from "./motion";
+import { computeBattleChoreography } from "./battle-choreography";
 import {
-  computeBattleChoreography,
-  type BattleStageMood,
-} from "./battle-choreography";
+  computeBattleStageMoodLayout,
+  evaluateFluteCameo,
+  resolveBattleVfxPosition,
+  resolveFluteCameoIds,
+} from "./battle-stage";
 
 export type RenderOptions = {
   paused?: boolean;
@@ -139,51 +142,9 @@ type FootstepPuff = {
 const FOOTSTEP_POOL_SIZE = 24;
 const BATTLE_VFX_POOL_SIZE = 64;
 const EMOTE_POOL_SIZE = 24;
-const FLUTE_CAMEO_DURATION = 45;
 const CLUBHOUSE_PRIZES_ALIAS = "clubhouse-prizes";
 const PET_REACTION_DURATION = 42;
 const PET_SPARKLE_TINTS: readonly number[] = [0xff9ebc, 0xf6c94c, 0x67d5c4];
-
-const BATTLE_STAGE_MOODS: Record<
-  BattleStageMood,
-  { waveA: number; waveB: number; alpha: number; pulse: boolean; spotlightTint: number }
-> = {
-  "calm-normal": {
-    waveA: 0xfff2cf,
-    waveB: 0xfff2cf,
-    alpha: 0.15,
-    pulse: false,
-    spotlightTint: 0xfff8e6,
-  },
-  windup: {
-    waveA: 0xe5c4ff,
-    waveB: 0xffc8d8,
-    alpha: 0.2,
-    pulse: false,
-    spotlightTint: 0xf7e8ff,
-  },
-  "together-ready": {
-    waveA: 0xffe794,
-    waveB: 0xfff4c2,
-    alpha: 0.22,
-    pulse: false,
-    spotlightTint: 0xfff3c8,
-  },
-  "together-active": {
-    waveA: 0x5c3e80,
-    waveB: 0xf7c33e,
-    alpha: 0.3,
-    pulse: true,
-    spotlightTint: 0xffe484,
-  },
-  soothed: {
-    waveA: 0xc4f2dc,
-    waveB: 0xfff2c2,
-    alpha: 0.24,
-    pulse: false,
-    spotlightTint: 0xf2fff7,
-  },
-};
 
 const SURFACE_PUFFS: Record<Surface, { tint: number; alpha: number }> = {
   sand: { tint: 0xebd7b8, alpha: 0.45 },
@@ -2152,31 +2113,27 @@ export class GameView {
     }
     // Drifting watercolour mood washes and radial spotlight kept strictly
     // inside the central 70% so all four painted corners stay untouched.
-    const stageMood = BATTLE_STAGE_MOODS[choreo.stageMood];
-    const driftA = Math.sin(state.tick * 0.025);
-    const driftB = Math.cos(state.tick * 0.019);
-    const pulseBoost = stageMood.pulse ? 1 + 0.08 * Math.sin(state.tick * 0.22) : 1;
-    this.battleMoodWaveA.position.set(
-      this.viewWidth * 0.45 + driftA * 32,
-      this.viewHeight * 0.42 + driftB * 14,
+    const moodLayout = computeBattleStageMoodLayout(
+      choreo.stageMood,
+      state.tick,
+      this.viewWidth,
+      this.viewHeight,
     );
-    this.battleMoodWaveA.width = this.viewWidth * 0.54 * pulseBoost;
-    this.battleMoodWaveA.height = this.viewHeight * 0.36 * pulseBoost;
-    this.battleMoodWaveA.tint = stageMood.waveA;
-    this.battleMoodWaveA.alpha = stageMood.alpha;
-    this.battleMoodWaveB.position.set(
-      this.viewWidth * 0.43 + driftB * 36,
-      this.viewHeight * 0.5 + driftA * 14,
-    );
-    this.battleMoodWaveB.width = this.viewWidth * 0.5 * pulseBoost;
-    this.battleMoodWaveB.height = this.viewHeight * 0.34 * pulseBoost;
-    this.battleMoodWaveB.tint = stageMood.waveB;
-    this.battleMoodWaveB.alpha = stageMood.alpha * 0.85;
-    this.battleSpotlight.position.set(this.viewWidth * 0.44, this.viewHeight * 0.46);
-    this.battleSpotlight.width = this.viewWidth * 0.68 * pulseBoost;
-    this.battleSpotlight.height = this.viewHeight * 0.62 * pulseBoost;
-    this.battleSpotlight.tint = stageMood.spotlightTint;
-    this.battleSpotlight.alpha = stageMood.pulse ? 0.44 : 0.16;
+    this.battleMoodWaveA.position.set(moodLayout.waveA.x, moodLayout.waveA.y);
+    this.battleMoodWaveA.width = moodLayout.waveA.width;
+    this.battleMoodWaveA.height = moodLayout.waveA.height;
+    this.battleMoodWaveA.tint = moodLayout.waveA.tint;
+    this.battleMoodWaveA.alpha = moodLayout.waveA.alpha;
+    this.battleMoodWaveB.position.set(moodLayout.waveB.x, moodLayout.waveB.y);
+    this.battleMoodWaveB.width = moodLayout.waveB.width;
+    this.battleMoodWaveB.height = moodLayout.waveB.height;
+    this.battleMoodWaveB.tint = moodLayout.waveB.tint;
+    this.battleMoodWaveB.alpha = moodLayout.waveB.alpha;
+    this.battleSpotlight.position.set(moodLayout.spotlight.x, moodLayout.spotlight.y);
+    this.battleSpotlight.width = moodLayout.spotlight.width;
+    this.battleSpotlight.height = moodLayout.spotlight.height;
+    this.battleSpotlight.tint = moodLayout.spotlight.tint;
+    this.battleSpotlight.alpha = moodLayout.spotlight.alpha;
 
     const slideOffset = 14 * (1 - introEase);
     const critter = this.world.critters[battle.critterId];
@@ -2348,18 +2305,7 @@ export class GameView {
       (showingFluteLine && this.battleFluteCameoIds.length === 0)
     ) {
       this.battleFluteSeen = true;
-      const cameoIds: string[] = [];
-      if (battle.message.includes("Pond Pup")) cameoIds.push("pond-pup");
-      if (battle.message.includes("Acorn Squirrel")) cameoIds.push("acorn-squirrel");
-      if (battle.message.includes("Ribbon Bunny")) cameoIds.push("ribbon-bunny");
-      if (cameoIds.length === 0) {
-        if (this.world.storyVariable(state.ink, "pup_friend") === true) cameoIds.push("pond-pup");
-        if (this.world.storyVariable(state.ink, "squirrel_friend") === true)
-          cameoIds.push("acorn-squirrel");
-        if (this.world.storyVariable(state.ink, "bunny_friend") === true)
-          cameoIds.push("ribbon-bunny");
-      }
-      this.battleFluteCameoIds = cameoIds;
+      this.battleFluteCameoIds = resolveFluteCameoIds(this.world, state.ink, battle.message);
       this.battleFluteCameoStartTick = state.tick;
     } else if (showingFluteLine) {
       this.battleFluteCameoStartTick = state.tick;
@@ -2368,67 +2314,44 @@ export class GameView {
       this.battleFluteCameoStartTick === undefined
         ? -1
         : state.tick - this.battleFluteCameoStartTick;
-    const cameoSparkles: {
-      x: number;
-      y: number;
-      scale: number;
-      rotation: number;
-      alpha: number;
-      tint: number;
-    }[] = [];
-    if (
-      (showingFluteLine || (cameoElapsed >= 0 && cameoElapsed < FLUTE_CAMEO_DURATION)) &&
-      this.battleFluteCameoIds.length > 0
-    ) {
-      const cameoAlpha = showingFluteLine
-        ? 1
-        : Math.max(0, Math.min(1, (FLUTE_CAMEO_DURATION - cameoElapsed) / 8));
-      const animTick = state.tick;
-      this.battleFluteCameoIds.forEach((id, idx) => {
-        const sprite = this.battlePartySprites.get(id);
-        const content = this.world.party[id];
-        const memberSheet = Assets.get<Spritesheet | undefined>(`${id}-sheet`);
-        if (sprite === undefined || content === undefined || memberSheet === undefined) return;
-        const frames = memberSheet.animations.walk_left ?? memberSheet.animations.idle_down;
-        const frame = frames?.[Math.floor(animTick / 6) % frames.length];
-        if (frame === undefined) return;
-        const baseScale = ((content.scale ?? 0.5) / 0.5) * 0.58;
-        const hopY = -Math.abs(Math.sin((animTick + idx * 4) / 6)) * 16;
-        const cameoX = faeX + 106 + idx * 48;
-        const cameoY = faeY + 16 - idx * 8;
-        sprite.visible = true;
-        sprite.texture = frame;
-        if (frame.defaultAnchor !== undefined) sprite.anchor.copyFrom(frame.defaultAnchor);
-        sprite.scale.set(-baseScale, baseScale);
-        sprite.position.set(cameoX, cameoY + hopY);
-        sprite.rotation = Math.sin((animTick + idx * 4) / 6) * 0.08;
-        sprite.alpha = cameoAlpha;
-        const shadow = this.battlePartyShadows.get(id);
-        if (shadow !== undefined) {
-          const lift = liftShadowScale(hopY);
-          const shadowWidth = content.box.width * 1.15 * lift;
-          shadow.visible = true;
-          shadow.position.set(cameoX, cameoY);
-          shadow.width = shadowWidth;
-          shadow.height = shadowWidth * 0.36;
-          shadow.alpha = 0.3 * cameoAlpha * lift;
-        }
-        for (let s = 0; s < 4; s += 1) {
-          const angle = (s / 4) * Math.PI * 2 + animTick * 0.14 + idx;
-          cameoSparkles.push({
-            x: cameoX + Math.cos(angle) * 34,
-            y: cameoY - 46 + hopY * 0.5 + Math.sin(angle) * 20,
-            scale: 0.42 + (s % 2) * 0.16,
-            rotation: animTick * 0.1 + s,
-            alpha: 0.94 * cameoAlpha,
-            tint: s % 2 === 0 ? 0x67d5c4 : 0xf5b82e,
-          });
-        }
-      });
+    const cameo = evaluateFluteCameo({
+      ids: this.battleFluteCameoIds,
+      showingFluteLine,
+      cameoElapsed,
+      tick: state.tick,
+      faeX,
+      faeY,
+      party: this.world.party,
+    });
+    for (const actor of cameo.actors) {
+      const sprite = this.battlePartySprites.get(actor.id);
+      const memberSheet = Assets.get<Spritesheet | undefined>(`${actor.id}-sheet`);
+      if (sprite === undefined || memberSheet === undefined) continue;
+      const frames = memberSheet.animations.walk_left ?? memberSheet.animations.idle_down;
+      const frame = frames?.[Math.floor(state.tick / 6) % frames.length];
+      if (frame === undefined) continue;
+      sprite.visible = true;
+      sprite.texture = frame;
+      if (frame.defaultAnchor !== undefined) sprite.anchor.copyFrom(frame.defaultAnchor);
+      sprite.scale.set(-actor.baseScale, actor.baseScale);
+      sprite.position.set(actor.x, actor.y + actor.hopY);
+      sprite.rotation = actor.rotation;
+      sprite.alpha = actor.alpha;
+      const shadow = this.battlePartyShadows.get(actor.id);
+      if (shadow !== undefined) {
+        shadow.visible = true;
+        shadow.position.set(actor.x, actor.y);
+        shadow.width = actor.shadowWidth;
+        shadow.height = actor.shadowHeight;
+        shadow.alpha = actor.shadowAlpha;
+      }
     }
 
-    const faeAnchor = { x: faeX, y: faeY - 72 };
-    const critterAnchor = { x: critterX, y: critterY - critter.battleHeight * 0.5 };
+    const vfxAnchors = {
+      fae: { x: faeX, y: faeY - 72 },
+      critter: { x: critterX, y: critterY - critter.battleHeight * 0.5 },
+      party: partyAnchors,
+    };
     let vfxSlot = 0;
     for (const particle of choreo.vfx) {
       if (vfxSlot >= this.battleVfxSprites.length) break;
@@ -2442,25 +2365,10 @@ export class GameView {
       sprite.alpha = particle.alpha;
       sprite.scale.set(particle.scaleX, particle.scaleY);
       sprite.rotation = particle.rotation;
-      let baseX = critterAnchor.x;
-      let baseY = critterAnchor.y;
-      if (particle.anchor === "fae") {
-        baseX = faeAnchor.x;
-        baseY = faeAnchor.y;
-      } else if (particle.anchor === "between") {
-        const t = particle.t ?? 0.5;
-        baseX = faeAnchor.x + (critterAnchor.x - faeAnchor.x) * t;
-        baseY = faeAnchor.y + (critterAnchor.y - faeAnchor.y) * t;
-      } else if (particle.anchor === "party" && particle.actorId !== undefined) {
-        const actorAnchor = partyAnchors.get(particle.actorId);
-        if (actorAnchor !== undefined) {
-          baseX = actorAnchor.x;
-          baseY = actorAnchor.y;
-        }
-      }
-      sprite.position.set(baseX + particle.offsetX, baseY + particle.offsetY);
+      const pos = resolveBattleVfxPosition(particle, vfxAnchors);
+      sprite.position.set(pos.x, pos.y);
     }
-    for (const spark of cameoSparkles) {
+    for (const spark of cameo.sparkles) {
       if (vfxSlot >= this.battleVfxSprites.length) break;
       const sprite = this.battleVfxSprites[vfxSlot];
       if (sprite === undefined) break;

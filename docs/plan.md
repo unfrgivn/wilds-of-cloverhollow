@@ -4312,6 +4312,58 @@ the old trail, the owl, and the clubhouse claim.
   and harness hook checks), and full `CLOVERHOLLOW_E2E_PORT=4261 just e2e`
   (1,066 passed, 2 skipped in 4.7 min).
 
+## Milestone 91: Alpha WebP Asset Diet, Monolith Modularization, Tactile Haptics & Full-Game Balance Audit **Status:** ✅ Completed (2026-11-26)
+- Data-driven atlas image resolution & Alpha WebP asset diet
+  (`src/ui/atlas.ts`, `src/main.ts`, `src/dev/ui-gallery.ts`,
+  `tools/art/optimize-atlases.ts`, `tools/art/critter-check.ts`):
+  - Added optional `meta.image` to `AtlasJson` and exported
+    `atlasImagePath(atlasJsonPath, sheet)` to resolve runtime image URLs from
+    each atlas JSON's `meta.image` (falling back to `.png` when absent).
+  - Updated all runtime DOM atlas callers (`src/main.ts`, `src/dev/ui-gallery.ts`)
+    and critter image checks (`tests/unit/milestone-70.test.ts`,
+    `tests/unit/milestone-71.test.ts`, `tools/art/critter-check.ts`) to resolve
+    images through `meta.image` and decode WebP atlases cleanly.
+  - Added reusable `tools/art/optimize-atlases.ts` and converted 88 runtime
+    spritesheet and prop atlases under `public/assets/` to WebP with lossless
+    alpha (`-alpha_q 100 -m 6`, `q90` for area prop sheets and `q92` for
+    character/critter/arcade/prize/toy/ambient/glow atlases, automatic
+    `-lossless -z 9` fallback below 42 dB PSNR; standalone 40 KB
+    `public/assets/items/lantern/lantern.png` CSS icon kept as-is).
+- Monolith modularization (`src/core/geometry.ts`, `src/core/party.ts`,
+  `src/core/roam.ts`, `src/core/sim.ts`, `src/core/index.ts`,
+  `src/render/battle-stage.ts`, `src/render/view.ts`):
+  - Extracted pure polygon/collision math (`geometry.ts`), party formation and
+    trail following (`party.ts`), and recurring critter rolling/roaming/touch
+    (`roam.ts`) out of `src/core/sim.ts` while keeping every public export and
+    replay hash 100% identical (zero behavioral changes across all 65 sims).
+  - Extracted `BATTLE_STAGE_MOODS`, stage mood wash layout, Flute Friend cameo
+    helpers (`resolveFluteCameoIds`, `evaluateFluteCameo`), and VFX anchor
+    resolution (`resolveBattleVfxPosition`) out of `src/render/view.ts` into
+    `src/render/battle-stage.ts`.
+- Tactile haptics progressive enhancement (`src/platform/haptics.ts`,
+  `src/main.ts`):
+  - Added zero-dependency `createHaptics()` supporting native Capacitor Haptics
+    (strict type guards, zero `any`/`as`) and Web Vibration fallback, guarded by
+    `prefers-reduced-motion: reduce` and skipped during synthetic harness steps.
+  - Wired into `src/main.ts` for `GREAT!` battle checks (`"medium"`),
+    `Together!` / `soothed` / `prize-won` / `fish-catch` (`"celebrate"`), and
+    `claw-grab` / `mole-boop` / `fish-bite` / companion pet (`"light"`).
+- Expanded full-game balance & pacing audit (`tools/sim/balance.ts`):
+  - Added the 5 late-game/expansion recorded runs (`crab`, `penguin`,
+    `principal`, `cavern`, `m81-festival`) plus a full 29-encounter /
+    24-species roster integrity audit (positive levels, valid XP payouts,
+    finite command stats).
+- Evidence: `tests/unit/milestone-91.test.ts` (5 tests). `public/assets/` shrank
+  from `81.53 MB` to `28.25 MB` (`-53.28 MB`, `-65.3%`, 88 atlases converted
+  at lossless alpha, PSNR >= 42.11 dB); `src/core/sim.ts` trimmed by `-879`
+  lines (`2,944 -> 2,065`); all 15 golden & expansion balance routes verified
+  within `[0, +1]` gap on expansions and 29 encounters / 24 species audited.
+- Gates: `just check` (150 unit files / 1,197 tests, all 65 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (production and
+  harness hook checks), and full `CLOVERHOLLOW_E2E_PORT=4271 just e2e`
+  (1,062/1,066 passed with zero diffs on first run + 4/4 WebKit 1–11 px WebP
+  subpixel baselines refreshed via `--last-failed --update-snapshots`).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

@@ -214,7 +214,7 @@ describe("core", () => {
       expect(existsSync(`public/assets/areas/${area.ground}/ground.json`)).toBe(true);
       const extra = readdirSync(`public/assets/areas/${area.ground}`).filter((file) =>
         !/^ground_\d+_\d+\.webp$/.test(file) && file !== "ground.json" &&
-        !/^props-\d+\.(png|json)$/.test(file));
+        !/^props-\d+\.(webp|json)$/.test(file));
       expect(extra, area.id).toEqual([]);
     }
   });

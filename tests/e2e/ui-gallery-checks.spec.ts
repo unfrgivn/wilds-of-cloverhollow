@@ -1,4 +1,6 @@
+import { readFileSync } from "node:fs";
 import { expect, test, type Page } from "@playwright/test";
+import { atlasImagePath, parseAtlasJson } from "../../src/ui/atlas";
 import { clawGalleryStates } from "../../src/dev/claw-gallery";
 import { cometGalleryStates } from "../../src/dev/comet-gallery";
 import { cookGalleryStates } from "../../src/dev/cook-gallery";
@@ -109,10 +111,18 @@ type Box = { x: number; y: number; width: number; height: number; right: number 
 // How closely the image drawn in `box` matches each frog frame, comparing only
 // each frame's interior (3+ px inside its silhouette) so a die-cut rim doesn't
 // count and the face and marks decide. `paper` is the colour behind the image.
+const frogAtlasSrc = atlasImagePath(
+  "assets/critters/frog/frog.json",
+  parseAtlasJson(
+    JSON.parse(readFileSync("public/assets/critters/frog/frog.json", "utf8")),
+    "public/assets/critters/frog/frog.json",
+  ),
+);
+
 async function frogFrameScores(page: Page, box: Box, paper: string):
   Promise<Record<string, number>> {
   const encoded = (await page.screenshot({ animations: "disabled" })).toString("base64");
-  return page.evaluate(async ({ encoded, box, frames, paper }) => {
+  return page.evaluate(async ({ encoded, box, frames, paper, atlasSrc }) => {
     const load = async (src: string): Promise<HTMLImageElement> => {
       const image = new Image();
       image.src = src;
@@ -120,7 +130,7 @@ async function frogFrameScores(page: Page, box: Box, paper: string):
       return image;
     };
     const shot = await load(`data:image/png;base64,${encoded}`);
-    const atlas = await load("assets/critters/frog/frog.png");
+    const atlas = await load(atlasSrc);
     const scale = shot.naturalWidth / window.innerWidth;
     // Compare at the box's own pixel size so the screenshot isn't resampled.
     const size = Math.round(box.width * scale);
@@ -164,7 +174,7 @@ async function frogFrameScores(page: Page, box: Box, paper: string):
     };
     return Object.fromEntries(Object.entries(frames)
       .map(([name, frame]) => [name, similarity(frame)]));
-  }, { encoded, box, frames: frogFrames, paper });
+  }, { encoded, box, frames: frogFrames, paper, atlasSrc: frogAtlasSrc });
 }
 
 // The calm frame must be the clear best match. Small renders keep fewer of the

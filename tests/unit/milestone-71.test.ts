@@ -1,94 +1,33 @@
 import { readFileSync } from "node:fs";
-import { inflateSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 import { loadContent } from "../../src/content/load";
 import { areaEntityAtlases } from "../../src/render/view";
-import { parseAtlasJson } from "../../src/ui/atlas";
-
-type RgbaImage = { width: number; height: number; data: Uint8Array };
-
-function paeth(a: number, b: number, c: number): number {
-  const p = a + b - c;
-  const pa = Math.abs(p - a);
-  const pb = Math.abs(p - b);
-  const pc = Math.abs(p - c);
-  return pa <= pb && pa <= pc ? a : pb <= pc ? b : c;
-}
-
-// Decodes an 8-bit non-interlaced RGBA PNG in pure Node (no external binary).
-function decodeRgbaPng(path: string): RgbaImage {
-  const raw = readFileSync(path);
-  let width = 0;
-  let height = 0;
-  const idat: Buffer[] = [];
-  let offset = 8;
-  while (offset + 8 <= raw.length) {
-    const length = raw.readUInt32BE(offset);
-    const type = raw.subarray(offset + 4, offset + 8).toString("ascii");
-    const chunk = raw.subarray(offset + 8, offset + 8 + length);
-    if (type === "IHDR") {
-      width = chunk.readUInt32BE(0);
-      height = chunk.readUInt32BE(4);
-      const bitDepth = chunk[8];
-      const colorType = chunk[9];
-      if (bitDepth !== 8 || colorType !== 6) {
-        throw new Error(
-          `${path}: expected 8-bit RGBA PNG, got depth=${bitDepth} type=${colorType}`,
-        );
-      }
-    } else if (type === "IDAT") {
-      idat.push(chunk);
-    } else if (type === "IEND") {
-      break;
-    }
-    offset += 12 + length;
-  }
-  const inflated = inflateSync(Buffer.concat(idat));
-  const stride = width * 4;
-  const data = new Uint8Array(width * height * 4);
-  for (let y = 0; y < height; y += 1) {
-    const filter = inflated[y * (stride + 1)] ?? 0;
-    const srcStart = y * (stride + 1) + 1;
-    const dstStart = y * stride;
-    for (let i = 0; i < stride; i += 1) {
-      const value = inflated[srcStart + i] ?? 0;
-      const a = i >= 4 ? (data[dstStart + i - 4] ?? 0) : 0;
-      const b = y > 0 ? (data[dstStart - stride + i] ?? 0) : 0;
-      const c = y > 0 && i >= 4 ? (data[dstStart - stride + i - 4] ?? 0) : 0;
-      let recon = value;
-      if (filter === 1) recon = (value + a) & 0xff;
-      else if (filter === 2) recon = (value + b) & 0xff;
-      else if (filter === 3) recon = (value + ((a + b) >> 1)) & 0xff;
-      else if (filter === 4) recon = (value + paeth(a, b, c)) & 0xff;
-      data[dstStart + i] = recon;
-    }
-  }
-  return { width, height, data };
-}
+import { atlasImagePath, parseAtlasJson } from "../../src/ui/atlas";
+import { decodeRgbaImage, type RgbaImage } from "./decode-image";
 
 describe("Milestone 71: critter keying, proportions, and per-area entity atlases", () => {
   const { world } = loadContent();
   const decodedCache = new Map<string, RgbaImage>();
   const readAtlas = (atlasRel: string): {
-    png: RgbaImage;
+    image: RgbaImage;
     json: ReturnType<typeof parseAtlasJson>;
   } => {
     const jsonPath = `public/${atlasRel}`;
-    const pngPath = jsonPath.replace(/\.json$/, ".png");
-    let png = decodedCache.get(pngPath);
-    if (png === undefined) {
-      png = decodeRgbaPng(pngPath);
-      decodedCache.set(pngPath, png);
-    }
     const json = parseAtlasJson(JSON.parse(readFileSync(jsonPath, "utf8")), jsonPath);
-    return { png, json };
+    const imagePath = atlasImagePath(jsonPath, json);
+    let image = decodedCache.get(imagePath);
+    if (image === undefined) {
+      image = decodeRgbaImage(imagePath);
+      decodedCache.set(imagePath, image);
+    }
+    return { image, json };
   };
 
   it("has zero magenta or green soft-edge spill on calm_idle_01 across all critters", () => {
     const critters = Object.values(world.critters);
     expect(critters.length).toBeGreaterThanOrEqual(25);
     for (const critter of critters) {
-      const { png, json } = readAtlas(critter.atlas);
+      const { image, json } = readAtlas(critter.atlas);
       const rect = json.frames.calm_idle_01?.frame;
       expect(rect, `${critter.id} missing calm_idle_01 frame`).toBeDefined();
       if (rect === undefined) continue;
@@ -96,11 +35,11 @@ describe("Milestone 71: critter keying, proportions, and per-area entity atlases
       let magentaSpill = 0;
       for (let y = 0; y < rect.h; y += 1) {
         for (let x = 0; x < rect.w; x += 1) {
-          const idx = ((rect.y + y) * png.width + (rect.x + x)) * 4;
-          const r = png.data[idx] ?? 0;
-          const g = png.data[idx + 1] ?? 0;
-          const b = png.data[idx + 2] ?? 0;
-          const a = png.data[idx + 3] ?? 0;
+          const idx = ((rect.y + y) * image.width + (rect.x + x)) * 4;
+          const r = image.rgba[idx] ?? 0;
+          const g = image.rgba[idx + 1] ?? 0;
+          const b = image.rgba[idx + 2] ?? 0;
+          const a = image.rgba[idx + 3] ?? 0;
           if (a <= 16 || a >= 240) continue;
           if (g - Math.max(r, b) > 40) greenSpill += 1;
           if (Math.min(r, b) - g > 40) magentaSpill += 1;
@@ -115,7 +54,7 @@ describe("Milestone 71: critter keying, proportions, and per-area entity atlases
 
   it("declares figureHeight within 15% of drawn chaos_idle_01 height for every critter", () => {
     for (const critter of Object.values(world.critters)) {
-      const { png, json } = readAtlas(critter.atlas);
+      const { image, json } = readAtlas(critter.atlas);
       const rect = json.frames.chaos_idle_01?.frame;
       expect(rect, `${critter.id} missing chaos_idle_01 frame`).toBeDefined();
       if (rect === undefined) continue;
@@ -123,7 +62,7 @@ describe("Milestone 71: critter keying, proportions, and per-area entity atlases
       let maxY = -1;
       for (let y = 0; y < rect.h; y += 1) {
         for (let x = 0; x < rect.w; x += 1) {
-          const a = png.data[((rect.y + y) * png.width + (rect.x + x)) * 4 + 3] ?? 0;
+          const a = image.rgba[((rect.y + y) * image.width + (rect.x + x)) * 4 + 3] ?? 0;
           if (a > 16) {
             if (y < minY) minY = y;
             if (y > maxY) maxY = y;

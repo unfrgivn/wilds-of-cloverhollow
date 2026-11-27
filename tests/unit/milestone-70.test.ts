@@ -1,5 +1,4 @@
 import { readFileSync } from "node:fs";
-import { inflateSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 import { areaConnectionErrors } from "../../src/content/area-checks";
 import { loadContent, parseCharacters, parsePartyMember } from "../../src/content/load";
@@ -13,85 +12,14 @@ import {
   type State,
 } from "../../src/core";
 import { dialogueFacing } from "../../src/render/animation";
+import { atlasImagePath, parseAtlasJson } from "../../src/ui/atlas";
+import { decodeRgbaImage, type RgbaImage } from "./decode-image";
 
 const content = loadContent();
 const { world } = content;
 
-type PngImage = { width: number; height: number; rgba: Uint8Array };
-
-function paeth(a: number, b: number, c: number): number {
-  const p = a + b - c;
-  const pa = Math.abs(p - a);
-  const pb = Math.abs(p - b);
-  const pc = Math.abs(p - c);
-  return pa <= pb && pa <= pc ? a : pb <= pc ? b : c;
-}
-
-function decodeRgbaPng(file: string): PngImage {
-  const data = readFileSync(file);
-  const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
-  let width = 0;
-  let height = 0;
-  const chunks: Uint8Array[] = [];
-  for (let offset = 8; offset < data.length;) {
-    const length = view.getUint32(offset);
-    const type = data.subarray(offset + 4, offset + 8).toString("ascii");
-    const body = data.subarray(offset + 8, offset + 8 + length);
-    if (type === "IHDR") {
-      width = view.getUint32(offset + 8);
-      height = view.getUint32(offset + 12);
-    } else if (type === "IDAT") {
-      chunks.push(body);
-    } else if (type === "IEND") {
-      break;
-    }
-    offset += 12 + length;
-  }
-  const raw = inflateSync(Buffer.concat(chunks));
-  const bpp = 4;
-  const stride = width * bpp;
-  const rgba = new Uint8Array(height * stride);
-  for (let y = 0; y < height; y += 1) {
-    const rowStart = y * (stride + 1);
-    const filter = raw[rowStart] ?? 0;
-    const outStart = y * stride;
-    for (let x = 0; x < stride; x += 1) {
-      const value = raw[rowStart + 1 + x] ?? 0;
-      const a = x >= bpp ? (rgba[outStart + x - bpp] ?? 0) : 0;
-      const b = y > 0 ? (rgba[outStart - stride + x] ?? 0) : 0;
-      const c = x >= bpp && y > 0 ? (rgba[outStart - stride + x - bpp] ?? 0) : 0;
-      const recon = filter === 0 ? value
-        : filter === 1 ? value + a
-          : filter === 2 ? value + b
-            : filter === 3 ? value + Math.floor((a + b) / 2)
-              : value + paeth(a, b, c);
-      rgba[outStart + x] = recon & 0xff;
-    }
-  }
-  return { width, height, rgba };
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
-function frameRect(
-  atlasPath: string,
-  name: string,
-): { x: number; y: number; w: number; h: number } {
-  const parsed: unknown = JSON.parse(readFileSync(atlasPath, "utf8"));
-  if (!isRecord(parsed) || !isRecord(parsed.frames)) throw new Error(`${atlasPath}: bad atlas`);
-  const entry = parsed.frames[name];
-  if (!isRecord(entry) || !isRecord(entry.frame)) throw new Error(`${atlasPath}: missing ${name}`);
-  const { x, y, w, h } = entry.frame;
-  if (typeof x !== "number" || typeof y !== "number" ||
-      typeof w !== "number" || typeof h !== "number")
-    throw new Error(`${atlasPath}: invalid ${name} rect`);
-  return { x, y, w, h };
-}
-
 function frameCentroids(
-  image: PngImage,
+  image: RgbaImage,
   rect: { x: number; y: number; w: number; h: number },
 ): { opaque: { x: number; y: number }; weighted: { x: number; y: number } } {
   let sx = 0;
@@ -124,16 +52,18 @@ function frameCentroids(
 
 describe("Milestone 70 polish checks", () => {
   it("keeps every critter's auraCentre within 6 px of its chaos_aura_01 centroid", () => {
-    const cache = new Map<string, PngImage>();
+    const cache = new Map<string, RgbaImage>();
     for (const critter of Object.values(world.critters)) {
       const atlasPath = `public/${critter.atlas}`;
-      const pngPath = atlasPath.replace(/\.json$/, ".png");
-      let image = cache.get(pngPath);
+      const sheet = parseAtlasJson(JSON.parse(readFileSync(atlasPath, "utf8")), atlasPath);
+      const imagePath = atlasImagePath(atlasPath, sheet);
+      let image = cache.get(imagePath);
       if (image === undefined) {
-        image = decodeRgbaPng(pngPath);
-        cache.set(pngPath, image);
+        image = decodeRgbaImage(imagePath);
+        cache.set(imagePath, image);
       }
-      const rect = frameRect(atlasPath, "chaos_aura_01");
+      const rect = sheet.frames.chaos_aura_01?.frame;
+      if (rect === undefined) throw new Error(`${atlasPath}: missing chaos_aura_01`);
       const { opaque, weighted } = frameCentroids(image, rect);
       const distance = Math.min(
         Math.hypot(opaque.x - critter.auraCentre.x, opaque.y - critter.auraCentre.y),

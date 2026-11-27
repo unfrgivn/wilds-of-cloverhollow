@@ -48,7 +48,13 @@ import { combineInputFrames, GamepadInput } from "./platform/gamepad";
 import { createInputSource } from "./platform/input";
 import { mountTouchControls } from "./ui/touch-controls";
 import { GameView, type BattleCheckGeometry } from "./render/view";
-import { atlasImage, parseAtlasJson, type AtlasImage, type AtlasJson } from "./ui/atlas";
+import {
+  atlasImage,
+  atlasImagePath,
+  parseAtlasJson,
+  type AtlasImage,
+  type AtlasJson,
+} from "./ui/atlas";
 import { preventPinchZoom } from "./platform/gestures";
 import { createDialogueBox, createNoticeMarks, createPrompt } from "./ui/sticker";
 import { cropPortraitFrame, speakerAccent, speakerPortraitSource } from "./ui/portraits";
@@ -92,6 +98,7 @@ import {
 } from "./shell/title-flow";
 import { creditsConfirmAllowed } from "./shell/credits-flow";
 import { createAudio, type CompanionAudioEffect } from "./platform/audio";
+import { createHaptics } from "./platform/haptics";
 import { findPettableCompanion, findRestSpot } from "./render/companions";
 import type { AudioLevel } from "./platform/audio-settings";
 import { createGameSettings } from "./platform/game-settings";
@@ -127,6 +134,7 @@ async function boot(): Promise<void> {
         `[cloverhollow] audio ${JSON.stringify({ state: audioState })}`,
       );
   });
+  const haptics = createHaptics();
   const qaEnabled = import.meta.env.DEV || import.meta.env.MODE === "harness";
   const qaTools = qaEnabled ? await import("./dev/qa") : null;
   const qaPacks: PackState[] = qaTools?.loadQaPacks() ?? [];
@@ -443,11 +451,16 @@ async function boot(): Promise<void> {
     atlasJsonPending.set(file, promise);
     return promise;
   };
-  // A DOM-only atlas (no WebGL texture): its frame metadata + decoded PNG.
+  // A DOM-only atlas (no WebGL texture): its frame metadata + decoded image.
   const domAtlas = async (file: string): Promise<AtlasJson> => {
     const data = await loadAtlasJson(file);
-    await decodeOnce(file.replace(".json", ".png"));
+    await decodeOnce(atlasImagePath(file, data));
     return data;
+  };
+  const decodeAtlasImage = async (file: string): Promise<void> => {
+    const cached = atlasJsonCache.get(file) ?? Assets.get<Spritesheet | undefined>(file)?.data;
+    const data = cached ?? await loadAtlasJson(file);
+    await decodeOnce(atlasImagePath(file, data));
   };
   // The moles' frames and Mom's dishes for the clubhouse microwave (spec 8.2).
   const moleAtlas = "assets/arcade/moles.json";
@@ -469,8 +482,9 @@ async function boot(): Promise<void> {
   };
   const atlasFrame = (file: string, frameName: string): AtlasImage | null => {
     const data = atlasJsonCache.get(file) ?? Assets.get<Spritesheet | undefined>(file)?.data;
-    return data === undefined ? null : atlasImage(data, assetUrl(file.replace(".json", ".png")),
-      frameName);
+    return data === undefined
+      ? null
+      : atlasImage(data, assetUrl(atlasImagePath(file, data)), frameName);
   };
   const stickerArt = (critterId: string, frameName: string): AtlasImage | null => {
     const critter = content.world.critters[critterId];
@@ -483,13 +497,13 @@ async function boot(): Promise<void> {
       atlasJsonCache.get(source.atlas) ?? Assets.get<Spritesheet | undefined>(source.atlas)?.data;
     if (data === undefined) {
       void loadAtlasJson(source.atlas)
-        .then(() => decodeOnce(source.atlas.replace(".json", ".png")))
+        .then((loaded) => decodeOnce(atlasImagePath(source.atlas, loaded)))
         .then(invalidate)
         .catch(() => undefined);
       return null;
     }
     if (data.frames[source.frame] === undefined) return null;
-    const image = atlasImage(data, assetUrl(source.atlas.replace(".json", ".png")), source.frame);
+    const image = atlasImage(data, assetUrl(atlasImagePath(source.atlas, data)), source.frame);
     return { ...image, frame: cropPortraitFrame(image.frame, source.cropMode) };
   };
   // A prize's art: its frame in the prize atlas (spec 8.2).
@@ -625,12 +639,12 @@ async function boot(): Promise<void> {
     ]);
     for (const id of areaCritters) {
       const critter = content.world.critters[id];
-      if (critter !== undefined) loads.push(decodeOnce(critter.atlas.replace(".json", ".png")));
+      if (critter !== undefined) loads.push(decodeAtlasImage(critter.atlas));
     }
     for (const npc of area.npcs) {
       const character = content.world.characters[npc.id];
       if (character !== undefined) {
-        loads.push(decodeOnce(character.atlas.replace(".json", ".png")));
+        loads.push(decodeAtlasImage(character.atlas));
       }
     }
     await Promise.all(loads);
@@ -640,20 +654,20 @@ async function boot(): Promise<void> {
     for (const id of snapshot.stickers) {
       const sticker = content.world.stickers.catalogue.find((item) => item.id === id);
       const critter = sticker === undefined ? undefined : content.world.critters[sticker.critter];
-      if (critter !== undefined) loads.push(decodeOnce(critter.atlas.replace(".json", ".png")));
+      if (critter !== undefined) loads.push(decodeAtlasImage(critter.atlas));
     }
     if (snapshot.prizes.length > 0)
-      loads.push(decodeOnce(content.world.arcade.atlas.replace(".json", ".png")));
+      loads.push(decodeAtlasImage(content.world.arcade.atlas));
     await Promise.all(loads);
   };
   const partyCommands: Record<string, string | null> = Object.fromEntries(
     Object.entries(content.world.party).map(([id, member]) => [id, member.command?.id ?? null]),
   );
   const warmBattlePortraits = async (snapshot: State): Promise<void> => {
-    const loads: Promise<unknown>[] = [decodeOnce("assets/characters/fae/fae.png")];
+    const loads: Promise<unknown>[] = [decodeAtlasImage("assets/characters/fae/fae.json")];
     for (const member of battleParty(content.world, snapshot.party)) {
       const info = content.world.party[member.id];
-      if (info !== undefined) loads.push(decodeOnce(info.atlas.replace(".json", ".png")));
+      if (info !== undefined) loads.push(decodeAtlasImage(info.atlas));
     }
     await Promise.all(loads);
   };
@@ -662,7 +676,7 @@ async function boot(): Promise<void> {
   ];
   // Boot loads only permanent core sheets + tiny ~1 KB atlas JSON metadata
   // (for journal/credits frame crops) + the initial area. No unused critter
-  // PNGs or arcade paintings are decoded up front.
+  // images or arcade paintings are decoded up front.
   const [mapCentres] = await Promise.all([
     loadMapCentres(),
     loadAtlasJson(content.world.arcade.atlas),
@@ -682,8 +696,8 @@ async function boot(): Promise<void> {
         view.setArea(initialArea).then(() => cacheAreaNpcPortraits(initialArea)),
         warmAreaMedia(initialArea),
         warmOwnedJournalMedia(state),
-        decodeOnce("assets/characters/fae/fae.png"),
-        decodeOnce(content.world.battle.toyAtlas.replace(".json", ".png")),
+        decodeAtlasImage("assets/characters/fae/fae.json"),
+        decodeAtlasImage(content.world.battle.toyAtlas),
       ]);
     }),
   ]);
@@ -693,9 +707,9 @@ async function boot(): Promise<void> {
     const sheet = Assets.get<Spritesheet | undefined>(atlas);
     const rect = sheet?.data.frames[frameName]?.frame;
     const size = sheet?.data.meta.size;
-    if (rect === undefined || size === undefined) return null;
+    if (sheet === undefined || rect === undefined || size === undefined) return null;
     return {
-      src: assetUrl(atlas.replace(".json", ".png")),
+      src: assetUrl(atlasImagePath(atlas, sheet.data)),
       frame: { x: rect.x, y: rect.y, w: rect.w, h: rect.h },
       atlas: { w: size.w, h: size.h },
     };
@@ -1419,6 +1433,7 @@ async function boot(): Promise<void> {
           if (companion !== null) {
             view.triggerPet(companion.id, state.tick);
             sound.playEffect(petEffectForCompanion(companion.id));
+            if (!harnessStepping) haptics.trigger("light");
           }
         }
       }
@@ -1487,10 +1502,30 @@ async function boot(): Promise<void> {
       revealed: activeTalk?.revealed,
       choiceIndex,
     };
-    for (const cue of soundCues(previous, state, content.world)) {
+    const cues = soundCues(previous, state, content.world);
+    for (const cue of cues) {
       const played = sound.play(cue, state.tick, soundContext);
       if (import.meta.env.DEV || import.meta.env.MODE === "harness")
         console.log(`[cloverhollow] sound ${JSON.stringify(played)}`);
+    }
+    if (!harnessStepping) {
+      const soothedNow = previous.battle?.phase !== "soothed" && state.battle?.phase === "soothed";
+      if (
+        soothedNow ||
+        cues.includes("battle-together") ||
+        cues.includes("prize-won") ||
+        cues.includes("fish-catch")
+      ) {
+        haptics.trigger("celebrate");
+      } else if (cues.includes("battle-hit") && state.battle?.lastGrade === "great") {
+        haptics.trigger("medium");
+      } else if (
+        cues.includes("claw-grab") ||
+        cues.includes("mole-boop") ||
+        cues.includes("fish-bite")
+      ) {
+        haptics.trigger("light");
+      }
     }
     if (qaActivePack === null && !qaBlocked && autosaveNeeded(previous, state)) void save();
     if (import.meta.env.DEV || import.meta.env.MODE === "harness") {

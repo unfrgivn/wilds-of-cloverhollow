@@ -119,6 +119,23 @@ ios/            Capacitor iOS project (from Milestone 4).
   from state and tick and never feeds back into the core.
 - `src/core` remains pure. The sole package import exception is `inkjs` in
   `src/core/ink.ts`; Ink is always loaded from a fresh Story per command.
+  Core simulation helpers are split cleanly across pure modules
+  (`src/core/geometry.ts` for polygon/collision math, `src/core/party.ts` for
+  party formation, follower slots, trail following, and battle party helpers,
+  and `src/core/roam.ts` for recurring critter rolling, wandering, sight, and
+  touch checks), all re-exported through `src/core/sim.ts` and
+  `src/core/index.ts` (Milestone 91).
+- Battle stage mood washes, Flute Friend on-stage cameo poses, and battle VFX
+  anchor resolution live in `src/render/battle-stage.ts` (Milestone 91).
+- Tactile haptics (`src/platform/haptics.ts`, Milestone 91): progressive
+  enhancement with zero new npm dependencies. `createHaptics()` checks for a
+  native Capacitor Haptics plugin (`Capacitor.Plugins.Haptics`) via strict type
+  guards and falls back to `navigator.vibrate` (`light: 10`, `medium: 18`,
+  `celebrate: [14, 40, 22]`), respecting `prefers-reduced-motion: reduce` and
+  no-oping safely on unsupported browsers or during synthetic harness steps.
+  Wired in `src/main.ts` on `GREAT!` battle checks (`"medium"`), `Together!` /
+  `soothed` / `prize-won` / `fish-catch` (`"celebrate"`), and `claw-grab` /
+  `mole-boop` / `fish-bite` / companion pet (`"light"`).
 
 ### 3.2 Input
 - Devices produce one `ActionFrame` per tick: a `move` vector (x and y in
@@ -417,8 +434,14 @@ ios/            Capacitor iOS project (from Milestone 4).
   (owner, 2026-11-23: every door crossing held a paper-white screen for the
   whole target reload). DOM-only sticker/prize/credits frame crops read tiny
   atlas JSON metadata without loading unused WebGL textures or decoding all
-  critter PNGs up front; arcade and clubhouse microwave close-ups (paintings
+  critter sheets up front; arcade and clubhouse microwave close-ups (paintings
   and DOM atlases) load on demand when entering `arcade` or `clubhouse`.
+  Runtime spritesheet and prop atlases under `public/assets/` ship as WebP with
+  lossless alpha (`cwebp -q 90/92 -alpha_q 100 -m 6`, falling back to
+  `-lossless -z 9` if PSNR < 42 dB, via `tools/art/optimize-atlases.ts`,
+  Milestone 91; standalone `public/assets/items/lantern/lantern.png` stays PNG
+  for the CSS touch button), and DOM callers resolve image paths from
+  `meta.image` via `atlasImagePath` (`src/ui/atlas.ts`).
 
 ## 5. Characters and animation (locked)
 - Frame-by-frame animation in 4 directions: down, up, left, right. Right may
@@ -454,8 +477,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   after finishing a chat with an NPC or calm critter.
 - Idle: 1 to 4 frames per direction.
 - Fae is about 140 units tall (about 280 source pixels).
-- Sprite sheets: one PNG atlas plus JSON frame data per character (Pixi
-  spritesheet format). Every frame shares a feet-centered pivot.
+- Sprite sheets: one WebP atlas (lossless alpha, generated from lossless PNG
+  sources in `art/source/` via `tools/art/optimize-atlases.ts`) plus JSON frame
+  data per character (Pixi spritesheet format, `meta.image` naming the sibling
+  image). Every frame shares a feet-centered pivot.
 - Fae's atlas (`public/assets/characters/fae/`): 384x384 source-pixel frames
   (192x192 units), feet baseline at row 375 (anchor `{x: 0.5, y: 375/384}`),
   animations `walk_down`, `walk_up`, `walk_left` (6 frames each) and
@@ -3037,9 +3062,10 @@ trunks keep its two exits.
 - The touch menu button is the JOURNAL sticker from the concept sheet: an open
   book with a teal quill (inline SVG, aria-label "journal").
 - Shared pieces (`src/ui/atlas.ts`, `.die-cut` in sticker.css): atlas frames
-  are cropped with percentage backgrounds, exact at any box size, and the
-   die-cut rim is stacked hard drop-shadows that follow the image's silhouette.
-   The reward card uses both.
+  resolve their image file from `meta.image` via `atlasImagePath` (falling back
+  to `.png` when absent), are cropped with percentage backgrounds, exact at any
+  box size, and the die-cut rim is stacked hard drop-shadows that follow the
+  image's silhouette. The reward card uses both.
 - Backpack Treats Strip: when Fae carries one or more specialty treats
   (`carriedTreats`), a dashed cream strip (`.journal-treats-strip`) renders
   below the `NOTES` heading row showing each carried treat pill (`<Name> ×N`).

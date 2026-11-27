@@ -10,8 +10,17 @@ export type AtlasImage = {
 
 export type AtlasJson = {
   frames: Record<string, { frame: AtlasFrame }>;
-  meta: { size?: { w: number; h: number } };
+  meta: { size?: { w: number; h: number }; image?: string };
 };
+
+export function atlasImagePath(atlasJsonPath: string, sheet?: AtlasJson): string {
+  const image = sheet?.meta.image;
+  if (typeof image === "string" && image.length > 0) {
+    const slash = atlasJsonPath.lastIndexOf("/");
+    return slash >= 0 ? `${atlasJsonPath.slice(0, slash + 1)}${image}` : image;
+  }
+  return atlasJsonPath.replace(/\.json$/, ".png");
+}
 
 export function parseAtlasJson(value: unknown, file: string): AtlasJson {
   if (typeof value !== "object" || value === null || !("frames" in value) || !("meta" in value))
@@ -36,7 +45,10 @@ export function parseAtlasJson(value: unknown, file: string): AtlasJson {
       "w" in metaRaw.size && "h" in metaRaw.size &&
       typeof metaRaw.size.w === "number" && typeof metaRaw.size.h === "number")
     size = { w: metaRaw.size.w, h: metaRaw.size.h };
-  return { frames, meta: { size } };
+  const image = "image" in metaRaw && typeof metaRaw.image === "string" && metaRaw.image.length > 0
+    ? metaRaw.image
+    : undefined;
+  return { frames, meta: { size, ...(image === undefined ? {} : { image }) } };
 }
 
 export function atlasImage(sheet: AtlasJson, src: string, frameName: string): AtlasImage {

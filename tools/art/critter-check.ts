@@ -125,7 +125,7 @@ const recipe = object(JSON.parse(await Bun.file(arg("recipe", "art/recipes/frog.
 if (recipe === undefined) throw new Error("Invalid recipe");
 const config = object(recipe.checker);
 if (config === undefined) throw new Error("Recipe has no checker config");
-const atlas = arg("atlas", "public/assets/critters/frog/frog.png");
+const atlas = arg("atlas", "public/assets/critters/frog/frog.webp");
 const image = await readImage(atlas);
 const rawSources = object(config.rawSources); const bodyNames = Array.isArray(config.bodyFrames)
   ? config.bodyFrames.filter((value): value is string => typeof value === "string") : [];
@@ -146,7 +146,9 @@ const bodyKey: Pixel = matteMethods?.body === "green-key"
   ? { r: 0, g: 255, b: 0, a: 255 }
   : { r: 255, g: 0, b: 255, a: 255 };
 // Frames are read by name from the atlas JSON beside the image.
-const sheet = object(JSON.parse(await Bun.file(atlas.replace(/\.png$/, ".json")).text()));
+const sheet = object(
+  JSON.parse(await Bun.file(atlas.replace(/\.(?:png|webp)$/, ".json")).text()),
+);
 const rects = object(sheet?.frames);
 // Every frame in the atlas is checked, as a body or as an aura: a recipe that
 // lists only some frames would let the rest ship unchecked (an owl's recipe

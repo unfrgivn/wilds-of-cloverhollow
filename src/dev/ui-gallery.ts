@@ -29,7 +29,7 @@ import {
   parseMoleCalibration, parseCometCalibration, parseSkeeCalibration,
 } from "../content/load";
 import { createState, creditEntries, critterFieldNote, inkFacts, runInk } from "../core";
-import { atlasImage, type AtlasJson } from "../ui/atlas";
+import { atlasImage, atlasImagePath, type AtlasJson } from "../ui/atlas";
 import { clawGalleryView } from "./claw-gallery";
 import type { BattleTalk } from "../core";
 import { cookGalleryView } from "./cook-gallery";
@@ -133,8 +133,14 @@ const creditImage = (image: { atlas: string; frame: string }) => {
   const key = Object.keys(atlasFiles).find((path) => path.endsWith(image.atlas));
   const sheet = key === undefined ? undefined : atlasFiles[key];
   if (sheet === undefined) throw new Error(`Missing gallery atlas ${image.atlas}`);
-  return atlasImage(sheet, image.atlas.replace(".json", ".png"), image.frame);
+  return atlasImage(sheet, atlasImagePath(image.atlas, sheet), image.frame);
 };
+const frogAtlasKey = Object.keys(atlasFiles).find(
+  (path) => path.endsWith("assets/critters/frog/frog.json"),
+);
+const frogAtlasSheet = frogAtlasKey === undefined ? undefined : atlasFiles[frogAtlasKey];
+if (frogAtlasSheet === undefined) throw new Error("Missing gallery frog atlas");
+const frogAtlasSrc = atlasImagePath("assets/critters/frog/frog.json", frogAtlasSheet);
 const arcadeFixture = content.fixtures.arcade;
 if (arcadeFixture === undefined) throw new Error("Missing the arcade fixture");
 const clawView = clawGalleryView(content.world, arcadeFixture, state);
@@ -274,39 +280,45 @@ const windUpBubbles = createWindUpBubbles(stage);
 const reward = createRewardSticker(stage);
 const journal = createJournal(stage);
 // A prize's art: its frame in the prize atlas.
+const prizeAtlasSrc = atlasImagePath("assets/prizes/prizes.json", prizeAtlas);
 const prizeFrames = new Map(
   Object.entries(prizeAtlas.frames).map(([name, entry]) => [name, entry.frame]),
 );
 const galleryPrizeArt = (frame: string): AtlasImage | null => {
   const rect = prizeFrames.get(frame);
   return rect === undefined ? null : {
-    src: "assets/prizes/prizes.png",
+    src: prizeAtlasSrc,
     frame: { x: rect.x, y: rect.y, w: rect.w, h: rect.h },
     atlas: { w: prizeAtlas.meta.size.w, h: prizeAtlas.meta.size.h },
   };
 };
 // A mole's art: its frame in the moles' atlas.
+const moleAtlasSrc = atlasImagePath("assets/arcade/moles.json", moleAtlas);
 const moleFrames = new Map(
   Object.entries(moleAtlas.frames).map(([name, entry]) => [name, entry.frame]),
 );
 const galleryMoleArt = (frame: string): AtlasImage | null => {
   const rect = moleFrames.get(frame);
   return rect === undefined ? null : {
-    src: "assets/arcade/moles.png",
+    src: moleAtlasSrc,
     frame: { x: rect.x, y: rect.y, w: rect.w, h: rect.h },
     atlas: { w: moleAtlas.meta.size.w, h: moleAtlas.meta.size.h },
   };
 };
+const cometAtlasSrc = atlasImagePath("assets/arcade/comet.json", cometAtlas);
 const cometFrames = new Map(
   Object.entries(cometAtlas.frames).map(([name, entry]) => [name, entry.frame]),
 );
 const galleryCometArt = (frame: string): AtlasImage | null => {
   const rect = cometFrames.get(frame);
   return rect === undefined ? null : {
-    src: "assets/arcade/comet.png", frame: { x: rect.x, y: rect.y, w: rect.w, h: rect.h },
+    src: cometAtlasSrc, frame: { x: rect.x, y: rect.y, w: rect.w, h: rect.h },
     atlas: { w: cometAtlas.meta.size.w, h: cometAtlas.meta.size.h },
   };
 };
+const foodAtlasSrc = atlasImagePath("assets/arcade/cook-food.json", foodAtlas);
+const fishAtlasSrc = atlasImagePath("assets/arcade/fish-catches.json", fishAtlas);
+const toysAtlasSrc = atlasImagePath("assets/battle/toys/toys.json", toysJson);
 const arcade = createArcade(stage, galleryPrizeArt, {
   calibration: parseClawCalibration(calibrationData, "public/assets/arcade/claw-machine.json"),
   image: "assets/arcade/claw-machine.webp",
@@ -330,7 +342,7 @@ const arcade = createArcade(stage, galleryPrizeArt, {
   art: (frame) => {
     const rect = Object.entries(foodAtlas.frames).find(([name]) => name === frame)?.[1].frame;
     return rect === undefined ? null : {
-      src: "assets/arcade/cook-food.png",
+      src: foodAtlasSrc,
       frame: { x: rect.x, y: rect.y, w: rect.w, h: rect.h },
       atlas: { w: foodAtlas.meta.size.w, h: foodAtlas.meta.size.h },
     };
@@ -341,7 +353,7 @@ const arcade = createArcade(stage, galleryPrizeArt, {
   art: (frame) => {
     const rect = Object.entries(fishAtlas.frames).find(([name]) => name === frame)?.[1].frame;
     return rect === undefined ? null : {
-      src: "assets/arcade/fish-catches.png",
+      src: fishAtlasSrc,
       frame: { x: rect.x, y: rect.y, w: rect.w, h: rect.h },
       atlas: { w: fishAtlas.meta.size.w, h: fishAtlas.meta.size.h },
     };
@@ -479,7 +491,7 @@ function renderGalleryState(): void {
     image:
       id === "frog"
         ? {
-            src: "assets/critters/frog/frog.png",
+            src: frogAtlasSrc,
             frame: { x: 0, y: 512, w: 512, h: 512 },
             atlas: { w: 1536, h: 1024 },
           }
@@ -646,7 +658,7 @@ function renderGalleryState(): void {
   // The pup's two tennis balls in the toy atlas (assets/battle/toys).
   const tennisBall = (index: 0 | 1): AtlasImage => atlasImage(
     toysJson,
-    "assets/battle/toys/toys.png",
+    toysAtlasSrc,
     index === 0 ? "tennis-ball-01" : "tennis-ball-02",
   );
   const galleryChecks: Record<string, BattleCheckView> = {
@@ -801,7 +813,7 @@ function renderGalleryState(): void {
     title: "NEW STICKER!",
     name: "Fountain Frog",
     image: {
-      src: "assets/critters/frog/frog.png",
+      src: frogAtlasSrc,
       frame: { x: 0, y: 512, w: 512, h: 512 },
       atlas: { w: 1536, h: 1024 },
     },
@@ -848,10 +860,10 @@ window.addEventListener("resize", renderGalleryState);
 // seven, all at once, took Chromium about 0.1 s a page, in every state), then
 // mark the page ready for its screenshots.
 const arcadeArt = ["assets/arcade/claw-machine.webp", "assets/arcade/skee-lane.webp",
-  "assets/arcade/mole-cabinet.webp", "assets/arcade/moles.png", "assets/prizes/prizes.png",
-  "assets/arcade/microwave.webp", "assets/arcade/cook-food.png",
-  "assets/arcade/fishing-dock.webp", "assets/arcade/fish-catches.png",
-  "assets/arcade/comet-cabinet.webp", "assets/arcade/comet.png"];
+  "assets/arcade/mole-cabinet.webp", moleAtlasSrc, prizeAtlasSrc,
+  "assets/arcade/microwave.webp", foodAtlasSrc,
+  "assets/arcade/fishing-dock.webp", fishAtlasSrc,
+  "assets/arcade/comet-cabinet.webp", cometAtlasSrc];
 const backgrounds = [...document.body.querySelectorAll<HTMLElement>("*")]
   .filter((element) => element.checkVisibility())
   .map((element) => getComputedStyle(element).backgroundImage);

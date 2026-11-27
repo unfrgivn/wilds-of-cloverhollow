@@ -28,7 +28,12 @@ import {
 } from "./core";
 import { loadContent } from "./content/load";
 import { Keyboard } from "./platform/keyboard";
-import { combineInputFrames, GamepadInput } from "./platform/gamepad";
+import {
+  combineInputFrames,
+  gamepadFrame,
+  GamepadInput,
+  gamepadSelectPressed,
+} from "./platform/gamepad";
 import { createInputSource } from "./platform/input";
 import { mountTouchControls } from "./ui/touch-controls";
 import { GameView } from "./render/view";
@@ -1220,12 +1225,82 @@ async function boot(): Promise<void> {
         });
     }
   };
+  const snapPostcard = async (
+    options?: { download?: boolean },
+  ): Promise<PostcardCapture | null> => {
+    if (!photoMode || !canPhotoMode()) return null;
+    sound.playEffect("camera-shutter");
+    shutterFlash.trigger();
+    if (!harnessStepping) haptics.trigger("light");
+    render(1);
+    app.render();
+    const extracted = app.renderer.extract.canvas({
+      target: app.stage,
+      frame: new Rectangle(0, 0, app.screen.width, app.screen.height),
+      resolution: app.renderer.resolution,
+      clearColor: 0xf8edcf,
+    });
+    const sourceCanvas = extracted instanceof HTMLCanvasElement ? extracted : app.canvas;
+    const area = content.world.areas[state.area];
+    const areaName = area?.name ?? state.area;
+    const land =
+      area?.land === undefined
+        ? undefined
+        : content.world.lands.find((entry) => entry.id === area.land);
+    const meta = postcardMetadata(state.area, areaName, land?.name ?? "");
+    const composed = composePostcardFrame(sourceCanvas, meta.caption, meta.subcaption);
+    if (composed === null) return null;
+    if (options?.download !== false) {
+      triggerPostcardDownload(composed.dataUrl, meta.filename);
+    }
+    return {
+      filename: meta.filename,
+      caption: meta.caption,
+      width: composed.width,
+      height: composed.height,
+      dataUrl: composed.dataUrl,
+    };
+  };
+  let previousPadSelect = false;
+  let previousPadConfirm = false;
+  let previousPadCancel = false;
   for (const type of ["resize", "pointerdown", "pointerup"])
     window.addEventListener(type, invalidate);
   let last = performance.now();
   let accumulator = 0;
   app.ticker.add(() => {
-    gamepad.poll();
+    const pads = gamepad.poll();
+    const padSelect = gamepadSelectPressed(pads);
+    const padActions = gamepadFrame(pads);
+    const padSelectEdge = padSelect && !previousPadSelect;
+    const padConfirmEdge = padActions.confirm && !previousPadConfirm;
+    const padCancelEdge = padActions.cancel && !previousPadCancel;
+    previousPadSelect = padSelect;
+    previousPadConfirm = padActions.confirm;
+    previousPadCancel = padActions.cancel;
+
+    if (padSelectEdge) {
+      if (canBattlePeek()) {
+        setBattlePeek(!battlePeekOpen);
+      } else if (canPhotoMode() && state.transition === null) {
+        setPhotoMode(!photoMode);
+      }
+    } else if (photoMode) {
+      if (padConfirmEdge && canPhotoMode()) {
+        swallowed.add("confirm");
+        gamepad.clearTaps();
+        void snapPostcard({ download: true });
+      } else if (padCancelEdge) {
+        setPhotoMode(false);
+        swallowed.add("cancel");
+        gamepad.clearTaps();
+      }
+    } else if (battlePeekOpen && padCancelEdge) {
+      setBattlePeek(false);
+      swallowed.add("cancel");
+      gamepad.clearTaps();
+    }
+
     const bumperStep = gamepad.consumeBumperStep();
     if (
       bumperStep !== 0 &&
@@ -1265,42 +1340,6 @@ async function boot(): Promise<void> {
     }
   });
   render();
-  const snapPostcard = async (
-    options?: { download?: boolean },
-  ): Promise<PostcardCapture | null> => {
-    if (!photoMode || !canPhotoMode()) return null;
-    sound.playEffect("camera-shutter");
-    shutterFlash.trigger();
-    if (!harnessStepping) haptics.trigger("light");
-    render(1);
-    app.render();
-    const extracted = app.renderer.extract.canvas({
-      target: app.stage,
-      frame: new Rectangle(0, 0, app.screen.width, app.screen.height),
-      resolution: app.renderer.resolution,
-      clearColor: 0xf8edcf,
-    });
-    const sourceCanvas = extracted instanceof HTMLCanvasElement ? extracted : app.canvas;
-    const area = content.world.areas[state.area];
-    const areaName = area?.name ?? state.area;
-    const land =
-      area?.land === undefined
-        ? undefined
-        : content.world.lands.find((entry) => entry.id === area.land);
-    const meta = postcardMetadata(state.area, areaName, land?.name ?? "");
-    const composed = composePostcardFrame(sourceCanvas, meta.caption, meta.subcaption);
-    if (composed === null) return null;
-    if (options?.download !== false) {
-      triggerPostcardDownload(composed.dataUrl, meta.filename);
-    }
-    return {
-      filename: meta.filename,
-      caption: meta.caption,
-      width: composed.width,
-      height: composed.height,
-      dataUrl: composed.dataUrl,
-    };
-  };
   // Photo / showcase mode (spec 4): P hides overworld chrome for unobstructed
   // storybook views; Enter/Space snaps a framed Postcard PNG; Escape exits cleanly.
   window.addEventListener("keydown", (event) => {

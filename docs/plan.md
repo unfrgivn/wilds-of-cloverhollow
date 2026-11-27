@@ -5210,6 +5210,33 @@ the old trail, the owl, and the clubhouse claim.
   purity, lint), `just build`, 17/17 minigame e2e, and 361/361 Chromium
   `ui-gallery` + `ui-gallery-checks`.
 
+## Milestone 115: Gamepad Full-Feature Parity (Field Guide Peek & Photo Mode Postcard) + Audio/VFX Modularization **Status:** ✅ Completed (2026-11-27)
+- Completes controller parity for Battle Field Guide Peek and Photo Mode
+  Postcard capture and splits the final two 1,100+ line platform/render
+  monoliths with zero `src/core` changes, zero replay hash drift across all 67
+  recorded sims, and zero visual baseline diffs.
+- Gamepad full-feature parity (`src/platform/gamepad.ts`, `src/main.ts`):
+  - Exported pure `gamepadSelectPressed(pads)` for standard button `8` without
+    modifying `ActionFrame`.
+  - Wired Select (button `8`) rising edge to toggle Battle Field Guide Peek
+    during battle `command` phase or Photo Mode in the free overworld, `A`
+    (button `0`) to snap a framed Cloverhollow Postcard PNG while in Photo Mode
+    without triggering interactions, and `B` (button `1`) to dismiss only the
+    Battle Peek card or exit Photo Mode.
+- Audio & VFX modularization (zero behavior or pixel change):
+  - Extracted static sound/effect recipes (`soundCueRecipes`, `effectRecipes`,
+    `soundCueRecipe`, `effectRecipe`) from `src/platform/audio.ts` (1,208 ->
+    515 lines) into `src/platform/audio-recipes.ts` (re-exporting all public
+    symbols from `audio.ts`).
+  - Extracted all 9 hand-inked watercolor keepsake builders and
+    `createKeepsakeTextures` from `src/render/vfx-textures.ts` (1,343 -> 643
+    lines) into `src/render/keepsake-textures.ts`.
+- Evidence: `tests/unit/milestone-114.test.ts` (6 tests) and
+  `tests/e2e/milestone-114.spec.ts` (`@smoke` Chromium + WebKit fake-gamepad
+  e2e).
+- Gates: `just check` (172 unit files / 1,318 tests, all 67 sims, 23 QA packs,
+  purity, lint), `just build`, and 38/38 targeted Chromium & WebKit e2e tests.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

@@ -127,6 +127,14 @@ export function gamepadBumpers(
   return { left, right };
 }
 
+export function gamepadSelectPressed(pads: readonly StandardGamepad[]): boolean {
+  for (const pad of pads) {
+    if (pad.mapping !== "standard") continue;
+    if (pressed(pad, 8)) return true;
+  }
+  return false;
+}
+
 export class GamepadInput {
   private readonly latch = new GamepadLatch();
   private readonly getPads: () => readonly StandardGamepad[];
@@ -146,7 +154,7 @@ export class GamepadInput {
     window.addEventListener("blur", () => this.clearTaps());
   }
 
-  poll(): void {
+  poll(): readonly StandardGamepad[] {
     const pads = this.getPads();
     this.latch.update(gamepadFrame(pads));
     const bumpers = gamepadBumpers(pads);
@@ -154,6 +162,7 @@ export class GamepadInput {
     else if (bumpers.right && !this.prevBumperRight) this.pendingBumperStep = 1;
     this.prevBumperLeft = bumpers.left;
     this.prevBumperRight = bumpers.right;
+    return pads;
   }
 
   consumeBumperStep(): -1 | 0 | 1 {

@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 110)
+Last updated: 2026-11-27 (Milestone 114)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -209,7 +209,14 @@ ios/            Capacitor iOS project (from Milestone 4).
   12..15) override the stick. A/Cross confirms, B/Circle cancels, Y/Triangle
   or Start opens the journal, X/Square toggles the lantern, the left shoulder
   (LB/L1, standard button 4) twirls the lasso in battle, and the right
-  shoulder (RB/R1, standard button 5) plays the flute. Only
+  shoulder (RB/R1, standard button 5) plays the flute. Select/Back/View
+  (standard button 8, read via pure `gamepadSelectPressed` in
+  `src/platform/gamepad.ts` without altering `ActionFrame`, Milestone 114)
+  toggles the Battle Field Guide Peek card during battle `command` phase or
+  Photo Mode in the free overworld; while Photo Mode is active, gamepad A
+  (button 0) snaps a framed Postcard (swallowing overworld confirm) and B
+  (button 1) exits Photo Mode; while Battle Peek is open, gamepad B dismisses
+  only the peek card (swallowing `cancel`). Only
   standard-mapping pads count; connected pads merge with button OR and first
   non-zero movement.
   When devices provide different movement vectors, touch wins, then keyboard,
@@ -408,9 +415,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   (C5→E5→G5→B5→C6 + C7 sparkle overtone, ~0.48 s); `level-up` plays an uplifting
   7-note celebratory RPG arpeggio (C5→D5→E5→G5→A5→C6→E6 over a C4 bass root +
   C7 shimmer, ~0.55 s); and `AudioController.playEffect` adds `"camera-shutter"`
-  (dual-transient mechanical click + soft lowpass lens whirr, ~0.12 s). Read-only
-  `soundCueRecipe` and `effectRecipe` helpers expose the synthesized recipes for
-  unit verification.
+  (dual-transient mechanical click + soft lowpass lens whirr, ~0.12 s). Pure
+  static cue and shell effect recipe tables (`soundCueRecipes`, `effectRecipes`,
+  `soundCueRecipe`, `effectRecipe`, `AudioSegment`, `CompanionAudioEffect`) live
+  in `src/platform/audio-recipes.ts` (Milestone 114) and are re-exported from
+  `src/platform/audio.ts` for backwards-compatible unit verification.
 ## 4. Presentation (locked)
 - Logical view: 720 units tall. Width = 720 x screen aspect, clamped to
   960..1600 (4:3 to 20:9). Letterbox outside that range.
@@ -434,8 +443,10 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Depth: the area ground layer is always at the back; characters y-sort by
   their feet, and props sort against them column by column by the front edge
   of their footprints (section 6.2).
-- Procedural watercolor VFX kit (`src/render/vfx-textures.ts`, Milestones 72–73,
-  84, 88, 93, 95–96, 98): twenty-six small cached offscreen-canvas Pixi textures
+- Procedural watercolor VFX kit (`src/render/vfx-textures.ts` composing the nine
+  keepsake builders from `src/render/keepsake-textures.ts` and re-exporting
+  `KeepsakeTextureKey`, Milestones 72–73,
+  84, 88, 93, 95–96, 98, 114): twenty-six small cached offscreen-canvas Pixi textures
   (`contactShadow`, `softGlow`, `sparkle`, `petal`, `waterGlint`, `mistWisp`,
   `sunbeam`, `sunburst`, `paperGrain`, `puff`, `heart`, `energyRing`, five
   hand-inked 48x48 comic
@@ -488,13 +499,16 @@ ios/            Capacitor iOS project (from Milestone 4).
   adventure areas (`plaza`, `park`, `bay`, `pass`, `trail`, `woods`, `hills`,
   `field`) once `has_lantern` is set; and `morning` washes `bedroom` and
   `kitchen` before any sticker is earned and before `has_lantern`.
-- Photo / Showcase mode (Milestone 90) & Postcard Camera (Milestone 107): pressing
-  `P` (`KeyP`) while exploring the free overworld (ignored inside inputs, on title,
-  dialogue, battle, arcade, journal, finale, or QA overlays) toggles
+- Photo / Showcase mode (Milestone 90), Postcard Camera (Milestone 107), &
+  Gamepad Parity (Milestone 114): pressing `P` (`KeyP`) or gamepad Select
+  (standard button 8) while exploring the free overworld (ignored inside inputs,
+  on title, dialogue, battle, arcade, journal, transition, finale, or QA
+  overlays) toggles
   `data-photo="on"` on the root, hiding `.sticker-prompt`, `.touch-controls`,
   `.hud-hints`, `.area-banner`, `.qa-badge`, `.notice-marks`, and the dev debug
   readout (`view.setPhotoMode`) for unobstructed storybook views. While Photo Mode
-  is active, pressing `Enter` or `Space` (swallowing confirm so it never interacts
+  is active, pressing `Enter`, `Space`, or gamepad A (button 0) (swallowing
+  confirm so it never interacts
   or scrolls) plays `camera-shutter`, triggers a gentle `light` haptic tap and a
   240 ms warm-cream `.photo-shutter-flash` overlay (softened to a subtle 220 ms
   pulse under Reduced Motion, hidden cleanly on exit or reset), extracts the live
@@ -502,8 +516,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   frames it inside a warm cream watercolor postcard border (`#fbf6e8` margin,
   `#47321f` hand-inked inner rule, four-leaf clover emblem, region subcaption, and
   bottom-right `"<Area> · Wilds of Cloverhollow"` stamp in `src/ui/postcard.ts`),
-  and downloads `cloverhollow-postcard-<areaId>.png`. Pressing `P` again, `Escape`,
-  or opening any overlay exits Photo Mode automatically.
+  and downloads `cloverhollow-postcard-<areaId>.png`. Pressing `P` again,
+  `Escape`, gamepad Select/B (button 8 / button 1), or opening any overlay exits
+  Photo Mode automatically.
 - Texture budget: at most 96 MB of decoded textures per loaded area (UI
   excluded) and no single texture over 2048x2048. Every Pixi spritesheet and
   ground tile loads with `autoGenerateMipmaps: true`. One `AreaView`
@@ -2649,9 +2664,11 @@ trunks keep its two exits.
   for `>= 28`, `+N ♥` coral-pink `#ffd7e2` for `>= 45` or favourite-treat text),
   popped wind-up bubbles spawn sky-blue `"POP!"` (`#d6eefc`), and energy restores
   spawn peach-mint `+N ⚡` (`#e6f5d5`) over Fae.
-- **Battle Field Guide Peek** (Milestone 110, `src/ui/battle-peek.ts`,
+- **Battle Field Guide Peek** (Milestone 110, gamepad parity Milestone 114,
+  `src/ui/battle-peek.ts`,
   `src/ui/battle.ts`, `src/main.ts`): during live battle `command` phase
-  (outside Talk and QA overlays), pressing `I` or clicking/tapping the top-right
+  (outside Talk and QA overlays), pressing `I`, gamepad Select (standard button
+  8), or clicking/tapping the top-right
   foe plate (`.battle-calm`, styled identically at rest so existing battle
   baselines stay unchanged) toggles a compact warm-paper `.battle-peek-card`
   (`role="region"`, `aria-label="Critter field guide"`, `hidden` by default,
@@ -2664,7 +2681,8 @@ trunks keep its two exits.
   gentle hint), discovered favourite treats (revealed only after calming once so
   undiscovered favourites are never spoiled), and a concise `<= 72`-char
   tactical tip tailored to Talk, Peekaboo, Echo Chimes, wind-ups, or burst check
-  kind. Pressing `Escape` dismisses only the peek card (swallowing `cancel`),
+  kind. Pressing `Escape` or gamepad B (button 1) dismisses only the peek card
+  (swallowing `cancel`),
   and leaving `command` phase or closing battle auto-hides it. Responsive layout
   keeps it clear of HUD meters, party medallions, commands, dialogue, sprites,
   and touch buttons at `1280x720`, `874x402`, and `667x375`.

@@ -161,12 +161,46 @@ import {
 } from "./props";
 import { parseSurfaceMap } from "./surfaces";
 import { parseAmbient, setAreaAmbient } from "./ambient";
+import {
+  array,
+  boolean,
+  box,
+  boxesApart,
+  calibrationHeader,
+  calibrationRect,
+  checkSpec,
+  direction,
+  edge,
+  faeSideCheck,
+  field,
+  gradeMap,
+  insideBox,
+  integer,
+  integerBox,
+  integerIn,
+  isFiniteNumber,
+  isInteger,
+  isPositive,
+  nonEmptyString,
+  nonNegative,
+  number,
+  optionalString,
+  point,
+  pointField,
+  pointTuple,
+  polygon,
+  positive,
+  rawCrossing,
+  record,
+  string,
+  strings,
+  type Box,
+  type RawCrossing,
+} from "./parsers";
 import type {
   Area,
   CharacterContent,
-  Direction,
   Fixture,
-  Polygon,
   Spawn,
   Tunables,
   World,
@@ -176,10 +210,8 @@ import type {
   BattleContent,
   SharedCommandId,
   StickerCatalogue,
-  Point,
   PartyContent,
   FriendCommand,
-  CheckSpec,
   FeelingId,
   Recurring,
   Den,
@@ -205,231 +237,6 @@ import type {
   LevelContent,
   TreatItem,
 } from "../core";
-
-// A battle check's spec (spec 8), validated by kind. Every number is an
-// integer tick count; the windows must fit inside the check.
-function checkSpec(value: unknown, file: string, name: string): CheckSpec {
-  field(record(value), file, name);
-  const kind = value.kind;
-  field(kind === "ring" || kind === "charge" || kind === "chain" || kind === "catch" ||
-    kind === "lean" || kind === "trace" || kind === "peekaboo" || kind === "echo",
-    file, `${name}.kind`);
-  const integer = (key: string): number => {
-    const item = value[key];
-    field(typeof item === "number" && Number.isInteger(item), file, `${name}.${key}`);
-    return item;
-  };
-  const integers = (key: string): number[] => {
-    const items = value[key];
-    field(Array.isArray(items) && items.length > 0 &&
-      items.every((item): item is number => typeof item === "number" && Number.isInteger(item)),
-    file, `${name}.${key}`);
-    return [...items];
-  };
-  if (kind === "ring") {
-    const ticks = integer("ticks");
-    const targetTick = integer("targetTick");
-    const greatWindow = integer("greatWindow");
-    const goodWindow = integer("goodWindow");
-    field(0 <= greatWindow && greatWindow <= goodWindow, file, `${name}.greatWindow`);
-    field(targetTick - goodWindow >= 1 && targetTick + goodWindow < ticks, file,
-      `${name}.targetTick`);
-    return { kind, ticks, targetTick, greatWindow, goodWindow };
-  }
-  if (kind === "charge") {
-    const waitTicks = integer("waitTicks");
-    const maxTicks = integer("maxTicks");
-    const targetTick = integer("targetTick");
-    const greatWindow = integer("greatWindow");
-    const goodWindow = integer("goodWindow");
-    field(waitTicks >= 1, file, `${name}.waitTicks`);
-    field(0 <= greatWindow && greatWindow <= goodWindow, file, `${name}.greatWindow`);
-    field(targetTick - goodWindow >= 1 && targetTick + goodWindow < maxTicks, file,
-      `${name}.targetTick`);
-    return { kind, waitTicks, maxTicks, targetTick, greatWindow, goodWindow };
-  }
-  if (kind === "lean") {
-    const puffTicks = integer("puffTicks");
-    const steer = integer("steer");
-    const spring = integer("spring");
-    const starts = integers("starts");
-    const forces = integers("forces");
-    field(puffTicks >= 1, file, `${name}.puffTicks`);
-    field(spring >= 1, file, `${name}.spring`);
-    // One puff blows at a time, the first after a moment to read the hint.
-    starts.forEach((start, index) => {
-      const previous = starts[index - 1];
-      field(previous === undefined ? start >= 1 : start >= previous + puffTicks, file,
-        `${name}.starts`);
-    });
-    // Every puff pushes, and Fae can always lean harder than it.
-    field(forces.every((force) => force >= 1 && force < steer), file, `${name}.forces`);
-    return { kind, puffTicks, starts, forces, steer, spring };
-  }
-  if (kind === "trace") {
-    const dryTicks = integer("dryTicks");
-    const brushSpeed = value.brushSpeed;
-    const reachRadius = value.reachRadius;
-    field(typeof brushSpeed === "number" && brushSpeed > 0, file, `${name}.brushSpeed`);
-    field(typeof reachRadius === "number" && reachRadius > 0, file, `${name}.reachRadius`);
-    field(dryTicks >= 1 && dryTicks <= 180, file, `${name}.dryTicks`);
-    const rawPaths = value.paths;
-    field(Array.isArray(rawPaths) && rawPaths.length > 0, file, `${name}.paths`);
-    const paths = rawPaths.map((rawPath, pathIndex) => {
-      if (!record(rawPath)) throw new Error(`${file}: invalid ${name}.paths[${pathIndex}]`);
-      field(typeof rawPath.id === "string" && rawPath.id.length > 0, file,
-        `${name}.paths[${pathIndex}]`);
-      const rawPoints = rawPath.points;
-      if (!Array.isArray(rawPoints) || rawPoints.length < 4)
-        throw new Error(`${file}: invalid ${name}.paths[${pathIndex}].points`);
-      const points = rawPoints.map((rawPoint, pointIndex) => {
-        if (!record(rawPoint))
-          throw new Error(`${file}: invalid ${name}.paths[${pathIndex}].points[${pointIndex}]`);
-        const x = rawPoint.x;
-        const y = rawPoint.y;
-        field(typeof x === "number" && typeof y === "number" && Number.isInteger(x) &&
-          Number.isInteger(y) && x >= 0 && x <= 1000 && y >= 0 && y <= 1000,
-          file, `${name}.paths[${pathIndex}].points[${pointIndex}]`);
-        return { x, y };
-      });
-      let length = 0;
-      points.forEach((point, pointIndex) => {
-        const previous = points[pointIndex - 1];
-        if (previous !== undefined) {
-          const dx = point.x - previous.x;
-          const dy = point.y - previous.y;
-          const segment = Math.sqrt(dx * dx + dy * dy);
-          field(segment >= 2 * reachRadius, file, `${name}.paths[${pathIndex}].points`);
-          length += segment;
-        }
-      });
-      field(length / brushSpeed <= dryTicks * 0.7, file, `${name}.paths[${pathIndex}]`);
-      return { id: rawPath.id, points };
-    });
-    return { kind, dryTicks, brushSpeed, reachRadius, paths };
-  }
-  if (kind === "peekaboo") {
-    const ticks = integer("ticks");
-    const goal = integer("goal");
-    const warningTicks = integer("warningTicks");
-    const graceTicks = integer("graceTicks");
-    field(ticks >= 1 && ticks <= 180, file, `${name}.ticks`);
-    field(goal >= 1, file, `${name}.goal`);
-    field(warningTicks >= 1, file, `${name}.warningTicks`);
-    field(graceTicks >= 0, file, `${name}.graceTicks`);
-    const rawPeeks = value.peeks;
-    field(Array.isArray(rawPeeks) && rawPeeks.length > 0, file, `${name}.peeks`);
-    let peekTicks = 0;
-    const peeks = rawPeeks.map((rawPeek, peekIndex) => {
-      const label = `${name}.peeks[${peekIndex}]`;
-      field(record(rawPeek), file, label);
-      const start = rawPeek.start;
-      const end = rawPeek.end;
-      field(
-        typeof start === "number" && Number.isInteger(start) &&
-          typeof end === "number" && Number.isInteger(end) &&
-          start >= 1 && start < end && end <= ticks,
-        file,
-        label,
-      );
-      peekTicks += end - start;
-      return { start, end };
-    });
-    peeks.forEach((peek, index) => {
-      const previous = peeks[index - 1];
-      field(previous === undefined || peek.start >= previous.end, file, `${name}.peeks`);
-    });
-    field(ticks - peekTicks >= goal, file, `${name}.goal`);
-    return { kind, ticks, goal, warningTicks, graceTicks, peeks };
-  }
-  if (kind === "echo") {
-    const notes = integer("notes");
-    const demoTicks = integer("demoTicks");
-    const gapTicks = integer("gapTicks");
-    const inputTicks = integer("inputTicks");
-    field(notes >= 2, file, `${name}.notes`);
-    field(demoTicks >= 4, file, `${name}.demoTicks`);
-    field(gapTicks >= 1, file, `${name}.gapTicks`);
-    field(inputTicks >= notes * 10, file, `${name}.inputTicks`);
-    return { kind, notes, demoTicks, gapTicks, inputTicks };
-  }
-  const travelTicks = integer("travelTicks");
-  field(travelTicks >= 1, file, `${name}.travelTicks`);
-  const arrivals = integers("arrivals");
-  // The first one has room to travel in. A chain's windows never touch, so a
-  // press belongs to one beat; a catch's toys land at least 8 ticks apart.
-  const hitWindow = kind === "chain" ? integer("hitWindow") : 0;
-  if (kind === "chain") field(hitWindow >= 1, file, `${name}.hitWindow`);
-  const gap = kind === "chain" ? 2 * hitWindow + 2 : 8;
-  arrivals.forEach((arrival, index) => {
-    const previous = arrivals[index - 1];
-    field(previous === undefined ? arrival >= travelTicks : arrival >= previous + gap,
-      file, `${name}.arrivals`);
-  });
-  if (kind === "catch") {
-    const toys = value.toys;
-    field(Array.isArray(toys) && toys.length > 0 &&
-      toys.every((item): item is string => typeof item === "string" && item.length > 0),
-    file, `${name}.toys`);
-    return { kind, travelTicks, arrivals, toys: [...toys] };
-  }
-  const look = value.look;
-  field(look === "pinecone" || look === "bubble" || look === "dust" || look === "star", file,
-    `${name}.look`);
-  return { kind, travelTicks, hitWindow, arrivals, look };
-}
-
-// Soothe's and a friend's check: a catch or a lean is only ever a burst's,
-// since its toys' lanes and its puffs' forces come from the burst's roll
-// (spec 8).
-function faeSideCheck(value: unknown, file: string, name: string): CheckSpec {
-  const spec = checkSpec(value, file, name);
-  field(
-    spec.kind !== "catch" && spec.kind !== "lean" && spec.kind !== "trace" &&
-      spec.kind !== "peekaboo" && spec.kind !== "echo",
-    file,
-    `${name}.kind`,
-  );
-  return spec;
-}
-
-function record(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
-function field(
-  condition: boolean,
-  file: string,
-  name: string,
-): asserts condition {
-  if (!condition) throw new Error(`${file}: invalid ${name}`);
-}
-
-function polygon(value: unknown): value is Polygon {
-  return (
-    Array.isArray(value) &&
-    value.length >= 3 &&
-    value.every(
-      (item) =>
-        Array.isArray(item) &&
-        item.length === 2 &&
-        typeof item[0] === "number" &&
-        typeof item[1] === "number",
-    )
-  );
-}
-
-type RawCrossing = { id: string; polygon: Polygon; opens: string };
-function rawCrossing(value: unknown): value is RawCrossing {
-  return record(value) && typeof value.id === "string" && polygon(value.polygon) &&
-    typeof value.opens === "string";
-}
-
-function direction(value: unknown): value is Direction {
-  return (
-    value === "up" || value === "down" || value === "left" || value === "right"
-  );
-}
 
 export function parseStoryJson(value: unknown, file: string): Record<string, unknown> {
   field(record(value), file, "story");
@@ -560,19 +367,11 @@ export function endingContentErrors(
   ];
 }
 
-function list(value: unknown): value is unknown[] {
-  return Array.isArray(value);
-}
-
-function strings(value: unknown): value is string[] {
-  return list(value) && value.every((item) => typeof item === "string");
-}
-
 // The prize catalogue (content/prizes.json): its atlas and one entry a prize.
 function parsePrizes(value: unknown): ArcadeContent["prizes"] {
   const file = "content/prizes.json";
   field(record(value) && typeof value.atlas === "string" && value.atlas.endsWith(".json") &&
-    list(value.catalogue), file, "atlas or catalogue");
+    array(value.catalogue), file, "atlas or catalogue");
   const prizes: ArcadeContent["prizes"] = [];
   for (const item of value.catalogue) {
     field(record(item) && typeof item.id === "string" && typeof item.name === "string" &&
@@ -592,37 +391,33 @@ export function parseArcade(value: unknown, prizesValue: unknown): ArcadeContent
   const prizes = parsePrizes(prizesValue);
   field(record(value) && record(value.claw), file, "claw");
   const claw = value.claw;
-  const integer = (
+  const intField = (
     source: Record<string, unknown>,
     name: string,
     minimum: number,
     label = `claw.${name}`,
-  ): number => {
-    const item = source[name];
-    field(typeof item === "number" && Number.isInteger(item) && item >= minimum, file, label);
-    return item;
-  };
+  ): number => integerIn(source, name, minimum, file, label);
   field(record(claw.box), file, "claw.box");
-  const box = {
-    width: integer(claw.box, "width", 1, "claw.box.width"),
-    depth: integer(claw.box, "depth", 1, "claw.box.depth"),
+  const clawBox = {
+    width: intField(claw.box, "width", 1, "claw.box.width"),
+    depth: intField(claw.box, "depth", 1, "claw.box.depth"),
   };
-  const railLeft = integer(claw, "railLeft", 0);
-  const railRight = integer(claw, "railRight", 0);
-  field(railLeft < railRight && railRight <= box.width, file, "claw rail");
-  const depthFront = integer(claw, "depthFront", 0);
-  const depthBack = integer(claw, "depthBack", 0);
-  field(depthFront < depthBack && depthBack <= box.depth, file, "claw depth");
-  const reach = integer(claw, "reach", 1);
-  field(list(claw.heap) && claw.heap.length > 0, file, "claw.heap");
+  const railLeft = intField(claw, "railLeft", 0);
+  const railRight = intField(claw, "railRight", 0);
+  field(railLeft < railRight && railRight <= clawBox.width, file, "claw rail");
+  const depthFront = intField(claw, "depthFront", 0);
+  const depthBack = intField(claw, "depthBack", 0);
+  field(depthFront < depthBack && depthBack <= clawBox.depth, file, "claw depth");
+  const reach = intField(claw, "reach", 1);
+  field(array(claw.heap) && claw.heap.length > 0, file, "claw.heap");
   const heap: HeapPlush[] = claw.heap.map((item, index) => {
     const label = `claw.heap[${index}]`;
     field(record(item) && typeof item.prize === "string" && strings(item.on), file, label);
     field(prizes.some((prize) => prize.id === item.prize), file, `${label}.prize`);
-    const x = integer(item, "x", railLeft, `${label}.x`);
-    const z = integer(item, "z", depthFront, `${label}.z`);
+    const x = intField(item, "x", railLeft, `${label}.x`);
+    const z = intField(item, "z", depthFront, `${label}.z`);
     field(x <= railRight && z <= depthBack, file, `${label} position`);
-    const level = integer(item, "level", 0, `${label}.level`);
+    const level = intField(item, "level", 0, `${label}.level`);
     return { prize: item.prize, x, z, level, on: item.on };
   });
   heap.forEach((plush, index) => {
@@ -652,12 +447,12 @@ export function parseArcade(value: unknown, prizesValue: unknown): ArcadeContent
   return {
     atlas: prizesValue.atlas,
     claw: {
-      box, railLeft, railRight, depthFront, depthBack, reach,
-      speed: integer(claw, "speed", 1),
-      dropTicks: integer(claw, "dropTicks", 1),
-      grabTicks: integer(claw, "grabTicks", 1),
-      liftTicks: integer(claw, "liftTicks", 1),
-      releaseTicks: integer(claw, "releaseTicks", 1),
+      box: clawBox, railLeft, railRight, depthFront, depthBack, reach,
+      speed: intField(claw, "speed", 1),
+      dropTicks: intField(claw, "dropTicks", 1),
+      grabTicks: intField(claw, "grabTicks", 1),
+      liftTicks: intField(claw, "liftTicks", 1),
+      releaseTicks: intField(claw, "releaseTicks", 1),
       heap,
       lines: {
         slide: lines.slide, push: lines.push, won: lines.won, missed: lines.missed,
@@ -672,18 +467,6 @@ export function parseArcade(value: unknown, prizesValue: unknown): ArcadeContent
     counter: parseCounter(value.counter, file, prizes, heap),
     prizes,
   };
-}
-
-function integerIn(
-  source: Record<string, unknown>,
-  name: string,
-  minimum: number,
-  file: string,
-  label: string,
-): number {
-  const item = source[name];
-  field(typeof item === "number" && Number.isInteger(item) && item >= minimum, file, label);
-  return item;
 }
 
 // Skee-ball (spec 8.2): integers throughout; the arrow turns exactly at the
@@ -712,7 +495,7 @@ function parseSkee(value: unknown, file: string): SkeeContent {
     x: integer(value.centre, "x", -edge, "skee.centre.x"),
     y: integer(value.centre, "y", 0, "skee.centre.y"),
   };
-  field(list(value.rings) && value.rings.length > 0, file, "skee.rings");
+  field(array(value.rings) && value.rings.length > 0, file, "skee.rings");
   const rings = value.rings.map((ring, index) => {
     field(record(ring), file, `skee.rings[${index}]`);
     return {
@@ -820,7 +603,7 @@ function parseFish(value: unknown, file: string): FishContent {
   };
   const nibbleGapMin = integer(value, "nibbleGapMin", 1);
   const nibbleGapMax = integer(value, "nibbleGapMax", nibbleGapMin);
-  field(list(value.catches) && value.catches.length > 0, file, "fish.catches");
+  field(array(value.catches) && value.catches.length > 0, file, "fish.catches");
   const seen = new Set<string>();
   const catches: FishCatchSpec[] = value.catches.map((item, index) => {
     const label = `fish.catches[${index}]`;
@@ -940,7 +723,7 @@ function parseCounter(
   prizes: ArcadeContent["prizes"],
   heap: HeapPlush[],
 ): CounterContent {
-  field(record(value) && list(value.prizes) && value.prizes.length > 0, file, "counter.prizes");
+  field(record(value) && array(value.prizes) && value.prizes.length > 0, file, "counter.prizes");
   const items = value.prizes.map((item, index) => {
     const label = `counter.prizes[${index}]`;
     field(record(item) && typeof item.prize === "string" &&
@@ -960,100 +743,62 @@ function parseCounter(
 // narrower than its front, the ceiling meeting the glass above the back wall,
 // and the chute's mouth four points on the floor.
 export function parseClawCalibration(value: unknown, file: string): ClawCalibration {
-  const number = (item: unknown): item is number =>
-    typeof item === "number" && Number.isFinite(item);
-  type Box = { x: number; y: number; w: number; h: number };
-  const rect = (item: unknown): item is Box =>
-    record(item) && number(item.x) && number(item.y) && number(item.w) && number(item.h) &&
-    item.w > 0 && item.h > 0;
-  const edge = (item: unknown): item is { y: number; left: number; right: number } =>
-    record(item) && number(item.y) && number(item.left) && number(item.right) &&
-    item.left < item.right;
-  const level = (item: unknown): item is { y: number } => record(item) && number(item.y);
-  const point = (item: unknown): item is [number, number] =>
-    list(item) && item.length === 2 && number(item[0]) && number(item[1]);
-  field(record(value) && typeof value.image === "string", file, "image");
-  field(record(value.size) && number(value.size.w) && number(value.size.h), file, "size");
-  const size = { w: value.size.w, h: value.size.h };
-  const inside = (box: Box): boolean =>
-    box.x >= 0 && box.y >= 0 && box.x + box.w <= size.w && box.y + box.h <= size.h;
+  const { raw, image, size, bounds } = calibrationHeader(value, file);
+  const level = (item: unknown): item is { y: number } => record(item) && isFiniteNumber(item.y);
   const rounded = (item: unknown): item is Box & { radius: number } =>
-    record(item) && number(item.radius) && item.radius >= 0 && rect(item);
-  field(rounded(value.glass) && inside(value.glass), file, "glass");
-  field(rect(value.plate) && inside(value.plate), file, "plate");
-  field(record(value.floor) && edge(value.floor.front) && edge(value.floor.back) &&
-    value.floor.back.y < value.floor.front.y &&
-    value.floor.back.right - value.floor.back.left <
-      value.floor.front.right - value.floor.front.left, file, "floor");
-  field(record(value.ceiling) && level(value.ceiling.front) && level(value.ceiling.back) &&
-    value.ceiling.front.y < value.ceiling.back.y &&
-    value.ceiling.back.y < value.floor.back.y, file, "ceiling");
-  field(record(value.chute) && list(value.chute.mouth) && value.chute.mouth.length === 4 &&
-    value.chute.mouth.every(point), file, "chute.mouth");
-  const glass = value.glass;
-  const plate = value.plate;
+    record(item) && isFiniteNumber(item.radius) && item.radius >= 0 && box(item);
+  field(rounded(raw.glass) && insideBox(raw.glass, bounds), file, "glass");
+  field(box(raw.plate) && insideBox(raw.plate, bounds), file, "plate");
+  field(record(raw.floor) && edge(raw.floor.front) && edge(raw.floor.back) &&
+    raw.floor.back.y < raw.floor.front.y &&
+    raw.floor.back.right - raw.floor.back.left <
+      raw.floor.front.right - raw.floor.front.left, file, "floor");
+  field(record(raw.ceiling) && level(raw.ceiling.front) && level(raw.ceiling.back) &&
+    raw.ceiling.front.y < raw.ceiling.back.y &&
+    raw.ceiling.back.y < raw.floor.back.y, file, "ceiling");
+  field(record(raw.chute) && array(raw.chute.mouth) && raw.chute.mouth.length === 4 &&
+    raw.chute.mouth.every(pointTuple), file, "chute.mouth");
+  const { glass, plate } = raw;
   return {
-    image: value.image,
+    image,
     size,
     glass: { x: glass.x, y: glass.y, w: glass.w, h: glass.h, radius: glass.radius },
-    floor: {
-      front: { ...value.floor.front },
-      back: { ...value.floor.back },
-    },
-    ceiling: { front: { y: value.ceiling.front.y }, back: { y: value.ceiling.back.y } },
-    chute: { mouth: value.chute.mouth.map(([x, y]) => [x, y]) },
+    floor: { front: { ...raw.floor.front }, back: { ...raw.floor.back } },
+    ceiling: { front: { y: raw.ceiling.front.y }, back: { y: raw.ceiling.back.y } },
+    chute: { mouth: raw.chute.mouth.map(([x, y]) => [x, y]) },
     plate: { x: plate.x, y: plate.y, w: plate.w, h: plate.h },
   };
 }
 
-// The Boop-a-Mole painting's calibration (spec 8.2): every number finite, the
-// plate and every hole inside the image, the holes in a plus (far over middle
-// over near, left of middle left of right), and no hole's box touching
-// another's or the plate.
 // The microwave's close-up: every part inside the image; the turntable inside
 // the glass; the display and the button clear of the glass; the fridge's front
 // below everything else.
 export function parseCookCalibration(value: unknown, file: string): CookCalibration {
-  const number = (item: unknown): item is number =>
-    typeof item === "number" && Number.isFinite(item);
-  type Box = { x: number; y: number; w: number; h: number };
-  field(record(value) && typeof value.image === "string", file, "image");
-  field(record(value.size) && number(value.size.w) && number(value.size.h), file, "size");
-  const size = { w: value.size.w, h: value.size.h };
-  const inside = (box: Box, within: Box = { x: 0, y: 0, ...size }): boolean =>
-    box.x >= within.x && box.y >= within.y && box.x + box.w <= within.x + within.w &&
-    box.y + box.h <= within.y + within.h;
-  const apart = (a: Box, b: Box): boolean =>
-    a.x + a.w <= b.x || b.x + b.w <= a.x || a.y + a.h <= b.y || b.y + b.h <= a.y;
-  const rect = (item: unknown, name: string): Box => {
-    field(record(item) && number(item.x) && number(item.y) && number(item.w) &&
-      number(item.h) && item.w > 0 && item.h > 0, file, name);
-    const box = { x: item.x, y: item.y, w: item.w, h: item.h };
-    field(inside(box), file, `${name} (inside the image)`);
-    return box;
-  };
-  const glass = rect(value.glass, "glass");
-  const radius = record(value.glass) ? value.glass.r : undefined;
-  field(number(radius) && radius >= 0 && 2 * radius <= Math.min(glass.w, glass.h), file,
+  const { raw, image, size, bounds } = calibrationHeader(value, file);
+  const glass = calibrationRect(raw, "glass", bounds, file);
+  const radius = record(raw.glass) ? raw.glass.r : undefined;
+  field(isFiniteNumber(radius) && radius >= 0 && 2 * radius <= Math.min(glass.w, glass.h), file,
     "glass.r");
-  const plate = value.plate;
-  field(record(plate) && number(plate.cx) && number(plate.cy) && number(plate.rx) &&
-    number(plate.ry) && plate.rx > 0 && plate.ry > 0 && inside({ x: plate.cx - plate.rx,
-    y: plate.cy - plate.ry, w: 2 * plate.rx, h: 2 * plate.ry }, glass), file,
-  "plate (inside the glass)");
-  const display = rect(value.display, "display");
-  const button = value.button;
-  field(record(button) && number(button.cx) && number(button.cy) && number(button.r) &&
-    button.r > 0, file, "button");
-  const buttonBox = { x: button.cx - button.r, y: button.cy - button.r, w: 2 * button.r,
-    h: 2 * button.r };
-  field(inside(buttonBox) && apart(buttonBox, glass) && apart(display, glass) &&
-    apart(display, buttonBox), file, "display and button (clear of the glass and each other)");
-  const front = rect(value.front, "front");
-  field([glass, display, buttonBox].every((box) => box.y + box.h <= front.y), file,
+  const plate = raw.plate;
+  field(record(plate) && isFiniteNumber(plate.cx) && isFiniteNumber(plate.cy) &&
+    isPositive(plate.rx) && isPositive(plate.ry) &&
+    insideBox({ x: plate.cx - plate.rx, y: plate.cy - plate.ry, w: 2 * plate.rx,
+      h: 2 * plate.ry }, glass), file, "plate (inside the glass)");
+  const display = calibrationRect(raw, "display", bounds, file);
+  const button = raw.button;
+  field(record(button) && isFiniteNumber(button.cx) && isFiniteNumber(button.cy) &&
+    isPositive(button.r), file, "button");
+  const buttonBox: Box = {
+    x: button.cx - button.r, y: button.cy - button.r, w: 2 * button.r, h: 2 * button.r,
+  };
+  field(insideBox(buttonBox, bounds) && boxesApart(buttonBox, glass) &&
+    boxesApart(display, glass) && boxesApart(display, buttonBox),
+  file, "display and button (clear of the glass and each other)");
+  const front = calibrationRect(raw, "front", bounds, file);
+  field([glass, display, buttonBox].every((item) => item.y + item.h <= front.y), file,
     "front (below the glass, the display, and the button)");
   return {
-    image: value.image,
+    image,
     size,
     glass: { ...glass, r: radius },
     plate: { cx: plate.cx, cy: plate.cy, rx: plate.rx, ry: plate.ry },
@@ -1064,79 +809,50 @@ export function parseCookCalibration(value: unknown, file: string): CookCalibrat
 }
 
 export function parseFishCalibration(value: unknown, file: string): FishCalibration {
-  const number = (item: unknown): item is number =>
-    typeof item === "number" && Number.isFinite(item);
-  type Box = { x: number; y: number; w: number; h: number };
-  field(record(value) && typeof value.image === "string", file, "image");
-  field(record(value.size) && number(value.size.w) && number(value.size.h) &&
-    value.size.w > 0 && value.size.h > 0, file, "size");
-  const size = { w: value.size.w, h: value.size.h };
-  const inside = (box: Box): boolean =>
-    box.x >= 0 && box.y >= 0 && box.x + box.w <= size.w && box.y + box.h <= size.h;
-  const rect = (item: unknown, name: string): Box => {
-    field(record(item) && number(item.x) && number(item.y) && number(item.w) &&
-      number(item.h) && item.w > 0 && item.h > 0, file, name);
-    const box = { x: item.x, y: item.y, w: item.w, h: item.h };
-    field(inside(box), file, `${name} (inside the image)`);
-    return box;
-  };
-  const water = rect(value.water, "water");
-  const front = rect(value.front, "front");
-  const horizonY = value.horizonY;
-  const dockY = value.dockY;
-  field(number(horizonY) && horizonY >= 0 && horizonY <= water.y, file, "horizonY");
-  field(number(dockY) && dockY >= water.y + water.h && dockY <= front.y, file, "dockY");
-  const rodTip = value.rodTip;
-  field(record(rodTip) && number(rodTip.x) && number(rodTip.y) &&
-    rodTip.x >= 0 && rodTip.x <= size.w && rodTip.y >= 0 && rodTip.y <= size.h, file, "rodTip");
-  return {
-    image: value.image,
-    size,
-    water,
-    horizonY,
-    dockY,
-    rodTip: { x: rodTip.x, y: rodTip.y },
-    front,
-  };
+  const { raw, image, size, bounds } = calibrationHeader(value, file, { positiveSize: true });
+  const water = calibrationRect(raw, "water", bounds, file);
+  const front = calibrationRect(raw, "front", bounds, file);
+  const horizonY = number(raw, "horizonY", file);
+  const dockY = number(raw, "dockY", file);
+  field(horizonY >= 0 && horizonY <= water.y, file, "horizonY");
+  field(dockY >= water.y + water.h && dockY <= front.y, file, "dockY");
+  const rodTip = pointField(raw, "rodTip", file);
+  field(rodTip.x >= 0 && rodTip.x <= size.w && rodTip.y >= 0 && rodTip.y <= size.h, file, "rodTip");
+  return { image, size, water, horizonY, dockY, rodTip, front };
 }
 
+// The Boop-a-Mole painting's calibration (spec 8.2): every number finite, the
+// plate and every hole inside the image, the holes in a plus (far over middle
+// over near, left of middle left of right), and no hole's box touching
+// another's or the plate.
 export function parseMoleCalibration(value: unknown, file: string): MoleCalibration {
-  const number = (item: unknown): item is number =>
-    typeof item === "number" && Number.isFinite(item);
-  type Box = { x: number; y: number; w: number; h: number };
   type Hole = { cx: number; cy: number; rx: number; ry: number };
-  field(record(value) && typeof value.image === "string", file, "image");
-  field(record(value.size) && number(value.size.w) && number(value.size.h), file, "size");
-  const size = { w: value.size.w, h: value.size.h };
-  const inside = (box: Box): boolean =>
-    box.x >= 0 && box.y >= 0 && box.x + box.w <= size.w && box.y + box.h <= size.h;
-  const apart = (a: Box, b: Box): boolean =>
-    a.x + a.w <= b.x || b.x + b.w <= a.x || a.y + a.h <= b.y || b.y + b.h <= a.y;
-  const rect = (item: unknown): item is Box =>
-    record(item) && number(item.x) && number(item.y) && number(item.w) && number(item.h) &&
-    item.w > 0 && item.h > 0;
-  const plate = value.plate;
-  field(rect(plate) && inside(plate), file, "plate");
-  field(record(value.holes), file, "holes");
-  const holes = value.holes;
+  const { raw, image, size, bounds } = calibrationHeader(value, file);
+  const plate = raw.plate;
+  field(box(plate) && insideBox(plate, bounds), file, "plate");
+  field(record(raw.holes), file, "holes");
+  const holes = raw.holes;
   const hole = (name: MoleHole): Hole => {
     const item = holes[name];
-    field(record(item) && number(item.cx) && number(item.cy) && number(item.rx) &&
-      number(item.ry) && item.rx > 0 && item.ry > 0, file, `holes.${name}`);
+    field(record(item) && isFiniteNumber(item.cx) && isFiniteNumber(item.cy) &&
+      isPositive(item.rx) && isPositive(item.ry), file, `holes.${name}`);
     return { cx: item.cx, cy: item.cy, rx: item.rx, ry: item.ry };
   };
-  const all = { up: hole("up"), left: hole("left"), middle: hole("middle"),
-    right: hole("right"), down: hole("down") };
-  const box = (item: Hole): Box =>
+  const all = {
+    up: hole("up"), left: hole("left"), middle: hole("middle"),
+    right: hole("right"), down: hole("down"),
+  };
+  const toBox = (item: Hole): Box =>
     ({ x: item.cx - item.rx, y: item.cy - item.ry, w: 2 * item.rx, h: 2 * item.ry });
-  const boxes = Object.values(all).map(box);
-  field(boxes.every((item) => inside(item) && apart(item, plate)) &&
-    boxes.every((item, index) => boxes.slice(index + 1).every((other) => apart(item, other))) &&
+  const boxes = Object.values(all).map(toBox);
+  field(boxes.every((item) => insideBox(item, bounds) && boxesApart(item, plate)) &&
+    boxes.every((item, index) =>
+      boxes.slice(index + 1).every((other) => boxesApart(item, other))) &&
     all.up.cy < all.middle.cy && all.middle.cy < all.down.cy &&
     all.left.cx < all.middle.cx && all.middle.cx < all.right.cx,
   file, "holes (a plus, each inside the image, none touching another or the plate)");
   return {
-    image: value.image,
+    image,
     size,
     plate: { x: plate.x, y: plate.y, w: plate.w, h: plate.h },
     holes: all,
@@ -1144,100 +860,62 @@ export function parseMoleCalibration(value: unknown, file: string): MoleCalibrat
 }
 
 export function parseCometCalibration(value: unknown, file: string): CometCalibration {
-  const number = (item: unknown): item is number =>
-    typeof item === "number" && Number.isInteger(item) && Number.isFinite(item);
-  type Box = { x: number; y: number; w: number; h: number };
-  const rect = (item: unknown): item is Box => record(item) && number(item.x) && number(item.y) &&
-    number(item.w) && number(item.h) && item.w > 0 && item.h > 0;
-  field(record(value) && typeof value.image === "string", file, "image");
-  field(record(value.size) && number(value.size.w) && number(value.size.h) &&
-    value.size.w > 0 && value.size.h > 0, file, "size");
-  const size = { w: value.size.w, h: value.size.h };
-  const inside = (box: Box): boolean => box.x >= 0 && box.y >= 0 &&
-    box.x + box.w <= size.w && box.y + box.h <= size.h;
+  const { raw, image, size, bounds } = calibrationHeader(value, file, {
+    positiveSize: true, integerSize: true,
+  });
   const parseBox = (name: "marquee" | "screen" | "field" | "deck"): Box => {
-    const box = value[name];
-    field(rect(box) && inside(box), file, name);
-    return box;
+    const item = raw[name];
+    field(integerBox(item) && insideBox(item, bounds), file, name);
+    return item;
   };
   const marquee = parseBox("marquee");
   const screen = parseBox("screen");
   const fieldBox = parseBox("field");
   const deck = parseBox("deck");
-  field(fieldBox.x >= screen.x && fieldBox.y >= screen.y &&
-    fieldBox.x + fieldBox.w <= screen.x + screen.w &&
-    fieldBox.y + fieldBox.h <= screen.y + screen.h, file, "field (inside screen)");
+  field(insideBox(fieldBox, screen), file, "field (inside screen)");
   field(marquee.y + marquee.h <= screen.y, file, "marquee (above screen)");
   field(deck.y >= screen.y + screen.h, file, "deck (below screen)");
-  return { image: value.image, size, marquee, screen, field: fieldBox, deck };
+  return { image, size, marquee, screen, field: fieldBox, deck };
 }
 
 // The skee-ball painting's calibration (spec 8.2): every number finite; the
 // lane narrowing from its foot up to the hump; the board above the hump; the
 // board and the plate inside the image, apart.
 export function parseSkeeCalibration(value: unknown, file: string): SkeeCalibration {
-  const number = (item: unknown): item is number =>
-    typeof item === "number" && Number.isFinite(item);
-  type Box = { x: number; y: number; w: number; h: number };
-  const rect = (item: unknown): item is Box =>
-    record(item) && number(item.x) && number(item.y) && number(item.w) && number(item.h) &&
-    item.w > 0 && item.h > 0;
-  const edge = (item: unknown): item is { y: number; left: number; right: number } =>
-    record(item) && number(item.y) && number(item.left) && number(item.right) &&
-    item.left < item.right;
-  field(record(value) && typeof value.image === "string", file, "image");
-  field(record(value.size) && number(value.size.w) && number(value.size.h), file, "size");
-  const size = { w: value.size.w, h: value.size.h };
-  const inside = (box: Box): boolean =>
-    box.x >= 0 && box.y >= 0 && box.x + box.w <= size.w && box.y + box.h <= size.h;
-  const apart = (a: Box, b: Box): boolean =>
-    a.x + a.w <= b.x || b.x + b.w <= a.x || a.y + a.h <= b.y || b.y + b.h <= a.y;
-  field(record(value.lane) && edge(value.lane.near) && edge(value.lane.far) &&
-    value.lane.far.y < value.lane.near.y &&
-    value.lane.far.right - value.lane.far.left < value.lane.near.right - value.lane.near.left,
+  const { raw, image, size, bounds } = calibrationHeader(value, file);
+  field(record(raw.lane) && edge(raw.lane.near) && edge(raw.lane.far) &&
+    raw.lane.far.y < raw.lane.near.y &&
+    raw.lane.far.right - raw.lane.far.left < raw.lane.near.right - raw.lane.near.left,
   file, "lane");
-  const { board, plate } = value;
-  field(rect(board) && inside(board) && board.y + board.h <= value.lane.far.y, file, "board");
-  field(rect(plate) && inside(plate) && apart(plate, board), file, "plate");
-  const copy = (box: Box): Box => ({ x: box.x, y: box.y, w: box.w, h: box.h });
+  const { board, plate } = raw;
+  field(box(board) && insideBox(board, bounds) && board.y + board.h <= raw.lane.far.y,
+    file, "board");
+  field(box(plate) && insideBox(plate, bounds) && boxesApart(plate, board), file, "plate");
+  const copy = (item: Box): Box => ({ x: item.x, y: item.y, w: item.w, h: item.h });
   return {
-    image: value.image,
+    image,
     size,
-    lane: { near: { ...value.lane.near }, far: { ...value.lane.far } },
+    lane: { near: { ...raw.lane.near }, far: { ...raw.lane.far } },
     board: copy(board),
     plate: copy(plate),
   };
 }
 
-function numberValue(
-  value: Record<string, unknown>,
-  name: string,
-  file: string,
-): number {
-  const result = value[name];
-  field(typeof result === "number", file, name);
-  return result;
-}
-
 export function parseTunables(value: unknown, file: string): Tunables {
   field(record(value), file, "object");
-  field(typeof value.walkSpeed === "number", file, "walkSpeed");
-  field(typeof value.playerRadius === "number", file, "playerRadius");
-  field(typeof value.walkCycleUnits === "number", file, "walkCycleUnits");
-  field(typeof value.doorFadeTicks === "number", file, "doorFadeTicks");
   field(record(value.interact), file, "interact");
   field(record(value.follow), file, "follow");
   field(record(value.roam), file, "roam");
   const follow = value.follow;
-  const followValue = (name: string): number => numberValue(follow, name, file);
+  const followValue = (name: string): number => number(follow, name, file);
   return {
-    walkSpeed: value.walkSpeed,
-    playerRadius: value.playerRadius,
-    walkCycleUnits: value.walkCycleUnits,
-    doorFadeTicks: value.doorFadeTicks,
+    walkSpeed: number(value, "walkSpeed", file),
+    playerRadius: number(value, "playerRadius", file),
+    walkCycleUnits: number(value, "walkCycleUnits", file),
+    doorFadeTicks: number(value, "doorFadeTicks", file),
     interact: {
-      range: numberValue(value.interact, "range", file),
-      revealPerTick: numberValue(value.interact, "revealPerTick", file),
+      range: number(value.interact, "range", file),
+      revealPerTick: number(value.interact, "revealPerTick", file),
     },
     follow: {
       distance: followValue("distance"),
@@ -1252,13 +930,13 @@ export function parseTunables(value: unknown, file: string): Tunables {
       settleDelayTicks: followValue("settleDelayTicks"),
     },
     roam: {
-      wanderSpeed: numberValue(value.roam, "wanderSpeed", file),
-      chaseSpeed: numberValue(value.roam, "chaseSpeed", file),
-      sight: numberValue(value.roam, "sight", file),
-      cooldownTicks: numberValue(value.roam, "cooldownTicks", file),
-      pauseTicks: numberValue(value.roam, "pauseTicks", file),
-      noticeTicks: numberValue(value.roam, "noticeTicks", file),
-      alertTicks: numberValue(value.roam, "alertTicks", file),
+      wanderSpeed: number(value.roam, "wanderSpeed", file),
+      chaseSpeed: number(value.roam, "chaseSpeed", file),
+      sight: number(value.roam, "sight", file),
+      cooldownTicks: number(value.roam, "cooldownTicks", file),
+      pauseTicks: number(value.roam, "pauseTicks", file),
+      noticeTicks: number(value.roam, "noticeTicks", file),
+      alertTicks: number(value.roam, "alertTicks", file),
     },
   };
 }
@@ -1300,101 +978,63 @@ export function parseArea(value: unknown, file: string, catalogue?: PropCatalogu
     value.critters === undefined ||
       (Array.isArray(value.critters) &&
         value.critters.every(
-          (item) =>
-            record(item) &&
-            typeof item.id === "string" &&
-            record(item.point) &&
-            typeof item.point.x === "number" &&
-            typeof item.point.y === "number" &&
+          (item) => record(item) && typeof item.id === "string" && point(item.point) &&
             (item.visibleWhile === undefined || typeof item.visibleWhile === "string"),
         )),
-    file,
-    "critters",
+    file, "critters",
   );
   const recurring = parseRecurring(value.recurring, file);
   field(
     value.npcs === undefined ||
       (Array.isArray(value.npcs) &&
         value.npcs.every(
-          (item) =>
-            record(item) &&
-            typeof item.id === "string" &&
-            record(item.point) &&
-            typeof item.point.x === "number" &&
-            typeof item.point.y === "number" &&
-            direction(item.facing) &&
-            polygon(item.footprint) &&
-            typeof item.knot === "string" &&
+          (item) => record(item) && typeof item.id === "string" && point(item.point) &&
+            direction(item.facing) && polygon(item.footprint) && typeof item.knot === "string" &&
             (item.prompt === "Look" || item.prompt === "Talk" || item.prompt === "Pet") &&
-            (item.visibleWhile === undefined ||
-              typeof item.visibleWhile === "string") &&
-            (item.visibleWhenCalmed === undefined ||
-              typeof item.visibleWhenCalmed === "string"),
+            (item.visibleWhile === undefined || typeof item.visibleWhile === "string") &&
+            (item.visibleWhenCalmed === undefined || typeof item.visibleWhenCalmed === "string"),
         )),
-    file,
-    "npcs",
+    file, "npcs",
   );
   field(
     value.triggers === undefined ||
       (Array.isArray(value.triggers) &&
         value.triggers.every(
-          (item) =>
-            record(item) &&
-            typeof item.id === "string" &&
-            polygon(item.polygon) &&
-            record(item.target) &&
-            typeof item.target.area === "string" &&
+          (item) => record(item) && typeof item.id === "string" && polygon(item.polygon) &&
+            record(item.target) && typeof item.target.area === "string" &&
             typeof item.target.spawn === "string",
         )),
-    file,
-    "triggers",
+    file, "triggers",
   );
+  field(value.ground === undefined || typeof value.ground === "string", file, "ground");
   field(
-    value.ground === undefined || typeof value.ground === "string",
-    file,
-    "ground",
-  );
-  field(
-    (value.glows === undefined || Array.isArray(value.glows)) &&
-      (value.glows === undefined || value.glows.every(
-        (item) => record(item) && typeof item.id === "string" &&
-          typeof item.frame === "string" && record(item.point) &&
-          typeof item.point.x === "number" && typeof item.point.y === "number" &&
-          (item.knot === undefined || typeof item.knot === "string") &&
-          (item.prompt === undefined || item.prompt === "Look") &&
-          (item.flip === undefined || typeof item.flip === "boolean"),
-      )),
+    value.glows === undefined ||
+      (Array.isArray(value.glows) &&
+        value.glows.every(
+          (item) => record(item) && typeof item.id === "string" && typeof item.frame === "string" &&
+            point(item.point) && (item.knot === undefined || typeof item.knot === "string") &&
+            (item.prompt === undefined || item.prompt === "Look") &&
+            (item.flip === undefined || typeof item.flip === "boolean"),
+        )),
     file, "glows",
   );
   field(
     value.interactables === undefined ||
       (Array.isArray(value.interactables) &&
         value.interactables.every(
-          (item) =>
-            record(item) &&
-            typeof item.id === "string" &&
-            typeof item.knot === "string" &&
-            record(item.point) &&
-            typeof item.point.x === "number" &&
-            typeof item.point.y === "number" &&
+          (item) => record(item) && typeof item.id === "string" && typeof item.knot === "string" &&
+            point(item.point) &&
             (item.prompt === "Look" || item.prompt === "Play" || item.prompt === "Talk"),
         )),
-    file,
-    "interactables",
+    file, "interactables",
   );
   field(record(value.spawns), file, "spawns");
   const spawns: Record<string, Spawn> = {};
   for (const [name, raw] of Object.entries(value.spawns)) {
     field(record(raw), file, `spawns.${name}`);
-    field(
-      typeof raw.x === "number" && typeof raw.y === "number",
-      file,
-      `spawns.${name}.position`,
-    );
+    field(typeof raw.x === "number" && typeof raw.y === "number", file, `spawns.${name}.position`);
     field(direction(raw.facing), file, `spawns.${name}.facing`);
-    const x = typeof raw.x === "number" ? raw.x : 0;
-    const y = typeof raw.y === "number" ? raw.y : 0;
-    spawns[name] = { x, y, facing: raw.facing };
+    spawns[name] = { x: raw.x, y: raw.y, facing: raw.facing };
   }
   const area: Area = {
     id: value.id,
@@ -1468,32 +1108,25 @@ export function parseArea(value: unknown, file: string, catalogue?: PropCatalogu
 function parseRecurring(value: unknown, file: string): Recurring | undefined {
   if (value === undefined) return undefined;
   field(record(value), file, "recurring");
-  const after = value.after;
-  field(after === undefined || typeof after === "string", file, "recurring.after");
+  const after = optionalString(value, "after", file, "recurring.after");
   const dens = value.dens;
-  field(Array.isArray(dens) && dens.length > 0, file, "recurring.dens");
+  field(array(dens) && dens.length > 0, file, "recurring.dens");
   return {
     ...(after === undefined ? {} : { after }),
     dens: dens.map((den: unknown, index): Den => {
       const name = `recurring.dens.${index}`;
       field(record(den), file, name);
-      const point = den.point;
-      field(record(point) && typeof point.x === "number" && typeof point.y === "number",
-        file, `${name}.point`);
-      const radius = den.radius;
-      field(typeof radius === "number" && radius > 0, file, `${name}.radius`);
+      const pt = pointField(den, "point", file, `${name}.point`);
+      const radius = positive(den, "radius", file, `${name}.radius`);
       const kinds = den.kinds;
-      field(Array.isArray(kinds) && kinds.length > 0, file, `${name}.kinds`);
-      const names = kinds.filter((kind): kind is string => typeof kind === "string");
-      field(names.length === kinds.length, file, `${name}.kinds`);
+      field(strings(kinds) && kinds.length > 0, file, `${name}.kinds`);
       const chance = den.chance ?? 1;
-      field(typeof chance === "number" && chance > 0 && chance <= 1, file, `${name}.chance`);
-      const denAfter = den.after;
-      field(denAfter === undefined || typeof denAfter === "string", file, `${name}.after`);
+      field(isPositive(chance) && chance <= 1, file, `${name}.chance`);
+      const denAfter = optionalString(den, "after", file, `${name}.after`);
       return {
-        point: { x: point.x, y: point.y },
+        point: pt,
         radius,
-        kinds: names,
+        kinds: [...kinds],
         chance,
         ...(denAfter === undefined ? {} : { after: denAfter }),
       };
@@ -1501,53 +1134,20 @@ function parseRecurring(value: unknown, file: string): Recurring | undefined {
   };
 }
 
-function gradeMap(
-  value: unknown,
-  file: string,
-  name: string,
-): Record<Grade, string> {
-  field(record(value), file, name);
-  const get = (grade: Grade): string => {
-    const item = value[grade];
-    field(typeof item === "string", file, `${name}.${grade}`);
-    return item;
-  };
-  return { great: get("great"), good: get("good"), miss: get("miss") };
-}
-
 export function parseCritter(value: unknown, file: string): Critter {
   field(record(value), file, "object");
-  const text = (object: Record<string, unknown>, name: string): string => {
-    const item = object[name];
-    field(typeof item === "string", file, name);
-    return item;
-  };
-  const number = (object: Record<string, unknown>, name: string): number => {
-    const item = object[name];
-    field(typeof item === "number" && item >= 0, file, name);
-    return item;
-  };
+  const text = (object: Record<string, unknown>, key: string): string => string(object, key, file);
+  const nonNeg = (object: Record<string, unknown>, key: string): number =>
+    nonNegative(object, key, file);
   const toyScale = value.toyScale === undefined ? 1 : value.toyScale;
-  field(
-    typeof toyScale === "number" && Number.isFinite(toyScale) && toyScale > 0,
-    file, "toyScale",
-  );
+  field(isPositive(toyScale), file, "toyScale");
   const id = text(value, "id");
-  const level = number(value, "level");
-  field(Number.isInteger(level) && level >= 1 && level <= 99, file, "level");
+  const level = integerIn(value, "level", 1, file, "level");
+  field(level <= 99, file, "level");
   const species = text(value, "species");
   const name = text(value, "name");
   const calmName = text(value, "calmName");
   const atlas = text(value, "atlas");
-  const point = (key: string): Point => {
-    const item = value[key];
-    field(
-      record(item) && typeof item.x === "number" && typeof item.y === "number",
-      file,
-      key,
-    );
-    return { x: item.x, y: item.y };
-  };
   const calmKnot = text(value, "calmKnot");
   const calmPrompt = value.calmPrompt;
   field(calmPrompt === "Look" || calmPrompt === "Talk", file, "calmPrompt");
@@ -1566,17 +1166,16 @@ export function parseCritter(value: unknown, file: string): Critter {
   ): Record<string, number> => {
     const raw = commands[commandName];
     field(record(raw), file, `commands.${commandName}`);
-    return Object.fromEntries(keys.map((key) => [key, number(raw, key)]));
+    return Object.fromEntries(keys.map((key) => [key, nonNeg(raw, key)]));
   };
   const burst = value.burst;
   field(record(burst), file, "burst");
   const burstValue = {
-    bigChance: number(burst, "bigChance"),
+    bigChance: nonNeg(burst, "bigChance"),
     check: checkSpec(burst.check, file, "burst.check"),
     ...(burst.big === undefined ? {} : { big: checkSpec(burst.big, file, "burst.big") }),
   };
   field(burstValue.bigChance <= 1, file, "burst.bigChance");
-  // A big burst plays the same kind of check, only bigger.
   if (burstValue.big !== undefined)
     field(burstValue.big.kind === burstValue.check.kind, file, "burst.big.kind");
   const lines = value.lines;
@@ -1586,40 +1185,24 @@ export function parseCritter(value: unknown, file: string): Critter {
   const talkRaw = value.talk;
   let talk: Critter["talk"] = null;
   if (talkRaw !== undefined && talkRaw !== null) {
-    field(record(talkRaw) && record(talkRaw.calm) && Array.isArray(talkRaw.knots), file, "talk");
-    if (!record(talkRaw) || !record(talkRaw.calm) || !Array.isArray(talkRaw.knots))
-      throw new Error(`${file}: invalid talk`);
+    field(record(talkRaw) && record(talkRaw.calm) && array(talkRaw.knots), file, "talk");
     const knots = talkRaw.knots;
     field(
       knots.length === 3 && knots.every((item) => typeof item === "string" && item.length > 0),
       file, "talk.knots",
     );
     const calm = talkRaw.calm;
-    const calmValue = (grade: Grade): number => {
-      const item = calm[grade];
-      field(
-        typeof item === "number" && Number.isInteger(item) && item > 0,
-        file, `talk.calm.${grade}`,
-      );
-      return item;
-    };
+    const calmValue = (grade: Grade): number =>
+      integerIn(calm, grade, 1, file, `talk.calm.${grade}`);
     const values = { great: calmValue("great"), good: calmValue("good"), miss: calmValue("miss") };
     field(values.great >= values.good && values.good >= values.miss, file, "talk.calm order");
-    const talkAtValue = talkRaw.talkAt;
-    field(
-      typeof talkAtValue === "number" && Number.isInteger(talkAtValue) && talkAtValue > 0 &&
-        talkAtValue < number(value, "calmMax"), file, "talk.talkAt",
-    );
-    const talkAt = typeof talkAtValue === "number" ? talkAtValue : 0;
+    const talkAt = integerIn(talkRaw, "talkAt", 1, file, "talk.talkAt");
+    field(talkAt < nonNeg(value, "calmMax"), file, "talk.talkAt");
     talk = {
-      label: typeof talkRaw.label === "string"
-        ? talkRaw.label
-        : (field(false, file, "talk.label"), "Talk"),
-      prompt: typeof talkRaw.prompt === "string" && talkRaw.prompt.length > 0
-        ? talkRaw.prompt
-        : (field(false, file, "talk.prompt"), ""),
+      label: string(talkRaw, "label", file, "talk.label"),
+      prompt: nonEmptyString(talkRaw, "prompt", file, "talk.prompt"),
       talkAt,
-      knots: [knots[0] ?? "", knots[1] ?? "", knots[2] ?? ""],
+      knots: [String(knots[0] ?? ""), String(knots[1] ?? ""), String(knots[2] ?? "")],
       calm: values,
     };
   }
@@ -1627,18 +1210,16 @@ export function parseCritter(value: unknown, file: string): Critter {
   field(typeof canRun === "boolean", file, "canRun");
   const sootheRaw = command("soothe", ["calm", "great", "good"]);
   const snackRaw = command("snack", ["calm", "energy"]);
-  // One entry per party command id (spec 8); the loader checks the roster's
-  // ids are all here.
   const friendsRaw = commands.friends;
   field(record(friendsRaw), file, "commands.friends");
   const friends: Record<string, FriendCommand> = {};
   for (const [friendId, raw] of Object.entries(friendsRaw)) {
     field(record(raw), file, `commands.friends.${friendId}`);
     friends[friendId] = {
-      calm: number(raw, "calm"),
-      great: number(raw, "great"),
-      good: number(raw, "good"),
-      rest: number(raw, "rest"),
+      calm: nonNeg(raw, "calm"),
+      great: nonNeg(raw, "great"),
+      good: nonNeg(raw, "good"),
+      rest: nonNeg(raw, "rest"),
     };
   }
   const friendLinesRaw = lines.friends;
@@ -1653,29 +1234,29 @@ export function parseCritter(value: unknown, file: string): Critter {
     name,
     calmName,
     atlas,
-    auraCentre: point("auraCentre"),
-    bodyCentre: point("bodyCentre"),
-    figureHeight: number(value, "figureHeight"),
+    auraCentre: pointField(value, "auraCentre", file),
+    bodyCentre: pointField(value, "bodyCentre", file),
+    figureHeight: nonNeg(value, "figureHeight"),
     toyScale,
-    overworldHeight: number(value, "overworldHeight"),
-    battleHeight: number(value, "battleHeight"),
-    touchRadius: number(value, "touchRadius"),
-    calmMax: number(value, "calmMax"),
-    energyMax: number(value, "energyMax"),
-    coins: number(value, "coins"),
+    overworldHeight: nonNeg(value, "overworldHeight"),
+    battleHeight: nonNeg(value, "battleHeight"),
+    touchRadius: nonNeg(value, "touchRadius"),
+    calmMax: nonNeg(value, "calmMax"),
+    energyMax: nonNeg(value, "energyMax"),
+    coins: nonNeg(value, "coins"),
     sticker: stickerValue,
     calmKnot,
     calmPrompt,
     feelings,
     commands: {
       soothe: {
-        calm: number(sootheRaw, "calm"),
-        great: number(sootheRaw, "great"),
-        good: number(sootheRaw, "good"),
+        calm: nonNeg(sootheRaw, "calm"),
+        great: nonNeg(sootheRaw, "great"),
+        good: nonNeg(sootheRaw, "good"),
       },
       snack: {
-        calm: number(snackRaw, "calm"),
-        energy: number(snackRaw, "energy"),
+        calm: nonNeg(snackRaw, "calm"),
+        energy: nonNeg(snackRaw, "energy"),
       },
       friends,
     },
@@ -1875,24 +1456,14 @@ function critterFeelings(value: unknown, file: string): FeelingId[] {
 function critterWindUp(value: unknown, file: string, feelings: number): WindUp | null {
   if (value === undefined || value === null) return null;
   field(record(value), file, "windUp");
-  const integer = (key: string): number => {
-    const item = value[key];
-    field(typeof item === "number" && Number.isInteger(item), file, `windUp.${key}`);
-    return item;
-  };
-  const start = integer("start");
-  const every = integer("every");
-  const bubbles = integer("bubbles");
-  field(start >= 2, file, "windUp.start");
-  field(bubbles >= 1 && bubbles <= feelings, file, "windUp.bubbles");
+  const start = integerIn(value, "start", 2, file, "windUp.start");
+  const every = integer(value, "every", file, "windUp.every");
+  const bubbles = integerIn(value, "bubbles", 1, file, "windUp.bubbles");
+  field(bubbles <= feelings, file, "windUp.bubbles");
   field(every > bubbles, file, "windUp.every");
   const lines = value.lines;
   field(record(lines), file, "windUp.lines");
-  const line = (key: string): string => {
-    const item = lines[key];
-    field(typeof item === "string" && item.length > 0, file, `windUp.lines.${key}`);
-    return item;
-  };
+  const line = (key: string): string => nonEmptyString(lines, key, file, `windUp.lines.${key}`);
   return {
     start,
     every,
@@ -1919,55 +1490,41 @@ export function feelingErrors(
 
 export function parsePartyMember(value: unknown, file: string): PartyContent {
   field(record(value), file, "object");
-  const text = (object: Record<string, unknown>, name: string): string => {
-    const item = object[name];
-    field(typeof item === "string" && item !== "", file, name);
-    return item;
-  };
-  const size = (object: Record<string, unknown>, name: string): number => {
-    const item = object[name];
-    field(typeof item === "number" && item > 0, file, name);
-    return item;
-  };
-  const box = value.box;
-  field(record(box), file, "box");
+  const text = (object: Record<string, unknown>, name: string): string =>
+    nonEmptyString(object, name, file, name);
+  const size = (object: Record<string, unknown>, name: string): number =>
+    positive(object, name, file, name);
+  const memberBox = value.box;
+  field(record(memberBox), file, "box");
   const flute = value.flute ?? false;
   field(typeof flute === "boolean", file, "flute");
   const command = value.command;
-  // A flute friend has no battle command; everyone else has one.
   field(flute ? command === null : record(command), file, "command");
   field(!flute || typeof value.joins === "string", file, "flute/joins");
   const critter = value.critter ?? null;
   field(critter === null || (flute && typeof critter === "string"), file, "critter");
-  field(typeof value.sits === "boolean", file, "sits");
-  field(typeof value.start === "boolean", file, "start");
+  const sits = boolean(value, "sits", file);
+  const start = boolean(value, "start", file);
   field(value.joins === null || typeof value.joins === "string", file, "joins");
-  field(value.befriended === undefined || typeof value.befriended === "string",
-    file, "befriended");
-  // A flute friend's `joins` only says it's following right now; whether it's
-  // Fae's friend at all (the credits) is its own variable.
-  field(!flute || typeof value.befriended === "string", file, "flute/befriended");
+  const befriended = optionalString(value, "befriended", file);
+  field(!flute || typeof befriended === "string", file, "flute/befriended");
   field(
-    (value.start && value.joins === null) || (!value.start && typeof value.joins === "string"),
+    (start && value.joins === null) || (!start && typeof value.joins === "string"),
     file,
     "start/joins",
   );
   const scale = value.scale;
-  field(
-    scale === undefined || (typeof scale === "number" && Number.isFinite(scale) && scale > 0),
-    file,
-    "scale",
-  );
+  field(scale === undefined || isPositive(scale), file, "scale");
   return {
     id: text(value, "id"),
     name: text(value, "name"),
     atlas: text(value, "atlas"),
-    box: { width: size(box, "width"), height: size(box, "height") },
+    box: { width: size(memberBox, "width"), height: size(memberBox, "height") },
     walkCycleUnits: size(value, "walkCycleUnits"),
-    sits: value.sits,
-    start: value.start,
+    sits,
+    start,
     joins: value.joins,
-    ...(value.befriended === undefined ? {} : { befriended: value.befriended }),
+    ...(befriended === undefined ? {} : { befriended }),
     flute,
     critter,
     command: record(command)
@@ -2171,33 +1728,22 @@ export function parseFixture(value: unknown, file: string): Fixture {
   };
 }
 
-export function parseGroundManifest(
-  value: unknown,
-  file: string,
-): GroundManifest {
+export function parseGroundManifest(value: unknown, file: string): GroundManifest {
   field(record(value), file, "object");
-  field(typeof value.paper === "string", file, "paper");
-  field(Array.isArray(value.tiles), file, "tiles");
+  const paper = string(value, "paper", file);
+  field(array(value.tiles), file, "tiles");
   const tiles = value.tiles.map((item, index) => {
-    field(record(item), file, `tiles.${index}`);
-    field(
-      typeof item.file === "string" &&
-        typeof item.x === "number" &&
-        typeof item.y === "number" &&
-        typeof item.width === "number" &&
-        typeof item.height === "number",
-      file,
-      `tiles.${index}`,
-    );
+    const label = `tiles.${index}`;
+    field(record(item), file, label);
     return {
-      file: item.file,
-      x: item.x,
-      y: item.y,
-      width: item.width,
-      height: item.height,
+      file: string(item, "file", file, label),
+      x: number(item, "x", file, label),
+      y: number(item, "y", file, label),
+      width: number(item, "width", file, label),
+      height: number(item, "height", file, label),
     };
   });
-  return { paper: value.paper, tiles };
+  return { paper, tiles };
 }
 
 // The painted world map's manifest (`assets/ui/map/world-map.json`): each
@@ -2207,14 +1753,14 @@ export function parseMapCentres(
   file: string,
 ): Record<string, { x: number; y: number }> {
   field(record(value), file, "object");
-  field(Array.isArray(value.lands), file, "lands");
+  field(array(value.lands), file, "lands");
   const centres: Record<string, { x: number; y: number }> = {};
   value.lands.forEach((item, index) => {
+    const label = `lands.${index}`;
     field(
-      record(item) && typeof item.id === "string" && typeof item.x === "number" &&
-        typeof item.y === "number",
-      file,
-      `lands.${index}`,
+      record(item) && typeof item.id === "string" && isFiniteNumber(item.x) &&
+        isFiniteNumber(item.y),
+      file, label,
     );
     centres[item.id] = { x: item.x, y: item.y };
   });
@@ -2231,21 +1777,13 @@ export function parseCharacters(
     field(record(raw) && typeof raw.atlas === "string", file, `${id}.atlas`);
     const ticks = raw.idleTicks;
     field(
-      Array.isArray(ticks) &&
+      array(ticks) &&
         ticks.length > 0 &&
-        ticks.every(
-          (tick) =>
-            typeof tick === "number" && Number.isInteger(tick) && tick > 0,
-        ),
-      file,
-      `${id}.idleTicks`,
+        ticks.every((tick): tick is number => isInteger(tick) && tick > 0),
+      file, `${id}.idleTicks`,
     );
     const scale = raw.scale;
-    field(
-      scale === undefined || (typeof scale === "number" && Number.isFinite(scale) && scale > 0),
-      file,
-      `${id}.scale`,
-    );
+    field(scale === undefined || isPositive(scale), file, `${id}.scale`);
     characters[id] = {
       atlas: raw.atlas,
       idleTicks: ticks,
@@ -2272,50 +1810,50 @@ export function completeSurfaceMaps(
 function parseLevels(value: unknown, file: string): LevelContent {
   field(record(value), file, "object");
   const rawThresholds = value.thresholds;
-  field(Array.isArray(rawThresholds) && rawThresholds.length === 99 &&
-    rawThresholds.every((item) => typeof item === "number" && Number.isInteger(item) && item >= 0),
-    file, "thresholds");
+  field(
+    array(rawThresholds) &&
+      rawThresholds.length === 99 &&
+      rawThresholds.every((item): item is number => isInteger(item) && item >= 0),
+    file,
+    "thresholds",
+  );
   const rawStats = value.stats;
   field(record(rawStats), file, "stats");
-  const stat = (name: string): number => {
-    const item = rawStats[name];
-    field(typeof item === "number" && Number.isInteger(item) && item >= 0, file, `stats.${name}`);
-    return item;
-  };
+  const stat = (name: string): number => integerIn(rawStats, name, 0, file, `stats.${name}`);
   const rawCritters = value.critters;
   field(record(rawCritters), file, "critters");
   const critters: LevelContent["critters"] = {};
   for (const [id, raw] of Object.entries(rawCritters)) {
     field(record(raw), file, `critters.${id}`);
-    const integer = (name: string): number => {
-      const item = raw[name];
-      field(typeof item === "number" && Number.isInteger(item) && item >= 0, file,
-        `critters.${id}.${name}`);
-      return item;
+    const intVal = (name: string): number =>
+      integerIn(raw, name, 0, file, `critters.${id}.${name}`);
+    const level = integerIn(raw, "level", 1, file, `critters.${id}.level`);
+    field(level <= 99, file, `critters.${id}.level`);
+    critters[id] = {
+      level, calmMax: intVal("calmMax"), burst: intVal("burst"),
+      bigBurst: intVal("bigBurst"), xp: intVal("xp"),
     };
-    const level = integer("level");
-    field(level >= 1 && level <= 99, file, `critters.${id}.level`);
-    critters[id] = { level, calmMax: integer("calmMax"), burst: integer("burst"),
-      bigBurst: integer("bigBurst"), xp: integer("xp") };
   }
   const rawCommands = rawStats.commands;
   field(record(rawCommands), file, "stats.commands");
   const commands: LevelContent["stats"]["commands"] = {};
   for (const [id, raw] of Object.entries(rawCommands)) {
     field(record(raw), file, `stats.commands.${id}`);
-    const number = (name: string): number => {
-      const item = raw[name];
-      field(typeof item === "number" && Number.isInteger(item) && item >= 0, file,
-        `stats.commands.${id}.${name}`);
-      return item;
+    const intVal = (name: string): number =>
+      integerIn(raw, name, 0, file, `stats.commands.${id}.${name}`);
+    commands[id] = {
+      powerBase: intVal("powerBase"), powerPerLevel: intVal("powerPerLevel"),
+      magicBase: intVal("magicBase"), magicPerLevel: intVal("magicPerLevel"),
     };
-    commands[id] = { powerBase: number("powerBase"), powerPerLevel: number("powerPerLevel"),
-      magicBase: number("magicBase"), magicPerLevel: number("magicPerLevel") };
   }
-  return { thresholds: [...rawThresholds], stats: {
-    lifeBase: stat("lifeBase"), lifeEvery: stat("lifeEvery"), guardEvery: stat("guardEvery"),
-    commands,
-  }, critters };
+  return {
+    thresholds: [...rawThresholds],
+    stats: {
+      lifeBase: stat("lifeBase"), lifeEvery: stat("lifeEvery"), guardEvery: stat("guardEvery"),
+      commands,
+    },
+    critters,
+  };
 }
 
 export function parseTreats(
@@ -2323,18 +1861,13 @@ export function parseTreats(
   file: string,
   critters: Record<string, Critter>,
 ): TreatItem[] {
-  field(record(value) && Array.isArray(value.treats) && value.treats.length > 0, file, "treats");
+  field(record(value) && array(value.treats) && value.treats.length > 0, file, "treats");
   const species = new Set(Object.values(critters).map((critter) => critter.species));
   const seen = new Set<string>();
-  const nonEmpty = (source: Record<string, unknown>, key: string, label: string): string => {
-    const raw = source[key];
-    field(typeof raw === "string" && raw.trim().length > 0, file, label);
-    return raw;
-  };
   return value.treats.map((item, index): TreatItem => {
     const label = `treats[${index}]`;
     field(record(item), file, label);
-    const id = nonEmpty(item, "id", `${label}.id`);
+    const id = nonEmptyString(item, "id", file, `${label}.id`);
     field(/^[a-z][a-z0-9-]*$/.test(id) && id !== "snack" && id !== "back", file, `${label}.id`);
     field(!seen.has(id), file, `${label}.id (duplicate ${id})`);
     seen.add(id);
@@ -2352,15 +1885,15 @@ export function parseTreats(
     }
     return {
       id,
-      name: nonEmpty(item, "name", `${label}.name`),
+      name: nonEmptyString(item, "name", file, `${label}.name`),
       price,
       energy,
       calm,
       favouriteCalm,
       favourites: [...rawFavourites],
-      description: nonEmpty(item, "description", `${label}.description`),
-      useLine: nonEmpty(item, "useLine", `${label}.useLine`),
-      favouriteLine: nonEmpty(item, "favouriteLine", `${label}.favouriteLine`),
+      description: nonEmptyString(item, "description", file, `${label}.description`),
+      useLine: nonEmptyString(item, "useLine", file, `${label}.useLine`),
+      favouriteLine: nonEmptyString(item, "favouriteLine", file, `${label}.favouriteLine`),
     };
   });
 }

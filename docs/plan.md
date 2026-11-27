@@ -4571,6 +4571,50 @@ the old trail, the owl, and the clubhouse claim.
   `CLOVERHOLLOW_E2E_PORT=4301 just e2e` (1,072 passed, 2 skipped, 0 failed in
   4.4 min).
 
+## Milestone 97: Storybook Title Screen Emblem Polish, PWA/iOS Shell Metadata & Deep Content/Render Modularization **Status:** ✅ Completed (2026-11-27)
+- Handcrafted Storybook Title Screen Emblem Polish (`src/ui/title.ts`,
+  `src/ui/title.css`):
+  - Softened `.title-plate` tilt from `-2deg` to `-1.2deg`, added warm inset
+    dashed stitching (`::after`) and a warm cream-to-ivory parchment gradient
+    (`#fbf6e8` -> `#f5ebd4`) over opaque `--sticker-paper`, added a
+    complementary bottom-left wildflower/clover sprig (`.title-blossom`, zero
+    text) balancing `.title-clover`, and added a warm radial cream halo behind
+    `.title-screen`.
+  - Added a zero-text CSS leaf/pip selection indicator (`::before`) and subtle
+    spring lift on selected `.title-option` and `.title-confirm-button`
+    stickers, deepened `.title-option-detail` ink to `#362313` (> 7.5:1 on
+    `--sticker-green`), styled unselected buttons in warm `--sticker-paper`,
+    added matching dashed inner stitching to `.title-confirm-card`, and guarded
+    transitions/transforms under `prefers-reduced-motion: reduce`.
+- Web App Manifest, Favicon & iOS Shell Metadata (`public/manifest.webmanifest`,
+  `index.html`):
+  - Added `public/manifest.webmanifest` (`Wilds of Cloverhollow`, standalone
+    landscape, `#f8edcf` paper colors, inline four-leaf clover SVG icon).
+  - Updated `index.html` with `description`, `theme-color`, iOS
+    `apple-mobile-web-app-*` meta tags, inline four-leaf clover SVG favicon,
+    and manifest link.
+- Deep Architecture Modularization (`src/content/parsers.ts`,
+  `src/content/load.ts`, `src/render/overworld-render.ts`,
+  `src/render/view.ts`):
+  - Extracted reusable primitive/geometry/checkSpec JSON validators into
+    `src/content/parsers.ts`, trimming `src/content/load.ts` from 2,643 to
+    2,176 lines with zero core or replay-hash changes.
+  - Extracted stateless overworld render helpers (`areaEntityAtlases`,
+    `resolveNpcTextureFrame`, `computeRoamerBobAndFacing`,
+    `computeCritterShadow`, `computePartyFollowerTransform`, `computeFaePose`,
+    `spawnFootstepPuffs`, `computeLanternMote`, `computeGlowTransform`,
+    `computeCompanionEmoteSpecs`, `computeOverworldEmoteInputs`,
+    `computeBackdropTransform`, and `INDOOR_AREAS`/`ADULT_NPCS` constants) into
+    pure `src/render/overworld-render.ts` (re-exporting `areaEntityAtlases`
+    from `src/render/view.ts`), trimming `src/render/view.ts` from 2,855 to
+    2,483 lines.
+- Evidence: `tests/unit/milestone-97.test.ts` (3 tests) and review capture
+  `art/review/m97-title-continue.jpg` verified with `vision`.
+- Gates: `just check` (158 unit files / 1,233 tests, all 67 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  `CLOVERHOLLOW_E2E_PORT=4311 just e2e` (1,072 passed, 2 skipped in 4.5 min).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

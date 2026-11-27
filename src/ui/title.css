@@ -16,30 +16,47 @@
   box-sizing: border-box;
   padding: calc(16px + var(--safe-top)) calc(20px + var(--safe-right))
     calc(16px + var(--safe-bottom)) calc(20px + var(--safe-left));
-  background: #fffaf033;
+  background: radial-gradient(
+    circle at 50% 48%,
+    #fffaf070 0%,
+    #fffaf028 55%,
+    #f8edcf18 100%
+  );
   color: var(--sticker-ink);
   font-family: var(--sticker-font);
   pointer-events: auto;
 }
 
-/* The wordmark plate: a cream die-cut sticker, tilted a little. */
+/* The wordmark plate: a stitched cream die-cut sticker, gently tilted. */
 .title-plate {
   position: relative;
   flex: none;
   box-sizing: border-box;
-  padding: clamp(12px, 2.6vh, 22px) clamp(22px, 4vw, 40px);
+  padding: clamp(14px, 2.8vh, 24px) clamp(24px, 4.2vw, 44px);
   border: 6px solid var(--sticker-rim);
   outline: 2px solid var(--sticker-ink);
   border-radius: 24px;
-  background: var(--sticker-paper);
-  box-shadow: var(--sticker-shadow);
-  transform: rotate(-2deg);
+  background-color: var(--sticker-paper);
+  background-image: linear-gradient(180deg, #fbf6e8 0%, #f5ebd4 100%);
+  box-shadow: var(--sticker-shadow), inset 0 0 0 2px var(--sticker-border);
+  transform: rotate(-1.2deg);
+}
+.title-plate::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1.5px dashed var(--sticker-ink);
+  border-radius: 14px;
+  opacity: 0.34;
+  pointer-events: none;
 }
 .title-logo {
+  position: relative;
+  z-index: 1;
   margin: 0;
   font-size: clamp(28px, min(6vw, 9vh), 56px);
   font-weight: 900;
-  letter-spacing: .01em;
+  letter-spacing: 0.01em;
   line-height: 1;
   text-align: center;
   white-space: nowrap;
@@ -48,58 +65,100 @@
   position: absolute;
   top: -22px;
   right: -16px;
+  z-index: 2;
   width: 44px;
   height: 48px;
   transform: rotate(14deg);
+  pointer-events: none;
 }
-.title-clover-leaf {
+.title-clover-leaf,
+.title-blossom-leaf {
   fill: var(--sticker-green);
   stroke: var(--sticker-ink);
   stroke-width: 2;
 }
-.title-clover-stem {
+.title-clover-stem,
+.title-blossom-stem {
   fill: none;
   stroke: var(--sticker-ink);
   stroke-linecap: round;
   stroke-width: 2.4;
 }
+.title-blossom {
+  position: absolute;
+  bottom: -16px;
+  left: -16px;
+  z-index: 2;
+  width: 42px;
+  height: 40px;
+  transform: rotate(-10deg);
+  pointer-events: none;
+}
+.title-blossom-petal {
+  fill: #fff9e8;
+  stroke: var(--sticker-ink);
+  stroke-width: 1.8;
+}
+.title-blossom-center {
+  fill: #f2c652;
+  stroke: var(--sticker-ink);
+  stroke-width: 1.8;
+}
 
 .title-options {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   width: min(330px, 100%);
 }
 .title-option,
 .title-confirm-button {
+  position: relative;
   min-height: 48px;
-  padding: 8px 16px;
+  padding: 8px 34px;
   border: 5px solid var(--sticker-rim);
   outline: 2px solid var(--sticker-ink);
   border-radius: 14px;
-  background: var(--sticker-rim);
-  box-shadow: 0 4px 0 var(--sticker-border);
+  background-color: var(--sticker-paper);
+  box-shadow: 0 4px 0 #47321f24, inset 0 0 0 1.5px var(--sticker-border);
   color: var(--sticker-ink);
   cursor: pointer;
   font: inherit;
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 700;
   text-align: center;
-  transition: transform 110ms ease-out, background-color 110ms ease-out;
+  transition: transform 110ms ease-out, background-color 110ms ease-out,
+    box-shadow 110ms ease-out;
 }
 .title-option[aria-selected="true"],
 .title-confirm-button[aria-selected="true"] {
-  background: var(--sticker-green);
+  background-color: var(--sticker-green);
   box-shadow: 0 5px 0 var(--sticker-ink);
-  transform: translateY(-3px) rotate(-1deg);
+  transform: translateY(-2px);
+}
+.title-option[aria-selected="true"]::before,
+.title-confirm-button[aria-selected="true"]::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 2px 8px 2px 8px;
+  background: #ffe27a;
+  box-shadow: 0 0 0 2px var(--sticker-rim);
+  transform: translateY(-50%) rotate(-12deg);
+  pointer-events: none;
 }
 .title-option-label {
   display: block;
 }
 .title-option-detail {
   display: block;
+  color: #362313;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 700;
 }
 
 /* Asking before a new game replaces the save: a modal card over a soft dim. */
@@ -115,32 +174,58 @@
   pointer-events: auto;
 }
 .title-confirm-card {
+  position: relative;
   width: min(440px, calc(100vw - 60px - var(--safe-left) - var(--safe-right)));
   box-sizing: border-box;
   padding: 20px 22px 22px;
   border: 6px solid var(--sticker-rim);
   outline: 2px solid var(--sticker-ink);
   border-radius: 22px;
-  background: var(--sticker-paper);
-  box-shadow: var(--sticker-shadow);
+  background-color: var(--sticker-paper);
+  background-image: linear-gradient(180deg, #fbf6e8 0%, #f5ebd4 100%);
+  box-shadow: var(--sticker-shadow), inset 0 0 0 2px var(--sticker-border);
   text-align: center;
 }
+.title-confirm-card::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1.5px dashed var(--sticker-ink);
+  border-radius: 13px;
+  opacity: 0.34;
+  pointer-events: none;
+}
 .title-confirm-text {
+  position: relative;
+  z-index: 1;
   margin: 4px 0 18px;
   font-size: 19px;
   line-height: 1.35;
+  text-wrap: balance;
 }
 .title-confirm-buttons {
+  position: relative;
+  z-index: 1;
   display: flex;
   gap: 12px;
 }
 .title-confirm-button {
   flex: 1;
+  padding: 8px 16px 8px 26px;
   font-size: 16px;
+}
+.title-confirm-button[aria-selected="true"]::before {
+  left: 9px;
+  width: 9px;
+  height: 9px;
 }
 @media (prefers-reduced-motion: reduce) {
   .title-option,
   .title-confirm-button {
     transition: none;
+  }
+  .title-option[aria-selected="true"],
+  .title-confirm-button[aria-selected="true"] {
+    transform: none;
   }
 }

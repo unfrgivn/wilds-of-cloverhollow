@@ -30,11 +30,8 @@ import {
   type CheckSide,
   type CreditEntry,
   type Direction,
-  type PartyContent,
-  type PartyMember,
   type Point,
   type State,
-  type Surface,
   type World,
 } from "../core";
 import { AreaView, type Rect } from "./area-view";
@@ -89,7 +86,7 @@ export type BattleCheckGeometry =
 // catch where it is, a lean's star where it is).
 export type BattleCheckInfo = BattleCheckGeometry & { side: CheckSide; x: number; y: number };
 import { interpolatePoint, smoothFollowCamera, worldToScreen } from "./camera";
-import { dialogueFacing, dialoguePartner, facingToward, selectFaeAnimation } from "./animation";
+import { dialogueFacing, dialoguePartner, selectFaeAnimation } from "./animation";
 import { assetUrl } from "../platform/assets";
 import { fadeAlpha, transitionZoom } from "./fade";
 import { battleLayout, type BattleLayout } from "./battle-layout";
@@ -101,17 +98,7 @@ import { evaluateOverworldEmotes } from "./emotes";
 import { evaluateClubhouseDisplay } from "./clubhouse-display";
 import type { RestSpot } from "./companions";
 import { storyTimeOfDay, type TimeOfDayPhase } from "./time-of-day";
-import {
-  companionIdlePose,
-  composePose,
-  fairyHover,
-  idleBreathing,
-  NEUTRAL_POSE,
-  roamerHop,
-  sitSquash,
-  walkPose,
-  type MotionPose,
-} from "./motion";
+import { idleBreathing, NEUTRAL_POSE } from "./motion";
 import { computeBattleChoreography } from "./battle-choreography";
 import {
   computeBattleStageMoodLayout,
@@ -119,6 +106,35 @@ import {
   resolveBattleVfxPosition,
   resolveFluteCameoIds,
 } from "./battle-stage";
+import {
+  areaEntityAtlases,
+  computeBackdropTransform,
+  computeCompanionEmoteSpecs,
+  computeCritterShadow,
+  computeFaePose,
+  computeGlowTransform,
+  computeLanternBlend,
+  computeLanternMote,
+  computeNpcOverworldHeight,
+  computeNpcPose,
+  computeNpcShadow,
+  computeOverworldEmoteInputs,
+  computePartyFollowerTransform,
+  computeRoamerBobAndFacing,
+  INDOOR_AREAS,
+  LANTERN_MOTE_COUNT,
+  LANTERN_MOTE_TINTS,
+  liftShadowScale,
+  PET_REACTION_DURATION,
+  resolveNpcTextureFrame,
+  spawnFootstepPuffs,
+  warmFlashTint,
+  type EntityAtlas,
+  type FootstepPuff,
+  type ShadowTransform,
+} from "./overworld-render";
+
+export { areaEntityAtlases, type EntityAtlas };
 
 export type RenderOptions = {
   paused?: boolean;
@@ -126,74 +142,10 @@ export type RenderOptions = {
   previousState?: State;
 };
 
-type FootstepPuff = {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  bornTick: number;
-  life: number;
-  tint: number;
-  baseAlpha: number;
-  baseScale: number;
-  rotation: number;
-};
-
 const FOOTSTEP_POOL_SIZE = 24;
 const BATTLE_VFX_POOL_SIZE = 64;
 const EMOTE_POOL_SIZE = 24;
 const CLUBHOUSE_PRIZES_ALIAS = "clubhouse-prizes";
-const PET_REACTION_DURATION = 42;
-const PET_SPARKLE_TINTS: readonly number[] = [0xff9ebc, 0xf6c94c, 0x67d5c4];
-
-const SURFACE_PUFFS: Record<Surface, { tint: number; alpha: number }> = {
-  sand: { tint: 0xebd7b8, alpha: 0.45 },
-  stone: { tint: 0xebd7b8, alpha: 0.45 },
-  snow: { tint: 0xffffff, alpha: 0.55 },
-  grass: { tint: 0xd3e8a8, alpha: 0.42 },
-  wood: { tint: 0xefe2cc, alpha: 0.2 },
-  tile: { tint: 0xefe2cc, alpha: 0.2 },
-  carpet: { tint: 0xefe2cc, alpha: 0.2 },
-};
-
-function facingBackVector(facing: Direction): Point {
-  if (facing === "left") return { x: 1, y: 0 };
-  if (facing === "right") return { x: -1, y: 0 };
-  if (facing === "up") return { x: 0, y: 1 };
-  return { x: 0, y: -1 };
-}
-
-function liftShadowScale(offsetY: number): number {
-  const lift = Math.max(0, -offsetY);
-  return Math.max(0.76, 1 - lift * 0.02);
-}
-
-function warmFlashTint(flash: number): number {
-  if (flash <= 0.005) return 0xffffff;
-  const t = Math.min(1, Math.max(0, flash));
-  const r = 255;
-  const g = Math.round(255 - (255 - 0xb4) * t);
-  const b = Math.round(255 - (255 - 0xa2) * t);
-  return (r << 16) | (g << 8) | b;
-}
-
-const INDOOR_AREAS = new Set([
-  "bedroom",
-  "kitchen",
-  "school",
-  "east-hall",
-  "classroom",
-  "gym",
-  "music",
-  "art-room",
-  "arcade",
-  "lodge",
-  "clubhouse",
-]);
-
-const ADULT_NPCS = new Set(["mom", "teacher", "nurse", "coach", "music-teacher", "fern"]);
-const LANTERN_MOTE_COUNT = 12;
-const LANTERN_MOTE_TINTS: readonly number[] = [0xd4b0ff, 0xe9d8ff, 0xb69eff];
 
 function makeShadowSprite(texture: Texture, label: string): Sprite {
   const sprite = new Sprite(texture);
@@ -202,40 +154,11 @@ function makeShadowSprite(texture: Texture, label: string): Sprite {
   return sprite;
 }
 
-export type EntityAtlas = { alias: string; src: string };
-
-/**
- * Unique per-area NPC and critter spritesheets, excluding party members
- * (which stay resident across areas). Loaded with the area and evicted on the
- * same current + previous residency window as AreaView textures (spec 4).
- */
-export function areaEntityAtlases(world: World, area: Area): EntityAtlas[] {
-  const seen = new Set<string>();
-  const result: EntityAtlas[] = [];
-  const add = (alias: string, atlas: string): void => {
-    if (seen.has(alias)) return;
-    seen.add(alias);
-    result.push({ alias, src: assetUrl(atlas) });
-  };
-  for (const npc of area.npcs) {
-    if (world.party[npc.id] !== undefined) continue;
-    if (npc.visibleWhenCalmed !== undefined) {
-      const critter = world.critters[npc.visibleWhenCalmed];
-      if (critter !== undefined) add(critter.atlas, critter.atlas);
-      continue;
-    }
-    const character = world.characters[npc.id];
-    if (character !== undefined) add(`${npc.id}-sheet`, character.atlas);
-  }
-  const critterIds = [
-    ...area.critters.map((piece) => piece.id),
-    ...(area.recurring?.dens ?? []).flatMap((den) => den.kinds),
-  ];
-  for (const id of critterIds) {
-    const critter = world.critters[id];
-    if (critter !== undefined) add(critter.atlas, critter.atlas);
-  }
-  return result;
+function applyShadow(sprite: Sprite, shadow: ShadowTransform): void {
+  sprite.position.set(shadow.x, shadow.y);
+  sprite.width = shadow.width;
+  sprite.height = shadow.height;
+  sprite.alpha = shadow.alpha;
 }
 
 function mipmapSheet(alias: string, src: string): Promise<Spritesheet> {
@@ -901,52 +824,6 @@ export class GameView {
     this.currentFrame = selection.frame;
   }
 
-  // A party member's frame: walk frames advance with its own distance; at
-  // rest, a sitter (Maddie) keeps standing (walk frame 0) until sitDelayTicks
-  // and then sits (its idle), anyone else idles at once.
-  private setFollowerTexture(
-    sprite: Sprite,
-    state: State,
-    member: PartyMember,
-    content: PartyContent,
-    partner: Point | null,
-    petting = false,
-  ): { id: string; animation: string; frame: number } {
-    const sheet = Assets.get<Spritesheet>(`${member.id}-sheet`);
-    const settled = !content.sits && !member.motion.moving &&
-      member.stillTicks >= this.world.tunables.follow.settleDelayTicks;
-    const facing = petting && !member.motion.moving
-      ? facingToward(member, state.player)
-      : settled
-        ? (partner !== null ? facingToward(member, partner) : state.facing)
-        : member.facing;
-    const side = facing === "right" ? "left" : facing;
-    const mirror = facing === "right";
-    const resting =
-      !member.motion.moving &&
-      (!content.sits ||
-        member.stillTicks >= this.world.tunables.follow.sitDelayTicks);
-    const animation = resting ? `idle_${side}` : `walk_${side}`;
-    const frames = sheet.animations[animation];
-    if (frames === undefined || frames.length === 0)
-      throw new Error(`Missing ${member.id} animation ${animation}`);
-    const frame = member.motion.moving
-      ? Math.floor(
-          (member.motion.distance / content.walkCycleUnits) * frames.length,
-        ) % frames.length
-      : 0;
-    const texture = frames[frame];
-    if (texture === undefined)
-      throw new Error(`Missing ${member.id} frame ${frame}`);
-    sprite.texture = texture;
-    if (texture.defaultAnchor === undefined)
-      throw new Error(`${member.id} anchor missing`);
-    sprite.anchor.copyFrom(texture.defaultAnchor);
-    const s = content.scale ?? 0.5;
-    sprite.scale.set(mirror ? -s : s, s);
-    return { id: member.id, animation, frame };
-  }
-
   private renderParty(
     state: State,
     shadowAlpha: number,
@@ -971,57 +848,39 @@ export class GameView {
       const pos = prevMember !== undefined && alpha < 1
         ? interpolatePoint(prevMember, member, alpha)
         : member;
-      const beingPetted = activePet !== null && activePet.id === member.id;
-      const frameInfo = this.setFollowerTexture(
-        sprite,
-        state,
+      const sheet = Assets.get<Spritesheet>(`${member.id}-sheet`);
+      const transform = computePartyFollowerTransform(
         member,
         content,
+        state,
+        index,
+        pos,
         partner,
-        beingPetted,
+        shadowAlpha,
+        livingMotion,
+        this.world.tunables.follow,
+        activePet,
+        (animation) => {
+          const frames = sheet.animations[animation];
+          if (frames === undefined || frames.length === 0)
+            throw new Error(`Missing ${member.id} animation ${animation}`);
+          return frames.length;
+        },
       );
-      let pose: MotionPose = NEUTRAL_POSE;
-      if (livingMotion) {
-        const isSideBounder = member.id === "acorn-squirrel" &&
-          (member.facing === "left" || member.facing === "right");
-        if (member.motion.moving) {
-          pose = walkPose(member.motion.distance, content.walkCycleUnits, true, isSideBounder);
-        } else {
-          pose = companionIdlePose(member.id, member.stillTicks, state.tick, index);
-          if (content.sits) {
-            pose = composePose(
-              pose,
-              sitSquash(member.stillTicks, this.world.tunables.follow.sitDelayTicks),
-            );
-          }
-        }
-        if (activePet !== null && activePet.id === member.id) {
-          const e = activePet.elapsed;
-          const decay = Math.max(0, 1 - e / PET_REACTION_DURATION);
-          const hop = Math.abs(Math.sin(e / 4.2));
-          pose = composePose(pose, {
-            offsetX: 0,
-            offsetY: -hop * 14 * (0.45 + 0.55 * decay),
-            scaleX: 1 + (0.08 * (1 - hop) - 0.06 * hop) * decay,
-            scaleY: 1 + (0.08 * hop - 0.06 * (1 - hop)) * decay,
-            rotation: Math.sin(e / 3.8) * 0.12 * decay,
-          });
-        }
-      }
-      sprite.position.set(pos.x + pose.offsetX, pos.y + pose.offsetY);
-      sprite.scale.set(sprite.scale.x * pose.scaleX, sprite.scale.y * pose.scaleY);
-      sprite.rotation = pose.rotation;
-      sprite.zIndex = pos.y;
+      const texture = sheet.animations[transform.animation]?.[transform.frame];
+      if (texture === undefined)
+        throw new Error(`Missing ${member.id} frame ${transform.frame}`);
+      sprite.texture = texture;
+      if (texture.defaultAnchor === undefined)
+        throw new Error(`${member.id} anchor missing`);
+      sprite.anchor.copyFrom(texture.defaultAnchor);
+      sprite.position.set(transform.x, transform.y);
+      sprite.scale.set(transform.scaleX, transform.scaleY);
+      sprite.rotation = transform.rotation;
+      sprite.zIndex = transform.zIndex;
       const shadow = this.partyShadows.get(member.id);
-      if (shadow !== undefined) {
-        const shadowScale = liftShadowScale(pose.offsetY);
-        const shadowWidth = content.box.width * 0.92 * shadowScale;
-        shadow.position.set(pos.x, pos.y);
-        shadow.width = shadowWidth;
-        shadow.height = shadowWidth * 0.38;
-        shadow.alpha = shadowAlpha * shadowScale;
-      }
-      return [frameInfo];
+      if (shadow !== undefined) applyShadow(shadow, transform.shadow);
+      return [{ id: member.id, animation: transform.animation, frame: transform.frame }];
     });
   }
 
@@ -1056,38 +915,9 @@ export class GameView {
       if (delta >= 1 && delta <= 5 && stride > this.lastFootstepStride) {
         const map = this.world.surfaces[areaId];
         const surface = map === undefined ? "grass" : surfaceAt(map, state.player);
-        const style = SURFACE_PUFFS[surface];
-        const back = facingBackVector(state.facing);
-        const side = stride % 2 === 0 ? 1 : -1;
-        const perpX = -back.y;
-        const perpY = back.x;
-        const next: FootstepPuff[] = [
-          {
-            x: playerPos.x + back.x * 8 + perpX * side * 6,
-            y: playerPos.y - 2 + back.y * 5 + perpY * side * 3,
-            vx: back.x * 0.45 + perpX * side * 0.25,
-            vy: back.y * 0.25 - 0.35,
-            bornTick: state.tick,
-            life: 18,
-            tint: style.tint,
-            baseAlpha: style.alpha,
-            baseScale: 0.24,
-            rotation: (stride * 0.7) % (Math.PI * 2),
-          },
-          {
-            x: playerPos.x + back.x * 14 - perpX * side * 5,
-            y: playerPos.y - 1 + back.y * 7 - perpY * side * 3,
-            vx: back.x * 0.6 - perpX * side * 0.18,
-            vy: back.y * 0.2 - 0.45,
-            bornTick: state.tick,
-            life: 18,
-            tint: style.tint,
-            baseAlpha: style.alpha * 0.85,
-            baseScale: 0.18,
-            rotation: (stride * 1.3 + 1.1) % (Math.PI * 2),
-          },
-        ];
-        this.footstepPuffs.push(...next);
+        this.footstepPuffs.push(
+          ...spawnFootstepPuffs(playerPos, state.facing, surface, stride, state.tick),
+        );
         if (this.footstepPuffs.length > FOOTSTEP_POOL_SIZE) {
           this.footstepPuffs = this.footstepPuffs.slice(-FOOTSTEP_POOL_SIZE);
         }
@@ -1111,10 +941,9 @@ export class GameView {
       }
       const age = state.tick - puff.bornTick;
       const u = age / puff.life;
-      const scale = puff.baseScale * (0.65 + u * 0.75);
       sprite.visible = true;
       sprite.position.set(puff.x + puff.vx * age, puff.y + puff.vy * age);
-      sprite.scale.set(scale);
+      sprite.scale.set(puff.baseScale * (0.65 + u * 0.75));
       sprite.rotation = puff.rotation + u * 0.35;
       sprite.tint = puff.tint;
       sprite.alpha = puff.baseAlpha * (1 - u) * (1 - u);
@@ -1197,25 +1026,14 @@ export class GameView {
     const activeRest = this.activeRestSpot(state);
     this.shadowLayer.visible = livingMotion;
     this.setFaeTexture(state, activeRest?.spot.facing);
-    let faePose: MotionPose = !livingMotion
-      ? NEUTRAL_POSE
-      : state.motion.moving
-        ? walkPose(state.motion.distance, this.world.tunables.walkCycleUnits, true)
-        : activeRest !== null
-          ? {
-              offsetX: 0,
-              offsetY: 3,
-              scaleX: 1.04 - Math.sin(activeRest.elapsed * 0.055) * 0.01,
-              scaleY: 0.94 + Math.sin(activeRest.elapsed * 0.055) * 0.015,
-              rotation: Math.sin(activeRest.elapsed * 0.04) * 0.025,
-            }
-          : idleBreathing(state.tick, 0);
-    if (livingMotion && activePet !== null && activePet.elapsed < 22 && !state.motion.moving) {
-      const petMember = state.party.find((item) => item.id === activePet.id);
-      const nodDir = petMember !== undefined && petMember.x < playerPos.x ? -1 : 1;
-      const nod = Math.sin((activePet.elapsed / 22) * Math.PI) * 0.05 * nodDir;
-      faePose = { ...faePose, rotation: faePose.rotation + nod };
-    }
+    const faePose = computeFaePose(
+      state,
+      livingMotion,
+      this.world.tunables.walkCycleUnits,
+      playerPos,
+      activeRest,
+      activePet,
+    );
     this.player.position.set(playerPos.x + faePose.offsetX, playerPos.y + faePose.offsetY);
     this.player.scale.set(
       this.player.scale.x * faePose.scaleX,
@@ -1318,19 +1136,13 @@ export class GameView {
     const area = this.areaView?.area;
     const sheet = Assets.get<Spritesheet>("glow-sheet");
     const on = state.lantern && state.battle === null && state.arcade === null;
-    const target = on ? 1 : 0;
-    if (
-      snapLantern ||
-      this.lanternTick === undefined ||
-      state.tick < this.lanternTick ||
-      state.tick - this.lanternTick > 18
-    ) {
-      this.lanternBlend = target;
-    } else if (state.tick > this.lanternTick) {
-      const delta = state.tick - this.lanternTick;
-      const gap = target - this.lanternBlend;
-      this.lanternBlend += Math.sign(gap) * Math.min(Math.abs(gap), 0.12 * delta);
-    }
+    this.lanternBlend = computeLanternBlend(
+      this.lanternBlend,
+      this.lanternTick,
+      state.tick,
+      on,
+      snapLantern,
+    );
     this.lanternTick = state.tick;
 
     // Blacklight: deep indigo-plum dusk clipped inside viewportMask, paired with
@@ -1349,18 +1161,12 @@ export class GameView {
       for (let i = 0; i < this.lanternMotes.length; i += 1) {
         const mote = this.lanternMotes[i];
         if (mote === undefined) continue;
-        const speed = 0.012 + (i % 4) * 0.004;
-        const angle = (i / this.lanternMotes.length) * Math.PI * 2 +
-          state.tick * speed * (i % 2 === 0 ? 1 : -1);
-        const baseRadius = 46 + ((i * 53) % 165);
-        const radius = baseRadius + Math.sin(state.tick * 0.03 + i * 1.7) * 16;
-        const mx = centerX + Math.cos(angle) * radius;
-        const my = centerY + Math.sin(angle) * radius * 0.72;
-        const twinkle = 0.5 + 0.5 * Math.sin(state.tick * 0.08 + i * 1.9);
-        const scale = 0.24 + (i % 3) * 0.11;
-        mote.position.set(mx, my);
-        mote.scale.set(scale);
-        mote.alpha = (0.24 + 0.36 * twinkle) * this.lanternBlend;
+        const spec = computeLanternMote(
+          i, this.lanternMotes.length, centerX, centerY, state.tick, this.lanternBlend,
+        );
+        mote.position.set(spec.x, spec.y);
+        mote.scale.set(spec.scale);
+        mote.alpha = spec.alpha;
       }
     }
 
@@ -1373,15 +1179,11 @@ export class GameView {
       if (texture !== undefined && glow !== undefined) {
         sprite.texture = texture;
         sprite.position.set(glow.point.x, glow.point.y);
-        const dx = glow.point.x - state.player.x;
-        const dy = glow.point.y - state.player.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const proximity = dist >= 320 ? 0.78 : 0.78 + 0.22 * (1 - dist / 320);
-        const pulse = 0.84 + Math.sin(state.tick / 24 + index * 1.15) * 0.12;
-        const bloom = 1 + 0.025 * Math.sin(state.tick / 18 + index * 1.15);
-        const s = 0.5 * bloom;
-        sprite.scale.set(glow.flip === true ? -s : s, s);
-        sprite.alpha = Math.min(1, pulse * proximity) * Math.max(0.35, this.lanternBlend);
+        const transform = computeGlowTransform(
+          glow, state.player, state.tick, index, this.lanternBlend,
+        );
+        sprite.scale.set(transform.scaleX, transform.scaleY);
+        sprite.alpha = transform.alpha;
         if (sprite.visible) drawn.push(id);
       }
     });
@@ -1568,13 +1370,7 @@ export class GameView {
         const critter = npc.visibleWhenCalmed === undefined
           ? undefined
           : this.world.critters[npc.visibleWhenCalmed];
-        const height = critter !== undefined
-          ? critter.overworldHeight
-          : npc.id === "oliver" || npc.id.startsWith("fairy-")
-            ? 72
-            : ADULT_NPCS.has(npc.id)
-              ? 132
-              : 114;
+        const height = computeNpcOverworldHeight(npc, critter);
         this.activeDialoguePartner = { x: npc.point.x, y: npc.point.y, height };
       } else {
         const calm = present
@@ -1610,68 +1406,13 @@ export class GameView {
       }
     }
 
-    const noticeTicks = this.world.tunables.roam.noticeTicks;
-    const roamers: {
-      x: number;
-      y: number;
-      height: number;
-      notice: number;
-      noticeTicks: number;
-      chasing: boolean;
-    }[] = [];
-    const calmedCritters: { x: number; y: number; height: number; index: number }[] = [];
-    present.forEach((critter, index) => {
-      const roamer = critter.wild;
-      const prevWild = roamer === null || previousState === undefined
-        ? undefined
-        : previousState.wild.find(
-            (item) => item.den === roamer.den && item.kind === roamer.kind,
-          );
-      const point = prevWild !== undefined && alpha < 1
-        ? interpolatePoint(prevWild, critter.point, alpha)
-        : critter.point;
-      if (roamer !== null && critter.mood === "chaos") {
-        roamers.push({
-          x: point.x,
-          y: point.y,
-          height: critter.kind.overworldHeight,
-          notice: roamer.notice,
-          noticeTicks,
-          chasing: roamer.notice >= noticeTicks,
-        });
-      } else if (critter.mood === "calm") {
-        calmedCritters.push({
-          x: point.x,
-          y: point.y,
-          height: critter.kind.overworldHeight,
-          index,
-        });
-      }
-    });
-
-    const nappingMembers: {
-      x: number;
-      y: number;
-      height: number;
-      stillTicks: number;
-      index: number;
-    }[] = [];
-    state.party.forEach((member, index) => {
-      if (member.id !== "maddie") return;
-      const content = this.world.party[member.id];
-      if (content === undefined) return;
-      const prevMember = previousState?.party.find((item) => item.id === member.id);
-      const pos = prevMember !== undefined && alpha < 1
-        ? interpolatePoint(prevMember, member, alpha)
-        : member;
-      nappingMembers.push({
-        x: pos.x,
-        y: pos.y,
-        height: content.box.height,
-        stillTicks: member.stillTicks,
-        index,
-      });
-    });
+    const { roamers, calmedCritters, nappingMembers } = computeOverworldEmoteInputs(
+      this.world,
+      state,
+      present,
+      previousState,
+      alpha,
+    );
 
     const emotes = evaluateOverworldEmotes({
       areaId: area.id,
@@ -1705,64 +1446,31 @@ export class GameView {
       blend: "normal",
     }));
 
-    // Joyful rising hearts + pastel sparkles over a freshly petted companion.
+    let petPos: Point | null = null;
+    let petHeight = 0;
     if (activePet !== null) {
       const member = state.party.find((entry) => entry.id === activePet.id);
       const content = this.world.party[activePet.id];
       if (member !== undefined && content !== undefined) {
         const prevMember = previousState?.party.find((entry) => entry.id === activePet.id);
-        const pos = prevMember !== undefined && alpha < 1
+        petPos = prevMember !== undefined && alpha < 1
           ? interpolatePoint(prevMember, member, alpha)
           : member;
-        const offsets: readonly [number, number, number][] = [
-          [-16, 0, 0.72],
-          [0, 7, 0.82],
-          [16, 14, 0.68],
-        ];
-        offsets.forEach(([dx, delay, baseScale], idx) => {
-          const age = activePet.elapsed - delay;
-          const life = PET_REACTION_DURATION - delay;
-          if (age < 0 || age >= life) return;
-          const progress = age / life;
-          const fadeIn = Math.min(1, (age + 1) / 5);
-          const fadeOut = Math.min(1, (life - age) / 10);
-          items.push({
-            texture: this.vfx.emoteHeart,
-            x: pos.x + dx + Math.sin(progress * Math.PI * 2 + idx) * 4,
-            y: pos.y - content.box.height - 14 - age * 1.15,
-            scale: baseScale * (0.72 + 0.28 * fadeIn),
-            alpha: 0.96 * fadeIn * fadeOut,
-            rotation: Math.sin(progress * Math.PI * 2 + idx) * 0.14,
-            tint: 0xffffff,
-            blend: "normal",
-          });
-          items.push({
-            texture: this.vfx.sparkle,
-            x: pos.x - dx * 1.1 + Math.cos(progress * Math.PI * 2 + idx) * 6,
-            y: pos.y - content.box.height - 4 - age * 0.95,
-            scale: 0.46 + 0.18 * (1 - progress),
-            alpha: 0.94 * fadeIn * fadeOut,
-            rotation: age * 0.08 + idx,
-            tint: PET_SPARKLE_TINTS[idx % PET_SPARKLE_TINTS.length] ?? 0xff9ebc,
-            blend: "normal",
-          });
-        });
+        petHeight = content.box.height;
       }
     }
-
-    // Gentle lazily drifting eighth-note over Fae while cozily resting.
-    if (activeRest !== null) {
-      const cycle = (activeRest.elapsed % 90) / 90;
-      const envelope = Math.sin(cycle * Math.PI);
+    for (const spec of computeCompanionEmoteSpecs(
+      petPos, petHeight, activePet?.elapsed ?? null, playerPos, activeRest?.elapsed ?? null,
+    )) {
       items.push({
-        texture: this.vfx.emoteNote,
-        x: playerPos.x + 12 + Math.sin(cycle * Math.PI * 2) * 6,
-        y: playerPos.y - faeBox.height - 18 - cycle * 22,
-        scale: 0.56 + 0.18 * envelope,
-        alpha: 0.9 * envelope,
-        rotation: Math.sin(cycle * Math.PI * 2) * 0.14,
-        tint: 0xffffff,
-        blend: "normal",
+        texture: this.vfx[spec.textureKey],
+        x: spec.x,
+        y: spec.y,
+        scale: spec.scale,
+        alpha: spec.alpha,
+        rotation: spec.rotation,
+        tint: spec.tint,
+        blend: spec.blend,
       });
     }
 
@@ -1821,11 +1529,8 @@ export class GameView {
         sprite.rotation = pose.rotation;
         sprite.zIndex = npc.point.y;
         if (shadow !== null) {
-          const baseWidth = Math.min(76, Math.max(36, critter.overworldHeight * 0.56));
-          shadow.position.set(npc.point.x, npc.point.y);
-          shadow.width = baseWidth;
-          shadow.height = baseWidth * 0.38;
-          shadow.alpha = shadowAlpha;
+          applyShadow(shadow, computeCritterShadow(npc.point, critter.overworldHeight, 0,
+            shadowAlpha));
         }
         frames.push({ id: npc.id, frame: "calm_idle_01", facing });
         continue;
@@ -1834,63 +1539,25 @@ export class GameView {
       const character = this.world.characters[npc.id];
       if (sheet === undefined || character === undefined) continue;
       const facing = npcFacing(state, npc);
-      const wanted = `idle_${facing}`;
-      const mirror =
-        facing === "right" &&
-        sheet.data.animations?.[wanted] === undefined &&
-        sheet.data.animations?.idle_left !== undefined;
-      const animation = mirror
-        ? "idle_left"
-        : sheet.data.animations?.[wanted] !== undefined
-          ? wanted
-          : "idle_down";
-      const names = sheet.data.animations?.[animation] ?? [];
-      let index = 0;
-      if (
-        animation === "idle_down" &&
-        names.length === character.idleTicks.length
-      ) {
-        const cycle = character.idleTicks.reduce(
-          (sum, ticks) => sum + ticks,
-          0,
-        );
-        let left = state.tick % cycle;
-        while (left >= (character.idleTicks[index] ?? cycle)) {
-          left -= character.idleTicks[index] ?? cycle;
-          index += 1;
-        }
-      }
-      const name = names[index] ?? names[0];
+      const { mirror, frameName: name } = resolveNpcTextureFrame(
+        sheet.data.animations,
+        facing,
+        character.idleTicks,
+        state.tick,
+      );
       const texture = name === undefined ? undefined : sheet.textures[name];
       if (name === undefined || texture === undefined) continue;
       sprite.texture = texture;
       if (texture.defaultAnchor !== undefined)
         sprite.anchor.copyFrom(texture.defaultAnchor);
       const s = character.scale ?? 0.5;
-      const isFairy = npc.id.startsWith("fairy-");
-      const pose = !livingMotion || npc.id === "bus-stop"
-        ? NEUTRAL_POSE
-        : isFairy
-          ? fairyHover(state.tick, npcIndex)
-          : idleBreathing(state.tick, (npcIndex + 1) * 0.9);
+      const pose = computeNpcPose(npc.id, npcIndex, state.tick, livingMotion);
       sprite.scale.set((mirror ? -s : s) * pose.scaleX, s * pose.scaleY);
       sprite.position.set(npc.point.x + pose.offsetX, npc.point.y + pose.offsetY);
       sprite.rotation = pose.rotation;
       sprite.zIndex = npc.point.y;
       if (shadow !== null) {
-        if (isFairy) {
-          const altScale = liftShadowScale(pose.offsetY);
-          shadow.position.set(npc.point.x, npc.point.y + 8);
-          shadow.width = 28 * altScale;
-          shadow.height = 12 * altScale;
-          shadow.alpha = 0.24 * altScale;
-        } else {
-          const width = npc.id === "oliver" ? 34 : ADULT_NPCS.has(npc.id) ? 52 : 48;
-          shadow.position.set(npc.point.x, npc.point.y);
-          shadow.width = width;
-          shadow.height = width * 0.38;
-          shadow.alpha = shadowAlpha;
-        }
+        applyShadow(shadow, computeNpcShadow(npc.id, npc.point, pose, shadowAlpha));
       }
       frames.push({ id: npc.id, frame: name, facing });
     }
@@ -1957,41 +1624,28 @@ export class GameView {
         : logicalPoint;
       const sheet = Assets.get<Spritesheet>(content.atlas);
       if (sheet === undefined) continue;
-      const calm = critter.mood === "calm";
-      const frame = calm ? "calm_idle_01" : "chaos_idle_01";
+      const { calm, frame, flipX, pose } = computeRoamerBobAndFacing(
+        critter,
+        state,
+        index,
+        point,
+        this.world.tunables.roam.noticeTicks,
+        livingMotion,
+      );
       const texture = sheet.textures[frame];
       const auraTexture = sheet.textures.chaos_aura_01;
       if (texture === undefined || auraTexture === undefined) continue;
       const scale = content.overworldHeight / content.figureHeight;
       body.texture = texture;
       body.anchor.set(0.5, 504 / 512);
-      const talking = calm && state.dialogue !== null && state.dialogue.knot === content.calmKnot;
-      const flipX = talking
-        ? state.player.x > point.x
-        : roamer !== null && roamer.facing === "right";
-      const noticeTicks = this.world.tunables.roam.noticeTicks;
-      const pose = !livingMotion
-        ? NEUTRAL_POSE
-        : roamer !== null
-          ? roamerHop(
-              state.tick,
-              roamer.moving,
-              roamer.notice >= noticeTicks,
-              roamer.notice,
-              noticeTicks,
-              roamer.facing,
-            )
-          : idleBreathing(state.tick, (index + 1) * 1.1, calm ? 0.012 : 0.02);
       body.scale.set((flipX ? -scale : scale) * pose.scaleX, scale * pose.scaleY);
       body.position.set(point.x + pose.offsetX, point.y + pose.offsetY);
       body.rotation = pose.rotation;
       body.zIndex = point.y;
-      const baseWidth = Math.min(76, Math.max(36, content.overworldHeight * 0.56));
-      const hopScale = liftShadowScale(pose.offsetY);
-      shadow.position.set(point.x, point.y);
-      shadow.width = baseWidth * hopScale;
-      shadow.height = baseWidth * 0.38 * hopScale;
-      shadow.alpha = shadowAlpha * hopScale;
+      applyShadow(
+        shadow,
+        computeCritterShadow(point, content.overworldHeight, pose.offsetY, shadowAlpha),
+      );
       aura.visible = !calm;
       aura.texture = auraTexture;
       placeAura(
@@ -2030,29 +1684,8 @@ export class GameView {
         x: area.width / 2,
         y: area.height / 2,
       };
-    // Watercolour areas fade to bare paper near their edges (the plaza by
-    // about 120 units at the sides and 50 at the top and bottom), so frame
-    // only the painted interior, 8% in from every side.
-    const insetX = area.width * 0.08;
-    const insetY = area.height * 0.08;
-    const margin = 32;
-    const baseCover = Math.max(
-      (width + margin * 2) / (area.width - insetX * 2),
-      (height + margin * 2) / (area.height - insetY * 2),
-      Math.min(width / this.viewWidth, height / this.viewHeight),
-    );
-    const cover = baseCover * zoom;
-    const clamp = (value: number, low: number, high: number): number =>
-      Math.min(high, Math.max(low, value));
-    const x = clamp(
-      width / 2 - focus.x * cover,
-      width + margin - (area.width - insetX) * cover,
-      -margin - insetX * cover,
-    );
-    const y = clamp(
-      height / 2 - focus.y * cover,
-      height + margin - (area.height - insetY) * cover,
-      -margin - insetY * cover,
+    const transform = computeBackdropTransform(
+      area, focus, width, height, this.viewWidth, this.viewHeight, zoom,
     );
     if (this.backdropTexture === undefined && this.areaView !== undefined) {
       // Blur the painting (the plate with its props) once into a small
@@ -2070,14 +1703,9 @@ export class GameView {
       });
       this.backdropSprite.texture = this.backdropTexture;
     }
-    this.backdropSprite.scale.set(cover);
-    this.backdropSprite.position.set(x, y);
-    this.battleBackdrop = {
-      x,
-      y,
-      width: area.width * cover,
-      height: area.height * cover,
-    };
+    this.backdropSprite.scale.set(transform.cover);
+    this.backdropSprite.position.set(transform.x, transform.y);
+    this.battleBackdrop = transform.bounds;
   }
 
   private renderBattle(

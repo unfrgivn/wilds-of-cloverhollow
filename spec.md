@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 94)
+Last updated: 2026-11-27 (Milestone 97)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -53,7 +53,12 @@ reference material only.
 
 ## 2. Platforms and stack (locked)
 - Ship target: iOS (iPhone and iPad, landscape only) via Capacitor 8.
-  Development and tests run in desktop Chrome/Chromium.
+  Development and tests run in desktop Chrome/Chromium. `index.html` links a
+  standalone landscape web app manifest (`public/manifest.webmanifest`,
+  `#f8edcf` paper theme/background), iOS web-app shell meta tags
+  (`apple-mobile-web-app-capable`, `apple-mobile-web-app-status-bar-style`,
+  `apple-mobile-web-app-title`, `theme-color`, `description`), and an inline
+  four-leaf clover SVG favicon matching the title plate emblem (Milestone 97).
 - Nintendo Switch: deferred. It would be a separate port, so keep content
   portable (Ink, JSON, PNG).
 - Language: TypeScript with `strict`. No `any`; avoid `as` casts by modeling
@@ -438,7 +443,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   At boot, `GameView` loads only permanent core sheets (`fae-sheet`, party
   members in `world.party`, `glow-sheet`, `ambient-sheet`, and the battle toy
   atlas — deduplicating party members that also appear in `world.characters`).
-  Per-area NPC and critter atlases (`areaEntityAtlases`) load on demand with
+  Per-area NPC and critter atlases (`areaEntityAtlases`, extracted with pure
+  stateless overworld render helpers into `src/render/overworld-render.ts` and
+  re-exported from `src/render/view.ts`, alongside reusable primitive/geometry
+  JSON validators in `src/content/parsers.ts`, Milestone 97) load on demand with
   their area (and warm on door fade-out prefetch) and unload on the same
   bounded current + previous area residency window as ground tiles and prop
   atlases, so the way back through a door is a cache hit instead of a reload
@@ -1752,15 +1760,26 @@ trunks keep its two exits.
   readable small-size text.
 
 ### 7.2 Title screen layout
-- The title screen (`src/ui/title.ts`) is the top layer (`--z-title`) over the
-  area painting: the "Wilds of Cloverhollow" wordmark on a tilted cream
-  sticker plate (Nunito 900, a clover sprig in the corner), with choice-style
-  option stickers centred below it, at least 44 px tall.
+- The title screen (`src/ui/title.ts`, Milestone 97 polish) is the top layer
+  (`--z-title`) over a warm radial cream halo (`#fffaf070` -> `#fffaf028` ->
+  `#f8edcf18`) above the area painting: the "Wilds of Cloverhollow" wordmark
+  (`Nunito 900`) on a gently tilted (`-1.2deg`) warm cream-to-ivory parchment
+  die-cut sticker plate (`.title-plate`) with inset warm-brown dashed stitching
+  (`::after`), an upper-right four-leaf clover sprig (`.title-clover`), and a
+  complementary bottom-left botanical wildflower/clover sprig (`.title-blossom`,
+  `aria-hidden="true"`, zero text). Choice-style option stickers sit centred
+  below it, at least 44 px tall: unselected buttons use warm cream paper
+  (`--sticker-paper`), while the selected button uses `--sticker-green` with a
+  subtle spring lift (`translateY(-2px)`), a zero-text CSS leaf/pip selection
+  indicator (`::before`), and deepened dark-espresso detail ink (`#362313`,
+  > 7.5:1 contrast on `--sticker-green`). All transitions and motion respect
+  `prefers-reduced-motion: reduce`.
 - Modes: `fresh` (no save: New game only), `continue` (a save exists:
   Continue, with a detail line saying where Fae is and how many stickers she
   has, then New game), and `confirm` (choosing New game over a save asks
   "Start a new game? Your saved game will be replaced." with "Yes, start over"
-  and "No, go back", No selected by default, on a modal card over a soft dim).
+  and "No, go back", No selected by default, on a stitched parchment modal card
+  over a soft dim, with matching `::before` selection pip).
 - `data-title="open"` on the root hides the touch controls; the option and
   confirm stickers take taps directly, and keys move the selection.
 

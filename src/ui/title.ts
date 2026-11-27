@@ -16,7 +16,7 @@ type Option = { id: TitleChoiceId; button: HTMLButtonElement };
 
 const svgNamespace = "http://www.w3.org/2000/svg";
 
-// A four-leaf clover sprig for the wordmark plate.
+// A four-leaf clover sprig for the upper-right corner of the wordmark plate.
 function cloverIcon(): SVGSVGElement {
   const icon = document.createElementNS(svgNamespace, "svg");
   icon.setAttribute("class", "title-clover");
@@ -35,6 +35,50 @@ function cloverIcon(): SVGSVGElement {
   stem.setAttribute("class", "title-clover-stem");
   stem.setAttribute("d", "M20 21 C21 30 25 37 31 42");
   icon.append(stem);
+  return icon;
+}
+
+// A storybook wildflower and leaf sprig for the bottom-left corner of the plate.
+function blossomIcon(): SVGSVGElement {
+  const icon = document.createElementNS(svgNamespace, "svg");
+  icon.setAttribute("class", "title-blossom");
+  icon.setAttribute("viewBox", "0 0 42 40");
+  icon.setAttribute("aria-hidden", "true");
+  const stem = document.createElementNS(svgNamespace, "path");
+  stem.setAttribute("class", "title-blossom-stem");
+  stem.setAttribute("d", "M29 14 C23 20 15 24 7 29");
+  icon.append(stem);
+  const leaves: readonly [number, number, number, number, string][] = [
+    [28, 24, 7, 4.4, "rotate(-24 28 24)"],
+    [15, 13, 6.5, 4, "rotate(34 15 13)"],
+  ];
+  for (const [cx, cy, rx, ry, transform] of leaves) {
+    const leaf = document.createElementNS(svgNamespace, "ellipse");
+    leaf.setAttribute("class", "title-blossom-leaf");
+    leaf.setAttribute("cx", String(cx));
+    leaf.setAttribute("cy", String(cy));
+    leaf.setAttribute("rx", String(rx));
+    leaf.setAttribute("ry", String(ry));
+    leaf.setAttribute("transform", transform);
+    icon.append(leaf);
+  }
+  const petals: readonly [number, number][] = [
+    [19, 15.8], [24.9, 20.1], [22.6, 27], [15.4, 27], [13.1, 20.1],
+  ];
+  for (const [cx, cy] of petals) {
+    const petal = document.createElementNS(svgNamespace, "circle");
+    petal.setAttribute("class", "title-blossom-petal");
+    petal.setAttribute("cx", String(cx));
+    petal.setAttribute("cy", String(cy));
+    petal.setAttribute("r", "5.2");
+    icon.append(petal);
+  }
+  const center = document.createElementNS(svgNamespace, "circle");
+  center.setAttribute("class", "title-blossom-center");
+  center.setAttribute("cx", "19");
+  center.setAttribute("cy", "22");
+  center.setAttribute("r", "4.2");
+  icon.append(center);
   return icon;
 }
 
@@ -85,7 +129,7 @@ export function createTitleScreen(root: HTMLElement): {
     if (held) qa();
   });
   logo.addEventListener("pointerleave", endPress);
-  plate.append(logo, cloverIcon());
+  plate.append(logo, cloverIcon(), blossomIcon());
   const options = element("div", "title-options");
   options.setAttribute("role", "listbox");
   options.setAttribute("aria-label", "Start");

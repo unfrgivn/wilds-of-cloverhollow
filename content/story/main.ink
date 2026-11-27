@@ -87,6 +87,8 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 {sue_cottage_visited: I visited Sue's mint-green beach cottage up the cove at Bubblegum Bay! She gave me her Sea-Glass Compass and a tip for catching the Golden Starfish Crown. # speaker: Fae}
 {sanctuary_reward_14: Ranger Fern wove me a Sanctuary Clover Wreath for welcoming so many calm critters to the Wildlife Sanctuary! # speaker: Fae}
 {sanctuary_visited and not sanctuary_reward_14: I found the Wildlife Sanctuary east of Clover Hills! Ranger Fern looks after every calm animal who visits the meadow. # speaker: Fae}
+{buster_reward: I filled Buster's Star-Line Stamp Card at Bubblegum Bay and Pinecone Pass, and earned his Golden Star-Line Whistle! # speaker: Fae}
+{buster_quest and not buster_reward: {stamp_bay and stamp_pass: Both stamps are on Buster's Star-Line Stamp Card! Time to show Buster back at the plaza bus stop.|{stamp_bay: I got the Bubblegum Bay wave stamp on Buster's Star-Line Stamp Card! Next: Pinecone Pass's mountain stand.|{stamp_pass: I got the Pinecone Pass pine stamp on Buster's Star-Line Stamp Card! Next: Bubblegum Bay's seaside stand.|Buster gave me a Star-Line Stamp Card! Collect a wave stamp at Bubblegum Bay and a pine stamp at Pinecone Pass.}}} # speaker: Fae}
 {calmed("taco-chef"): I calmed Chef Mateo in Clover Hills by talking about Cloverhollow's taco favorites! He sells crispy taco snacks for 4 coins. # speaker: Fae}
 {taco_chef_out and not calmed("taco-chef"): Chef Mateo is fizzy in Clover Hills, waving his wooden spoon over a spicy taco cloud! # speaker: Fae}
 {calmed("moon-owl"): I calmed the Starry Owl in Whispering Woods with a quiet game of peekaboo! Its Moon Feather sparkles in our chest. # speaker: Fae}
@@ -1902,6 +1904,7 @@ The note from under the comics: "NEXT STOP: THE ARCADE. FIZZ THE HIGH SCORES!" #
 {sanctuary_reward_14: Ranger Fern's woven Sanctuary Clover Wreath! Dried wildflower petals still smell like alpine sunshine. # speaker: Fae}
 {sue_compass: Sue's Sea-Glass Compass from her beach cottage. Its needle always points toward the bay! # speaker: Fae}
 {jordan_clover: Jordan's Pressed Alpine Clover from his grandma's botany book. # speaker: Fae}
+{buster_reward: Buster's Golden Star-Line Whistle! It shines like a tiny bus-stop star. # speaker: Fae}
 Fae closes the lid gently. # speaker: Fae
 -> DONE
 = drawings
@@ -2908,3 +2911,82 @@ Jordan's glowing trail-blaze marks link Pinecone Pass to Crystal Cavern and Clov
 -> DONE
 
 
+// Buster the Bus Driver, Star-Line Stamp Card errand & regional souvenir treat stands (Milestone 97).
+VAR buster_quest = false
+VAR stamp_bay = false
+VAR stamp_pass = false
+VAR buster_reward = false
+
+=== buster ===
+{buster_reward: -> after}
+{buster_quest: -> progress}
+All aboard, kiddo! I'm Buster, driver of the Cloverhollow Star-Line! # speaker: Buster
+My bus loops right from this star sign out to Bubblegum Bay's sandy beach and all the way up to Pinecone Pass's snowy pines. # speaker: Buster
+~ buster_quest = true
+Tell you what: take this Star-Line Stamp Card! Visit Bubblegum Bay's seaside stand for a wave stamp and Pinecone Pass's mountain stand for a pine stamp. # speaker: Buster
+Bring me both stamps, and I've got my lucky Golden Star-Line Whistle plus a travel bonus waiting just for you! # speaker: Buster
+{not club_open: We'll stay parked here until your clues point out of town, then just tap the star sign to hop aboard! # speaker: Buster}
+Deal! I'll fill the whole Star-Line Stamp Card! # speaker: Fae
+-> DONE
+= progress
+{stamp_bay and stamp_pass: -> complete}
+{stamp_bay:
+    Ooh, you've got the Bubblegum Bay wave stamp already! One more to go! # speaker: Buster
+    Next stop is Pinecone Pass's mountain stand for the crisp pine stamp. Hop on at the star sign whenever the mountain route's open! # speaker: Buster
+    -> DONE
+}
+{stamp_pass:
+    Hey, look at that Pinecone Pass pine stamp! Only one stamp left! # speaker: Buster
+    Swing by Bubblegum Bay's seaside stand for the wave stamp, then bring that full card right back to me! # speaker: Buster
+    -> DONE
+}
+Still got two empty star squares on your Star-Line Stamp Card, kiddo! # speaker: Buster
+{not club_open: Once your town clues open the road out to Bubblegum Bay, tap the star sign right here and we'll roll out to the coast and mountains! # speaker: Buster|Visit Bubblegum Bay's seaside stand for a wave stamp and Pinecone Pass's mountain stand for a pine stamp, then come right back! # speaker: Buster}
+-> DONE
+= complete
+Whoa-ho! Let me take a peek at that Star-Line Stamp Card! # speaker: Buster
+Both stamps, shiny as stars! You're an official Star-Line Explorer, Fae! # speaker: Buster
+~ buster_reward = true
+Here's twenty-five shiny coins for your travels... # speaker: Buster # gift: coins 25
+...two fresh road snacks for the backpack... # speaker: Buster # gift: snack 2
+...and my Golden Star-Line Whistle! Keep it safe in your clubhouse chest, kiddo! # speaker: Buster # sound: chime-yellow
+Whoa, a real Golden Star-Line Whistle! Thanks, Buster! # speaker: Fae
+-> DONE
+= after
+All aboard anytime, Star-Line Explorer! Keep that Golden Star-Line Whistle shining bright! # speaker: Buster
+{clubhouse_claimed: Heard your crew fixed up a cozy woodland clubhouse too! Now that's first-class travel! # speaker: Buster}
+{has_flute and not clubhouse_claimed: That wooden flute sounds sweeter than my morning bus horn, kiddo! # speaker: Buster}
+{not has_flute and not clubhouse_claimed: Whenever you want sea air or mountain snow, just tap the star sign down by the southern bus bench! # speaker: Buster}
+-> DONE
+
+=== bay_souvenirs ===
+Welcome to the Bubblegum Bay seaside stand! Fresh pastel Sea-Salt Taffy and sunny bay keepsakes! # speaker: Bay keeper
+{buster_quest and not stamp_bay:
+    ~ stamp_bay = true
+    A Star-Line Stamp Card from Buster? Stamp! One shiny Bubblegum Bay wave stamp, all yours! # speaker: Bay keeper # sound: chime-blue
+}
+{coins() < 9:
+    Sea-Salt Taffy is 9 coins a bag. Come back whenever your pockets jingle! # speaker: Bay keeper
+    -> DONE
+}
++ {coins() >= 9} [Buy Sea-Salt Taffy (9 coins)]
+    One pastel bag of chewy Sea-Salt Taffy! Beach and cavern critters adore it! # speaker: Bay keeper # buy-treat: sea-salt-taffy 9
++ [Not now]
+    Enjoy the ocean breeze, Fae! Stop by anytime! # speaker: Bay keeper
+- -> DONE
+
+=== pass_souvenirs ===
+Welcome to the Pinecone Pass mountain stand! Warm Maple Pine Brittle and snowy keepsakes! # speaker: Pass keeper
+{buster_quest and not stamp_pass:
+    ~ stamp_pass = true
+    Buster's Star-Line Stamp Card! Stamp! One crisp Pinecone Pass pine stamp, ready to roll! # speaker: Pass keeper # sound: chime-green
+}
+{coins() < 11:
+    Maple Pine Brittle is 11 coins a pack. Come warm up again anytime! # speaker: Pass keeper
+    -> DONE
+}
++ {coins() >= 11} [Buy Maple Pine Brittle (11 coins)]
+    Fresh golden Maple Pine Brittle! Mountain and forest critters go cozy-wild for it! # speaker: Pass keeper # buy-treat: maple-brittle 11
++ [Not now]
+    Stay warm out on the snow trails, Fae! # speaker: Pass keeper
+- -> DONE

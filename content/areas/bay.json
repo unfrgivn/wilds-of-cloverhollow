@@ -242,6 +242,15 @@
         "y": 760
       },
       "prompt": "Look"
+    },
+    {
+      "id": "bay-souvenirs",
+      "knot": "bay_souvenirs",
+      "point": {
+        "x": 785,
+        "y": 475
+      },
+      "prompt": "Talk"
     }
   ],
   "critters": [

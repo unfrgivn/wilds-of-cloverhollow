@@ -707,11 +707,24 @@ ios/            Capacitor iOS project (from Milestone 4).
   at (655, 345), knot `grocery`, selling `Orchard Apple` and `Fish Cracker` for
   8 coins each), and the Ice Cream Shop (`ice-cream` at (895, 340), knot
   `ice_cream`, selling `Berry Swirl Cone` for 10 coins and `Cozy Cocoa Sundae`
-  for 12 coins). Specialty treats are authored in `content/treats.json` and
+  for 12 coins). Regional souvenir stands extend specialty treats across the
+  bus line (Milestone 91): Bubblegum Bay's seaside stand (`bay-souvenirs` at
+  (785, 475), knot `bay_souvenirs`, `Bay keeper`) sells `Sea-Salt Taffy` for 9
+  coins, and Pinecone Pass's mountain stand (`pass-souvenirs` at (1135, 920),
+  knot `pass_souvenirs`, `Pass keeper`) sells `Maple Pine Brittle` for 11 coins.
+  Buster the Bus Driver (`buster` in `content/characters.json`, scale `0.48`,
+  adult portrait in `src/ui/portraits.ts`, warm baritone triangle voice in
+  `src/platform/voices.ts`) stands beside the plaza's Star-Line bus stop at
+  (515, 780) (knot `buster`, `Talk`) and hands Fae his Star-Line Stamp Card
+  (`buster_quest`): visiting `bay_souvenirs` stamps `stamp_bay` (`chime-blue`)
+  and `pass_souvenirs` stamps `stamp_pass` (`chime-green`) for free, and
+  returning to Buster awards `+25` coins, `+2` snacks, and his Golden Star-Line
+  Whistle keepsake (`buster_reward`, `chime-yellow`) recorded in the journal
+  and `club_chest`. Specialty treats are authored in `content/treats.json` and
   validated at load (`parseTreats`): unique valid ids, positive integer
   `price`/`energy`/`calm`/`favouriteCalm` (`favouriteCalm >= calm`), and
   non-empty `favourites` species lists covering every critter species in the
-  game.
+  game (six treats total).
 - The arcade (Milestone 29): `arcade`, "Cloverhollow Arcade", a 1200x800
   painted cutaway from `arcade_interior.png` (arcade cabinets, the ticket
   counter, a claw machine, a skee-ball lane, a gumball machine). Its door is on the back-left
@@ -837,7 +850,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   the comics (always: the club is claimed), the hooded kid's marker
   (`saw_hood`), the Star Racer token (`stash_found`), the pond's tin
   (`pond_tin`), the treasure map (`has_map`), a bow from Rosie's kite
-  (`kite_returned`), and the golden acorn (`acorn_found`, Milestone 60). The
+  (`kite_returned`), the golden acorn (`acorn_found`, Milestone 60), and
+  Buster's Golden Star-Line Whistle (`buster_reward`, Milestone 91). The
   journal tells of the freezer, the box in hand, and the chest.
 - Lasso spots (Milestone 49): once Fae has Coach Ash's lasso, three things
   are stuck out of reach, each an added prop (section 6.2) shown while

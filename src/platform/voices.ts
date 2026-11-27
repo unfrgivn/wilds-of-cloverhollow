@@ -277,6 +277,24 @@ const NAMED_VOICES: Record<string, VoiceProfile> = {
     duration: 0.05,
     gain: 0.052,
   },
+  buster: {
+    wave: "triangle",
+    notes: [208, 247, 262, 294],
+    duration: 0.056,
+    gain: 0.056,
+  },
+  "bay keeper": {
+    wave: "sine",
+    notes: [392, 440, 494, 440],
+    duration: 0.048,
+    gain: 0.05,
+  },
+  "pass keeper": {
+    wave: "triangle",
+    notes: [330, 392, 440, 392],
+    duration: 0.05,
+    gain: 0.05,
+  },
   "mr. pip": {
     wave: "triangle",
     notes: [330, 392, 440, 392],

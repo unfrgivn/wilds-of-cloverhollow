@@ -66,6 +66,9 @@ const TOWN_SPEAKERS = new Set([
   "grocer",
   "scoops",
   "cocoa seller",
+  "buster",
+  "bay keeper",
+  "pass keeper",
 ]);
 const FAIRY_SPEAKERS = new Set(["lavender", "mint", "sky", "peach"]);
 const MYSTERY_SPEAKERS = new Set([
@@ -156,6 +159,7 @@ const CHARACTER_MAP: Record<string, readonly [string, PortraitCropMode]> = {
   bree: ["bree", "adult"],
   "ranger fern": ["fern", "adult"],
   fern: ["fern", "adult"],
+  buster: ["buster", "adult"],
   "ms. clover": ["teacher", "adult"],
   "ms. maple": ["teacher", "adult"],
   teacher: ["teacher", "adult"],

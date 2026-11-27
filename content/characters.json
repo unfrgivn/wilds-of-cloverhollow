@@ -155,5 +155,13 @@
       175,
       8
     ]
+  },
+  "buster": {
+    "atlas": "assets/characters/buster/buster.json",
+    "idleTicks": [
+      180,
+      10
+    ],
+    "scale": 0.48
   }
 }

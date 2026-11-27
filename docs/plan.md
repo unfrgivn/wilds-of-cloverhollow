@@ -4615,6 +4615,46 @@ the old trail, the owl, and the clubhouse claim.
   deprecation warnings; production and harness hook checks green), and full
   `CLOVERHOLLOW_E2E_PORT=4311 just e2e` (1,072 passed, 2 skipped in 4.5 min).
 
+## Milestone 98: Buster the Bus Driver, Bus Route Stamp Errand & Regional Souvenir Stands **Status:** ✅ Completed (2026-11-27)
+- Completes `NOTES.md`'s Cloverhollow Bus Driver character slot and adds
+  regional souvenir/treat stops at Bubblegum Bay and Pinecone Pass with zero
+  `src/core` changes, zero save-version bumps, and zero replay hash drift
+  across all 66 recorded sims.
+- Buster the Bus Driver art, voice, portrait & Plaza placement:
+  - Generated Buster's 4-frame watercolor-and-ink blinking idle atlas in a single
+    Gemini call (`art/source/townspeople/buster/sheet-raw.png`,
+    `art/recipes/buster.json`, deterministic builder `tools/art/build-buster.ts`,
+    runtime `public/assets/characters/buster/buster.{webp,json}`, passing
+    `validate-sprite.ts` cleanly and verified via `vision` in
+    `art/review/m91-buster-sheet.jpg`).
+  - Registered `buster` in `content/characters.json` (`scale: 0.48`,
+    `idleTicks: [180, 10]`), added `Buster`, `Bay keeper`, and `Pass keeper` to
+    `TOWN_SPEAKERS` and Buster's adult bust crop in `src/ui/portraits.ts`, and
+    added distinct town voice profiles (warm mellow baritone triangle voice for
+    Buster) in `src/platform/voices.ts`.
+  - Placed Buster on open cobblestones in Cloverhollow Plaza at `(515, 780)`
+    between the notice board and archway — unobstructed on both 1280x720 and
+    874x402 phone viewports and clear of all 66 recorded simulation paths.
+- Star-Line Stamp Card errand & Regional Souvenir Stands:
+  - Added `buster_quest`, `stamp_bay`, `stamp_pass`, `buster_reward` and knots
+    `buster`, `bay_souvenirs`, `pass_souvenirs` to `content/story/main.ink`
+    (compiled to `main.ink.json`), plus dynamic Journal quest notes and
+    `club_chest` Golden Star-Line Whistle keepsake text (+25 coins, +2 snacks).
+  - Added two regional specialty treats to `content/treats.json` (now 6 total):
+    `Sea-Salt Taffy` (9 coins at `bay-souvenirs` `(785, 475)`, favourite of
+    coastal/cavern critters) and `Maple Pine Brittle` (11 coins at
+    `pass-souvenirs` `(1135, 920)`, favourite of mountain/forest critters),
+    automatically flowing through the Battle Treat Tray, Journal Compendium,
+    Journal Treats Strip, and QA console `treats` command.
+- Evidence: `tests/unit/buster-souvenirs.test.ts` (4 tests), updated
+  `tests/unit/treats-compendium.test.ts`, and
+  `tests/e2e/buster-souvenirs.spec.ts` (`@smoke` Chromium + WebKit); all review
+  shots (`art/review/m91-buster-sheet.jpg`, `m91-buster-plaza-1280.jpg`,
+  `m91-buster-plaza-874.jpg`, `m91-bay-souvenirs-1280.jpg`) and refreshed Plaza
+  baselines (`plaza-chromium-darwin.png`, `bus-stop-plaza-chromium-darwin.png`)
+  independently inspected and passed with `vision`.
+- Gates: `just check`, `just build`, and full e2e verified across Chromium & WebKit.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

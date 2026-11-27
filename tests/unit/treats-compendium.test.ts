@@ -100,12 +100,14 @@ function battleState(
 }
 
 describe("specialty treats catalogue & validation", () => {
-  it("loads all 4 treats and covers every critter species across the game", () => {
+  it("loads all 6 treats and covers every critter species across the game", () => {
     expect(world.treats.map((item) => item.id)).toEqual([
       "orchard-apple",
       "fish-cracker",
       "berry-cone",
       "cocoa-sundae",
+      "sea-salt-taffy",
+      "maple-brittle",
     ]);
     const allSpecies = [...new Set(Object.values(world.critters).map((c) => c.species))].sort();
     expect(allSpecies).toHaveLength(world.stickers.catalogue.length);
@@ -412,7 +414,7 @@ describe("journal Critter Compendium & carried treats", () => {
         { id: "curious", label: "Curious" },
         { id: "zoomy", label: "Zoomy" },
       ],
-      favouriteTreats: ["Fish Cracker", "Berry Swirl Cone"],
+      favouriteTreats: ["Fish Cracker", "Berry Swirl Cone", "Sea-Salt Taffy"],
     });
 
     const keeperNote = critterFieldNote(world, ownedFrog, "arcade-keeper");

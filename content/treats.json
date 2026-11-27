@@ -88,6 +88,48 @@
       "description": "Warm fudge and marshmallow swirl from the Ice Cream Shop.",
       "useLine": "Fae shares a Cozy Cocoa Sundae. Warm, sweet, and soothing!",
       "favouriteLine": "A Cozy Cocoa Sundae! Their favourite! Warmth washes all the fizz right away!"
+    },
+    {
+      "id": "sea-salt-taffy",
+      "name": "Sea-Salt Taffy",
+      "price": 9,
+      "energy": 2,
+      "calm": 18,
+      "favouriteCalm": 50,
+      "favourites": [
+        "crab",
+        "frog",
+        "bluebird",
+        "gull",
+        "lifeguard",
+        "penguin",
+        "bat"
+      ],
+      "description": "Chewy pastel saltwater taffy from Bubblegum Bay.",
+      "useLine": "Fae shares sweet Sea-Salt Taffy. Chewy and breezy!",
+      "favouriteLine": "Pastel Sea-Salt Taffy! Their seaside favourite! The fizz drifts right out to sea!"
+    },
+    {
+      "id": "maple-brittle",
+      "name": "Maple Pine Brittle",
+      "price": 11,
+      "energy": 3,
+      "calm": 20,
+      "favouriteCalm": 55,
+      "favourites": [
+        "hamster",
+        "penguin",
+        "lodge-keeper",
+        "owl",
+        "crystal-mole",
+        "bunny",
+        "squirrel",
+        "lamb",
+        "hedgehog"
+      ],
+      "description": "Golden maple crunch from Pinecone Pass.",
+      "useLine": "Fae shares warm Maple Pine Brittle. Sweet and snappy!",
+      "favouriteLine": "Maple Pine Brittle! Their mountain favourite! Cozy smiles all around!"
     }
   ]
 }

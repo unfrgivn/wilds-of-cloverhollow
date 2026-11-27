@@ -540,6 +540,169 @@
         "/#",
         "\n",
         "ev",
+        {
+          "VAR?": "buster_reward"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ I filled Buster's Star-Line Stamp Card at Bubblegum Bay and Pinecone Pass, and earned his Golden Star-Line Whistle! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.35"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "buster_quest"
+        },
+        {
+          "VAR?": "buster_reward"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              "ev",
+              {
+                "VAR?": "stamp_bay"
+              },
+              {
+                "VAR?": "stamp_pass"
+              },
+              "&&",
+              "/ev",
+              [
+                {
+                  "->": ".^.b",
+                  "c": true
+                },
+                {
+                  "b": [
+                    "^ Both stamps are on Buster's Star-Line Stamp Card! Time to show Buster back at the plaza bus stop.",
+                    {
+                      "->": ".^.^.^.8"
+                    },
+                    null
+                  ]
+                }
+              ],
+              [
+                {
+                  "->": ".^.b"
+                },
+                {
+                  "b": [
+                    "ev",
+                    {
+                      "VAR?": "stamp_bay"
+                    },
+                    "/ev",
+                    [
+                      {
+                        "->": ".^.b",
+                        "c": true
+                      },
+                      {
+                        "b": [
+                          "^ I got the Bubblegum Bay wave stamp on Buster's Star-Line Stamp Card! Next: Pinecone Pass's mountain stand.",
+                          {
+                            "->": ".^.^.^.5"
+                          },
+                          null
+                        ]
+                      }
+                    ],
+                    [
+                      {
+                        "->": ".^.b"
+                      },
+                      {
+                        "b": [
+                          "ev",
+                          {
+                            "VAR?": "stamp_pass"
+                          },
+                          "/ev",
+                          [
+                            {
+                              "->": ".^.b",
+                              "c": true
+                            },
+                            {
+                              "b": [
+                                "^ I got the Pinecone Pass pine stamp on Buster's Star-Line Stamp Card! Next: Bubblegum Bay's seaside stand.",
+                                {
+                                  "->": ".^.^.^.5"
+                                },
+                                null
+                              ]
+                            }
+                          ],
+                          [
+                            {
+                              "->": ".^.b"
+                            },
+                            {
+                              "b": [
+                                "^Buster gave me a Star-Line Stamp Card! Collect a wave stamp at Bubblegum Bay and a pine stamp at Pinecone Pass.",
+                                {
+                                  "->": ".^.^.^.5"
+                                },
+                                null
+                              ]
+                            }
+                          ],
+                          "nop",
+                          {
+                            "->": ".^.^.^.5"
+                          },
+                          null
+                        ]
+                      }
+                    ],
+                    "nop",
+                    {
+                      "->": ".^.^.^.8"
+                    },
+                    null
+                  ]
+                }
+              ],
+              "nop",
+              "^ ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.45"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
         "str",
         "^taco-chef",
         "/str",
@@ -559,7 +722,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.38"
+                "->": ".^.^.^.55"
               },
               null
             ]
@@ -593,7 +756,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.51"
+                "->": ".^.^.^.68"
               },
               null
             ]
@@ -622,7 +785,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.61"
+                "->": ".^.^.^.78"
               },
               null
             ]
@@ -656,7 +819,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.74"
+                "->": ".^.^.^.91"
               },
               null
             ]
@@ -681,7 +844,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.81"
+                "->": ".^.^.^.98"
               },
               null
             ]
@@ -720,7 +883,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.93"
+                "->": ".^.^.^.110"
               },
               null
             ]
@@ -745,7 +908,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.100"
+                "->": ".^.^.^.117"
               },
               null
             ]
@@ -770,7 +933,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.107"
+                "->": ".^.^.^.124"
               },
               null
             ]
@@ -800,7 +963,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.117"
+                "->": ".^.^.^.134"
               },
               null
             ]
@@ -830,7 +993,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.127"
+                "->": ".^.^.^.144"
               },
               null
             ]
@@ -855,7 +1018,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.134"
+                "->": ".^.^.^.151"
               },
               null
             ]
@@ -880,7 +1043,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.141"
+                "->": ".^.^.^.158"
               },
               null
             ]
@@ -910,7 +1073,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.151"
+                "->": ".^.^.^.168"
               },
               null
             ]
@@ -935,7 +1098,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.158"
+                "->": ".^.^.^.175"
               },
               null
             ]
@@ -965,7 +1128,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.168"
+                "->": ".^.^.^.185"
               },
               null
             ]
@@ -990,7 +1153,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.175"
+                "->": ".^.^.^.192"
               },
               null
             ]
@@ -1024,7 +1187,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.188"
+                "->": ".^.^.^.205"
               },
               null
             ]
@@ -1053,7 +1216,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.198"
+                "->": ".^.^.^.215"
               },
               null
             ]
@@ -1078,7 +1241,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.205"
+                "->": ".^.^.^.222"
               },
               null
             ]
@@ -1103,7 +1266,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.212"
+                "->": ".^.^.^.229"
               },
               null
             ]
@@ -1128,7 +1291,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.219"
+                "->": ".^.^.^.236"
               },
               null
             ]
@@ -1153,7 +1316,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.226"
+                "->": ".^.^.^.243"
               },
               null
             ]
@@ -1178,7 +1341,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.233"
+                "->": ".^.^.^.250"
               },
               null
             ]
@@ -1208,7 +1371,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.243"
+                "->": ".^.^.^.260"
               },
               null
             ]
@@ -1233,7 +1396,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.250"
+                "->": ".^.^.^.267"
               },
               null
             ]
@@ -1258,7 +1421,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.257"
+                "->": ".^.^.^.274"
               },
               null
             ]
@@ -1288,7 +1451,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.267"
+                "->": ".^.^.^.284"
               },
               null
             ]
@@ -1313,7 +1476,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.274"
+                "->": ".^.^.^.291"
               },
               null
             ]
@@ -1340,7 +1503,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.283"
+                "->": ".^.^.^.300"
               },
               null
             ]
@@ -1365,7 +1528,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.290"
+                "->": ".^.^.^.307"
               },
               null
             ]
@@ -1394,7 +1557,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.300"
+                "->": ".^.^.^.317"
               },
               null
             ]
@@ -1423,7 +1586,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.310"
+                "->": ".^.^.^.327"
               },
               null
             ]
@@ -1457,7 +1620,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.323"
+                "->": ".^.^.^.340"
               },
               null
             ]
@@ -1486,7 +1649,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.333"
+                "->": ".^.^.^.350"
               },
               null
             ]
@@ -1520,7 +1683,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.346"
+                "->": ".^.^.^.363"
               },
               null
             ]
@@ -1554,7 +1717,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.359"
+                "->": ".^.^.^.376"
               },
               null
             ]
@@ -1583,7 +1746,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.369"
+                "->": ".^.^.^.386"
               },
               null
             ]
@@ -1617,7 +1780,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.382"
+                "->": ".^.^.^.399"
               },
               null
             ]
@@ -1642,7 +1805,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.389"
+                "->": ".^.^.^.406"
               },
               null
             ]
@@ -1667,7 +1830,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.396"
+                "->": ".^.^.^.413"
               },
               null
             ]
@@ -1701,7 +1864,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.408"
+                "->": ".^.^.^.425"
               },
               null
             ]
@@ -1726,7 +1889,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.415"
+                "->": ".^.^.^.432"
               },
               null
             ]
@@ -1751,7 +1914,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.422"
+                "->": ".^.^.^.439"
               },
               null
             ]
@@ -1781,7 +1944,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.432"
+                "->": ".^.^.^.449"
               },
               null
             ]
@@ -1811,7 +1974,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.442"
+                "->": ".^.^.^.459"
               },
               null
             ]
@@ -1836,7 +1999,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.449"
+                "->": ".^.^.^.466"
               },
               null
             ]
@@ -1866,7 +2029,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.459"
+                "->": ".^.^.^.476"
               },
               null
             ]
@@ -1896,7 +2059,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.469"
+                "->": ".^.^.^.486"
               },
               null
             ]
@@ -1921,7 +2084,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.476"
+                "->": ".^.^.^.493"
               },
               null
             ]
@@ -1951,7 +2114,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.486"
+                "->": ".^.^.^.503"
               },
               null
             ]
@@ -1981,7 +2144,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.496"
+                "->": ".^.^.^.513"
               },
               null
             ]
@@ -2006,7 +2169,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.503"
+                "->": ".^.^.^.520"
               },
               null
             ]
@@ -2031,7 +2194,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.510"
+                "->": ".^.^.^.527"
               },
               null
             ]
@@ -2061,7 +2224,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.520"
+                "->": ".^.^.^.537"
               },
               null
             ]
@@ -2095,7 +2258,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.533"
+                "->": ".^.^.^.550"
               },
               null
             ]
@@ -2125,7 +2288,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.543"
+                "->": ".^.^.^.560"
               },
               null
             ]
@@ -2150,7 +2313,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.550"
+                "->": ".^.^.^.567"
               },
               null
             ]
@@ -2180,7 +2343,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.560"
+                "->": ".^.^.^.577"
               },
               null
             ]
@@ -2214,7 +2377,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.573"
+                "->": ".^.^.^.590"
               },
               null
             ]
@@ -2248,7 +2411,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.586"
+                "->": ".^.^.^.603"
               },
               null
             ]
@@ -2278,7 +2441,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.596"
+                "->": ".^.^.^.613"
               },
               null
             ]
@@ -2308,7 +2471,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.606"
+                "->": ".^.^.^.623"
               },
               null
             ]
@@ -2338,7 +2501,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.616"
+                "->": ".^.^.^.633"
               },
               null
             ]
@@ -2363,7 +2526,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.623"
+                "->": ".^.^.^.640"
               },
               null
             ]
@@ -2405,7 +2568,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.640"
+                "->": ".^.^.^.657"
               },
               null
             ]
@@ -2439,7 +2602,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.653"
+                "->": ".^.^.^.670"
               },
               null
             ]
@@ -2539,7 +2702,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.663"
+                "->": ".^.^.^.680"
               },
               null
             ]
@@ -2564,7 +2727,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.670"
+                "->": ".^.^.^.687"
               },
               null
             ]
@@ -2594,7 +2757,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.680"
+                "->": ".^.^.^.697"
               },
               null
             ]
@@ -2628,7 +2791,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.692"
+                "->": ".^.^.^.709"
               },
               null
             ]
@@ -2653,7 +2816,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.699"
+                "->": ".^.^.^.716"
               },
               null
             ]
@@ -2683,7 +2846,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.709"
+                "->": ".^.^.^.726"
               },
               null
             ]
@@ -2717,7 +2880,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.722"
+                "->": ".^.^.^.739"
               },
               null
             ]
@@ -2746,7 +2909,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.732"
+                "->": ".^.^.^.749"
               },
               null
             ]
@@ -2775,7 +2938,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.742"
+                "->": ".^.^.^.759"
               },
               null
             ]
@@ -2809,7 +2972,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.755"
+                "->": ".^.^.^.772"
               },
               null
             ]
@@ -2839,7 +3002,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.765"
+                "->": ".^.^.^.782"
               },
               null
             ]
@@ -2864,7 +3027,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.772"
+                "->": ".^.^.^.789"
               },
               null
             ]
@@ -2898,7 +3061,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.784"
+                "->": ".^.^.^.801"
               },
               null
             ]
@@ -2923,7 +3086,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.791"
+                "->": ".^.^.^.808"
               },
               null
             ]
@@ -2952,7 +3115,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.801"
+                "->": ".^.^.^.818"
               },
               null
             ]
@@ -2977,7 +3140,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.808"
+                "->": ".^.^.^.825"
               },
               null
             ]
@@ -3002,7 +3165,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.815"
+                "->": ".^.^.^.832"
               },
               null
             ]
@@ -3039,7 +3202,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.830"
+                "->": ".^.^.^.847"
               },
               null
             ]
@@ -3064,7 +3227,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.837"
+                "->": ".^.^.^.854"
               },
               null
             ]
@@ -3098,7 +3261,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.850"
+                "->": ".^.^.^.867"
               },
               null
             ]
@@ -3127,7 +3290,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.860"
+                "->": ".^.^.^.877"
               },
               null
             ]
@@ -3152,7 +3315,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.867"
+                "->": ".^.^.^.884"
               },
               null
             ]
@@ -3177,7 +3340,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.874"
+                "->": ".^.^.^.891"
               },
               null
             ]
@@ -3207,7 +3370,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.884"
+                "->": ".^.^.^.901"
               },
               null
             ]
@@ -3237,7 +3400,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.894"
+                "->": ".^.^.^.911"
               },
               null
             ]
@@ -3262,7 +3425,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.901"
+                "->": ".^.^.^.918"
               },
               null
             ]
@@ -3291,7 +3454,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.911"
+                "->": ".^.^.^.928"
               },
               null
             ]
@@ -3329,7 +3492,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.927"
+                "->": ".^.^.^.944"
               },
               null
             ]
@@ -3356,7 +3519,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.936"
+                "->": ".^.^.^.953"
               },
               null
             ]
@@ -3385,7 +3548,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.946"
+                "->": ".^.^.^.963"
               },
               null
             ]
@@ -3410,7 +3573,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.953"
+                "->": ".^.^.^.970"
               },
               null
             ]
@@ -3439,7 +3602,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.964"
+                "->": ".^.^.^.981"
               },
               null
             ]
@@ -3468,7 +3631,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.975"
+                "->": ".^.^.^.992"
               },
               null
             ]
@@ -16300,6 +16463,31 @@
         "nop",
         "/#",
         "\n",
+        "ev",
+        {
+          "VAR?": "buster_reward"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Buster's Golden Star-Line Whistle! It shines like a tiny bus-stop star. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.132"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
         "^Fae closes the lid gently. ",
         "#",
         "^speaker: Fae",
@@ -23061,6 +23249,687 @@
           ]
         }
       ],
+      "buster": [
+        "ev",
+        {
+          "VAR?": "buster_reward"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": "buster.after"
+              },
+              {
+                "->": "buster.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        {
+          "VAR?": "buster_quest"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": "buster.progress"
+              },
+              {
+                "->": "buster.10"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^All aboard, kiddo! I'm Buster, driver of the Cloverhollow Star-Line! ",
+        "#",
+        "^speaker: Buster",
+        "/#",
+        "\n",
+        "^My bus loops right from this star sign out to Bubblegum Bay's sandy beach and all the way up to Pinecone Pass's snowy pines. ",
+        "#",
+        "^speaker: Buster",
+        "/#",
+        "\n",
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "buster_quest",
+          "re": true
+        },
+        "^Tell you what: take this Star-Line Stamp Card! Visit Bubblegum Bay's seaside stand for a wave stamp and Pinecone Pass's mountain stand for a pine stamp. ",
+        "#",
+        "^speaker: Buster",
+        "/#",
+        "\n",
+        "^Bring me both stamps, and I've got my lucky Golden Star-Line Whistle plus a travel bonus waiting just for you! ",
+        "#",
+        "^speaker: Buster",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "club_open"
+        },
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ We'll stay parked here until your clues point out of town, then just tap the star sign to hop aboard! ",
+              "#",
+              "^speaker: Buster",
+              {
+                "->": "buster.41"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "^Deal! I'll fill the whole Star-Line Stamp Card! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        {
+          "progress": [
+            "ev",
+            {
+              "VAR?": "stamp_bay"
+            },
+            {
+              "VAR?": "stamp_pass"
+            },
+            "&&",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ ",
+                  {
+                    "->": "buster.complete"
+                  },
+                  {
+                    "->": ".^.^.^.6"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
+            "ev",
+            {
+              "VAR?": "stamp_bay"
+            },
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Ooh, you've got the Bubblegum Bay wave stamp already! One more to go! ",
+                  "#",
+                  "^speaker: Buster",
+                  "/#",
+                  "\n",
+                  "^Next stop is Pinecone Pass's mountain stand for the crisp pine stamp. Hop on at the star sign whenever the mountain route's open! ",
+                  "#",
+                  "^speaker: Buster",
+                  "/#",
+                  "\n",
+                  "done",
+                  {
+                    "->": ".^.^.^.12"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
+            "ev",
+            {
+              "VAR?": "stamp_pass"
+            },
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Hey, look at that Pinecone Pass pine stamp! Only one stamp left! ",
+                  "#",
+                  "^speaker: Buster",
+                  "/#",
+                  "\n",
+                  "^Swing by Bubblegum Bay's seaside stand for the wave stamp, then bring that full card right back to me! ",
+                  "#",
+                  "^speaker: Buster",
+                  "/#",
+                  "\n",
+                  "done",
+                  {
+                    "->": ".^.^.^.18"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
+            "^Still got two empty star squares on your Star-Line Stamp Card, kiddo! ",
+            "#",
+            "^speaker: Buster",
+            "/#",
+            "\n",
+            "ev",
+            {
+              "VAR?": "club_open"
+            },
+            "!",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ Once your town clues open the road out to Bubblegum Bay, tap the star sign right here and we'll roll out to the coast and mountains! ",
+                  "#",
+                  "^speaker: Buster",
+                  {
+                    "->": ".^.^.^.31"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              {
+                "->": ".^.b"
+              },
+              {
+                "b": [
+                  "^Visit Bubblegum Bay's seaside stand for a wave stamp and Pinecone Pass's mountain stand for a pine stamp, then come right back! ",
+                  "/#",
+                  "#",
+                  "^speaker: Buster",
+                  {
+                    "->": ".^.^.^.31"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "complete": [
+            "^Whoa-ho! Let me take a peek at that Star-Line Stamp Card! ",
+            "#",
+            "^speaker: Buster",
+            "/#",
+            "\n",
+            "^Both stamps, shiny as stars! You're an official Star-Line Explorer, Fae! ",
+            "#",
+            "^speaker: Buster",
+            "/#",
+            "\n",
+            "ev",
+            true,
+            "/ev",
+            {
+              "VAR=": "buster_reward",
+              "re": true
+            },
+            "^Here's twenty-five shiny coins for your travels... ",
+            "#",
+            "^speaker: Buster ",
+            "/#",
+            "#",
+            "^gift: coins 25",
+            "/#",
+            "\n",
+            "^...two fresh road snacks for the backpack... ",
+            "#",
+            "^speaker: Buster ",
+            "/#",
+            "#",
+            "^gift: snack 2",
+            "/#",
+            "\n",
+            "^...and my Golden Star-Line Whistle! Keep it safe in your clubhouse chest, kiddo! ",
+            "#",
+            "^speaker: Buster ",
+            "/#",
+            "#",
+            "^sound: chime-yellow",
+            "/#",
+            "\n",
+            "^Whoa, a real Golden Star-Line Whistle! Thanks, Buster! ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "after": [
+            "^All aboard anytime, Star-Line Explorer! Keep that Golden Star-Line Whistle shining bright! ",
+            "#",
+            "^speaker: Buster",
+            "/#",
+            "\n",
+            "ev",
+            {
+              "VAR?": "clubhouse_claimed"
+            },
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ Heard your crew fixed up a cozy woodland clubhouse too! Now that's first-class travel! ",
+                  "#",
+                  "^speaker: Buster",
+                  {
+                    "->": ".^.^.^.9"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "/#",
+            "\n",
+            "ev",
+            {
+              "VAR?": "has_flute"
+            },
+            {
+              "VAR?": "clubhouse_claimed"
+            },
+            "!",
+            "&&",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ That wooden flute sounds sweeter than my morning bus horn, kiddo! ",
+                  "#",
+                  "^speaker: Buster",
+                  {
+                    "->": ".^.^.^.19"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "/#",
+            "\n",
+            "ev",
+            {
+              "VAR?": "has_flute"
+            },
+            "!",
+            {
+              "VAR?": "clubhouse_claimed"
+            },
+            "!",
+            "&&",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ Whenever you want sea air or mountain snow, just tap the star sign down by the southern bus bench! ",
+                  "#",
+                  "^speaker: Buster",
+                  {
+                    "->": ".^.^.^.30"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
+      "bay_souvenirs": [
+        [
+          "^Welcome to the Bubblegum Bay seaside stand! Fresh pastel Sea-Salt Taffy and sunny bay keepsakes! ",
+          "#",
+          "^speaker: Bay keeper",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "VAR?": "buster_quest"
+          },
+          {
+            "VAR?": "stamp_bay"
+          },
+          "!",
+          "&&",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "ev",
+                true,
+                "/ev",
+                {
+                  "VAR=": "stamp_bay",
+                  "re": true
+                },
+                "^A Star-Line Stamp Card from Buster? Stamp! One shiny Bubblegum Bay wave stamp, all yours! ",
+                "#",
+                "^speaker: Bay keeper ",
+                "/#",
+                "#",
+                "^sound: chime-blue",
+                "/#",
+                "\n",
+                {
+                  "->": ".^.^.^.12"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          {
+            "x()": "coins"
+          },
+          9,
+          "<",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^Sea-Salt Taffy is 9 coins a bag. Come back whenever your pockets jingle! ",
+                "#",
+                "^speaker: Bay keeper",
+                "/#",
+                "\n",
+                "done",
+                {
+                  "->": ".^.^.^.20"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          "str",
+          "^Buy Sea-Salt Taffy (9 coins)",
+          "/str",
+          {
+            "x()": "coins"
+          },
+          9,
+          ">=",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 5
+          },
+          "ev",
+          "str",
+          "^Not now",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 4
+          },
+          {
+            "c-0": [
+              "\n",
+              "^One pastel bag of chewy Sea-Salt Taffy! Beach and cavern critters adore it! ",
+              "#",
+              "^speaker: Bay keeper ",
+              "/#",
+              "#",
+              "^buy-treat: sea-salt-taffy 9",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              null
+            ],
+            "c-1": [
+              "\n",
+              "^Enjoy the ocean breeze, Fae! Stop by anytime! ",
+              "#",
+              "^speaker: Bay keeper",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              null
+            ],
+            "g-0": [
+              "done",
+              null
+            ]
+          }
+        ],
+        null
+      ],
+      "pass_souvenirs": [
+        [
+          "^Welcome to the Pinecone Pass mountain stand! Warm Maple Pine Brittle and snowy keepsakes! ",
+          "#",
+          "^speaker: Pass keeper",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "VAR?": "buster_quest"
+          },
+          {
+            "VAR?": "stamp_pass"
+          },
+          "!",
+          "&&",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "ev",
+                true,
+                "/ev",
+                {
+                  "VAR=": "stamp_pass",
+                  "re": true
+                },
+                "^Buster's Star-Line Stamp Card! Stamp! One crisp Pinecone Pass pine stamp, ready to roll! ",
+                "#",
+                "^speaker: Pass keeper ",
+                "/#",
+                "#",
+                "^sound: chime-green",
+                "/#",
+                "\n",
+                {
+                  "->": ".^.^.^.12"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          {
+            "x()": "coins"
+          },
+          11,
+          "<",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^Maple Pine Brittle is 11 coins a pack. Come warm up again anytime! ",
+                "#",
+                "^speaker: Pass keeper",
+                "/#",
+                "\n",
+                "done",
+                {
+                  "->": ".^.^.^.20"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          "str",
+          "^Buy Maple Pine Brittle (11 coins)",
+          "/str",
+          {
+            "x()": "coins"
+          },
+          11,
+          ">=",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 5
+          },
+          "ev",
+          "str",
+          "^Not now",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 4
+          },
+          {
+            "c-0": [
+              "\n",
+              "^Fresh golden Maple Pine Brittle! Mountain and forest critters go cozy-wild for it! ",
+              "#",
+              "^speaker: Pass keeper ",
+              "/#",
+              "#",
+              "^buy-treat: maple-brittle 11",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              null
+            ],
+            "c-1": [
+              "\n",
+              "^Stay warm out on the snow trails, Fae! ",
+              "#",
+              "^speaker: Pass keeper",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              null
+            ],
+            "g-0": [
+              "done",
+              null
+            ]
+          }
+        ],
+        null
+      ],
       "global decl": [
         "ev",
         "str",
@@ -23572,6 +24441,22 @@
         false,
         {
           "VAR=": "jordan_note_read"
+        },
+        false,
+        {
+          "VAR=": "buster_quest"
+        },
+        false,
+        {
+          "VAR=": "stamp_bay"
+        },
+        false,
+        {
+          "VAR=": "stamp_pass"
+        },
+        false,
+        {
+          "VAR=": "buster_reward"
         },
         "/ev",
         "end",

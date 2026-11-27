@@ -537,6 +537,15 @@
         "y": 950
       },
       "prompt": "Look"
+    },
+    {
+      "id": "pass-souvenirs",
+      "knot": "pass_souvenirs",
+      "point": {
+        "x": 1135,
+        "y": 920
+      },
+      "prompt": "Talk"
     }
   ],
   "spawns": {

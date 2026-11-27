@@ -148,5 +148,12 @@
       8
     ],
     "scale": 0.47
+  },
+  "fern": {
+    "atlas": "assets/characters/fern/fern.json",
+    "idleTicks": [
+      175,
+      8
+    ]
   }
 }

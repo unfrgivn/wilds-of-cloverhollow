@@ -160,8 +160,9 @@ export type Npc = {
   facing: Direction;
   footprint: Polygon;
   knot: string;
-  prompt: "Look" | "Talk";
+  prompt: "Look" | "Talk" | "Pet";
   visibleWhile?: string;
+  visibleWhenCalmed?: string;
 };
 export type GroundManifest = {
   paper: string;
@@ -975,6 +976,7 @@ export type BattleView = {
 export type Fixture = {
   area: string; spawn: string; seed?: number; party?: string[];
   variables?: Record<string, boolean>;
+  calms?: Record<string, number>;
 };
 // One friend in the party: member 0 follows Fae, member i follows member i-1,
 // each along its own breadcrumb trail of its leader's recent positions.

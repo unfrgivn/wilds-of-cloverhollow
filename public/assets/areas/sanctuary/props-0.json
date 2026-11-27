@@ -1,0 +1,180 @@
+{
+  "frames": {
+    "hollow-oak": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 700,
+        "h": 993
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 700,
+        "h": 993
+      },
+      "sourceSize": {
+        "w": 700,
+        "h": 993
+      },
+      "anchor": {
+        "x": 0.52571,
+        "y": 0.96979
+      }
+    },
+    "hay-barn": {
+      "frame": {
+        "x": 702,
+        "y": 0,
+        "w": 830,
+        "h": 692
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 830,
+        "h": 692
+      },
+      "sourceSize": {
+        "w": 830,
+        "h": 692
+      },
+      "anchor": {
+        "x": 0.50361,
+        "y": 0.97254
+      }
+    },
+    "bulletin-board": {
+      "frame": {
+        "x": 1534,
+        "y": 0,
+        "w": 250,
+        "h": 374
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 250,
+        "h": 374
+      },
+      "sourceSize": {
+        "w": 250,
+        "h": 374
+      },
+      "anchor": {
+        "x": 0.464,
+        "y": 0.91444
+      }
+    },
+    "hay-trough": {
+      "frame": {
+        "x": 0,
+        "y": 995,
+        "w": 330,
+        "h": 248
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 330,
+        "h": 248
+      },
+      "sourceSize": {
+        "w": 330,
+        "h": 248
+      },
+      "anchor": {
+        "x": 0.48485,
+        "y": 0.94758
+      }
+    },
+    "moss-boulders": {
+      "frame": {
+        "x": 332,
+        "y": 995,
+        "w": 390,
+        "h": 244
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 390,
+        "h": 244
+      },
+      "sourceSize": {
+        "w": 390,
+        "h": 244
+      },
+      "anchor": {
+        "x": 0.48205,
+        "y": 0.9877
+      }
+    },
+    "birdbath": {
+      "frame": {
+        "x": 724,
+        "y": 995,
+        "w": 190,
+        "h": 240
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 190,
+        "h": 240
+      },
+      "sourceSize": {
+        "w": 190,
+        "h": 240
+      },
+      "anchor": {
+        "x": 0.48947,
+        "y": 0.9625
+      }
+    },
+    "picnic-basket": {
+      "frame": {
+        "x": 916,
+        "y": 995,
+        "w": 180,
+        "h": 187
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 180,
+        "h": 187
+      },
+      "sourceSize": {
+        "w": 180,
+        "h": 187
+      },
+      "anchor": {
+        "x": 0.49444,
+        "y": 0.94118
+      }
+    }
+  },
+  "meta": {
+    "image": "props-0.webp",
+    "size": {
+      "w": 2048,
+      "h": 1243
+    },
+    "scale": "1"
+  }
+}

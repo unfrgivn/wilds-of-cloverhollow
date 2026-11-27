@@ -213,6 +213,31 @@
         "area": "woods",
         "spawn": "hills"
       }
+    },
+    {
+      "id": "sanctuary",
+      "polygon": [
+        [
+          1555,
+          375
+        ],
+        [
+          1615,
+          375
+        ],
+        [
+          1615,
+          445
+        ],
+        [
+          1555,
+          445
+        ]
+      ],
+      "target": {
+        "area": "sanctuary",
+        "spawn": "entrance"
+      }
     }
   ],
   "interactables": [
@@ -292,6 +317,11 @@
       "x": 1040,
       "y": 180,
       "facing": "down"
+    },
+    "sanctuary": {
+      "x": 1495,
+      "y": 405,
+      "facing": "left"
     }
   },
   "props": [

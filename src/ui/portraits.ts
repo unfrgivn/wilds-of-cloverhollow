@@ -54,6 +54,8 @@ const TOWN_SPEAKERS = new Set([
   "grandpa barnaby",
   "barnaby",
   "bree",
+  "ranger fern",
+  "fern",
   "ms. coral",
   "lifeguard",
   "mrs. flurry",
@@ -73,7 +75,7 @@ const MYSTERY_SPEAKERS = new Set([
   "mysterious voice",
   "???",
 ]);
-const SIGN_SPEAKERS = new Set(["sign", "notice board", "chalkboard"]);
+const SIGN_SPEAKERS = new Set(["sign", "notice board", "chalkboard", "sanctuary board"]);
 const CRITTER_KEYWORDS = [
   "frog",
   "pup",
@@ -152,6 +154,8 @@ const CHARACTER_MAP: Record<string, readonly [string, PortraitCropMode]> = {
   "grandpa barnaby": ["barnaby", "adult"],
   barnaby: ["barnaby", "adult"],
   bree: ["bree", "adult"],
+  "ranger fern": ["fern", "adult"],
+  fern: ["fern", "adult"],
   "ms. clover": ["teacher", "adult"],
   "ms. maple": ["teacher", "adult"],
   teacher: ["teacher", "adult"],

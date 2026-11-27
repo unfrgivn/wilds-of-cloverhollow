@@ -113,6 +113,9 @@ describe("people in areas", () => {
     expect(() => parseCharacters({ mom: { idleTicks: [8] } }, "c.json")).toThrow(/c.json/);
     for (const area of Object.values(world.areas))
       for (const npc of area.npcs)
-        expect(world.characters[npc.id], `${npc.id} has an atlas`).toBeDefined();
+        if (npc.visibleWhenCalmed !== undefined)
+          expect(world.critters[npc.visibleWhenCalmed], `${npc.id} critter`).toBeDefined();
+        else
+          expect(world.characters[npc.id], `${npc.id} has an atlas`).toBeDefined();
   });
 });

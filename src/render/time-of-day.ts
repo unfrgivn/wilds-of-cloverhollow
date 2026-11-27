@@ -24,6 +24,7 @@ const OUTDOOR_GOLDEN_AREAS = new Set([
   "trail",
   "woods",
   "hills",
+  "sanctuary",
   "field",
 ]);
 

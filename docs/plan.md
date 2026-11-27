@@ -4364,6 +4364,52 @@ the old trail, the owl, and the clubhouse claim.
   (1,062/1,066 passed with zero diffs on first run + 4/4 WebKit 1–11 px WebP
   subpixel baselines refreshed via `--last-failed --update-snapshots`).
 
+## Milestone 92: The Wildlife Sanctuary (Living Calm-Critter Meadow & Ranger Fern) **Status:** ✅ Completed (2026-11-26)
+- New sunlit alpine **Wildlife Sanctuary** meadow (`NOTES.md: 59`,
+  `content/areas/sanctuary.json`, `land: "hills"`, 1650x1100), branching east
+  off Clover Hills's open wildflower gap (`hills.json` trigger `sanctuary` at
+  `x=1555..1615, y=375..445`, return spawn `(1495, 405)` facing left; zero
+  changes to any existing `hills` route or earlier sim):
+  - Painted sanctuary meadow tiled into four 1650x1100 WebP tiles (`paper`
+    `#fcf5ee`) plus a 7-prop depth-sorted alpha-WebP kit (`bulletin-board`,
+    `birdbath`, `hay-trough`, `hay-barn`, `hollow-oak`, `moss-boulders`,
+    `picnic-basket`; 0 warnings, `245 KB` WebP atlas, `rebuilt vs painting
+    0.00%`), `content/surfaces/sanctuary.json` (`grass` default + `sand`
+    footpaths + `carpet` picnic blanket), 5 ambient butterflies, golden meadow
+    sunbeams/pollen/pond glints (`src/render/atmosphere.ts`), story time-of-day
+    support (`src/render/time-of-day.ts`), and `"hills"` / `"forest"` audio.
+- **Living Calm-Animal Residents (`visibleWhenCalmed` + `"Pet"` prompt)**:
+  - Extended `Npc` (`src/core/types.ts`, `src/core/party.ts`, `src/core/roam.ts`,
+    `src/core/sim.ts`, `src/content/load.ts`, `src/render/view.ts`) with
+    optional `visibleWhenCalmed?: string` and `prompt: "Pet"`: all 17 calm
+    animal species across Cloverhollow's valley visibly move into their
+    preferred Sanctuary habitats once calmed (`fountain-frog`, `pup`, `cat`,
+    `raccoon`, `bluebird`, `crab`, `hamster`, `penguin`, `bunny`, `squirrel`,
+    `gull`, `owl`, `lamb`, `hedgehog`, `bat`, `crystal-mole`, `moon-owl`),
+    rendered directly from their existing `calm_idle_01` WebP atlases loaded on
+    demand (zero duplicate art, zero boot cost, zero sticker-count churn), each
+    with a unique cozy `pet_*` dialogue and chime cue.
+- **Ranger Fern & Sanctuary Milestones**:
+  - New blinking Sanctuary Caretaker NPC (`fern`, built deterministically as
+    alpha WebP by `tools/art/build-fern.ts`, 72 KB, registered in
+    `content/characters.json`, `src/ui/portraits.ts`, and `src/platform/voices.ts`).
+  - `ranger_fern` tracks live `sanctuary_count()` (`N of 17` valley animals)
+    and grants progressive rewards at 3+ (`+15` coins, `+1` snack), 8+ (`+25`
+    coins, `+2` snacks), and 14+ (`+40` coins, `+2` snacks, plus the
+    **Sanctuary Clover Wreath** keepsake in `club_chest`), alongside
+    `sanctuary_board`, `sanctuary_picnic` (party meadow picnic + once-only
+    basket snack), and `sanctuary_barn` (zero Milo mentions).
+- Evidence: `tests/unit/sanctuary.test.ts`, `tests/unit/sanctuary-replay.test.ts`,
+  recorded run `tests/sim/scripts/new-game/sanctuary.json` (15,416 ticks, all
+  65 prior runs unchanged), real-key `tests/e2e/sanctuary.spec.ts` matching
+  Bun's exact hash at 1280x720 and 874x402, and `vision`-reviewed
+  `art/review/sanctuary-{overlay,depth,frames,gameplay}.jpg` and
+  `art/review/sanctuary-fern-{cream,dark}.jpg`.
+- Gates: `just check` (152 unit files / 1,207 tests, 66 sims with zero shifted
+  prior runs, 23 QA packs, purity, lint), `just build` (production and harness
+  hook checks), and full `CLOVERHOLLOW_E2E_PORT=4215 just e2e` (1,067 passed,
+  2 skipped across Chromium & WebKit).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

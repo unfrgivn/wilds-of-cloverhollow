@@ -191,7 +191,7 @@ const INDOOR_AREAS = new Set([
   "clubhouse",
 ]);
 
-const ADULT_NPCS = new Set(["mom", "teacher", "nurse", "coach", "music-teacher"]);
+const ADULT_NPCS = new Set(["mom", "teacher", "nurse", "coach", "music-teacher", "fern"]);
 const LANTERN_MOTE_COUNT = 12;
 const LANTERN_MOTE_TINTS: readonly number[] = [0xd4b0ff, 0xe9d8ff, 0xb69eff];
 
@@ -219,6 +219,11 @@ export function areaEntityAtlases(world: World, area: Area): EntityAtlas[] {
   };
   for (const npc of area.npcs) {
     if (world.party[npc.id] !== undefined) continue;
+    if (npc.visibleWhenCalmed !== undefined) {
+      const critter = world.critters[npc.visibleWhenCalmed];
+      if (critter !== undefined) add(critter.atlas, critter.atlas);
+      continue;
+    }
     const character = world.characters[npc.id];
     if (character !== undefined) add(`${npc.id}-sheet`, character.atlas);
   }
@@ -1552,11 +1557,16 @@ export class GameView {
           item.knot === knot,
       );
       if (npc !== undefined) {
-        const height = npc.id === "oliver" || npc.id.startsWith("fairy-")
-          ? 72
-          : ADULT_NPCS.has(npc.id)
-            ? 132
-            : 114;
+        const critter = npc.visibleWhenCalmed === undefined
+          ? undefined
+          : this.world.critters[npc.visibleWhenCalmed];
+        const height = critter !== undefined
+          ? critter.overworldHeight
+          : npc.id === "oliver" || npc.id.startsWith("fairy-")
+            ? 72
+            : ADULT_NPCS.has(npc.id)
+              ? 132
+              : 114;
         this.activeDialoguePartner = { x: npc.point.x, y: npc.point.y, height };
       } else {
         const calm = present
@@ -1780,13 +1790,41 @@ export class GameView {
   ): void {
     const frames: { id: string; frame: string; facing: string }[] = [];
     for (const [npcIndex, { npc, sprite, shadow }] of this.npcSprites.entries()) {
-      const sheet = Assets.get<Spritesheet>(`${npc.id}-sheet`);
-      const character = this.world.characters[npc.id];
-      // Someone the story has sent away isn't drawn (spec 6).
+      // Someone the story has sent away or hasn't calmed yet isn't drawn (spec 6).
       sprite.visible = npcVisible(this.world, state, npc);
       if (shadow !== null) shadow.visible = sprite.visible;
-      if (sheet === undefined || character === undefined || !sprite.visible)
+      if (!sprite.visible) continue;
+      if (npc.visibleWhenCalmed !== undefined) {
+        const critter = this.world.critters[npc.visibleWhenCalmed];
+        const sheet = critter === undefined ? undefined : Assets.get<Spritesheet>(critter.atlas);
+        const texture = sheet?.textures.calm_idle_01;
+        if (critter === undefined || texture === undefined) continue;
+        const facing = npcFacing(state, npc);
+        const talking = state.dialogue !== null && state.dialogue.knot === npc.knot;
+        const flipX = talking ? state.player.x > npc.point.x : npc.facing === "right";
+        const scale = critter.overworldHeight / critter.figureHeight;
+        const pose = !livingMotion
+          ? NEUTRAL_POSE
+          : idleBreathing(state.tick, (npcIndex + 1) * 1.1, 0.012);
+        sprite.texture = texture;
+        sprite.anchor.set(0.5, 504 / 512);
+        sprite.scale.set((flipX ? -scale : scale) * pose.scaleX, scale * pose.scaleY);
+        sprite.position.set(npc.point.x + pose.offsetX, npc.point.y + pose.offsetY);
+        sprite.rotation = pose.rotation;
+        sprite.zIndex = npc.point.y;
+        if (shadow !== null) {
+          const baseWidth = Math.min(76, Math.max(36, critter.overworldHeight * 0.56));
+          shadow.position.set(npc.point.x, npc.point.y);
+          shadow.width = baseWidth;
+          shadow.height = baseWidth * 0.38;
+          shadow.alpha = shadowAlpha;
+        }
+        frames.push({ id: npc.id, frame: "calm_idle_01", facing });
         continue;
+      }
+      const sheet = Assets.get<Spritesheet>(`${npc.id}-sheet`);
+      const character = this.world.characters[npc.id];
+      if (sheet === undefined || character === undefined) continue;
       const facing = npcFacing(state, npc);
       const wanted = `idle_${facing}`;
       const mirror =

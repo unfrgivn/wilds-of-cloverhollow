@@ -1,0 +1,48 @@
+{
+  "asset": "sanctuary",
+  "date": "2026-11-26",
+  "summary": "The Wildlife Sanctuary (NOTES.md: 59), a 1650x1100 sunlit alpine wildflower meadow branching east off Clover Hills: four 1650x1100 WebP tiles (paper #fcf5ee) and a 7-prop depth-sorted area kit (bulletin-board, birdbath, hay-trough, hay-barn, hollow-oak, moss-boulders, picnic-basket; 0 warnings, 1 atlas page 9.7 MB decoded, rebuilt vs painting 0.00%).",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 16,
+  "references": [
+    "art/source/areas/hills/hills-final.png",
+    "art/source/areas/woods/woods-final.png"
+  ],
+  "steps": [
+    {
+      "what": "Two 4K 3:2 candidates for the Wildlife Sanctuary meadow.",
+      "calls": 2,
+      "outputs": [
+        "art/scratch/1795754973301-gemini-3-pro-image-preview-0.png",
+        "art/scratch/1795754974526-gemini-3-pro-image-preview-0.png"
+      ],
+      "selected": "1795754973301 resized with Lanczos to 3300x2200 and tiled into four 1650x1100 WebP tiles (open timber archway entrance, broad uncluttered meadow with ample spacing for all 17 calm animal visitors)."
+    },
+    {
+      "what": "Area kit isolation (7 subjects x 2 samples = 14 calls) via art/kit/sanctuary.json; 0 warnings, 1 atlas page (9.7 MB decoded), rebuilt vs painting 0.00%.",
+      "calls": 14,
+      "config": "art/kit/sanctuary.json"
+    }
+  ],
+  "commands": [
+    "bun tools/art/kit.ts sanctuary gen",
+    "bun tools/art/kit.ts sanctuary masks",
+    "bun tools/art/kit.ts sanctuary fill",
+    "bun tools/art/kit.ts sanctuary pack",
+    "bun tools/art/kit.ts sanctuary place"
+  ],
+  "subjects": [
+    "bulletin-board",
+    "birdbath",
+    "hay-trough",
+    "hay-barn",
+    "hollow-oak",
+    "moss-boulders",
+    "picnic-basket"
+  ],
+  "outputs": {
+    "painting": "art/source/areas/sanctuary/painting/ground.json",
+    "atlas": "public/assets/areas/sanctuary/props-0.json",
+    "catalogue": "content/props/sanctuary.json"
+  }
+}

@@ -38,6 +38,24 @@ export function partyCommand(world: World, id: string): PartyContent["command"] 
   return world.party[id]?.command ?? null;
 }
 
+export function isSpeciesCalmed(
+  world: World,
+  state: State,
+  species: string,
+): boolean {
+  const critter = world.critters[species];
+  const resolved = critter?.species ?? species;
+  return (
+    (state.calms[resolved] ?? 0) > 0 ||
+    (state.calms[species] ?? 0) > 0 ||
+    state.critters[species] === "calm" ||
+    (critter !== undefined && state.stickers.includes(critter.sticker.id)) ||
+    Object.entries(state.critters).some(
+      ([id, mood]) => mood === "calm" && world.critters[id]?.species === resolved,
+    )
+  );
+}
+
 export function npcVisible(
   world: World,
   state: State,
@@ -46,7 +64,9 @@ export function npcVisible(
   return (
     !state.party.some((member) => member.id === npc.id) &&
     (npc.visibleWhile === undefined ||
-      world.storyVariable(state.ink, npc.visibleWhile) === true)
+      world.storyVariable(state.ink, npc.visibleWhile) === true) &&
+    (npc.visibleWhenCalmed === undefined ||
+      isSpeciesCalmed(world, state, npc.visibleWhenCalmed))
   );
 }
 

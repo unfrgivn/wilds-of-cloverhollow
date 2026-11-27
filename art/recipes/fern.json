@@ -1,0 +1,19 @@
+{
+  "asset": "fern",
+  "date": "2026-11-26",
+  "summary": "Ranger Fern, the Wildlife Sanctuary caretaker NPC: blinking 4x1 atlas (down_idle_01, down_idle_02 happy blink, left_idle_01, right_idle_01) at 448x448 frames, baseline 439, built from a spotless 2x2 flat-magenta sheet.",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 1,
+  "references": [
+    "docs/art/concepts/npcs/fae_family.png",
+    "art/source/townspeople/barnaby/sheet-raw.png"
+  ],
+  "kept": "art/source/sanctuary/fern/sheet-raw.png",
+  "commands": [
+    "bun tools/art/build-fern.ts"
+  ],
+  "review": [
+    "art/review/sanctuary-fern-cream.jpg",
+    "art/review/sanctuary-fern-dark.jpg"
+  ]
+}

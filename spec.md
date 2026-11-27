@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-26 (Milestone 88)
+Last updated: 2026-11-26 (Milestone 92)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -1059,6 +1059,31 @@ ios/            Capacitor iOS project (from Milestone 4).
   atmosphere (`src/render/atmosphere.ts`) adds warm counter glows, two NW
   window sunbeams, and ten rising cocoa-steam motes; its soundtrack plays
   `"cafe"` ("Cinnamon Waltz") with `"cafe-murmur"` ambience (`src/core/music.ts`).
+- The Wildlife Sanctuary: `sanctuary`, "Wildlife Sanctuary", in the `hills`
+  land, a 1650x1100 sunlit alpine meadow branching east off Clover Hills
+  (`hills` trigger `sanctuary` at x=1555..1615, y=375..445 ->
+  `sanctuary.entrance` at (545, 710) facing right; return trigger `hills` at
+  the SW timber archway road x=140..310, y=800..910 -> `hills.sanctuary` at
+  (1495, 405) facing left). Its 7-prop depth-sorted kit lifts `bulletin-board`,
+  `birdbath`, `hay-trough`, `hay-barn`, `hollow-oak` (canopy), `moss-boulders`,
+  and `picnic-basket`, with the NW lily pond as a solid water blocker, 5
+  ambient butterflies, grass default surface with sand footpaths and a carpet
+  gingham picnic blanket, and three Look spots (`sanctuary-board`,
+  `sanctuary-picnic`, `sanctuary-barn`). Caretaker Ranger Fern (`fern` in
+  `content/characters.json`, `ranger_fern`) welcomes Fae (`sanctuary_visited`),
+  counts calmed valley animals (`sanctuary_count()` out of 17), and awards
+  progressive rewards at 3 (`sanctuary_reward_3`: +15 coins, +1 snack), 8
+  (`sanctuary_reward_8`: +25 coins, +2 snacks), and 14+ (`sanctuary_reward_14`:
+  +40 coins, +2 snacks, plus the Sanctuary Clover Wreath keepsake in
+  `club_chest`). All 17 calmed valley animal species (`fountain-frog`, `pup`,
+  `cat`, `raccoon`, `bluebird`, `crab`, `hamster`, `penguin`, `bunny`,
+  `squirrel`, `gull`, `owl`, `lamb`, `hedgehog`, `bat`, `crystal-mole`,
+  `moon-owl`) visit their meadow habitats as `visibleWhenCalmed` NPCs with
+  `prompt: "Pet"` and unique `pet_*` reactions. Its fixture `sanctuary`
+  populates 8 calmed animals with Maddie, Sue, and Jordan; its atmosphere adds
+  warm alpine sunbeams, NW lily-pond water glints, and golden wildflower pollen
+  motes; its soundtrack plays `"hills"` ("Clover Meadow") with `"forest"`
+  ambience.
 - The lifeguard (Milestone 64): once Sue has joined (`sue_joined`), the bay's
   picnic leads on (`bay_picnic.back`): a whistle blasts, and the picnic's
   owner, Ms. Coral, the bay's lifeguard, is back and fizzy (`lifeguard_back`),
@@ -1195,32 +1220,38 @@ ios/            Capacitor iOS project (from Milestone 4).
   only where a link turns her round (the bay's south edge and the trail's
   beach), where a kid holding down would otherwise bounce between them.
 - People: an area's `npcs` are `{ id, point, facing, knot, prompt, footprint,
-  visibleWhile? }` (Ms. Maple the teacher and Nurse Holly in the school
-  hallway, and the kid in the purple hood there for a moment; Ms. Maple,
-  Milo, and Rosie in the classroom; Coach Ash in the gym; Mom and Oliver in
-  the kitchen). Each is
-  drawn from the atlas named for its id in
-  `content/characters.json` (`{ atlas, idleTicks, scale? }`, where `idleTicks`
-  are the ticks per `idle_down` frame: Mom holds her smile 180 ticks, then
-  blinks for 8, and optional positive finite `scale` defaults to `0.5`, with
-  `0.46` for Sue and Jordan and `0.47` for Rosie), y-sorted with everyone else,
-  and targeted like an interactable. Every NPC must have at least one reachable
-  floor point within `interact.range` (`areaConnectionErrors`). While Fae talks
-  to one (the dialogue's knot is theirs), they face her along the larger axis
-  of the gap between them (`npcFacing`), mirroring `idle_left` when facing
-  right without an `idle_right` animation, and Fae turns render-only toward her
-  conversation partner (`dialogueFacing`, also for calm critters, which mirror
-  toward Fae while speaking); otherwise people face as authored. Without a
-  frame for that facing they show their front.
+  visibleWhile?, visibleWhenCalmed? }` (Ms. Maple the teacher and Nurse Holly
+  in the school hallway, and the kid in the purple hood there for a moment; Ms.
+  Maple, Milo, and Rosie in the classroom; Coach Ash in the gym; Mom and Oliver
+  in the kitchen; Ranger Fern and the 17 calm-animal visitors in the Wildlife
+  Sanctuary). `prompt` is `"Look"`, `"Talk"`, or `"Pet"`. Regular NPCs are
+  drawn from the atlas named for their id in `content/characters.json` (`{ atlas,
+  idleTicks, scale? }`, where `idleTicks` are the ticks per `idle_down` frame:
+  Mom holds her smile 180 ticks, then blinks for 8, and optional positive finite
+  `scale` defaults to `0.5`, with `0.46` for Sue and Jordan and `0.47` for
+  Rosie); an NPC with `visibleWhenCalmed` names a critter kind in
+  `world.critters`, renders its `calm_idle_01` frame scaled to
+  `overworldHeight / figureHeight` with gentle calm breathing and a contact
+  shadow, and appears only once `isSpeciesCalmed(world, state, species)` is
+  true. Everyone is y-sorted with the party and props, and targeted like an
+  interactable. Every NPC must have at least one reachable floor point within
+  `interact.range` (`areaConnectionErrors`). While Fae talks to one (the
+  dialogue's knot is theirs), they face her along the larger axis of the gap
+  between them (`npcFacing`), mirroring `idle_left` when facing right without an
+  `idle_right` animation, and Fae turns render-only toward her conversation
+  partner (`dialogueFacing`, also for calm critters, which mirror toward Fae
+  while speaking); otherwise people face as authored. Without a frame for that
+  facing they show their front.
   Standing props such as the plaza bus stop use the same person entry and
   y-sorted renderer, but are props rather than people.
 - A person's `footprint` polygon is solid, for Fae and for the party, like a
-  blocker. A person with `visibleWhile` (an Ink variable) is only there while
-  it's true; otherwise they aren't drawn, can't be talked to, and aren't
-  solid (`npcVisible`). The area checks count every footprint as solid, since
-  someone may be standing there. Story variables are read per tick through
-  `world.storyVariable(ink, name)`: one Story built at load, reused for each
-  read, since building one costs about 0.2 ms.
+  blocker. A person with `visibleWhile` (an Ink variable) or
+  `visibleWhenCalmed` (a calmed critter kind/species) is only there while those
+  conditions hold; otherwise they aren't drawn, can't be talked to or petted,
+  and aren't solid (`npcVisible`). The area checks count every footprint as
+  solid, since someone may be standing there. Story variables are read per tick
+  through `world.storyVariable(ink, name)`: one Story built at load, reused for
+  each read, since building one costs about 0.2 ms.
 - Area paintings: opaque WebP tiles (each at most 2048x2048) at 2 source px
   per unit, listed in `public/assets/areas/<id>/ground.json` (tile offsets in
   source px and the painting's `paper` margin colour). The paper colour fills

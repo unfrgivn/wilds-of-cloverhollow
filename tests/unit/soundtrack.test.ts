@@ -69,6 +69,7 @@ describe("soundtrackFor", () => {
       cafe: ["cafe", "cafe-murmur"],
       park: ["home", "town-breeze"],
       hills: ["hills", "town-breeze"],
+      sanctuary: ["hills", "forest"],
       school: ["school", "none"],
       "east-hall": ["school", "none"],
       classroom: ["school", "none"],

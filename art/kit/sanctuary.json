@@ -1,0 +1,89 @@
+{
+  "area": "sanctuary",
+  "subjects": [
+    {
+      "id": "bulletin-board",
+      "crop": [435, 685, 175, 225],
+      "seed": [520, 775],
+      "home": [521, 878],
+      "painted": true,
+      "canopy": false,
+      "ground": "the sunlit green meadow grass beside the wooden fence",
+      "object": "the complete freestanding two-post wooden sanctuary bulletin board with its overhanging top rail, pinned paper flyers, both timber posts, and warm-brown ink outline down to the grass; not the fence behind it or meadow grass",
+      "footprint": [[[472, 836], [570, 868], [566, 886], [468, 852]]]
+    },
+    {
+      "id": "birdbath",
+      "crop": [550, 155, 140, 165],
+      "seed": [622, 235],
+      "home": [622, 294],
+      "painted": true,
+      "canopy": false,
+      "ground": "the sunlit green meadow grass",
+      "object": "the complete freestanding fluted stone birdbath with its water basin, small sculpted rim ornament, pedestal, and base down to the grass; not the meadow grass or distant fence",
+      "footprint": [[[594, 272], [650, 272], [652, 294], [592, 294]]]
+    },
+    {
+      "id": "hay-trough",
+      "crop": [850, 195, 210, 170],
+      "seed": [955, 268],
+      "home": [955, 336],
+      "painted": true,
+      "canopy": false,
+      "ground": "the sunlit green meadow grass",
+      "object": "the complete freestanding wooden slatted hay feeding trough brimming with golden hay, including all four wooden legs and warm-brown ink outline; not the meadow grass or fence",
+      "footprint": [[[882, 292], [1026, 286], [1026, 310], [924, 338], [882, 320]]]
+    },
+    {
+      "id": "hay-barn",
+      "crop": [1040, 30, 445, 385],
+      "seed": [1235, 210],
+      "home": [1270, 390],
+      "painted": true,
+      "canopy": false,
+      "ground": "the sunlit green meadow grass and pale sandy path",
+      "object": "the complete cozy small timber-and-terracotta-roofed sanctuary hay barn, including its scalloped shingle roof, side lean-to hay shelter, stacked golden hay bale along its left wall, wooden walls, and warm-brown ink outline down to the ground; not the pine trees behind it, fence, or open grass",
+      "footprint": [[[1064, 278], [1165, 240], [1450, 324], [1448, 350], [1336, 392], [1252, 356], [1095, 308]]]
+    },
+    {
+      "id": "hollow-oak",
+      "crop": [1255, 330, 395, 530],
+      "seed": [1465, 560],
+      "home": [1465, 832],
+      "painted": true,
+      "canopy": true,
+      "samples": { "object": 2 },
+      "ground": "the sunlit green meadow grass",
+      "object": "the complete large mid-east hollow oak tree, including its broad layered green watercolor leafy canopy, thick gnarled brown trunk with dark hollow opening, spreading base roots, and warm-brown ink outline; not the two grey mossy boulders to its left or open grass",
+      "footprint": [[[1382, 774], [1540, 774], [1565, 818], [1488, 838], [1380, 822]]]
+    },
+    {
+      "id": "moss-boulders",
+      "crop": [1190, 635, 235, 190],
+      "seed": [1295, 735],
+      "home": [1310, 786],
+      "painted": true,
+      "canopy": false,
+      "samples": { "object": 2 },
+      "core": 2,
+      "exclude": [
+        [[1408, 630], [1430, 630], [1430, 830], [1408, 830]],
+        [[1340, 630], [1430, 630], [1430, 672], [1340, 672]]
+      ],
+      "ground": "the sunlit green meadow grass",
+      "object": "the complete pair of smooth rounded mossy grey meadow boulders (and tiny pebble right beside them) in the middle of the crop, with their soft moss caps and warm-brown ink outlines; not the oak tree trunk or open meadow grass",
+      "footprint": [[[1216, 736], [1306, 695], [1394, 725], [1345, 788], [1222, 776]]]
+    },
+    {
+      "id": "picnic-basket",
+      "crop": [1015, 800, 145, 145],
+      "seed": [1086, 872],
+      "home": [1086, 914],
+      "painted": true,
+      "canopy": false,
+      "ground": "the red-and-cream checkered gingham picnic blanket",
+      "object": "the complete lidded woven wicker picnic basket resting on the checkered blanket, including its lid, rim, woven base, and warm-brown ink outline; not the red-and-cream checkered picnic blanket underneath",
+      "footprint": [[[1046, 886], [1124, 886], [1126, 914], [1044, 914]]]
+    }
+  ]
+}

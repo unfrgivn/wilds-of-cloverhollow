@@ -11,8 +11,9 @@ describe("Clover Hills", () => {
   it("connects park west to woods north and has no bus stop", () => {
     expect(hills.name).toBe("Clover Hills");
     expect(hills.triggers.map((trigger) => trigger.target)).toEqual([
-       { area: "park", spawn: "hills" },
-       { area: "woods", spawn: "hills" },
+      { area: "park", spawn: "hills" },
+      { area: "woods", spawn: "hills" },
+      { area: "sanctuary", spawn: "entrance" },
     ]);
     expect(world.lands.find((land) => land.id === "hills")?.busStop).toBe(false);
   });

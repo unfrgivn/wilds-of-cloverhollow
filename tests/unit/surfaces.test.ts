@@ -69,6 +69,12 @@ describe("area surface maps", () => {
       surface: "wood" },
     { area: "plaza", what: "the paved square by the fountain", point: spawn("plaza", "fountain"),
       surface: "stone" },
+    { area: "sanctuary", what: "the sunlit entrance path", point: spawn("sanctuary", "entrance"),
+      surface: "sand" },
+    { area: "sanctuary", what: "the checkered picnic blanket", point: { x: 966, y: 904 },
+      surface: "carpet" },
+    { area: "sanctuary", what: "the central wildflower lawn", point: { x: 875, y: 565 },
+      surface: "grass" },
   ];
   it.each(truths)("$area: $what is $surface", ({ area, point, surface }) => {
     expect(surfaceAt(mapOf(area), point)).toBe(surface);

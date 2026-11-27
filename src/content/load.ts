@@ -20,6 +20,8 @@ import mistData from "../../content/areas/mist.json";
 import enchantedData from "../../content/areas/enchanted.json";
 import hillsData from "../../content/areas/hills.json";
 import hillsPropsData from "../../content/props/hills.json";
+import sanctuaryData from "../../content/areas/sanctuary.json";
+import sanctuaryPropsData from "../../content/props/sanctuary.json";
 import cavernData from "../../content/areas/cavern.json";
 import cavernPropsData from "../../content/props/cavern.json";
 import cafeData from "../../content/areas/cafe.json";
@@ -51,6 +53,7 @@ import lodgeSurfaceData from "../../content/surfaces/lodge.json";
 import mistSurfaceData from "../../content/surfaces/mist.json";
 import enchantedSurfaceData from "../../content/surfaces/enchanted.json";
 import hillsSurfaceData from "../../content/surfaces/hills.json";
+import sanctuarySurfaceData from "../../content/surfaces/sanctuary.json";
 import cavernSurfaceData from "../../content/surfaces/cavern.json";
 import cafeSurfaceData from "../../content/surfaces/cafe.json";
 import artRoomSurfaceData from "../../content/surfaces/art-room.json";
@@ -99,6 +102,7 @@ import musicFixtureData from "../../content/fixtures/music.json";
 import arcadeFixtureData from "../../content/fixtures/arcade.json";
 import cavernFixtureData from "../../content/fixtures/cavern.json";
 import cafeFixtureData from "../../content/fixtures/cafe.json";
+import sanctuaryFixtureData from "../../content/fixtures/sanctuary.json";
 import tunableData from "../../content/tunables.json";
 import storyData from "../../content/story/main.ink.json";
 import fountainFrogData from "../../content/critters/fountain-frog.json";
@@ -1313,9 +1317,11 @@ export function parseArea(value: unknown, file: string, catalogue?: PropCatalogu
             direction(item.facing) &&
             polygon(item.footprint) &&
             typeof item.knot === "string" &&
-            (item.prompt === "Look" || item.prompt === "Talk") &&
+            (item.prompt === "Look" || item.prompt === "Talk" || item.prompt === "Pet") &&
             (item.visibleWhile === undefined ||
-              typeof item.visibleWhile === "string"),
+              typeof item.visibleWhile === "string") &&
+            (item.visibleWhenCalmed === undefined ||
+              typeof item.visibleWhenCalmed === "string"),
         )),
     file,
     "npcs",
@@ -1436,6 +1442,9 @@ export function parseArea(value: unknown, file: string, catalogue?: PropCatalogu
       ...(item.visibleWhile === undefined
         ? {}
         : { visibleWhile: item.visibleWhile }),
+      ...(item.visibleWhenCalmed === undefined
+        ? {}
+        : { visibleWhenCalmed: item.visibleWhenCalmed }),
     })),
     props: placeProps(parsePropPlacements(value.props, file), catalogue, file),
     atlases: catalogue?.atlases ?? [],
@@ -2055,6 +2064,11 @@ export function critterErrors(
         errors.push(`${area.id}: den ${index} after ${den.after} is neither a set piece ` +
           `nor a species`);
     });
+    for (const npc of area.npcs) {
+      if (npc.visibleWhenCalmed !== undefined && critters[npc.visibleWhenCalmed] === undefined)
+        errors.push(`${area.id}: npc ${npc.id} visibleWhenCalmed ${npc.visibleWhenCalmed} ` +
+          `isn't a critter kind`);
+    }
   }
   return errors;
 }
@@ -2119,6 +2133,22 @@ export function parseFixture(value: unknown, file: string): Fixture {
       if (typeof enabled === "boolean") parsedVariables[name] = enabled;
     }
   }
+  const rawCalms = value.calms;
+  field(
+    rawCalms === undefined ||
+      (record(rawCalms) &&
+        Object.values(rawCalms).every(
+          (count) => typeof count === "number" && Number.isInteger(count) && count >= 0,
+        )),
+    file,
+    "calms",
+  );
+  const parsedCalms: Record<string, number> = {};
+  if (record(rawCalms)) {
+    for (const [species, count] of Object.entries(rawCalms)) {
+      if (typeof count === "number") parsedCalms[species] = count;
+    }
+  }
   return {
     area: value.area,
     spawn: value.spawn,
@@ -2127,6 +2157,9 @@ export function parseFixture(value: unknown, file: string): Fixture {
     ...(variables === undefined
       ? {}
       : { variables: parsedVariables }),
+    ...(rawCalms === undefined
+      ? {}
+      : { calms: parsedCalms }),
   };
 }
 
@@ -2374,6 +2407,8 @@ export function loadContent(): {
     parsePropCatalogue(enchantedPropsData, "content/props/enchanted.json"));
   const hills = parseArea(hillsData, "content/areas/hills.json",
     parsePropCatalogue(hillsPropsData, "content/props/hills.json"));
+  const sanctuary = parseArea(sanctuaryData, "content/areas/sanctuary.json",
+    parsePropCatalogue(sanctuaryPropsData, "content/props/sanctuary.json"));
   const cavern = parseArea(cavernData, "content/areas/cavern.json",
     parsePropCatalogue(cavernPropsData, "content/props/cavern.json"));
   const cafe = parseArea(cafeData, "content/areas/cafe.json",
@@ -2500,6 +2535,7 @@ export function loadContent(): {
     arcade: parseFixture(arcadeFixtureData, "content/fixtures/arcade.json"),
     cavern: parseFixture(cavernFixtureData, "content/fixtures/cavern.json"),
     cafe: parseFixture(cafeFixtureData, "content/fixtures/cafe.json"),
+    sanctuary: parseFixture(sanctuaryFixtureData, "content/fixtures/sanctuary.json"),
   };
   for (const [name, fixture] of Object.entries(fixtures))
     for (const id of fixture.party ?? [])
@@ -2528,6 +2564,7 @@ export function loadContent(): {
     [mist.id]: mist,
     [enchanted.id]: enchanted,
     [hills.id]: hills,
+    [sanctuary.id]: sanctuary,
     [cavern.id]: cavern,
     [cafe.id]: cafe,
   };
@@ -2541,6 +2578,7 @@ export function loadContent(): {
     mist: mistSurfaceData,
     enchanted: enchantedSurfaceData,
     hills: hillsSurfaceData,
+    sanctuary: sanctuarySurfaceData,
     cavern: cavernSurfaceData,
     cafe: cafeSurfaceData,
     "art-room": artRoomSurfaceData,

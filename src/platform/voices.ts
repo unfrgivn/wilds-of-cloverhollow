@@ -265,6 +265,18 @@ const NAMED_VOICES: Record<string, VoiceProfile> = {
     duration: 0.048,
     gain: 0.052,
   },
+  "ranger fern": {
+    wave: "sine",
+    notes: [349, 392, 440, 494],
+    duration: 0.05,
+    gain: 0.052,
+  },
+  fern: {
+    wave: "sine",
+    notes: [349, 392, 440, 494],
+    duration: 0.05,
+    gain: 0.052,
+  },
   "mr. pip": {
     wave: "triangle",
     notes: [330, 392, 440, 392],

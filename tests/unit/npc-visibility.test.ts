@@ -83,6 +83,10 @@ describe("people who come and go with the story", () => {
     const state = inKitchen(500, 650, "right");
     for (const area of Object.values(content.world.areas))
       for (const npc of area.npcs) {
+        if (npc.visibleWhenCalmed !== undefined) {
+          expect(npcVisible(content.world, state, npc), `${area.id}/${npc.id}`).toBe(false);
+          continue;
+        }
         if (npc.visibleWhile === undefined) {
           expect(npcVisible(content.world, state, npc), `${area.id}/${npc.id}`).toBe(true);
           continue;

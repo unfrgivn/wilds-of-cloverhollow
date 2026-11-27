@@ -636,6 +636,8 @@ async function boot(): Promise<void> {
     const areaCritters = new Set([
       ...area.critters.map((piece) => piece.id),
       ...(area.recurring?.dens ?? []).flatMap((den) => den.kinds),
+      ...area.npcs.flatMap((npc) =>
+        npc.visibleWhenCalmed === undefined ? [] : [npc.visibleWhenCalmed]),
     ]);
     for (const id of areaCritters) {
       const critter = content.world.critters[id];

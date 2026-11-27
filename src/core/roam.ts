@@ -18,9 +18,17 @@ export { nextNotice, noticed };
 export function calmedCritters(world: World, state: State): Record<string, boolean> {
   const calmed: Record<string, boolean> = {};
   for (const kind of Object.values(world.critters))
-    if (state.stickers.includes(kind.sticker.id)) calmed[kind.species] = true;
+    if (state.stickers.includes(kind.sticker.id) || (state.calms[kind.species] ?? 0) > 0)
+      calmed[kind.species] = true;
   for (const area of Object.values(world.areas))
-    for (const piece of area.critters) calmed[piece.id] = state.critters[piece.id] === "calm";
+    for (const piece of area.critters) {
+      const pieceCalm = state.critters[piece.id] === "calm";
+      calmed[piece.id] = calmed[piece.id] === true || pieceCalm;
+      if (pieceCalm) {
+        const kind = world.critters[piece.id];
+        if (kind !== undefined) calmed[kind.species] = true;
+      }
+    }
   return calmed;
 }
 

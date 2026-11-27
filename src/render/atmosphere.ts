@@ -315,6 +315,62 @@ export function evaluateAtmosphere(
     return out;
   }
 
+  if (areaId === "sanctuary") {
+    // 3 warm diagonal alpine pine sunbeams across the sunlit meadow.
+    const shafts: readonly [number, number, number][] = [
+      [480, 310, 2.2],
+      [960, 280, 2.5],
+      [1340, 360, 2.1],
+    ];
+    shafts.forEach(([sx, sy, scale], i) => {
+      const alpha = 0.058 + 0.01 * Math.sin(tick * 0.018 + i * 2.1);
+      out.push({
+        layer: "over",
+        texture: "sunbeam",
+        blend: "add",
+        x: sx,
+        y: sy,
+        scaleX: scale,
+        scaleY: scale,
+        rotation: 0,
+        alpha: clamp01(alpha),
+        tint: 0xfff2c8,
+      });
+    });
+    // 8 sparkling aqua water glints dancing over the northwest lily pond.
+    for (let i = 0; i < 8; i += 1) {
+      const h0 = hash01(seed + i * 23 + 11);
+      const h1 = hash01(seed + i * 23 + 12);
+      const h2 = hash01(seed + i * 23 + 13);
+      const x = 195 + h0 * 290 + Math.sin(tick * 0.03 + i) * 5;
+      const y = 275 + h1 * 105;
+      const pulse = Math.sin(tick * (0.06 + h2 * 0.04) + i * 1.5);
+      const scale = 0.44 + h2 * 0.36;
+      out.push({
+        layer: "under",
+        texture: i % 2 === 0 ? "waterGlint" : "sparkle",
+        blend: "add",
+        x,
+        y,
+        scaleX: scale,
+        scaleY: scale * 0.85,
+        rotation: 0,
+        alpha: clamp01(0.24 + pulse * pulse * 0.52),
+        tint: pickTint(WATER_TINTS, i),
+      });
+    }
+    // 14 golden wildflower pollen motes drifting softly over the sanctuary meadow.
+    addFloatingMotes(out, seed + 240, width, height, tick, 14, MEADOW_TINTS, {
+      driftX: 0.24,
+      driftY: -0.04,
+      minScale: 0.22,
+      maxScale: 0.42,
+      minAlpha: 0.22,
+      maxAlpha: 0.54,
+    });
+    return out;
+  }
+
   if (MEADOW_AREAS.has(areaId)) {
     // 16 soft drifting dandelion seeds & sunlit golden pollen motes inside the painted interior.
     const insetX = width * 0.08;

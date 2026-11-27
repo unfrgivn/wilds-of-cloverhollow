@@ -1,0 +1,983 @@
+{
+  "id": "sanctuary",
+  "name": "Wildlife Sanctuary",
+  "land": "hills",
+  "width": 1650,
+  "height": 1100,
+  "ground": "sanctuary",
+  "ambient": [
+    {
+      "id": "pink-pond",
+      "animation": "butterfly_pink",
+      "path": [
+        [
+          240,
+          320
+        ],
+        [
+          430,
+          260
+        ],
+        [
+          520,
+          360
+        ],
+        [
+          330,
+          420
+        ]
+      ],
+      "loopTicks": 420,
+      "phase": 0,
+      "frameTicks": 9,
+      "size": 20
+    },
+    {
+      "id": "blue-meadow",
+      "animation": "butterfly_blue",
+      "path": [
+        [
+          620,
+          440
+        ],
+        [
+          860,
+          410
+        ],
+        [
+          980,
+          560
+        ],
+        [
+          720,
+          610
+        ]
+      ],
+      "loopTicks": 480,
+      "phase": 95,
+      "frameTicks": 10,
+      "size": 20
+    },
+    {
+      "id": "pink-clover",
+      "animation": "butterfly_pink",
+      "path": [
+        [
+          760,
+          770
+        ],
+        [
+          1020,
+          790
+        ],
+        [
+          1090,
+          930
+        ],
+        [
+          810,
+          940
+        ]
+      ],
+      "loopTicks": 520,
+      "phase": 210,
+      "frameTicks": 11,
+      "size": 20
+    },
+    {
+      "id": "blue-trough",
+      "animation": "butterfly_blue",
+      "path": [
+        [
+          760,
+          210
+        ],
+        [
+          990,
+          200
+        ],
+        [
+          1040,
+          330
+        ],
+        [
+          810,
+          320
+        ]
+      ],
+      "loopTicks": 460,
+      "phase": 150,
+      "frameTicks": 9,
+      "size": 19
+    },
+    {
+      "id": "pink-oak",
+      "animation": "butterfly_pink",
+      "path": [
+        [
+          1140,
+          520
+        ],
+        [
+          1340,
+          480
+        ],
+        [
+          1390,
+          670
+        ],
+        [
+          1180,
+          650
+        ]
+      ],
+      "loopTicks": 540,
+      "phase": 310,
+      "frameTicks": 10,
+      "size": 20
+    }
+  ],
+  "walkable": [
+    [
+      135,
+      865
+    ],
+    [
+      255,
+      785
+    ],
+    [
+      335,
+      740
+    ],
+    [
+      432,
+      685
+    ],
+    [
+      432,
+      520
+    ],
+    [
+      225,
+      515
+    ],
+    [
+      210,
+      430
+    ],
+    [
+      195,
+      345
+    ],
+    [
+      260,
+      235
+    ],
+    [
+      380,
+      180
+    ],
+    [
+      540,
+      160
+    ],
+    [
+      720,
+      150
+    ],
+    [
+      920,
+      155
+    ],
+    [
+      1055,
+      175
+    ],
+    [
+      1055,
+      310
+    ],
+    [
+      1175,
+      345
+    ],
+    [
+      1340,
+      398
+    ],
+    [
+      1465,
+      355
+    ],
+    [
+      1535,
+      385
+    ],
+    [
+      1560,
+      485
+    ],
+    [
+      1555,
+      625
+    ],
+    [
+      1545,
+      755
+    ],
+    [
+      1510,
+      865
+    ],
+    [
+      1420,
+      920
+    ],
+    [
+      1295,
+      985
+    ],
+    [
+      1155,
+      1035
+    ],
+    [
+      820,
+      1035
+    ],
+    [
+      700,
+      1020
+    ],
+    [
+      590,
+      950
+    ],
+    [
+      475,
+      895
+    ],
+    [
+      418,
+      862
+    ],
+    [
+      365,
+      825
+    ],
+    [
+      325,
+      890
+    ],
+    [
+      215,
+      965
+    ],
+    [
+      135,
+      925
+    ]
+  ],
+  "blockers": [
+    [
+      [
+        152,
+        340
+      ],
+      [
+        175,
+        295
+      ],
+      [
+        265,
+        270
+      ],
+      [
+        365,
+        240
+      ],
+      [
+        465,
+        248
+      ],
+      [
+        526,
+        288
+      ],
+      [
+        512,
+        325
+      ],
+      [
+        450,
+        345
+      ],
+      [
+        380,
+        396
+      ],
+      [
+        295,
+        408
+      ],
+      [
+        215,
+        394
+      ],
+      [
+        160,
+        372
+      ]
+    ],
+    [
+      [
+        474,
+        818
+      ],
+      [
+        526,
+        832
+      ],
+      [
+        522,
+        842
+      ],
+      [
+        472,
+        828
+      ]
+    ]
+  ],
+  "triggers": [
+    {
+      "id": "hills",
+      "polygon": [
+        [
+          140,
+          800
+        ],
+        [
+          310,
+          800
+        ],
+        [
+          310,
+          910
+        ],
+        [
+          140,
+          910
+        ]
+      ],
+      "target": {
+        "area": "hills",
+        "spawn": "sanctuary"
+      }
+    }
+  ],
+  "interactables": [
+    {
+      "id": "sanctuary-board",
+      "knot": "sanctuary_board",
+      "point": {
+        "x": 521,
+        "y": 842
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "sanctuary-picnic",
+      "knot": "sanctuary_picnic",
+      "point": {
+        "x": 966,
+        "y": 904
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "sanctuary-barn",
+      "knot": "sanctuary_barn",
+      "point": {
+        "x": 1185,
+        "y": 352
+      },
+      "prompt": "Look"
+    }
+  ],
+  "critters": [],
+  "npcs": [
+    {
+      "id": "fern",
+      "point": {
+        "x": 675,
+        "y": 765
+      },
+      "facing": "left",
+      "footprint": [
+        [
+          657,
+          749
+        ],
+        [
+          693,
+          749
+        ],
+        [
+          693,
+          771
+        ],
+        [
+          657,
+          771
+        ]
+      ],
+      "knot": "ranger_fern",
+      "prompt": "Talk"
+    },
+    {
+      "id": "sanctuary-frog",
+      "point": {
+        "x": 365,
+        "y": 448
+      },
+      "facing": "right",
+      "footprint": [
+        [
+          349,
+          434
+        ],
+        [
+          381,
+          434
+        ],
+        [
+          381,
+          454
+        ],
+        [
+          349,
+          454
+        ]
+      ],
+      "knot": "pet_frog",
+      "prompt": "Pet",
+      "visibleWhenCalmed": "fountain-frog"
+    },
+    {
+      "id": "sanctuary-pup",
+      "point": {
+        "x": 265,
+        "y": 468
+      },
+      "facing": "right",
+      "footprint": [
+        [
+          249,
+          454
+        ],
+        [
+          281,
+          454
+        ],
+        [
+          281,
+          474
+        ],
+        [
+          249,
+          474
+        ]
+      ],
+      "knot": "pet_pup",
+      "prompt": "Pet",
+      "visibleWhenCalmed": "pup"
+    },
+    {
+      "id": "sanctuary-bluebird",
+      "point": {
+        "x": 722,
+        "y": 288
+      },
+      "facing": "left",
+      "footprint": [
+        [
+          706,
+          274
+        ],
+        [
+          738,
+          274
+        ],
+        [
+          738,
+          294
+        ],
+        [
+          706,
+          294
+        ]
+      ],
+      "knot": "pet_bluebird",
+      "prompt": "Pet",
+      "visibleWhenCalmed": "bluebird"
+    },
+    {
+      "id": "sanctuary-gull",
+      "point": {
+        "x": 790,
+        "y": 202
+      },
+      "facing": "left",
+      "footprint": [
+        [
+          772,
+          186
+        ],
+        [
+          808,
+          186
+        ],
+        [
+          808,
+          208
+        ],
+        [
+          772,
+          208
+        ]
+      ],
+      "knot": "pet_gull",
+      "prompt": "Pet",
+      "visibleWhenCalmed": "gull"
+    },
+    {
+      "id": "sanctuary-penguin",
+      "point": {
+        "x": 515,
+        "y": 215
+      },
+      "facing": "right",
+      "footprint": [
+        [
+          499,
+          201
+        ],
+        [
+          531,
+          201
+        ],
+        [
+          531,
+          221
+        ],
+        [
+          499,
+          221
+        ]
+      ],
+      "knot": "pet_penguin",
+      "prompt": "Pet",
+      "visibleWhenCalmed": "penguin"
+    },
+    {
+      "id": "sanctuary-lamb",
+      "point": {
+        "x": 835,
+        "y": 292
+      },
+      "facing": "right",
+      "footprint": [
+        [
+          819,
+          278
+        ],
+        [
+          851,
+          278
+        ],
+        [
+          851,
+          298
+        ],
+        [
+          819,
+          298
+        ]
+      ],
+      "knot": "pet_lamb",
+      "prompt": "Pet",
+      "visibleWhenCalmed": "lamb"
+    },
+    {
+      "id": "sanctuary-bunny",
+      "point": {
+        "x": 695,
+        "y": 495
+      },
+      "facing": "right",
+      "footprint": [
+        [
+          679,
+          481
+        ],
+        [
+          711,
+          481
+        ],
+        [
+          711,
+          501
+        ],
+        [
+          679,
+          501
+        ]
+      ],
+      "knot": "pet_bunny",
+      "prompt": "Pet",
+      "visibleWhenCalmed": "bunny"
+    },
+    {
+      "id": "sanctuary-cat",
+      "point": {
+        "x": 1245,
+        "y": 445
+      },
+      "facing": "left",
+      "footprint": [
+        [
+          1229,
+          431
+        ],
+        [
+          1261,
+          431
+        ],
+        [
+          1261,
+          451
+        ],
+        [
+          1229,
+          451
+        ]
+      ],
+      "knot": "pet_cat",
+      "prompt": "Pet",
+      "visibleWhenCalmed": "cat"
+    },
+    {
+      "id": "sanctuary-hamster",
+      "point": {
+        "x": 980,
+        "y": 215
+      },
+      "facing": "left",
+      "footprint": [
+        [
+          964,
+          201
+        ],
+        [
+          996,
+          201
+        ],
+        [
+          996,
+          221
+        ],
+        [
+          964,
+          221
+        ]
+      ],
+      "knot": "pet_hamster",
+      "prompt": "Pet",
+      "visibleWhenCalmed": "hamster"
+    },
+    {
+      "id": "sanctuary-hedgehog",
+      "point": {
+        "x": 875,
+        "y": 565
+      },
+      "facing": "right",
+      "footprint": [
+        [
+          859,
+          551
+        ],
+        [
+          891,
+          551
+        ],
+        [
+          891,
+          571
+        ],
+        [
+          859,
+          571
+        ]
+      ],
+      "knot": "pet_hedgehog",
+      "prompt": "Pet",
+      "visibleWhenCalmed": "hedgehog"
+    },
+    {
+      "id": "sanctuary-squirrel",
+      "point": {
+        "x": 1370,
+        "y": 895
+      },
+      "facing": "left",
+      "footprint": [
+        [
+          1354,
+          881
+        ],
+        [
+          1386,
+          881
+        ],
+        [
+          1386,
+          901
+        ],
+        [
+          1354,
+          901
+        ]
+      ],
+      "knot": "pet_squirrel",
+      "prompt": "Pet",
+      "visibleWhenCalmed": "squirrel"
+    },
+    {
+      "id": "sanctuary-raccoon",
+      "point": {
+        "x": 745,
+        "y": 850
+      },
+      "facing": "right",
+      "footprint": [
+        [
+          729,
+          836
+        ],
+        [
+          761,
+          836
+        ],
+        [
+          761,
+          856
+        ],
+        [
+          729,
+          856
+        ]
+      ],
+      "knot": "pet_raccoon",
+      "prompt": "Pet",
+      "visibleWhenCalmed": "raccoon"
+    },
+    {
+      "id": "sanctuary-owl",
+      "point": {
+        "x": 1060,
+        "y": 465
+      },
+      "facing": "left",
+      "footprint": [
+        [
+          1044,
+          451
+        ],
+        [
+          1076,
+          451
+        ],
+        [
+          1076,
+          471
+        ],
+        [
+          1044,
+          471
+        ]
+      ],
+      "knot": "pet_owl",
+      "prompt": "Pet",
+      "visibleWhenCalmed": "owl"
+    },
+    {
+      "id": "sanctuary-moon-owl",
+      "point": {
+        "x": 1095,
+        "y": 595
+      },
+      "facing": "left",
+      "footprint": [
+        [
+          1077,
+          579
+        ],
+        [
+          1113,
+          579
+        ],
+        [
+          1113,
+          601
+        ],
+        [
+          1077,
+          601
+        ]
+      ],
+      "knot": "pet_moon_owl",
+      "prompt": "Pet",
+      "visibleWhenCalmed": "moon-owl"
+    },
+    {
+      "id": "sanctuary-bat",
+      "point": {
+        "x": 1255,
+        "y": 865
+      },
+      "facing": "left",
+      "footprint": [
+        [
+          1239,
+          851
+        ],
+        [
+          1271,
+          851
+        ],
+        [
+          1271,
+          871
+        ],
+        [
+          1239,
+          871
+        ]
+      ],
+      "knot": "pet_bat",
+      "prompt": "Pet",
+      "visibleWhenCalmed": "bat"
+    },
+    {
+      "id": "sanctuary-crystal-mole",
+      "point": {
+        "x": 1165,
+        "y": 790
+      },
+      "facing": "left",
+      "footprint": [
+        [
+          1149,
+          776
+        ],
+        [
+          1181,
+          776
+        ],
+        [
+          1181,
+          796
+        ],
+        [
+          1149,
+          796
+        ]
+      ],
+      "knot": "pet_mole",
+      "prompt": "Pet",
+      "visibleWhenCalmed": "crystal-mole"
+    },
+    {
+      "id": "sanctuary-crab",
+      "point": {
+        "x": 565,
+        "y": 555
+      },
+      "facing": "right",
+      "footprint": [
+        [
+          549,
+          541
+        ],
+        [
+          581,
+          541
+        ],
+        [
+          581,
+          561
+        ],
+        [
+          549,
+          561
+        ]
+      ],
+      "knot": "pet_crab",
+      "prompt": "Pet",
+      "visibleWhenCalmed": "crab"
+    }
+  ],
+  "spawns": {
+    "entrance": {
+      "x": 545,
+      "y": 710,
+      "facing": "right"
+    }
+  },
+  "props": [
+    {
+      "id": "bulletin-board",
+      "prop": "bulletin-board",
+      "x": 521,
+      "y": 878
+    },
+    {
+      "id": "birdbath",
+      "prop": "birdbath",
+      "x": 622,
+      "y": 294
+    },
+    {
+      "id": "hay-trough",
+      "prop": "hay-trough",
+      "x": 955,
+      "y": 336
+    },
+    {
+      "id": "hay-barn",
+      "prop": "hay-barn",
+      "x": 1270,
+      "y": 390
+    },
+    {
+      "id": "hollow-oak",
+      "prop": "hollow-oak",
+      "x": 1465,
+      "y": 832
+    },
+    {
+      "id": "moss-boulders",
+      "prop": "moss-boulders",
+      "x": 1310,
+      "y": 786
+    },
+    {
+      "id": "picnic-basket",
+      "prop": "picnic-basket",
+      "x": 1086,
+      "y": 914
+    }
+  ]
+}

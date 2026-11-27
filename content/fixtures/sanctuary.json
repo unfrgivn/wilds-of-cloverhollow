@@ -1,0 +1,20 @@
+{
+  "area": "sanctuary",
+  "spawn": "entrance",
+  "seed": 1,
+  "party": [
+    "maddie",
+    "sue",
+    "jordan"
+  ],
+  "calms": {
+    "fountain-frog": 1,
+    "pup": 1,
+    "bluebird": 1,
+    "lamb": 1,
+    "bunny": 1,
+    "owl": 1,
+    "bat": 1,
+    "moon-owl": 1
+  }
+}

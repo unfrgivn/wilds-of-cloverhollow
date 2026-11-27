@@ -17,6 +17,7 @@ import type {
   FeelingId,
   FluteAssistKind,
   Grade,
+  Mood,
   TreatTrayItem,
 } from "./types";
 import { createInkState, runInk, setInkVariables, storyHasKnot, type InkFacts } from "./ink";
@@ -129,6 +130,24 @@ export function createState(
   const ink = setInkVariables(
     createInkState(world.story, seed), fixture.variables ?? {},
   );
+  const critters: Record<string, Mood> = Object.fromEntries(
+    Object.values(world.areas).flatMap((each) => each.critters)
+      .map((piece) => [piece.id, "chaos"]),
+  );
+  const calms: Record<string, number> = {};
+  const stickers: string[] = [];
+  if (fixture.calms !== undefined) {
+    for (const [key, count] of Object.entries(fixture.calms)) {
+      if (count <= 0) continue;
+      const kind = world.critters[key] ??
+        Object.values(world.critters).find((item) => item.species === key);
+      const species = kind?.species ?? key;
+      calms[species] = (calms[species] ?? 0) + count;
+      if (critters[key] !== undefined) critters[key] = "calm";
+      if (kind !== undefined && !stickers.includes(kind.sticker.id))
+        stickers.push(kind.sticker.id);
+    }
+  }
   const state: State = {
     tick: 0,
     area: area.id,
@@ -142,13 +161,10 @@ export function createState(
     xp: 0,
     ink,
     dialogue: null,
-    critters: Object.fromEntries(
-      Object.values(world.areas).flatMap((each) => each.critters)
-        .map((piece) => [piece.id, "chaos"]),
-    ),
+    critters,
     wild: [],
-    calms: {},
-    stickers: [],
+    calms,
+    stickers,
     safeSpot: { area: area.id, spawn: fixture.spawn },
     battle: null,
     arcade: null,
@@ -304,7 +320,11 @@ function moveDirection(move: Point): Direction | undefined {
 export function targetInteractable(
   world: World,
   state: State,
-): Area["interactables"][number] | Area["glows"][number] | undefined {
+):
+  | Area["interactables"][number]
+  | Area["glows"][number]
+  | { id: string; knot: string; point: Point; prompt: Npc["prompt"] }
+  | undefined {
   if (state.transition !== null || state.dialogue !== null) return undefined;
   const area = world.areas[state.area];
   if (area === undefined) return undefined;

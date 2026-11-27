@@ -1,0 +1,41 @@
+{
+  "asset": "bay-keeper",
+  "milestone": 92,
+  "status": "generated-selected-owner-review",
+  "date": "2026-11-26",
+  "model": "gemini-3-pro-image-preview",
+  "generationCalls": 1,
+  "prompt": "Cloverhollow watercolor-and-ink 2D game sprite sheet matching the exact chibi adult proportions, thin warm-brown ink outlines (#5B3530), soft watercolor washes, and cozy storybook style of the reference sheets (not 3D, not pixel art, no black outlines). Create a clean 2x2 grid of 4 full-body standing idle poses of the Bay Keeper, a cheerful, friendly coastal seaside souvenir shopkeeper: sunny woven straw sunhat with a sky-blue ribbon, wavy warm auburn-brown shoulder-length hair peeking below the hat, soft warm peach skin with gentle warm apricot cheek blush, cream linen short-sleeve collared shirt, soft warm coral-apricot shop apron with a tiny gold seashell pin on the chest, rolled medium-denim capri pants, and tan beach sandals, warm friendly smile. ZERO magenta, fuchsia, purple, or bright pink anywhere on the character, cheeks, ribbon, or outfit. Exact 2x2 quadrant layout with NO grid lines, NO borders, NO text, NO labels, and NO ground shadows, over a completely flat, solid, uniform #FF00FF pure magenta chroma-key background: Top-left: straight-on front standing idle, dark dot eyes open, friendly smile, relaxed arms slightly out. Top-right: identical front standing idle pose and silhouette, eyes closed in a happy smiling blink (^ ^). Bottom-left: 3/4 side view standing idle facing LEFT, dot eyes open, smiling. Bottom-right: 3/4 side view standing idle facing RIGHT, dot eyes open, smiling. Identical figure height, head proportion, hat size, and feet baseline across all four quadrants, with generous solid #FF00FF magenta padding around every figure so nothing is cropped or touches edges.",
+  "references": [
+    "docs/art/concepts/npcs/school_staff_npcs.png",
+    "art/source/townspeople/buster/sheet-raw.png"
+  ],
+  "selectedRawSources": [
+    "art/source/townspeople/bay-keeper/sheet-raw.png"
+  ],
+  "generationLog": {
+    "sheet": "1795756067976-gemini-3-pro-image-preview-0.png"
+  },
+  "postProcessing": {
+    "key": "#FF00FF border flood fill, 25% fuzz, interior holes keyed",
+    "despill": "edge-only magenta despill in postprocess plus 12px band pass via tools/art/despill-edge.ts",
+    "islands": "drop disconnected islands smaller than 80px via tools/art/drop-islands.ts",
+    "canvas": "448x448 source pixels",
+    "figureHeight": "336 source pixels",
+    "baseline": 439,
+    "frames": "Top-left (0,0) is down_idle_01, top-right (1,0) is down_idle_02 happy blink, bottom-right (1,1) is left_idle_01, bottom-left (0,1) is right_idle_01.",
+    "atlas": "tools/art/build-keepers.ts, PixiJS v8"
+  },
+  "validator": {
+    "biped": false,
+    "idleOnly": true,
+    "directions": ["down", "left", "right"],
+    "key": "magenta"
+  },
+  "commands": [
+    "bun tools/art/build-keepers.ts"
+  ],
+  "review": [
+    "art/review/m92-bay-keeper-sheet.jpg"
+  ]
+}

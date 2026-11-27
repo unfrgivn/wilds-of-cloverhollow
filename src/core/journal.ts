@@ -24,7 +24,8 @@ export type KeepsakeId =
   | "taco-badge"
   | "clover-wreath"
   | "sea-compass"
-  | "alpine-clover";
+  | "alpine-clover"
+  | "star-whistle";
 export type JournalKeepsake = {
   id: KeepsakeId;
   name: string;
@@ -235,7 +236,7 @@ export function carriedTreats(
   });
 }
 
-/** All eight quest keepsakes in canonical display order with ownership state. */
+/** All nine quest keepsakes in canonical display order with ownership state. */
 export function journalKeepsakes(
   world: Pick<World, "storyVariable">,
   state: Pick<State, "ink" | "stickers">,
@@ -289,6 +290,12 @@ export function journalKeepsakes(
       name: "Pressed Alpine Clover",
       source: "Jordan's Mountain Cabin",
       owned: flag("jordan_clover"),
+    },
+    {
+      id: "star-whistle",
+      name: "Golden Star-Line Whistle",
+      source: "Buster · Star-Line",
+      owned: flag("buster_reward"),
     },
   ];
 }

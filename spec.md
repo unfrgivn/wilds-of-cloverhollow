@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 97)
+Last updated: 2026-11-27 (Milestone 99)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -382,16 +382,15 @@ ios/            Capacitor iOS project (from Milestone 4).
   their feet, and props sort against them column by column by the front edge
   of their footprints (section 6.2).
 - Procedural watercolor VFX kit (`src/render/vfx-textures.ts`, Milestones 72–73,
-  84, 88, 92, 95–96): twenty-five small cached offscreen-canvas Pixi textures
+  84, 88, 93, 95–96, 98): twenty-six small cached offscreen-canvas Pixi textures
   (`contactShadow`, `softGlow`, `sparkle`, `petal`, `waterGlint`, `mistWisp`,
   `sunbeam`, `sunburst`, `paperGrain`, `puff`, `heart`, `energyRing`, five
   hand-inked 48x48 comic
   emote bubbles `emoteQuestion`, `emoteExclaim`, `emoteNote`, `emoteZzz`, and
-  `emoteHeart`, plus eight hand-inked 48x48 quest keepsake tokens
+  `emoteHeart`, plus nine hand-inked 48x48 quest keepsake tokens
   `keepsakeCrystal`, `keepsakePin`, `keepsakeGeode`, `keepsakeFeather`,
-  `keepsakeTaco`, `keepsakeWreath`, `keepsakeCompass`, and `keepsakeClover`),
-  rendered with warm plum-brown shadows
-  (`#52455F`), warm
+  `keepsakeTaco`, `keepsakeWreath`, `keepsakeCompass`, `keepsakeClover`, and
+  `keepsakeWhistle`), rendered with warm plum-brown shadows (`#52455F`), warm
   `#47321F` ink outlines, pastel washes, gouache puffs, and seamless cold-press
   paper tooth. In non-harness areas, a `shadowLayer` sits directly above `ground`
   and below `depth` (with a pooled `footstepLayer` above it) to ground Fae, party
@@ -708,10 +707,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   8 coins each), and the Ice Cream Shop (`ice-cream` at (895, 340), knot
   `ice_cream`, selling `Berry Swirl Cone` for 10 coins and `Cozy Cocoa Sundae`
   for 12 coins). Regional souvenir stands extend specialty treats across the
-  bus line (Milestone 91): Bubblegum Bay's seaside stand (`bay-souvenirs` at
-  (785, 475), knot `bay_souvenirs`, `Bay keeper`) sells `Sea-Salt Taffy` for 9
-  coins, and Pinecone Pass's mountain stand (`pass-souvenirs` at (1135, 920),
-  knot `pass_souvenirs`, `Pass keeper`) sells `Maple Pine Brittle` for 11 coins.
+  bus line (Milestones 91–92): Bubblegum Bay's coastal shopkeeper NPC (`bay-keeper`
+  in `content/characters.json`, scale `0.48`, adult portrait in `src/ui/portraits.ts`,
+  at (785, 455), knot `bay_souvenirs`, `Bay keeper`) sells `Sea-Salt Taffy` for 9
+  coins, and Pinecone Pass's mountain shopkeeper NPC (`pass-keeper` in
+  `content/characters.json`, scale `0.48`, adult portrait in `src/ui/portraits.ts`,
+  at (1190, 910), knot `pass_souvenirs`, `Pass keeper`) sells `Maple Pine Brittle`
+  for 11 coins.
   Buster the Bus Driver (`buster` in `content/characters.json`, scale `0.48`,
   adult portrait in `src/ui/portraits.ts`, warm baritone triangle voice in
   `src/platform/voices.ts`) stands beside the plaza's Star-Line bus stop at
@@ -1219,10 +1221,11 @@ ios/            Capacitor iOS project (from Milestone 4).
     `moon-feather` on sticker `starry-owl`, `taco-badge` on sticker `taco-chef`,
     `clover-wreath` on `sanctuary_reward_14` mounted on the left wood wall at
     `(468, 314)`, `sea-compass` on `sue_compass` perched on the crate
-    front-right corner at `(782, 348)`, and `alpine-clover` on `jordan_clover`
-    mounted beside the wreath at `(516, 308)` — 21 total Living Clubhouse items),
-    each grounded with a miniature contact shadow and subtle breathing sparkle
-    aura.
+    front-right corner at `(782, 348)`, `alpine-clover` on `jordan_clover`
+    mounted beside the wreath at `(516, 308)`, and `star-whistle` on
+    `buster_reward` perched on the round window sill at `(805, 259)` — 22 total
+    Living Clubhouse items), each grounded with a miniature contact shadow and
+    subtle breathing sparkle aura.
   - `findPettableCompanion` & `findRestSpot` (`src/render/companions.ts`): on a
     fresh overworld confirm press when no real interactable (`targetInteractable`)
     or overlay is active, Fae can pet Maddie or any active Flute Friend
@@ -3392,9 +3395,9 @@ trunks keep its two exits.
   on|off`,
   which set exactly the four tool story variables `has_lantern`, `has_lasso`,
   `has_flute`, and `has_map`; and `keepsakes on|off`, which toggles the closed
-  six quest-keepsake story variables (`cavern_chime_rung`, `spice_returned`,
-  `gem_reward_all`, `sanctuary_reward_14`, `sue_compass`, `jordan_clover`; an
-  undeclared story variable is an error). `save <name>`
+  seven quest-keepsake story variables (`cavern_chime_rung`, `spice_returned`,
+  `gem_reward_all`, `sanctuary_reward_14`, `sue_compass`, `jordan_clover`,
+  `buster_reward`; an undeclared story variable is an error). `save <name>`
   keeps the state in a QA-only slot listed in the QA menu; `export` shows the
   state's save file for a bug report or the library. Nothing the console does
   autosaves or touches the player's slot.

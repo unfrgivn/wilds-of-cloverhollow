@@ -131,6 +131,16 @@ describe("Buster character atlas, portrait, voice, and world placement", () => {
       frame: "down_idle_01",
       cropMode: "adult",
     });
+    expect(speakerPortraitSource(world, "Bay keeper")).toEqual({
+      atlas: "assets/characters/bay-keeper/bay-keeper.json",
+      frame: "down_idle_01",
+      cropMode: "adult",
+    });
+    expect(speakerPortraitSource(world, "Pass keeper")).toEqual({
+      atlas: "assets/characters/pass-keeper/pass-keeper.json",
+      frame: "down_idle_01",
+      cropMode: "adult",
+    });
 
     const busterVoice = voiceForSpeaker("Buster");
     expect(busterVoice.wave).toBe("triangle");
@@ -139,7 +149,7 @@ describe("Buster character atlas, portrait, voice, and world placement", () => {
     expect(voiceForSpeaker("Bay keeper")).not.toEqual(voiceForSpeaker("Pass keeper"));
   });
 
-  it("places Buster in plaza and souvenir stands in Bubblegum Bay and Pinecone Pass", () => {
+  it("places Buster in plaza and living shopkeeper NPCs in Bubblegum Bay and Pinecone Pass", () => {
     const plaza = world.areas.plaza;
     const bay = world.areas.bay;
     const pass = world.areas.pass;
@@ -153,15 +163,19 @@ describe("Buster character atlas, portrait, voice, and world placement", () => {
       facing: "down",
       point: { x: 515, y: 780 },
     });
-    expect(bay.interactables.find((item) => item.id === "bay-souvenirs")).toMatchObject({
+    expect(bay.interactables.find((item) => item.id === "bay-souvenirs")).toBeUndefined();
+    expect(bay.npcs.find((npc) => npc.id === "bay-keeper")).toMatchObject({
       knot: "bay_souvenirs",
       prompt: "Talk",
-      point: { x: 785, y: 475 },
+      facing: "down",
+      point: { x: 785, y: 455 },
     });
-    expect(pass.interactables.find((item) => item.id === "pass-souvenirs")).toMatchObject({
+    expect(pass.interactables.find((item) => item.id === "pass-souvenirs")).toBeUndefined();
+    expect(pass.npcs.find((npc) => npc.id === "pass-keeper")).toMatchObject({
       knot: "pass_souvenirs",
       prompt: "Talk",
-      point: { x: 1135, y: 920 },
+      facing: "down",
+      point: { x: 1190, y: 910 },
     });
 
     const atBuster: State = {
@@ -171,19 +185,19 @@ describe("Buster character atlas, portrait, voice, and world placement", () => {
     };
     expect(targetInteractable(world, atBuster)?.id).toBe("npc:buster");
 
-    const atBayStand: State = {
+    const atBayKeeper: State = {
       ...createState(world, fixtureOf("bay")),
-      player: { x: 785, y: 515 },
+      player: { x: 785, y: 505 },
       facing: "up",
     };
-    expect(targetInteractable(world, atBayStand)?.id).toBe("bay-souvenirs");
+    expect(targetInteractable(world, atBayKeeper)?.id).toBe("npc:bay-keeper");
 
-    const atPassStand: State = {
+    const atPassKeeper: State = {
       ...createState(world, fixtureOf("pass")),
-      player: { x: 1135, y: 955 },
+      player: { x: 1190, y: 955 },
       facing: "up",
     };
-    expect(targetInteractable(world, atPassStand)?.id).toBe("pass-souvenirs");
+    expect(targetInteractable(world, atPassKeeper)?.id).toBe("npc:pass-keeper");
   });
 });
 
@@ -209,11 +223,11 @@ describe("Buster's Star-Line Stamp Card errand and regional souvenir stands", ()
     const beforeStamps = runDialogue(intro.state);
     expect(beforeStamps.lines.some((line) => line.includes("two empty star squares"))).toBe(true);
 
-    // 3. Visit Bubblegum Bay souvenir stand when short on coins -> still stamps card free!
+    // 3. Visit Bubblegum Bay shopkeeper when short on coins -> still stamps card free!
     const atBayShort: State = {
       ...beforeStamps.state,
       area: "bay",
-      player: { x: 785, y: 515 },
+      player: { x: 785, y: 505 },
       facing: "up",
       coins: 5,
     };
@@ -241,11 +255,11 @@ describe("Buster's Star-Line Stamp Card errand and regional souvenir stands", ()
     expect(midBuster.lines.some((line) => line.includes("Bubblegum Bay wave stamp"))).toBe(true);
     expect(journalNotes(world, midBuster.state)[0]).toContain("Pinecone Pass");
 
-    // 6. Visit Pinecone Pass souvenir stand when short on coins -> still stamps card free!
+    // 6. Visit Pinecone Pass shopkeeper when short on coins -> still stamps card free!
     const atPassShort: State = {
       ...midBuster.state,
       area: "pass",
-      player: { x: 1135, y: 955 },
+      player: { x: 1190, y: 955 },
       facing: "up",
       coins: 10,
     };

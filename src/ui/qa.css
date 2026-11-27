@@ -19,7 +19,7 @@
 .qa-console-ok { color: #4c7a43; }
 .qa-console-error { color: #b23b3b; }
 .qa-console-help { white-space: pre-line; }
-.qa-console-save { max-height: min(30vh, 160px); overflow: auto; padding: 10px 12px; border: 3px solid #d4a36d; border-radius: 16px; background: #fffdf1; color: #5d3e30; font: 600 12px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+.qa-console-save { box-sizing: border-box; max-height: min(30vh, 178px); overflow: auto; padding: 10px 12px; border: 3px solid #d4a36d; border-radius: 16px; background: #fffdf1; color: #5d3e30; font: 600 12px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
 .qa-console-form { display: flex; gap: 10px; }
 .qa-console-input { flex: 1; min-width: 0; padding: 10px 14px; border: 3px solid #6b4937; border-radius: 16px; background: #fffdf1; color: #5d3e30; font: 600 16px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 .qa-console-input:focus { outline: 3px solid #7eaa70; outline-offset: 2px; }

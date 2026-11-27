@@ -25,7 +25,8 @@ export type VfxTextureKey =
   | "keepsakeTaco"
   | "keepsakeWreath"
   | "keepsakeCompass"
-  | "keepsakeClover";
+  | "keepsakeClover"
+  | "keepsakeWhistle";
 
 export type VfxTextures = Record<VfxTextureKey, Texture> & {
   destroy: () => void;
@@ -1214,6 +1215,96 @@ function buildKeepsakeClover(): Texture {
   return toTexture(canvas);
 }
 
+// 48x48 hand-inked Golden Star-Line Whistle keepsake (conductor whistle + periwinkle lanyard).
+function buildKeepsakeWhistle(): Texture {
+  const { canvas, ctx } = makeCanvas(48, 48);
+  const halo = ctx.createRadialGradient(25, 25, 3, 25, 25, 21);
+  halo.addColorStop(0, "rgba(255, 217, 102, 0.38)");
+  halo.addColorStop(1, "rgba(255, 217, 102, 0)");
+  ctx.fillStyle = halo;
+  ctx.fillRect(0, 0, 48, 48);
+
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+
+  // Coiled periwinkle Star-Line lanyard cord looping behind the whistle ring.
+  ctx.beginPath();
+  ctx.moveTo(13, 25);
+  ctx.bezierCurveTo(4, 17, 7, 5, 20, 6);
+  ctx.bezierCurveTo(31, 7, 32, 16, 25, 21);
+  ctx.lineWidth = 5.2;
+  ctx.strokeStyle = "#47321F";
+  ctx.stroke();
+  ctx.lineWidth = 2.8;
+  ctx.strokeStyle = "#7393E5";
+  ctx.stroke();
+
+  // Small brass lanyard loop ring on the rear of the whistle.
+  ctx.beginPath();
+  ctx.arc(13, 26.5, 4.4, 0, Math.PI * 2);
+  ctx.lineWidth = 4.4;
+  ctx.strokeStyle = "#47321F";
+  ctx.stroke();
+  ctx.lineWidth = 2.2;
+  ctx.strokeStyle = "#F4BE3F";
+  ctx.stroke();
+
+  // Classic conductor pea-whistle silhouette: round chamber + tapered mouthpiece.
+  ctx.beginPath();
+  ctx.moveTo(15.5, 27.5);
+  ctx.bezierCurveTo(15.5, 19.5, 23, 16, 29.5, 19.2);
+  ctx.lineTo(41, 15.8);
+  ctx.quadraticCurveTo(44, 17.8, 42.8, 22.2);
+  ctx.lineTo(35.5, 25.8);
+  ctx.bezierCurveTo(36.4, 34, 29.6, 39.8, 22.5, 38.8);
+  ctx.bezierCurveTo(17, 38, 15, 33, 15.5, 27.5);
+  ctx.closePath();
+  const brass = ctx.createLinearGradient(16, 15, 39, 39);
+  brass.addColorStop(0, "#FFF2A8");
+  brass.addColorStop(0.48, "#F4BA38");
+  brass.addColorStop(1, "#C67F1E");
+  ctx.fillStyle = brass;
+  ctx.fill();
+  ctx.lineWidth = 2.6;
+  ctx.strokeStyle = "#47321F";
+  ctx.stroke();
+
+  // Dark acoustic notch along the top of the mouthpiece.
+  ctx.fillStyle = "#47321F";
+  ctx.beginPath();
+  ctx.moveTo(28.5, 19.5);
+  ctx.lineTo(33.2, 18.1);
+  ctx.lineTo(32.8, 21.8);
+  ctx.lineTo(29.2, 22.3);
+  ctx.closePath();
+  ctx.fill();
+
+  // Warm cream specular highlight along the upper curve of the chamber.
+  ctx.fillStyle = "rgba(255, 253, 242, 0.8)";
+  ctx.beginPath();
+  ctx.ellipse(22, 23.2, 3.6, 1.8, -0.45, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Tiny gleaming 5-point Star-Line emblem embossed on the brass side.
+  ctx.beginPath();
+  for (let i = 0; i < 10; i += 1) {
+    const angle = (i * Math.PI) / 5 - Math.PI / 2;
+    const r = i % 2 === 0 ? 4.6 : 2.1;
+    const px = 25.5 + Math.cos(angle) * r;
+    const py = 29.8 + Math.sin(angle) * r;
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  }
+  ctx.closePath();
+  ctx.fillStyle = "#FFF8D4";
+  ctx.fill();
+  ctx.lineWidth = 1.2;
+  ctx.strokeStyle = "#7D521B";
+  ctx.stroke();
+
+  return toTexture(canvas);
+}
+
 export function createVfxTextures(): VfxTextures {
   const textures: Record<VfxTextureKey, Texture> = {
     contactShadow: buildContactShadow(),
@@ -1241,6 +1332,7 @@ export function createVfxTextures(): VfxTextures {
     keepsakeWreath: buildKeepsakeWreath(),
     keepsakeCompass: buildKeepsakeCompass(),
     keepsakeClover: buildKeepsakeClover(),
+    keepsakeWhistle: buildKeepsakeWhistle(),
   };
   return {
     ...textures,

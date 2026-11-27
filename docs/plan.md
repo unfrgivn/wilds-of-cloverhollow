@@ -4655,6 +4655,42 @@ the old trail, the owl, and the clubhouse claim.
   independently inspected and passed with `vision`.
 - Gates: `just check`, `just build`, and full e2e verified across Chromium & WebKit.
 
+## Milestone 95: Living Biome Shopkeepers, Golden Star-Line Whistle Clubhouse Display & QA Console Polish **Status:** ✅ Completed (2026-11-27)
+- Turns Bubblegum Bay's and Pinecone Pass's regional souvenir stops into living
+  biome shopkeepers (`NOTES.md` biome NPCs), displays Buster's Golden Star-Line
+  Whistle on the Living Clubhouse window sill, and resolves the `.qa-console-save`
+  vertical bottom-line clip — zero `src/core` changes and zero replay hash drift
+  across all 65 recorded sims.
+- Living Biome Shopkeepers (`bay-keeper` & `pass-keeper`):
+  - Generated two 4-frame watercolor-and-ink blinking idle sheets (2 Gemini
+    calls total, 1 per character; `art/source/townspeople/{bay,pass}-keeper/sheet-raw.png`,
+    `art/recipes/{bay,pass}-keeper.json`, deterministic builder
+    `tools/art/build-keepers.ts`, runtime `public/assets/characters/{bay,pass}-keeper/`).
+  - Both atlases pass `bun tools/art/validate-sprite.ts` cleanly and were
+    verified via `vision` in `art/review/m92-{bay,pass}-keeper-sheet.jpg`.
+  - Registered `bay-keeper` (`idleTicks: [175, 10]`, `scale: 0.48`) and
+    `pass-keeper` (`idleTicks: [195, 10]`, `scale: 0.48`) in
+    `content/characters.json`, added adult dialogue portraits in
+    `src/ui/portraits.ts`, and upgraded `bay-souvenirs` / `pass-souvenirs` into
+    living NPCs in `content/areas/bay.json` (`(785, 455)`) and
+    `content/areas/pass.json` (`(1190, 910)`).
+- Living Clubhouse 6th Keepsake (`keepsakeWhistle` / `star-whistle`):
+  - Hand-inked 48x48 watercolor Golden Star-Line Whistle texture with periwinkle
+    lanyard loop (`src/render/vfx-textures.ts`) perched on the sunlit round
+    window sill `(805, 259)` when `buster_reward === true`
+    (`src/render/clubhouse-display.ts`), wired into QA console `keepsakes on|off`
+    (`src/dev/console.ts`).
+- QA Console Export Polish (`src/ui/qa.css`):
+  - Fixed `.qa-console-save` (`box-sizing: border-box; max-height: min(30vh, 178px)`)
+    so all 9 visible JSON lines render cleanly with zero vertical bottom clip.
+- Evidence: `tests/unit/milestone-92.test.ts`, updated
+  `tests/unit/{buster-souvenirs,milestone-89}.test.ts`,
+  `tests/e2e/{buster-souvenirs,clubhouse-petting,qa}.spec.ts`; all 5 review
+  shots (`art/review/m92-{bay-keeper-sheet,pass-keeper-sheet,bay-keeper-1280,pass-keeper-1280,clubhouse-whistle-1280}.jpg`)
+  and `qa-console-export` independently verified with `vision`.
+- Gates: `just check` (150 unit files / 1,190 tests, all 65 sims, 23 QA packs,
+  purity, lint), `just build`, and targeted e2e (34/34 Chromium passed).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

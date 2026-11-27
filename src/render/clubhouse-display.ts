@@ -18,7 +18,8 @@ export type ClubhouseKeepsakeKey =
   | "keepsakeTaco"
   | "keepsakeWreath"
   | "keepsakeCompass"
-  | "keepsakeClover";
+  | "keepsakeClover"
+  | "keepsakeWhistle";
 
 export type ClubhouseKeepsakePlacement = {
   id: string;
@@ -165,6 +166,18 @@ const KEEPSAKE_RULES: readonly KeepsakeRule[] = [
       sparkleTint: 0xa2ce8f,
     },
     unlocked: (world, state) => world.storyVariable(state.ink, "jordan_clover") === true,
+  },
+  {
+    placement: {
+      id: "star-whistle",
+      texture: "keepsakeWhistle",
+      x: 805,
+      y: 259,
+      zIndex: 320,
+      scale: 0.78,
+      sparkleTint: 0xffd966,
+    },
+    unlocked: (world, state) => world.storyVariable(state.ink, "buster_reward") === true,
   },
 ];
 

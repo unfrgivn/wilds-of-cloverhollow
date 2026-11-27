@@ -204,9 +204,25 @@ const keepsakeMarkup: Record<KeepsakeId, string> = {
     'stroke-width="1.2" stroke-linejoin="round"/>' +
     '<polygon points="32.5,37 39,35 37.5,39.5 31,41.5" fill="#e8d6f5" stroke="#47321f" ' +
     'stroke-width="1.2" stroke-linejoin="round"/>',
+  "star-whistle":
+    '<path d="M13 25 C4 17 7 5 20 6 C31 7 32 16 25 21" fill="none" stroke="#47321f" ' +
+    'stroke-width="5" stroke-linecap="round"/>' +
+    '<path d="M13 25 C4 17 7 5 20 6 C31 7 32 16 25 21" fill="none" stroke="#85a2e3" ' +
+    'stroke-width="2.4" stroke-linecap="round"/>' +
+    '<circle cx="13.5" cy="27.5" r="3.4" fill="none" stroke="#47321f" stroke-width="2.3"/>' +
+    '<path d="M16 25 C16 19 25 18 30 22 L40 22 C42 22 42 27.5 39.5 28.5 L31 30 ' +
+    'C31 37 22 40 17 36 C13.5 33 13.5 28 16 25 Z" fill="#f6cc5e" stroke="#47321f" ' +
+    'stroke-width="2.3" stroke-linejoin="round"/>' +
+    '<path d="M25.5 21.5 L30.5 21.5 L29.5 24.5 L26.5 24.5 Z" fill="#7d521b" ' +
+    'stroke="#47321f" stroke-width="1.2" stroke-linejoin="round"/>' +
+    '<path d="M19.5 25 A6 6 0 0 1 25 22.5" fill="none" stroke="#fff9d6" ' +
+    'stroke-width="2" stroke-linecap="round"/>' +
+    '<polygon points="22.5,26.8 23.8,29.6 26.8,29.9 24.5,31.8 25.2,34.7 22.5,33.1 ' +
+    '19.8,34.7 20.5,31.8 18.2,29.9 21.2,29.6" fill="#fff8d4" stroke="#7d521b" ' +
+    'stroke-width="1.2" stroke-linejoin="round"/>',
 };
 
-/** Hand-crafted inline SVG icon for each of Fae's eight quest keepsakes. */
+/** Hand-crafted inline SVG icon for each of Fae's nine quest keepsakes. */
 export function keepsakeIcon(id: KeepsakeId): SVGSVGElement {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("class", "journal-keepsake-icon die-cut");

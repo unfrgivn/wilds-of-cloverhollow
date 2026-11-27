@@ -132,6 +132,7 @@ describe("Milestone 89: Living Clubhouse display", () => {
         sanctuary_reward_14: true,
         sue_compass: true,
         jordan_clover: true,
+        buster_reward: true,
       },
     );
     const display = evaluateClubhouseDisplay(world, full);
@@ -145,6 +146,7 @@ describe("Milestone 89: Living Clubhouse display", () => {
       "clover-wreath",
       "sea-compass",
       "alpine-clover",
+      "star-whistle",
     ]);
     expect(display.keepsakes.map((item) => item.texture)).toEqual([
       "keepsakeCrystal",
@@ -155,6 +157,7 @@ describe("Milestone 89: Living Clubhouse display", () => {
       "keepsakeWreath",
       "keepsakeCompass",
       "keepsakeClover",
+      "keepsakeWhistle",
     ]);
   });
 
@@ -334,7 +337,8 @@ describe("Milestone 89: Companion petting & cozy resting", () => {
     expect(world.storyVariable(on.state.ink, "sanctuary_reward_14")).toBe(true);
     expect(world.storyVariable(on.state.ink, "sue_compass")).toBe(true);
     expect(world.storyVariable(on.state.ink, "jordan_clover")).toBe(true);
-    expect(evaluateClubhouseDisplay(world, on.state).keepsakes).toHaveLength(6);
+    expect(world.storyVariable(on.state.ink, "buster_reward")).toBe(true);
+    expect(evaluateClubhouseDisplay(world, on.state).keepsakes).toHaveLength(7);
 
     const off = runConsoleCommand(context, on.state, "keepsakes off");
     expect(off.kind).toBe("applied");

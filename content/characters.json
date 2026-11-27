@@ -163,5 +163,21 @@
       10
     ],
     "scale": 0.48
+  },
+  "bay-keeper": {
+    "atlas": "assets/characters/bay-keeper/bay-keeper.json",
+    "idleTicks": [
+      175,
+      10
+    ],
+    "scale": 0.48
+  },
+  "pass-keeper": {
+    "atlas": "assets/characters/pass-keeper/pass-keeper.json",
+    "idleTicks": [
+      195,
+      10
+    ],
+    "scale": 0.48
   }
 }

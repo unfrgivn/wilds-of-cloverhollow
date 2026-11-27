@@ -137,14 +137,6 @@ test.describe("Buster the Bus Driver, Star-Line Stamp Card & regional souvenir s
         await expect(portrait).toHaveAttribute("data-accent", "town");
         await page.waitForTimeout(150);
         await step(page, 1);
-        await captureReview(page, testInfo, "m91-buster-plaza-1280");
-        await page.setViewportSize({ width: 874, height: 402 });
-        await page.waitForTimeout(100);
-        await step(page, 1);
-        await captureReview(page, testInfo, "m91-buster-plaza-874");
-        await page.setViewportSize({ width: 1280, height: 720 });
-        await page.waitForTimeout(100);
-        await step(page, 1);
       });
       expect(introLines.some((line) => line.includes("Star-Line Stamp Card"))).toBe(true);
 
@@ -159,16 +151,21 @@ test.describe("Buster the Bus Driver, Star-Line Stamp Card & regional souvenir s
       await finishDialogue(page, 1);
       await waitTransition(page, "bay");
 
-      // Visit Bubblegum Bay souvenir stand (785, 475) -> wave stamp + Sea-Salt Taffy (9 coins).
+      // Talk to Bay Keeper (785, 455) -> wave stamp + Sea-Salt Taffy (9 coins).
       await walk(page, "x", 785);
-      await walk(page, "y", 515);
+      await walk(page, "y", 505);
       await press(page, "ArrowUp");
       await expect(page.locator(".sticker-prompt")).toContainText("TALK");
       await press(page, "z");
       const bayLines = await finishDialogue(page, 0, async (text) => {
-        if (text.includes("Bubblegum Bay wave stamp")) {
-          await captureReview(page, testInfo, "m91-bay-souvenirs-1280");
-        }
+        if (!text.includes("Bubblegum Bay wave stamp")) return;
+        await expect(page.locator(".sticker-speaker")).toHaveText("Bay keeper");
+        const portrait = page.locator(".sticker-portrait");
+        await expect(portrait).toBeVisible();
+        await expect(portrait).toHaveAttribute("data-accent", "town");
+        await page.waitForTimeout(150);
+        await step(page, 1);
+        await captureReview(page, testInfo, "m92-bay-keeper-1280");
       });
       expect(bayLines.some((line) => line.includes("Bubblegum Bay wave stamp"))).toBe(true);
       expect((await readState(page)).coins).toBe(startCoins - 9);
@@ -182,13 +179,22 @@ test.describe("Buster the Bus Driver, Star-Line Stamp Card & regional souvenir s
       await finishDialogue(page, 1);
       await waitTransition(page, "pass");
 
-      // Visit Pinecone Pass souvenir stand (1135, 920) -> pine stamp + Maple Pine Brittle (11).
-      await walk(page, "x", 1135);
+      // Talk to Pass Keeper (1190, 910) -> pine stamp + Maple Pine Brittle (11 coins).
+      await walk(page, "x", 1190);
       await walk(page, "y", 955);
       await press(page, "ArrowUp");
       await expect(page.locator(".sticker-prompt")).toContainText("TALK");
       await press(page, "z");
-      const passLines = await finishDialogue(page, 0);
+      const passLines = await finishDialogue(page, 0, async (text) => {
+        if (!text.includes("Pinecone Pass pine stamp")) return;
+        await expect(page.locator(".sticker-speaker")).toHaveText("Pass keeper");
+        const portrait = page.locator(".sticker-portrait");
+        await expect(portrait).toBeVisible();
+        await expect(portrait).toHaveAttribute("data-accent", "town");
+        await page.waitForTimeout(150);
+        await step(page, 1);
+        await captureReview(page, testInfo, "m92-pass-keeper-1280");
+      });
       expect(passLines.some((line) => line.includes("Pinecone Pass pine stamp"))).toBe(true);
       expect((await readState(page)).coins).toBe(startCoins - 20);
       expect((await readState(page)).treats).toEqual({

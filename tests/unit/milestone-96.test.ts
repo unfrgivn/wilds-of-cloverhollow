@@ -35,7 +35,7 @@ function stateIn(
 describe("Milestone 96: 8-Keepsake Showcase, 9 Resting Areas & core/battle Extraction", () => {
   it("journalKeepsakes returns all 8 keepsakes including sea-compass and alpine-clover", () => {
     const empty = journalKeepsakes(world, stateIn("plaza"));
-    expect(empty).toHaveLength(8);
+    expect(empty).toHaveLength(9);
     expect(empty.map((item) => item.id)).toEqual([
       "star-crystal",
       "star-pin",
@@ -45,6 +45,7 @@ describe("Milestone 96: 8-Keepsake Showcase, 9 Resting Areas & core/battle Extra
       "clover-wreath",
       "sea-compass",
       "alpine-clover",
+      "star-whistle",
     ]);
     expect(empty.every((item) => !item.owned)).toBe(true);
 

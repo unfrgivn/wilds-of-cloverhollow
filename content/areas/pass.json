@@ -537,15 +537,6 @@
         "y": 950
       },
       "prompt": "Look"
-    },
-    {
-      "id": "pass-souvenirs",
-      "knot": "pass_souvenirs",
-      "point": {
-        "x": 1135,
-        "y": 920
-      },
-      "prompt": "Talk"
     }
   ],
   "spawns": {
@@ -652,6 +643,34 @@
         [
           1075,
           700
+        ]
+      ]
+    },
+    {
+      "id": "pass-keeper",
+      "point": {
+        "x": 1190,
+        "y": 910
+      },
+      "facing": "down",
+      "knot": "pass_souvenirs",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          1175,
+          900
+        ],
+        [
+          1205,
+          900
+        ],
+        [
+          1205,
+          920
+        ],
+        [
+          1175,
+          920
         ]
       ]
     }

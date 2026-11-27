@@ -160,6 +160,8 @@ const CHARACTER_MAP: Record<string, readonly [string, PortraitCropMode]> = {
   "ranger fern": ["fern", "adult"],
   fern: ["fern", "adult"],
   buster: ["buster", "adult"],
+  "bay keeper": ["bay-keeper", "adult"],
+  "pass keeper": ["pass-keeper", "adult"],
   "ms. clover": ["teacher", "adult"],
   "ms. maple": ["teacher", "adult"],
   teacher: ["teacher", "adult"],

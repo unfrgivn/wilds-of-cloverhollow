@@ -890,8 +890,11 @@
   background: var(--sticker-paper);
   box-shadow: var(--sticker-shadow);
   color: var(--sticker-ink);
+  cursor: pointer;
   font-family: var(--sticker-font);
+  pointer-events: auto;
   text-align: center;
+  touch-action: manipulation;
   transform: translate(-50%, -50%);
 }
 .battle-reward-title {

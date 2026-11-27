@@ -1935,6 +1935,23 @@ trunks keep its two exits.
   once the line has finished typing; the advance arrow shows only on a fully
   shown line without choices. A tap on a choice sticker reaches the core as
   `choose: index` in that tick's action frame.
+- Pointer and touch click-to-advance ergonomics (Milestone 126):
+  - `shouldAdvanceDialogueClick` (`src/ui/sticker.ts`) returns `true` when the
+    dialogue card is visible and either still revealing characters
+    (`revealed < text.length`) or advanceable without choices
+    (`canAdvance && choices.length === 0`). `createDialogueBox` exposes
+    `onAdvance` and toggles `.is-clickable` (`cursor: pointer; pointer-events: auto`)
+    on `.sticker-dialogue`; clicking or tapping `.sticker-dialogue` (ignoring
+    clicks inside `.sticker-choice` / `.sticker-choices`) emits a `confirm` tap
+    via `touch.tapButton("confirm")` in `src/main.ts`, so players can reveal and
+    advance overworld, battle, arcade, and level-up dialogue directly without
+    accidentally picking an open choice or confirming a battle command prompt.
+  - `createPrompt` (`src/ui/sticker.ts`) marks `.sticker-prompt` as an
+    interactive button (`role="button"`, `aria-label` synced to `view.label`
+    while visible, `cursor: pointer; pointer-events: auto; touch-action: manipulation`
+    with `.sticker-prompt-arrow` kept at `pointer-events: none`) and exposes
+    `onActivate`, wired to `touch.tapButton("confirm")` so clicking or tapping
+    the floating `TALK`/`LOOK`/`PLAY`/`PET` pill opens the interaction directly.
 - Ink choices are once-only by default, so every knot must still say
   something sensible on a revisit (the window's `again` stitch remembers the
   plan). A choice offered on every visit (the shops, the bus stops, the
@@ -2089,7 +2106,11 @@ trunks keep its two exits.
   change), so the ticks and their input stay a replay's.
 - A confirm counts after a 12-tick beat (`CREDITS_BEAT_TICKS`,
   `creditsConfirmAllowed`), so a press still down from Milo's last line can't
-  skip the credits. It puts the kept snapshot back as the state, with no core
+  skip the credits. Clicking or tapping `.credits-screen` (`createCredits`
+  `onClose`, Milestone 126; with `:root[data-credits="open"] .touch-controls`
+  set to `pointer-events: none` so touch taps reach the sheet while
+  `.touch-buttons` keeps `pointer-events: auto`) emits a `confirm` tap through
+  the same beat guard. It puts the kept snapshot back as the state, with no core
   tick, and opens the title in `continue` mode over it: Continue resumes the
   dream at the save's exact hash, as a later boot does. The credits only
   follow an ending in the same session (the morning is never saved), so
@@ -2684,7 +2705,10 @@ trunks keep its two exits.
 - Battle UI is the sticker DOM layer (`src/ui/battle.ts`): a HUD, a command
   menu, a check overlay (a ring, a charge meter, a beat chain, a catch, or a
   lean) with its
-  grade sticker and hint, and a reward card. The game passes a full view to
+  grade sticker and hint, and a reward card (`.battle-reward`, which exposes
+  `onConfirm` in Milestone 126 with `cursor: pointer; pointer-events: auto` so
+  clicking or tapping the reward sticker or arcade prize card emits a `confirm`
+  tap). The game passes a full view to
   each `render` every frame; identical views change no DOM nodes. Battle
   messages use the dialogue box with no speaker.
 - One stacking scale (`--z-*` in sticker.css), bottom to top: HUD, dialogue,

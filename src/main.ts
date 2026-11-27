@@ -265,11 +265,15 @@ async function boot(): Promise<void> {
     );
   });
   dialogueBox.onChoose((index) => touch.tapChoice(index));
+  dialogueBox.onAdvance(() => touch.tapButton("confirm"));
+  prompt.onActivate(() => touch.tapButton("confirm"));
   commandMenu.onChoose((index) => touch.tapChoice(index));
+  rewardSticker.onConfirm(() => touch.tapButton("confirm"));
   battleHud.onTogether(() => touch.tapButton("cancel"));
   battleHud.onFlute(() => touch.tapButton("flute"));
   battleHud.onLasso(() => touch.tapButton("lasso"));
   journal.onClose(() => touch.tapButton("cancel"));
+  credits.onClose(() => touch.tapButton("confirm"));
   const view = new GameView(content.world, {
     debugLabel: import.meta.env.DEV || import.meta.env.MODE === "harness",
     renderer: app.renderer,

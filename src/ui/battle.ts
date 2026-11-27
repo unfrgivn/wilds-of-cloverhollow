@@ -1004,7 +1004,9 @@ export function createWindUpBubbles(root: HTMLElement): {
 
 export function createRewardSticker(root: HTMLElement): {
   render: (view: RewardStickerView) => void;
+  onConfirm: (callback: () => void) => void;
 } {
+  let confirmHandler: () => void = () => undefined;
   const card = element("section", "battle-reward");
   const title = element("div", "battle-reward-title");
   const image = element("div", "battle-reward-image die-cut");
@@ -1012,8 +1014,14 @@ export function createRewardSticker(root: HTMLElement): {
   const name = element("div", "battle-reward-name");
   card.append(title, image, name);
   card.hidden = true;
+  card.addEventListener("click", () => {
+    if (!card.hidden) confirmHandler();
+  });
   root.append(card);
   return {
+    onConfirm: (callback) => {
+      confirmHandler = callback;
+    },
     render: (view) => {
       card.hidden = !view.visible;
       card.classList.toggle("is-visible", view.visible);

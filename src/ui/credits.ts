@@ -12,10 +12,17 @@ export type CreditsView = {
   summary?: readonly string[];
 };
 
-export function createCredits(root: HTMLElement): { render: (view: CreditsView) => void } {
+export function createCredits(root: HTMLElement): {
+  render: (view: CreditsView) => void;
+  onClose: (callback: () => void) => void;
+} {
+  let closeHandler: () => void = () => undefined;
   const screen = document.createElement("section");
   screen.className = "credits-screen";
   screen.setAttribute("aria-label", "Credits");
+  screen.addEventListener("click", () => {
+    if (!screen.hidden) closeHandler();
+  });
   const title = document.createElement("h1");
   title.className = "credits-title";
   title.textContent = "THE END";
@@ -41,62 +48,70 @@ export function createCredits(root: HTMLElement): { render: (view: CreditsView) 
   let shown = "";
   // The stickers' atlases, decoded and held while the credits are up.
   let atlases: HTMLImageElement[] = [];
-  return { render: (view) => {
-    screen.hidden = !view.visible;
-    if (!view.visible) {
-      shown = "";
-      atlases = [];
-      return;
-    }
-    const summary = view.summary ?? [];
-    const key = JSON.stringify({ entries: view.entries, summary });
-    if (key === shown) return;
-    shown = key;
-    friends.hidden = !view.entries.some((entry) => entry.section === "friends");
-    met.hidden = !view.entries.some((entry) => entry.section === "met");
-    summaryList.hidden = summary.length === 0;
-    summaryList.replaceChildren(
-      ...summary.map((text) => {
+  return {
+    onClose: (callback) => {
+      closeHandler = callback;
+    },
+    render: (view) => {
+      screen.hidden = !view.visible;
+      if (!view.visible) {
+        shown = "";
+        atlases = [];
+        return;
+      }
+      const summary = view.summary ?? [];
+      const key = JSON.stringify({ entries: view.entries, summary });
+      if (key === shown) return;
+      shown = key;
+      friends.hidden = !view.entries.some((entry) => entry.section === "friends");
+      met.hidden = !view.entries.some((entry) => entry.section === "met");
+      summaryList.hidden = summary.length === 0;
+      summaryList.replaceChildren(
+        ...summary.map((text) => {
+          const item = document.createElement("li");
+          item.className = text.startsWith("★ ")
+            ? "credits-summary-pill is-master"
+            : "credits-summary-pill";
+          item.textContent = text;
+          return item;
+        }),
+      );
+      const renderEntry = (entry: CreditsEntryView): HTMLLIElement => {
         const item = document.createElement("li");
-        item.className = text.startsWith("★ ")
-          ? "credits-summary-pill is-master"
-          : "credits-summary-pill";
-        item.textContent = text;
+        item.className = `credits-entry credits-entry-${entry.section}`;
+        const image = document.createElement("div");
+        image.className = "credits-entry-image die-cut";
+        const atlas = entry.image;
+        if (atlas !== null) applyAtlasCrop(image, atlas);
+        const label = document.createElement("span");
+        label.className = "credits-entry-name";
+        label.textContent = entry.name;
+        item.append(image, label);
         return item;
-      }),
-    );
-    const renderEntry = (entry: CreditsEntryView): HTMLLIElement => {
-      const item = document.createElement("li");
-      item.className = `credits-entry credits-entry-${entry.section}`;
-      const image = document.createElement("div");
-      image.className = "credits-entry-image die-cut";
-      const atlas = entry.image;
-      if (atlas !== null) applyAtlasCrop(image, atlas);
-      const label = document.createElement("span");
-      label.className = "credits-entry-name";
-      label.textContent = entry.name;
-      item.append(image, label);
-      return item;
-    };
-    friendsList.replaceChildren(...view.entries.filter((entry) => entry.section === "friends")
-      .map(renderEntry));
-    metList.replaceChildren(...view.entries.filter((entry) => entry.section === "met")
-      .map(renderEntry));
-    // The stickers show once their atlases are decoded. A new layer's first
-    // paint in WebKit decodes a large image at the size it's drawn unless a
-    // whole decode is ready, and that copy resamples a little differently from
-    // the whole one every later paint draws (and pops in when it's done).
-    const sources = new Set(view.entries.flatMap((entry) =>
-      entry.image === null ? [] : [entry.image.src]));
-    const decoding = [...sources].map((src) => {
-      const image = new Image();
-      image.src = src;
-      return image;
-    });
-    atlases = decoding;
-    screen.dataset.stickers = "decoding";
-    void Promise.allSettled(decoding.map((image) => image.decode())).then(() => {
-      if (atlases === decoding) screen.dataset.stickers = "ready";
-    });
-  } };
+      };
+      friendsList.replaceChildren(
+        ...view.entries.filter((entry) => entry.section === "friends").map(renderEntry),
+      );
+      metList.replaceChildren(
+        ...view.entries.filter((entry) => entry.section === "met").map(renderEntry),
+      );
+      // The stickers show once their atlases are decoded. A new layer's first
+      // paint in WebKit decodes a large image at the size it's drawn unless a
+      // whole decode is ready, and that copy resamples a little differently from
+      // the whole one every later paint draws (and pops in when it's done).
+      const sources = new Set(
+        view.entries.flatMap((entry) => (entry.image === null ? [] : [entry.image.src])),
+      );
+      const decoding = [...sources].map((src) => {
+        const image = new Image();
+        image.src = src;
+        return image;
+      });
+      atlases = decoding;
+      screen.dataset.stickers = "decoding";
+      void Promise.allSettled(decoding.map((image) => image.decode())).then(() => {
+        if (atlases === decoding) screen.dataset.stickers = "ready";
+      });
+    },
+  };
 }

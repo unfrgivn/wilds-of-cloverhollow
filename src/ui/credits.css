@@ -13,6 +13,7 @@
     calc(124px + var(--safe-bottom)) max(24px, var(--safe-left));
   background: var(--sticker-paper);
   color: var(--sticker-ink);
+  cursor: pointer;
   text-align: center;
   font-family: var(--sticker-font);
 }
@@ -118,6 +119,7 @@
   font-size: 22px;
   font-weight: 700;
 }
+:root[data-credits="open"] .touch-controls { pointer-events: none; }
 :root[data-credits="open"] .touch-stick,
 :root[data-credits="open"] .touch-menu,
 :root[data-credits="open"] .touch-cancel,

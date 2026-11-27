@@ -14,11 +14,25 @@ export type DialogueView = {
   accent?: SpeakerAccent;
 };
 
+export type DialogueClickState = Pick<
+  DialogueView,
+  "canAdvance" | "choices" | "revealed" | "text"
+> & { visible: boolean };
+
+/** True when clicking or tapping the dialogue card should reveal or advance the active line. */
+export function shouldAdvanceDialogueClick(view: DialogueClickState): boolean {
+  return (
+    view.visible &&
+    (view.revealed < view.text.length || (view.canAdvance && view.choices.length === 0))
+  );
+}
+
 type ChoiceCallback = (index: number) => void;
 
 export function createDialogueBox(root: HTMLElement): {
   render: (view: DialogueView) => void;
   onChoose: (callback: ChoiceCallback) => void;
+  onAdvance: (callback: () => void) => void;
   hide: () => void;
 } {
   const box = document.createElement("section");
@@ -61,14 +75,33 @@ export function createDialogueBox(root: HTMLElement): {
   box.append(portrait, speaker, text, subtitle, live, choiceLive, advance, choices);
   root.append(box);
   let choose: ChoiceCallback = () => undefined;
+  let advanceHandler: () => void = () => undefined;
+  let canClickAdvance = false;
   let announcedLine = "";
   let announcedChoice = "";
   let lastPortraitKey = "";
   let lastAccent = "";
 
+  box.addEventListener("click", (event) => {
+    if (box.hidden || !canClickAdvance) return;
+    if (
+      event.target instanceof Element &&
+      event.target.closest(".sticker-choice, .sticker-choices") !== null
+    ) {
+      return;
+    }
+    advanceHandler();
+  });
+
   const onChoose = (callback: ChoiceCallback): void => { choose = callback; };
+  const onAdvance = (callback: () => void): void => { advanceHandler = callback; };
   const render = (view: DialogueView): void => {
     box.hidden = false;
+    const nextClickable = shouldAdvanceDialogueClick({ ...view, visible: true });
+    if (nextClickable !== canClickAdvance) {
+      canClickAdvance = nextClickable;
+      box.classList.toggle("is-clickable", canClickAdvance);
+    }
     const accent = view.accent ?? "default";
     if (accent !== lastAccent) {
       speaker.dataset.accent = accent;
@@ -134,7 +167,18 @@ export function createDialogueBox(root: HTMLElement): {
       announcedChoice = selectedText;
     }
   };
-  return { render, onChoose, hide: () => { box.hidden = true; } };
+  return {
+    render,
+    onChoose,
+    onAdvance,
+    hide: () => {
+      box.hidden = true;
+      if (canClickAdvance) {
+        canClickAdvance = false;
+        box.classList.remove("is-clickable");
+      }
+    },
+  };
 }
 
 export type PromptView = { label: string; x: number; y: number; visible: boolean };
@@ -147,9 +191,17 @@ export function clampPromptPosition(x: number, y: number, width: number, height:
     y: Math.min(Math.max(insets.top + height, y), viewportHeight - insets.bottom - 8) };
 }
 
-export function createPrompt(root: HTMLElement): { render: (view: PromptView) => void } {
+export function createPrompt(root: HTMLElement): {
+  render: (view: PromptView) => void;
+  onActivate: (callback: () => void) => void;
+} {
+  let activateHandler: () => void = () => undefined;
   const prompt = document.createElement("div");
   prompt.className = "sticker-ui sticker-prompt";
+  prompt.setAttribute("role", "button");
+  prompt.addEventListener("click", () => {
+    if (!prompt.hidden) activateHandler();
+  });
   const label = document.createElement("span");
   const arrow = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   arrow.classList.add("sticker-prompt-arrow");
@@ -190,6 +242,7 @@ export function createPrompt(root: HTMLElement): { render: (view: PromptView) =>
     label.textContent = view.label;
     prompt.hidden = !view.visible;
     if (view.visible) {
+      prompt.setAttribute("aria-label", view.label);
       const insets = currentInsets();
       const position = clampPromptPosition(view.x, view.y, prompt.offsetWidth,
         prompt.offsetHeight + 44, window.innerWidth, window.innerHeight, insets);
@@ -205,6 +258,8 @@ export function createPrompt(root: HTMLElement): { render: (view: PromptView) =>
       arrow.style.top = `calc(100% + ${dy}px)`;
       prompt.dataset.tipX = String(position.x);
       prompt.dataset.tipY = String(position.y);
+    } else {
+      prompt.removeAttribute("aria-label");
     }
   };
   const invalidate = (): void => {
@@ -213,15 +268,20 @@ export function createPrompt(root: HTMLElement): { render: (view: PromptView) =>
   };
   window.addEventListener("resize", invalidate);
   document.fonts?.addEventListener("loadingdone", invalidate);
-  return { render: (view) => {
-    lastView = view;
-    const key = view.visible
-      ? `${view.label}|${view.x}|${view.y}|${window.innerWidth}x${window.innerHeight}`
-      : "hidden";
-    if (key === lastKey) return;
-    lastKey = key;
-    apply(view);
-  } };
+  return {
+    onActivate: (callback) => {
+      activateHandler = callback;
+    },
+    render: (view) => {
+      lastView = view;
+      const key = view.visible
+        ? `${view.label}|${view.x}|${view.y}|${window.innerWidth}x${window.innerHeight}`
+        : "hidden";
+      if (key === lastKey) return;
+      lastKey = key;
+      apply(view);
+    },
+  };
 }
 
 // A recurring critter's mark (spec 8.1, Milestone 51): "?" while it hasn't

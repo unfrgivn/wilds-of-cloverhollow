@@ -73,6 +73,11 @@
   animation: sticker-fade-in 150ms ease-out;
 }
 
+.sticker-dialogue.is-clickable {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
 :root[data-battle="open"] .sticker-dialogue {
   right: calc(300px + var(--safe-right));
   width: min(620px, calc(100vw - 320px - var(--safe-left) - var(--safe-right)));
@@ -492,10 +497,13 @@
   background: var(--sticker-teal);
   box-shadow: var(--sticker-shadow);
   color: var(--sticker-ink);
+  cursor: pointer;
   font-size: var(--sticker-label-size);
   font-weight: 800;
   letter-spacing: .1em;
+  pointer-events: auto;
   text-transform: uppercase;
+  touch-action: manipulation;
   transform: translate(-50%, calc(-100% - 45px));
 }
 .sticker-prompt > span {
@@ -524,6 +532,7 @@
   width: 44px;
   height: 41px;
   overflow: visible;
+  pointer-events: none;
   transform: translateX(-50%);
 }
 

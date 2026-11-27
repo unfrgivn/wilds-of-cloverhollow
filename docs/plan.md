@@ -5608,6 +5608,45 @@ the old trail, the owl, and the clubhouse claim.
   `CLOVERHOLLOW_E2E_PORT=4451 just e2e` (1,140 passed, 2 skipped, 0 failed,
   zero snapshot diffs across Chromium & WebKit in 5.6 min).
 
+## Milestone 126: Universal Pointer & Touch Click-to-Advance Ergonomics (Dialogue Box, Floating Overworld `TALK`/`LOOK` Prompts, Battle Reward Sticker Card & Ending Credits Screen) **Status:** ✅ Completed (2026-11-27)
+- Zero `src/core` changes and zero replay hash shifts across all 67 recorded
+  sims; zero visual pixel changes across all existing Playwright snapshots.
+- Dialogue Box Click-to-Advance (`src/ui/sticker.ts`, `src/ui/sticker.css`,
+  `src/main.ts`):
+  - Exports pure helper `shouldAdvanceDialogueClick` returning `true` when
+    visible and either typing (`revealed < text.length`) or advanceable with no
+    open choices (`canAdvance && choices.length === 0`).
+  - Extends `createDialogueBox` with `onAdvance`, toggling `.is-clickable`
+    (`cursor: pointer; pointer-events: auto`) with zero DOM churn on identical
+    renders and ignoring clicks originating inside `.sticker-choice` /
+    `.sticker-choices`, wired to `touch.tapButton("confirm")`.
+- Floating Overworld Prompt Pill (`src/ui/sticker.ts`, `src/ui/sticker.css`,
+  `src/main.ts`):
+  - Extends `createPrompt` with `onActivate`, `role="button"`, synced
+    `aria-label`, and `cursor: pointer; pointer-events: auto` on
+    `.sticker-prompt` while keeping `.sticker-prompt-arrow` at
+    `pointer-events: none`, wired to `touch.tapButton("confirm")`.
+- Battle Reward Sticker Card (`src/ui/battle.ts`, `src/ui/battle.css`,
+  `src/main.ts`):
+  - Extends `createRewardSticker` with `onConfirm` and
+    `cursor: pointer; pointer-events: auto` on `.battle-reward`, wired to
+    `touch.tapButton("confirm")`.
+- Ending Credits Screen (`src/ui/credits.ts`, `src/ui/credits.css`,
+  `src/main.ts`):
+  - Extends `createCredits` with `onClose` and `cursor: pointer` on
+    `.credits-screen` (plus `:root[data-credits="open"] .touch-controls`
+    `pointer-events: none` so touch taps reach the credits sheet while
+    `.touch-buttons` keeps `pointer-events: auto`), wired to
+    `touch.tapButton("confirm")` through the existing `CREDITS_BEAT_TICKS`
+    guard.
+- Evidence: `tests/unit/milestone-126.test.ts` (2 tests) and real-click/touch
+  `tests/e2e/milestone-126.spec.ts` (`@smoke` on Chromium & WebKit).
+- Gates: `just check` (185 unit files / 1,391 tests, all 67 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  `CLOVERHOLLOW_E2E_PORT=4461 just e2e` (1,146 passed, 2 skipped, 0 failed,
+  zero snapshot diffs across Chromium & WebKit in 5.5 min).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

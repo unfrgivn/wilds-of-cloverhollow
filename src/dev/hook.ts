@@ -1,6 +1,7 @@
 import { stableHash, type ActionFrame, type State, type TextSpeed } from "../core";
 import type { InputSource } from "../platform/input";
 import type { AudioController } from "../platform/audio";
+import type { MinigameRecords } from "../platform/minigame-records";
 import type { BattleCheckInfo } from "../render/view";
 import type { TimeOfDayPhase } from "../render/time-of-day";
 import type { ArcadeInfo } from "../ui/arcade";
@@ -111,6 +112,7 @@ export type CloverhollowHook = {
     photoMode: () => boolean;
     setPhotoMode: (on: boolean) => void;
     snapPostcard: (options?: { download?: boolean }) => Promise<PostcardCapture | null>;
+    minigameRecords: () => MinigameRecords;
   };
 };
 

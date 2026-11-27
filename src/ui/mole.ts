@@ -1,4 +1,10 @@
 import "./mole.css";
+import {
+  classifyMolePopup,
+  createArcadePopupLayer,
+  updateArcadeBestBadge,
+  type ArcadeRecordBadge,
+} from "./arcade-popups";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
 import { element, measure, pixels, place, setStyle, setText, type Box } from "./dom";
 import { layoutMole, moleFrame, type MoleLayout } from "./mole-layout";
@@ -43,16 +49,22 @@ export function createMole(
   calibration: MoleCalibration,
   image: string,
   onHole: (hole: MoleHole, down: boolean) => void,
-): { render: (view: MoleView | null) => void; info: () => MoleInfo | null } {
+): {
+  render: (view: MoleView | null, record?: ArcadeRecordBadge | null) => void;
+  info: () => MoleInfo | null;
+} {
   const overlay = element("section", "mole-overlay", root);
   overlay.setAttribute("aria-label", "Boop-a-Mole");
   overlay.hidden = true;
+  const popups = createArcadePopupLayer(overlay);
   const machine = element("div", "mole-machine", overlay);
   const paint = element("div", "mole-paint", machine);
   paint.style.backgroundImage = `url("${image}")`;
   const plate = element("div", "mole-plate", machine);
   const plateText = element("span", "mole-plate-text", plate);
   const hud = element("div", "mole-hud", machine);
+  const bestBadge = element("div", "arcade-best-badge is-left-anchored", machine);
+  bestBadge.hidden = true;
   const score = element("span", "mole-score", hud);
   const left = element("span", "mole-left", hud);
   type HoleNodes = { hole: MoleHole; box: HTMLDivElement; sprite: HTMLDivElement;
@@ -89,13 +101,19 @@ export function createMole(
   let lastPlateKey = "";
   let lastView: MoleView | null = null;
   let lastLayout: MoleLayout | null = null;
+  let lastRecord: ArcadeRecordBadge | null = null;
+  let prevBoops: number | null = null;
   const frames = new Map<string, AtlasImage | null>();
   const frameArt = (name: string): AtlasImage | null => {
     if (!frames.has(name)) frames.set(name, art(name));
     return frames.get(name) ?? null;
   };
 
-  const draw = (view: MoleView, layout: MoleLayout): void => {
+  const draw = (
+    view: MoleView,
+    layout: MoleLayout,
+    record: ArcadeRecordBadge | null,
+  ): void => {
     setStyle(machine, "width", `${layout.width}px`);
     setStyle(machine, "height", `${layout.height}px`);
     setStyle(paint, "background-size",
@@ -121,6 +139,10 @@ export function createMole(
     setStyle(hud, "top", `${layout.hud.y}px`);
     setStyle(hud, "font-size", `${Math.max(14, Math.round(layout.plate.height * 0.3))}px`);
     hud.hidden = view.phase === "result";
+    setStyle(bestBadge, "left", `${layout.hud.x}px`);
+    setStyle(bestBadge, "top", `${layout.hud.y}px`);
+    setStyle(bestBadge, "font-size", `${Math.max(12, Math.round(layout.plate.height * 0.24))}px`);
+    updateArcadeBestBadge(bestBadge, view.phase === "result", record);
     setText(score, `BOOPS ${view.booped}`);
     setText(left, `MOLES ${view.molesLeft}`);
     for (const nodes of holes) {
@@ -168,28 +190,37 @@ export function createMole(
   // when it loads (spec 7.1): what's shown is drawn again then.
   document.fonts.addEventListener("loadingdone", () => {
     lastPlateKey = "";
-    if (lastView !== null && lastLayout !== null) draw(lastView, lastLayout);
+    if (lastView !== null && lastLayout !== null) draw(lastView, lastLayout, lastRecord);
   });
 
   return {
-    render: (view) => {
+    render: (view, record = null) => {
       overlay.hidden = view === null;
       lastView = view;
+      lastRecord = record;
       if (view === null) {
         lastKey = "";
+        prevBoops = null;
+        popups.clear();
+        bestBadge.hidden = true;
         return;
       }
+      const popupSpec = classifyMolePopup(prevBoops, view.booped);
+      prevBoops = view.booped;
+      if (view.phase === "result") popups.clear();
+      else if (popupSpec !== null) popups.spawn(popupSpec);
       const style = getComputedStyle(overlay);
       const width = overlay.clientWidth - pixels(style.paddingLeft) - pixels(style.paddingRight);
       const height = overlay.clientHeight - pixels(style.paddingTop) -
         pixels(style.paddingBottom);
-      const key = `${width}x${height} ${JSON.stringify(view)}`;
+      const recordKey = record === null ? "" : `${record.best}:${record.isNewBest ? 1 : 0}`;
+      const key = `${width}x${height} ${recordKey} ${JSON.stringify(view)}`;
       if (key === lastKey) return;
       lastKey = key;
       const shown = moleFrame(calibration);
       const scale = Math.max(0.01, Math.min(width / shown.w, height / shown.h));
       lastLayout = layoutMole(view, calibration, scale);
-      draw(view, lastLayout);
+      draw(view, lastLayout, record);
     },
     info: () => {
       if (lastView === null || lastLayout === null) return null;

@@ -1,4 +1,10 @@
 import "./fish.css";
+import {
+  classifyFishPopup,
+  createArcadePopupLayer,
+  updateArcadeBestBadge,
+  type ArcadeRecordBadge,
+} from "./arcade-popups";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
 import { element, measure, pixels, place, setStyle, setText, type Box } from "./dom";
 import { layoutFish, type FishLayout } from "./fish-layout";
@@ -41,10 +47,14 @@ export function createFish(
   art: (frame: string) => AtlasImage | null,
   calibration: FishCalibration,
   image: string,
-): { render: (view: FishView | null) => void; info: () => FishInfo | null } {
+): {
+  render: (view: FishView | null, record?: ArcadeRecordBadge | null) => void;
+  info: () => FishInfo | null;
+} {
   const overlay = element("section", "fish-overlay", root);
   overlay.setAttribute("aria-label", "Bubblegum Bay fishing dock");
   overlay.hidden = true;
+  const popups = createArcadePopupLayer(overlay);
 
   const stage = element("div", "fish-stage", overlay);
   stage.style.backgroundImage = `url("${image}")`;
@@ -159,10 +169,12 @@ export function createFish(
   const bookSlots = element("div", "fish-book-slots", book);
   const slotNodes: { wrap: HTMLDivElement; sprite: HTMLDivElement; frame: string }[] = [];
 
-  // Top-right escape pill.
+  // Top-right escape pill and Personal Best result pill.
   const escape = element("div", "fish-escape", stage);
   const escapeText = element("span", "fish-escape-text", escape);
   setText(escapeText, "Esc · Pack up");
+  const bestBadge = element("div", "arcade-best-badge", stage);
+  bestBadge.hidden = true;
 
   // Left Cast Power Gauge (aim phase).
   const powerGauge = element("div", "fish-power", stage);
@@ -234,8 +246,14 @@ export function createFish(
   let lastCatchFrame = "";
   let lastView: FishView | null = null;
   let lastLayout: FishLayout | null = null;
+  let lastRecord: ArcadeRecordBadge | null = null;
+  let prevPhase: string | null = null;
 
-  const draw = (view: FishView, layout: FishLayout): void => {
+  const draw = (
+    view: FishView,
+    layout: FishLayout,
+    record: ArcadeRecordBadge | null,
+  ): void => {
     place(stage, { x: 0, y: 0, width: layout.width, height: layout.height });
     setStyle(stage, "border-radius", `${layout.radius}px`);
     stage.dataset.scale = String(layout.scale);
@@ -358,12 +376,16 @@ export function createFish(
       }
     });
 
-    // Top-right escape pill (touch-aware copy).
+    // Top-right escape pill (touch-aware copy) and Personal Best result badge.
     escape.hidden = !view.canCancel;
     place(escape, layout.escape);
     const touchOn = document.documentElement.dataset.touch === "on";
     setText(escapeText, touchOn ? "× · Pack up" : "Esc · Pack up");
     setStyle(escapeText, "font-size", `${Math.max(9, Math.round(layout.escape.height * 0.42))}px`);
+    setStyle(bestBadge, "top", `${layout.escape.y}px`);
+    setStyle(bestBadge, "right", `${Math.max(8, Math.round(28 * layout.scale))}px`);
+    setStyle(bestBadge, "font-size", `${Math.max(10, Math.round(layout.escape.height * 0.38))}px`);
+    updateArcadeBestBadge(bestBadge, view.phase === "result", record);
 
     // Left Cast Power Gauge (aim phase).
     powerGauge.hidden = view.phase !== "aim";
@@ -460,22 +482,35 @@ export function createFish(
 
   document.fonts.addEventListener("loadingdone", () => {
     lastFrontKey = "";
-    if (lastView !== null && lastLayout !== null) draw(lastView, lastLayout);
+    if (lastView !== null && lastLayout !== null) draw(lastView, lastLayout, lastRecord);
   });
 
   return {
-    render: (view) => {
+    render: (view, record = null) => {
       overlay.hidden = view === null;
       lastView = view;
+      lastRecord = record;
       if (view === null) {
         lastKey = "";
+        prevPhase = null;
+        popups.clear();
+        bestBadge.hidden = true;
         return;
       }
+      const popupSpec = classifyFishPopup(
+        prevPhase,
+        view.phase,
+        view.caught?.rarity === "rare",
+        view.caught !== null,
+      );
+      prevPhase = view.phase;
+      if (popupSpec !== null) popups.spawn(popupSpec);
       const style = getComputedStyle(overlay);
       const width = overlay.clientWidth - pixels(style.paddingLeft) - pixels(style.paddingRight);
       const height = overlay.clientHeight - pixels(style.paddingTop) - pixels(style.paddingBottom);
       const touch = document.documentElement.dataset.touch === "on" ? "1" : "0";
-      const key = `${width}x${height} ${touch} ${JSON.stringify(view)}`;
+      const recordKey = record === null ? "" : `${record.best}:${record.isNewBest ? 1 : 0}`;
+      const key = `${width}x${height} ${touch} ${recordKey} ${JSON.stringify(view)}`;
       if (key === lastKey) return;
       lastKey = key;
       const scale = Math.max(
@@ -483,7 +518,7 @@ export function createFish(
         Math.min(width / calibration.size.w, height / calibration.size.h),
       );
       lastLayout = layoutFish(view, calibration, scale);
-      draw(view, lastLayout);
+      draw(view, lastLayout, record);
     },
     info: () => {
       if (lastView === null || lastLayout === null) return null;

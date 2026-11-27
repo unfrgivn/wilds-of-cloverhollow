@@ -5185,6 +5185,31 @@ the old trail, the owl, and the clubhouse claim.
 - Gates: `just check` (169 unit files / 1,297 tests, all 67 sims, 23 QA packs,
   purity, lint), `just build`, and 559/559 targeted Chromium & WebKit e2e tests.
 
+## Milestone 114: Tactile Minigame Personal Bests & Die-Cut Arcade Score Popups **Status:** ✅ Completed (2026-11-27)
+- Adds Paper-Mario die-cut score popups and persistent local Personal Best
+  celebrations across Skee-Ball, Boop-a-Mole, Comet Cruise, and Bubblegum Bay
+  Fishing with zero `src/core` changes, zero save-version bumps, zero replay
+  hash drift across all 67 sims, and zero `ui-gallery` baseline regressions.
+- Persistent local Personal Bests (`src/platform/minigame-records.ts`):
+  - Stored via `@capacitor/preferences` under `"cloverhollow-records"`
+    (`skee`, `mole`, `comet`, `fish` consecutive streak) with strict integer
+    clamping, zero-score `NEW BEST` guard, and `window.__cloverhollow.settings.minigameRecords()`.
+- Die-cut arcade score popups & result badges (`src/ui/arcade-popups.{ts,css}`,
+  `src/ui/{skee,mole,comet,fish,arcade}.ts`, `src/shell/assets.ts`, `src/main.ts`):
+  - Pure classifiers (`classifySkeePopup`, `classifyMolePopup`,
+    `classifyCometPopup`, `classifyFishPopup`) stay silent on initial open and
+    static gallery renders, spawning crisp `#47321f`-inked pastel pills
+    (`+N`, `+50!`, `+100 ★!`, `BOOP! +2`, `★ +1`, `NICE CATCH!`, `★ RARE!`) on
+    live score gains and golden `★ NEW BEST! <best>` / `Best: <best>` badges on
+    live result screens, respecting both OS and in-game reduced motion.
+- Evidence: `tests/unit/milestone-113.test.ts` (10 tests) and
+  `tests/e2e/milestone-113.spec.ts` (`@smoke` Chromium + WebKit); review
+  captures `art/review/m112-mole-popup-1280.jpg`, `m112-skee-best-1280.jpg`, and
+  refreshed live result snapshots independently verified via `vision`.
+- Gates: `just check` (170 unit files / 1,307 tests, all 67 sims, 23 QA packs,
+  purity, lint), `just build`, 17/17 minigame e2e, and 361/361 Chromium
+  `ui-gallery` + `ui-gallery-checks`.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

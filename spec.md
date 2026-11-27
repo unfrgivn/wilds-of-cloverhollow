@@ -3269,6 +3269,24 @@ trunks keep its two exits.
   and celebratory pop on `ding`; smooth choice/command/title transitions,
   `.touch-button:active` tactile squash, and subtle inner-label float on
   `.sticker-prompt` keeping its arrow tip anchored.
+- Tactile Minigame Personal Bests & Die-Cut Arcade Score Popups (Milestone 112):
+  persistent local personal bests (`src/platform/minigame-records.ts`, stored
+  outside the save slot via `@capacitor/preferences` under
+  `"cloverhollow-records"` with keys `skee`, `mole`, `comet`, and consecutive
+  fishing catch streak `fish`; zero `src/core` changes and zero save-version
+  bump) and live Paper-Mario die-cut arcade score popups (`src/ui/arcade-popups.ts`
+  and `src/ui/arcade-popups.css`). Pure classifiers (`classifySkeePopup`,
+  `classifyMolePopup`, `classifyCometPopup`, `classifyFishPopup`) stay silent on
+  initial open, reset, or static `ui-gallery` renders, and spawn crisp
+  `#47321f`-inked `.arcade-popup` pills (`+N`, `+50!`, `+100 ★!`, `BOOP! +2`,
+  `★ +1`, `NICE CATCH!`, `★ RARE!`) in the upper-right margin on live gains.
+  When a live round enters `phase === "result"`, the minigame renders a die-cut
+  `.arcade-best-badge` pill (`★ NEW BEST! <best>` in gold when beating a
+  non-zero record, or `Best: <best>` in warm cream otherwise) in the vacated
+  HUD/escape slot; static gallery callers omit the optional second `record`
+  argument so gallery baselines stay pixel-identical. All popup and badge
+  animations respect both `@media (prefers-reduced-motion: reduce)` and
+  `:root[data-reduced-motion="on"]`.
 
 ## 9. Journal and stickers
 - Experience is saved as XP for Fae and each party member. A member's level is
@@ -3695,9 +3713,10 @@ trunks keep its two exits.
   These are harness only and are absent from production.
 - `settings` exposes `gentleTiming()`, `setGentleTiming(on)`, `keyHints()`,
   `setKeyHints(on)`, `textSpeed()`, `setTextSpeed(speed)`, `reducedMotion()`,
-  `setReducedMotion(on)`, `photoMode()`, `setPhotoMode(on)`, and
-  `snapPostcard(options?)` for toggling and reading gameplay preferences and
-  testing Photo Mode postcard captures in harness tests.
+  `setReducedMotion(on)`, `photoMode()`, `setPhotoMode(on)`,
+  `snapPostcard(options?)`, and `minigameRecords()` for toggling and reading
+  gameplay preferences, testing Photo Mode postcard captures, and verifying
+  persisted local minigame Personal Bests in harness tests.
 - The iOS shell's native evidence uses the untouched Capacitor SPM template
   for native code and AXe for simulator UI description and touch gestures.
   `just ios-smoke` is the automated native evidence step; it resolves an

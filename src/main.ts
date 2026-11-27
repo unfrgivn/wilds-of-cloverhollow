@@ -72,6 +72,8 @@ import { createHaptics } from "./platform/haptics";
 import { findPettableCompanion, findRestSpot } from "./render/companions";
 import type { AudioLevel } from "./platform/audio-settings";
 import { createGameSettings } from "./platform/game-settings";
+import { createMinigameRecords } from "./platform/minigame-records";
+import type { ArcadeRecordBadge } from "./ui/arcade-popups";
 import { areaBannerInfo, createAreaBanner } from "./ui/area-banner";
 import { createHudHints, resolveHudInteractHint } from "./ui/hud-hints";
 import { createSaveToast } from "./ui/save-toast";
@@ -185,6 +187,11 @@ async function boot(): Promise<void> {
     syncReducedMotion();
     invalidate();
   });
+  const minigameRecords = createMinigameRecords(() => {
+    invalidate();
+  });
+  let activeArcadeRecord: ArcadeRecordBadge | null = null;
+  let fishStreak = 0;
   syncReducedMotion();
   const hudHints = createHudHints(uiRoot);
   const saveToast = createSaveToast(uiRoot);
@@ -583,7 +590,7 @@ async function boot(): Promise<void> {
       }
     }
     const arcadeState = arcadeView(content.world, state, gameSettings.gentleTiming());
-    assets.renderOverlays(arcadeState);
+    assets.renderOverlays(arcadeState, activeArcadeRecord);
     if (state.journalOpen && !wasJournalOpen) {
       void assets.warmJournalAssets(state).then(() => {
         if (state.journalOpen) invalidate();
@@ -983,6 +990,33 @@ async function boot(): Promise<void> {
     });
     state = stepped.state;
     previousState = state.area === previous.area ? previous : state;
+    if (previous.area !== state.area) fishStreak = 0;
+    const nextArcade = state.arcade;
+    if (nextArcade === null || nextArcade.phase !== "result") {
+      activeArcadeRecord = null;
+    } else if (
+      previous.arcade !== null &&
+      previous.arcade.game === nextArcade.game &&
+      previous.arcade.phase !== "result"
+    ) {
+      if (nextArcade.game === "skee") {
+        const total = nextArcade.throws.reduce((sum, item) => sum + item.points, 0);
+        activeArcadeRecord = minigameRecords.submit("skee", total);
+      } else if (nextArcade.game === "mole") {
+        activeArcadeRecord = minigameRecords.submit("mole", nextArcade.booped);
+      } else if (nextArcade.game === "comet") {
+        activeArcadeRecord = minigameRecords.submit("comet", nextArcade.caught);
+      } else if (nextArcade.game === "fish") {
+        if (nextArcade.caught !== null) {
+          fishStreak += 1;
+          activeArcadeRecord = minigameRecords.submit("fish", fishStreak);
+        } else {
+          fishStreak = 0;
+          const best = minigameRecords.bestOf("fish");
+          activeArcadeRecord = best > 0 ? { best, isNewBest: false } : null;
+        }
+      }
+    }
     const clearRest =
       input.move.x !== 0 ||
       input.move.y !== 0 ||
@@ -1388,6 +1422,8 @@ async function boot(): Promise<void> {
         qaJustPicked = false;
         qaConsoleOpen = false;
         battlePeekOpen = false;
+        activeArcadeRecord = null;
+        fishStreak = 0;
         setPhotoMode(false);
         levelUpNotices.length = 0;
         swallowed.clear();
@@ -1443,6 +1479,7 @@ async function boot(): Promise<void> {
           setPhotoMode(on);
         },
         snapPostcard,
+        minigameRecords: () => minigameRecords.records(),
       },
       boot: { title: () => titleMode },
     });

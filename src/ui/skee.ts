@@ -1,5 +1,11 @@
 import "./skee.css";
 import {
+  classifySkeePopup,
+  createArcadePopupLayer,
+  updateArcadeBestBadge,
+  type ArcadeRecordBadge,
+} from "./arcade-popups";
+import {
   element, measure, pixels, place, setAttribute, setStyle, setText, svgElement, type Box,
 } from "./dom";
 import { layoutSkee, skeeFrame, type SkeeLayout, type Target } from "./skee-layout";
@@ -39,10 +45,14 @@ export function createSkee(
   root: HTMLElement,
   calibration: SkeeCalibration,
   image: string,
-): { render: (view: SkeeView | null) => void; info: () => SkeeInfo | null } {
+): {
+  render: (view: SkeeView | null, record?: ArcadeRecordBadge | null) => void;
+  info: () => SkeeInfo | null;
+} {
   const overlay = element("section", "skee-overlay", root);
   overlay.setAttribute("aria-label", "Skee-ball");
   overlay.hidden = true;
+  const popups = createArcadePopupLayer(overlay);
   // The close-up shows part of the painting (`skeeFrame`): a frame that clips
   // it, holding the whole painting moved so that part shows.
   const frame = element("div", "skee-frame", overlay);
@@ -54,6 +64,8 @@ export function createSkee(
   const plate = element("div", "skee-plate", machine);
   const plateText = element("span", "skee-plate-text", plate);
   const hud = element("div", "skee-hud", machine);
+  const bestBadge = element("div", "arcade-best-badge", machine);
+  bestBadge.hidden = true;
   const score = element("span", "skee-score", hud);
   const balls = element("span", "skee-balls", hud);
   balls.setAttribute("aria-label", "balls left");
@@ -72,6 +84,8 @@ export function createSkee(
   let lastPlateKey = "";
   let lastView: SkeeView | null = null;
   let lastLayout: SkeeLayout | null = null;
+  let lastRecord: ArcadeRecordBadge | null = null;
+  let prevScore: number | null = null;
 
   const targetNodes = (list: TargetNodes[], count: number, className: string): void => {
     while (list.length < count)
@@ -91,7 +105,11 @@ export function createSkee(
     nodes.label.classList.toggle("is-lit", item.lit);
   };
 
-  const draw = (view: SkeeView, layout: SkeeLayout): void => {
+  const draw = (
+    view: SkeeView,
+    layout: SkeeLayout,
+    record: ArcadeRecordBadge | null,
+  ): void => {
     setStyle(frame, "width", `${layout.frame.width}px`);
     setStyle(frame, "height", `${layout.frame.height}px`);
     setStyle(machine, "left", `${-layout.frame.x}px`);
@@ -123,6 +141,10 @@ export function createSkee(
     // As large as the marquee's lettering allows, never under 14 px.
     setStyle(hud, "font-size", `${Math.max(14, Math.round(layout.plate.height * 0.3))}px`);
     hud.hidden = view.phase === "result";
+    setStyle(bestBadge, "left", `${layout.hud.x}px`);
+    setStyle(bestBadge, "top", `${layout.hud.y}px`);
+    setStyle(bestBadge, "font-size", `${Math.max(11, Math.round(layout.plate.height * 0.24))}px`);
+    updateArcadeBestBadge(bestBadge, view.phase === "result", record);
     setText(score, `SCORE ${view.score}`);
     // A dot a ball: filled for those still to roll.
     setText(balls, "●".repeat(view.ballsLeft) + "○".repeat(view.balls - view.ballsLeft));
@@ -183,28 +205,37 @@ export function createSkee(
   // when it loads (spec 7.1): what's shown is drawn again then.
   document.fonts.addEventListener("loadingdone", () => {
     lastPlateKey = "";
-    if (lastView !== null && lastLayout !== null) draw(lastView, lastLayout);
+    if (lastView !== null && lastLayout !== null) draw(lastView, lastLayout, lastRecord);
   });
 
   return {
-    render: (view) => {
+    render: (view, record = null) => {
       overlay.hidden = view === null;
       lastView = view;
+      lastRecord = record;
       if (view === null) {
         lastKey = "";
+        prevScore = null;
+        popups.clear();
+        bestBadge.hidden = true;
         return;
       }
+      const popupSpec = classifySkeePopup(prevScore, view.score);
+      prevScore = view.score;
+      if (view.phase === "result") popups.clear();
+      else if (popupSpec !== null) popups.spawn(popupSpec);
       const style = getComputedStyle(overlay);
       const width = overlay.clientWidth - pixels(style.paddingLeft) - pixels(style.paddingRight);
       const height = overlay.clientHeight - pixels(style.paddingTop) -
         pixels(style.paddingBottom);
-      const key = `${width}x${height} ${JSON.stringify(view)}`;
+      const recordKey = record === null ? "" : `${record.best}:${record.isNewBest ? 1 : 0}`;
+      const key = `${width}x${height} ${recordKey} ${JSON.stringify(view)}`;
       if (key === lastKey) return;
       lastKey = key;
       const shown = skeeFrame(calibration);
       const scale = Math.max(0.01, Math.min(width / shown.w, height / shown.h));
       lastLayout = layoutSkee(view, calibration, scale);
-      draw(view, lastLayout);
+      draw(view, lastLayout, record);
     },
     info: () => {
       if (lastView === null || lastLayout === null) return null;

@@ -42,6 +42,7 @@ import {
 import { assetUrl } from "../platform/assets";
 import type { BattleCheckGeometry } from "../render/view";
 import type { ArcadeInfo } from "../ui/arcade";
+import type { ArcadeRecordBadge } from "../ui/arcade-popups";
 import {
   atlasImage,
   atlasImagePath,
@@ -518,6 +519,11 @@ type Overlay<V, I> = {
   info: () => I | null;
 };
 
+type RecordOverlay<V, I> = {
+  render: (view: V | null, record?: ArcadeRecordBadge | null) => void;
+  info: () => I | null;
+};
+
 export type ShellAssetsOptions = {
   world: World;
   uiRoot: HTMLElement;
@@ -551,7 +557,7 @@ export type ShellAssets = {
   warmAreaMedia: (area: Area) => Promise<void>;
   warmJournalAssets: (snapshot: State) => Promise<void>;
   warmBattlePortraits: (snapshot: State) => Promise<void>;
-  renderOverlays: (arcadeState: ArcadeView | null) => void;
+  renderOverlays: (arcadeState: ArcadeView | null, record?: ArcadeRecordBadge | null) => void;
   overlayInfo: () => ArcadeInfo | null;
 };
 
@@ -718,7 +724,7 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
     return clawLoad;
   };
 
-  let skeeOverlay: Overlay<SkeeView, SkeeInfo> | null = null;
+  let skeeOverlay: RecordOverlay<SkeeView, SkeeInfo> | null = null;
   let skeeLoad: Promise<void> | undefined;
   const ensureSkeeOverlay = (): Promise<void> => {
     if (skeeOverlay !== null) return Promise.resolve();
@@ -731,7 +737,7 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
     return skeeLoad;
   };
 
-  let moleOverlay: Overlay<MoleView, MoleInfo> | null = null;
+  let moleOverlay: RecordOverlay<MoleView, MoleInfo> | null = null;
   let moleLoad: Promise<void> | undefined;
   const ensureMoleOverlay = (): Promise<void> => {
     if (moleOverlay !== null) return Promise.resolve();
@@ -751,7 +757,7 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
     return moleLoad;
   };
 
-  let cometOverlay: Overlay<CometView, CometInfo> | null = null;
+  let cometOverlay: RecordOverlay<CometView, CometInfo> | null = null;
   let cometLoad: Promise<void> | undefined;
   const ensureCometOverlay = (): Promise<void> => {
     if (cometOverlay !== null) return Promise.resolve();
@@ -797,7 +803,7 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
     return cookLoad;
   };
 
-  let fishOverlay: Overlay<FishView, FishInfo> | null = null;
+  let fishOverlay: RecordOverlay<FishView, FishInfo> | null = null;
   let fishLoad: Promise<void> | undefined;
   const ensureFishOverlay = (): Promise<void> => {
     if (fishOverlay !== null) return Promise.resolve();
@@ -841,7 +847,10 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
     );
   };
 
-  const renderOverlays = (arcadeState: ArcadeView | null): void => {
+  const renderOverlays = (
+    arcadeState: ArcadeView | null,
+    record: ArcadeRecordBadge | null = null,
+  ): void => {
     if (arcadeState !== null) {
       if (arcadeState.game === "claw" && clawOverlay === null)
         void ensureClawOverlay().then(invalidate);
@@ -857,11 +866,23 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
         void ensureFishOverlay().then(invalidate);
     }
     clawOverlay?.render(arcadeState?.game === "claw" ? arcadeState : null);
-    skeeOverlay?.render(arcadeState?.game === "skee" ? arcadeState : null);
-    moleOverlay?.render(arcadeState?.game === "mole" ? arcadeState : null);
-    cometOverlay?.render(arcadeState?.game === "comet" ? arcadeState : null);
+    skeeOverlay?.render(
+      arcadeState?.game === "skee" ? arcadeState : null,
+      arcadeState?.game === "skee" ? record : null,
+    );
+    moleOverlay?.render(
+      arcadeState?.game === "mole" ? arcadeState : null,
+      arcadeState?.game === "mole" ? record : null,
+    );
+    cometOverlay?.render(
+      arcadeState?.game === "comet" ? arcadeState : null,
+      arcadeState?.game === "comet" ? record : null,
+    );
     cookOverlay?.render(arcadeState?.game === "cook" ? arcadeState : null);
-    fishOverlay?.render(arcadeState?.game === "fish" ? arcadeState : null);
+    fishOverlay?.render(
+      arcadeState?.game === "fish" ? arcadeState : null,
+      arcadeState?.game === "fish" ? record : null,
+    );
   };
 
   const overlayInfo = (): ArcadeInfo | null =>

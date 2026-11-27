@@ -1,4 +1,10 @@
 import "./comet.css";
+import {
+  classifyCometPopup,
+  createArcadePopupLayer,
+  updateArcadeBestBadge,
+  type ArcadeRecordBadge,
+} from "./arcade-popups";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
 import { element, measure, pixels, place, setStyle, setText, type Box } from "./dom";
 import { cometFrame, layoutComet, type CometLayout, type Rect } from "./comet-layout";
@@ -40,16 +46,22 @@ export function createComet(
   art: (frame: string) => AtlasImage | null,
   calibration: CometCalibration,
   image: string,
-): { render: (view: CometView | null) => void; info: () => CometInfo | null } {
+): {
+  render: (view: CometView | null, record?: ArcadeRecordBadge | null) => void;
+  info: () => CometInfo | null;
+} {
   const overlay = element("section", "comet-overlay", root);
   overlay.setAttribute("aria-label", "Comet Cruise");
   overlay.hidden = true;
+  const popups = createArcadePopupLayer(overlay);
   const machine = element("div", "comet-machine", overlay);
   const paint = element("div", "comet-paint", machine);
   paint.style.backgroundImage = `url("${image}")`;
   const marquee = element("div", "comet-marquee", machine);
   const marqueeText = element("span", "comet-marquee-text", marquee);
   const hud = element("div", "comet-hud", machine);
+  const bestBadge = element("div", "arcade-best-badge is-left-anchored", machine);
+  bestBadge.hidden = true;
   const score = element("span", "comet-score", hud);
   const left = element("span", "comet-left", hud);
   const field = element("div", "comet-field", machine);
@@ -87,6 +99,8 @@ export function createComet(
   let lastMarqueeKey = "";
   let lastView: CometView | null = null;
   let lastLayout: CometLayout | null = null;
+  let lastRecord: ArcadeRecordBadge | null = null;
+  let prevCaught: number | null = null;
   const frames = new Map<string, AtlasImage | null>();
   const spriteFrame = new WeakMap<HTMLDivElement, string>();
   const frameArt = (name: string): AtlasImage | null => {
@@ -107,7 +121,11 @@ export function createComet(
     }
   };
 
-  const draw = (view: CometView, layout: CometLayout): void => {
+  const draw = (
+    view: CometView,
+    layout: CometLayout,
+    record: ArcadeRecordBadge | null,
+  ): void => {
     setStyle(machine, "width", `${layout.width}px`);
     setStyle(machine, "height", `${layout.height}px`);
     setStyle(paint, "background-size", `${layout.painting.width}px ${layout.painting.height}px`);
@@ -133,6 +151,14 @@ export function createComet(
     setStyle(hud, "top", `${layout.hud.y}px`);
     setStyle(hud, "font-size", `${Math.max(14, Math.round(layout.marquee.height * 0.24))}px`);
     hud.hidden = view.phase === "result";
+    setStyle(bestBadge, "left", `${layout.hud.x}px`);
+    setStyle(bestBadge, "top", `${layout.hud.y}px`);
+    setStyle(
+      bestBadge,
+      "font-size",
+      `${Math.max(12, Math.round(layout.marquee.height * 0.22))}px`,
+    );
+    updateArcadeBestBadge(bestBadge, view.phase === "result", record);
     setText(score, `STARS ${view.caught}`);
     setText(left, `LEFT ${view.left}`);
     place(field, layout.field);
@@ -169,28 +195,37 @@ export function createComet(
   // when it loads (spec 7.1): what's shown is drawn again then.
   document.fonts.addEventListener("loadingdone", () => {
     lastMarqueeKey = "";
-    if (lastView !== null && lastLayout !== null) draw(lastView, lastLayout);
+    if (lastView !== null && lastLayout !== null) draw(lastView, lastLayout, lastRecord);
   });
 
   return {
-    render: (view) => {
+    render: (view, record = null) => {
       overlay.hidden = view === null;
       lastView = view;
+      lastRecord = record;
       if (view === null) {
         lastKey = "";
+        prevCaught = null;
+        popups.clear();
+        bestBadge.hidden = true;
         return;
       }
+      const popupSpec = classifyCometPopup(prevCaught, view.caught);
+      prevCaught = view.caught;
+      if (view.phase === "result") popups.clear();
+      else if (popupSpec !== null) popups.spawn(popupSpec);
       const style = getComputedStyle(overlay);
       const width = overlay.clientWidth - pixels(style.paddingLeft) - pixels(style.paddingRight);
       const height = overlay.clientHeight - pixels(style.paddingTop) -
         pixels(style.paddingBottom);
-      const key = `${width}x${height} ${JSON.stringify(view)}`;
+      const recordKey = record === null ? "" : `${record.best}:${record.isNewBest ? 1 : 0}`;
+      const key = `${width}x${height} ${recordKey} ${JSON.stringify(view)}`;
       if (key === lastKey) return;
       lastKey = key;
       const shown = cometFrame(calibration);
       const scale = Math.max(0.01, Math.min(width / shown.w, height / shown.h));
       lastLayout = layoutComet(view, calibration, scale);
-      draw(view, lastLayout);
+      draw(view, lastLayout, record);
     },
     info: () => {
       if (lastView === null || lastLayout === null) return null;

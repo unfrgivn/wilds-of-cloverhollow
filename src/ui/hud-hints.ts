@@ -9,7 +9,23 @@ export type HudHintsView = {
   lanternOn: boolean;
   hasFlute: boolean;
   muted: boolean;
+  canPhoto?: boolean;
+  battlePeekHint?: boolean;
 };
+
+export type ResolvedHudHints = {
+  showRibbon: boolean;
+  showPhoto: boolean;
+  showBattleGuide: boolean;
+};
+
+/** Projects HudHintsView to ribbon, Photo pill, and battle Field Guide pill visibility. */
+export function resolveHudHintVisibility(view: HudHintsView): ResolvedHudHints {
+  const showRibbon = view.visible;
+  const showPhoto = showRibbon && view.canPhoto === true;
+  const showBattleGuide = !showRibbon && view.battlePeekHint === true;
+  return { showRibbon, showPhoto, showBattleGuide };
+}
 
 export type HudInteractHint = {
   canInteract: boolean;
@@ -107,6 +123,8 @@ export function createHudHints(root: HTMLElement): {
   const flutePill = makeHintPill("flute", "F", "Flute");
   flutePill.root.hidden = true;
   const mutePill = makeHintPill("mute", "M", "Mute");
+  const photoPill = makeHintPill("photo", "P", "Photo");
+  photoPill.root.hidden = true;
 
   ribbon.append(
     journalPill.root,
@@ -114,21 +132,33 @@ export function createHudHints(root: HTMLElement): {
     lanternPill.root,
     flutePill.root,
     mutePill.root,
+    photoPill.root,
   );
-  root.append(ribbon);
+
+  const battleHint = document.createElement("aside");
+  battleHint.className = "hud-battle-hint";
+  battleHint.setAttribute("aria-label", "Battle keyboard hint");
+  battleHint.hidden = true;
+  const battleGuidePill = makeHintPill("battle-guide", "I", "Field Guide");
+  battleHint.append(battleGuidePill.root);
+
+  root.append(ribbon, battleHint);
 
   let lastSignature = "";
 
   return {
     render: (view) => {
+      const resolved = resolveHudHintVisibility(view);
       const signature =
-        `${view.visible}|${view.canInteract}|${view.interactLabel}|` +
+        `${resolved.showRibbon}|${resolved.showPhoto}|${resolved.showBattleGuide}|` +
+        `${view.canInteract}|${view.interactLabel}|` +
         `${view.hasLantern}|${view.lanternOn}|${view.hasFlute}|${view.muted}`;
       if (signature === lastSignature) return;
       lastSignature = signature;
 
-      ribbon.hidden = !view.visible;
-      if (!view.visible) return;
+      ribbon.hidden = !resolved.showRibbon;
+      battleHint.hidden = !resolved.showBattleGuide;
+      if (!resolved.showRibbon) return;
 
       interactPill.root.classList.toggle("is-active", view.canInteract);
       setText(interactPill.label, view.canInteract ? view.interactLabel : "Talk");
@@ -140,6 +170,8 @@ export function createHudHints(root: HTMLElement): {
 
       mutePill.root.classList.toggle("is-muted", view.muted);
       setText(mutePill.label, view.muted ? "Muted" : "Mute");
+
+      photoPill.root.hidden = !resolved.showPhoto;
     },
   };
 }

@@ -14,6 +14,12 @@ export type MinigameRecordBadge = {
   isNewBest: boolean;
 };
 
+export type ArcadeRecordPill = {
+  id: MinigameKey;
+  label: string;
+  value: string;
+};
+
 export type MinigameRecordsController = {
   records: () => MinigameRecords;
   bestOf: (game: MinigameKey) => number;
@@ -34,6 +40,20 @@ function sanitizeScore(value: unknown): number {
 
 export function defaultMinigameRecords(): MinigameRecords {
   return { skee: 0, mole: 0, comet: 0, fish: 0 };
+}
+
+/** Projects persisted personal bests into canonical Journal pill entries, omitting 0 scores. */
+export function formatArcadeRecordPills(records: MinigameRecords): ArcadeRecordPill[] {
+  const pills: ArcadeRecordPill[] = [];
+  const skee = sanitizeScore(records.skee);
+  const mole = sanitizeScore(records.mole);
+  const comet = sanitizeScore(records.comet);
+  const fish = sanitizeScore(records.fish);
+  if (skee > 0) pills.push({ id: "skee", label: "Skee-Ball", value: String(skee) });
+  if (mole > 0) pills.push({ id: "mole", label: "Boop-a-Mole", value: `${mole} boops` });
+  if (comet > 0) pills.push({ id: "comet", label: "Comet Cruise", value: `${comet} stars` });
+  if (fish > 0) pills.push({ id: "fish", label: "Fishing Streak", value: `${fish}` });
+  return pills;
 }
 
 export function readMinigameRecords(value: string | null): MinigameRecords {

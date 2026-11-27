@@ -1,8 +1,10 @@
-.hud-hints[hidden] {
+.hud-hints[hidden],
+.hud-battle-hint[hidden] {
   display: none;
 }
 
-:root[data-touch="on"] .hud-hints {
+:root[data-touch="on"] .hud-hints,
+:root[data-touch="on"] .hud-battle-hint {
   display: none;
 }
 
@@ -81,4 +83,23 @@
 
 .hud-hint-label {
   color: var(--sticker-ink);
+}
+
+.hud-battle-hint {
+  position: fixed;
+  right: calc(24px + var(--safe-right));
+  bottom: calc(20px + var(--safe-bottom));
+  z-index: var(--z-hud);
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border: 4px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: var(--sticker-paper);
+  box-shadow: var(--sticker-shadow);
+  color: var(--sticker-ink);
+  font-family: var(--sticker-font);
+  pointer-events: none;
+  user-select: none;
 }

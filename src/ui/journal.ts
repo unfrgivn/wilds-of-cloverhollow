@@ -12,6 +12,7 @@ import {
 } from "./icons";
 import { createJournalFieldOverlays } from "./journal-field-note";
 import { AUDIO_LEVELS, type AudioLevel } from "../platform/audio-settings";
+import { formatArcadeRecordPills, type MinigameRecords } from "../platform/minigame-records";
 import type {
   BusRoute,
   CarriedTreat,
@@ -45,6 +46,23 @@ export type JournalFishEntry = {
   blurb: string;
 };
 
+export type JukeboxMeta = {
+  active: boolean;
+  index: number;
+  total: number;
+};
+
+/** Formats the accessible label and tooltip for the Music Box now-playing pill. */
+export function formatJukeboxLabel(nowPlaying: string, meta?: JukeboxMeta): string {
+  if (meta !== undefined && meta.active && meta.total > 0) {
+    return (
+      `Track ${meta.index + 1} of ${meta.total}: ${nowPlaying} ` +
+      "— press Left or Right to browse, Enter to return to area theme"
+    );
+  }
+  return `Now playing: ${nowPlaying} — press Left or Right to browse Music Box`;
+}
+
 export type JournalView = {
   visible: boolean;
   /** Newest first; the game decides the order. */
@@ -52,6 +70,7 @@ export type JournalView = {
   treats?: CarriedTreat[];
   stickers: JournalSticker[];
   prizes: JournalPrize[];
+  arcadeRecords?: MinigameRecords;
   fish?: JournalFishEntry[];
   keepsakes?: JournalKeepsake[];
   lands: { id: string; name: string; busStop: boolean; x: number; y: number }[];
@@ -73,6 +92,7 @@ export type JournalView = {
   musicLevel: AudioLevel;
   ambienceMuted: boolean;
   nowPlaying: string;
+  jukebox?: JukeboxMeta;
   gentleTiming: boolean;
   keyHints: boolean;
   textSpeed: TextSpeed;
@@ -355,6 +375,7 @@ export function createJournal(root: HTMLElement): {
   onSetMusicLevel: (callback: (level: AudioLevel) => void) => void;
   onToggleAmbience: (callback: () => void) => void;
   onStepTrack: (callback: (delta: -1 | 1) => void) => void;
+  onResetJukebox: (callback: () => void) => void;
   onToggleGentleTiming: (callback: () => void) => void;
   onToggleKeyHints: (callback: () => void) => void;
   onCycleTextSpeed: (callback: () => void) => void;
@@ -409,6 +430,9 @@ export function createJournal(root: HTMLElement): {
   prizesHeading.append(tickets.root);
   const prizesComplete = makeCompleteRibbon();
   const prizesGrid = element("div", "journal-stickers journal-prizes");
+  const recordsStrip = element("div", "journal-records-strip");
+  recordsStrip.setAttribute("role", "region");
+  recordsStrip.setAttribute("aria-label", "Arcade and fishing records");
   const fishHeading = element("h3", "journal-prizes-heading journal-fish-heading");
   const fishCount = element("span", "journal-section-count");
   fishHeading.append("FISH", fishCount);
@@ -466,11 +490,13 @@ export function createJournal(root: HTMLElement): {
   const jukebox = element("div", "journal-jukebox");
   jukebox.setAttribute("role", "group");
   jukebox.setAttribute("aria-label", "Music Box");
+  jukebox.tabIndex = -1;
   const prevTrack = element("button", "journal-jukebox-btn journal-jukebox-prev");
   prevTrack.type = "button";
   prevTrack.textContent = "‹";
   prevTrack.setAttribute("aria-label", "Previous track");
-  const nowPlaying = element("div", "journal-now-playing");
+  const nowPlaying = element("button", "journal-now-playing");
+  nowPlaying.type = "button";
   nowPlaying.setAttribute("aria-live", "polite");
   const nextTrack = element("button", "journal-jukebox-btn journal-jukebox-next");
   nextTrack.type = "button";
@@ -601,6 +627,7 @@ export function createJournal(root: HTMLElement): {
   let onSetMusicLevel: (level: AudioLevel) => void = () => undefined;
   let onToggleAmbience: () => void = () => undefined;
   let onStepTrack: (delta: -1 | 1) => void = () => undefined;
+  let onResetJukebox: () => void = () => undefined;
   let onToggleGentleTiming: () => void = () => undefined;
   let onToggleKeyHints: () => void = () => undefined;
   let onCycleTextSpeed: () => void = () => undefined;
@@ -612,6 +639,7 @@ export function createJournal(root: HTMLElement): {
   let routeSignature = "";
   let badgeSignature = "";
   let treatsSignature = "";
+  let recordsSignature = "";
   let selectedLandId: string | null = null;
   let hoveredLandId: string | null = null;
   let latestView: JournalView | null = null;
@@ -691,6 +719,13 @@ export function createJournal(root: HTMLElement): {
     if (book.hidden) return;
     if (fieldOverlays.handleKeydown(event)) return;
     if (event.target !== null && sliders.has(event.target)) return;
+    if (
+      event.target instanceof Node &&
+      jukebox.contains(event.target) &&
+      (event.key === "ArrowLeft" || event.key === "ArrowRight")
+    ) {
+      return;
+    }
     if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") {
       event.preventDefault();
       const index = journalPages.indexOf(page);
@@ -713,6 +748,27 @@ export function createJournal(root: HTMLElement): {
   optAmbience.addEventListener("click", () => onToggleAmbience());
   prevTrack.addEventListener("click", () => onStepTrack(-1));
   nextTrack.addEventListener("click", () => onStepTrack(1));
+  nowPlaying.addEventListener("click", () => {
+    if (latestView?.jukebox?.active === true) onResetJukebox();
+  });
+  nowPlaying.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      event.stopPropagation();
+      if (latestView?.jukebox?.active === true) onResetJukebox();
+    }
+  });
+  jukebox.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      event.stopPropagation();
+      onStepTrack(-1);
+    } else if (event.key === "ArrowRight") {
+      event.preventDefault();
+      event.stopPropagation();
+      onStepTrack(1);
+    }
+  });
   optGentle.addEventListener("click", () => onToggleGentleTiming());
   optHints.addEventListener("click", () => onToggleKeyHints());
   optTextSpeed.addEventListener("click", () => onCycleTextSpeed());
@@ -756,6 +812,9 @@ export function createJournal(root: HTMLElement): {
     onStepTrack: (callback) => {
       onStepTrack = callback;
     },
+    onResetJukebox: (callback) => {
+      onResetJukebox = callback;
+    },
     onToggleGentleTiming: (callback) => {
       onToggleGentleTiming = callback;
     },
@@ -795,6 +854,12 @@ export function createJournal(root: HTMLElement): {
       audio.classList.toggle("is-muted", view.muted);
       syncSlider(volume.button, volume.value, view.level);
       setText(nowPlaying, `♫ ${view.nowPlaying}`);
+      const jukeboxBrowsing = view.jukebox?.active === true;
+      const jukeboxLabel = formatJukeboxLabel(view.nowPlaying, view.jukebox);
+      nowPlaying.classList.toggle("is-browsing", jukeboxBrowsing);
+      setAttribute(nowPlaying, "data-browsing", String(jukeboxBrowsing));
+      setAttribute(nowPlaying, "aria-label", jukeboxLabel);
+      setAttribute(nowPlaying, "title", jukeboxLabel);
       setText(optSfx, view.muted ? "off" : "on");
       optSfx.classList.toggle("is-muted", view.muted);
       setAttribute(optSfx, "aria-pressed", String(!view.muted));
@@ -971,10 +1036,38 @@ export function createJournal(root: HTMLElement): {
         view.prizes.length > 0 && view.prizes.every((prize) => prize.owned);
       syncChild(prizesHeading, prizesComplete, allPrizesOwned);
 
+      const arcadePills =
+        view.arcadeRecords === undefined ? [] : formatArcadeRecordPills(view.arcadeRecords);
+      const showRecords = arcadePills.length > 0;
+      syncAttachedAfter(prizesGrid, recordsStrip, showRecords);
+      if (showRecords) {
+        const nextRecordsSignature = arcadePills
+          .map((item) => `${item.id}:${item.value}`)
+          .join("|");
+        if (nextRecordsSignature !== recordsSignature) {
+          recordsSignature = nextRecordsSignature;
+          const stripLabel = element("span", "journal-records-label");
+          stripLabel.textContent = "BESTS";
+          recordsStrip.replaceChildren(
+            stripLabel,
+            ...arcadePills.map((item) => {
+              const pill = element("span", "journal-record-pill");
+              setAttribute(pill, "data-record", item.id);
+              pill.textContent = `★ ${item.label} · ${item.value}`;
+              return pill;
+            }),
+          );
+        }
+      } else if (recordsSignature !== "") {
+        recordsSignature = "";
+        recordsStrip.replaceChildren();
+      }
+
+      const fishAnchor = showRecords ? recordsStrip : prizesGrid;
       const fishList = view.fish ?? [];
       const fishOwned = fishList.filter((item) => item.owned).length;
       const showFish = fishOwned > 0;
-      syncAttachedAfter(prizesGrid, fishHeading, showFish);
+      syncAttachedAfter(fishAnchor, fishHeading, showFish);
       syncAttachedAfter(fishHeading, fishGrid, showFish);
       if (showFish) {
         setText(fishCount, `${fishOwned}/${fishList.length}`);
@@ -1018,7 +1111,7 @@ export function createJournal(root: HTMLElement): {
       const keepsakesList = view.keepsakes ?? [];
       const keepsakesOwned = keepsakesList.filter((item) => item.owned).length;
       const showKeepsakes = keepsakesOwned > 0;
-      const keepsakesAnchor = showFish ? fishGrid : prizesGrid;
+      const keepsakesAnchor = showFish ? fishGrid : fishAnchor;
       syncAttachedAfter(keepsakesAnchor, keepsakesHeading, showKeepsakes);
       syncAttachedAfter(keepsakesHeading, keepsakesGrid, showKeepsakes);
       if (showKeepsakes) {

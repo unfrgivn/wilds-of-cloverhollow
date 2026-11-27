@@ -5237,6 +5237,38 @@ the old trail, the owl, and the clubhouse claim.
 - Gates: `just check` (172 unit files / 1,318 tests, all 67 sims, 23 QA packs,
   purity, lint), `just build`, and 38/38 targeted Chromium & WebKit e2e tests.
 
+## Milestone 116: Journal Arcade High Scores Shelf, Keyboard-Scrubbable 20-Track Jukebox & Discoverable Photo/Guide Key Hints **Status:** ✅ Completed (2026-11-27)
+- Connects local minigame Personal Bests directly into Fae's Journal, adds
+  keyboard browsing & area-theme reset to the 20-track Music Box Jukebox, and
+  surfaces `P Photo` & `I Field Guide` when players turn on `Key Hints` — zero
+  `src/core` changes, zero save-version bumps, zero replay hash drift across all
+  67 sims, and zero `ui-gallery` baseline regressions.
+- Conditional Journal Arcade Records Strip (`src/platform/minigame-records.ts`,
+  `src/shell/assets.ts`, `src/ui/journal.{ts,css}`, `src/main.ts`):
+  - Pure `formatArcadeRecordPills(records)` surfaces only non-zero bests in
+    canonical order (`Skee-Ball`, `Boop-a-Mole`, `Comet Cruise`,
+    `Fishing Streak`) inside `.journal-records-strip` right under `PRIZES`
+    (detached when empty so existing Journal baselines stay pixel-identical).
+- Keyboard-scrubbable 20-track Music Box Jukebox (`src/ui/journal.{ts,css}`,
+  `src/shell/assets.ts`, `src/main.ts`):
+  - Converted `.journal-now-playing` to an accessible `<button type="button">`
+    with track-index `aria-label` / `title` (`formatJukeboxLabel`); pressing
+    `ArrowLeft`/`ArrowRight` while focused scrubs all 20 tracks unducked, and
+    clicking or pressing `Enter`/`Space` resets cleanly to the live area theme.
+- Discoverable `P Photo` & `I Field Guide` Key Hints (`src/ui/hud-hints.{ts,css}`,
+  `src/main.ts`):
+  - Added `[data-hint="photo"]` (`P Photo`) to the desktop overworld ribbon and
+    bottom-right `[data-hint="battle-guide"]` (`I Field Guide`) during battle
+    `command` phase when `Key Hints` is enabled.
+- Evidence: `tests/unit/milestone-116.test.ts` (8 tests) and
+  `tests/e2e/milestone-116.spec.ts` (`@smoke` Chromium + WebKit); review
+  captures `art/review/m116-journal-records-1280.jpg`,
+  `m116-battle-hints-1280.jpg`, and refreshed Key Hints ribbon baselines
+  independently verified via `vision`.
+- Gates: `just check` (174 unit files / 1,332 tests, all 67 sims, 23 QA packs,
+  purity, lint), `just build`, 48/48 Chromium & WebKit e2e, and 95/95 Chromium
+  `ui-gallery` tests.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

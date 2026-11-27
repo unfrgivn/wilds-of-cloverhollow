@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 114)
+Last updated: 2026-11-27 (Milestone 116)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -3414,10 +3414,15 @@ trunks keep its two exits.
   line unchanged.
 - The OPTIONS spread is a two-page open-book layout matching NOTES/STICKERS:
   the left page (`SOUND & MUSIC`) shows the interactive Music Box pill
-  (`.journal-jukebox`: 44 px `‹` `.journal-jukebox-prev` and `›`
-  `.journal-jukebox-next` buttons flanking `.journal-now-playing`, `♫ <title>`,
-  cycling all 20 `jukeboxTracks` unducked while the journal is open and
-  returning to the live area theme when closed) and touch-sized (>= 44 px)
+  (`.journal-jukebox`: `role="group"`, 44 px `‹` `.journal-jukebox-prev` and `›`
+  `.journal-jukebox-next` buttons flanking the interactive `.journal-now-playing`
+  button, `♫ <title>`, cycling all 20 `jukeboxTracks` unducked while the journal
+  is open; focusing `.journal-jukebox` or any button inside it scrubs tracks with
+  `ArrowLeft` / `ArrowRight` without flipping journal pages, exposes the active
+  track index in `aria-label` / `title` via `formatJukeboxLabel`, and clicking or
+  pressing `Enter` / `Space` on `.journal-now-playing` while previewing resets
+  smoothly to the live area theme via `onResetJukebox`, as does closing the
+  journal) and touch-sized (>= 44 px)
   controls for Sound Effects (on/off + volume slider), Music (on/off + volume
   slider), and Ambience (on/off); the right page (`GAMEPLAY`) shows touch-sized
   controls for Gentle Timing, Key Hints, Text Speed (`Cozy` / `Brisk` /
@@ -3454,9 +3459,15 @@ trunks keep its two exits.
   interactable prompt or `Talk`, `Stand` while resting, `Pet` when actively
   facing a pettable companion with forward dot `>= 0.15`, `Rest` at a rest
   spot, or inactive `Talk`), Lantern (`L`, shown once unlocked and glowing
-  lavender when lit), Flute (`F`, shown once unlocked), and Mute (`M`). It
-  hides automatically during touch mode, title, dialogue, battle, arcade,
-  journal, credits, or QA overlays.
+  lavender when lit), Flute (`F`, shown once unlocked), Mute (`M`), and Photo
+  (`P`, `[data-hint="photo"]`, shown beside Mute whenever `canPhoto` is true in
+  the free overworld outside Photo Mode). During battle `command` phase (outside
+  the treat tray and touch mode) with Key Hints enabled, a single compact
+  die-cut pill (`.hud-battle-hint`, `[data-hint="battle-guide"]`: `I` `Field
+  Guide`, resolved via `resolveHudHintVisibility`) docks cleanly at bottom-right
+  clear of commands, dialogue, portraits, and the Field Guide Peek card. Both
+  hide automatically when Key Hints is off or during touch mode, title,
+  dialogue, arcade, journal, credits, or QA overlays.
 - `data-journal="open"` hides all touch controls while the book is open.
 - The touch menu button is the JOURNAL sticker from the concept sheet: an open
   book with a teal quill (inline SVG, aria-label "journal").
@@ -3492,6 +3503,15 @@ trunks keep its two exits.
   ticket counter's four toys. The PRIZES heading carries Fae's tickets in a
   pill like the notes page's Coins and Snacks (an orange ticket and the
   count, Milestone 45).
+- **Journal Arcade Records Strip** (Milestone 116, `formatArcadeRecordPills` in
+  `src/platform/minigame-records.ts`): attached directly below `.journal-prizes`
+  on the right page of `NOTES` (`role="region"`, `aria-label="Arcade and fishing
+  records"`, `.journal-records-strip`) only when at least one local minigame
+  personal best is `> 0` (omitted when all four are `0` so fresh Journal layouts
+  stay unchanged). Displays a warm-gold `BESTS` label and rounded pastel pills
+  in canonical order (`★ Skee-Ball · N`, `★ Boop-a-Mole · N boops`, `★ Comet
+  Cruise · N stars`, `★ Fishing Streak · N`) with `>= 8.5:1` `#47321f` ink
+  contrast and zero horizontal overflow across desktop and phone viewports.
 - Complete Journal Collection Showcase (Milestone 94, pure helpers
   `journalKeepsakes`, `journalFish`, `journalProgress` in `src/core/journal.ts`
   with zero save-format or replay-hash shifts):

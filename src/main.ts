@@ -246,6 +246,11 @@ async function boot(): Promise<void> {
     jukeboxTrack = nextTrack;
     invalidate();
   });
+  journal.onResetJukebox(() => {
+    if (jukeboxTrack === null) return;
+    jukeboxTrack = null;
+    invalidate();
+  });
   journal.onToggleGentleTiming(() => {
     gameSettings.toggleGentleTiming();
     invalidate();
@@ -670,6 +675,11 @@ async function boot(): Promise<void> {
             findRestSpot(content.world, state) !== null,
         })
       : { canInteract: false, interactLabel: "Talk" };
+    const battlePeekHint =
+      gameSettings.keyHints() &&
+      !touchActive &&
+      canBattlePeek() &&
+      !(state.battle?.treatMenu ?? false);
     hudHints.render({
       visible: gameSettings.keyHints() && !touchActive && overworldFree,
       canInteract: interactHint.canInteract,
@@ -678,6 +688,8 @@ async function boot(): Promise<void> {
       lanternOn: state.lantern,
       hasFlute,
       muted: sound.muted(),
+      canPhoto: canPhotoMode() && !photoMode,
+      battlePeekHint,
     });
     if (bannerStartTick >= 0 && state.tick < bannerStartTick) clearAreaBanner();
     const bannerInfo = bannerArea !== null && bannerArea === state.area && !bannerPendingFade
@@ -855,6 +867,12 @@ async function boot(): Promise<void> {
     rewardSticker.render(
       buildRewardStickerView(content.world, state, activeBattle, arcadeState, assets),
     );
+    const jukeboxIndex =
+      jukeboxTrack !== null
+        ? jukeboxTracks.indexOf(jukeboxTrack)
+        : soundtrack.track === "silent"
+          ? -1
+          : jukeboxTracks.indexOf(soundtrack.track);
     journal.render(
       buildJournalView({
         world: content.world,
@@ -868,6 +886,12 @@ async function boot(): Promise<void> {
         musicLevel: sound.musicLevel(),
         ambienceMuted: sound.ambienceMuted(),
         nowPlaying: soundtrack.title,
+        jukebox: {
+          active: jukeboxTrack !== null,
+          index: jukeboxIndex,
+          total: jukeboxTracks.length,
+        },
+        arcadeRecords: minigameRecords.records(),
         gentleTiming: gameSettings.gentleTiming(),
         keyHints: gameSettings.keyHints(),
         textSpeed: gameSettings.textSpeed(),

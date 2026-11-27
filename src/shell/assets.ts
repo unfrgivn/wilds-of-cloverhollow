@@ -29,7 +29,8 @@ import {
   type World,
 } from "../core";
 import type { AudioLevel } from "../platform/audio-settings";
-import type { JournalView } from "../ui/journal";
+import type { MinigameRecords } from "../platform/minigame-records";
+import type { JournalView, JukeboxMeta } from "../ui/journal";
 import {
   parseClawCalibration,
   parseCometCalibration,
@@ -297,6 +298,8 @@ export type JournalViewParams = {
   musicLevel: AudioLevel;
   ambienceMuted: boolean;
   nowPlaying: string;
+  jukebox?: JukeboxMeta;
+  arcadeRecords?: MinigameRecords;
   gentleTiming: boolean;
   keyHints: boolean;
   textSpeed: TextSpeed;
@@ -345,6 +348,7 @@ export function buildJournalView(params: JournalViewParams): JournalView {
           };
         })
       : [],
+    arcadeRecords: open ? params.arcadeRecords : undefined,
     fish: open
       ? journalFish(world, state).map((item) => ({
           id: item.id,
@@ -389,6 +393,7 @@ export function buildJournalView(params: JournalViewParams): JournalView {
     musicLevel: params.musicLevel,
     ambienceMuted: params.ambienceMuted,
     nowPlaying: params.nowPlaying,
+    jukebox: params.jukebox,
     gentleTiming: params.gentleTiming,
     keyHints: params.keyHints,
     textSpeed: params.textSpeed,

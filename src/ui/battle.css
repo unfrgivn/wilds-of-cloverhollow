@@ -14,7 +14,8 @@
 .battle-treat-count[hidden],
 .battle-treat-fav[hidden],
 .battle-grade[hidden],
-.battle-reward[hidden] {
+.battle-reward[hidden],
+.battle-peek-card[hidden] {
   display: none;
 }
 
@@ -412,6 +413,14 @@
 .battle-calm {
   right: calc(78px + var(--safe-right));
   width: min(280px, calc(100vw - 350px));
+}
+.battle-calm.is-peekable {
+  pointer-events: auto;
+  cursor: pointer;
+}
+.battle-calm.is-peekable:focus-visible {
+  outline: 3px solid var(--sticker-ink);
+  outline-offset: 2px;
 }
 .battle-meter-label {
   display: block;
@@ -1605,4 +1614,217 @@
   .battle-windup-bubble:nth-child(even) { margin-top: 10px; }
   .battle-windup-icon { width: 22px; height: 22px; }
   .battle-windup-label { font-size: 10px; }
+}
+
+/* Battle Field Guide Peek card (spec 8.1, Milestone 110): toggled by I or
+   clicking the foe plate during command phase; sits clear of HUD, commands,
+   dialogue, sprites, and touch controls across desktop and phone viewports. */
+.battle-peek-card {
+  position: fixed;
+  top: max(96px, calc(var(--safe-top) + 96px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-prompt);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-sizing: border-box;
+  width: min(440px, 84vw);
+  padding: 10px 13px;
+  border: 5px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 18px;
+  background: #fbf6e8;
+  box-shadow: var(--sticker-shadow), inset 0 0 0 1.5px var(--sticker-border);
+  color: var(--sticker-ink);
+  font-family: var(--sticker-font);
+  pointer-events: auto;
+  animation: battle-peek-in 140ms ease-out;
+}
+@media (min-width: 1180px) and (min-height: 600px) {
+  .battle-peek-card {
+    top: max(28px, calc(var(--safe-top) + 28px));
+    left: calc(50% + 44px);
+    width: min(416px, 84vw);
+  }
+}
+@keyframes battle-peek-in {
+  from { opacity: 0; transform: translate(-50%, -6px); }
+}
+.battle-peek-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.battle-peek-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.battle-peek-name {
+  color: var(--sticker-ink);
+  font-size: 17px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+.battle-peek-level,
+.battle-peek-fam,
+.battle-peek-badge,
+.battle-peek-feeling,
+.battle-peek-treat {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border: 1.5px solid var(--sticker-ink);
+  border-radius: 999px;
+  color: var(--sticker-ink);
+  font-size: 11.5px;
+  font-weight: 800;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.battle-peek-level {
+  background: #fff3c4;
+}
+.battle-peek-fam {
+  background: #efe8d8;
+}
+.battle-peek-fam[data-familiarity="befriended"] {
+  background: #dff4e5;
+}
+.battle-peek-fam[data-familiarity="old-friend"] {
+  background: #ffe896;
+}
+.battle-peek-close {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  box-sizing: border-box;
+  padding: 0;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 50%;
+  background: var(--sticker-rim);
+  color: var(--sticker-ink);
+  font: inherit;
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.battle-peek-close:hover {
+  background: #fff3c4;
+}
+.battle-peek-close:focus-visible {
+  outline: 3px solid var(--sticker-ink);
+  outline-offset: 2px;
+}
+.battle-peek-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.battle-peek-badge.is-land {
+  background: #f3ecda;
+}
+.battle-peek-badge.is-check {
+  background: #e4f1f7;
+}
+.battle-peek-row {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+}
+.battle-peek-label {
+  color: var(--sticker-ink);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+.battle-peek-body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+.battle-peek-feeling {
+  background: #f6ecfc;
+}
+.battle-peek-treat {
+  background: #fde6dc;
+}
+.battle-peek-hint {
+  color: var(--sticker-ink);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.battle-peek-tip {
+  padding: 6px 10px;
+  border: 1.5px dashed var(--sticker-ink);
+  border-radius: 10px;
+  background: #f5eedc;
+  color: var(--sticker-ink);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+@media (max-width: 999px), (max-height: 500px) {
+  .battle-peek-card {
+    top: max(96px, calc(var(--safe-top) + 96px));
+    left: calc((100vw - 270px - var(--safe-right) + var(--safe-left)) / 2);
+    width: min(420px, calc(100vw - 294px - var(--safe-left) - var(--safe-right)));
+    gap: 4px;
+    padding: 7px 10px;
+    border-width: 4px;
+    border-radius: 15px;
+  }
+  .battle-peek-name {
+    font-size: 14px;
+  }
+  .battle-peek-level,
+  .battle-peek-fam,
+  .battle-peek-badge,
+  .battle-peek-feeling,
+  .battle-peek-treat {
+    padding: 1px 6px;
+    font-size: 10.5px;
+  }
+  .battle-peek-close {
+    width: 28px;
+    height: 28px;
+    font-size: 17px;
+  }
+  .battle-peek-row {
+    grid-template-columns: 54px minmax(0, 1fr);
+    gap: 5px;
+  }
+  .battle-peek-label {
+    font-size: 10px;
+  }
+  .battle-peek-hint {
+    font-size: 10.5px;
+    line-height: 1.2;
+  }
+  .battle-peek-tip {
+    padding: 4px 8px;
+    font-size: 10.5px;
+    line-height: 1.2;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .battle-peek-card {
+    animation: none;
+  }
 }

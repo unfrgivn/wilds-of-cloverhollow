@@ -5154,6 +5154,37 @@ the old trail, the owl, and the clubhouse claim.
   `CLOVERHOLLOW_E2E_PORT=4371 just e2e` (1,106 passed, 2 skipped, 0 failed in
   6.9 min).
 
+## Milestone 113: Battle Field Guide Peek & Interactive Journal Map Land Guide **Status:** ✅ Completed (2026-11-27)
+- Adds classic Paper-Mario / Pokémon tactical inspection right inside battle
+  and enriches Journal MAP land inspection with zero simulation changes, zero
+  save-version bumps, zero replay hash drift across all 67 recorded sims, and
+  zero visual baseline regressions.
+- Battle Field Guide Peek (`src/ui/battle-peek.ts`, `src/ui/battle.ts`,
+  `src/ui/battle.css`, `src/main.ts`):
+  - Pure `battlePeekData(world, state)` + exhaustive `checkMechanicLabel` (all
+    8 check kinds) showing critter name, level, region, familiarity
+    (`New Friend` / `Befriended ✓` / `Old Friend ★`), check style, discovered
+    favourite treats (never spoiling undiscovered favourites), known feelings
+    (after calming once or carrying the lantern), and tailored `<= 72`-char
+    tactical tips.
+  - Opened via `KeyI` or clicking the foe calm meter plate during battle
+    `command` phase, dismissed via `KeyI`, `Escape`, `×`, or leaving `command`;
+    steps aside floating feeling/wind-up bubbles while open and fits cleanly
+    across `1280x720`, `874x402`, and `667x375`.
+- Journal MAP Interactive Land Field Guide (`src/core/journal.ts`,
+  `src/shell/assets.ts`, `src/ui/journal.ts`):
+  - Pure `landFieldGuide(world, state, landId)` enriches `.journal-map-detail`
+    ONLY when a revealed land pin is clicked or hovered (keeping default
+    `"Here: ..."` baselines pixel-identical), showing sticker progress, Star
+    Gem status (`★ Gem` / `◇ Gem`), Star-Line bus stop status, and regional
+    highlights.
+- Evidence: `tests/unit/milestone-110.test.ts` (5 tests) and
+  `tests/e2e/milestone-110.spec.ts` (`@smoke` Chromium + WebKit); all 3 review
+  captures (`art/review/m110-battle-peek-1280.jpg`, `m110-battle-peek-874.jpg`,
+  `m110-map-guide-1280.jpg`) independently verified via `vision`.
+- Gates: `just check` (169 unit files / 1,297 tests, all 67 sims, 23 QA packs,
+  purity, lint), `just build`, and 559/559 targeted Chromium & WebKit e2e tests.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

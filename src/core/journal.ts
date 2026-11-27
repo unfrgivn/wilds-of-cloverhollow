@@ -62,6 +62,27 @@ export const STAR_GEM_VARIABLES = [
   "gem_hills",
 ] as const;
 
+type StarGemVariable = (typeof STAR_GEM_VARIABLES)[number];
+
+const LAND_GEMS: Readonly<Record<string, readonly StarGemVariable[]>> = {
+  cloverhollow: ["gem_park"],
+  bay: ["gem_bay"],
+  trail: ["gem_trail"],
+  pass: ["gem_pass", "gem_cavern"],
+  forest: ["gem_woods"],
+  hills: ["gem_hills"],
+};
+
+const LAND_HIGHLIGHTS: Readonly<Record<string, string>> = {
+  cloverhollow: "Shops, Café & Arcade",
+  bay: "Fishing, Boats & Cottage",
+  pass: "Lodge, Cavern & Cabin",
+  hills: "Wildlife Sanctuary",
+  forest: "Clubhouse & Garden",
+  trail: "Cliffside Lookout",
+  enchanted: "Misty Path & Ancient Tree",
+};
+
 /** Counts how many of Cloverhollow's seven Star Gems Fae has found. */
 export function starGemsFound(
   world: Pick<World, "storyVariable">,
@@ -125,6 +146,58 @@ export function landStickerProgress(
     result[land.id] = { owned, total: ids.size };
   }
   return result;
+}
+
+/**
+ * Concise interactive Land Field Guide line for a revealed land on the Journal
+ * MAP (spec 9.1): combines sticker progress, Star Gem status once gems are in
+ * play, Star-Line bus stop status, and iconic land highlights.
+ */
+export function landFieldGuide(
+  world: Pick<World, "areas" | "critters" | "lands" | "stickers" | "storyVariable">,
+  state: Pick<State, "area" | "ink" | "stickers">,
+  landId: string,
+): string {
+  const land = world.lands.find((entry) => entry.id === landId);
+  if (land === undefined) return "";
+  const currentLand = world.areas[state.area]?.land ?? null;
+  const isSet = (variable: string): boolean => world.storyVariable(state.ink, variable) === true;
+  if (mapLandName(land, currentLand, isSet) === "???") return "";
+
+  const parts: string[] = [land.name];
+  const progress = landStickerProgress(world, state)[land.id];
+  if (progress !== undefined && progress.total > 0) {
+    parts.push(`${progress.owned}/${progress.total} stickers`);
+  }
+
+  const landGems = LAND_GEMS[land.id];
+  const showGems = starGemsFound(world, state).found > 0 || isSet("gem_quest");
+  if (showGems && landGems !== undefined && landGems.length > 0) {
+    let foundHere = 0;
+    for (const variable of landGems) {
+      if (isSet(variable)) foundHere += 1;
+    }
+    if (landGems.length === 1) {
+      parts.push(foundHere === 1 ? "★ Gem" : "◇ Gem");
+    } else {
+      parts.push(
+        foundHere >= landGems.length
+          ? `★ Gem (${foundHere}/${landGems.length})`
+          : `◇ Gem (${foundHere}/${landGems.length})`,
+      );
+    }
+  }
+
+  if (land.busStop) {
+    parts.push("Star-Line stop");
+  }
+
+  const highlights = LAND_HIGHLIGHTS[land.id];
+  if (highlights !== undefined) {
+    parts.push(highlights);
+  }
+
+  return parts.join(" · ");
 }
 
 /**

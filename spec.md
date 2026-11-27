@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 109)
+Last updated: 2026-11-27 (Milestone 110)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -2649,6 +2649,25 @@ trunks keep its two exits.
   for `>= 28`, `+N ♥` coral-pink `#ffd7e2` for `>= 45` or favourite-treat text),
   popped wind-up bubbles spawn sky-blue `"POP!"` (`#d6eefc`), and energy restores
   spawn peach-mint `+N ⚡` (`#e6f5d5`) over Fae.
+- **Battle Field Guide Peek** (Milestone 110, `src/ui/battle-peek.ts`,
+  `src/ui/battle.ts`, `src/main.ts`): during live battle `command` phase
+  (outside Talk and QA overlays), pressing `I` or clicking/tapping the top-right
+  foe plate (`.battle-calm`, styled identically at rest so existing battle
+  baselines stay unchanged) toggles a compact warm-paper `.battle-peek-card`
+  (`role="region"`, `aria-label="Critter field guide"`, `hidden` by default,
+  `z-index: var(--z-prompt)`, `#fbf6e8` card with `#47321f` dark-ink text and
+  pills). It shows critter name, level, familiarity (`New Friend` /
+  `Befriended ✓` / `Old Friend ★` using `state.calms[species]` and
+  `world.battle.oldFriends.calms`), region name, check mechanic badge
+  (`checkMechanicLabel`, exhaustive over all 8 `CheckSpec["kind"]` values),
+  known feelings (revealed after calming once or carrying the lantern, else a
+  gentle hint), discovered favourite treats (revealed only after calming once so
+  undiscovered favourites are never spoiled), and a concise `<= 72`-char
+  tactical tip tailored to Talk, Peekaboo, Echo Chimes, wind-ups, or burst check
+  kind. Pressing `Escape` dismisses only the peek card (swallowing `cancel`),
+  and leaving `command` phase or closing battle auto-hides it. Responsive layout
+  keeps it clear of HUD meters, party medallions, commands, dialogue, sprites,
+  and touch buttons at `1280x720`, `874x402`, and `667x375`.
 - Commands: a two-column grid of sticker buttons on phones (one column from
   1000 px wide), right-aligned above confirm and cancel, clear of the HUD, the
   dialogue box, and the touch buttons. The menu grows with the party: four
@@ -3350,7 +3369,13 @@ trunks keep its two exits.
   completion badges beside revealed lands whose discoverable stickers are all
   owned (`landStickerProgress` in `src/core/journal.ts`), and sits above a
   compact footer strip displaying the active or clicked/hovered land's sticker
-  progress alongside total Stickers, total Prizes, and the Bus legend.
+  progress alongside total Stickers, total Prizes, and the Bus legend. Clicking
+  or hovering any revealed land pin enriches the footer detail line with
+  `landFieldGuide` (`src/core/journal.ts`, Milestone 110): sticker progress,
+  Star Gem status (`★ Gem` / `◇ Gem` once any Star Gem is found or `gem_quest`
+  is active), Star-Line bus stop status (`cloverhollow`, `bay`, `pass`), and
+  iconic land highlights, while keeping the default un-selected `"Here: ..."`
+  line unchanged.
 - The OPTIONS spread is a two-page open-book layout matching NOTES/STICKERS:
   the left page (`SOUND & MUSIC`) shows the interactive Music Box pill
   (`.journal-jukebox`: 44 px `‹` `.journal-jukebox-prev` and `›`

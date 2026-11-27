@@ -5,6 +5,7 @@ import {
   critterFieldNote,
   journalFish,
   journalKeepsakes,
+  landFieldGuide,
   landStickerProgress,
   levelForXp,
   mapBusRoutes,
@@ -365,6 +366,11 @@ export function buildJournalView(params: JournalViewParams): JournalView {
       : [],
     currentLand,
     landProgress: open ? landStickerProgress(world, state) : {},
+    landGuides: open
+      ? Object.fromEntries(
+          world.lands.map((land) => [land.id, landFieldGuide(world, state, land.id)]),
+        )
+      : {},
     busRoutes: open
       ? mapBusRoutes(world.lands, isStorySet, (id) => state.stickers.includes(id))
       : [],

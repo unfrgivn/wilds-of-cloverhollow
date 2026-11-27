@@ -36,6 +36,7 @@ import { preventPinchZoom } from "./platform/gestures";
 import { createDialogueBox, createNoticeMarks, createPrompt } from "./ui/sticker";
 import { evaluateBattlePortraits } from "./ui/battle-portraits";
 import {
+  battlePeekData,
   createBattleHud,
   createCommandMenu,
   createBattleCheck,
@@ -532,12 +533,34 @@ async function boot(): Promise<void> {
     else shutterFlash.hide();
     invalidate();
   };
+  let battlePeekOpen = false;
+  const canBattlePeek = (): boolean =>
+    titleMode === null &&
+    !qaMenuOpen &&
+    !qaConsoleOpen &&
+    !qaBlocked &&
+    !state.journalOpen &&
+    state.battle !== null &&
+    state.battle.phase === "command" &&
+    (state.battle.talk === undefined || state.battle.talk === null);
+  const setBattlePeek = (on: boolean): void => {
+    const next = on && canBattlePeek();
+    if (next === battlePeekOpen) return;
+    battlePeekOpen = next;
+    sound.play("choice-move", state.tick);
+    invalidate();
+  };
+  battleHud.onPeekToggle(() => setBattlePeek(!battlePeekOpen));
+  battleHud.onPeekClose(() => setBattlePeek(false));
   const render = (alpha = 1): void => {
     if (photoMode && !canPhotoMode()) {
       photoMode = false;
       document.documentElement.dataset.photo = "off";
       view.setPhotoMode(false);
       shutterFlash.hide();
+    }
+    if (battlePeekOpen && !canBattlePeek()) {
+      battlePeekOpen = false;
     }
     if (!state.journalOpen || titleMode !== null || qaMenuOpen) jukeboxTrack = null;
     const baseSoundtrack = soundtrackFor(content.world, state, {
@@ -768,6 +791,9 @@ async function boot(): Promise<void> {
       lassoSteady: hideActions ? false : (battle?.lassoSteady ?? false),
       portraits: battlePortraits,
       popupSnapshot,
+      canPeek: canBattlePeek(),
+      peekOpen: battlePeekOpen,
+      peek: battlePeekOpen ? battlePeekData(content.world, state) : null,
     });
     commandMenu.render({
       visible: activeBattle && state.battle?.phase === "command" && battle?.talk === null,
@@ -776,14 +802,20 @@ async function boot(): Promise<void> {
       treatTray: battle?.treatTray ?? null,
     });
     // What the critter feels (spec 8.1), in the menu and over its result.
+    // Step aside while the Battle Field Guide Peek card is open so the cloud
+    // never peeks out behind the card.
     const feelingAt = view.battleFeelingAnchor(state, window.innerWidth, window.innerHeight);
-    feelingBubble.render(battle === null || battle.feelings === null || feelingAt === null
-      ? null
-      : { ...battle.feelings, ...feelingAt });
+    feelingBubble.render(
+      battlePeekOpen || battle === null || battle.feelings === null || feelingAt === null
+        ? null
+        : { ...battle.feelings, ...feelingAt },
+    );
     // A mini-boss's wind-up shows its bubbles there instead (Milestone 50).
-    windUpBubbles.render(battle === null || battle.windUp === null || feelingAt === null
-      ? null
-      : { ...battle.windUp, ...feelingAt });
+    windUpBubbles.render(
+      battlePeekOpen || battle === null || battle.windUp === null || feelingAt === null
+        ? null
+        : { ...battle.windUp, ...feelingAt },
+    );
     if (
       activeBattle &&
       state.battle?.phase === "command" &&
@@ -1257,6 +1289,19 @@ async function boot(): Promise<void> {
         return;
       }
     }
+    if (event.code === "KeyI" && canBattlePeek()) {
+      event.preventDefault();
+      setBattlePeek(!battlePeekOpen);
+      return;
+    }
+    if (event.code === "Escape" && battlePeekOpen) {
+      event.preventDefault();
+      event.stopPropagation();
+      setBattlePeek(false);
+      swallowed.add("cancel");
+      keyboard.clearTaps();
+      return;
+    }
     if (event.code === "KeyP") {
       if (!canPhotoMode()) return;
       event.preventDefault();
@@ -1342,6 +1387,7 @@ async function boot(): Promise<void> {
         qaActivePack = null;
         qaJustPicked = false;
         qaConsoleOpen = false;
+        battlePeekOpen = false;
         setPhotoMode(false);
         levelUpNotices.length = 0;
         swallowed.clear();

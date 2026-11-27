@@ -16,13 +16,23 @@ import {
   type BattlePopupSnapshot,
   type BattlePopupSpec,
 } from "./battle-popups";
+import {
+  battlePeekData,
+  checkMechanicLabel,
+  type BattlePeekData,
+  type CheckKind,
+} from "./battle-peek";
 
 export {
+  battlePeekData,
+  checkMechanicLabel,
   classifyBattlePopup,
+  type BattlePeekData,
   type BattlePopupKind,
   type BattlePopupSide,
   type BattlePopupSnapshot,
   type BattlePopupSpec,
+  type CheckKind,
 };
 
 export { createBattleCheck, type BattleCheckView, type TimingGrade } from "./battle-checks";
@@ -64,6 +74,9 @@ export type BattleHudView = {
   lassoSteady: boolean;
   portraits?: readonly BattlePortraitItem[];
   popupSnapshot?: BattlePopupSnapshot | null;
+  canPeek?: boolean;
+  peekOpen?: boolean;
+  peek?: BattlePeekData | null;
 };
 
 export type BattleCommand = {
@@ -348,10 +361,15 @@ export function createBattleHud(root: HTMLElement): {
   onTogether: (callback: () => void) => void;
   onFlute: (callback: () => void) => void;
   onLasso: (callback: () => void) => void;
+  onPeekToggle: (callback: () => void) => void;
+  onPeekClose: (callback: () => void) => void;
 } {
   let togetherHandler: () => void = () => undefined;
   let fluteHandler: () => void = () => undefined;
   let lassoHandler: () => void = () => undefined;
+  let peekToggleHandler: () => void = () => undefined;
+  let peekCloseHandler: () => void = () => undefined;
+  let peekable = false;
   const hud = element("div", "battle-hud");
   const energy = element("section", "battle-meter battle-energy");
   const energyLabel = element("span", "battle-meter-label");
@@ -435,11 +453,54 @@ export function createBattleHud(root: HTMLElement): {
   track.append(fill);
   calmRow.append(calmHeart, track);
   calm.append(calmLabel, calmRow);
+  calm.addEventListener("click", () => {
+    if (peekable) peekToggleHandler();
+  });
+  calm.addEventListener("keydown", (event) => {
+    if (!peekable) return;
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      peekToggleHandler();
+    }
+  });
   hud.append(energy, portraits, actionsLeft, calm);
   hud.hidden = true;
+  const peekCard = element("section", "battle-peek-card");
+  peekCard.setAttribute("role", "region");
+  peekCard.setAttribute("aria-label", "Critter field guide");
+  peekCard.hidden = true;
+  const peekHead = element("div", "battle-peek-head");
+  const peekTitleRow = element("div", "battle-peek-title-row");
+  const peekName = element("span", "battle-peek-name");
+  const peekLevel = element("span", "battle-peek-level");
+  const peekFam = element("span", "battle-peek-fam");
+  peekTitleRow.append(peekName, peekLevel, peekFam);
+  const peekClose = element("button", "battle-peek-close");
+  peekClose.type = "button";
+  peekClose.textContent = "×";
+  peekClose.setAttribute("aria-label", "Close critter field guide");
+  peekClose.addEventListener("click", () => peekCloseHandler());
+  peekHead.append(peekTitleRow, peekClose);
+  const peekMeta = element("div", "battle-peek-meta");
+  const peekLand = element("span", "battle-peek-badge is-land");
+  const peekCheck = element("span", "battle-peek-badge is-check");
+  peekMeta.append(peekLand, peekCheck);
+  const peekFeelingsRow = element("div", "battle-peek-row");
+  const peekFeelingsLabel = element("span", "battle-peek-label");
+  peekFeelingsLabel.textContent = "Feelings";
+  const peekFeelingsBody = element("div", "battle-peek-body");
+  peekFeelingsRow.append(peekFeelingsLabel, peekFeelingsBody);
+  const peekTreatsRow = element("div", "battle-peek-row");
+  const peekTreatsLabel = element("span", "battle-peek-label");
+  peekTreatsLabel.textContent = "Treats";
+  const peekTreatsBody = element("div", "battle-peek-body");
+  peekTreatsRow.append(peekTreatsLabel, peekTreatsBody);
+  const peekTip = element("div", "battle-peek-tip");
+  peekCard.append(peekHead, peekMeta, peekFeelingsRow, peekTreatsRow, peekTip);
+  let lastPeekSig = "";
   const popupsLayer = element("div", "battle-popups");
   popupsLayer.setAttribute("aria-hidden", "true");
-  root.append(hud, popupsLayer);
+  root.append(hud, peekCard, popupsLayer);
   type ActivePopup = {
     node: HTMLElement;
     spawnedAtTick: number | null;
@@ -497,6 +558,12 @@ export function createBattleHud(root: HTMLElement): {
     },
     onLasso: (callback) => {
       lassoHandler = callback;
+    },
+    onPeekToggle: (callback) => {
+      peekToggleHandler = callback;
+    },
+    onPeekClose: (callback) => {
+      peekCloseHandler = callback;
     },
     render: (view) => {
       hud.hidden = !view.visible;
@@ -594,6 +661,72 @@ export function createBattleHud(root: HTMLElement): {
         String(Math.round(calmFraction * 100)),
       );
       fill.style.width = `${calmFraction * 100}%`;
+      peekable = view.visible && view.canPeek === true;
+      calm.classList.toggle("is-peekable", peekable);
+      if (peekable) {
+        setAttribute(calm, "role", "button");
+        setAttribute(calm, "tabindex", "0");
+        setAttribute(calm, "aria-expanded", String(view.peekOpen === true));
+        setAttribute(calm, "aria-label", `${view.critterName}. Inspect critter field guide`);
+        setAttribute(calm, "title", "Inspect critter field guide (I)");
+      } else {
+        if (calm.hasAttribute("role")) calm.removeAttribute("role");
+        if (calm.hasAttribute("tabindex")) calm.removeAttribute("tabindex");
+        if (calm.hasAttribute("aria-expanded")) calm.removeAttribute("aria-expanded");
+        if (calm.hasAttribute("aria-label")) calm.removeAttribute("aria-label");
+        if (calm.hasAttribute("title")) calm.removeAttribute("title");
+      }
+      const peek = view.visible && view.peekOpen === true ? (view.peek ?? null) : null;
+      peekCard.hidden = peek === null;
+      if (peek !== null) {
+        const sig = [
+          peek.critterId,
+          peek.name,
+          peek.level,
+          peek.landName,
+          peek.familiarity,
+          peek.familiarityLabel,
+          peek.checkLabel,
+          peek.favouriteTreats.join(","),
+          peek.knownFeelings === null ? "hidden" : peek.knownFeelings.join(","),
+          peek.tip,
+        ].join("|");
+        if (sig !== lastPeekSig) {
+          lastPeekSig = sig;
+          setAttribute(peekCard, "data-critter", peek.critterId);
+          setText(peekName, peek.name);
+          setText(peekLevel, `Lv ${peek.level}`);
+          setText(peekFam, peek.familiarityLabel);
+          setAttribute(peekFam, "data-familiarity", peek.familiarity);
+          setText(peekLand, peek.landName);
+          setText(peekCheck, peek.checkLabel);
+          if (peek.knownFeelings !== null && peek.knownFeelings.length > 0) {
+            const pills = peek.knownFeelings.map((feelingLabel) => {
+              const pill = element("span", "battle-peek-feeling");
+              pill.textContent = feelingLabel;
+              return pill;
+            });
+            peekFeelingsBody.replaceChildren(...pills);
+          } else {
+            const hint = element("span", "battle-peek-hint");
+            hint.textContent = "Calm once or carry the lantern to spot feelings.";
+            peekFeelingsBody.replaceChildren(hint);
+          }
+          if (peek.favouriteTreats.length > 0) {
+            const pills = peek.favouriteTreats.map((treatName) => {
+              const pill = element("span", "battle-peek-treat");
+              pill.textContent = `♥ Fav: ${treatName}`;
+              return pill;
+            });
+            peekTreatsBody.replaceChildren(...pills);
+          } else {
+            const hint = element("span", "battle-peek-hint");
+            hint.textContent = "Try treats in battle to discover favourites!";
+            peekTreatsBody.replaceChildren(hint);
+          }
+          setText(peekTip, peek.tip);
+        }
+      }
       const nextPopup = view.popupSnapshot ?? null;
       const battleReset =
         nextPopup === null ||

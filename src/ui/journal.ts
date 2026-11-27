@@ -57,6 +57,7 @@ export type JournalView = {
   lands: { id: string; name: string; busStop: boolean; x: number; y: number }[];
   currentLand: string | null;
   landProgress: Record<string, LandProgress>;
+  landGuides?: Record<string, string>;
   busRoutes: BusRoute[];
   stickersOwned: number;
   stickersTotal: number;
@@ -629,6 +630,23 @@ export function createJournal(root: HTMLElement): {
     const prefix = inspected !== undefined && inspected.id !== view.currentLand ? "" : "Here: ";
     if (active === undefined) {
       setText(mapDetail, "Cloverhollow World");
+      if (mapDetail.hasAttribute("title")) mapDetail.removeAttribute("title");
+    } else if (inspected !== undefined) {
+      const guide = view.landGuides?.[inspected.id];
+      if (guide !== undefined && guide.length > 0) {
+        const text = `${prefix}${guide}`;
+        setText(mapDetail, text);
+        setAttribute(mapDetail, "title", text);
+      } else {
+        const progress = view.landProgress[inspected.id];
+        const suffix =
+          progress === undefined || progress.total === 0
+            ? ""
+            : ` · ${progress.owned}/${progress.total} stickers`;
+        const text = `${prefix}${inspected.name}${suffix}`;
+        setText(mapDetail, text);
+        setAttribute(mapDetail, "title", text);
+      }
     } else {
       const progress = view.landProgress[active.id];
       const suffix =
@@ -636,6 +654,7 @@ export function createJournal(root: HTMLElement): {
           ? ""
           : ` · ${progress.owned}/${progress.total} stickers`;
       setText(mapDetail, `${prefix}${active.name}${suffix}`);
+      if (mapDetail.hasAttribute("title")) mapDetail.removeAttribute("title");
     }
     for (const node of mapLabels.children) {
       if (!(node instanceof HTMLElement)) continue;

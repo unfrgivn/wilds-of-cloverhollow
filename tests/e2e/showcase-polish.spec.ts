@@ -277,10 +277,19 @@ test(
       });
     }
 
-    // Escape exits Photo Mode cleanly.
+    // Space in Photo Mode captures a postcard download and flashes the shutter cleanly.
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      page.keyboard.press("Space"),
+    ]);
+    expect(download.suggestedFilename()).toBe("cloverhollow-postcard-woods.png");
+    await expect(page.locator(".photo-shutter-flash")).toHaveAttribute("data-shutter-count", "1");
+
+    // Escape exits Photo Mode cleanly and hides any active shutter flash.
     await page.keyboard.press("Escape");
     await step(page, 1);
     await expect(page.locator("html")).toHaveAttribute("data-photo", "off");
+    await expect(page.locator(".photo-shutter-flash")).toBeHidden();
     expect((await renderInfo(page)).photoMode).toBe(false);
     await expect(page.locator(".hud-hints")).toBeVisible();
 

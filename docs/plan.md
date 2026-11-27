@@ -5031,6 +5031,58 @@ the old trail, the owl, and the clubhouse claim.
 - Gates: `just check` (167 unit files / 1,288 tests, all 67 sims, 23 QA packs,
   purity, lint), `just build`, and 18/18 soundtrack & jukebox e2e tests.
 
+## Milestone 110: `arcade-parsers.ts` & `journal-field-note.ts` Extraction, Postcard Polish & Full iOS Simulator/Device Verification **Status:** ✅ Completed (2026-11-27)
+- Pure architectural modularization, Photo Mode polish, and full live iOS 27
+  verification with zero `src/core` changes, zero save-version bumps, and zero
+  replay hash drift across all 67 recorded sims.
+- Arcade & minigame parser extraction (`src/content/arcade-parsers.ts`,
+  `src/content/load.ts`):
+  - Extracted `parsePrizes`, `parseArcade`, `parseSkee`, `parseCook`,
+    `parseFish`, `parseMole`, `parseComet`, `parseCounter`,
+    `parseClawCalibration`, `parseCookCalibration`, `parseFishCalibration`,
+    `parseMoleCalibration`, `parseCometCalibration`, and `parseSkeeCalibration`
+    out of `src/content/load.ts` into `src/content/arcade-parsers.ts`,
+    re-exporting all public parsers from `src/content/load.ts` (trimming
+    `src/content/load.ts` from 2,176 to 1,625 lines).
+- Journal Field Note & Field Treasures overlay extraction
+  (`src/ui/journal-field-note.ts`, `src/ui/journal.ts`):
+  - Extracted the interactive Field Note Card (`.journal-field-backdrop`,
+    `.journal-field-note`, `fieldNoteBlurb`, Critter / Fish / Keepsake rendering)
+    and Field Treasures Card (`.journal-treasures-backdrop`,
+    `.journal-treasures-card`) DOM components, zero-churn signature caches, and
+    Escape/backdrop/close dismiss logic into `src/ui/journal-field-note.ts`
+    (trimming `src/ui/journal.ts` from 1,546 to 1,178 lines) with identical DOM
+    structure and zero pixel diffs.
+- Photo Mode Postcard shutter polish (`src/ui/postcard.ts`, `src/main.ts`,
+  `tests/e2e/showcase-polish.spec.ts`):
+  - Extended `createShutterFlash` with `hide()` and `count()`, hiding the
+    shutter overlay cleanly on Photo Mode exit/reset, triggering a gentle `light`
+    haptic tap on postcard capture, and verifying real browser `download` events
+    on `Space` in Photo Mode (`tests/e2e/showcase-polish.spec.ts`).
+- Live iPhone 17 Simulator & arm64 iOS Device verification (`src/ui/save-toast.css`,
+  `tools/ios/smoke.ts`):
+  - Caught and fixed two live iOS defects during `just ios-smoke`:
+    1. Repositioned `:root[data-touch="on"] .save-toast` cleanly to bottom-center
+       so the `"Saved"` pill never overlaps the bottom-right `×` touch button on
+       iPhone/iPad (verified visually in `art/review/m110-ios-plaza.jpg`).
+    2. Updated `tools/ios/smoke.ts` Town Plaza shop-walk route to stop clear of
+       the tight corner between the bakery and `arch-ne`'s north lamp post (with
+       down-left nudge recovery), passing the entire native AXe touch smoke flow
+       end-to-end (Title -> Dialogue -> Kitchen -> Plaza -> Meadow Park -> Frog
+       Battle -> Relaunch Continue -> Journal).
+  - Verified `just ios-device-build` compiles unsigned `Release-iphoneos/App.app`
+    cleanly with all 88 Alpha WebP atlases and Vite 8 code-split chunks.
+- Evidence: `tests/unit/milestone-110.test.ts` (3 tests), extended Photo Mode
+  download verification in `tests/e2e/showcase-polish.spec.ts`, and live iOS
+  Simulator captures `art/review/m110-ios-plaza.jpg` &
+  `art/review/m110-ios-battle.jpg` verified with `vision`.
+- Gates: `just check` (169 unit files / 1,297 tests, all 67 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), full
+  `CLOVERHOLLOW_E2E_PORT=4351 just e2e` (1,104 passed, 2 skipped, 0 failed in
+  5.1 min), `just ios-smoke` (passed on iPhone 17 / iOS 27.0), and
+  `just ios-device-build` (passed).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

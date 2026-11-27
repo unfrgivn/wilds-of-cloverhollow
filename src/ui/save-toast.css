@@ -58,6 +58,14 @@
   color: var(--sticker-ink);
 }
 
+:root[data-touch="on"] .save-toast {
+  left: 50%;
+  right: auto;
+  bottom: calc(14px + var(--safe-bottom));
+  transform: translateX(-50%);
+  animation-name: save-toast-touch-in;
+}
+
 @keyframes save-toast-in {
   from {
     opacity: 0;
@@ -66,6 +74,17 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes save-toast-touch-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 6px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
   }
 }
 

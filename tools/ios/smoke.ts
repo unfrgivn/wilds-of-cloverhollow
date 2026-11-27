@@ -707,12 +707,10 @@ async function main(): Promise<void> {
       );
     }
     // Go round the top of the plaza, then down into Meadow Park, never near
-    // the frog's circle. The shops along the top are blockers, and the bench
-    // below the bakery leaves one row under its corner (1030, 385), so: up,
-    // right until the bakery stops her, down past its corner, right until the
-    // arcade's slanted wall slides her under it, then down beside the planter.
-    // Checked headless from y 359, 372, and 386 (drags land at different
-    // heights): every start reaches the park the same way.
+    // the frog's circle. Stop in the open aisle left of arch-ne's north post
+    // (x 945-990), nudging down-left if a drag overshoots into the narrow
+    // corner between the bakery and arch-ne (x >= 995), then step down past
+    // arch-ne's post before heading right under the arcade and south to park.
     await walkTo(
       { x: latest().x, y: 260 },
       (value) => !value.moving && value.y <= 380,
@@ -720,14 +718,19 @@ async function main(): Promise<void> {
       "y",
     );
     await walkTo(
-      { x: 1260, y: latest().y },
-      (value) => !value.moving && value.x >= 990,
+      { x: 965, y: latest().y },
+      (value) => !value.moving && value.x >= 945,
       "along the shops",
       "x",
     );
+    if (latest().x >= 995) {
+      const before = latest().tick;
+      await drag(-18, 18, 0.6);
+      await settle(before);
+    }
     await walkTo(
-      { x: latest().x, y: 430 },
-      (value) => !value.moving && value.y >= 420,
+      { x: latest().x, y: 455 },
+      (value) => !value.moving && value.y >= 445,
       "below the bakery",
       "y",
     );

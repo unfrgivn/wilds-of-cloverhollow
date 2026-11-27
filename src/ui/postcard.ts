@@ -216,7 +216,11 @@ export function triggerPostcardDownload(dataUrl: string, filename: string): void
 }
 
 /** Crisp warm-cream shutter flash overlay used when snapping a Photo Mode postcard. */
-export function createShutterFlash(root: HTMLElement): { trigger: () => void } {
+export function createShutterFlash(root: HTMLElement): {
+  trigger: () => void;
+  hide: () => void;
+  count: () => number;
+} {
   const node = element("div", "photo-shutter-flash");
   node.setAttribute("aria-hidden", "true");
   node.dataset.shutterCount = "0";
@@ -246,5 +250,7 @@ export function createShutterFlash(root: HTMLElement): { trigger: () => void } {
       node.classList.add("is-flashing");
       timer = window.setTimeout(finish, 280);
     },
+    hide: finish,
+    count: () => count,
   };
 }

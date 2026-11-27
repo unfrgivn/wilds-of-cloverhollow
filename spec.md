@@ -483,9 +483,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   `.hud-hints`, `.area-banner`, `.qa-badge`, `.notice-marks`, and the dev debug
   readout (`view.setPhotoMode`) for unobstructed storybook views. While Photo Mode
   is active, pressing `Enter` or `Space` (swallowing confirm so it never interacts
-  or scrolls) plays `camera-shutter`, triggers a 240 ms warm-cream
-  `.photo-shutter-flash` overlay (softened to a subtle 220 ms pulse under Reduced
-  Motion), extracts the live viewport via Pixi `app.renderer.extract.canvas`,
+  or scrolls) plays `camera-shutter`, triggers a gentle `light` haptic tap and a
+  240 ms warm-cream `.photo-shutter-flash` overlay (softened to a subtle 220 ms
+  pulse under Reduced Motion, hidden cleanly on exit or reset), extracts the live
+  viewport via Pixi `app.renderer.extract.canvas`,
   frames it inside a warm cream watercolor postcard border (`#fbf6e8` margin,
   `#47321f` hand-inked inner rule, four-leaf clover emblem, region subcaption, and
   bottom-right `"<Area> · Wilds of Cloverhollow"` stamp in `src/ui/postcard.ts`),
@@ -502,7 +503,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   Per-area NPC and critter atlases (`areaEntityAtlases`, extracted with pure
   stateless overworld render helpers into `src/render/overworld-render.ts` and
   re-exported from `src/render/view.ts`, alongside reusable primitive/geometry
-  JSON validators in `src/content/parsers.ts`, Milestone 97) load on demand with
+  JSON validators in `src/content/parsers.ts`, Milestone 97, and arcade/minigame
+  content & calibration parsers in `src/content/arcade-parsers.ts`, re-exported
+  from `src/content/load.ts`, Milestone 110) load on demand with
   their area (and warm on door fade-out prefetch) and unload on the same
   bounded current + previous area residency window as ground tiles and prop
   atlases, so the way back through a door is a cache hit instead of a reload
@@ -3332,7 +3335,8 @@ trunks keep its two exits.
   Field Treasures card, and plays the in-key `choice-move` page-flip ping
   without intercepting `ArrowLeft` / `ArrowRight` slider navigation.
 - **Interactive Field Treasures Card** (`treasuresSummary` in
-  `src/core/treasures.ts`, `src/ui/journal.ts`): summarizes Fae's Star-Line
+  `src/core/treasures.ts`, `src/ui/journal-field-note.ts` mounted by
+  `src/ui/journal.ts`): summarizes Fae's Star-Line
   Stamp Card (`buster_quest`, `stamp_bay`, `stamp_pass`, `buster_reward`),
   all six Clubhouse Keepsakes (`star-crystal`, `star-pin`, `star-geode`,
   `moon-feather`, `taco-badge`, `star-whistle`), and all six Bubblegum Bay Catch
@@ -3367,7 +3371,8 @@ trunks keep its two exits.
   below the `NOTES` heading row showing each carried treat pill (`<Name> ×N`).
   When Fae carries no specialty treats, the strip stays hidden.
 - Interactive Journal Critter Compendium (`critterFieldNote` in
-  `src/core/journal.ts`): every owned sticker slot in `.journal-stickers` is
+  `src/core/journal.ts`, modal DOM and `fieldNoteBlurb` in
+  `src/ui/journal-field-note.ts`): every owned sticker slot in `.journal-stickers` is
   clickable and keyboard-focusable (`role="button"`, `tabindex="0"`, Enter/Space
   or click/tap). Selecting an owned sticker opens a die-cut Field Note Card
   (`.journal-field-note`) centered inside `.journal-book` (max 520 px wide,
@@ -3477,10 +3482,12 @@ trunks keep its two exits.
   (`autosaveNeeded`), and it is false while `finale` isn't null: the dream's
   last save is the ending's snapshot (section 7.4). Fixture resets don't save.
   In live unpaused gameplay outside QA packs, title, and the harness room, a
-  successful autosave displays a compact non-blocking bottom-right die-cut
-  quill pill (`createSaveToast` in `src/ui/save-toast.ts`, `"Saved"`,
-  auto-hiding after 1800 ms, respecting reduced motion, and hidden during
-  photo, battle, journal, title, and credits overlays).
+  successful autosave displays a compact non-blocking die-cut quill pill
+  (`createSaveToast` in `src/ui/save-toast.ts`, `"Saved"`, bottom-right on
+  desktop and bottom-center on touch devices under `data-touch="on"` so it
+  never overlaps the bottom-right `✓`/`×` buttons, auto-hiding after 1800 ms,
+  respecting reduced motion, and hidden during photo, battle, journal, title,
+  and credits overlays).
 - Boot: a valid save resumes the game; otherwise a new game starts.
 - QA mode never reads or writes `cloverhollow-save` and never autosaves. QA
   packs are separate files in the dev/harness-only save library; movement,

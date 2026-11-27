@@ -529,6 +529,7 @@ async function boot(): Promise<void> {
     document.documentElement.dataset.photo = next ? "on" : "off";
     view.setPhotoMode(next);
     if (next) saveToast.hide();
+    else shutterFlash.hide();
     invalidate();
   };
   const render = (alpha = 1): void => {
@@ -536,6 +537,7 @@ async function boot(): Promise<void> {
       photoMode = false;
       document.documentElement.dataset.photo = "off";
       view.setPhotoMode(false);
+      shutterFlash.hide();
     }
     if (!state.journalOpen || titleMode !== null || qaMenuOpen) jukeboxTrack = null;
     const baseSoundtrack = soundtrackFor(content.world, state, {
@@ -1203,6 +1205,7 @@ async function boot(): Promise<void> {
     if (!photoMode || !canPhotoMode()) return null;
     sound.playEffect("camera-shutter");
     shutterFlash.trigger();
+    if (!harnessStepping) haptics.trigger("light");
     render(1);
     app.render();
     const extracted = app.renderer.extract.canvas({

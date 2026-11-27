@@ -769,6 +769,7 @@ async function boot(): Promise<void> {
         canPeek: canBattlePeek(gate),
         peekOpen: battlePeekOpen,
         speakerPortrait: assets.speakerPortrait,
+        inputMode: inputShortcuts.inputMode(),
       }),
     );
     commandMenu.render({

@@ -1,4 +1,12 @@
-export type BattlePopupKind = "normal" | "big" | "fav" | "pop" | "energy";
+export type BattlePopupKind =
+  | "normal"
+  | "big"
+  | "fav"
+  | "pop"
+  | "energy"
+  | "assist"
+  | "steady"
+  | "peek";
 
 export type BattlePopupSide = "critter" | "fae";
 
@@ -16,6 +24,10 @@ export type BattlePopupSnapshot = {
   message: string;
   tick?: number;
   paused?: boolean;
+  fluteUsed?: boolean;
+  lassoUsed?: boolean;
+  lanternPeek?: boolean;
+  togetherActive?: boolean;
 };
 
 /**
@@ -54,6 +66,22 @@ export function classifyBattlePopup(
   const deltaEnergy = Math.round(next.energy - prev.energy);
   if (deltaEnergy > 0) {
     popups.push({ kind: "energy", text: `+${deltaEnergy} ⚡`, side: "fae" });
+  }
+
+  if (!prev.fluteUsed && next.fluteUsed === true) {
+    popups.push({ kind: "assist", text: "FLUTE! ♪", side: "fae" });
+  }
+
+  if (!prev.lassoUsed && next.lassoUsed === true) {
+    popups.push({ kind: "steady", text: "STEADY! ✦", side: "critter" });
+  }
+
+  if (!prev.lanternPeek && next.lanternPeek === true) {
+    popups.push({ kind: "peek", text: "MOOD PEEK! ✦", side: "critter" });
+  }
+
+  if (!prev.togetherActive && next.togetherActive === true) {
+    popups.push({ kind: "big", text: "TOGETHER! ★", side: "fae" });
   }
 
   return popups;

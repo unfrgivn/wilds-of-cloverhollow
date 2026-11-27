@@ -1244,6 +1244,27 @@
   background: #e6f5d5;
   font-size: 19px;
 }
+.battle-popup.is-assist,
+.battle-popup-assist {
+  background: #c7f0e8;
+  color: #47321f;
+  font-size: 19px;
+  letter-spacing: 0.04em;
+}
+.battle-popup.is-steady,
+.battle-popup-steady {
+  background: #ffe484;
+  color: #47321f;
+  font-size: 19px;
+  letter-spacing: 0.04em;
+}
+.battle-popup.is-peek,
+.battle-popup-peek {
+  background: #ede0ff;
+  color: #47321f;
+  font-size: 19px;
+  letter-spacing: 0.04em;
+}
 @keyframes battle-popup-rise {
   0% {
     opacity: 0;

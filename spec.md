@@ -155,7 +155,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   and the eight active battle timing-check DOM overlays (`ring`, `charge`,
   `chain`, `catch`, `lean`, `trace`, `peekaboo`, `echo`) live in
   `src/ui/battle-checks.ts` (re-exported through `src/ui/battle.ts`, Milestone
-  105).
+  105), while the secondary battle DOM overlays (`createCommandMenu`,
+  `createFeelingBubble`, `createWindUpBubbles`, `createRewardSticker`, and
+  `battleCommandPreview`) live in `src/ui/battle-overlays.ts` (re-exported
+  identically through `src/ui/battle.ts`, Milestone 134).
 - Lazy DOM atlas metadata caching, single-decode image warming, frame crop
   resolvers (`stickerArt`, `prizeArt`, `speakerPortrait`, `fishArt`, `toyArt`),
   per-area close-up overlays (`ensureClawOverlay`, `ensureSkeeOverlay`,
@@ -2864,7 +2867,12 @@ trunks keep its two exits.
   an unpopped wind-up, and `R` key badge hidden on touch while available),
   `.battle-soften-pill` (`Softened` badge while Acorn Squirrel's burst soften
   is active), and `.battle-steady-pill` (`✦ Steady` cream badge while
-  `lassoSteady` is active). Beside ENERGY on desktop viewports (`>= 960 px`,
+  `lassoSteady` is active). The action keycap badges on `.battle-together-btn`,
+  `.battle-lasso-btn`, and `.battle-flute-btn` (plus the `.battle-calm` field
+  guide tooltip) adapt dynamically between keyboard (`X`, `R`, `F`, `I`) and
+  gamepad (`B`, `LB`, `RB`, `View`) glyphs via `battleActionKeys(mode)` in
+  `src/ui/battle.ts` (Milestone 134, defaulting to `"keyboard"` so existing
+  baselines stay unchanged). Beside ENERGY on desktop viewports (`>= 960 px`,
   hidden on compact phone screens `< 960 px`) sits `.battle-portraits`, a row
   of 42 px circular die-cut party medallions (`src/ui/battle-portraits.ts`,
   Milestone 90) for Fae and each active fighting party member (excluding flute
@@ -2880,17 +2888,23 @@ trunks keep its two exits.
   and during live command selection (outside Talk and the treat tray) displays
   a high-contrast `.sticker-subtitle` preview line (`battleCommandPreview`)
   describing the highlighted command, any active feeling match, or cooldown.
-- Die-cut Paper-Mario battle popups (Milestone 107, `src/ui/battle-popups.ts` &
-  `src/ui/battle.ts`): purely UI-driven by diffing consecutive live battle HUD
-  snapshots (zero `src/core` changes, zero popups on battle open/close/switch or
-  static gallery renders). Ephemeral `.battle-popup` pills mount inside
-  `.battle-popups` (`z-index: 28`, `pointer-events: none`), rising and fading over
-  850 ms (or a calm 450 ms fade under `prefers-reduced-motion: reduce` and
-  `data-reduced-motion="on"`), clearing immediately on battle end/reset: calm gains
-  spawn over the critter (`+N` mint-cream `#dff2cf`, `+N ★` butter-yellow `#ffe896`
-  for `>= 28`, `+N ♥` coral-pink `#ffd7e2` for `>= 45` or favourite-treat text),
-  popped wind-up bubbles spawn sky-blue `"POP!"` (`#d6eefc`), and energy restores
-  spawn peach-mint `+N ⚡` (`#e6f5d5`) over Fae.
+- Die-cut Paper-Mario battle popups (Milestone 107, extended Milestone 134,
+  `src/ui/battle-popups.ts` & `src/ui/battle.ts`): purely UI-driven by diffing
+  consecutive live battle HUD snapshots (zero `src/core` changes, zero popups on
+  battle open/close/switch or static gallery renders). Ephemeral `.battle-popup`
+  pills mount inside `.battle-popups` (`z-index: 28`, `pointer-events: none`),
+  rising and fading over 850 ms (or a calm 450 ms fade under
+  `prefers-reduced-motion: reduce` and `data-reduced-motion="on"`), clearing
+  immediately on battle end/reset: calm gains spawn over the critter (`+N`
+  mint-cream `#dff2cf`, `+N ★` butter-yellow `#ffe896` for `>= 28`, `+N ♥`
+  coral-pink `#ffd7e2` for `>= 45` or favourite-treat text), popped wind-up
+  bubbles spawn sky-blue `"POP!"` (`#d6eefc`), energy restores spawn peach-mint
+  `+N ⚡` (`#e6f5d5`) over Fae, and live tactical assist transitions spawn
+  WCAG-AAA `#47321f`-ink pills: Flute Friends (`FLUTE! ♪`, `.battle-popup-assist`,
+  sky-meadow teal `#c7f0e8`, over Fae), Lasso (`STEADY! ✦`, `.battle-popup-steady`,
+  buttercup gold `#ffe484`, over the critter), Lantern Mood Peek (`MOOD PEEK! ✦`,
+  `.battle-popup-peek`, pastel lavender `#ede0ff`, over the critter), and
+  `Together!` (`TOGETHER! ★`, `kind: "big"`, butter-yellow `#ffe896`, over Fae).
 - **Battle Field Guide Peek** (Milestone 110, gamepad parity Milestone 114,
   `src/ui/battle-peek.ts`,
   `src/ui/battle.ts`, `src/main.ts`): during live battle `command` phase

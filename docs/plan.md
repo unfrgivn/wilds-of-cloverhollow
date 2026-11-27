@@ -5917,6 +5917,39 @@ the old trail, the owl, and the clubhouse claim.
   `CLOVERHOLLOW_E2E_PORT=4521/4522 just e2e` (631 Chromium + 536 WebKit = 1,167
   passed, 2 skipped, 0 failed, 0 snapshot diffs).
 
+## Milestone 134: Paper-Mario Battle Assist Popups, Adaptive Gamepad Battle Action Badges & `src/ui/battle-overlays.ts` Extraction **Status:** ✅ Completed (2026-11-27)
+- Zero `src/core` changes and zero replay hash shifts across all 68 recorded
+  sims; zero visual pixel changes across all existing Playwright snapshots.
+- Paper-Mario Battle Assist & Mood-Peek Popups (`src/ui/battle-popups.ts`,
+  `src/ui/battle.css`, `src/ui/battle.ts`, `src/shell/assets.ts`):
+  - Extends `BattlePopupKind` with `"assist"`, `"steady"`, and `"peek"` and
+    `BattlePopupSnapshot` with optional `fluteUsed`, `lassoUsed`,
+    `lanternPeek`, and `togetherActive`.
+  - Emits `"FLUTE! ♪"` (`assist`, `fae`, `#c7f0e8`), `"STEADY! ✦"` (`steady`,
+    `critter`, `#ffe484`), `"MOOD PEEK! ✦"` (`peek`, `critter`, `#ede0ff`), and
+    `"TOGETHER! ★"` (`big`, `fae`, `#ffe896`) strictly on `false -> true` live
+    transitions with WCAG AAA `#47321f` ink (`>= 9.5:1` contrast).
+- Adaptive Gamepad Battle Action Badges (`src/ui/battle.ts`,
+  `src/shell/assets.ts`, `src/main.ts`):
+  - Exports pure `BattleActionKeys` and `battleActionKeys(mode)` mapping
+    `"keyboard"` to `{ together: "X", lasso: "R", flute: "F", peek: "I" }` and
+    `"gamepad"` to `{ together: "B", lasso: "LB", flute: "RB", peek: "View" }`,
+    wiring `inputMode: inputShortcuts.inputMode()` into `BattleHudView`.
+- Modular `src/ui/battle-overlays.ts` Extraction (`src/ui/battle-overlays.ts`,
+  `src/ui/battle.ts`):
+  - Moves `createCommandMenu`, `createFeelingBubble`, `createWindUpBubbles`,
+    `createRewardSticker`, and `battleCommandPreview` (with their view types)
+    out of `src/ui/battle.ts` and re-exports them identically from
+    `src/ui/battle.ts`, reducing `src/ui/battle.ts` from 1,034 lines to under
+    700 lines with zero caller or DOM changes.
+- Evidence: `tests/unit/milestone-134.test.ts` (3 tests) and real-input
+  `tests/e2e/milestone-134.spec.ts` (`@smoke`, Chromium & WebKit).
+- Gates: `just check` (194 unit files / 1,426 tests, all 68 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  `CLOVERHOLLOW_E2E_PORT=4531/4532 just e2e` (633 Chromium + 538 WebKit = 1,171
+  passed, 2 skipped, 0 failed, 0 snapshot diffs).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

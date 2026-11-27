@@ -598,6 +598,7 @@ export type BattleHudViewParams = {
   canPeek: boolean;
   peekOpen: boolean;
   speakerPortrait: (speaker: string | null) => AtlasImage | null;
+  inputMode?: HudInputMode;
 };
 
 /** Projects core battle state, party portraits, and Field Guide peek onto BattleHudView. */
@@ -631,6 +632,13 @@ export function buildBattleHudView(params: BattleHudViewParams): BattleHudView {
           message: battle.message,
           tick: state.tick,
           paused,
+          fluteUsed: state.battle.fluteUsed === true,
+          lassoUsed: state.battle.lassoUsed === true,
+          lanternPeek: state.battle.lanternPeek === true,
+          togetherActive:
+            state.battle.command === "together" &&
+            state.battle.phase === "check" &&
+            state.battle.check?.side === "critter",
         }
       : null;
   const critter = world.critters[state.battle?.critterId ?? ""];
@@ -651,6 +659,7 @@ export function buildBattleHudView(params: BattleHudViewParams): BattleHudView {
     canPeek,
     peekOpen,
     peek: peekOpen ? battlePeekData(world, state) : null,
+    inputMode: params.inputMode,
   };
 }
 

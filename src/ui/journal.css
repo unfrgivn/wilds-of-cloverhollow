@@ -1063,6 +1063,71 @@
   font-weight: 700;
   line-height: 1.25;
 }
+.journal-photo-btn {
+  display: none;
+}
+:root[data-touch="on"] .journal-controls-card.has-photo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+:root[data-touch="on"] .journal-controls-card.has-photo .journal-controls-title {
+  margin-bottom: 0;
+}
+:root[data-touch="on"] .journal-controls-card.has-photo .journal-controls-line {
+  display: none;
+}
+:root[data-touch="on"] .journal-photo-btn:not([hidden]) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: #fbf6e8;
+  box-shadow:
+    inset 0 0 0 1.5px #fffdf7,
+    0 2px 0 #47321f33;
+  color: var(--sticker-ink);
+  font: 800 13px/1 var(--sticker-font);
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition: transform 90ms ease-out;
+}
+:root[data-touch="on"] .journal-photo-btn svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+}
+:root[data-touch="on"] .journal-photo-btn:active {
+  transform: scale(0.96);
+}
+:root[data-touch="on"] .journal-photo-btn:focus-visible {
+  outline: 3px solid #6b9e56;
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-touch="on"] .journal-photo-btn:not([hidden]) {
+    transition: none;
+  }
+  :root[data-touch="on"] .journal-photo-btn:active {
+    transform: none;
+  }
+}
+:root[data-reduced-motion="on"] .journal-photo-btn:not([hidden]) {
+  transition: none;
+}
+:root[data-reduced-motion="on"] .journal-photo-btn:active {
+  transform: none;
+}
 .journal-tabs {
   position: absolute;
   top: 68px;

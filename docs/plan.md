@@ -6682,6 +6682,43 @@ the old trail, the owl, and the clubhouse claim.
 - Gates: `just check` (213 unit files / 1,563 tests, all 71 sims, 23 QA packs,
   purity, lint), `just build`, and 26/26 Chromium & WebKit e2e tests.
 
+## Milestone 154: Touch Photo Mode Launcher, Vite Chunk-Budget Future-Proofing (`< 500 kB` Gate) & `src/content/area-parsers.ts` Modular Extraction **Status:** ✅ Completed (2026-11-27)
+- Completes 100% keyboard-free Photo Mode on iOS/iPad, splits oversized
+  production JS bundles (`story-content` 632 -> 376 kB, `index` 508 -> 464 kB)
+  under an automated `< 500 kB` gate, and extracts `src/content/area-parsers.ts`
+  (`load.ts` 852 -> 480 lines) — zero `src/core` changes, zero save-version
+  bumps, zero replay hash drift across all 72 sims, and zero desktop /
+  `ui-gallery` regressions.
+- Vite chunk future-proofing & automated app-chunk gate (`vite.config.ts`,
+  `tools/check-dist.ts`):
+  - Exported `ChunkGroup` & `chunkGroups` adding dedicated `story-content`
+    (`376.31 kB`, priority 22), `area-content` (`255.85 kB`, priority 20), and
+    `audio-scores` (`45.87 kB`, priority 18) with zero circular chunk warnings.
+  - Exported `MAX_APP_CHUNK_BYTES` (`512_000`) and `oversizedAppChunks(...)` in
+    `tools/check-dist.ts`, enforcing `< 500 kB` on all non-vendor production JS
+    chunks in `just build`.
+- Touch Photo Mode launcher (`src/shell/input-shortcuts.ts`, `src/ui/postcard.ts`,
+  `src/ui/journal-options.ts`, `src/ui/journal.ts`, `src/ui/journal-nav.ts`,
+  `src/ui/journal.css`, `src/shell/view-models.ts`, `src/main.ts`):
+  - Exported `canPhotoFromJournal(ctx)` and shared `cameraIcon()` SVG helper
+    (zero `<text>` nodes), mounted 44 px `.journal-photo-btn` strictly visible
+    under `:root[data-touch="on"]` inside `.journal-controls-card.has-photo`,
+    and skipped `display: none` elements in `journal-nav.ts` `isElementVisible`.
+- Pure area & world parser extraction (`src/content/area-parsers.ts`,
+  `src/content/load.ts`):
+  - Extracted 8 pure area/world/tunables/character/surface parsers (433 lines),
+    re-exporting every public parser from `src/content/load.ts` (480 lines)
+    across all 33 areas (`milo-house`, `rosie-cottage`, `summit`, `island`,
+    `market`, `parlor`).
+- Evidence: `tests/unit/milestone-154.test.ts` and
+  `tests/e2e/milestone-154.spec.ts` (`@smoke` Chromium + WebKit); review
+  capture `art/review/m154-touch-options-photo-874.jpg` and refreshed touch
+  `journal-options-874` snapshots independently verified via `vision`.
+- Gates: `just check` (216 unit files / 1,586 tests, all 72 sims, 23 QA packs,
+  purity, lint), `just build` (production hook leak + `< 500 kB` app-chunk
+  budget + harness checks), 52/52 Chromium & WebKit e2e, and 95/95 Chromium
+  `ui-gallery` tests.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

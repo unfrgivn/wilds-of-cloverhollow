@@ -54,10 +54,17 @@ export function pickNotesScrollTarget(options: {
 
 /** Returns true when a Journal DOM control is visible and enabled for focus cycling. */
 export function isElementVisible(node: HTMLElement): boolean {
+  if (
+    node.hidden ||
+    node.closest("[hidden]") !== null ||
+    node.getAttribute("aria-disabled") === "true"
+  ) {
+    return false;
+  }
   return (
-    !node.hidden &&
-    node.closest("[hidden]") === null &&
-    node.getAttribute("aria-disabled") !== "true"
+    typeof window === "undefined" ||
+    !node.isConnected ||
+    window.getComputedStyle(node).display !== "none"
   );
 }
 

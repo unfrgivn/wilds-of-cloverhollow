@@ -47,8 +47,8 @@ import { createHudHints } from "./ui/hud-hints";
 import { createSaveToast } from "./ui/save-toast";
 import { createPhotoTouchBar, createShutterFlash, type PostcardCapture } from "./ui/postcard";
 import {
-  canBattlePeek, canOverworldSteer, canPhotoMode, createInputShortcuts, isBannerEligible,
-  isOverworldFree, type OverlayGateContext,
+  canBattlePeek, canOverworldSteer, canPhotoFromJournal, canPhotoMode, createInputShortcuts,
+  isBannerEligible, isOverworldFree, type OverlayGateContext,
 } from "./shell/input-shortcuts";
 import { bindOverworldPointerSteer } from "./shell/overworld-pointer";
 import { bindWebGlRecovery, renderBootError, shouldFreezeLiveLoop } from "./shell/lifecycle";
@@ -352,12 +352,11 @@ async function boot(): Promise<void> {
   let wasBattleOpen = false;
   document.documentElement.dataset.photo = "off";
   const overlayContext = (): OverlayGateContext => ({
-    state,
-    titleMode,
+    state, titleMode, photoMode,
     qaMenuOpen: qa?.isMenuOpen() ?? false,
     qaConsoleOpen: qa?.isConsoleOpen() ?? false,
     qaBlocked: qa?.isBlocked() ?? false,
-    photoMode,
+    loading: areaLoader.isLoading(),
   });
   const setPhotoMode = (on: boolean, silent = false): void => {
     const next = on && canPhotoMode(overlayContext());
@@ -365,18 +364,19 @@ async function boot(): Promise<void> {
     photoMode = next;
     document.documentElement.dataset.photo = next ? "on" : "off";
     view.setPhotoMode(next);
-    if (next) {
-      overworldPointer.release();
-      saveToast.hide();
-    } else {
-      shutterFlash.hide();
-    }
+    if (next) { overworldPointer.release(); saveToast.hide(); } else shutterFlash.hide();
     if (changed && !silent && titleMode === null && state.battle === null) {
       sound.playEffect(next ? "toggle-on" : "toggle-off");
       if (next) lightHaptic();
     }
     invalidate();
   };
+  journal.onEnterPhotoMode(() => {
+    if (!state.journalOpen || !canPhotoFromJournal(overlayContext())) return;
+    state = { ...state, journalOpen: false };
+    previousState = state;
+    setPhotoMode(true);
+  });
   let battlePeekOpen = false;
   const setBattlePeek = (on: boolean): void => {
     const next = on && canBattlePeek(overlayContext());
@@ -624,10 +624,9 @@ async function boot(): Promise<void> {
         keyHints: gameSettings.keyHints(),
         textSpeed: gameSettings.textSpeed(),
         reducedMotion: gameSettings.reducedMotion(),
-        hasLantern,
-        hasFlute,
-        hasLasso,
+        hasLantern, hasFlute, hasLasso,
         inputMode: inputShortcuts.inputMode(),
+        canPhoto: canPhotoFromJournal(gate),
       }),
     );
     syncOpenFlag("journal", state.journalOpen);

@@ -16,6 +16,7 @@ export type OverlayGateContext = {
   qaConsoleOpen: boolean;
   qaBlocked: boolean;
   photoMode: boolean;
+  loading?: boolean;
 };
 
 export type ShortcutKeyTarget = {
@@ -103,6 +104,22 @@ export function canPhotoMode(ctx: Omit<OverlayGateContext, "photoMode">): boolea
     ctx.state.battle === null &&
     ctx.state.arcade === null &&
     !ctx.state.journalOpen &&
+    ctx.state.finale === null
+  );
+}
+
+/** Returns true when Photo Mode can be launched from Journal OPTIONS in the free overworld. */
+export function canPhotoFromJournal(ctx: Omit<OverlayGateContext, "photoMode">): boolean {
+  return (
+    ctx.titleMode === null &&
+    !ctx.qaMenuOpen &&
+    !ctx.qaConsoleOpen &&
+    !ctx.qaBlocked &&
+    ctx.loading !== true &&
+    ctx.state.dialogue === null &&
+    ctx.state.battle === null &&
+    ctx.state.arcade === null &&
+    ctx.state.transition === null &&
     ctx.state.finale === null
   );
 }

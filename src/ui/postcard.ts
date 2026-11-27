@@ -290,7 +290,8 @@ export function createShutterFlash(root: HTMLElement): {
   };
 }
 
-function cameraIcon(): SVGSVGElement {
+/** Hand-inked inline SVG camera icon shared by touch Photo Mode controls (zero `<text>` nodes). */
+export function cameraIcon(): SVGSVGElement {
   const icon = svgElement("svg", "photo-touch-camera-icon");
   icon.setAttribute("viewBox", "0 0 28 28");
   icon.setAttribute("aria-hidden", "true");

@@ -23,8 +23,9 @@ import type { LevelStats } from "../core/levels";
 import type { TreasuresSummary } from "../core/treasures";
 
 export {
-  formatJukeboxLabel, journalControlsLines, type JournalControlsLines,
-  type JournalControlsTools, type JournalControlTools, type JournalInputMode, type JukeboxMeta,
+  bindOptionsCallbacks, defaultOptionsCallbacks, formatJukeboxLabel, journalControlsLines,
+  textSpeedLabel, type JournalControlsLines, type JournalControlsTools, type JournalControlTools,
+  type JournalInputMode, type JournalOptionsCallbacks, type JukeboxMeta,
 } from "./journal-options";
 
 export type JournalPage = "notes" | "map" | "options";

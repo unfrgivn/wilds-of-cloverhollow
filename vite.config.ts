@@ -1,18 +1,18 @@
 import { defineConfig } from "vite";
 
-const chunkGroups = [
+export interface ChunkGroup {
+  name: string;
+  test: RegExp;
+  priority: number;
+}
+
+export const chunkGroups: ChunkGroup[] = [
   { name: "vendor-pixi", test: /node_modules\/pixi\.js\//, priority: 30 },
   { name: "vendor-ink", test: /node_modules\/inkjs\//, priority: 25 },
-  {
-    name: "story-content",
-    test: /\/content\/(story\/main\.ink\.json|areas\/|props\/)/,
-    priority: 20,
-  },
-  {
-    name: "world-content",
-    test: /\/content\/(?!qa\/)/,
-    priority: 15,
-  },
+  { name: "story-content", test: /\/content\/story\/main\.ink\.json/, priority: 22 },
+  { name: "area-content", test: /\/content\/(areas|props)\//, priority: 20 },
+  { name: "audio-scores", test: /\/src\/platform\/scores(-[a-z]+)?\.ts/, priority: 18 },
+  { name: "world-content", test: /\/content\/(?!qa\/)/, priority: 15 },
 ];
 
 export default defineConfig(({ mode }) => ({

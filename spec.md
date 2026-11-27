@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 153)
+Last updated: 2026-11-27 (Milestone 154)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -75,9 +75,12 @@ reference material only.
   real shapes and narrowing with type guards.
 - Tooling: Vite 8 / Rolldown (dev server and production/harness builds with
   `build.rolldownOptions.output.codeSplitting` into `vendor-pixi`, `vendor-ink`,
-  `story-content`, `world-content`, and `index`/`game` app chunks, keeping all
-  app and content chunks under 500 kB), Bun (package manager and script runner),
-  Node 24 LTS for Node-based tools (`.nvmrc`), `just` for tasks.
+  `story-content`, `area-content`, `audio-scores`, `world-content`, and
+  `index`/`game` app chunks, keeping all non-vendor app and content chunks
+  under 500 kB, enforced automatically on production builds by
+  `tools/check-dist.ts` via `just build`, Milestone 154), Bun (package manager
+  and script runner), Node 24 LTS for Node-based tools (`.nvmrc`), `just` for
+  tasks.
 - Approved npm dependencies. Anything else needs the owner's approval first,
   then an update to this list:
   - Runtime: `pixi.js` 8, `inkjs` 2, `@capacitor/core` 8, `@capacitor/ios` 8,
@@ -186,7 +189,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   (`computeOverworldSteer`, `isOverworldTap`, `bindOverworldPointerSteer`) live
   in `src/shell/overworld-pointer.ts`; and
   shell keyboard/gamepad overlay & journal shortcut orchestration
-  (`canPhotoMode`, `canBattlePeek`, `canOverworldSteer`,
+  (`canPhotoMode`, `canPhotoFromJournal`, `canBattlePeek`, `canOverworldSteer`,
   `isJournalShortcutActive`, `isOverworldFree`, `isBannerEligible`,
   `createInputShortcuts`) lives in `src/shell/input-shortcuts.ts`; dynamic
   browser tab title formatting (`formatDocumentTitle`) lives in
@@ -667,12 +670,17 @@ ios/            Capacitor iOS project (from Milestone 4).
   `sanctuary`, `field`) once `has_lantern` is set; and `morning` washes `bedroom` and
   `kitchen` before any sticker is earned and before `has_lantern`.
 - Photo / Showcase mode (Milestone 90), Postcard Camera (Milestone 107),
-  Gamepad Parity (Milestone 114), Touch Camera Controls (Milestone 118), &
-  Desktop Click-to-Snap / Right-Click-to-Exit (Milestone 151):
-  pressing `P` (`KeyP`) or gamepad Select
-  (standard button 8) while exploring the free overworld (ignored inside inputs,
-  on title, dialogue, battle, arcade, journal, transition, finale, or QA
-  overlays) toggles
+  Gamepad Parity (Milestone 114), Touch Camera Controls (Milestone 118),
+  Desktop Click-to-Snap / Right-Click-to-Exit (Milestone 151), & Touch Journal
+  Photo Mode Launcher (Milestone 154):
+  pressing `P` (`KeyP`), gamepad Select (standard button 8), or tapping the
+  touch-only `Photo Mode` button (`.journal-photo-btn`) inside Journal
+  `OPTIONS`'s `CONTROLS` card (shown strictly under `:root[data-touch="on"]`
+  when `canPhotoFromJournal` is true in the free overworld, closing the Journal
+  and entering Photo Mode with zero keyboard input) while exploring the free
+  overworld (ignored inside inputs, on title, dialogue, battle, arcade,
+  transition, finale, loading, or QA overlays, and ignored on `P`/Select while
+  the Journal is open) toggles
   `data-photo="on"` on the root, hiding `.sticker-prompt`, `.touch-controls`,
   `.hud-hints`, `.area-banner`, `.qa-badge`, `.notice-marks`, and the dev debug
   readout (`view.setPhotoMode`) for unobstructed storybook views. On touch devices
@@ -680,8 +688,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   (`src/ui/postcard.ts`, styled in `src/ui/sticker.css`) displays `.photo-touch-bar`
   (`role="group"`, `aria-label="Photo mode controls"`) in the bottom-right safe
   area with two 44×44 px warm cream (`#fbf6e8`) circular `#47321f`-inked buttons:
-  `.photo-touch-snap` (`aria-label="Snap postcard"`, inline SVG camera icon with
-  zero `<text>` nodes) and `.photo-touch-close` (`aria-label="Exit photo mode"`,
+  `.photo-touch-snap` (`aria-label="Snap postcard"`, shared exported
+  `cameraIcon()` inline SVG with zero `<text>` nodes) and `.photo-touch-close`
+  (`aria-label="Exit photo mode"`,
   `×`), completely hidden on desktop and outside Photo Mode and excluded from Pixi
   `extract.canvas` captures. While Photo Mode
   is active, pressing `Enter`, `Space`, gamepad A (button 0), or left-clicking
@@ -723,8 +732,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   `src/content/parsers.ts`, Milestone 97, arcade/minigame content &
   calibration parsers in `src/content/arcade-parsers.ts`, Milestone 110, and
   battle/critter/party/feeling/sticker/level/treat parsers & validators in
-  `src/content/battle-parsers.ts`, re-exported from `src/content/load.ts`,
-  Milestone 121) load on demand with
+  `src/content/battle-parsers.ts`, Milestone 121, and pure area/lands/tunables/
+  fixture/character/ground/map/surface parsers in `src/content/area-parsers.ts`,
+  re-exported from `src/content/load.ts`, Milestone 154) load on demand with
   their area (and warm on door fade-out prefetch) and unload on the same
   bounded current + previous area residency window as ground tiles and prop
   atlases, so the way back through a door is a cache hit instead of a reload
@@ -4093,7 +4103,16 @@ trunks keep its two exits.
   (`Lantern: L`, `Flute: F`, `Lasso: R`); when a gamepad is active (`"gamepad"`
   mode) it switches cleanly to
   `Move: Stick / D-Pad · Talk: A · Back: B · Journal: Y` plus unlocked tools
-  (`Lantern: X`, `Flute: RB`, `Lasso: LB`) and `Photo / Guide: View`. Both pages
+  (`Lantern: X`, `Flute: RB`, `Lasso: LB`) and `Photo / Guide: View`. On touch
+  devices (`:root[data-touch="on"]`) when `canPhotoFromJournal` is true
+  (Milestone 154), `.journal-controls-card.has-photo` replaces the desktop
+  keyboard-shortcut text lines with a 44 px tall warm-cream `#fbf6e8` die-cut
+  `.journal-photo-btn` pill (`aria-label="Enter Photo Mode"`, shared
+  `cameraIcon()` SVG + `"Photo Mode"`, dark-ink `#47321f` border/text, full
+  `prefers-reduced-motion` + `:root[data-reduced-motion="on"]` guards and
+  iOS/Safari tap-selection hygiene); on desktop and in `ui-gallery` it stays
+  `display: none` and skipped by `isElementVisible` during keyboard/gamepad
+  focus cycling. Both pages
   fit without scrolling or overlap at 667x375, 874x402, 1180x820, and 1280x720
   (switching Gameplay into a 2x2 touch tile grid at `max-height: 500px`).
   While the Journal is open (outside Title / QA overlays), pressing `[` /

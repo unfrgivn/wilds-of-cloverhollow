@@ -1,4 +1,5 @@
 import { element, setAttribute, setText } from "./dom";
+import { cameraIcon } from "./postcard";
 import { AUDIO_LEVELS, type AudioLevel } from "../platform/audio-settings";
 import type { TextSpeed } from "../core/sim";
 
@@ -39,6 +40,22 @@ export type JournalOptionsView = {
   hasFlute: boolean;
   hasLasso?: boolean;
   inputMode?: JournalInputMode;
+  canPhoto?: boolean;
+};
+
+export type JournalOptionsCallbacks = {
+  onToggleAudio: () => void;
+  onSetAudioLevel: (level: AudioLevel) => void;
+  onToggleMusic: () => void;
+  onSetMusicLevel: (level: AudioLevel) => void;
+  onToggleAmbience: () => void;
+  onStepTrack: (delta: -1 | 1) => void;
+  onResetJukebox: () => void;
+  onToggleGentleTiming: () => void;
+  onToggleKeyHints: () => void;
+  onCycleTextSpeed: () => void;
+  onToggleReducedMotion: () => void;
+  onEnterPhotoMode: () => void;
 };
 
 export type JournalOptionsHandlers = {
@@ -53,7 +70,47 @@ export type JournalOptionsHandlers = {
   onToggleKeyHints: (callback: () => void) => void;
   onCycleTextSpeed: (callback: () => void) => void;
   onToggleReducedMotion: (callback: () => void) => void;
+  onEnterPhotoMode: (callback: () => void) => void;
 };
+
+/** Returns a safe default callback table for Journal OPTIONS controls. */
+export function defaultOptionsCallbacks(): JournalOptionsCallbacks {
+  const noop = (): void => undefined;
+  return {
+    onToggleAudio: noop,
+    onSetAudioLevel: noop,
+    onToggleMusic: noop,
+    onSetMusicLevel: noop,
+    onToggleAmbience: noop,
+    onStepTrack: noop,
+    onResetJukebox: noop,
+    onToggleGentleTiming: noop,
+    onToggleKeyHints: noop,
+    onCycleTextSpeed: noop,
+    onToggleReducedMotion: noop,
+    onEnterPhotoMode: noop,
+  };
+}
+
+/** Creates handler-registration setters backed by a mutable options callback table. */
+export function bindOptionsCallbacks(
+  callbacks: JournalOptionsCallbacks,
+): JournalOptionsHandlers {
+  return {
+    onToggleAudio: (cb) => { callbacks.onToggleAudio = cb; },
+    onSetAudioLevel: (cb) => { callbacks.onSetAudioLevel = cb; },
+    onToggleMusic: (cb) => { callbacks.onToggleMusic = cb; },
+    onSetMusicLevel: (cb) => { callbacks.onSetMusicLevel = cb; },
+    onToggleAmbience: (cb) => { callbacks.onToggleAmbience = cb; },
+    onStepTrack: (cb) => { callbacks.onStepTrack = cb; },
+    onResetJukebox: (cb) => { callbacks.onResetJukebox = cb; },
+    onToggleGentleTiming: (cb) => { callbacks.onToggleGentleTiming = cb; },
+    onToggleKeyHints: (cb) => { callbacks.onToggleKeyHints = cb; },
+    onCycleTextSpeed: (cb) => { callbacks.onCycleTextSpeed = cb; },
+    onToggleReducedMotion: (cb) => { callbacks.onToggleReducedMotion = cb; },
+    onEnterPhotoMode: (cb) => { callbacks.onEnterPhotoMode = cb; },
+  };
+}
 
 export type JournalOptionsPage = {
   root: HTMLElement;
@@ -182,7 +239,7 @@ function syncOptionToggle(button: HTMLButtonElement, enabled: boolean): void {
   setAttribute(button, "aria-pressed", String(enabled));
 }
 
-function textSpeedLabel(speed: TextSpeed): string {
+export function textSpeedLabel(speed: TextSpeed): string {
   if (speed === "brisk") return "Brisk";
   if (speed === "instant") return "Instant";
   return "Cozy";
@@ -295,65 +352,61 @@ export function createJournalOptionsPage(options: {
   const controlsLine = element("div", "journal-controls-line");
   const controlsTools = element("div", "journal-controls-line journal-controls-tools");
   controlsTools.hidden = true;
-  controlsCard.append(controlsTitle, controlsLine, controlsTools);
+  const photoBtn = makeJournalButton("journal-photo-btn", "Enter Photo Mode");
+  photoBtn.hidden = true;
+  const photoLabel = element("span", "journal-photo-btn-label");
+  photoLabel.textContent = "Photo Mode";
+  photoBtn.append(cameraIcon(), photoLabel);
+  controlsCard.append(controlsTitle, controlsLine, controlsTools, photoBtn);
   playPage.append(playHead, playList, controlsCard);
 
   optionsPage.append(soundPage, playPage);
 
   let jukeboxBrowsing = false;
-  let onToggleAudio: () => void = () => undefined;
-  let onSetAudioLevel: (level: AudioLevel) => void = () => undefined;
-  let onToggleMusic: () => void = () => undefined;
-  let onSetMusicLevel: (level: AudioLevel) => void = () => undefined;
-  let onToggleAmbience: () => void = () => undefined;
-  let onStepTrack: (delta: -1 | 1) => void = () => undefined;
-  let onResetJukebox: () => void = () => undefined;
-  let onToggleGentleTiming: () => void = () => undefined;
-  let onToggleKeyHints: () => void = () => undefined;
-  let onCycleTextSpeed: () => void = () => undefined;
-  let onToggleReducedMotion: () => void = () => undefined;
+  const callbacks = defaultOptionsCallbacks();
 
-  optSfx.addEventListener("click", () => onToggleAudio());
-  optMusic.addEventListener("click", () => onToggleMusic());
-  optAmbience.addEventListener("click", () => onToggleAmbience());
-  prevTrack.addEventListener("click", () => onStepTrack(-1));
-  nextTrack.addEventListener("click", () => onStepTrack(1));
+  optSfx.addEventListener("click", () => callbacks.onToggleAudio());
+  optMusic.addEventListener("click", () => callbacks.onToggleMusic());
+  optAmbience.addEventListener("click", () => callbacks.onToggleAmbience());
+  prevTrack.addEventListener("click", () => callbacks.onStepTrack(-1));
+  nextTrack.addEventListener("click", () => callbacks.onStepTrack(1));
   nowPlaying.addEventListener("click", () => {
-    if (jukeboxBrowsing) onResetJukebox();
+    if (jukeboxBrowsing) callbacks.onResetJukebox();
   });
   nowPlaying.addEventListener("keydown", (event) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       event.stopPropagation();
-      if (jukeboxBrowsing) onResetJukebox();
+      if (jukeboxBrowsing) callbacks.onResetJukebox();
     }
   });
   jukebox.addEventListener("keydown", (event) => {
     if (event.key === "ArrowLeft") {
       event.preventDefault();
       event.stopPropagation();
-      onStepTrack(-1);
+      callbacks.onStepTrack(-1);
     } else if (event.key === "ArrowRight") {
       event.preventDefault();
       event.stopPropagation();
-      onStepTrack(1);
+      callbacks.onStepTrack(1);
     }
   });
-  optGentle.addEventListener("click", () => onToggleGentleTiming());
-  optHints.addEventListener("click", () => onToggleKeyHints());
-  optTextSpeed.addEventListener("click", () => onCycleTextSpeed());
-  optReducedMotion.addEventListener("click", () => onToggleReducedMotion());
+  optGentle.addEventListener("click", () => callbacks.onToggleGentleTiming());
+  optHints.addEventListener("click", () => callbacks.onToggleKeyHints());
+  optTextSpeed.addEventListener("click", () => callbacks.onCycleTextSpeed());
+  optReducedMotion.addEventListener("click", () => callbacks.onToggleReducedMotion());
+  photoBtn.addEventListener("click", () => callbacks.onEnterPhotoMode());
 
   options.sliderSteppers.set(
     optSfxSlider.button,
     wireSlider(optSfxSlider.button, optSfxSlider.value, () => (next) => {
       options.onMirrorAudioLevel(next);
-      onSetAudioLevel(next);
+      callbacks.onSetAudioLevel(next);
     }),
   );
   options.sliderSteppers.set(
     musicSlider.button,
-    wireSlider(musicSlider.button, musicSlider.value, () => onSetMusicLevel),
+    wireSlider(musicSlider.button, musicSlider.value, () => callbacks.onSetMusicLevel),
   );
 
   return {
@@ -361,25 +414,13 @@ export function createJournalOptionsPage(options: {
     soundPage,
     playPage,
     jukebox,
-    handlers: {
-      onToggleAudio: (cb) => { onToggleAudio = cb; },
-      onSetAudioLevel: (cb) => { onSetAudioLevel = cb; },
-      onToggleMusic: (cb) => { onToggleMusic = cb; },
-      onSetMusicLevel: (cb) => { onSetMusicLevel = cb; },
-      onToggleAmbience: (cb) => { onToggleAmbience = cb; },
-      onStepTrack: (cb) => { onStepTrack = cb; },
-      onResetJukebox: (cb) => { onResetJukebox = cb; },
-      onToggleGentleTiming: (cb) => { onToggleGentleTiming = cb; },
-      onToggleKeyHints: (cb) => { onToggleKeyHints = cb; },
-      onCycleTextSpeed: (cb) => { onCycleTextSpeed = cb; },
-      onToggleReducedMotion: (cb) => { onToggleReducedMotion = cb; },
-    },
-    toggleAudio: () => onToggleAudio(),
+    handlers: bindOptionsCallbacks(callbacks),
+    toggleAudio: () => callbacks.onToggleAudio(),
     setAudioLevel: (next) => {
       syncSlider(optSfxSlider.button, optSfxSlider.value, next);
-      onSetAudioLevel(next);
+      callbacks.onSetAudioLevel(next);
     },
-    stepTrack: (delta) => onStepTrack(delta),
+    stepTrack: (delta) => callbacks.onStepTrack(delta),
     render: (view) => {
       setText(nowPlaying, `♫ ${view.nowPlaying}`);
       jukeboxBrowsing = view.jukebox?.active === true;
@@ -408,6 +449,9 @@ export function createJournalOptionsPage(options: {
       setText(controlsLine, controls.primary);
       controlsTools.hidden = controls.tools.length === 0;
       setText(controlsTools, controls.tools);
+      const showPhoto = view.canPhoto === true;
+      photoBtn.hidden = !showPhoto;
+      controlsCard.classList.toggle("has-photo", showPhoto);
     },
   };
 }

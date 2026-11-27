@@ -213,6 +213,7 @@ export type JournalViewParams = {
   hasFlute: boolean;
   hasLasso: boolean;
   inputMode?: JournalInputMode;
+  canPhoto?: boolean;
 };
 
 /** Builds the complete DOM JournalView from core state, map centres, and atlas resolvers. */
@@ -310,6 +311,7 @@ export function buildJournalView(params: JournalViewParams): JournalView {
     hasFlute: params.hasFlute,
     hasLasso: params.hasLasso,
     inputMode: params.inputMode,
+    ...(params.canPhoto === undefined ? {} : { canPhoto: params.canPhoto }),
     members: open
       ? [
           {

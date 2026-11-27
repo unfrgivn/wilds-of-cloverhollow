@@ -1,0 +1,153 @@
+{
+  "id": "sue-cottage",
+  "name": "Sue's Beach Cottage",
+  "land": "bay",
+  "ground": "sue-cottage",
+  "width": 1200,
+  "height": 800,
+  "walkable": [
+    [
+      42,
+      537
+    ],
+    [
+      412,
+      388
+    ],
+    [
+      437,
+      398
+    ],
+    [
+      543,
+      444
+    ],
+    [
+      680,
+      382
+    ],
+    [
+      710,
+      399
+    ],
+    [
+      760,
+      415
+    ],
+    [
+      800,
+      448
+    ],
+    [
+      1044,
+      536
+    ],
+    [
+      1122,
+      505
+    ],
+    [
+      1158,
+      520
+    ],
+    [
+      582,
+      773
+    ]
+  ],
+  "blockers": [],
+  "glows": [
+    {
+      "id": "sue-secret-note",
+      "frame": "ink_note",
+      "point": {
+        "x": 855,
+        "y": 468
+      },
+      "knot": "sue_secret_note",
+      "prompt": "Look"
+    }
+  ],
+  "triggers": [
+    {
+      "id": "door",
+      "polygon": [
+        [
+          95,
+          516
+        ],
+        [
+          206,
+          470
+        ],
+        [
+          234,
+          486
+        ],
+        [
+          125,
+          532
+        ]
+      ],
+      "target": {
+        "area": "bay",
+        "spawn": "sue-cottage"
+      }
+    }
+  ],
+  "spawns": {
+    "door": {
+      "x": 290,
+      "y": 540,
+      "facing": "right"
+    }
+  },
+  "interactables": [
+    {
+      "id": "sue-workbench",
+      "knot": "sue_workbench",
+      "point": {
+        "x": 945,
+        "y": 496
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "sue-bed",
+      "knot": "sue_bed",
+      "point": {
+        "x": 545,
+        "y": 438
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "sue-lamp",
+      "knot": "sue_lamp",
+      "point": {
+        "x": 745,
+        "y": 412
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "sue-snacks",
+      "knot": "sue_snacks",
+      "point": {
+        "x": 840,
+        "y": 598
+      },
+      "prompt": "Look"
+    }
+  ],
+  "npcs": [],
+  "critters": [],
+  "props": [
+    {
+      "id": "snack-basket",
+      "prop": "snack-basket",
+      "x": 870,
+      "y": 628
+    }
+  ]
+}

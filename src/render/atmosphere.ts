@@ -95,6 +95,7 @@ const FIREFLY_TINTS: readonly number[] = [0xf9da8e, 0xa8f0d8];
 const HEARTH_MOTE_TINTS: readonly number[] = [0xffe3a8, 0xffcfa0];
 const CAFE_MOTE_TINTS: readonly number[] = [0xfff2cc, 0xffe0a6, 0xffd29d];
 const SUNLIT_MOTE_TINTS: readonly number[] = [0xfff6dc, 0xf9e4ab];
+const COTTAGE_MOTE_TINTS: readonly number[] = [0xfff8e2, 0xc7f7ee, 0xffe6ba];
 const CLUBHOUSE_BLOOM_TINTS: readonly number[] = [0xfff2b2, 0xf9d28c, 0xf7b2c7];
 const ARCADE_MOTE_TINTS: readonly number[] = [0xffa6da, 0x9cf2eb, 0xf9e29c];
 const CAVERN_CRYSTALS: readonly {
@@ -775,6 +776,134 @@ export function evaluateAtmosphere(
       minAlpha: 0.17,
       maxAlpha: 0.42,
     });
+    return out;
+  }
+
+  if (areaId === "sue-cottage") {
+    // Soft aqua-mint glow halo over Sue's sea-glass jar lamp (756, 305), emissive over dusk.
+    const lampPulse = 0.22 + 0.03 * Math.sin(tick * 0.045);
+    out.push({
+      layer: "emissive",
+      texture: "softGlow",
+      blend: "add",
+      x: 756,
+      y: 305,
+      scaleX: 1.85,
+      scaleY: 1.6,
+      rotation: 0,
+      alpha: clamp01(lampPulse),
+      tint: 0x8ef2dc,
+    });
+    out.push({
+      layer: "emissive",
+      texture: "softGlow",
+      blend: "add",
+      x: 756,
+      y: 305,
+      scaleX: 0.95,
+      scaleY: 0.9,
+      rotation: 0,
+      alpha: clamp01(lampPulse * 0.85),
+      tint: 0xdffef6,
+    });
+    // 2 warm coastal window sunbeams streaming from the left cottage window & porthole.
+    const beams: readonly [number, number, number][] = [
+      [420, 355, 1.9],
+      [495, 435, 1.7],
+    ];
+    beams.forEach(([bx, by, scale], i) => {
+      const alpha = 0.058 + 0.008 * Math.sin(tick * 0.017 + i * 2.1);
+      out.push({
+        layer: "over",
+        texture: "sunbeam",
+        blend: "add",
+        x: bx,
+        y: by,
+        scaleX: scale,
+        scaleY: scale,
+        rotation: 0,
+        alpha: clamp01(alpha),
+        tint: 0xfff5d6,
+      });
+    });
+    // 10 gentle sunlit sea-dust motes drifting across the cottage.
+    addFloatingMotes(out, seed + 660, width, height, tick, 10, COTTAGE_MOTE_TINTS, {
+      marginX: 180,
+      marginY: 200,
+      driftX: 0.09,
+      driftY: -0.05,
+      minScale: 0.17,
+      maxScale: 0.33,
+      minAlpha: 0.16,
+      maxAlpha: 0.4,
+    });
+    return out;
+  }
+
+  if (areaId === "jordan-cabin") {
+    // Crisp snowy window sunbeam slanting across the cabin floorboards.
+    const beamAlpha = 0.062 + 0.008 * Math.sin(tick * 0.016);
+    out.push({
+      layer: "over",
+      texture: "sunbeam",
+      blend: "add",
+      x: 380,
+      y: 415,
+      scaleX: 1.95,
+      scaleY: 1.9,
+      rotation: 0,
+      alpha: clamp01(beamAlpha),
+      tint: 0xf4f8ff,
+    });
+    // Warm amber glow halos over the steaming cocoa kettle (890, 360) and camp lantern (1080, 380).
+    const cocoaPulse = 0.17 + 0.022 * Math.sin(tick * 0.04);
+    out.push({
+      layer: "emissive",
+      texture: "softGlow",
+      blend: "add",
+      x: 890,
+      y: 360,
+      scaleX: 1.55,
+      scaleY: 1.35,
+      rotation: 0,
+      alpha: clamp01(cocoaPulse),
+      tint: 0xffd08a,
+    });
+    const lanternPulse = 0.24 + 0.028 * Math.sin(tick * 0.055 + 1.2);
+    out.push({
+      layer: "emissive",
+      texture: "softGlow",
+      blend: "add",
+      x: 1080,
+      y: 380,
+      scaleX: 1.75,
+      scaleY: 1.6,
+      rotation: 0,
+      alpha: clamp01(lanternPulse),
+      tint: 0xffd98a,
+    });
+    // 6 rising warm cocoa-steam wisps curling up from the copper cocoa kettle.
+    const cycle = 160;
+    for (let i = 0; i < 6; i += 1) {
+      const age = wrap(tick + i * (cycle / 6), cycle) / cycle;
+      const fadeIn = Math.min(1, age / 0.2);
+      const fadeOut = Math.min(1, (1 - age) / 0.45);
+      const x = 905 + Math.sin(age * Math.PI * 2 + i * 1.1) * 10;
+      const y = 328 - age * 76;
+      const scale = 0.14 + age * 0.28;
+      out.push({
+        layer: "over",
+        texture: "mistWisp",
+        blend: "normal",
+        x,
+        y,
+        scaleX: scale,
+        scaleY: scale * 0.72,
+        rotation: 0.08 * Math.sin(age * 4 + i),
+        alpha: clamp01(0.22 * fadeIn * fadeOut),
+        tint: 0xfff5e8,
+      });
+    }
     return out;
   }
 

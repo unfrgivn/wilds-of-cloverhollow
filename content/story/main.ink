@@ -83,6 +83,8 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 -> DONE
 
 === journal ===
+{jordan_cabin_visited: I visited Jordan's timber cabin along the west trail at Pinecone Pass! He shared hot cocoa and his grandma's Pressed Alpine Clover. # speaker: Fae}
+{sue_cottage_visited: I visited Sue's mint-green beach cottage up the cove at Bubblegum Bay! She gave me her Sea-Glass Compass and a tip for catching the Golden Starfish Crown. # speaker: Fae}
 {sanctuary_reward_14: Ranger Fern wove me a Sanctuary Clover Wreath for welcoming so many calm critters to the Wildlife Sanctuary! # speaker: Fae}
 {sanctuary_visited and not sanctuary_reward_14: I found the Wildlife Sanctuary east of Clover Hills! Ranger Fern looks after every calm animal who visits the meadow. # speaker: Fae}
 {calmed("taco-chef"): I calmed Chef Mateo in Clover Hills by talking about Cloverhollow's taco favorites! He sells crispy taco snacks for 4 coins. # speaker: Fae}
@@ -1898,6 +1900,8 @@ The note from under the comics: "NEXT STOP: THE ARCADE. FIZZ THE HIGH SCORES!" #
 {calmed("moon-owl"): Starry Owl's iridescent Moon Feather! It shimmers softly even with the lid half closed. # speaker: Fae}
 {calmed("taco-chef"): Chef Mateo's shiny Golden Taco Badge! Best taste-tester in Cloverhollow Hills. # speaker: Fae}
 {sanctuary_reward_14: Ranger Fern's woven Sanctuary Clover Wreath! Dried wildflower petals still smell like alpine sunshine. # speaker: Fae}
+{sue_compass: Sue's Sea-Glass Compass from her beach cottage. Its needle always points toward the bay! # speaker: Fae}
+{jordan_clover: Jordan's Pressed Alpine Clover from his grandma's botany book. # speaker: Fae}
 Fae closes the lid gently. # speaker: Fae
 -> DONE
 = drawings
@@ -2790,4 +2794,117 @@ Gem Mole polishes a tiny sparkling meadow pebble with its paws and holds it up f
 === pet_crab ===
 Click-clack! Sandy Crab does a cheerful sideways shuffle along the warm sunlit footpath and waves both claws! # speaker: Sandy Crab # sound: chime-yellow
 -> DONE
+
+// Other Kids' Houses: Sue's Beach Cottage & Jordan's Mountain Cabin.
+VAR sue_cottage_visited = false
+VAR sue_compass = false
+VAR sue_basket_taken = false
+VAR sue_note_read = false
+VAR jordan_cabin_visited = false
+VAR jordan_clover = false
+VAR jordan_note_read = false
+
+=== sue_cottage_locked ===
+A cozy mint-green beach cottage sits up the sandy cove, with painted driftwood trim and a brass porthole door. Maybe whoever lives here is down by the dock! # speaker: Fae
+-> DONE
+
+=== jordan_cabin_locked ===
+A snug timber cabin peeks through the pines along the west trail! Smoke curls from its chimney, so maybe the hiker who lives here is up near the snowman. # speaker: Fae
+-> DONE
+
+=== sue_workbench ===
+{sue_compass: -> again}
+~ sue_cottage_visited = true
+~ sue_compass = true
+Whoa, look at all those painted fishing bobbers, sea-glass jars, and that wooden model sailboat! # speaker: Fae
+Heh, welcome to tackle headquarters! I paint every bobber myself so the bay fish can spot a friendly wiggle. # speaker: Sue
+Pro tip for the Bubblegum Bay dock: cast all the way into the golden RARE band if you want to hook the legendary Golden Starfish Crown! # speaker: Sue
+And here, take my Sea-Glass Compass for your clubhouse chest, plus ten coins I fished out of my lucky jar! Its needle always points toward the bay! # speaker: Sue # gift: coins 10 # sound: chime-blue
+It's shimmering seafoam green! Thanks so much, Sue! # speaker: Fae
+-> DONE
+= again
+Sue's tackle workbench is neatly lined with painted bobbers, sea-glass jars, and her model sailboat. # speaker: Fae
+Remember, Fae: cast deep into the golden RARE band off the Bubblegum Bay dock for the Golden Starfish Crown! # speaker: Sue
+-> DONE
+
+=== sue_bed ===
+Sue's twin bed is topped with a bright coral-and-peach patchwork quilt. # speaker: Fae
+My mom stitched that quilt out of all my old summer bandanas! It still smells a little bit like salt air and sunshine. # speaker: Sue
+It looks super cozy. Best sleepover fort headquarters ever! # speaker: Fae
+Anytime you want to swap adventure stories and listen to the tide, you're invited, Fae! # speaker: Sue
+-> DONE
+
+=== sue_lamp ===
+A round glass jar full of frosted aqua sea glass glows softly on the nightstand above two tidy seashells. # speaker: Fae
+I found every piece of that glass after summer storms. Oh, and don't tell anyone, but I tucked a secret glow-ink seashell doodle behind the jars! # speaker: Sue
+{has_lantern: Good thing I have Jordan's blacklight lantern! Let's shine it near the workbench charts and look closely. # speaker: Fae|A glow-ink doodle? Maybe we'll find a special lantern that can light it up someday! # speaker: Fae}
+-> DONE
+
+=== sue_snacks ===
+{sue_basket_taken: -> again}
+~ sue_basket_taken = true
+A woven coastal wicker basket sits on the floorboards, packed with bright beach snack pouches! # speaker: Fae
+Go ahead and grab two for the road, Fae! Exploring on an empty stomach is against Bay Explorers Club rules! # speaker: Sue # gift: snack 2
+Two free beach snacks! You're the best, Sue! # speaker: Fae
+-> DONE
+= again
+Sue's wicker snack basket is neat and tidy on the driftwood planks, ready for the next seaside picnic. # speaker: Fae
+-> DONE
+
+=== sue_secret_note ===
+{sue_note_read: -> again}
+~ sue_note_read = true
+Under the blacklight lantern, a hidden glow-ink seashell star chart lights up beside Sue's workbench! # speaker: Fae
+\"BAY EXPLORERS CLUB STAR CHART: 1. Catch a shiny bay fish. 2. Map every cove. 3. Find the best adventure crew in Cloverhollow... DONE!!\" # speaker: Glow Note
+Aw, Sue! You drew Maddie, Jordan, and me right under the Little Dipper! # speaker: Fae
+Hey, no peeking at my secret ink! Fine, keep the ten lucky arcade coins I taped behind the chart! # speaker: Sue # gift: coins 10 # sound: chime-yellow
+-> DONE
+= again
+Sue's glowing \"Bay Explorers Club\" star chart shimmers softly in lavender ink, with tiny stars sketched around her adventure crew. # speaker: Fae
+-> DONE
+
+=== jordan_table ===
+{jordan_clover: -> again}
+~ jordan_cabin_visited = true
+~ jordan_clover = true
+Three framed alpine wildflower sketches lean beside strawberry seed packets and a steaming copper cocoa pot! # speaker: Fae
+Those pressed blooms belonged to my grandma. She taught me how to read every trail, and she always said calm valleys grow the sweetest berries. # speaker: Jordan
+Here, keep this Pressed Alpine Clover from her botany book in your clubhouse chest, and pour yourself a mug from the copper cocoa pot! # speaker: Jordan # gift: snack 1 # sound: chime-green
+It smells like mountain pine and hot chocolate! Thank you, Jordan! # speaker: Fae
+-> DONE
+= again
+Grandma's pressed alpine wildflowers, strawberry seed packets, and the warm copper cocoa pot make the cabin smell cozy and sweet. # speaker: Fae
+Calm valleys grow the sweetest berries, just like Grandma always said. # speaker: Jordan
+-> DONE
+
+=== jordan_bed ===
+A sturdy log bed piled high with thick forest-green plaid quilts. # speaker: Fae
+Best spot on Pinecone Pass when the mountain wind whistles against the windowpane! # speaker: Jordan
+{sue_joined: Whoa, those blankets look ten times fluffier than my beach quilt! I'm calling dibs on the top wool layer! # speaker: Sue}
+Haha, there's plenty of quilt to go around after a long snowy hike! # speaker: Jordan
+-> DONE
+
+=== jordan_rack ===
+A neat timber A-frame rack holds Jordan's olive hiking pack, coiled trail rope, and a glowing brass camp lantern. # speaker: Fae
+Always pack dry socks, extra rope, and good light! Oh, I also marked my secret trail-blaze compass notes in invisible ink right by my pinned mountain map. # speaker: Jordan
+{has_lantern: Let's switch on your blacklight lantern near the mountain map and read them! # speaker: Fae|Invisible ink on a mountain map? We'll definitely need a blacklight lantern for that! # speaker: Fae}
+-> DONE
+
+=== jordan_firewood ===
+Split cedar logs are stacked crisply inside a woven timber basket, filling the room with warm pine scent. # speaker: Fae
+Nothing beats fresh cedar firewood on snowy Pinecone Pass evenings. Maddie would definitely nap right beside this basket! # speaker: Jordan
+-> DONE
+
+=== jordan_map_glow ===
+{jordan_note_read: -> again}
+~ jordan_note_read = true
+Under the blacklight lantern, glowing trail-blaze compass marks flare brightly below Jordan's pinned mountain map! # speaker: Fae
+\"SECRET VALLEY PASSAGES: Pinecone Pass north snow gap → Crystal Cavern. Clover Hills sunlit east trail → Wildlife Sanctuary!\" # speaker: Trail Note
+Whoa! You mapped every hidden trail across the whole valley, Jordan! # speaker: Fae
+Gotta be prepared! Oh, and take the ten trail-emergency coins tucked in my map tube, explorer to explorer! # speaker: Jordan # gift: coins 10 # sound: chime-blue
+-> DONE
+= again
+Jordan's glowing trail-blaze marks link Pinecone Pass to Crystal Cavern and Clover Hills to the Wildlife Sanctuary in crisp lavender ink. # speaker: Fae
+-> DONE
+
 

@@ -1,0 +1,36 @@
+{
+  "frames": {
+    "snack-basket": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 250,
+        "h": 212
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 250,
+        "h": 212
+      },
+      "sourceSize": {
+        "w": 250,
+        "h": 212
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.96698
+      }
+    }
+  },
+  "meta": {
+    "image": "props-0.webp",
+    "size": {
+      "w": 2048,
+      "h": 212
+    },
+    "scale": "1"
+  }
+}

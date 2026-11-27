@@ -1,0 +1,36 @@
+{
+  "frames": {
+    "firewood-basket": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 320,
+        "h": 257
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 320,
+        "h": 257
+      },
+      "sourceSize": {
+        "w": 320,
+        "h": 257
+      },
+      "anchor": {
+        "x": 0.49062,
+        "y": 0.9572
+      }
+    }
+  },
+  "meta": {
+    "image": "props-0.webp",
+    "size": {
+      "w": 2048,
+      "h": 257
+    },
+    "scale": "1"
+  }
+}

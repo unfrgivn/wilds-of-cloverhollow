@@ -157,6 +157,35 @@
         "variable": "rode_bus",
         "knot": "bay_cliff_path"
       }
+    },
+    {
+      "id": "sue-cottage",
+      "polygon": [
+        [
+          215,
+          62
+        ],
+        [
+          355,
+          62
+        ],
+        [
+          355,
+          112
+        ],
+        [
+          215,
+          112
+        ]
+      ],
+      "target": {
+        "area": "sue-cottage",
+        "spawn": "door"
+      },
+      "requires": {
+        "variable": "sue_joined",
+        "knot": "sue_cottage_locked"
+      }
     }
   ],
   "interactables": [
@@ -329,6 +358,11 @@
       "x": 850,
       "y": 1000,
       "facing": "up"
+    },
+    "sue-cottage": {
+      "x": 285,
+      "y": 190,
+      "facing": "down"
     }
   },
   "land": "bay",

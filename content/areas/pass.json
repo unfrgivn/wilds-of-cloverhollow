@@ -434,6 +434,35 @@
         "variable": "has_lantern",
         "knot": "cavern_dark"
       }
+    },
+    {
+      "id": "jordan-cabin",
+      "polygon": [
+        [
+          170,
+          555
+        ],
+        [
+          235,
+          555
+        ],
+        [
+          235,
+          605
+        ],
+        [
+          170,
+          605
+        ]
+      ],
+      "target": {
+        "area": "jordan-cabin",
+        "spawn": "door"
+      },
+      "requires": {
+        "variable": "jordan_joined",
+        "knot": "jordan_cabin_locked"
+      }
     }
   ],
   "interactables": [
@@ -535,6 +564,11 @@
       "x": 940,
       "y": 185,
       "facing": "down"
+    },
+    "jordan-cabin": {
+      "x": 325,
+      "y": 575,
+      "facing": "right"
     }
   },
   "critters": [

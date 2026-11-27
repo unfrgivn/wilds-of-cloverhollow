@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-26 (Milestone 92)
+Last updated: 2026-11-27 (Milestone 94)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -1091,6 +1091,55 @@ ios/            Capacitor iOS project (from Milestone 4).
   warm alpine sunbeams, NW lily-pond water glints, and golden wildflower pollen
   motes; its soundtrack plays `"hills"` ("Clover Meadow") with `"forest"`
   ambience.
+- Other Kids' Houses: Sue's Beach Cottage & Jordan's Mountain Cabin:
+  - `sue-cottage`, "Sue's Beach Cottage", in the `bay` land, a 1200x800 painted
+    isometric cutaway entered from Bubblegum Bay's NW sandy cove (`bay` trigger
+    `sue-cottage` at x=215..355, y=62..112 -> `sue-cottage.door`, gated on
+    `sue_joined` via `sue_cottage_locked`; return spawn `bay.sue-cottage` at
+    (285, 190) facing down). Inside, the back-left driftwood porthole door
+    returns to `bay.sue-cottage` (`door` spawn at (290, 540) facing right). Its
+    1-prop alpha-WebP kit lifts the depth-sorted wicker `snack-basket` at
+    (870, 628); its floor surface is wood with carpet polygons for the braided
+    coastal center rug and jute doormat. Four Look spots cover `sue-workbench`
+    (`sue_workbench`: fishing tip for the Golden Starfish Crown in the golden
+    `RARE` band, sets `sue_cottage_visited` & `sue_compass`, awards Sue's
+    Sea-Glass Compass keepsake in `club_chest` + 10 coins with `chime-blue`),
+    `sue-bed` (`sue_bed`: mom's coral bandana patchwork quilt), `sue-lamp`
+    (`sue_lamp`: aqua sea-glass jar lamp hinting at a secret glow-ink doodle),
+    and `sue-snacks` (`sue_snacks`: one-time `gift: snack 2` via
+    `sue_basket_taken`), plus one blacklight lantern glow `sue-secret-note`
+    (`frame: "ink_note"`, `sue_secret_note`: Sue's glow-ink "Bay Explorers Club"
+    star chart, sets `sue_note_read`, `gift: coins 10`, `chime-yellow`). Its
+    fixture `sue-cottage` starts at `door` with Maddie, Sue, Jordan, and the
+    blacklight lantern; its atmosphere adds warm coastal window sunbeams, an
+    emissive aqua-mint sea-glass lamp halo at (756, 305), and 10 sunlit sea-dust
+    motes; its soundtrack plays `"bay"` ("Bubblegum Breeze") with `"ocean"`
+    ambience.
+  - `jordan-cabin`, "Jordan's Mountain Cabin", in the `pass` land, a 1200x800
+    painted isometric cutaway entered from Pinecone Pass's west snow trail
+    (`pass` trigger `jordan-cabin` at x=170..235, y=555..605 ->
+    `jordan-cabin.door`, gated on `jordan_joined` via `jordan_cabin_locked`;
+    return spawn `pass.jordan-cabin` at (325, 575) facing right). Inside, the
+    back-left cedar door returns to `pass.jordan-cabin` (`door` spawn at
+    (290, 545) facing right). Its 1-prop alpha-WebP kit lifts the depth-sorted
+    woven `firewood-basket` at (885, 622); its floor surface is wood with carpet
+    polygons for the braided wool center rug and plaid doormat. Four Look spots
+    cover `jordan-table` (`jordan_table`: grandma's pressed alpine wildflowers,
+    strawberry seeds, and steaming copper cocoa pot, sets `jordan_cabin_visited`
+    & `jordan_clover`, awards the Pressed Alpine Clover keepsake in `club_chest`
+    + `gift: snack 1` with `chime-green`), `jordan-bed` (`jordan_bed`: plaid
+    mountain quilts banter), `jordan-rack` (`jordan_rack`: hiking pack, trail
+    rope, and brass camp lantern hinting at invisible trail-blaze map marks),
+    and `jordan-firewood` (`jordan_firewood`: cedar logs), plus one blacklight
+    lantern glow `jordan-map-glow` (`frame: "trail_marker"`, `jordan_map_glow`:
+    secret trail-blaze compass marks linking Pinecone Pass to Crystal Cavern and
+    Clover Hills to the Wildlife Sanctuary, sets `jordan_note_read`,
+    `gift: coins 10`, `chime-blue`). Its fixture `jordan-cabin` starts at `door`
+    with Maddie, Sue, Jordan, and the blacklight lantern; its atmosphere adds a
+    crisp snowy window sunbeam, warm amber emissive halos over the steaming
+    cocoa kettle (890, 360) and brass camp lantern (1080, 380), and rising warm
+    cocoa-steam wisps; its soundtrack plays `"pass"` ("Pinecone Snowfall") with
+    `"hearth"` ambience.
 - The lifeguard (Milestone 64): once Sue has joined (`sue_joined`), the bay's
   picnic leads on (`bay_picnic.back`): a whistle blasts, and the picnic's
   owner, Ms. Coral, the bay's lifeguard, is back and fizzy (`lifeguard_back`),

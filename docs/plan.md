@@ -4457,6 +4457,47 @@ the old trail, the owl, and the clubhouse claim.
   deprecation warnings; production and harness hook checks green), and full e2e
   verified across Chromium & WebKit.
 
+## Milestone 94: Other Kids' Houses (Sue's Beach Cottage & Jordan's Mountain Cabin) **Status:** ✅ Completed (2026-11-27)
+- Two brand-new hand-painted enterable friend homes (`NOTES.md: 34`), with zero
+  edits to core sim, renderer, UI, audio, or character/sticker/treat registries
+  and zero changes to any of the 66 prior recorded runs:
+  - **Sue's Beach Cottage (`sue-cottage`, 1200x800 cutaway, `land: "bay"`)**:
+    entered from Bubblegum Bay's open NW sandy cove (`bay.json` trigger
+    `sue-cottage` gated on `sue_joined` / `sue_cottage_locked`, return spawn
+    `(285, 190)` facing down). Painted driftwood/seafoam-mint cutaway (`395 KB`
+    two-tile WebP plate, `paper #fcf4ea`), 1-prop depth-sorted alpha-WebP kit
+    (`snack-basket`, `18 KB`, `rebuilt vs painting 0.00%`), `wood` + `carpet`
+    surfaces, emissive cyan sea-glass jar lamp halo + coastal sunbeams
+    (`src/render/atmosphere.ts`), `"bay"` / `"ocean"` audio (`src/core/music.ts`),
+    4 Look interactables (`sue-workbench` awarding `+10` coins & **Sue's
+    Sea-Glass Compass** keepsake in `club_chest` plus a rare-cast fishing tip;
+    `sue-bed`; `sue-lamp`; `sue-snacks` gifting 2 beach snacks), and a
+    blacklight lantern secret (`sue-secret-note`, `"Bay Explorers Club"` star
+    chart + `+10` coins).
+  - **Jordan's Mountain Cabin (`jordan-cabin`, 1200x800 cutaway, `land: "pass"`)**:
+    entered from Pinecone Pass's open west snow path (`pass.json` trigger
+    `jordan-cabin` gated on `jordan_joined` / `jordan_cabin_locked`, return
+    spawn `(325, 575)` facing right). Painted honey-pine log cutaway (`632 KB`
+    two-tile WebP plate, `paper #faefe8`), 1-prop depth-sorted alpha-WebP kit
+    (`firewood-basket`, `26 KB`, `rebuilt vs painting 0.00%`), `wood` + `carpet`
+    surfaces, emissive warm amber cocoa-kettle & brass camp-lantern halos +
+    rising steam wisps (`src/render/atmosphere.ts`), `"pass"` / `"hearth"`
+    audio, 4 Look interactables (`jordan-table` awarding `+1` cocoa snack &
+    **Pressed Alpine Clover** keepsake in `club_chest` plus his grandma's
+    botany story; `jordan-bed`; `jordan-rack`; `jordan-firewood`), and a
+    blacklight lantern secret (`jordan-map-glow`, secret valley passages to
+    Crystal Cavern & the Wildlife Sanctuary + `+10` coins).
+- Evidence: `tests/unit/friend-homes.test.ts`, `tests/unit/friend-homes-replay.test.ts`,
+  recorded run `tests/sim/scripts/new-game/friend-homes.json` (11,334 ticks,
+  zero shifted prior runs), real-key `tests/e2e/friend-homes.spec.ts` matching
+  Bun's exact hash at 1280x720 and 874x402, and `vision`-reviewed
+  `art/review/{sue-cottage,jordan-cabin}-{overlay,depth}.jpg` and
+  `art/review/friend-homes-gameplay.jpg`.
+- Gates: `just check` (155 unit files / 1,221 tests, 67 sims with zero shifted
+  prior runs, 23 QA packs, purity, lint), `just build` (zero chunk warnings,
+  production and harness hook checks), and full `CLOVERHOLLOW_E2E_PORT=4215
+  just e2e` (1,068 passed, 2 skipped across Chromium & WebKit).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

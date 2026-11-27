@@ -1,0 +1,153 @@
+{
+  "id": "jordan-cabin",
+  "name": "Jordan's Mountain Cabin",
+  "land": "pass",
+  "ground": "jordan-cabin",
+  "width": 1200,
+  "height": 800,
+  "walkable": [
+    [
+      58,
+      537
+    ],
+    [
+      395,
+      394
+    ],
+    [
+      417,
+      405
+    ],
+    [
+      532,
+      452
+    ],
+    [
+      718,
+      374
+    ],
+    [
+      735,
+      419
+    ],
+    [
+      890,
+      481
+    ],
+    [
+      958,
+      486
+    ],
+    [
+      1084,
+      534
+    ],
+    [
+      1141,
+      506
+    ],
+    [
+      1144,
+      522
+    ],
+    [
+      582,
+      779
+    ]
+  ],
+  "blockers": [],
+  "glows": [
+    {
+      "id": "jordan-map-glow",
+      "frame": "trail_marker",
+      "point": {
+        "x": 925,
+        "y": 506
+      },
+      "knot": "jordan_map_glow",
+      "prompt": "Look"
+    }
+  ],
+  "triggers": [
+    {
+      "id": "door",
+      "polygon": [
+        [
+          95,
+          520
+        ],
+        [
+          204,
+          474
+        ],
+        [
+          232,
+          490
+        ],
+        [
+          124,
+          536
+        ]
+      ],
+      "target": {
+        "area": "pass",
+        "spawn": "jordan-cabin"
+      }
+    }
+  ],
+  "spawns": {
+    "door": {
+      "x": 290,
+      "y": 545,
+      "facing": "right"
+    }
+  },
+  "interactables": [
+    {
+      "id": "jordan-table",
+      "knot": "jordan_table",
+      "point": {
+        "x": 785,
+        "y": 438
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "jordan-bed",
+      "knot": "jordan_bed",
+      "point": {
+        "x": 545,
+        "y": 445
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "jordan-rack",
+      "knot": "jordan_rack",
+      "point": {
+        "x": 1018,
+        "y": 508
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "jordan-firewood",
+      "knot": "jordan_firewood",
+      "point": {
+        "x": 850,
+        "y": 598
+      },
+      "prompt": "Look"
+    }
+  ],
+  "npcs": [],
+  "critters": [],
+  "props": [
+    {
+      "id": "firewood-basket",
+      "prop": "firewood-basket",
+      "x": 885,
+      "y": 622
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "area": "jordan-cabin",
+  "subjects": [
+    {
+      "id": "firewood-basket",
+      "crop": [785, 475, 205, 175],
+      "seed": [885, 565],
+      "home": [885, 622],
+      "painted": true,
+      "canopy": false,
+      "ground": "the warm honey-pine floorboards",
+      "object": "the complete woven basket overflowing with stacked split firewood logs sitting on the cabin floor in the middle of the crop, including every wood log, woven handle, and warm-brown ink outline down to its base; not the floorboards, braided rug, or gear rack",
+      "footprint": [[[818, 594], [888, 566], [952, 594], [882, 622]]]
+    }
+  ]
+}

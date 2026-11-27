@@ -1,0 +1,20 @@
+{
+  "asset": "friend-homes",
+  "date": "2026-11-26",
+  "summary": "Other Kids' Houses (NOTES.md: 34): Sue's Beach Cottage (`sue-cottage`, 1200x800 cutaway at Bubblegum Bay, paper #fcf4ea, 18 KB alpha-WebP snack-basket prop) and Jordan's Mountain Cabin (`jordan-cabin`, 1200x800 cutaway at Pinecone Pass, paper #faefe8, 26 KB alpha-WebP firewood-basket prop).",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 8,
+  "references": [
+    "art/source/areas/lodge/lodge-final.png",
+    "art/source/areas/classroom/classroom-final.png"
+  ],
+  "kept": {
+    "sue-cottage": "art/source/areas/sue-cottage/painting/ground.json",
+    "jordan-cabin": "art/source/areas/jordan-cabin/painting/ground.json"
+  },
+  "commands": [
+    "bun tools/art/kit.ts sue-cottage gen && masks && fill && pack",
+    "bun tools/art/kit.ts jordan-cabin gen && masks && fill && pack",
+    "convert props-0.png -> props-0.webp (quality 92, alpha-quality 100)"
+  ]
+}

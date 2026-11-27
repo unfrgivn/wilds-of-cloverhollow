@@ -1,0 +1,16 @@
+{
+  "area": "sue-cottage",
+  "subjects": [
+    {
+      "id": "snack-basket",
+      "crop": [785, 505, 170, 150],
+      "seed": [870, 585],
+      "home": [870, 628],
+      "painted": true,
+      "canopy": false,
+      "ground": "the pale driftwood floorboards",
+      "object": "the complete woven wicker snack basket filled with colorful coastal snack pouches sitting on the floor in the middle of the crop, including its braided rim, pouches peeking out the top, and warm-brown ink outline down to its base; not the wooden floorboards or workbench legs",
+      "footprint": [[[818, 606], [876, 582], [922, 602], [864, 628]]]
+    }
+  ]
+}

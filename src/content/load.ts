@@ -26,6 +26,10 @@ import cavernData from "../../content/areas/cavern.json";
 import cavernPropsData from "../../content/props/cavern.json";
 import cafeData from "../../content/areas/cafe.json";
 import cafePropsData from "../../content/props/cafe.json";
+import sueCottageData from "../../content/areas/sue-cottage.json";
+import sueCottagePropsData from "../../content/props/sue-cottage.json";
+import jordanCabinData from "../../content/areas/jordan-cabin.json";
+import jordanCabinPropsData from "../../content/props/jordan-cabin.json";
 import artRoomData from "../../content/areas/art-room.json";
 import enchantedPropsData from "../../content/props/enchanted.json";
 import arcadeGameData from "../../content/arcade.json";
@@ -56,6 +60,8 @@ import hillsSurfaceData from "../../content/surfaces/hills.json";
 import sanctuarySurfaceData from "../../content/surfaces/sanctuary.json";
 import cavernSurfaceData from "../../content/surfaces/cavern.json";
 import cafeSurfaceData from "../../content/surfaces/cafe.json";
+import sueCottageSurfaceData from "../../content/surfaces/sue-cottage.json";
+import jordanCabinSurfaceData from "../../content/surfaces/jordan-cabin.json";
 import artRoomSurfaceData from "../../content/surfaces/art-room.json";
 import plazaPropsData from "../../content/props/plaza.json";
 import bedroomPropsData from "../../content/props/bedroom.json";
@@ -103,6 +109,8 @@ import arcadeFixtureData from "../../content/fixtures/arcade.json";
 import cavernFixtureData from "../../content/fixtures/cavern.json";
 import cafeFixtureData from "../../content/fixtures/cafe.json";
 import sanctuaryFixtureData from "../../content/fixtures/sanctuary.json";
+import sueCottageFixtureData from "../../content/fixtures/sue-cottage.json";
+import jordanCabinFixtureData from "../../content/fixtures/jordan-cabin.json";
 import tunableData from "../../content/tunables.json";
 import storyData from "../../content/story/main.ink.json";
 import fountainFrogData from "../../content/critters/fountain-frog.json";
@@ -2413,6 +2421,10 @@ export function loadContent(): {
     parsePropCatalogue(cavernPropsData, "content/props/cavern.json"));
   const cafe = parseArea(cafeData, "content/areas/cafe.json",
     parsePropCatalogue(cafePropsData, "content/props/cafe.json"));
+  const sueCottage = parseArea(sueCottageData, "content/areas/sue-cottage.json",
+    parsePropCatalogue(sueCottagePropsData, "content/props/sue-cottage.json"));
+  const jordanCabin = parseArea(jordanCabinData, "content/areas/jordan-cabin.json",
+    parsePropCatalogue(jordanCabinPropsData, "content/props/jordan-cabin.json"));
   const artRoom = parseArea(artRoomData, "content/areas/art-room.json",
     parsePropCatalogue(artRoomPropsData, "content/props/art-room.json"));
   field(
@@ -2536,6 +2548,8 @@ export function loadContent(): {
     cavern: parseFixture(cavernFixtureData, "content/fixtures/cavern.json"),
     cafe: parseFixture(cafeFixtureData, "content/fixtures/cafe.json"),
     sanctuary: parseFixture(sanctuaryFixtureData, "content/fixtures/sanctuary.json"),
+    "sue-cottage": parseFixture(sueCottageFixtureData, "content/fixtures/sue-cottage.json"),
+    "jordan-cabin": parseFixture(jordanCabinFixtureData, "content/fixtures/jordan-cabin.json"),
   };
   for (const [name, fixture] of Object.entries(fixtures))
     for (const id of fixture.party ?? [])
@@ -2567,6 +2581,8 @@ export function loadContent(): {
     [sanctuary.id]: sanctuary,
     [cavern.id]: cavern,
     [cafe.id]: cafe,
+    [sueCottage.id]: sueCottage,
+    [jordanCabin.id]: jordanCabin,
   };
   const surfaceData: Record<string, unknown> = {
     harness: harnessSurfaceData, bedroom: bedroomSurfaceData, plaza: plazaSurfaceData,
@@ -2581,6 +2597,8 @@ export function loadContent(): {
     sanctuary: sanctuarySurfaceData,
     cavern: cavernSurfaceData,
     cafe: cafeSurfaceData,
+    "sue-cottage": sueCottageSurfaceData,
+    "jordan-cabin": jordanCabinSurfaceData,
     "art-room": artRoomSurfaceData,
   };
   const surfaces = completeSurfaceMaps(areas, surfaceData);

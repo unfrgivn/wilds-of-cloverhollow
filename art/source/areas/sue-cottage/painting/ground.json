@@ -1,0 +1,23 @@
+{
+  "area": "sue-cottage",
+  "pxPerUnit": 2,
+  "width": 2400,
+  "height": 1600,
+  "paper": "#fcf4ea",
+  "tiles": [
+    {
+      "file": "ground_0_0.webp",
+      "x": 0,
+      "y": 0,
+      "width": 1200,
+      "height": 1600
+    },
+    {
+      "file": "ground_1_0.webp",
+      "x": 1200,
+      "y": 0,
+      "width": 1200,
+      "height": 1600
+    }
+  ]
+}

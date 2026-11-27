@@ -305,7 +305,7 @@ describe("core", () => {
     for (const area of Object.values(world.areas)) {
       expect(hiddenPositions(area, world.tunables.playerRadius), area.id).toEqual([]);
     }
-  }, 30_000);
+  }, 60_000);
 
   it("keeps Maddie valid during seeded random walks in every area", () => {
     for (const fixtureName of ["new-game", "plaza"] as const) {

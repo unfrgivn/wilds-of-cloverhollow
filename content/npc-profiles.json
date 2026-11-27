@@ -60,7 +60,7 @@
         {
           "id": "forest-calm",
           "text": "Every blossom in Cloverhollow is smiling!",
-          "priority": 50,
+          "priority": 65,
           "emote": "sparkle",
           "when": {
             "notVariable": "forest_fizzy"
@@ -138,6 +138,15 @@
           "emote": "wave",
           "when": {
             "withParty": "sue"
+          }
+        },
+        {
+          "id": "forest-calm",
+          "text": "Milo wants a fair rematch on Star Racer!",
+          "priority": 65,
+          "emote": "sparkle",
+          "when": {
+            "calmed": "hooded-kid"
           }
         },
         {
@@ -221,6 +230,15 @@
           "emote": "heart",
           "when": {
             "withParty": "pond-pup"
+          }
+        },
+        {
+          "id": "forest-calm",
+          "text": "Meadow Park is cheering for Fae and Milo!",
+          "priority": 65,
+          "emote": "sparkle",
+          "when": {
+            "calmed": "hooded-kid"
           }
         },
         {
@@ -437,6 +455,15 @@
           }
         },
         {
+          "id": "forest-calm",
+          "text": "Smooth seas from the bay to the calm forest!",
+          "priority": 65,
+          "emote": "heart",
+          "when": {
+            "notVariable": "forest_fizzy"
+          }
+        },
+        {
           "id": "lifeguard-calm",
           "text": "Ms. Coral's back and the beach sings!",
           "priority": 40,
@@ -638,6 +665,15 @@
           "emote": "heart",
           "when": {
             "withParty": "jordan"
+          }
+        },
+        {
+          "id": "forest-calm",
+          "text": "Warm cocoa cheers for Fae, Jordan, and Milo!",
+          "priority": 65,
+          "emote": "heart",
+          "when": {
+            "calmed": "hooded-kid"
           }
         },
         {
@@ -937,6 +973,15 @@
           }
         },
         {
+          "id": "forest-calm",
+          "text": "Clover Hills shimmers with calm forest light!",
+          "priority": 65,
+          "emote": "heart",
+          "when": {
+            "notVariable": "forest_fizzy"
+          }
+        },
+        {
           "id": "taco-chef",
           "text": "Chef Mateo's crispy tacos smell amazing!",
           "priority": 45,
@@ -1026,7 +1071,7 @@
         {
           "id": "forest-calm",
           "text": "You brought peace to the whole valley!",
-          "priority": 50,
+          "priority": 65,
           "emote": "heart",
           "when": {
             "notVariable": "forest_fizzy"
@@ -1117,6 +1162,15 @@
           }
         },
         {
+          "id": "forest-calm",
+          "text": "Baking victory cinnamon buns for our heroes!",
+          "priority": 65,
+          "emote": "heart",
+          "when": {
+            "notVariable": "forest_fizzy"
+          }
+        },
+        {
           "id": "spice-done",
           "text": "Star Cinnamon buns are rising golden!",
           "priority": 45,
@@ -1161,6 +1215,15 @@
           "emote": "sparkle",
           "when": {
             "lanternOn": true
+          }
+        },
+        {
+          "id": "forest-calm",
+          "text": "The calm Ancient Tree crowns your legend, Fae!",
+          "priority": 65,
+          "emote": "sparkle",
+          "when": {
+            "notVariable": "forest_fizzy"
           }
         },
         {
@@ -1821,6 +1884,15 @@
           }
         },
         {
+          "id": "forest-calm",
+          "text": "Postcards inviting Milo and Fae to picnics!",
+          "priority": 65,
+          "emote": "heart",
+          "when": {
+            "calmed": "hooded-kid"
+          }
+        },
+        {
           "id": "bosses-3",
           "text": "Letters from every land praise your kindness!",
           "priority": 56,
@@ -1910,6 +1982,15 @@
           "emote": "heart",
           "when": {
             "withParty": "maddie"
+          }
+        },
+        {
+          "id": "forest-calm",
+          "text": "So happy Milo found such kind friends, Fae!",
+          "priority": 65,
+          "emote": "heart",
+          "when": {
+            "calmed": "hooded-kid"
           }
         },
         {
@@ -2079,6 +2160,15 @@
           }
         },
         {
+          "id": "forest-calm",
+          "text": "Milo even signed my calm forest sketchbook!",
+          "priority": 65,
+          "emote": "sparkle",
+          "when": {
+            "calmed": "hooded-kid"
+          }
+        },
+        {
           "id": "moon-owl",
           "text": "I drew Starry Owl perching in the pines!",
           "priority": 45,
@@ -2233,6 +2323,15 @@
           "emote": "wave",
           "when": {
             "withParty": "sue"
+          }
+        },
+        {
+          "id": "forest-calm",
+          "text": "Saving a sailboat race for Fae and Milo!",
+          "priority": 65,
+          "emote": "sparkle",
+          "when": {
+            "calmed": "hooded-kid"
           }
         },
         {
@@ -2820,6 +2919,15 @@
           }
         },
         {
+          "id": "forest-calm",
+          "text": "Every sanctuary friend celebrates your peace!",
+          "priority": 65,
+          "emote": "heart",
+          "when": {
+            "notVariable": "forest_fizzy"
+          }
+        },
+        {
           "id": "treats",
           "text": "Critter treats in your pack? Every guest will smile!",
           "priority": 64,
@@ -2894,6 +3002,15 @@
           }
         },
         {
+          "id": "forest-calm",
+          "text": "Victory Dream Sundaes for Fae, Sue, and Milo!",
+          "priority": 65,
+          "emote": "sparkle",
+          "when": {
+            "calmed": "hooded-kid"
+          }
+        },
+        {
           "id": "parlor-secret",
           "text": "You found our Secret Sundae Club doodle, Fae!",
           "priority": 55,
@@ -2965,6 +3082,15 @@
           "emote": "heart",
           "when": {
             "withParty": "maddie"
+          }
+        },
+        {
+          "id": "forest-calm",
+          "text": "Victory orchard apples for Fae and Milo!",
+          "priority": 65,
+          "emote": "heart",
+          "when": {
+            "calmed": "hooded-kid"
           }
         },
         {
@@ -3057,6 +3183,15 @@
           "emote": "wave",
           "when": {
             "withParty": "jordan"
+          }
+        },
+        {
+          "id": "forest-calm",
+          "text": "Every Star-Line stop is cheering your name!",
+          "priority": 65,
+          "emote": "sparkle",
+          "when": {
+            "notVariable": "forest_fizzy"
           }
         },
         {
@@ -3223,6 +3358,172 @@
           "emote": "wave"
         }
       ]
+    },
+    {
+      "id": "marigold",
+      "name": "Mrs. Marigold",
+      "adult": true,
+      "personality": "cozy",
+      "greetRange": 150,
+      "lookAroundTicks": 185,
+      "favoriteParty": [
+        "sue",
+        "ribbon-bunny"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Oh! Your lantern makes the berries gleam!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "What a cheerful market melody, Fae!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "sue",
+          "text": "Sue! Fresh Fish Crackers right on the shelf!",
+          "priority": 80,
+          "emote": "wave",
+          "when": {
+            "withParty": "sue"
+          }
+        },
+        {
+          "id": "jordan",
+          "text": "Jordan! Pippin's apples rival your berries!",
+          "priority": 76,
+          "emote": "heart",
+          "when": {
+            "withParty": "jordan"
+          }
+        },
+        {
+          "id": "forest-calm",
+          "text": "Baking a berry pie for you, Sue, Jordan, and Milo!",
+          "priority": 65,
+          "emote": "heart",
+          "when": {
+            "calmed": "hooded-kid"
+          }
+        },
+        {
+          "id": "market-secret",
+          "text": "Clever eyes finding that glowing recipe tip!",
+          "priority": 55,
+          "emote": "sparkle",
+          "when": {
+            "variable": "market_note_read"
+          }
+        },
+        {
+          "id": "treats",
+          "text": "Ooh, lovely critter treats in your pack!",
+          "priority": 48,
+          "emote": "heart",
+          "when": {
+            "hasTreats": true
+          }
+        },
+        {
+          "id": "default",
+          "text": "Pippin's orchard apples smell extra sweet!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "danny",
+      "name": "Danny",
+      "adult": false,
+      "personality": "kid-bouncy",
+      "greetRange": 155,
+      "lookAroundTicks": 150,
+      "favoriteParty": [
+        "sue",
+        "jordan"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Whoa! Neon space-glow on the gelato tubs!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "Sweet flute tune! Sounds like parlor bells!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "sue",
+          "text": "Sue! Penny just churned Mint Cloud Chip!",
+          "priority": 80,
+          "emote": "wave",
+          "when": {
+            "withParty": "sue"
+          }
+        },
+        {
+          "id": "jordan",
+          "text": "Jordan! Honey Caramel sundaes are peak fuel!",
+          "priority": 76,
+          "emote": "sparkle",
+          "when": {
+            "withParty": "jordan"
+          }
+        },
+        {
+          "id": "forest-calm",
+          "text": "Milo and I invented a Victory Rainbow Sundae!",
+          "priority": 65,
+          "emote": "sparkle",
+          "when": {
+            "calmed": "hooded-kid"
+          }
+        },
+        {
+          "id": "parlor-secret",
+          "text": "You found the Secret Sundae Club doodle?!",
+          "priority": 55,
+          "emote": "sparkle",
+          "when": {
+            "variable": "parlor_note_read"
+          }
+        },
+        {
+          "id": "treats",
+          "text": "Nice! Critters flip for Berry Swirl Cones!",
+          "priority": 48,
+          "emote": "heart",
+          "when": {
+            "hasTreats": true
+          }
+        },
+        {
+          "id": "default",
+          "text": "Crispy waffle cones and Dream Sundaes rule!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
     }
   ],
   "banter": [
@@ -3236,7 +3537,10 @@
       "lines": [
         "Fae's journal is already half full!",
         "Just like the explorers of old Cloverhollow!"
-      ]
+      ],
+      "when": {
+        "notCalmed": "hooded-kid"
+      }
     },
     {
       "id": "cafe-chef-toby",
@@ -3387,7 +3691,10 @@
       "lines": [
         "Any seed catalogs in the mailbag, Gus?",
         "Two bundles, Flora, fresh from the press!"
-      ]
+      ],
+      "when": {
+        "notCalmed": "hooded-kid"
+      }
     },
     {
       "id": "park-pippa-hazel",
@@ -3399,7 +3706,10 @@
       "lines": [
         "Grandma Hazel, look at my park chalk map!",
         "Every hidden burrow marked with a star!"
-      ]
+      ],
+      "when": {
+        "notCalmed": "hooded-kid"
+      }
     },
     {
       "id": "bay-sal-kai",
@@ -3411,7 +3721,10 @@
       "lines": [
         "Counted every painted hull in harbor, Kai?",
         "Yep! Plus Sue landed a whopper off pier!"
-      ]
+      ],
+      "when": {
+        "notCalmed": "hooded-kid"
+      }
     },
     {
       "id": "pass-mina-tuck",
@@ -3571,6 +3884,126 @@
         "Fresh sea-salt taffy ready for the dock crew, Sal!",
         "Sweetest pastel catch on Bubblegum Bay's pier!"
       ]
+    },
+    {
+      "id": "market-pippin-marigold",
+      "area": "market",
+      "speakers": [
+        "pippin",
+        "marigold"
+      ],
+      "lines": [
+        "Fresh berries and Orchard Apples just in!",
+        "Save me Fish Crackers and sweet pears, Pip!"
+      ],
+      "when": {
+        "notCalmed": "hooded-kid"
+      }
+    },
+    {
+      "id": "parlor-penny-danny",
+      "area": "parlor",
+      "speakers": [
+        "penny",
+        "danny"
+      ],
+      "lines": [
+        "Berry Swirl Cone or Dream Sundae, Danny?",
+        "Dream Sundae with extra rainbow sprinkles!"
+      ],
+      "when": {
+        "notCalmed": "hooded-kid"
+      }
+    },
+    {
+      "id": "plaza-flora-gus-finale",
+      "area": "plaza",
+      "speakers": [
+        "flora",
+        "gus"
+      ],
+      "lines": [
+        "Every tulip bloomed for Fae and Milo, Gus!",
+        "My bag is bursting with victory postcards!"
+      ],
+      "when": {
+        "calmed": "hooded-kid"
+      }
+    },
+    {
+      "id": "park-pippa-hazel-finale",
+      "area": "park",
+      "speakers": [
+        "pippa",
+        "hazel"
+      ],
+      "lines": [
+        "Fae, Sue, Jordan, and Milo saved the tree!",
+        "Best picnic celebration in Meadow Park!"
+      ],
+      "when": {
+        "calmed": "hooded-kid"
+      }
+    },
+    {
+      "id": "cafe-dad-barnaby-finale",
+      "area": "cafe",
+      "speakers": [
+        "dad",
+        "barnaby"
+      ],
+      "lines": [
+        "Fae and her friends calmed the whole land!",
+        "Even young Milo earned a seat at our table!"
+      ],
+      "when": {
+        "calmed": "hooded-kid"
+      }
+    },
+    {
+      "id": "market-pippin-marigold-finale",
+      "area": "market",
+      "speakers": [
+        "pippin",
+        "marigold"
+      ],
+      "lines": [
+        "Victory Orchard Apples for Fae and Milo!",
+        "And sweet berry tarts for Sue and Jordan!"
+      ],
+      "when": {
+        "calmed": "hooded-kid"
+      }
+    },
+    {
+      "id": "parlor-penny-danny-finale",
+      "area": "parlor",
+      "speakers": [
+        "penny",
+        "danny"
+      ],
+      "lines": [
+        "Victory Dream Sundaes on the house, Danny!",
+        "Yay! Saving a giant swirl scoop for Milo!"
+      ],
+      "when": {
+        "calmed": "hooded-kid"
+      }
+    },
+    {
+      "id": "bay-sal-kai-finale",
+      "area": "bay",
+      "speakers": [
+        "sal",
+        "kai"
+      ],
+      "lines": [
+        "Three cheers for Fae, Sue, and Milo, Kai!",
+        "Even the bay shells shimmer in victory!"
+      ],
+      "when": {
+        "calmed": "hooded-kid"
+      }
     }
   ]
 }

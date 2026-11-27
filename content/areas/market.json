@@ -155,6 +155,34 @@
           530
         ]
       ]
+    },
+    {
+      "id": "marigold",
+      "point": {
+        "x": 520,
+        "y": 640
+      },
+      "facing": "right",
+      "knot": "npc_marigold",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          505,
+          630
+        ],
+        [
+          535,
+          630
+        ],
+        [
+          535,
+          650
+        ],
+        [
+          505,
+          650
+        ]
+      ]
     }
   ],
   "critters": [],

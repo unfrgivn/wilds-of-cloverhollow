@@ -39,6 +39,7 @@ const FRIEND_SPEAKERS = new Set([
   "poppy",
   "gemma",
   "theo",
+  "danny",
   "pond pup",
   "acorn squirrel",
   "ribbon bunny",
@@ -107,6 +108,8 @@ const TOWN_SPEAKERS = new Set([
   "sage",
   "clara",
   "bramble",
+  "mrs. marigold",
+  "marigold",
 ]);
 const FAIRY_SPEAKERS = new Set(["lavender", "mint", "sky", "peach"]);
 const MYSTERY_SPEAKERS = new Set([
@@ -272,6 +275,9 @@ const CHARACTER_MAP: Record<string, readonly [string, PortraitCropMode]> = {
   poppy: ["poppy", "kid"],
   gemma: ["gemma", "kid"],
   theo: ["theo", "kid"],
+  "mrs. marigold": ["marigold", "adult"],
+  marigold: ["marigold", "adult"],
+  danny: ["danny", "kid"],
 };
 
 const FAIRY_MAP: Record<string, string> = {

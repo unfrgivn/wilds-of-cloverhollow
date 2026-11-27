@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 145)
+Last updated: 2026-11-27 (Milestone 147)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -743,20 +743,23 @@ ios/            Capacitor iOS project (from Milestone 4).
   holds upright (`rotation = 0`) at a steady anchor without bob, bounce, sway,
   or vertical drift (`emoteNote` and `emoteZzz` at fixed `scale: 0.66`,
   `alpha: 0.85`; `emoteHeart` keeping gentle fade in/out at `x = talk.x`).
-- Living NPC Intelligence & Organic World Cast (Milestone 144,
+- Living NPC Intelligence & Organic World Cast (Milestones 144–145,
   `src/core/npc-context.ts`, `content/npc-profiles.json`,
   `src/render/npc-life.ts`, `src/ui/npc-chatter.ts`, `src/render/motion.ts`):
-  - Twenty-six additional blinking 4-direction hand-painted watercolor NPCs
+  - Twenty-eight additional blinking 4-direction hand-painted watercolor NPCs
     (`tools/art/build-living-npcs.ts`, `art/recipes/living-npcs.json`; lossless
-    WebP atlases, 14 adults at default scale `0.5` and 12 kids at `scale: 0.47`)
-    populate Cloverhollow's plaza, park, arcade, school east hall, playing
-    field, art room, Bubblegum Bay, Cliffside Trail, Pinecone Pass, Mountain
-    Lodge, Crystal Cavern, Whispering Woods, Clover Hills, and Misty Path:
-    `flora`, `gus`, `sammy`, `poppy`, `pippa`, `hazel`, `leo`, `maya`, `theo`,
-    `bert`, `sal`, `kai`, `nora`, `lark`, `bramble`, `mina`, `tuck`, `otis`,
-    `clara`, `pebble`, `gemma`, `moss`, `wren`, `sunny`, `bram`, and `sage`,
-    each with bespoke voice profiles (`src/platform/voices.ts`) and circular
-    die-cut dialogue portraits (`src/ui/portraits.ts`).
+    WebP atlases, 15 adults at default scale `0.5` and 13 kids at `scale: 0.47`)
+    populate Cloverhollow's plaza, grocery market, ice cream parlor, park,
+    arcade, school east hall, playing field, art room, Bubblegum Bay, Cliffside
+    Trail, Pinecone Pass, Mountain Lodge, Crystal Cavern, Whispering Woods,
+    Clover Hills, and Misty Path: `flora`, `gus`, `sammy`, `poppy`, `pippa`,
+    `hazel`, `leo`, `maya`, `theo`, `bert`, `sal`, `kai`, `nora`, `lark`,
+    `bramble`, `mina`, `tuck`, `otis`, `clara`, `pebble`, `gemma`, `moss`,
+    `wren`, `sunny`, `bram`, `sage`, `marigold` (`market` at `(520, 640)`,
+    facing `right`, knot `npc_marigold`), and `danny` (`parlor` at `(540, 700)`,
+    facing `up`, knot `npc_danny`), each with bespoke voice profiles
+    (`src/platform/voices.ts`) and circular die-cut dialogue portraits
+    (`src/ui/portraits.ts`).
   - Dynamic story relocations via optional NPC schedule fields (`hiddenWhile`,
     `visibleAfterCalm`, `hiddenAfterCalm`, validated in
     `src/content/npc-parsers.ts`): Sammy moves from `plaza` into `arcade`
@@ -765,28 +768,37 @@ ios/            Capacitor iOS project (from Milestone 4).
     `art-room` (joined by Theo) once `art_open` is true.
   - Pure deterministic `npcWorldSituation`, `reactionRippleTicks`, and
     `evaluateNpcLife` (zero banned trig, zero `State` or save-version changes)
-    read `content/npc-profiles.json` (51 named character profiles covering the
-    entire town cast and 26 biome-wide NPC-to-NPC social banter entries,
-    skipping `bus-stop` and `sanctuary-*` critters) to drive live organic
-    facing, distance-rippled attention (`dialogue` > `lantern-awe` >
-    `celebrate` > `music-delight` > `chaos-worry` > `companion-greet` >
-    `player-greet` > `social-chat` > `idle`, preserving authored arrival facing
-    during a 48-tick arrival grace window), personality-driven living motion
-    (`npcLivingPose` including `mystic`, `celebrate`, and 6-tick turn-squash,
-    respecting `reducedMotion`), pooled celebration sparkles (skipped under
-    `reducedMotion`), whisper-soft voiced ambient chatter chimes during live
-    running play (`AudioController.playAmbientChatter`), and at most one crisp
-    die-cut watercolor overworld chatter bubble (`.npc-chatter` with six
-    high-contrast tones `normal`, `lantern`, `worry`, `warm`, `banter`, and
-    `music`, inline SVG emblems, smart top-or-side placement clamping
+    read `content/npc-profiles.json` (53 named character profiles covering the
+    entire town cast and 34 biome-wide NPC-to-NPC social banter entries,
+    including shop duos and six post-finale celebration banter pairs, skipping
+    `bus-stop` and `sanctuary-*` critters) to drive live organic facing,
+    distance-rippled attention (`dialogue` > `lantern-awe` > `celebrate` >
+    `music-delight` > `chaos-worry` > `companion-greet` > `player-greet` >
+    `social-chat` > `idle`, preserving authored arrival facing during a 48-tick
+    arrival grace window), post-finale `forest_calm` celebration warmth
+    (festive `heart`/`sparkle` emotes for `player-greet` and `idle` NPCs within
+    240 units after arrival grace, plus `warm` chatter tone on matching
+    `notVariable: "forest_fizzy"` / `calmed: "hooded-kid"` ambient rules),
+    personality-driven living motion (`npcLivingPose` including `mystic`,
+    `celebrate`, and 6-tick turn-squash, respecting `reducedMotion`), pooled
+    celebration sparkles (skipped under `reducedMotion`), whisper-soft voiced
+    ambient chatter chimes during live running play
+    (`AudioController.playAmbientChatter`), and at most one crisp die-cut
+    watercolor overworld chatter bubble (`.npc-chatter` with six high-contrast
+    tones `normal`, `lantern`, `worry`, `warm`, `banter`, and `music`, inline
+    SVG emblems, smart top-or-side placement clamping
     `data-side="top|left|right"`, `TALK`-prompt yielding, reduced-motion &
     Safari tap-selection hygiene, and hiding across overlays and `harness`).
     `renderInfo().npcLife` exposes read-only `{ stage, npcs, chatter }`.
-  - Cross-biome living errands & snack-sharing (all stitch-gated with zero new
-    global Ink `VAR`s): Mailman Gus's Postal Chain (`Gus -> Captain Sal ->
-    Mina -> Gus`), Wren's Botanical & Crystal Sketchbook (`Wren -> Professor
-    Pebble & Sunny -> Wren -> Maya/Theo`), and cozy neighbor snack-sharing
-    (`# feed: snack 1`) with Otis, Grandma Hazel, Tuck, Hiker Lark, and Clara.
+  - Cross-biome living errands, automatic Journal `NOTES` tracking &
+    snack-sharing (all stitch-gated with zero new global Ink `VAR`s): Mailman
+    Gus's Postal Chain (`Gus -> Captain Sal -> Mina -> Gus`), Wren's Botanical
+    & Crystal Sketchbook (`Wren -> Professor Pebble & Sunny -> Wren ->
+    Maya/Theo`), automatic Fae-voice Journal `NOTES` entries in the `journal`
+    knot driven purely by native Ink stitch visit counts (zero impact on
+    baseline 0-visit saves), shop regular thank-you treats/coins (`npc_marigold`
+    and `npc_danny`), and cozy neighbor snack-sharing (`# feed: snack 1`) with
+    Otis, Grandma Hazel, Tuck, Hiker Lark, and Clara.
 - Idle: 1 to 4 frames per direction.
 - Fae is about 140 units tall (about 280 source pixels).
 - Sprite sheets: one WebP atlas (lossless alpha, generated from lossless PNG

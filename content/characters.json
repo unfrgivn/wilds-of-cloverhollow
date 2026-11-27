@@ -387,5 +387,20 @@
       8
     ],
     "scale": 0.47
+  },
+  "marigold": {
+    "atlas": "assets/characters/marigold/marigold.json",
+    "idleTicks": [
+      176,
+      8
+    ]
+  },
+  "danny": {
+    "atlas": "assets/characters/danny/danny.json",
+    "idleTicks": [
+      152,
+      8
+    ],
+    "scale": 0.47
   }
 }

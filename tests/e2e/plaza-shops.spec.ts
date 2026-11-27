@@ -52,7 +52,7 @@ test("real keys: Cloverhollow Grocery Market & Sweet Scoop Ice Cream Parlor matc
         const info = await renderInfo(page);
 
         if (!marketArrived && state.area === "market" && state.transition === null) {
-          expect(info.npcs.map((npc) => npc.id)).toEqual(["pippin"]);
+          expect(info.npcs.map((npc) => npc.id).sort()).toEqual(["marigold", "pippin"]);
           for (const npc of info.npcs) expect(npc.frame, npc.id).not.toBe("");
           expect(info.props.map((prop) => prop.id).sort()).toEqual([
             "berry-barrel",
@@ -86,7 +86,7 @@ test("real keys: Cloverhollow Grocery Market & Sweet Scoop Ice Cream Parlor matc
         }
 
         if (!parlorArrived && state.area === "parlor" && state.transition === null) {
-          expect(info.npcs.map((npc) => npc.id)).toEqual(["penny"]);
+          expect(info.npcs.map((npc) => npc.id).sort()).toEqual(["danny", "penny"]);
           for (const npc of info.npcs) expect(npc.frame, npc.id).not.toBe("");
           expect(info.props.map((prop) => prop.id).sort()).toEqual([
             "table-east",

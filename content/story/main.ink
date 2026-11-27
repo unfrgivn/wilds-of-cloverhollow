@@ -92,6 +92,12 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 === journal ===
 {rosie_cottage_visited: I visited Rosie's flower cottage by Meadow Park! She showed off her pressed-clover bookmarks and shared a Sunlit Clover Tea Snack. # speaker: Fae}
 {milo_loft_visited: I visited Milo's sunlit sketch loft beside Meadow Park! His desk is covered in rocket watercolor comics and a jar of Star Racer tokens. # speaker: Fae}
+{npc_gus.mail_complete: Mailman Gus made me Cloverhollow's Honorary Junior Mail Carrier after our cross-town postcard delivery! # speaker: Fae}
+{npc_mina.received_letter and not npc_gus.mail_complete: Mina loved Captain Sal's Mountain Letter at Pinecone Pass! I should tell Mailman Gus back in the plaza. # speaker: Fae}
+{npc_sal.gave_mountain_letter and not npc_mina.received_letter: Captain Sal gave me a Mountain Reply Letter to deliver up to Mina at Pinecone Pass! # speaker: Fae}
+{npc_gus.gave_postcard and not npc_sal.gave_mountain_letter: Mailman Gus asked me to deliver a Seashell Postcard to Captain Sal down at Bubblegum Bay! # speaker: Fae}
+{npc_wren.sketch_complete: Wren finished the Cloverhollow valley sketchbook with Professor Pebble's crystal rubbing and Sunny's pressed clover! # speaker: Fae}
+{npc_wren.started_sketch and not npc_wren.sketch_complete: Wren in Whispering Woods is collecting a crystal rubbing from Professor Pebble and a pressed clover from Sunny for a valley sketchbook! # speaker: Fae}
 {parlor_visited: I visited Sweet Scoop Ice Cream Parlor! Scooper Penny whipped up a free Cloverhollow Dream Sundae and scoops Berry Swirl Cones and Cozy Cocoa Sundaes. # speaker: Fae}
 {market_visited: I stepped inside Cloverhollow Grocery Market! Grocer Pippin shared a crisp orchard apple sample and stocks Orchard Apples and Fish Crackers for our critter friends. # speaker: Fae}
 {jordan_cabin_visited: I visited Jordan's timber cabin along the west trail at Pinecone Pass! He shared hot cocoa and his grandma's Pressed Alpine Clover. # speaker: Fae}
@@ -4565,4 +4571,84 @@ Ooh, what a pretty fairy sketch! And ten lucky cottage coins sparkle right besid
 -> DONE
 = again
 Rosie's shimmering Four-Leaf Clover Fairy Doodle glows softly by the sunlit window, reminding Fae to follow the bluebell light toward the Enchanted Forest! # speaker: Fae
+-> DONE
+
+=== npc_marigold ===
+{lanternOn():
+    Oh, my stars! That violet lantern makes Grocer Pippin's berry barrel shimmer like velvet jewels! # speaker: Mrs. Marigold
+}
+{
+- calmed("hooded-kid"):
+    Oh, Fae, sweetheart! Ever since you helped Milo feel right at home with everyone, the whole plaza has been stopping by for celebratory berry pies and crisp orchard apples! # speaker: Mrs. Marigold
+- market_note_read:
+    Grocer Pippin told me you spotted that secret lavender orchard tip near the jam shelves! What a sharp explorer's eye you have, Fae! # speaker: Mrs. Marigold
+- else:
+    Well hello there, Fae! Nothing beats wandering down these pine shelves while Grocer Pippin stacks fresh red apples and meadow berries! # speaker: Mrs. Marigold
+}
+{withParty("sue"):
+    Mrs. Marigold! Think Grocer Pippin saved a jar of those crunchy Fish Crackers for my dock snacks? # speaker: Sue
+    Front shelf, Sue dear, baked nice and crisp for you and your seaside friends! # speaker: Mrs. Marigold
+}
+{withParty("jordan"):
+    Those wild berries smell almost as sweet as the strawberries from our clubhouse deck, Mrs. Marigold! # speaker: Jordan
+    Why, thank you, Jordan! You and Fae have quite the green thumb up in Whispering Woods! # speaker: Mrs. Marigold
+}
+{treats() > 0: Ooh, I can smell lovely critter treats tucked in your backpack! You're ready to brighten any furry friend's mood! # speaker: Mrs. Marigold}
++ [Ask about Grocer Pippin's best produce]
+    Orchard Apples are a dream for sweet meadow, hill, and cavern critters, while Fish Crackers make every bay and pond friend wiggle with delight! # speaker: Mrs. Marigold
+    {stickers() >= 5: With {stickers()} calm friends in your sticker album, you probably know every critter's favorite snack by heart! # speaker: Mrs. Marigold}
+    -> DONE
++ [Ask what Mrs. Marigold is baking]
+    {calmed("hooded-kid"):
+        A giant four-berry celebration tart for you, Sue, Jordan, and Milo! Cloverhollow has so much to cheer about! # speaker: Mrs. Marigold
+    - else:
+        Wild meadow berry hand pies! The berries in Pippin's barrel are plump and sweet, just right for a cozy kitchen tray. # speaker: Mrs. Marigold
+    }
+    -> DONE
++ {not basket_treat} [Help Mrs. Marigold pick a ripe orchard apple]
+    -> basket_treat
+= basket_treat
+Oh, bless your kind heart, Fae! You picked the glossiest red apple in the whole crate! # speaker: Mrs. Marigold
+Please take this crisp Orchard Apple treat and six shiny market coins as my thank-you! # speaker: Mrs. Marigold # gift: treat orchard-apple 1 # gift: coins 6 # sound: chime-green
+Ooh, thank you so much, Mrs. Marigold! # speaker: Fae
+-> DONE
+
+=== npc_danny ===
+{lanternOn():
+    WHOA! Your purple blacklight makes the pastel gelato tubs glow like cosmic neon space scoops! # speaker: Danny
+}
+{
+- calmed("hooded-kid"):
+    Fae! You're a total legend! Scooper Penny let Milo and me design a Victory Rainbow Dream Sundae to celebrate you calming the whole forest! # speaker: Danny
+- parlor_note_read:
+    No way! You found the Secret Sundae Club glow doodle by the curved gelato case?! That officially makes you top-tier parlor royalty! # speaker: Danny
+- else:
+    Hey, Fae! Pull up a stool! Scooper Penny's crispy waffle cones smell SO amazing right now! # speaker: Danny
+}
+{withParty("sue"):
+    Danny! Tell me Mint Cloud Chip didn't run out before I got here! # speaker: Sue
+    Relax, Sue! Penny just wheeled out a giant fresh tub with extra cocoa sprinkles! # speaker: Danny
+}
+{withParty("jordan"):
+    Have you tried the Warm Honey Caramel Dream Sundae yet, Danny? Best mountain-explorer fuel around! # speaker: Jordan
+    Ooh, YES! Two scoops of caramel plus a crispy cone is unbeatable, Jordan! # speaker: Danny
+}
+{treats() > 0: Whoa, nice! You're already carrying critter treats! Every critter in Cloverhollow flips for Berry Swirl Cones! # speaker: Danny}
++ [Ask Danny's favorite Dream Sundae flavor]
+    Tough call between Strawberry Swirl and Cozy Cocoa Sundae with fluffy marshmallows! Penny says Berry Swirl Cones even cheer up the grumpiest shopkeepers! # speaker: Danny
+    {bossesCalmed() >= 2: Heard you already calmed {bossesCalmed()} big valley troubles, so you definitely deserve a triple scoop! # speaker: Danny}
+    -> DONE
++ [Ask about the Secret Sundae Club]
+    {calmed("hooded-kid"):
+        We just made you, Sue, Jordan, and Milo honorary VIPs of the Secret Sundae Club! Extra sprinkles forever! # speaker: Danny
+    - else:
+        Scooper Penny keeps a super-secret sundae doodle tucked near the gelato case, and rumor says only a purple glow reveals it! # speaker: Danny
+    }
+    -> DONE
++ {not scoop_bonus} [Trade ice-cream flavor tips with Danny]
+    -> scoop_bonus
+= scoop_bonus
+Wait, strawberry swirl WITH crunchy honey drizzle?! That's genius, Fae! I'm telling Scooper Penny right away! # speaker: Danny
+Here, take my spare Berry Swirl Cone treat and six lucky parlor coins for the pro scoop tip! # speaker: Danny # gift: treat berry-cone 1 # gift: coins 6 # sound: chime-blue
+Awesome, thanks, Danny! # speaker: Fae
 -> DONE

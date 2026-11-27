@@ -1,4 +1,10 @@
 import "./cook.css";
+import {
+  classifyCookPopup,
+  createArcadePopupLayer,
+  updateArcadeBestBadge,
+  type ArcadeRecordBadge,
+} from "./arcade-popups";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
 import { element, measure, pixels, place, setStyle, setText, type Box } from "./dom";
 import { cookFront, layoutCook, type CookLayout } from "./cook-layout";
@@ -31,10 +37,14 @@ export function createCook(
   art: (frame: string) => AtlasImage | null,
   calibration: CookCalibration,
   image: string,
-): { render: (view: CookView | null) => void; info: () => CookInfo | null } {
+): {
+  render: (view: CookView | null, record?: ArcadeRecordBadge | null) => void;
+  info: () => CookInfo | null;
+} {
   const overlay = element("section", "cook-overlay", root);
   overlay.setAttribute("aria-label", "The clubhouse microwave");
   overlay.hidden = true;
+  const popups = createArcadePopupLayer(overlay);
   const machine = element("div", "cook-machine", overlay);
   machine.style.backgroundImage = `url("${image}")`;
   const glass = element("div", "cook-glass", machine);
@@ -45,15 +55,23 @@ export function createCook(
   element("div", "cook-sheen", glass);
   const display = element("div", "cook-display", machine);
   const button = element("div", "cook-button", machine);
+  const bestBadge = element("div", "arcade-best-badge cook-best-badge", machine);
+  bestBadge.hidden = true;
   const front = element("div", "cook-front", machine);
   const frontText = element("span", "cook-front-text", front);
   let lastKey = "";
   let lastFrontKey = "";
   let lastView: CookView | null = null;
   let lastLayout: CookLayout | null = null;
+  let lastRecord: ArcadeRecordBadge | null = null;
+  let prevPhase: string | null = null;
   let lastDish = "";
 
-  const draw = (view: CookView, layout: CookLayout): void => {
+  const draw = (
+    view: CookView,
+    layout: CookLayout,
+    record: ArcadeRecordBadge | null,
+  ): void => {
     place(machine, { x: 0, y: 0, width: layout.width, height: layout.height });
     machine.dataset.scale = String(layout.scale);
     machine.dataset.phase = view.phase;
@@ -113,33 +131,45 @@ export function createCook(
       if (room < 1) setStyle(frontText, "font-size", `${Math.max(9, Math.floor(tall * room))}px`);
     }
     front.hidden = view.phase === "result";
+    setStyle(bestBadge, "left", `${Math.round(layout.glass.x + layout.glass.width / 2)}px`);
+    setStyle(bestBadge, "top", `${Math.max(6, Math.round(layout.glass.y * 0.5))}px`);
+    setStyle(bestBadge, "font-size", `${Math.max(10, Math.round(layout.scale * 26))}px`);
+    updateArcadeBestBadge(bestBadge, view.phase === "result", record);
   };
   // The front was measured in whatever font was usable, and Nunito swaps in
   // when it loads (spec 7.1): what's shown is drawn again then.
   document.fonts.addEventListener("loadingdone", () => {
     lastFrontKey = "";
-    if (lastView !== null && lastLayout !== null) draw(lastView, lastLayout);
+    if (lastView !== null && lastLayout !== null) draw(lastView, lastLayout, lastRecord);
   });
 
   return {
-    render: (view) => {
+    render: (view, record = null) => {
       overlay.hidden = view === null;
       lastView = view;
+      lastRecord = record;
       if (view === null) {
         lastKey = "";
+        prevPhase = null;
+        popups.clear();
+        bestBadge.hidden = true;
         return;
       }
+      const popupSpec = classifyCookPopup(prevPhase, view.phase, view.zone);
+      prevPhase = view.phase;
+      if (popupSpec !== null) popups.spawn(popupSpec);
       const style = getComputedStyle(overlay);
       const width = overlay.clientWidth - pixels(style.paddingLeft) - pixels(style.paddingRight);
       const height = overlay.clientHeight - pixels(style.paddingTop) -
         pixels(style.paddingBottom);
-      const key = `${width}x${height} ${JSON.stringify(view)}`;
+      const recordKey = record === null ? "" : `${record.best}:${record.isNewBest ? 1 : 0}`;
+      const key = `${width}x${height} ${recordKey} ${JSON.stringify(view)}`;
       if (key === lastKey) return;
       lastKey = key;
       const scale = Math.max(0.01,
         Math.min(width / calibration.size.w, height / calibration.size.h));
       lastLayout = layoutCook(view, calibration, scale);
-      draw(view, lastLayout);
+      draw(view, lastLayout, record);
     },
     info: () => {
       if (lastView === null || lastLayout === null) return null;

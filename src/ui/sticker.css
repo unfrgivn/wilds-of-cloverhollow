@@ -102,6 +102,86 @@
   pointer-events: none;
 }
 
+/* Touch Photo Mode controls (Milestone 118): strictly hidden on desktop and
+   outside Photo Mode; excluded from Pixi WebGL extract.canvas captures. */
+.photo-touch-bar {
+  display: none;
+}
+
+:root[data-touch="on"][data-photo="on"] .photo-touch-bar {
+  display: flex;
+  position: fixed;
+  right: max(18px, env(safe-area-inset-right));
+  bottom: max(18px, env(safe-area-inset-bottom));
+  z-index: 82;
+  gap: 10px;
+  align-items: center;
+  pointer-events: auto;
+}
+
+.photo-touch-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 2.5px solid #47321f;
+  border-radius: 50%;
+  background: #fbf6e8;
+  box-shadow:
+    inset 0 0 0 2px #fffdf7,
+    0 4px 0 #47321f28,
+    0 6px 12px #47321f24;
+  color: #47321f;
+  cursor: pointer;
+  font-family: var(--sticker-font);
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+  touch-action: manipulation;
+  transition: transform 90ms ease-out;
+}
+
+.photo-touch-btn:active {
+  transform: scale(0.94);
+}
+
+.photo-touch-btn:focus-visible {
+  outline: 3px solid #6b9e56;
+  outline-offset: 2px;
+}
+
+.photo-touch-snap svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+.photo-camera-body {
+  fill: #fff8e6;
+  stroke: #47321f;
+  stroke-width: 2.1;
+  stroke-linejoin: round;
+}
+
+.photo-camera-lens {
+  fill: #addbd8;
+  stroke: #47321f;
+  stroke-width: 2;
+}
+
+.photo-camera-glint {
+  fill: #fffdf7;
+}
+
+.photo-camera-flash {
+  fill: #47321f;
+}
+
 .photo-shutter-flash[hidden] {
   display: none;
 }
@@ -322,7 +402,9 @@
   .sticker-advance.is-visible,
   .sticker-prompt > span,
   .notice-mark.is-alert { animation: none; }
-  .sticker-choice { transition: none; }
+  .sticker-choice,
+  .photo-touch-btn { transition: none; }
+  .photo-touch-btn:active { transform: none; }
   .photo-shutter-flash.is-flashing {
     animation: photo-shutter-pulse-gentle 220ms ease-out forwards;
   }

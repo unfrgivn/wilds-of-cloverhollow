@@ -63,6 +63,19 @@ export function classifyFishPopup(
   return rare ? { kind: "rare", text: "★ RARE!" } : { kind: "normal", text: "NICE CATCH!" };
 }
 
+export type CookPopupRating = "under" | "golden" | "over" | "burnt" | "frozen";
+
+export function classifyCookPopup(
+  prevPhase: string | null,
+  nextPhase: string,
+  rating: CookPopupRating | null,
+): ArcadePopupSpec | null {
+  if (prevPhase === null || prevPhase === nextPhase || nextPhase !== "result") {
+    return null;
+  }
+  return rating === "golden" ? { kind: "rare", text: "★ GOLDEN!" } : null;
+}
+
 export function formatArcadeBestText(record: ArcadeRecordBadge): string {
   return record.isNewBest ? `★ NEW BEST! ${record.best}` : `Best: ${record.best}`;
 }

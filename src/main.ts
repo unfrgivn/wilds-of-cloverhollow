@@ -15,6 +15,7 @@ import {
   trackTitles,
   type JukeboxTrack,
   arcadeView,
+  cookZone,
   targetInteractable,
   creditEntries,
   creditsSummary,
@@ -83,6 +84,7 @@ import {
 import { createSaveToast } from "./ui/save-toast";
 import {
   composePostcardFrame,
+  createPhotoTouchBar,
   createShutterFlash,
   postcardMetadata,
   triggerPostcardDownload,
@@ -1068,6 +1070,19 @@ async function boot(): Promise<void> {
           const best = minigameRecords.bestOf("fish");
           activeArcadeRecord = best > 0 ? { best, isNewBest: false } : null;
         }
+      } else if (nextArcade.game === "cook") {
+        const zone = cookZone(
+          content.world.arcade.cook,
+          nextArcade.dish,
+          nextArcade.cooked,
+          gameSettings.gentleTiming(),
+        );
+        if (zone === "golden") {
+          activeArcadeRecord = minigameRecords.submit("cook", minigameRecords.bestOf("cook") + 1);
+        } else {
+          const best = minigameRecords.bestOf("cook");
+          activeArcadeRecord = best > 0 ? { best, isNewBest: false } : null;
+        }
       }
     }
     const clearRest =
@@ -1309,6 +1324,12 @@ async function boot(): Promise<void> {
       dataUrl: composed.dataUrl,
     };
   };
+  createPhotoTouchBar(uiRoot, {
+    onSnap: () => {
+      void snapPostcard({ download: true });
+    },
+    onClose: () => setPhotoMode(false),
+  });
   for (const type of ["resize", "pointerdown", "pointerup"])
     window.addEventListener(type, invalidate);
   let last = performance.now();

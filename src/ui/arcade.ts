@@ -62,7 +62,10 @@ export function createArcade(
         view?.game === "comet" ? view : null,
         view?.game === "comet" ? record : null,
       );
-      cookUp.render(view?.game === "cook" ? view : null);
+      cookUp.render(
+        view?.game === "cook" ? view : null,
+        view?.game === "cook" ? record : null,
+      );
       fishUp.render(view?.game === "fish" ? view : null, view?.game === "fish" ? record : null);
     },
     info: () => clawUp.info() ?? skeeUp.info() ?? moleUp.info() ?? cometUp.info() ??

@@ -150,7 +150,7 @@ test.describe("Milestone 116: Journal Arcade Shelf, Keyboard Jukebox & Key Hints
 
       await expect
         .poll(() => page.evaluate(() => window.__cloverhollow?.settings.minigameRecords()))
-        .toEqual({ skee: 220, mole: 14, comet: 18, fish: 5 });
+        .toEqual({ skee: 220, mole: 14, comet: 18, fish: 5, cook: 0 });
 
       await tapKey(page, "j");
       await expect(page.locator(".journal-book")).toBeVisible();

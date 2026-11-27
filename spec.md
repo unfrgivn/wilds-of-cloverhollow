@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 116)
+Last updated: 2026-11-27 (Milestone 118)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -464,7 +464,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   members, visible NPCs (hover shadows under the four fairies, skipping the
   painted `bus-stop`), and overworld critters (scaling slightly as characters
   bounce or hover); a deterministic `BiomeAtmosphere` (`src/render/atmosphere.ts`,
-  zero `Math.random()`) adds per-biome water glints, lamp pools, drifting
+  with pure stateless zero-Pixi particle recipes and `evaluateAtmosphere` extracted
+  into `src/render/atmosphere-recipes.ts` and re-exported from `atmosphere.ts`,
+  Milestone 118; zero `Math.random()`) adds per-biome water glints, lamp pools, drifting
   petals/pollen, snow and lodge chimney smoke, sunbeams, lavender mist, fairy
   aura halos, hearth glow, arcade neon blooms, blooming clubhouse planter-deck
   pollen sparkles (while `garden_sprouted` or `garden_ripe`), Milestone 108
@@ -502,14 +504,23 @@ ios/            Capacitor iOS project (from Milestone 4).
   adventure areas (`plaza`, `park`, `bay`, `pass`, `trail`, `woods`, `hills`,
   `field`) once `has_lantern` is set; and `morning` washes `bedroom` and
   `kitchen` before any sticker is earned and before `has_lantern`.
-- Photo / Showcase mode (Milestone 90), Postcard Camera (Milestone 107), &
-  Gamepad Parity (Milestone 114): pressing `P` (`KeyP`) or gamepad Select
+- Photo / Showcase mode (Milestone 90), Postcard Camera (Milestone 107),
+  Gamepad Parity (Milestone 114), & Touch Camera Controls (Milestone 118):
+  pressing `P` (`KeyP`) or gamepad Select
   (standard button 8) while exploring the free overworld (ignored inside inputs,
   on title, dialogue, battle, arcade, journal, transition, finale, or QA
   overlays) toggles
   `data-photo="on"` on the root, hiding `.sticker-prompt`, `.touch-controls`,
   `.hud-hints`, `.area-banner`, `.qa-badge`, `.notice-marks`, and the dev debug
-  readout (`view.setPhotoMode`) for unobstructed storybook views. While Photo Mode
+  readout (`view.setPhotoMode`) for unobstructed storybook views. On touch devices
+  (`:root[data-touch="on"][data-photo="on"]`), `createPhotoTouchBar`
+  (`src/ui/postcard.ts`, styled in `src/ui/sticker.css`) displays `.photo-touch-bar`
+  (`role="group"`, `aria-label="Photo mode controls"`) in the bottom-right safe
+  area with two 44×44 px warm cream (`#fbf6e8`) circular `#47321f`-inked buttons:
+  `.photo-touch-snap` (`aria-label="Snap postcard"`, inline SVG camera icon with
+  zero `<text>` nodes) and `.photo-touch-close` (`aria-label="Exit photo mode"`,
+  `×`), completely hidden on desktop and outside Photo Mode and excluded from Pixi
+  `extract.canvas` captures. While Photo Mode
   is active, pressing `Enter`, `Space`, or gamepad A (button 0) (swallowing
   confirm so it never interacts
   or scrolls) plays `camera-shutter`, triggers a gentle `light` haptic tap and a
@@ -3297,21 +3308,26 @@ trunks keep its two exits.
   and celebratory pop on `ding`; smooth choice/command/title transitions,
   `.touch-button:active` tactile squash, and subtle inner-label float on
   `.sticker-prompt` keeping its arrow tip anchored.
-- Tactile Minigame Personal Bests & Die-Cut Arcade Score Popups (Milestone 112):
+- Tactile Minigame Personal Bests & Die-Cut Arcade Score Popups (Milestone 112,
+  extended to Clubhouse Microwave in Milestone 118):
   persistent local personal bests (`src/platform/minigame-records.ts`, stored
   outside the save slot via `@capacitor/preferences` under
-  `"cloverhollow-records"` with keys `skee`, `mole`, `comet`, and consecutive
-  fishing catch streak `fish`; zero `src/core` changes and zero save-version
+  `"cloverhollow-records"` with keys `skee`, `mole`, `comet`, consecutive
+  fishing catch streak `fish`, and cumulative Golden Dishes cooked `cook`,
+  cleanly upgrading legacy 4-key JSON with `cook: 0`; zero `src/core` changes
+  and zero save-version
   bump) and live Paper-Mario die-cut arcade score popups (`src/ui/arcade-popups.ts`
   and `src/ui/arcade-popups.css`). Pure classifiers (`classifySkeePopup`,
-  `classifyMolePopup`, `classifyCometPopup`, `classifyFishPopup`) stay silent on
+  `classifyMolePopup`, `classifyCometPopup`, `classifyFishPopup`,
+  `classifyCookPopup`) stay silent on
   initial open, reset, or static `ui-gallery` renders, and spawn crisp
   `#47321f`-inked `.arcade-popup` pills (`+N`, `+50!`, `+100 ★!`, `BOOP! +2`,
-  `★ +1`, `NICE CATCH!`, `★ RARE!`) in the upper-right margin on live gains.
+  `★ +1`, `NICE CATCH!`, `★ RARE!`, `★ GOLDEN!`) in the upper-right margin on live gains.
   When a live round enters `phase === "result"`, the minigame renders a die-cut
   `.arcade-best-badge` pill (`★ NEW BEST! <best>` in gold when beating a
   non-zero record, or `Best: <best>` in warm cream otherwise) in the vacated
-  HUD/escape slot; static gallery callers omit the optional second `record`
+  HUD/escape slot (centered on the mint bezel above the glass in `src/ui/cook.ts`);
+  static gallery callers omit the optional second `record`
   argument so gallery baselines stay pixel-identical. All popup and badge
   animations respect both `@media (prefers-reduced-motion: reduce)` and
   `:root[data-reduced-motion="on"]`.
@@ -3525,10 +3541,11 @@ trunks keep its two exits.
   `src/platform/minigame-records.ts`): attached directly below `.journal-prizes`
   on the right page of `NOTES` (`role="region"`, `aria-label="Arcade and fishing
   records"`, `.journal-records-strip`) only when at least one local minigame
-  personal best is `> 0` (omitted when all four are `0` so fresh Journal layouts
+  personal best is `> 0` (omitted when all five are `0` so fresh Journal layouts
   stay unchanged). Displays a warm-gold `BESTS` label and rounded pastel pills
   in canonical order (`★ Skee-Ball · N`, `★ Boop-a-Mole · N boops`, `★ Comet
-  Cruise · N stars`, `★ Fishing Streak · N`) with `>= 8.5:1` `#47321f` ink
+  Cruise · N stars`, `★ Fishing Streak · N`, `★ Golden Dishes · N`) with
+  `>= 8.5:1` `#47321f` ink
   contrast and zero horizontal overflow across desktop and phone viewports.
 - Complete Journal Collection Showcase (Milestone 94, pure helpers
   `journalKeepsakes`, `journalFish`, `journalProgress` in `src/core/journal.ts`

@@ -11,7 +11,7 @@ test.describe.configure({ timeout: longFlowTimeout });
 
 async function readMinigameRecords(
   page: Page,
-): Promise<{ skee: number; mole: number; comet: number; fish: number }> {
+): Promise<{ skee: number; mole: number; comet: number; fish: number; cook: number }> {
   const records = await page.evaluate(() =>
     window.__cloverhollow?.settings.minigameRecords() ?? null,
   );
@@ -118,7 +118,13 @@ test(
       sawPopup: true,
       sawBestBadge: true,
     });
-    expect(await readMinigameRecords(page)).toEqual({ skee: 0, mole: 14, comet: 0, fish: 0 });
+    expect(await readMinigameRecords(page)).toEqual({
+      skee: 0,
+      mole: 14,
+      comet: 0,
+      fish: 0,
+      cook: 0,
+    });
 
     // Reload the page and verify Personal Best persists via Capacitor Preferences.
     await page.reload();
@@ -128,6 +134,7 @@ test(
       mole: 14,
       comet: 0,
       fish: 0,
+      cook: 0,
     });
     expect(errors).toEqual([]);
   },
@@ -202,7 +209,13 @@ test(
       sawCornerPopup: true,
       sawBestBadge: true,
     });
-    expect(await readMinigameRecords(page)).toEqual({ skee: 220, mole: 0, comet: 0, fish: 0 });
+    expect(await readMinigameRecords(page)).toEqual({
+      skee: 220,
+      mole: 0,
+      comet: 0,
+      fish: 0,
+      cook: 0,
+    });
 
     await page.reload();
     await page.waitForFunction(() => Boolean(window.__cloverhollow));
@@ -211,6 +224,7 @@ test(
       mole: 0,
       comet: 0,
       fish: 0,
+      cook: 0,
     });
     expect(errors).toEqual([]);
   },

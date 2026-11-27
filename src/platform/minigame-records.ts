@@ -1,12 +1,13 @@
 import { Preferences } from "@capacitor/preferences";
 
-export type MinigameKey = "skee" | "mole" | "comet" | "fish";
+export type MinigameKey = "skee" | "mole" | "comet" | "fish" | "cook";
 
 export type MinigameRecords = {
   skee: number;
   mole: number;
   comet: number;
   fish: number;
+  cook: number;
 };
 
 export type MinigameRecordBadge = {
@@ -39,7 +40,7 @@ function sanitizeScore(value: unknown): number {
 }
 
 export function defaultMinigameRecords(): MinigameRecords {
-  return { skee: 0, mole: 0, comet: 0, fish: 0 };
+  return { skee: 0, mole: 0, comet: 0, fish: 0, cook: 0 };
 }
 
 /** Projects persisted personal bests into canonical Journal pill entries, omitting 0 scores. */
@@ -49,10 +50,12 @@ export function formatArcadeRecordPills(records: MinigameRecords): ArcadeRecordP
   const mole = sanitizeScore(records.mole);
   const comet = sanitizeScore(records.comet);
   const fish = sanitizeScore(records.fish);
+  const cook = sanitizeScore(records.cook);
   if (skee > 0) pills.push({ id: "skee", label: "Skee-Ball", value: String(skee) });
   if (mole > 0) pills.push({ id: "mole", label: "Boop-a-Mole", value: `${mole} boops` });
   if (comet > 0) pills.push({ id: "comet", label: "Comet Cruise", value: `${comet} stars` });
   if (fish > 0) pills.push({ id: "fish", label: "Fishing Streak", value: `${fish}` });
+  if (cook > 0) pills.push({ id: "cook", label: "Golden Dishes", value: String(cook) });
   return pills;
 }
 
@@ -66,6 +69,7 @@ export function readMinigameRecords(value: string | null): MinigameRecords {
       mole: sanitizeScore(parsed.mole),
       comet: sanitizeScore(parsed.comet),
       fish: sanitizeScore(parsed.fish),
+      cook: sanitizeScore(parsed.cook),
     };
   } catch {
     return defaultMinigameRecords();
@@ -78,6 +82,7 @@ export function writeMinigameRecords(records: MinigameRecords): string {
     mole: sanitizeScore(records.mole),
     comet: sanitizeScore(records.comet),
     fish: sanitizeScore(records.fish),
+    cook: sanitizeScore(records.cook),
   });
 }
 
@@ -91,6 +96,7 @@ export function recordMinigameResult(
     mole: sanitizeScore(records.mole),
     comet: sanitizeScore(records.comet),
     fish: sanitizeScore(records.fish),
+    cook: sanitizeScore(records.cook),
   };
   const nextScore = sanitizeScore(score);
   const previous = clean[game];

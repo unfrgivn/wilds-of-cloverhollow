@@ -789,7 +789,7 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
       ensureCometOverlay(),
     ]).then(() => undefined);
 
-  let cookOverlay: Overlay<CookView, CookInfo> | null = null;
+  let cookOverlay: RecordOverlay<CookView, CookInfo> | null = null;
   let cookLoad: Promise<void> | undefined;
   const ensureCookOverlay = (): Promise<void> => {
     if (cookOverlay !== null) return Promise.resolve();
@@ -883,7 +883,10 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
       arcadeState?.game === "comet" ? arcadeState : null,
       arcadeState?.game === "comet" ? record : null,
     );
-    cookOverlay?.render(arcadeState?.game === "cook" ? arcadeState : null);
+    cookOverlay?.render(
+      arcadeState?.game === "cook" ? arcadeState : null,
+      arcadeState?.game === "cook" ? record : null,
+    );
     fishOverlay?.render(
       arcadeState?.game === "fish" ? arcadeState : null,
       arcadeState?.game === "fish" ? record : null,

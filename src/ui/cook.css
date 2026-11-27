@@ -113,6 +113,9 @@
   color: #fff6dc;
   text-shadow: 0 2px 0 rgb(20 24 50 / 70%);
 }
+.cook-best-badge {
+  transform: translateX(-50%);
+}
 @keyframes cook-ding-pop {
   0% { transform: scale(1); }
   45% { transform: scale(1.07, 0.94); }

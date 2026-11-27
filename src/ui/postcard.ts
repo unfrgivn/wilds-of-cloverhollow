@@ -1,4 +1,4 @@
-import { element } from "./dom";
+import { element, svgElement } from "./dom";
 
 export type PostcardMetadata = {
   filename: string;
@@ -253,4 +253,58 @@ export function createShutterFlash(root: HTMLElement): {
     hide: finish,
     count: () => count,
   };
+}
+
+function cameraIcon(): SVGSVGElement {
+  const icon = svgElement("svg", "photo-touch-camera-icon");
+  icon.setAttribute("viewBox", "0 0 28 28");
+  icon.setAttribute("aria-hidden", "true");
+  const body = svgElement("path", "photo-camera-body", icon);
+  body.setAttribute(
+    "d",
+    "M4.5 10.5 C4.5 9.2 5.6 8.2 6.9 8.2 H9.3 L10.7 6.1 C11.1 5.5 11.7 5.2 12.4 5.2 H15.6 " +
+      "C16.3 5.2 16.9 5.5 17.3 6.1 L18.7 8.2 H21.1 C22.4 8.2 23.5 9.2 23.5 10.5 V19.6 " +
+      "C23.5 20.9 22.4 22 21.1 22 H6.9 C5.6 22 4.5 20.9 4.5 19.6 Z",
+  );
+  const lens = svgElement("circle", "photo-camera-lens", icon);
+  lens.setAttribute("cx", "14");
+  lens.setAttribute("cy", "15");
+  lens.setAttribute("r", "4.1");
+  const glint = svgElement("circle", "photo-camera-glint", icon);
+  glint.setAttribute("cx", "12.5");
+  glint.setAttribute("cy", "13.5");
+  glint.setAttribute("r", "1.1");
+  const flash = svgElement("circle", "photo-camera-flash", icon);
+  flash.setAttribute("cx", "19.8");
+  flash.setAttribute("cy", "11.2");
+  flash.setAttribute("r", "1.15");
+  return icon;
+}
+
+/**
+ * Touch-only Photo Mode camera bar (Milestone 118): warm cream die-cut circular
+ * Snap Postcard + Exit buttons shown strictly when both data-touch="on" and
+ * data-photo="on" are set on :root, completely excluded from Pixi WebGL capture.
+ */
+export function createPhotoTouchBar(
+  root: HTMLElement,
+  handlers: { onSnap: () => void; onClose: () => void },
+): { element: HTMLDivElement } {
+  const bar = element("div", "photo-touch-bar", root);
+  bar.setAttribute("role", "group");
+  bar.setAttribute("aria-label", "Photo mode controls");
+
+  const snap = element("button", "photo-touch-btn photo-touch-snap", bar);
+  snap.type = "button";
+  snap.setAttribute("aria-label", "Snap postcard");
+  snap.append(cameraIcon());
+  snap.addEventListener("click", () => handlers.onSnap());
+
+  const close = element("button", "photo-touch-btn photo-touch-close", bar);
+  close.type = "button";
+  close.setAttribute("aria-label", "Exit photo mode");
+  close.textContent = "×";
+  close.addEventListener("click", () => handlers.onClose());
+
+  return { element: bar };
 }

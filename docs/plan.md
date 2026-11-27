@@ -5305,6 +5305,42 @@ the old trail, the owl, and the clubhouse claim.
   skipped, 0 failed across Chromium & WebKit; only the 4 glowing-firefly area
   baselines updated).
 
+## Milestone 118: Touch Photo Mode Camera Controls, Clubhouse Microwave Golden Chef Popups/Records & `atmosphere-recipes.ts` Extraction **Status:** ✅ Completed (2026-11-27)
+- Completes touch-device Photo Mode parity, brings Clubhouse Microwave Cooking
+  into the die-cut score-popup and Personal Best record system, and splits pure
+  biome atmosphere math out of `src/render/atmosphere.ts` with zero `src/core`
+  changes, zero save-version bumps, zero replay hash drift across all 67 sims,
+  and zero `ui-gallery` baseline regressions.
+- Touch Photo Mode camera bar (`src/ui/postcard.ts`, `src/ui/sticker.css`,
+  `src/main.ts`):
+  - Added `createPhotoTouchBar(root, { onSnap, onClose })` displaying two
+    44x44 px warm-cream circular buttons (inline SVG camera icon + `×`) strictly
+    under `:root[data-touch="on"][data-photo="on"]` inside bottom-right safe
+    areas — invisible on desktop and excluded from WebGL `extract.canvas`
+    Postcard PNG captures.
+- Clubhouse Microwave Golden Chef popups & record (`src/platform/minigame-records.ts`,
+  `src/ui/arcade-popups.ts`, `src/ui/cook.{ts,css}`, `src/ui/arcade.ts`,
+  `src/shell/assets.ts`, `src/main.ts`):
+  - Extended `MinigameRecords` with `cook` (cumulative Golden Dishes, upgrading
+    legacy 4-key JSON cleanly) and added `Golden Dishes` to
+    `formatArcadeRecordPills` (surfaced automatically in the Journal's
+    `.journal-records-strip`).
+  - Added pure `classifyCookPopup` (`★ GOLDEN!`) and wired optional
+    `.arcade-best-badge` (`★ NEW BEST! N`) cleanly onto the mint bezel above
+    the microwave glass.
+- Pure biome atmosphere recipes split (`src/render/atmosphere-recipes.ts`,
+  `src/render/atmosphere.ts`):
+  - Extracted all zero-Pixi deterministic atmosphere math and 27 biome recipes
+    into `src/render/atmosphere-recipes.ts`, trimming `src/render/atmosphere.ts`
+    from 1,262 to 128 lines while re-exporting all public symbols identically.
+- Evidence: `tests/unit/milestone-118.test.ts` and
+  `tests/e2e/milestone-118.spec.ts` (`@smoke` Chromium + WebKit); review
+  captures `art/review/m118-touch-photo-874.jpg` and
+  `m118-cook-golden-1280.jpg` plus refreshed `kitchen-golden-{1280,874}`
+  snapshots independently verified via `vision`.
+- Gates: `just check`, `just build`, 23/23 targeted Chromium & WebKit e2e, and
+  95/95 Chromium `ui-gallery` tests.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

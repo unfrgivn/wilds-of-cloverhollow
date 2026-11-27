@@ -12,7 +12,7 @@ import {
 import { formatJukeboxLabel, stepJournalPage } from "../../src/ui/journal";
 
 describe("Milestone 116: Journal Arcade Records Strip", () => {
-  it("returns an empty array when all four records are zero or invalid", () => {
+  it("returns an empty array when all records are zero or invalid", () => {
     expect(formatArcadeRecordPills(defaultMinigameRecords())).toEqual([]);
     expect(
       formatArcadeRecordPills({
@@ -20,25 +20,27 @@ describe("Milestone 116: Journal Arcade Records Strip", () => {
         mole: Number.NaN,
         comet: 0,
         fish: Infinity,
+        cook: -1,
       }),
     ).toEqual([]);
   });
 
   it("formats partial records in canonical order and skips zero scores", () => {
-    const partial: MinigameRecords = { skee: 0, mole: 14, comet: 0, fish: 5 };
+    const partial: MinigameRecords = { skee: 0, mole: 14, comet: 0, fish: 5, cook: 0 };
     expect(formatArcadeRecordPills(partial)).toEqual([
       { id: "mole", label: "Boop-a-Mole", value: "14 boops" },
       { id: "fish", label: "Fishing Streak", value: "5" },
     ]);
   });
 
-  it("formats all four records in canonical order with exact labels and integer flooring", () => {
-    const full: MinigameRecords = { skee: 220.9, mole: 14.4, comet: 18, fish: 5.2 };
+  it("formats all five records in canonical order with exact labels and integer flooring", () => {
+    const full: MinigameRecords = { skee: 220.9, mole: 14.4, comet: 18, fish: 5.2, cook: 3.8 };
     expect(formatArcadeRecordPills(full)).toEqual([
       { id: "skee", label: "Skee-Ball", value: "220" },
       { id: "mole", label: "Boop-a-Mole", value: "14 boops" },
       { id: "comet", label: "Comet Cruise", value: "18 stars" },
       { id: "fish", label: "Fishing Streak", value: "5" },
+      { id: "cook", label: "Golden Dishes", value: "3" },
     ]);
   });
 });

@@ -58,8 +58,11 @@ reference material only.
   portable (Ink, JSON, PNG).
 - Language: TypeScript with `strict`. No `any`; avoid `as` casts by modeling
   real shapes and narrowing with type guards.
-- Tooling: Vite (dev server and build), Bun (package manager and script
-  runner), Node 24 LTS for Node-based tools (`.nvmrc`), `just` for tasks.
+- Tooling: Vite 8 / Rolldown (dev server and production/harness builds with
+  `build.rolldownOptions.output.codeSplitting` into `vendor-pixi`, `vendor-ink`,
+  `story-content`, `world-content`, and `index`/`game` app chunks, keeping all
+  app and content chunks under 500 kB), Bun (package manager and script runner),
+  Node 24 LTS for Node-based tools (`.nvmrc`), `just` for tasks.
 - Approved npm dependencies. Anything else needs the owner's approval first,
   then an update to this list:
   - Runtime: `pixi.js` 8, `inkjs` 2, `@capacitor/core` 8, `@capacitor/ios` 8,
@@ -342,9 +345,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   file throws an error naming `content/surfaces/<id>.json` and directing registration
   in `src/content/load.ts`. Surface lookup is pure and footstep cues are
   `footstep-<surface>`, emitted on walk half-cycles (`walkCycleUnits / 2`) while
-  moving; the current platform recipes are synthesized and remain
-  replaceable by clips pending the owner's pick. The plaza's default is stone,
-  because it is a paved square.
+  moving. The platform shell (`src/platform/audio.ts`) synthesizes multi-layer
+  acoustic Web Audio foley for all seven surfaces (`grass`, `sand`, `wood`,
+  `snow`, `stone`, `tile`, `carpet`) with deterministic per-stride organic pitch
+  variation (`footstepPitchFactor(tick)` in `src/platform/voices.ts`,
+  `0.94..1.06`, zero `Math.random()`), remaining replaceable by clips pending
+  the owner's pick. The plaza's default is stone, because it is a paved square.
 ## 4. Presentation (locked)
 - Logical view: 720 units tall. Width = 720 x screen aspect, clamped to
   960..1600 (4:3 to 20:9). Letterbox outside that range.
@@ -369,9 +375,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   their feet, and props sort against them column by column by the front edge
   of their footprints (section 6.2).
 - Procedural watercolor VFX kit (`src/render/vfx-textures.ts`, Milestones 72–73,
-  84, 88): twenty-one small cached offscreen-canvas Pixi textures (`contactShadow`,
-  `softGlow`, `sparkle`, `petal`, `waterGlint`, `mistWisp`, `sunbeam`,
-  `paperGrain`, `puff`, `heart`, `energyRing`, five hand-inked 48x48 comic
+  84, 88, 92): twenty-two small cached offscreen-canvas Pixi textures
+  (`contactShadow`, `softGlow`, `sparkle`, `petal`, `waterGlint`, `mistWisp`,
+  `sunbeam`, `sunburst`, `paperGrain`, `puff`, `heart`, `energyRing`, five
+  hand-inked 48x48 comic
   emote bubbles `emoteQuestion`, `emoteExclaim`, `emoteNote`, `emoteZzz`, and
   `emoteHeart`, plus five hand-inked 48x48 quest keepsake tokens
   `keepsakeCrystal`, `keepsakePin`, `keepsakeGeode`, `keepsakeFeather`, and
@@ -2526,8 +2533,10 @@ trunks keep its two exits.
   results: critter squash-stretch, golden starburst flash, and damped `±3.5 px`
   directional stage shake), `great`/`good`/`miss` reactions and rainbow bursts,
   on-field `Together!` ready eager bounce and curving golden sparkle tether,
-  synchronized team wave-hop and golden sunburst cascade during `Together!`
-  activation, damped Fae recoil with warm blush flash and gentle 3 px stage
+  synchronized team wave-hop, rotating/breathing 12-ray watercolor
+  `battleSunburst` behind the party over a deepened `0x201042` (`0.54`) twilight
+  stage wash, and a 6-heart pastel rainbow + golden ring/sparkle cascade during
+  `Together!` activation, damped Fae recoil with warm blush flash and gentle 3 px stage
   shake on spent energy, wind-up micro-tremble and fizzle wide squash-deflate,
   expanding aura dissolve with celebratory hearts, sparkles, and 8 gently rising
   pastel watercolour Relief Bloom petals on `soothed`/`reward`, and a ~45-tick
@@ -3456,6 +3465,5 @@ trunks keep its two exits.
 
 ## 13. Out of scope until the owner adds it
 Multiplayer, merch, speedrun, boss rush, New Game Plus, achievements,
-analytics, voice acting, day/night, weather, fishing and bug minigames, photo
-mode, home customization, and non-English localization. Keep player-facing
-text in Ink or JSON so it stays translatable.
+analytics, voice acting, weather, bug minigames, and non-English localization.
+Keep player-facing text in Ink or JSON so it stays translatable.

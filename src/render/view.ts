@@ -335,6 +335,7 @@ export class GameView {
   private readonly battleMoodWaveB: Sprite;
   private readonly battleGroundStage: Sprite;
   private readonly battleSpotlight: Sprite;
+  private readonly battleSunburst: Sprite;
   private readonly battleCritterShadow: Sprite;
   private readonly battleFaeShadow: Sprite;
   private readonly battlePartyShadows = new Map<string, Sprite>();
@@ -503,6 +504,12 @@ export class GameView {
     this.battleSpotlight.tint = 0xfff8e6;
     this.battleSpotlight.blendMode = "screen";
     this.battleSpotlight.alpha = 0.16;
+    this.battleSunburst = new Sprite(this.vfx.sunburst);
+    this.battleSunburst.label = "battle:sunburst";
+    this.battleSunburst.anchor.set(0.5);
+    this.battleSunburst.blendMode = "normal";
+    this.battleSunburst.alpha = 0.72;
+    this.battleSunburst.visible = false;
     this.battleCritterShadow = makeShadowSprite(
       this.vfx.contactShadow,
       "battle:shadow:critter",
@@ -574,6 +581,7 @@ export class GameView {
       this.battleMoodWaveB,
       this.battleSpotlight,
       this.battleGroundStage,
+      this.battleSunburst,
       this.battleCritterShadow,
       this.battleFaeShadow,
       ...this.battlePartyShadows.values(),
@@ -2145,7 +2153,7 @@ export class GameView {
       y + choreo.stageShake.y * scale,
     );
     if (choreo.stageMood === "together-active") {
-      drawWash(0.42, 0x2b1952);
+      drawWash(0.54, 0x201042);
     } else {
       drawWash(0.2);
     }
@@ -2273,7 +2281,16 @@ export class GameView {
     );
     this.battleGroundStage.height = 124;
     this.battleGroundStage.tint = 0xfff3d4;
-    this.battleGroundStage.alpha = choreo.stageMood === "together-active" ? 0.34 : 0.26;
+    this.battleGroundStage.alpha = choreo.stageMood === "together-active" ? 0.18 : 0.26;
+    const showSunburst = choreo.stageMood === "together-active";
+    this.battleSunburst.visible = showSunburst;
+    if (showSunburst) {
+      const sunburstScale = 2.05 + 0.14 * Math.sin(state.tick * 0.18);
+      this.battleSunburst.position.set(faeX - 18, faeY - 64);
+      this.battleSunburst.rotation = state.tick * 0.014;
+      this.battleSunburst.scale.set(sunburstScale);
+      this.battleSunburst.alpha = 0.88;
+    }
 
     // The party stands with Fae: a sitter (Maddie) sits facing the critter,
     // anyone else is seen from behind like Fae. Flute friends sit it out,

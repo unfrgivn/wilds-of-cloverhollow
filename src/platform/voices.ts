@@ -429,3 +429,13 @@ const TRACK_SCALES: Record<MusicTrack, readonly number[]> = {
 export function trackScaleNotes(track: MusicTrack): readonly number[] {
   return TRACK_SCALES[track];
 }
+
+// Deterministic per-stride organic pitch variation in [0.94, 1.06] (zero Math.random).
+export function footstepPitchFactor(tick: number): number {
+  const step = Math.trunc(tick);
+  let hash = Math.imul(step ^ 0x9e3779b9, 0x85ebca6b) >>> 0;
+  hash = Math.imul(hash ^ (hash >>> 13), 0xc2b2ae35) >>> 0;
+  hash = (hash ^ (hash >>> 16)) >>> 0;
+  const unit = hash / 0xffffffff;
+  return Number((0.94 + unit * 0.12).toFixed(4));
+}

@@ -18,7 +18,7 @@ import {
 } from "./audio-settings";
 import { createAmbiencePlayer, type AmbiencePlayer } from "./ambience";
 import { createMusicPlayer, type MusicPlayer } from "./music";
-import { blipFrequency, trackScaleNotes } from "./voices";
+import { blipFrequency, footstepPitchFactor, trackScaleNotes } from "./voices";
 
 export type SoundLogEntry = { tick: number; cue: SoundCue; played: boolean };
 export type SoundPlayContext = {
@@ -115,16 +115,82 @@ const recipes: Record<SoundCue, Recipe> = {
     { wave: "triangle", frequency: 523, offset: 0, duration: 0.09, gain: 0.075 },
     { wave: "triangle", frequency: 330, offset: 0.075, duration: 0.13, gain: 0.075 },
   ],
-  "footstep-grass": [{ wave: "noise", offset: 0, duration: 0.06, gain: 0.022, lowpass: 980 }],
-  "footstep-sand": [{ wave: "noise", offset: 0, duration: 0.075, gain: 0.022, lowpass: 620 }],
-  "footstep-wood": [
-    { wave: "triangle", frequency: 145, offset: 0, duration: 0.055, gain: 0.024 },
-    { wave: "noise", offset: 0.01, duration: 0.035, gain: 0.013, lowpass: 1250 },
+  "footstep-grass": [
+    { wave: "noise", offset: 0, duration: 0.055, gain: 0.02, lowpass: 1350, attack: 0.006 },
+    {
+      wave: "sine",
+      frequency: 135,
+      endFrequency: 95,
+      offset: 0.004,
+      duration: 0.045,
+      gain: 0.015,
+      attack: 0.004,
+    },
   ],
-  "footstep-snow": [{ wave: "noise", offset: 0, duration: 0.095, gain: 0.021, lowpass: 400 }],
-  "footstep-stone": [{ wave: "triangle", frequency: 840, offset: 0, duration: 0.034, gain: 0.021 }],
-  "footstep-tile": [{ wave: "square", frequency: 980, offset: 0, duration: 0.026, gain: 0.016 }],
-  "footstep-carpet": [{ wave: "noise", offset: 0, duration: 0.07, gain: 0.019, lowpass: 480 }],
+  "footstep-sand": [
+    { wave: "noise", offset: 0, duration: 0.07, gain: 0.021, lowpass: 1850, attack: 0.008 },
+    {
+      wave: "sine",
+      frequency: 110,
+      endFrequency: 78,
+      offset: 0.005,
+      duration: 0.05,
+      gain: 0.016,
+      attack: 0.005,
+    },
+  ],
+  "footstep-wood": [
+    {
+      wave: "triangle",
+      frequency: 168,
+      endFrequency: 112,
+      offset: 0,
+      duration: 0.06,
+      gain: 0.028,
+      attack: 0.003,
+    },
+    { wave: "noise", offset: 0, duration: 0.025, gain: 0.016, lowpass: 1900, attack: 0.002 },
+  ],
+  "footstep-snow": [
+    { wave: "noise", offset: 0, duration: 0.055, gain: 0.022, lowpass: 2600, attack: 0.004 },
+    { wave: "noise", offset: 0.02, duration: 0.06, gain: 0.018, lowpass: 1450, attack: 0.006 },
+  ],
+  "footstep-stone": [
+    { wave: "noise", offset: 0, duration: 0.03, gain: 0.018, lowpass: 2400, attack: 0.002 },
+    {
+      wave: "triangle",
+      frequency: 290,
+      endFrequency: 210,
+      offset: 0,
+      duration: 0.035,
+      gain: 0.022,
+      attack: 0.002,
+    },
+  ],
+  "footstep-tile": [
+    { wave: "noise", offset: 0, duration: 0.026, gain: 0.016, lowpass: 2700, attack: 0.002 },
+    {
+      wave: "triangle",
+      frequency: 360,
+      endFrequency: 260,
+      offset: 0,
+      duration: 0.03,
+      gain: 0.02,
+      attack: 0.002,
+    },
+  ],
+  "footstep-carpet": [
+    { wave: "noise", offset: 0, duration: 0.045, gain: 0.018, lowpass: 620, attack: 0.006 },
+    {
+      wave: "sine",
+      frequency: 98,
+      endFrequency: 72,
+      offset: 0.003,
+      duration: 0.045,
+      gain: 0.016,
+      attack: 0.005,
+    },
+  ],
   door: [
     {
       wave: "triangle",
@@ -945,6 +1011,18 @@ export function createAudio(
     ];
   };
 
+  const scaleRecipePitch = (recipe: Recipe, factor: number): Segment[] =>
+    recipe.map((segment) =>
+      segment.wave === "noise"
+        ? { ...segment, lowpass: segment.lowpass * factor }
+        : {
+            ...segment,
+            frequency: segment.frequency * factor,
+            endFrequency:
+              segment.endFrequency === undefined ? undefined : segment.endFrequency * factor,
+          },
+    );
+
   const playRecipe = (cue: SoundCue, tick: number, info?: SoundPlayContext): boolean => {
     if (muted) return false;
     unlock();
@@ -955,6 +1033,8 @@ export function createAudio(
       recipe = dialogueBlipRecipe(tick, info);
     } else if (cue === "choice-move" || cue === "battle-command" || cue === "choice-select") {
       recipe = scaleChoiceRecipe(cue, tick, info);
+    } else if (cue.startsWith("footstep-")) {
+      recipe = scaleRecipePitch(recipes[cue], footstepPitchFactor(tick));
     } else {
       recipe = recipes[cue];
     }

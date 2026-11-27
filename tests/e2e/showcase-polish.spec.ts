@@ -164,6 +164,15 @@ test(
       maddie: "radiant",
       sue: "radiant",
     });
+    const activeMembers = async (): Promise<string[]> =>
+      page.locator('.battle-portrait[data-active="true"]').evaluateAll((nodes) =>
+        nodes.map((node) => node.getAttribute("data-member") ?? ""),
+      );
+    expect(await activeMembers()).toEqual(["fae"]);
+    await tapKey(page, "ArrowDown");
+    expect(await activeMembers()).toEqual(["maddie"]);
+    await tapKey(page, "ArrowUp");
+    expect(await activeMembers()).toEqual(["fae"]);
 
     // Check clearance again while Together! button is visible below ENERGY.
     const [readyPortraitRect] = await visibleRects(page, ".battle-portraits");

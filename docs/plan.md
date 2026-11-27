@@ -4193,7 +4193,6 @@ the old trail, the owl, and the clubhouse claim.
   and full `CLOVERHOLLOW_E2E_PORT=4224 just e2e` (1,029 passed, 2 skipped
   across Chromium & WebKit after refreshing the 2 post-lasso battle baselines).
 
-<<<<<<< HEAD
 ## Milestone 88: Bubblegum Bay Fishing Minigame **Status:** ✅ Completed (2026-11-26)
 - Playable cozy **Bubblegum Bay Fishing** minigame (`NOTES.md: 47–48`,
   `game: "fish"`, launched via `# play: fish 0` from `dock_end` once
@@ -4364,6 +4363,7 @@ the old trail, the owl, and the clubhouse claim.
   (1,062/1,066 passed with zero diffs on first run + 4/4 WebKit 1–11 px WebP
   subpixel baselines refreshed via `--last-failed --update-snapshots`).
 
+<<<<<<< HEAD
 ## Milestone 92: The Wildlife Sanctuary (Living Calm-Critter Meadow & Ranger Fern) **Status:** ✅ Completed (2026-11-26)
 - New sunlit alpine **Wildlife Sanctuary** meadow (`NOTES.md: 59`,
   `content/areas/sanctuary.json`, `land: "hills"`, 1650x1100), branching east
@@ -4409,6 +4409,53 @@ the old trail, the owl, and the clubhouse claim.
   prior runs, 23 QA packs, purity, lint), `just build` (production and harness
   hook checks), and full `CLOVERHOLLOW_E2E_PORT=4215 just e2e` (1,067 passed,
   2 skipped across Chromium & WebKit).
+
+## Milestone 93: Radial Sunburst Together! Spectacle, Showcase Battle Portraits, Acoustic Surface Footsteps & Clean Code-Splitting **Status:** ✅ Completed (2026-11-27)
+- Pure presentation/audio/build craft pass: zero `src/core` changes and zero
+  replay hash shifts across all 66 recorded sims.
+- Rotating golden radial sunburst & high-contrast `Together!` spectacle
+  (`src/render/vfx-textures.ts`, `src/render/battle-choreography.ts`,
+  `src/render/view.ts`):
+  - Added `256x256` procedural watercolor `sunburst` texture (12 alternating soft
+    tapered primary/secondary rays from warm cream-gold center to feathered gold
+    edge), mounted on `battleSunburst` behind Fae and the party in `battleLayer`
+    during `together-active`, rotating and breathing over a deepened `0x201042`
+    (`0.54`) twilight stage wash.
+  - Enriched `Together!` active cascade with 6 normal-blended saturated pastel
+    rainbow hearts (`scale: 0.56..0.72`) and 6 normal-blended golden sparkles
+    sweeping smoothly from the party into the critter.
+- Showcase battle portraits polish (`src/ui/battle.css`,
+  `src/ui/battle-portraits.ts`, `src/ui/battle.ts`):
+  - Scaled desktop `.battle-portrait` medallions from `42px` to `48px`
+    (`top: calc(20px + var(--safe-top)); left: calc(242px + var(--safe-left));
+    gap: 9px;`), staying hidden below `960px` so phones remain unobstructed.
+  - Added `data-active` attribute alongside `.is-active` with upward lift
+    (`-3px`) and crisp double rim highlight preserved even during `radiant`
+    mood, plus strengthened `radiant` golden outer glow (with reduced-motion
+    guards).
+- Acoustic multi-layer surface footsteps (`src/platform/audio.ts`,
+  `src/platform/voices.ts`):
+  - Upgraded all 7 surface footstep recipes (`footstep-grass`, `footstep-sand`,
+    `footstep-wood`, `footstep-snow`, `footstep-stone`, `footstep-tile`,
+    `footstep-carpet`) to multi-layer Web Audio foley modulated by pure
+    deterministic `footstepPitchFactor(tick)` (`0.94..1.06`, zero `Math.random`).
+- Clean Vite 8 / Rolldown code-splitting (`vite.config.ts`):
+  - Replaced deprecated `rollupOptions` with `rolldownOptions.output.codeSplitting`
+    splitting `vendor-pixi` (single atomic 610 kB / 176 kB gzip chunk to avoid
+    PixiJS class-extends cycles), `vendor-ink` (127 kB), `story-content`
+    (396 kB), `world-content` (247 kB), and `index`/`game` app code (333 kB)
+    with `chunkSizeWarningLimit: 650`, zero deprecation or chunk-size warnings,
+    and both hook checks passing.
+- Spec alignment: removed owner-commissioned features (fishing, photo mode,
+  home display, story time-of-day) from `spec.md` section 13.
+- Evidence: `tests/unit/milestone-93.test.ts` (3 tests) and updated
+  `tests/e2e/showcase-polish.spec.ts`; review captures
+  `art/review/m93-together-sunburst.jpg` and `art/review/m93-battle-portraits.jpg`
+  verified with `vision`.
+- Gates: `just check` (153 unit files / 1,210 tests, all 66 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full e2e
+  verified across Chromium & WebKit.
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.

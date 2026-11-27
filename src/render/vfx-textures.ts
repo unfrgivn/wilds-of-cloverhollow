@@ -8,6 +8,7 @@ export type VfxTextureKey =
   | "waterGlint"
   | "mistWisp"
   | "sunbeam"
+  | "sunburst"
   | "paperGrain"
   | "puff"
   | "heart"
@@ -231,6 +232,51 @@ function buildSunbeam(): Texture {
       data[offset] = 255;
       data[offset + 1] = 250;
       data[offset + 2] = 232;
+      data[offset + 3] = Math.round(alpha * 255);
+    }
+  }
+  ctx.putImageData(image, 0, 0);
+  return toTexture(canvas);
+}
+
+// 256x256 hand-painted watercolor radial sunburst: 12 alternating soft tapered
+// rays (6 primary + 6 secondary) from cream-gold center to feathered gold edge.
+function buildSunburst(): Texture {
+  const size = 256;
+  const half = size * 0.5;
+  const maxR = 126;
+  const { canvas, ctx } = makeCanvas(size, size);
+  const image = ctx.createImageData(size, size);
+  const data = image.data;
+  for (let y = 0; y < size; y += 1) {
+    const dy = y - half + 0.5;
+    for (let x = 0; x < size; x += 1) {
+      const dx = x - half + 0.5;
+      const r = Math.hypot(dx, dy);
+      const rn = r / maxR;
+      if (rn >= 1) continue;
+      const theta = Math.atan2(dy, dx);
+      const wave = Math.cos(6 * theta);
+      const primaryAng = Math.pow(Math.max(0, wave), 2.8);
+      const secondaryAng = Math.pow(Math.max(0, -wave), 3.6);
+      const primaryRad = (1 - rn * rn) * (1 - 0.18 * rn);
+      const primaryRay = primaryAng * primaryRad * 0.92;
+      const secRn = rn / 0.86;
+      const secondaryRay = secRn >= 1
+        ? 0
+        : secondaryAng * (1 - secRn * secRn) * 0.62;
+      const coreFalloff = Math.max(0, 1 - rn / 0.3);
+      const coreGlow = coreFalloff * coreFalloff * 0.92;
+      const alpha = Math.min(0.94, Math.max(coreGlow, primaryRay + secondaryRay));
+      // Warm cream-gold center (255, 248, 208) -> mid gold (255, 220, 102) -> (255, 204, 72).
+      const tMid = Math.min(1, rn * 1.8);
+      const tOuter = Math.max(0, (rn - 0.55) / 0.45);
+      const g = Math.round((248 + (220 - 248) * tMid) + (204 - 220) * tOuter);
+      const b = Math.round((208 + (102 - 208) * tMid) + (72 - 102) * tOuter);
+      const offset = (y * size + x) * 4;
+      data[offset] = 255;
+      data[offset + 1] = g;
+      data[offset + 2] = b;
       data[offset + 3] = Math.round(alpha * 255);
     }
   }
@@ -885,6 +931,7 @@ export function createVfxTextures(): VfxTextures {
     waterGlint: buildWaterGlint(),
     mistWisp: buildMistWisp(),
     sunbeam: buildSunbeam(),
+    sunburst: buildSunburst(),
     paperGrain: buildPaperGrain(),
     puff: buildPuff(),
     heart: buildHeart(),

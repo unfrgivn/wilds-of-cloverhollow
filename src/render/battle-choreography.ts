@@ -714,16 +714,16 @@ export function computeBattleChoreography(
       anchor: "fae",
       offsetX: -12,
       offsetY: -8,
-      scaleX: 2.6 + sunPulse * 0.4,
-      scaleY: 2.0 + sunPulse * 0.32,
+      scaleX: 1.45 + sunPulse * 0.2,
+      scaleY: 1.15 + sunPulse * 0.16,
       rotation: 0,
-      alpha: 0.42 + sunPulse * 0.14,
+      alpha: 0.2 + sunPulse * 0.08,
       tint: 0xf7c33e,
     });
     for (let i = 0; i < 3; i += 1) {
       const ru = battle.phase === "check"
-        ? ((tick + i * 10 + 3) % 30) / 30
-        : clamp01((battle.phaseTicks + 4 - i * 4) / 24);
+        ? (((tick + i * 10 + 3) % 30) + 0.5) / 30
+        : clamp01((battle.phaseTicks + 6 - i * 4) / 26);
       if (ru <= 0 || ru >= 1) continue;
       const scale = 0.65 + ru * 1.35;
       vfx.push({
@@ -736,47 +736,48 @@ export function computeBattleChoreography(
         scaleX: scale * 0.78,
         scaleY: scale,
         rotation: 0,
-        alpha: (1 - ru) * 0.88,
+        alpha: (1 - ru * 0.55) * 0.92,
         tint: i % 2 === 0 ? 0xf5b324 : 0xffe474,
       });
     }
     for (let i = 0; i < 6; i += 1) {
       const su = battle.phase === "check"
-        ? ((tick + i * 5 + 2) % 30) / 30
-        : clamp01((battle.phaseTicks + 5 - i * 2) / 26);
+        ? (((tick + i * 5 + 2) % 30) + 0.5) / 30
+        : clamp01((battle.phaseTicks + 12 - i * 2) / 30);
       if (su <= 0 || su >= 1) continue;
-      const scale = (0.42 + (i % 3) * 0.14) * (1 - su * 0.3);
+      const scale = (0.56 + (i % 3) * 0.14) * (1 - su * 0.2);
       vfx.push({
         texture: "sparkle",
-        blend: "add",
+        blend: "normal",
         anchor: "between",
-        t: 0.08 + su * 0.9,
-        offsetX: Math.sin(su * 6 + i) * 14,
-        offsetY: -Math.sin(su * Math.PI) * 44 + ((i % 3) - 1) * 16,
+        t: 0.1 + su * 0.86,
+        offsetX: Math.sin(su * 6 + i) * 18,
+        offsetY: -Math.sin(su * Math.PI) * 54 + ((i % 3) - 1) * 22,
         scaleX: scale,
         scaleY: scale,
         rotation: su * 2.4 + i,
-        alpha: (1 - su) * 0.96,
-        tint: i % 2 === 0 ? 0xffe066 : 0xfff6c2,
+        alpha: 0.96 * (0.45 + 0.55 * Math.sin(su * Math.PI)),
+        tint: i % 2 === 0 ? 0xffe066 : 0xfff6c4,
       });
     }
-    for (let i = 0; i < 5; i += 1) {
+    const heartScales: readonly number[] = [0.56, 0.64, 0.72];
+    for (let i = 0; i < 6; i += 1) {
       const hu = battle.phase === "check"
-        ? ((tick + i * 6 + 4) % 30) / 30
-        : clamp01((battle.phaseTicks + 4 - i * 3) / 28);
+        ? (((tick + i * 5 + 3) % 30) + 0.5) / 30
+        : clamp01((battle.phaseTicks + 12 - i * 2) / 32);
       if (hu <= 0 || hu >= 1) continue;
-      const scale = 0.44 + (i % 2) * 0.12;
+      const scale = heartScales[i % heartScales.length] ?? 0.64;
       vfx.push({
         texture: "heart",
         blend: "normal",
         anchor: "between",
-        t: 0.12 + hu * 0.84,
-        offsetX: Math.cos(hu * 5 + i) * 12,
-        offsetY: -Math.sin(hu * Math.PI) * 50 + ((i % 2) * 14 - 7),
+        t: 0.12 + hu * 0.82,
+        offsetX: Math.cos(hu * 5 + i) * 16,
+        offsetY: -Math.sin(hu * Math.PI) * 60 + ((i % 3) - 1) * 18,
         scaleX: scale,
         scaleY: scale,
-        rotation: Math.sin(hu * 4 + i) * 0.25,
-        alpha: (1 - hu) * 0.9,
+        rotation: Math.sin(hu * 4 + i) * 0.24,
+        alpha: 0.96 * (0.5 + 0.5 * Math.sin(hu * Math.PI)),
         tint: RAINBOW_HEARTS[i % RAINBOW_HEARTS.length] ?? 0xff9bb8,
       });
     }

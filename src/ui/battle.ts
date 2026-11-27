@@ -1167,6 +1167,7 @@ export function createBattleHud(root: HTMLElement): {
         if (slot === undefined) return;
         setAttribute(slot.card, "data-member", item.id);
         setAttribute(slot.card, "data-mood", item.mood);
+        setAttribute(slot.card, "data-active", item.active ? "true" : "false");
         setAttribute(slot.card, "aria-label", `${item.name}: ${item.mood}`);
         slot.card.classList.toggle("is-active", item.active);
         const key = item.image === null

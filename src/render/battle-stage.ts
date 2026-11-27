@@ -34,9 +34,9 @@ export const BATTLE_STAGE_MOODS: Record<BattleStageMood, BattleStageMoodStyle> =
     spotlightTint: 0xfff3c8,
   },
   "together-active": {
-    waveA: 0x5c3e80,
-    waveB: 0xf7c33e,
-    alpha: 0.3,
+    waveA: 0x3b2466,
+    waveB: 0x5c3682,
+    alpha: 0.24,
     pulse: true,
     spotlightTint: 0xffe484,
   },
@@ -95,7 +95,7 @@ export function computeBattleStageMoodLayout(
       width: viewWidth * 0.68 * pulseBoost,
       height: viewHeight * 0.62 * pulseBoost,
       tint: stageMood.spotlightTint,
-      alpha: stageMood.pulse ? 0.44 : 0.16,
+      alpha: 0.16,
     },
   };
 }

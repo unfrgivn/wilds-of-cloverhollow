@@ -648,6 +648,122 @@ export function computeGlowTransform(
   };
 }
 
+export type StarGemGlint = {
+  id: string;
+  x: number;
+  y: number;
+  haloSize: number;
+  haloAlpha: number;
+  haloTint: number;
+  starScale: number;
+  starAlpha: number;
+  starRotation: number;
+};
+
+const STAR_GEM_KNOT_VARIABLES: Readonly<Record<string, string>> = {
+  park_gem: "gem_park",
+  bay_gem: "gem_bay",
+  trail_gem: "gem_trail",
+  pass_gem: "gem_pass",
+  cavern_gem: "gem_cavern",
+  woods_gem: "gem_woods",
+  hills_gem: "gem_hills",
+};
+
+const STAR_GEM_HALO_PALETTE: readonly [number, number, number] = [
+  0xd4b2ff,
+  0x9be7f2,
+  0xffe58f,
+];
+
+function lerpTint(from: number, to: number, t: number): number {
+  const r0 = (from >> 16) & 0xff;
+  const g0 = (from >> 8) & 0xff;
+  const b0 = from & 0xff;
+  const r1 = (to >> 16) & 0xff;
+  const g1 = (to >> 8) & 0xff;
+  const b1 = to & 0xff;
+  const r = Math.round(r0 + (r1 - r0) * t);
+  const g = Math.round(g0 + (g1 - g0) * t);
+  const b = Math.round(b0 + (b1 - b0) * t);
+  return (r << 16) | (g << 8) | b;
+}
+
+function prismaticHaloTint(tick: number): number {
+  const phase = ((tick * 0.025) % 3 + 3) % 3;
+  const index = Math.floor(phase);
+  const nextIndex = (index + 1) % 3;
+  const frac = phase - index;
+  const smooth = frac * frac * (3 - 2 * frac);
+  const from = STAR_GEM_HALO_PALETTE[index] ?? 0xffe58f;
+  const to = STAR_GEM_HALO_PALETTE[nextIndex] ?? 0xffe58f;
+  return lerpTint(from, to, smooth);
+}
+
+/**
+ * Pure evaluator for prismatic overworld Star Gem glints in the current area.
+ * Open-air interactable gems shimmer whenever uncollected; blacklight-secret glow
+ * gems (`park_gem`, `cavern_gem`) shimmer only while Fae's lantern is active.
+ */
+export function evaluateStarGemGlints(
+  world: World,
+  state: State,
+  reducedMotion: boolean,
+): StarGemGlint[] {
+  if (state.battle !== null || state.arcade !== null || state.area === "harness") return [];
+  const area = world.areas[state.area];
+  if (area === undefined) return [];
+
+  const tick = state.tick;
+  const bobY = reducedMotion ? 0 : Math.sin(tick * 0.09) * 3;
+  const pulse = reducedMotion ? 0.5 : 0.5 + 0.5 * Math.sin(tick * 0.11);
+  const haloSize = 38 + 8 * pulse;
+  const haloAlpha = reducedMotion ? 0.42 : 0.36 + 0.18 * pulse;
+  const haloTint = reducedMotion ? 0xffe58f : prismaticHaloTint(tick);
+  const starScale = 0.34 + 0.12 * pulse;
+  const starAlpha = 0.88;
+  const fullTurn = Math.PI * 2;
+  const starRotation = reducedMotion ? 0 : ((tick * 0.035) % fullTurn + fullTurn) % fullTurn;
+
+  const glints: StarGemGlint[] = [];
+  for (const item of area.interactables) {
+    const variable = STAR_GEM_KNOT_VARIABLES[item.knot];
+    if (variable === undefined) continue;
+    if (world.storyVariable(state.ink, variable) === true) continue;
+    glints.push({
+      id: item.id,
+      x: item.point.x,
+      y: item.point.y - 12 + bobY,
+      haloSize,
+      haloAlpha,
+      haloTint,
+      starScale,
+      starAlpha,
+      starRotation,
+    });
+  }
+  if (state.lantern) {
+    for (const glow of area.glows) {
+      if (glow.knot === undefined) continue;
+      const variable = STAR_GEM_KNOT_VARIABLES[glow.knot];
+      if (variable === undefined) continue;
+      if (world.storyVariable(state.ink, variable) === true) continue;
+      glints.push({
+        id: glow.id,
+        x: glow.point.x,
+        y: glow.point.y - 12 + bobY,
+        haloSize,
+        haloAlpha,
+        haloTint,
+        starScale,
+        starAlpha,
+        starRotation,
+      });
+    }
+  }
+  return glints;
+}
+
 export function computeOverworldEmoteInputs(
   world: World,
   state: State,

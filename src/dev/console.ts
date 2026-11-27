@@ -1,4 +1,5 @@
 import { inkVariable, setInkVariables } from "../core/ink";
+import { STAR_GEM_VARIABLES } from "../core/journal";
 import { addTreat } from "../core/sim";
 import type { State } from "../core/types";
 
@@ -62,6 +63,7 @@ const CONSOLE_HELP = [
   "stickers all|<id>  grant stickers",
   "prizes all|<id>    grant prizes",
   "fish all|clear     catch all or clear fish",
+  "gems all|clear     collect all or clear Star Gems",
   "lantern on|off     carry the lantern",
   "lasso on|off       carry the lasso",
   "flute on|off       carry the flute",
@@ -303,6 +305,32 @@ function fishCommand(
   return { kind: "error", message: `"${raw}" is not all or clear.` };
 }
 
+function gemsCommand(
+  context: ConsoleContext,
+  state: State,
+  args: string[],
+): ConsoleOutcome {
+  const [raw] = args;
+  if (raw === undefined) return { kind: "error", message: "Usage: gems all|clear." };
+  const setting = raw.toLowerCase();
+  if (setting !== "all" && setting !== "clear")
+    return { kind: "error", message: `"${raw}" is not all or clear.` };
+  const collected = setting === "all";
+  const updates: Record<string, boolean> = {};
+  for (const variable of STAR_GEM_VARIABLES) {
+    if (inkVariable(context.story, state.ink, variable) === undefined)
+      return { kind: "error", message: `${variable} is not a story variable.` };
+    updates[variable] = collected;
+  }
+  return {
+    kind: "applied",
+    state: { ...state, ink: setInkVariables(state.ink, updates) },
+    message: collected
+      ? `Collected all ${STAR_GEM_VARIABLES.length} Star Gems.`
+      : "Cleared Star Gems.",
+  };
+}
+
 function saveCommand(args: string[]): ConsoleOutcome {
   const [name] = args;
   if (name === undefined || !/^[a-z0-9][a-z0-9-]{0,23}$/.test(name))
@@ -333,6 +361,7 @@ export function runConsoleCommand(
     case "stickers": return collectionCommand(context, state, args, "stickers");
     case "prizes": return collectionCommand(context, state, args, "prizes");
     case "fish": return fishCommand(context, state, args);
+    case "gems": return gemsCommand(context, state, args);
     case "lantern": return toolCommand(context, state, args, "lantern");
     case "lasso": return toolCommand(context, state, args, "lasso");
     case "flute": return toolCommand(context, state, args, "flute");

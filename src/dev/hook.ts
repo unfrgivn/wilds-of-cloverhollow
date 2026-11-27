@@ -68,6 +68,7 @@ export type CloverhollowHook = {
     clubhouseDisplay: number;
     atmosphereParticles: number;
     footstepPuffs: number;
+    starGemGlints: number;
     petting: string | null;
     resting: string | null;
     timeOfDay: TimeOfDayPhase;

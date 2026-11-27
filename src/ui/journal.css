@@ -703,6 +703,40 @@ html[data-reduced-motion="on"] .journal-slot.is-inspectable:focus-visible {
   width: 10px;
   height: 14px;
 }
+.journal-master-crest {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 8px;
+  border: 1.5px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: #ffe68a;
+  box-shadow: inset 0 0 0 1.5px #c98f22, 0 1px 0 #47321f33;
+  color: #47321f;
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: .01em;
+  white-space: nowrap;
+}
+.journal-map-footer.has-master-crest {
+  gap: 5px;
+  padding: 3px 8px;
+}
+.journal-map-footer.has-master-crest .journal-map-detail {
+  font-size: 11px;
+}
+.journal-map-footer.has-master-crest .journal-map-summary {
+  gap: 4px;
+}
+.journal-map-footer.has-master-crest .journal-map-pill,
+.journal-map-footer.has-master-crest .journal-map-legend {
+  padding: 1px 5px;
+  font-size: 10px;
+}
+.journal-map-footer.has-master-crest .journal-treasures-btn {
+  padding: 1px 6px;
+  font-size: 10px;
+}
 .journal-treasures-btn {
   display: inline-flex;
   align-items: center;

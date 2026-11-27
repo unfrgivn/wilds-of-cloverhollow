@@ -386,3 +386,82 @@ test(
     expect(errors).toEqual([]);
   },
 );
+
+test(
+  "100% Valley Explorer Master Crest in Journal MAP and prismatic Star Gem glint",
+  { tag: "@smoke" },
+  async ({ page }, testInfo) => {
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.goto("./?qa=hills-lookout");
+    await page.waitForFunction(() => Boolean(window.__cloverhollow));
+    await page.evaluate(() => window.__cloverhollow?.pause());
+    await step(page, 12);
+
+    // Uncollected Clover Hills Star Gem shimmers with a prismatic emissive glint.
+    expect((await renderInfo(page)).starGemGlints).toBe(1);
+    await captureReview(page, testInfo, "m120-star-gem-glint");
+
+    // Below 100% completion, the Journal MAP footer omits the Master Crest.
+    await press(page, "j");
+    await expect(page.locator(".journal-book")).toBeVisible();
+    await page.locator(".journal-map-tab").click();
+    await expect(page.locator(".journal-book")).toHaveAttribute("data-journal-page", "map");
+    await expect(page.locator(".journal-master-crest")).toHaveCount(0);
+    await press(page, "j");
+    await expect(page.locator(".journal-book")).toBeHidden();
+
+    // Reach 100% across all five collections via the QA console.
+    await runQaCommands(page, [
+      "stickers all",
+      "prizes all",
+      "fish all",
+      "keepsakes on",
+      "gems all",
+    ]);
+
+    // Collecting all Star Gems vanishes the overworld Star Gem glint cleanly.
+    expect((await renderInfo(page)).starGemGlints).toBe(0);
+
+    await press(page, "j");
+    await expect(page.locator(".journal-book")).toBeVisible();
+    await page.locator(".journal-map-tab").click();
+    await expect(page.locator(".journal-book")).toHaveAttribute("data-journal-page", "map");
+
+    const crest = page.locator(".journal-master-crest");
+    await expect(crest).toBeVisible();
+    await expect(crest).toHaveText("★ 100% Valley Explorer!");
+
+    const crestContrast = await measureCollectionContrast(page, ".journal-master-crest");
+    expect(crestContrast).toHaveLength(1);
+    expect(crestContrast[0]?.ratio ?? 0).toBeGreaterThanOrEqual(9.5);
+
+    await captureReview(page, testInfo, "m120-valley-explorer-100");
+
+    for (const size of [{ width: 1280, height: 720 }, { width: 874, height: 402 }]) {
+      await page.setViewportSize(size);
+      await step(page, 1);
+      const footerFits = await page.evaluate(() => {
+        const footer = document.querySelector<HTMLElement>(".journal-map-footer");
+        const items = [
+          ...document.querySelectorAll<HTMLElement>(
+            ".journal-master-crest, .journal-map-pill, .journal-treasures-btn, .journal-map-legend",
+          ),
+        ];
+        if (footer === null || items.length === 0) return false;
+        const box = footer.getBoundingClientRect();
+        return footer.scrollWidth <= footer.clientWidth + 1 &&
+          items.every((item) => {
+            const rect = item.getBoundingClientRect();
+            return rect.left >= box.left - 1 && rect.right <= box.right + 1 &&
+              rect.top >= box.top - 1 && rect.bottom <= box.bottom + 1;
+          });
+      });
+      expect(footerFits, `${size.width}x${size.height} master crest map footer`).toBe(true);
+    }
+
+    expect(errors).toEqual([]);
+  },
+);

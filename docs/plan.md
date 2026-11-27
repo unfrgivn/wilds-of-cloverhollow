@@ -5379,6 +5379,52 @@ the old trail, the owl, and the clubhouse claim.
   baselines updated: `trail-arrival-874`, `trail-bridge`, `bunny-following-874`,
   and `squirrel-flute-1280`).
 
+## Milestone 120: Prismatic Overworld Star Gem Glints, 100% Valley Explorer Master Crest (Journal & Credits) & `src/render/overworld-effects.ts` Clean Extraction **Status:** ✅ Completed (2026-11-27)
+- Adds luminescent prismatic overworld glints for uncollected Star Gems, a 100%
+  Valley Explorer Master Crest across Journal MAP and Credits, a `gems
+  all|clear` QA console command, and extracts pooled overworld visual effects
+  out of `src/render/view.ts` into `src/render/overworld-effects.ts` with zero
+  save-format or replay-hash shifts across all 67 recorded sims.
+- Prismatic Overworld Star Gem Glints (`src/render/overworld-render.ts`,
+  `src/render/overworld-effects.ts`, `src/render/view.ts`, `src/dev/hook.ts`):
+  - Pure `evaluateStarGemGlints(world, state, reducedMotion)` emits `StarGemGlint`
+    specs for the five open-air interactable Star Gems whenever uncollected and
+    for the two blacklight-secret glow Star Gems (`park_gem`, `cavern_gem`) only
+    when uncollected with `state.lantern === true`, returning `[]` during
+    battle, arcade, `harness`, or once collected, and holding steady
+    (`0xffe58f`, `haloAlpha: 0.42`, zero bob/spin) under Reduced Motion.
+  - Rendered on `emissiveLayer` (additive pastel halo cycling lavender, aqua,
+    and butter-gold + crisp 4-point pearl-gold sparkle star) and exposed as
+    `starGemGlints` on `renderInfo()`.
+- 100% Valley Explorer Master Crest (`src/core/journal.ts`, `src/shell/assets.ts`,
+  `src/ui/journal.ts`, `src/ui/journal.css`, `src/ui/credits.ts`,
+  `src/ui/credits.css`, `src/dev/console.ts`):
+  - Pure `valleyCompletion(progress)` tallies all 5 collections (stickers +
+    prizes + fish + keepsakes + gems = 59 total) and flips `complete: true` only
+    at 100%; `creditsSummary` prepends `"★ 100% Valley Explorer!"` (rendered
+    with golden `.credits-summary-pill.is-master`) only at 100%.
+  - Journal MAP footer prepends golden `.journal-master-crest` (`#ffe68a` fill,
+    `#c98f22` inner accent, `#47321f` ink, `>= 9.5:1` contrast) when
+    `valleyComplete === true` and detaches it otherwise.
+  - Closed-set `gems all|clear` QA console command toggles all 7
+    `STAR_GEM_VARIABLES`.
+- Modular `OverworldEffectsController` extraction (`src/render/overworld-effects.ts`,
+  `src/render/view.ts`):
+  - Extracts footsteps, lantern motes, Star Gem glints, Clubhouse Living
+    Display, overworld emotes, and time-of-day grading out of `src/render/view.ts`
+    (trimming `src/render/view.ts` from 1,789 lines to 1,301 lines) with
+    identical z-ordering, labels, and `renderInfo()` fields.
+- Evidence: `tests/unit/milestone-120.test.ts` (6 tests), extended
+  `tests/e2e/journal-collections.spec.ts`, and review captures
+  `art/review/m120-star-gem-glint.jpg` and
+  `art/review/m120-valley-explorer-100.jpg` verified with `vision`.
+- Gates: `just check` (179 unit files / 1,361 tests, all 67 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  `CLOVERHOLLOW_E2E_PORT=4401 just e2e --update-snapshots` (1,134 passed, 2
+  skipped, 0 failed across Chromium & WebKit; only the uncollected Star Gem
+  area baselines on `bay`, `pass`, and `trail` updated).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

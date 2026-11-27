@@ -15,7 +15,6 @@ import {
   npcVisible,
   partyLeader,
   presentCritters,
-  surfaceAt,
   targetInteractable,
   wildMarks,
   creditEntries,
@@ -36,8 +35,6 @@ import { ambientFor, type AmbientFlyer } from "../content/ambient";
 import { flyerAt } from "./ambient";
 import { createVfxTextures, type VfxTextures } from "./vfx-textures";
 import { BiomeAtmosphere, type AtmosphereOptions } from "./atmosphere";
-import { evaluateOverworldEmotes } from "./emotes";
-import { evaluateClubhouseDisplay, evaluateSunberryMotes } from "./clubhouse-display";
 import type { RestSpot } from "./companions";
 import { storyTimeOfDay, type TimeOfDayPhase } from "./time-of-day";
 import { idleBreathing, NEUTRAL_POSE } from "./motion";
@@ -50,29 +47,25 @@ import {
   type BattleRenderInfo,
 } from "./battle-view";
 import {
+  CLUBHOUSE_PRIZES_ALIAS,
+  OverworldEffectsController,
+} from "./overworld-effects";
+import {
   areaEntityAtlases,
-  computeCompanionEmoteSpecs,
   computeCritterShadow,
   computeFaePose,
   computeFlyerVisual,
   computeGlowTransform,
   computeLanternBlend,
-  computeLanternMote,
-  computeNpcOverworldHeight,
   computeNpcPose,
   computeNpcShadow,
-  computeOverworldEmoteInputs,
   computePartyFollowerTransform,
   computeRoamerBobAndFacing,
   INDOOR_AREAS,
-  LANTERN_MOTE_COUNT,
-  LANTERN_MOTE_TINTS,
   liftShadowScale,
   PET_REACTION_DURATION,
   resolveNpcTextureFrame,
-  spawnFootstepPuffs,
   type EntityAtlas,
-  type FootstepPuff,
   type ShadowTransform,
 } from "./overworld-render";
 
@@ -83,10 +76,6 @@ export type RenderOptions = {
   alpha?: number;
   previousState?: State;
 };
-
-const FOOTSTEP_POOL_SIZE = 24;
-const EMOTE_POOL_SIZE = 24;
-const CLUBHOUSE_PRIZES_ALIAS = "clubhouse-prizes";
 
 function applyShadow(sprite: Sprite, shadow: ShadowTransform): void {
   sprite.position.set(shadow.x, shadow.y);
@@ -108,40 +97,24 @@ export class GameView {
   readonly ready: Promise<void>;
   private readonly vfx: VfxTextures;
   private readonly atmosphere: BiomeAtmosphere;
+  private readonly effects: OverworldEffectsController;
   private readonly background = new Graphics();
   private readonly paper = new Graphics();
   private readonly fade = new Graphics();
   private readonly viewport = new Container();
   private readonly scene = new Container();
   private readonly shadowLayer = new Container();
-  private readonly footstepLayer = new Container();
-  private readonly footstepSprites: Sprite[] = [];
-  private footstepPuffs: FootstepPuff[] = [];
-  private lastFootstepArea = "";
-  private lastFootstepTick: number | undefined;
-  private lastFootstepStride: number | undefined;
   private readonly paperGrain: TilingSprite;
-  private readonly timeOfDayLayer = new Container();
-  private readonly timeOfDayTint = new Graphics();
-  private readonly timeOfDaySun: Sprite;
-  private timeOfDayCachedKey = "";
   private viewportRect = { x: 0, y: 0, width: 0, height: 0 };
   private photoMode = false;
   private readonly lanternLayer = new Container();
   private readonly lanternTint = new Graphics();
   private readonly lanternWorld = new Container();
   private readonly lanternSpotlight: Sprite;
-  private readonly lanternMotes: Sprite[] = [];
   private readonly emissiveLayer = new Container();
   private readonly glowLayer = new Container();
   private readonly depth = new Container();
   private readonly ambientLayer = new Container();
-  private readonly emoteLayer = new Container();
-  private readonly emoteSprites: Sprite[] = [];
-  private activeDialoguePartner: { x: number; y: number; height: number } | null = null;
-  private recentTalk: { x: number; y: number; height: number; startTick: number } | null = null;
-  private lastEmoteArea = "";
-  private lastEmoteTick: number | undefined;
   private readonly player = new Sprite();
   private readonly playerShadow: Sprite;
   // One overworld sprite per roster member, labelled with its id; only the
@@ -198,16 +171,6 @@ export class GameView {
     glow: Sprite | null;
   }[] = [];
   private ambientFrames: { id: string; x: number; y: number; frame: number }[] = [];
-  private clubhousePrizePool: { container: Container; shadow: Sprite; item: Sprite }[] = [];
-  private clubhouseKeepsakePool: {
-    container: Container;
-    shadow: Sprite;
-    glow: Sprite;
-    item: Sprite;
-    sparkle: Sprite;
-  }[] = [];
-  private clubhouseSunberryPool: Sprite[] = [];
-  private clubhouseDisplayCount = 0;
   private petReaction: { id: string; startTick: number } | null = null;
   private restingSpot: { spot: RestSpot; startTick: number } | null = null;
 
@@ -217,6 +180,14 @@ export class GameView {
   ) {
     this.vfx = createVfxTextures();
     this.atmosphere = new BiomeAtmosphere(this.vfx);
+    this.emissiveLayer.label = "emissive";
+    this.emissiveLayer.addChild(this.atmosphere.emissive);
+    this.effects = new OverworldEffectsController(
+      this.world,
+      this.vfx,
+      this.depth,
+      this.emissiveLayer,
+    );
     this.battleView = new BattleViewController(this.world, this.vfx, options.renderer);
     this.paperGrain = new TilingSprite({
       texture: this.vfx.paperGrain,
@@ -231,32 +202,6 @@ export class GameView {
     this.playerShadow = makeShadowSprite(this.vfx.contactShadow, "shadow:fae");
     this.shadowLayer.label = "shadows";
     this.shadowLayer.addChild(this.playerShadow);
-    this.footstepLayer.label = "footsteps";
-    for (let i = 0; i < FOOTSTEP_POOL_SIZE; i += 1) {
-      const puff = new Sprite(this.vfx.puff);
-      puff.label = `footstep:${i}`;
-      puff.anchor.set(0.5);
-      puff.visible = false;
-      this.footstepSprites.push(puff);
-      this.footstepLayer.addChild(puff);
-    }
-    this.emoteLayer.label = "emotes";
-    for (let i = 0; i < EMOTE_POOL_SIZE; i += 1) {
-      const bubble = new Sprite(this.vfx.emoteQuestion);
-      bubble.label = `emote:${i}`;
-      bubble.anchor.set(0.5);
-      bubble.visible = false;
-      this.emoteSprites.push(bubble);
-      this.emoteLayer.addChild(bubble);
-    }
-
-    this.timeOfDaySun = new Sprite(this.vfx.softGlow);
-    this.timeOfDaySun.label = "time-of-day:sun";
-    this.timeOfDaySun.anchor.set(0.5);
-    this.timeOfDaySun.blendMode = "add";
-    this.timeOfDayLayer.label = "time-of-day";
-    this.timeOfDayLayer.visible = false;
-    this.timeOfDayLayer.addChild(this.timeOfDayTint, this.timeOfDaySun);
 
     this.lanternSpotlight = new Sprite(this.vfx.softGlow);
     this.lanternSpotlight.label = "lantern:spotlight";
@@ -265,21 +210,10 @@ export class GameView {
     this.lanternSpotlight.blendMode = "add";
     this.lanternSpotlight.width = 540;
     this.lanternSpotlight.height = 480;
-    this.lanternWorld.addChild(this.lanternSpotlight);
-    for (let i = 0; i < LANTERN_MOTE_COUNT; i += 1) {
-      const mote = new Sprite(this.vfx.sparkle);
-      mote.label = `lantern:mote:${i}`;
-      mote.anchor.set(0.5);
-      mote.blendMode = "add";
-      mote.tint = LANTERN_MOTE_TINTS[i % LANTERN_MOTE_TINTS.length] ?? 0xd4b0ff;
-      this.lanternMotes.push(mote);
-      this.lanternWorld.addChild(mote);
-    }
+    this.lanternWorld.addChild(this.lanternSpotlight, this.effects.lanternMoteLayer);
     this.lanternLayer.label = "lantern";
     this.lanternLayer.visible = false;
     this.lanternLayer.addChild(this.lanternTint, this.lanternWorld);
-    this.emissiveLayer.label = "emissive";
-    this.emissiveLayer.addChild(this.atmosphere.emissive);
 
     this.permanentAliases = new Set([
       "fae-sheet",
@@ -303,7 +237,7 @@ export class GameView {
     this.player.scale.set(0.5);
     this.viewport.addChild(
       this.scene,
-      this.timeOfDayLayer,
+      this.effects.timeOfDayLayer,
       this.lanternLayer,
       this.emissiveLayer,
       this.glowLayer,
@@ -319,12 +253,12 @@ export class GameView {
     );
     this.scene.addChild(
       this.shadowLayer,
-      this.footstepLayer,
+      this.effects.footstepLayer,
       this.atmosphere.under,
       this.depth,
       this.ambientLayer,
       this.atmosphere.over,
-      this.emoteLayer,
+      this.effects.emoteLayer,
       this.paperGrain,
     );
     this.depth.addChild(this.player);
@@ -445,10 +379,11 @@ export class GameView {
     this.previousCamera = undefined;
     this.lanternTick = undefined;
     this.staticWidth = 0;
-    this.clearFootsteps();
-    this.clearEmotes();
+    this.effects.clearFootsteps();
+    this.effects.clearStarGemGlints();
+    this.effects.clearEmotes();
     this.clearCompanionActions();
-    this.hideClubhouseDisplay();
+    this.effects.hideClubhouseDisplay();
   }
 
   // Unloads what a crossing displaced: everything resident that is neither
@@ -520,30 +455,9 @@ export class GameView {
     this.viewHeight = 720;
   }
 
-  private clearFootsteps(): void {
-    this.footstepPuffs = [];
-    this.lastFootstepTick = undefined;
-    this.lastFootstepStride = undefined;
-    for (const sprite of this.footstepSprites) sprite.visible = false;
-  }
-
-  private clearEmotes(): void {
-    this.activeDialoguePartner = null;
-    this.recentTalk = null;
-    this.lastEmoteTick = undefined;
-    for (const sprite of this.emoteSprites) sprite.visible = false;
-  }
-
   private clearCompanionActions(): void {
     this.petReaction = null;
     this.restingSpot = null;
-  }
-
-  private hideClubhouseDisplay(): void {
-    for (const entry of this.clubhousePrizePool) entry.container.visible = false;
-    for (const entry of this.clubhouseKeepsakePool) entry.container.visible = false;
-    for (const mote of this.clubhouseSunberryPool) mote.visible = false;
-    this.clubhouseDisplayCount = 0;
   }
 
   triggerPet(id: string, tick: number): void {
@@ -596,8 +510,8 @@ export class GameView {
 
   resetCamera(): void {
     this.previousCamera = undefined;
-    this.clearFootsteps();
-    this.clearEmotes();
+    this.effects.clearFootsteps();
+    this.effects.clearEmotes();
     this.clearCompanionActions();
   }
 
@@ -621,7 +535,7 @@ export class GameView {
     const viewW = this.viewWidth * scale;
     const viewH = this.viewHeight * scale;
     this.viewportRect = { x: letterboxX, y: letterboxY, width: viewW, height: viewH };
-    this.timeOfDayCachedKey = "";
+    this.effects.invalidateTimeOfDay();
     this.background.clear().rect(0, 0, width, height).fill(0xf8edcf);
     this.paper.clear().rect(letterboxX, letterboxY, viewW, viewH).fill(paper);
     this.viewportMask.clear().rect(letterboxX, letterboxY, viewW, viewH).fill(0xffffff);
@@ -718,76 +632,6 @@ export class GameView {
       if (shadow !== undefined) applyShadow(shadow, transform.shadow);
       return [{ id: member.id, animation: transform.animation, frame: transform.frame }];
     });
-  }
-
-  private updateFootsteps(state: State, areaId: string, playerPos: Point): void {
-    if (isReducedMotionActive()) {
-      this.clearFootsteps();
-      return;
-    }
-    const active = areaId !== "harness" &&
-      state.battle === null &&
-      state.arcade === null &&
-      state.transition === null;
-    if (!active) {
-      if (areaId !== this.lastFootstepArea ||
-          (this.lastFootstepTick !== undefined && state.tick < this.lastFootstepTick)) {
-        this.clearFootsteps();
-      }
-      for (const sprite of this.footstepSprites) sprite.visible = false;
-      this.lastFootstepArea = areaId;
-      this.lastFootstepTick = state.tick;
-      return;
-    }
-    if (areaId !== this.lastFootstepArea ||
-        (this.lastFootstepTick !== undefined && state.tick < this.lastFootstepTick)) {
-      this.clearFootsteps();
-    }
-    const halfStride = this.world.tunables.walkCycleUnits / 2;
-    const stride = Math.floor(state.motion.distance / halfStride);
-    if (
-      state.motion.moving &&
-      this.lastFootstepArea === areaId &&
-      this.lastFootstepTick !== undefined &&
-      this.lastFootstepStride !== undefined
-    ) {
-      const delta = state.tick - this.lastFootstepTick;
-      if (delta >= 1 && delta <= 5 && stride > this.lastFootstepStride) {
-        const map = this.world.surfaces[areaId];
-        const surface = map === undefined ? "grass" : surfaceAt(map, state.player);
-        this.footstepPuffs.push(
-          ...spawnFootstepPuffs(playerPos, state.facing, surface, stride, state.tick),
-        );
-        if (this.footstepPuffs.length > FOOTSTEP_POOL_SIZE) {
-          this.footstepPuffs = this.footstepPuffs.slice(-FOOTSTEP_POOL_SIZE);
-        }
-      }
-    }
-    this.lastFootstepArea = areaId;
-    this.lastFootstepTick = state.tick;
-    this.lastFootstepStride = stride;
-
-    this.footstepPuffs = this.footstepPuffs.filter((puff) => {
-      const age = state.tick - puff.bornTick;
-      return age >= 0 && age < puff.life;
-    });
-    for (let i = 0; i < this.footstepSprites.length; i += 1) {
-      const sprite = this.footstepSprites[i];
-      if (sprite === undefined) continue;
-      const puff = this.footstepPuffs[i];
-      if (puff === undefined) {
-        sprite.visible = false;
-        continue;
-      }
-      const age = state.tick - puff.bornTick;
-      const u = age / puff.life;
-      sprite.visible = true;
-      sprite.position.set(puff.x + puff.vx * age, puff.y + puff.vy * age);
-      sprite.scale.set(puff.baseScale * (0.65 + u * 0.75));
-      sprite.rotation = puff.rotation + u * 0.35;
-      sprite.tint = puff.tint;
-      sprite.alpha = puff.baseAlpha * (1 - u) * (1 - u);
-    }
   }
 
   render(
@@ -888,7 +732,7 @@ export class GameView {
     this.playerShadow.width = 46 * faeShadowScale;
     this.playerShadow.height = 18 * faeShadowScale;
     this.playerShadow.alpha = shadowAlpha * faeShadowScale;
-    this.updateFootsteps(state, area.id, playerPos);
+    this.effects.updateFootsteps(state, area.id, playerPos, reducedMotion);
     this.renderParty(
       state,
       shadowAlpha,
@@ -905,9 +749,9 @@ export class GameView {
       livingMotion,
     );
     this.renderNpcs(state, shadowAlpha, livingMotion);
-    this.renderClubhouseDisplay(state, area, reducedMotion);
+    this.effects.renderClubhouseDisplay(state, area, reducedMotion);
     this.renderAmbient(state, area, reducedMotion);
-    this.renderEmotes(
+    this.effects.renderEmotes(
       state,
       area,
       playerPos,
@@ -916,8 +760,9 @@ export class GameView {
       activePet,
       activeRest,
     );
-    this.renderTimeOfDay(state);
+    this.effects.renderTimeOfDay(state, this.viewportRect);
     this.renderGlows(state, playerPos, paused);
+    this.effects.updateStarGemGlints(state, reducedMotion);
     this.atmosphere.update(
       area.id,
       area.width,
@@ -999,26 +844,6 @@ export class GameView {
     };
   }
 
-  private renderTimeOfDay(state: State): void {
-    const grade = storyTimeOfDay(this.world, state);
-    const show = grade.alpha > 0 || grade.sunAlpha > 0;
-    this.timeOfDayLayer.visible = show;
-    if (!show) return;
-    const { x, y, width, height } = this.viewportRect;
-    const key = `${x}|${y}|${width}|${height}|${grade.tint}`;
-    if (this.timeOfDayCachedKey !== key) {
-      this.timeOfDayCachedKey = key;
-      this.timeOfDayTint.clear().rect(x, y, width, height).fill(grade.tint);
-    }
-    this.timeOfDayTint.alpha = grade.alpha;
-    this.timeOfDaySun.tint = grade.sunTint;
-    this.timeOfDaySun.alpha = grade.sunAlpha;
-    this.timeOfDaySun.position.set(x + width * 0.16, y + height * 0.12);
-    this.timeOfDaySun.width = width * 0.95;
-    this.timeOfDaySun.height = height * 0.85;
-    this.timeOfDaySun.rotation = -0.22;
-  }
-
   private renderGlows(state: State, playerPos: Point, snapLantern = false): void {
     const area = this.areaView?.area;
     const sheet = Assets.get<Spritesheet>("glow-sheet");
@@ -1045,16 +870,7 @@ export class GameView {
       this.lanternSpotlight.position.set(centerX, centerY);
       this.lanternSpotlight.alpha =
         (0.36 + 0.04 * Math.sin(state.tick / 16)) * this.lanternBlend;
-      for (let i = 0; i < this.lanternMotes.length; i += 1) {
-        const mote = this.lanternMotes[i];
-        if (mote === undefined) continue;
-        const spec = computeLanternMote(
-          i, this.lanternMotes.length, centerX, centerY, state.tick, this.lanternBlend,
-        );
-        mote.position.set(spec.x, spec.y);
-        mote.scale.set(spec.scale);
-        mote.alpha = spec.alpha;
-      }
+      this.effects.updateLanternMotes(centerX, centerY, state.tick, this.lanternBlend);
     }
 
     const drawn: string[] = [];
@@ -1075,142 +891,6 @@ export class GameView {
       }
     });
     this.drawnGlows = drawn;
-  }
-
-  private renderClubhouseDisplay(state: State, area: Area, reducedMotion: boolean): void {
-    const visible =
-      area.id === "clubhouse" &&
-      state.battle === null &&
-      state.arcade === null;
-    if (!visible) {
-      this.hideClubhouseDisplay();
-      return;
-    }
-    const display = evaluateClubhouseDisplay(this.world, state);
-    const prizeSheet = Assets.get<Spritesheet | undefined>(CLUBHOUSE_PRIZES_ALIAS);
-
-    let prizeShown = 0;
-    for (const placement of display.prizes) {
-      const texture = prizeSheet?.textures[placement.frame];
-      if (texture === undefined) continue;
-      let entry = this.clubhousePrizePool[prizeShown];
-      if (entry === undefined) {
-        const container = new Container();
-        const shadow = makeShadowSprite(this.vfx.contactShadow, `shadow:prize:${prizeShown}`);
-        const item = new Sprite();
-        container.addChild(shadow, item);
-        this.depth.addChild(container);
-        entry = { container, shadow, item };
-        this.clubhousePrizePool.push(entry);
-      }
-      entry.container.visible = true;
-      entry.container.label = `clubhouse:prize:${placement.id}`;
-      entry.container.position.set(placement.x, placement.y);
-      entry.container.zIndex = placement.zIndex;
-
-      entry.shadow.position.set(0, -1);
-      entry.shadow.width = 48 * (placement.scale / 0.3);
-      entry.shadow.height = 16 * (placement.scale / 0.3);
-      entry.shadow.alpha = 0.24;
-
-      entry.item.texture = texture;
-      if (texture.defaultAnchor !== undefined) {
-        entry.item.anchor.copyFrom(texture.defaultAnchor);
-      } else {
-        entry.item.anchor.set(0.5, 0.9375);
-      }
-      entry.item.scale.set(placement.scale);
-      entry.item.rotation = placement.rotation;
-      prizeShown += 1;
-    }
-    for (let i = prizeShown; i < this.clubhousePrizePool.length; i += 1) {
-      const entry = this.clubhousePrizePool[i];
-      if (entry !== undefined) entry.container.visible = false;
-    }
-
-    let keepsakeShown = 0;
-    for (const placement of display.keepsakes) {
-      let entry = this.clubhouseKeepsakePool[keepsakeShown];
-      if (entry === undefined) {
-        const container = new Container();
-        const shadow = makeShadowSprite(
-          this.vfx.contactShadow,
-          `shadow:keepsake:${keepsakeShown}`,
-        );
-        const glow = new Sprite(this.vfx.softGlow);
-        glow.anchor.set(0.5);
-        glow.blendMode = "add";
-        const item = new Sprite();
-        item.anchor.set(0.5, 0.85);
-        const sparkle = new Sprite(this.vfx.sparkle);
-        sparkle.anchor.set(0.5);
-        sparkle.blendMode = "normal";
-        container.addChild(shadow, glow, item, sparkle);
-        this.depth.addChild(container);
-        entry = { container, shadow, glow, item, sparkle };
-        this.clubhouseKeepsakePool.push(entry);
-      }
-      const phase = state.tick * 0.055 + keepsakeShown * 1.4;
-      const pulse = 0.5 + 0.5 * Math.sin(phase);
-      entry.container.visible = true;
-      entry.container.label = `clubhouse:keepsake:${placement.id}`;
-      entry.container.position.set(placement.x, placement.y);
-      entry.container.zIndex = placement.zIndex;
-
-      entry.shadow.position.set(0, -1);
-      entry.shadow.width = 26 * placement.scale;
-      entry.shadow.height = 10 * placement.scale;
-      entry.shadow.alpha = 0.22;
-
-      entry.glow.position.set(0, -14 * placement.scale);
-      entry.glow.tint = placement.sparkleTint;
-      entry.glow.scale.set(0.42 * placement.scale * (0.94 + 0.12 * pulse));
-      entry.glow.alpha = 0.18 + 0.1 * pulse;
-
-      entry.item.texture = this.vfx[placement.texture];
-      entry.item.scale.set(placement.scale);
-      entry.item.position.set(0, 0);
-
-      entry.sparkle.position.set(
-        10 * placement.scale + Math.sin(phase * 0.9) * 3,
-        -24 * placement.scale + Math.cos(phase * 1.1) * 2.5,
-      );
-      entry.sparkle.tint = placement.sparkleTint;
-      entry.sparkle.scale.set(0.32 + 0.16 * pulse);
-      entry.sparkle.alpha = 0.55 + 0.4 * pulse;
-      keepsakeShown += 1;
-    }
-    for (let i = keepsakeShown; i < this.clubhouseKeepsakePool.length; i += 1) {
-      const entry = this.clubhouseKeepsakePool[i];
-      if (entry !== undefined) entry.container.visible = false;
-    }
-
-    const sunberryMotes = evaluateSunberryMotes(this.world, state, reducedMotion);
-    for (let i = 0; i < sunberryMotes.length; i += 1) {
-      const mote = sunberryMotes[i];
-      if (mote === undefined) continue;
-      let sprite = this.clubhouseSunberryPool[i];
-      if (sprite === undefined) {
-        sprite = new Sprite(this.vfx.sparkle);
-        sprite.anchor.set(0.5);
-        sprite.blendMode = "add";
-        sprite.label = `clubhouse:sunberry:${i}`;
-        this.depth.addChild(sprite);
-        this.clubhouseSunberryPool.push(sprite);
-      }
-      sprite.visible = true;
-      sprite.position.set(mote.x, mote.y);
-      sprite.zIndex = mote.zIndex;
-      sprite.scale.set(mote.scale);
-      sprite.alpha = mote.alpha;
-      sprite.tint = mote.tint;
-    }
-    for (let i = sunberryMotes.length; i < this.clubhouseSunberryPool.length; i += 1) {
-      const sprite = this.clubhouseSunberryPool[i];
-      if (sprite !== undefined) sprite.visible = false;
-    }
-
-    this.clubhouseDisplayCount = prizeShown + keepsakeShown;
   }
 
   private renderAmbient(state: State, area: Area, reducedMotion: boolean): void {
@@ -1260,176 +940,6 @@ export class GameView {
       frames.push({ id: flyer.id, x: position.x, y: position.y, frame: position.frame });
     }
     this.ambientFrames = frames;
-  }
-
-  private renderEmotes(
-    state: State,
-    area: Area,
-    playerPos: Point,
-    previousState: State | undefined,
-    alpha: number,
-    activePet: { id: string; elapsed: number } | null,
-    activeRest: { spot: RestSpot; elapsed: number } | null,
-  ): void {
-    const active = area.id !== "harness" &&
-      state.battle === null &&
-      state.arcade === null;
-    if (!active) {
-      this.emoteLayer.visible = false;
-      for (const sprite of this.emoteSprites) sprite.visible = false;
-      if (area.id !== this.lastEmoteArea ||
-          (this.lastEmoteTick !== undefined && state.tick < this.lastEmoteTick) ||
-          state.battle !== null ||
-          state.arcade !== null) {
-        this.activeDialoguePartner = null;
-        this.recentTalk = null;
-      }
-      this.lastEmoteArea = area.id;
-      this.lastEmoteTick = state.tick;
-      return;
-    }
-
-    if (area.id !== this.lastEmoteArea ||
-        (this.lastEmoteTick !== undefined && state.tick < this.lastEmoteTick)) {
-      this.activeDialoguePartner = null;
-      this.recentTalk = null;
-    }
-
-    const present = presentCritters(this.world, state);
-    if (state.dialogue !== null) {
-      const knot = state.dialogue.knot;
-      const npc = area.npcs.find(
-        (item) => item.id !== "bus-stop" && npcVisible(this.world, state, item) &&
-          item.knot === knot,
-      );
-      if (npc !== undefined) {
-        const critter = npc.visibleWhenCalmed === undefined
-          ? undefined
-          : this.world.critters[npc.visibleWhenCalmed];
-        const height = computeNpcOverworldHeight(npc, critter);
-        this.activeDialoguePartner = { x: npc.point.x, y: npc.point.y, height };
-      } else {
-        const calm = present
-          .filter((item) => item.mood === "calm" && item.kind.calmKnot === knot)
-          .sort((a, b) =>
-            (a.point.x - state.player.x) ** 2 + (a.point.y - state.player.y) ** 2 -
-            ((b.point.x - state.player.x) ** 2 + (b.point.y - state.player.y) ** 2))[0];
-        if (calm !== undefined) {
-          this.activeDialoguePartner = {
-            x: calm.point.x,
-            y: calm.point.y,
-            height: calm.kind.overworldHeight,
-          };
-        }
-      }
-    } else if (this.activeDialoguePartner !== null) {
-      this.recentTalk = { ...this.activeDialoguePartner, startTick: state.tick };
-      this.activeDialoguePartner = null;
-    }
-
-    let recentTalk: { x: number; y: number; height: number; elapsed: number } | null = null;
-    if (this.recentTalk !== null) {
-      const elapsed = state.tick - this.recentTalk.startTick;
-      if (elapsed >= 0 && elapsed < 38) {
-        recentTalk = {
-          x: this.recentTalk.x,
-          y: this.recentTalk.y,
-          height: this.recentTalk.height,
-          elapsed,
-        };
-      } else {
-        this.recentTalk = null;
-      }
-    }
-
-    const { roamers, calmedCritters, nappingMembers } = computeOverworldEmoteInputs(
-      this.world,
-      state,
-      present,
-      previousState,
-      alpha,
-    );
-
-    const emotes = evaluateOverworldEmotes({
-      areaId: area.id,
-      tick: state.tick,
-      player: playerPos,
-      dialogueOpen: state.dialogue !== null || state.transition !== null || state.journalOpen,
-      roamers,
-      calmedCritters,
-      nappingMembers,
-      recentTalk,
-    });
-
-    type EmoteSpriteItem = {
-      texture: Texture;
-      x: number;
-      y: number;
-      scale: number;
-      alpha: number;
-      rotation: number;
-      tint: number;
-      blend: "normal" | "add";
-    };
-    const items: EmoteSpriteItem[] = emotes.map((emote) => ({
-      texture: this.vfx[emote.texture],
-      x: emote.x,
-      y: emote.y,
-      scale: emote.scale,
-      alpha: emote.alpha,
-      rotation: emote.rotation,
-      tint: 0xffffff,
-      blend: "normal",
-    }));
-
-    let petPos: Point | null = null;
-    let petHeight = 0;
-    if (activePet !== null) {
-      const member = state.party.find((entry) => entry.id === activePet.id);
-      const content = this.world.party[activePet.id];
-      if (member !== undefined && content !== undefined) {
-        const prevMember = previousState?.party.find((entry) => entry.id === activePet.id);
-        petPos = prevMember !== undefined && alpha < 1
-          ? interpolatePoint(prevMember, member, alpha)
-          : member;
-        petHeight = content.box.height;
-      }
-    }
-    for (const spec of computeCompanionEmoteSpecs(
-      petPos, petHeight, activePet?.elapsed ?? null, playerPos, activeRest?.elapsed ?? null,
-    )) {
-      items.push({
-        texture: this.vfx[spec.textureKey],
-        x: spec.x,
-        y: spec.y,
-        scale: spec.scale,
-        alpha: spec.alpha,
-        rotation: spec.rotation,
-        tint: spec.tint,
-        blend: spec.blend,
-      });
-    }
-
-    this.emoteLayer.visible = items.length > 0;
-    for (let i = 0; i < this.emoteSprites.length; i += 1) {
-      const sprite = this.emoteSprites[i];
-      if (sprite === undefined) continue;
-      const item = items[i];
-      if (item === undefined || item.alpha <= 0.01) {
-        sprite.visible = false;
-        continue;
-      }
-      sprite.visible = true;
-      sprite.texture = item.texture;
-      sprite.position.set(item.x, item.y);
-      sprite.scale.set(item.scale);
-      sprite.alpha = item.alpha;
-      sprite.rotation = item.rotation;
-      sprite.tint = item.tint;
-      sprite.blendMode = item.blend;
-    }
-    this.lastEmoteArea = area.id;
-    this.lastEmoteTick = state.tick;
   }
 
   // People in the area, y-sorted with everyone else. They face Fae while she
@@ -1713,6 +1223,7 @@ export class GameView {
     clubhouseDisplay: number;
     atmosphereParticles: number;
     footstepPuffs: number;
+    starGemGlints: number;
     petting: string | null;
     resting: string | null;
     timeOfDay: TimeOfDayPhase;
@@ -1769,9 +1280,10 @@ export class GameView {
         glows: this.drawnGlows.slice(),
       },
       marks: this.noticeMarks(state),
-      clubhouseDisplay: this.clubhouseDisplayCount,
+      clubhouseDisplay: this.effects.clubhouseDisplayCount,
       atmosphereParticles: this.atmosphere.activeCount,
-      footstepPuffs: this.footstepPuffs.length,
+      footstepPuffs: this.effects.footstepPuffCount,
+      starGemGlints: this.effects.starGemGlintCount,
       petting: this.activePetReaction(state)?.id ?? null,
       resting: this.activeRestSpot(state)?.spot.id ?? null,
       timeOfDay: storyTimeOfDay(this.world, state).phase,

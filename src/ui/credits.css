@@ -100,6 +100,12 @@
   letter-spacing: .02em;
   box-shadow: 0 2px 0 #47321f22;
 }
+.credits-summary-pill.is-master {
+  background: #ffe68a;
+  color: #47321f;
+  font-weight: 900;
+  box-shadow: inset 0 0 0 1.5px #c98f22, 0 2px 0 #c98f2266;
+}
 .credits-thanks {
   margin: 12px 0 0;
   padding: 10px 20px;

@@ -58,7 +58,9 @@ export function createCredits(root: HTMLElement): { render: (view: CreditsView) 
     summaryList.replaceChildren(
       ...summary.map((text) => {
         const item = document.createElement("li");
-        item.className = "credits-summary-pill";
+        item.className = text.startsWith("★ ")
+          ? "credits-summary-pill is-master"
+          : "credits-summary-pill";
         item.textContent = text;
         return item;
       }),

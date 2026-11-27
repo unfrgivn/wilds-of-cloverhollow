@@ -51,6 +51,12 @@ export type JournalProgress = {
   keepsakes: LandProgress;
   gems: LandProgress;
 };
+export type ValleyCompletion = {
+  owned: number;
+  total: number;
+  percent: number;
+  complete: boolean;
+};
 
 export const STAR_GEM_VARIABLES = [
   "gem_park",
@@ -444,6 +450,25 @@ export function journalProgress(
   };
 }
 
+/** Overall valley completion tally across stickers, prizes, fish, keepsakes, and gems. */
+export function valleyCompletion(progress: JournalProgress): ValleyCompletion {
+  const owned =
+    progress.stickers.owned +
+    progress.prizes.owned +
+    progress.fish.owned +
+    progress.keepsakes.owned +
+    progress.gems.owned;
+  const total =
+    progress.stickers.total +
+    progress.prizes.total +
+    progress.fish.total +
+    progress.keepsakes.total +
+    progress.gems.total;
+  const percent = total > 0 ? Math.floor((owned / total) * 100) : 0;
+  const complete = total > 0 && owned >= total;
+  return { owned, total, percent, complete };
+}
+
 /** Compact journey progress pills for the credits screen, omitting zero categories. */
 export function creditsSummary(
   world: Pick<World, "stickers" | "arcade" | "storyVariable">,
@@ -451,6 +476,9 @@ export function creditsSummary(
 ): string[] {
   const progress = journalProgress(world, state);
   const pills: string[] = [];
+  if (valleyCompletion(progress).complete) {
+    pills.push("★ 100% Valley Explorer!");
+  }
   if (progress.stickers.owned > 0) {
     pills.push(`${progress.stickers.owned}/${progress.stickers.total} Stickers`);
   }

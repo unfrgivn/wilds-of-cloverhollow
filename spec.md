@@ -544,10 +544,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   atlas — deduplicating party members that also appear in `world.characters`).
   Per-area NPC and critter atlases (`areaEntityAtlases`, extracted with pure
   stateless overworld render helpers into `src/render/overworld-render.ts` and
-  re-exported from `src/render/view.ts`, alongside reusable primitive/geometry
-  JSON validators in `src/content/parsers.ts`, Milestone 97, and arcade/minigame
-  content & calibration parsers in `src/content/arcade-parsers.ts`, re-exported
-  from `src/content/load.ts`, Milestone 110) load on demand with
+  re-exported from `src/render/view.ts`, alongside pooled overworld visual
+  effects in `OverworldEffectsController` inside `src/render/overworld-effects.ts`,
+  Milestone 120, reusable primitive/geometry JSON validators in
+  `src/content/parsers.ts`, Milestone 97, and arcade/minigame content &
+  calibration parsers in `src/content/arcade-parsers.ts`, re-exported from
+  `src/content/load.ts`, Milestone 110) load on demand with
   their area (and warm on door fade-out prefetch) and unload on the same
   bounded current + previous area residency window as ground tiles and prop
   atlases, so the way back through a door is a cache hit instead of a reload
@@ -1095,6 +1097,17 @@ ios/            Capacitor iOS project (from Milestone 4).
      `chime-yellow`).
   7. Clover Hills (`hills-gem`, `hills_gem`): meadow boulder clover burrow,
      fetched by Ribbon Bunny (`bunny_with_me`, Clover Star Gem, `chime-green`).
+  Uncollected Star Gems shimmer in the overworld via pure
+  `evaluateStarGemGlints` (`src/render/overworld-render.ts`, Milestone 120),
+  rendered on `emissiveLayer` by `OverworldEffectsController`
+  (`src/render/overworld-effects.ts`): an additive pastel halo cycling smoothly
+  across lavender (`0xd4b2ff`), aqua (`0x9be7f2`), and butter-gold (`0xffe58f`,
+  steady `0xffe58f` at `haloAlpha: 0.42` under Reduced Motion) paired with a
+  rotating pearl-gold 4-point sparkle star (`0xfff8cf`, stationary under Reduced
+  Motion). The five open-air interactable gems shimmer whenever uncollected;
+  the two blacklight-secret glow gems (`park_gem`, `cavern_gem`) shimmer only
+  while Fae's lantern is active (`state.lantern === true`), and all glints hide
+  during battle, arcade, `harness`, or once collected.
   Grandpa Barnaby (`barnaby` in Bon Appetit Cafe) celebrates Fae's gem count,
   awarding `+15` coins (`gem_reward_3`, `chime-yellow`) at 3+ gems and `+50`
   coins, `+2` snacks (`chime-red`), and the Rainbow Star Geode keepsake for
@@ -1380,6 +1393,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   - `renderInfo()` exposes `clubhouseDisplay` (visible display item count),
     `atmosphereParticles` (active `BiomeAtmosphere` particle count),
     `footstepPuffs` (active footstep gouache puff count),
+    `starGemGlints` (active prismatic Star Gem glint count),
     `petting` (currently petted companion id or `null`), and `resting` (active
     rest spot id or `null`).
   - Living Valley Townspeople Milestone Reactions (Milestone 108,
@@ -2025,7 +2039,10 @@ trunks keep its two exits.
   MET ALONG THE WAY, an optional Journey Summary ribbon (`.credits-summary`,
   populated from pure `creditsSummary` in `src/core/journal.ts` with compact
   pills for each non-zero collection category among Stickers, Star Gems, Fish,
-  Keepsakes, and Prizes, hidden when empty), and "Thank you for playing!", from `creditEntries` (`src/core/credits.ts`). FRIENDS is each roster member who
+  Keepsakes, and Prizes, hidden when empty; when `valleyCompletion` reaches
+  100% across all five collections, `creditsSummary` prepends a golden
+  `.credits-summary-pill.is-master` pill `"★ 100% Valley Explorer!"`,
+  Milestone 120), and "Thank you for playing!", from `creditEntries` (`src/core/credits.ts`). FRIENDS is each roster member who
   starts with Fae or whose `befriended` (else `joins`) variable is true, in
   roster order, on the frame `down_idle_01`; small animal party frames
   (`<= 280x280`, via `cropCreditFrame` in `src/shell/assets.ts`) tightly crop
@@ -3435,7 +3452,11 @@ trunks keep its two exits.
   completion badges beside revealed lands whose discoverable stickers are all
   owned (`landStickerProgress` in `src/core/journal.ts`), and sits above a
   compact footer strip displaying the active or clicked/hovered land's sticker
-  progress alongside total Stickers, total Prizes, and the Bus legend. Clicking
+  progress alongside total Stickers, total Prizes, and the Bus legend (and when
+  `valleyCompletion` in `src/core/journal.ts` reaches 100%, a gleaming golden
+  `.journal-master-crest` pill `"★ 100% Valley Explorer!"` prepended to
+  `.journal-map-summary` with `#ffe68a` fill, `#c98f22` inner accent, and
+  `#47321f` ink, detached whenever below 100%, Milestone 120). Clicking
   or hovering any revealed land pin enriches the footer detail line with
   `landFieldGuide` (`src/core/journal.ts`, Milestone 110): sticker progress,
   Star Gem status (`★ Gem` / `◇ Gem` once any Star Gem is found or `gem_quest`
@@ -3750,7 +3771,10 @@ trunks keep its two exits.
   every specialty treat or the named treat id, capped at 99); `stickers
   all|<id>` and `prizes
   all|<id>` (granting from the catalogues); `fish all|clear` (catching every
-  Bubblegum Bay species or clearing `caughtFish`); `lantern|lasso|flute|map
+  Bubblegum Bay species or clearing `caughtFish`); `gems all|clear` (setting
+  the closed seven `STAR_GEM_VARIABLES` `gem_park`, `gem_bay`, `gem_trail`,
+  `gem_pass`, `gem_cavern`, `gem_woods`, `gem_hills` to true or false,
+  Milestone 120); `lantern|lasso|flute|map
   on|off`,
   which set exactly the four tool story variables `has_lantern`, `has_lasso`,
   `has_flute`, and `has_map`; and `keepsakes on|off`, which toggles the closed

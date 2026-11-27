@@ -86,6 +86,7 @@ export type JournalView = {
   tickets: number;
   snacks: number;
   gems?: { found: number; total: number };
+  valleyComplete?: boolean;
   muted: boolean;
   level: AudioLevel;
   musicMuted: boolean;
@@ -465,6 +466,8 @@ export function createJournal(root: HTMLElement): {
   const mapFooter = element("div", "journal-map-footer");
   const mapDetail = element("span", "journal-map-detail");
   const mapSummary = element("div", "journal-map-summary");
+  const mapMasterCrest = element("span", "journal-master-crest");
+  mapMasterCrest.textContent = "★ 100% Valley Explorer!";
   const mapStickersPill = element("span", "journal-map-pill");
   setAttribute(mapStickersPill, "data-stat", "stickers");
   const mapPrizesPill = element("span", "journal-map-pill");
@@ -1261,6 +1264,13 @@ export function createJournal(root: HTMLElement): {
         }
       }
 
+      const showMasterCrest = view.valleyComplete === true;
+      if (showMasterCrest) {
+        if (!mapMasterCrest.isConnected) mapSummary.prepend(mapMasterCrest);
+      } else if (mapMasterCrest.isConnected) {
+        mapMasterCrest.remove();
+      }
+      mapFooter.classList.toggle("has-master-crest", showMasterCrest);
       setText(mapStickersPill, `Stickers ${view.stickersOwned}/${view.stickersTotal}`);
       setText(mapPrizesPill, `Prizes ${view.prizesOwned}/${view.prizesTotal}`);
       syncAttachedAfter(mapPrizesPill, mapFishPill, showFish);

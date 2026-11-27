@@ -4274,6 +4274,44 @@ the old trail, the owl, and the clubhouse claim.
   replay hash changes, 23 QA packs, purity, lint), `just build` (production
   and harness hook checks), and full e2e verified across Chromium & WebKit.
 
+## Milestone 90: Story Time-of-Day Lighting Arc, Expressive Battle Portraits & Photo Showcase Mode **Status:** ✅ Completed (2026-11-26)
+- Pure presentation-shell milestone: zero `src/core` changes and zero replay
+  hash shifts across all 65 recorded sims.
+- Story-driven Time-of-Day lighting arc (`src/render/time-of-day.ts`,
+  `src/render/view.ts`, `src/dev/hook.ts`):
+  - Pure `storyTimeOfDay(world, state)` derives `morning`, `day`,
+    `golden-hour`, `enchanted-twilight`, `golden-meadow`, and `sunrise` lighting
+    grades (neutral on `harness`, battles, arcades, and active lantern dusk).
+  - Mounted in `timeOfDayLayer` inside `viewport` (strictly clipped by
+    `viewportMask`, before `lanternLayer`) with a cached viewport tint and soft
+    diagonal additive sun wash (`vfx.softGlow`); exposed via
+    `renderInfo().timeOfDay`.
+- Expressive emotion-reactive battle party portraits
+  (`src/ui/battle-portraits.ts`, `src/ui/battle.ts`, `src/ui/battle.css`,
+  `src/main.ts`):
+  - Pure `evaluateBattlePortraits(...)` computes `cozy`, `eager`, `cheering`,
+    `flustered`, and `radiant` moods for Fae and fighting party members
+    (excluding flute friends).
+  - Renders 42 px circular die-cut medallions in `.battle-portraits` beside
+    `ENERGY` on viewports `>= 960 px` (hidden below `960 px` so phones stay
+    unobstructed), reusing cached bust crops with zero-text inline SVG mood
+    badges and reduced-motion guards.
+- Photo / Showcase Mode (`src/main.ts`, `src/render/view.ts`,
+  `src/ui/sticker.css`, `src/dev/hook.ts`):
+  - Pressing `P` in the free overworld toggles `data-photo="on"`, hiding prompts,
+    touch controls, key hints, area banners, QA badge, notice marks, and dev
+    readout; `P`, `Escape`, or opening any overlay exits automatically.
+  - Exposed via `renderInfo().photoMode` and `settings.photoMode` /
+    `settings.setPhotoMode`.
+- Evidence: `tests/unit/milestone-90.test.ts` (10 tests) and
+  `tests/e2e/showcase-polish.spec.ts` (`@smoke` Chromium + WebKit); reviewed
+  captures `art/review/m90-battle-portraits.jpg` and
+  `art/review/m90-golden-hour.jpg` verified with `vision`.
+- Gates: `just check` (149 unit files / 1,192 tests, all 65 sims with zero
+  replay hash changes, 23 QA packs, purity, lint), `just build` (production
+  and harness hook checks), and full `CLOVERHOLLOW_E2E_PORT=4261 just e2e`
+  (1,066 passed, 2 skipped in 4.7 min).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

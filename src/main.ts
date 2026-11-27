@@ -13,6 +13,7 @@ import {
   type MoleHole,
   type Point,
   type State,
+  battleParty,
   battleView,
   jukeboxTracks,
   soundCues,
@@ -51,6 +52,7 @@ import { atlasImage, parseAtlasJson, type AtlasImage, type AtlasJson } from "./u
 import { preventPinchZoom } from "./platform/gestures";
 import { createDialogueBox, createNoticeMarks, createPrompt } from "./ui/sticker";
 import { cropPortraitFrame, speakerAccent, speakerPortraitSource } from "./ui/portraits";
+import { evaluateBattlePortraits } from "./ui/battle-portraits";
 import {
   createBattleHud,
   createCommandMenu,
@@ -644,6 +646,17 @@ async function boot(): Promise<void> {
       loads.push(decodeOnce(content.world.arcade.atlas.replace(".json", ".png")));
     await Promise.all(loads);
   };
+  const partyCommands: Record<string, string | null> = Object.fromEntries(
+    Object.entries(content.world.party).map(([id, member]) => [id, member.command?.id ?? null]),
+  );
+  const warmBattlePortraits = async (snapshot: State): Promise<void> => {
+    const loads: Promise<unknown>[] = [decodeOnce("assets/characters/fae/fae.png")];
+    for (const member of battleParty(content.world, snapshot.party)) {
+      const info = content.world.party[member.id];
+      if (info !== undefined) loads.push(decodeOnce(info.atlas.replace(".json", ".png")));
+    }
+    await Promise.all(loads);
+  };
   const critterJsonFiles = [
     ...new Set(Object.values(content.world.critters).map((critter) => critter.atlas)),
   ];
@@ -791,7 +804,32 @@ async function boot(): Promise<void> {
     return journalCache.notes;
   };
   let wasJournalOpen = false;
+  let wasBattleOpen = false;
+  let photoMode = false;
+  document.documentElement.dataset.photo = "off";
+  const canPhotoMode = (): boolean =>
+    titleMode === null &&
+    !qaMenuOpen &&
+    !qaConsoleOpen &&
+    !qaBlocked &&
+    state.dialogue === null &&
+    state.battle === null &&
+    state.arcade === null &&
+    !state.journalOpen &&
+    state.finale === null;
+  const setPhotoMode = (on: boolean): void => {
+    const next = on && canPhotoMode();
+    photoMode = next;
+    document.documentElement.dataset.photo = next ? "on" : "off";
+    view.setPhotoMode(next);
+    invalidate();
+  };
   const render = (alpha = 1): void => {
+    if (photoMode && !canPhotoMode()) {
+      photoMode = false;
+      document.documentElement.dataset.photo = "off";
+      view.setPhotoMode(false);
+    }
     if (!state.journalOpen || titleMode !== null || qaMenuOpen) jukeboxTrack = null;
     const baseSoundtrack = soundtrackFor(content.world, state, {
       titleOpen: titleMode !== null || qaMenuOpen,
@@ -952,9 +990,22 @@ async function boot(): Promise<void> {
       touch.releaseArrows();
     const hideActions = state.battle?.phase === "check" ||
       state.battle?.phase === "burstResult";
+    if (activeBattle && !wasBattleOpen) void warmBattlePortraits(state).then(invalidate);
+    wasBattleOpen = activeBattle;
+    const showBattleHud = activeBattle && state.battle?.phase !== "reward" &&
+      !talkChoicesShown(battle?.talk ?? null);
+    const battlePortraits = showBattleHud && state.battle !== null
+      ? evaluateBattlePortraits({
+          battle: state.battle,
+          view: battle,
+          partyIds: battleParty(content.world, state.party).map((member) => member.id),
+          partyCommands,
+          energy: battle?.energy ?? state.battle.energy,
+          resolveImage: (id) => speakerPortrait(id),
+        })
+      : [];
     battleHud.render({
-      visible: activeBattle && state.battle?.phase !== "reward" &&
-        !talkChoicesShown(battle?.talk ?? null),
+      visible: showBattleHud,
       energy: battle?.energy ?? 0,
       energyMax: battle?.energyMax ?? 0,
       level: levelForXp(content.world.levels, state.xp),
@@ -968,6 +1019,7 @@ async function boot(): Promise<void> {
       burstSoften: hideActions ? 0 : (battle?.burstSoften ?? 0),
       lassoAssist: hideActions ? null : (battle?.lassoAssist ?? null),
       lassoSteady: hideActions ? false : (battle?.lassoSteady ?? false),
+      portraits: battlePortraits,
     });
     commandMenu.render({
       visible: activeBattle && state.battle?.phase === "command" && battle?.talk === null,
@@ -1485,13 +1537,17 @@ async function boot(): Promise<void> {
       const area = content.world.areas[state.area];
       if (area === undefined) throw new Error(`Unknown area ${state.area}`);
       if (!reload && view.loadedAreaId() === area.id) {
-        await warmAreaMedia(area);
+        await Promise.all([
+          warmAreaMedia(area),
+          state.battle !== null ? warmBattlePortraits(state) : Promise.resolve(),
+        ]);
         return;
       }
       reload = false;
       areaLoad = Promise.all([
         view.setArea(area).then(() => cacheAreaNpcPortraits(area)),
         warmAreaMedia(area),
+        state.battle !== null ? warmBattlePortraits(state) : Promise.resolve(),
       ])
         .then(() => {
           view.resetCamera();
@@ -1536,6 +1592,23 @@ async function boot(): Promise<void> {
     }
   });
   render();
+  // Photo / showcase mode (spec 4): P hides overworld chrome for unobstructed
+  // storybook views; Escape exits cleanly.
+  window.addEventListener("keydown", (event) => {
+    if (event.repeat) return;
+    if (event.target instanceof HTMLElement &&
+        event.target.closest("input, textarea") !== null) return;
+    if (event.code === "KeyP") {
+      if (!canPhotoMode()) return;
+      event.preventDefault();
+      setPhotoMode(!photoMode);
+      return;
+    }
+    if (event.code === "Escape" && photoMode) {
+      event.preventDefault();
+      setPhotoMode(false);
+    }
+  });
   // The QA keys: Q opens the save library on the title, and the backtick key
   // toggles the QA console while a pack is active (spec 11). Opening or
   // closing redraws, so the console appears over a game the harness paused.
@@ -1602,6 +1675,7 @@ async function boot(): Promise<void> {
         qaActivePack = null;
         qaJustPicked = false;
         qaConsoleOpen = false;
+        setPhotoMode(false);
         levelUpNotices.length = 0;
         swallowed.clear();
       },
@@ -1640,6 +1714,10 @@ async function boot(): Promise<void> {
         setKeyHints: (on) => {
           gameSettings.setKeyHints(on);
           invalidate();
+        },
+        photoMode: () => photoMode,
+        setPhotoMode: (on) => {
+          setPhotoMode(on);
         },
       },
       boot: { title: () => titleMode },

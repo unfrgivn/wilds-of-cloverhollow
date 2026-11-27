@@ -2,6 +2,7 @@ import { stableHash, type ActionFrame, type State } from "../core";
 import type { InputSource } from "../platform/input";
 import type { AudioController } from "../platform/audio";
 import type { BattleCheckInfo } from "../render/view";
+import type { TimeOfDayPhase } from "../render/time-of-day";
 import type { ArcadeInfo } from "../ui/arcade";
 import type { QaPack } from "./qa";
 
@@ -65,6 +66,8 @@ export type CloverhollowHook = {
     clubhouseDisplay: number;
     petting: string | null;
     resting: string | null;
+    timeOfDay: TimeOfDayPhase;
+    photoMode: boolean;
     battle: {
       phase: string | null;
       check: BattleCheckInfo | null;
@@ -99,6 +102,8 @@ export type CloverhollowHook = {
     setGentleTiming: (on: boolean) => void;
     keyHints: () => boolean;
     setKeyHints: (on: boolean) => void;
+    photoMode: () => boolean;
+    setPhotoMode: (on: boolean) => void;
   };
 };
 

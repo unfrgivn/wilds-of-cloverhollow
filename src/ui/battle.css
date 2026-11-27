@@ -1,5 +1,6 @@
 /* Battle stickers. Layering comes from the --z-* scale in sticker.css. */
 .battle-hud[hidden],
+.battle-portraits[hidden],
 .battle-actions-left[hidden],
 .battle-sparkle-pill[hidden],
 .battle-together-btn[hidden],
@@ -39,6 +40,142 @@
 .battle-energy {
   left: calc(20px + var(--safe-left));
   width: 210px;
+}
+/* Expressive party medallions (spec 8.1): sit cleanly beside ENERGY on desktop
+   and step aside below 960 px so phone battle viewports stay unobstructed. */
+.battle-portraits {
+  position: absolute;
+  top: calc(20px + var(--safe-top));
+  left: calc(242px + var(--safe-left));
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  pointer-events: none;
+}
+@media (max-width: 959px) {
+  .battle-portraits {
+    display: none;
+  }
+}
+.battle-portrait {
+  position: relative;
+  box-sizing: border-box;
+  width: 42px;
+  height: 42px;
+  border: 4px solid var(--sticker-rim);
+  border-radius: 50%;
+  outline: 2px solid var(--sticker-ink);
+  background-color: #f7f2e3;
+  box-shadow: var(--sticker-shadow);
+  transition: transform 140ms ease-out, border-color 140ms ease-out,
+    background-color 140ms ease-out;
+}
+.battle-portrait[data-mood="cozy"] {
+  border-color: #f7f2e3;
+  background-color: #f7f2e3;
+}
+.battle-portrait[data-mood="eager"] {
+  border-color: #c5e8b7;
+  background-color: #eaf7e4;
+  transform: translateY(-2px);
+}
+.battle-portrait[data-mood="cheering"] {
+  border-color: #e8f5b8;
+  background-color: #f4fae0;
+  animation: battle-portrait-cheer 720ms ease-in-out infinite;
+}
+.battle-portrait[data-mood="flustered"] {
+  border-color: #f9d0d6;
+  background-color: #fdecef;
+  animation: battle-portrait-fluster 560ms ease-in-out infinite;
+}
+.battle-portrait[data-mood="radiant"] {
+  border-color: #ffe27a;
+  background-color: #fff6cf;
+  box-shadow: var(--sticker-shadow), 0 0 10px #ffe27acc;
+  animation: battle-portrait-radiant 1200ms ease-in-out infinite;
+}
+.battle-portrait-clip {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.battle-portrait-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+}
+.battle-portrait-badge {
+  position: absolute;
+  right: -5px;
+  bottom: -5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  box-sizing: border-box;
+  border: 2px solid var(--sticker-rim);
+  border-radius: 50%;
+  outline: 1.5px solid var(--sticker-ink);
+  background: var(--sticker-paper);
+  box-shadow: 0 2px 4px #47321f33;
+}
+.battle-portrait[data-mood="cozy"] .battle-portrait-badge {
+  display: none;
+}
+.battle-portrait-badge-svg {
+  width: 13px;
+  height: 13px;
+  overflow: visible;
+}
+.battle-portrait-icon-eager,
+.battle-portrait-icon-cheering,
+.battle-portrait-icon-flustered,
+.battle-portrait-icon-radiant {
+  display: none;
+}
+.battle-portrait[data-mood="eager"] .battle-portrait-icon-eager,
+.battle-portrait[data-mood="cheering"] .battle-portrait-icon-cheering,
+.battle-portrait[data-mood="flustered"] .battle-portrait-icon-flustered,
+.battle-portrait[data-mood="radiant"] .battle-portrait-icon-radiant {
+  display: inline;
+}
+.battle-portrait-badge-shape {
+  stroke: var(--sticker-ink);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+}
+.battle-portrait-icon-eager .battle-portrait-badge-shape {
+  fill: #c5e8b7;
+}
+.battle-portrait-icon-cheering .battle-portrait-badge-shape {
+  fill: #ef8fa6;
+}
+.battle-portrait-icon-flustered .battle-portrait-badge-shape {
+  fill: #9fd9f4;
+}
+.battle-portrait-icon-radiant .battle-portrait-badge-shape {
+  fill: #f6cf4f;
+}
+.battle-portrait-badge-shine {
+  fill: #fffdf7;
+}
+@keyframes battle-portrait-cheer {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-3px) scale(1.04); }
+}
+@keyframes battle-portrait-fluster {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-4deg); }
+  75% { transform: rotate(4deg); }
+}
+@keyframes battle-portrait-radiant {
+  0%, 100% { transform: translateY(-1px) scale(1); }
+  50% { transform: translateY(-2px) scale(1.05); }
 }
 .battle-actions-left {
   position: absolute;
@@ -973,6 +1110,7 @@
   .battle-catch-ring,
   .battle-catch-toy,
   .battle-lean-puff,
+  .battle-portrait,
   .battle-echo-chime {
     transition: none;
   }
@@ -982,6 +1120,9 @@
   .battle-feeling-heart,
   .battle-windup-bubble.is-popped,
   .battle-command.is-match,
+  .battle-portrait[data-mood="cheering"],
+  .battle-portrait[data-mood="flustered"],
+  .battle-portrait[data-mood="radiant"],
   .battle-together-btn::after {
     animation: none;
   }

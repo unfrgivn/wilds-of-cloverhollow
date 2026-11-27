@@ -381,6 +381,27 @@ ios/            Capacitor iOS project (from Milestone 4).
   `1.00 -> 1.022` on `"out"`, `0.972 -> 1.00` on `"in"`, strictly clipped inside
   `viewportMask` and `1` outside transitions or in `harness`) and a whisper-soft
   paper-rustle noise tail in the `"door"` sound recipe (`src/platform/audio.ts`).
+- Story-driven time-of-day lighting arc (`src/render/time-of-day.ts`, Milestone
+  90): pure presentation-only `storyTimeOfDay(world, state)` computes a subtle
+  `TimeOfDayGrade` (`morning`, `day`, `golden-hour`, `enchanted-twilight`,
+  `golden-meadow`, or `sunrise`), rendered inside `viewport` (strictly clipped
+  by `viewportMask`, mounted right after `scene` and before `lanternLayer`) as a
+  cached viewport tint plus a soft diagonal top-left additive sun wash
+  (`vfx.softGlow`). It always stays neutral (`day`, zero alpha) on `harness`,
+  during battles or arcade close-ups, and while the lantern is on. `sunrise`
+  warms the Morning Wake-Up finale (`state.finale !== null`);
+  `enchanted-twilight` washes `mist` and fizzy `enchanted`; `golden-meadow`
+  warms calmed `enchanted` (`forest_fizzy === false`); `golden-hour` bathes outdoor
+  adventure areas (`plaza`, `park`, `bay`, `pass`, `trail`, `woods`, `hills`,
+  `field`) once `has_lantern` is set; and `morning` washes `bedroom` and
+  `kitchen` before any sticker is earned and before `has_lantern`.
+- Photo / Showcase mode (Milestone 90): pressing `P` (`KeyP`) while exploring
+  the free overworld (ignored inside inputs, on title, dialogue, battle, arcade,
+  journal, finale, or QA overlays) toggles `data-photo="on"` on the root, hiding
+  `.sticker-prompt`, `.touch-controls`, `.hud-hints`, `.area-banner`,
+  `.qa-badge`, `.notice-marks`, and the dev debug readout (`view.setPhotoMode`)
+  for unobstructed storybook views. Pressing `P` again, `Escape`, or opening any
+  overlay exits Photo Mode automatically.
 - Texture budget: at most 96 MB of decoded textures per loaded area (UI
   excluded) and no single texture over 2048x2048. Every Pixi spritesheet and
   ground tile loads with `autoGenerateMipmaps: true`. One `AreaView`
@@ -2279,7 +2300,14 @@ trunks keep its two exits.
   an unpopped wind-up, and `R` key badge hidden on touch while available),
   `.battle-soften-pill` (`Softened` badge while Acorn Squirrel's burst soften
   is active), and `.battle-steady-pill` (`✦ Steady` cream badge while
-  `lassoSteady` is active). Like the feelings cloud, `.battle-actions-left`
+  `lassoSteady` is active). Beside ENERGY on desktop viewports (`>= 960 px`,
+  hidden on compact phone screens `< 960 px`) sits `.battle-portraits`, a row
+  of 42 px circular die-cut party medallions (`src/ui/battle-portraits.ts`,
+  Milestone 90) for Fae and each active fighting party member (excluding flute
+  friends), reusing cached bust crops (`speakerPortraitSource` +
+  `cropPortraitFrame`) with mood rings and zero-text inline SVG corner badges
+  for `cozy`, `eager`, `cheering`, `flustered`, and `radiant` (with
+  reduced-motion guards). Like the feelings cloud, `.battle-actions-left`
   steps aside
   during active checks and burst results (`phase === "check"` or
   `"burstResult"`) so check overlays such as Lean's balance track stay
@@ -3158,7 +3186,9 @@ trunks keep its two exits.
     (Milestone 51). `finale` is the core's `finale` (`null`, `morning`, or
     `credits`); `credits` is `{ entries }` while the credits show (each
     `{ section, name, image }`, from `creditEntries`, section 7.4), otherwise
-    null (Milestone 56).
+    null (Milestone 56). `timeOfDay` reports the active `TimeOfDayPhase`, and
+    `photoMode` reports whether Photo Mode is active (`settings.photoMode` /
+    `settings.setPhotoMode` expose the same flag on the dev hook).
 - While dialogue is open, HTML carries `data-dialogue="open"`; movement, doors,
   cancel, and menu are ignored. Confirm reveals the current line, advances it,
   or selects the highlighted choice. Up/down edges wrap the selection.

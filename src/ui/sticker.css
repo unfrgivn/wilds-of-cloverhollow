@@ -82,6 +82,17 @@
   display: none;
 }
 
+/* Photo / showcase mode (spec 4): hides overworld chrome for unobstructed
+   hand-painted storybook views while toggled with P. */
+:root[data-photo="on"] .sticker-prompt,
+:root[data-photo="on"] .touch-controls,
+:root[data-photo="on"] .hud-hints,
+:root[data-photo="on"] .area-banner,
+:root[data-photo="on"] .qa-badge,
+:root[data-photo="on"] .notice-marks {
+  display: none;
+}
+
 .sticker-dialogue::before,
 .sticker-choice::before {
   content: "";

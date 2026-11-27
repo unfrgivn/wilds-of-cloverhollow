@@ -11,6 +11,7 @@ import type {
   PeekabooStatus,
 } from "../core";
 import type { DialogueView } from "./sticker";
+import type { BattlePortraitItem } from "./battle-portraits";
 
 /** Project battle Talk's core dialogue state onto the shared sticker dialogue. */
 export function battleTalkDialogueView(talk: BattleTalk): DialogueView {
@@ -47,6 +48,7 @@ export type BattleHudView = {
   burstSoften: number;
   lassoAssist: { available: boolean; windUp: boolean } | null;
   lassoSteady: boolean;
+  portraits?: readonly BattlePortraitItem[];
 };
 
 export type BattleCommand = {
@@ -980,6 +982,50 @@ export function battleCommandPreview(
   return base;
 }
 
+function portraitBadgeIcon(): SVGSVGElement {
+  const svg = svgElement("svg", "battle-portrait-badge-svg");
+  svg.setAttribute("viewBox", "0 0 18 18");
+  svg.setAttribute("aria-hidden", "true");
+  const add = <K extends "path" | "circle">(
+    parent: Element,
+    tag: K,
+    className: string,
+    attributes: Record<string, string>,
+  ): void => {
+    const node = svgElement(tag, className);
+    for (const [name, value] of Object.entries(attributes)) node.setAttribute(name, value);
+    parent.append(node);
+  };
+  const eager = svgElement("g", "battle-portrait-icon-eager");
+  add(eager, "path", "battle-portrait-badge-shape", {
+    d: "M9 2 L10.8 7.2 L16 9 L10.8 10.8 L9 16 L7.2 10.8 L2 9 L7.2 7.2 Z",
+  });
+  const cheering = svgElement("g", "battle-portrait-icon-cheering");
+  add(cheering, "path", "battle-portrait-badge-shape", {
+    d: "M9 15 C4.2 11.4 2.8 8.8 3.5 6.4 C4.3 3.9 7.2 3.5 9 6 " +
+      "C10.8 3.5 13.7 3.9 14.5 6.4 C15.2 8.8 13.8 11.4 9 15 Z",
+  });
+  const flustered = svgElement("g", "battle-portrait-icon-flustered");
+  add(flustered, "path", "battle-portrait-badge-shape", {
+    d: "M9 2.4 C11.4 6.2 13.4 8.8 13.4 11.4 C13.4 13.9 11.4 15.6 9 15.6 " +
+      "C6.6 15.6 4.6 13.9 4.6 11.4 C4.6 8.8 6.6 6.2 9 2.4 Z",
+  });
+  add(flustered, "circle", "battle-portrait-badge-shine", { cx: "7.6", cy: "10.6", r: "1.1" });
+  const radiant = svgElement("g", "battle-portrait-icon-radiant");
+  add(radiant, "path", "battle-portrait-badge-shape", {
+    d: "M9 1.8 L11.1 6.7 L16.4 7.2 L12.3 10.6 L13.6 15.8 L9 13 " +
+      "L4.4 15.8 L5.7 10.6 L1.6 7.2 L6.9 6.7 Z",
+  });
+  svg.append(eager, cheering, flustered, radiant);
+  return svg;
+}
+
+type PortraitSlot = {
+  card: HTMLDivElement;
+  img: HTMLSpanElement;
+  imageKey: string;
+};
+
 export function createBattleHud(root: HTMLElement): {
   render: (view: BattleHudView) => void;
   onTogether: (callback: () => void) => void;
@@ -999,6 +1045,22 @@ export function createBattleHud(root: HTMLElement): {
   count.hidden = true;
   energyRow.append(leaves, count);
   energy.append(energyLabel, energyRow);
+  const portraits = element("div", "battle-portraits");
+  portraits.setAttribute("aria-label", "Party mood");
+  portraits.hidden = true;
+  const portraitSlots: PortraitSlot[] = [];
+  const addPortraitSlot = (): PortraitSlot => {
+    const card = element("div", "battle-portrait");
+    const clip = element("span", "battle-portrait-clip");
+    const img = element("span", "battle-portrait-img");
+    clip.append(img);
+    const badge = element("span", "battle-portrait-badge");
+    badge.setAttribute("aria-hidden", "true");
+    badge.append(portraitBadgeIcon());
+    card.append(clip, badge);
+    portraits.append(card);
+    return { card, img, imageKey: "" };
+  };
   const actionsLeft = element("div", "battle-actions-left");
   actionsLeft.hidden = true;
   const sparklePill = element("div", "battle-sparkle-pill");
@@ -1056,7 +1118,7 @@ export function createBattleHud(root: HTMLElement): {
   track.append(fill);
   calmRow.append(calmHeart, track);
   calm.append(calmLabel, calmRow);
-  hud.append(energy, actionsLeft, calm);
+  hud.append(energy, portraits, actionsLeft, calm);
   hud.hidden = true;
   root.append(hud);
   return {
@@ -1092,6 +1154,31 @@ export function createBattleHud(root: HTMLElement): {
       setText(energyLabel, `ENERGY  Lv ${view.level}`);
       count.hidden = max <= 10;
       setText(count, `${current}/${max}`);
+      const portraitItems = view.visible ? (view.portraits ?? []) : [];
+      portraits.hidden = portraitItems.length === 0;
+      while (portraitSlots.length < portraitItems.length) {
+        portraitSlots.push(addPortraitSlot());
+      }
+      while (portraitSlots.length > portraitItems.length) {
+        portraitSlots.pop()?.card.remove();
+      }
+      portraitItems.forEach((item, index) => {
+        const slot = portraitSlots[index];
+        if (slot === undefined) return;
+        setAttribute(slot.card, "data-member", item.id);
+        setAttribute(slot.card, "data-mood", item.mood);
+        setAttribute(slot.card, "aria-label", `${item.name}: ${item.mood}`);
+        slot.card.classList.toggle("is-active", item.active);
+        const key = item.image === null
+          ? ""
+          : `${item.image.src}|${item.image.frame.x},${item.image.frame.y},` +
+            `${item.image.frame.w},${item.image.frame.h}`;
+        if (slot.imageKey !== key) {
+          slot.imageKey = key;
+          if (item.image !== null) applyAtlasCrop(slot.img, item.image);
+          else slot.img.style.backgroundImage = "";
+        }
+      });
       const showSparkle = view.visible && view.sparkle !== null &&
         view.sparkle.count > 0 && !view.sparkle.ready;
       sparklePill.hidden = !showSparkle;

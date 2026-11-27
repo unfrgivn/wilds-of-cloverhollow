@@ -100,6 +100,7 @@ import { BiomeAtmosphere } from "./atmosphere";
 import { evaluateOverworldEmotes } from "./emotes";
 import { evaluateClubhouseDisplay } from "./clubhouse-display";
 import type { RestSpot } from "./companions";
+import { storyTimeOfDay, type TimeOfDayPhase } from "./time-of-day";
 import {
   companionIdlePose,
   composePose,
@@ -316,6 +317,12 @@ export class GameView {
   private lastFootstepTick: number | undefined;
   private lastFootstepStride: number | undefined;
   private readonly paperGrain: TilingSprite;
+  private readonly timeOfDayLayer = new Container();
+  private readonly timeOfDayTint = new Graphics();
+  private readonly timeOfDaySun: Sprite;
+  private timeOfDayCachedKey = "";
+  private viewportRect = { x: 0, y: 0, width: 0, height: 0 };
+  private photoMode = false;
   private readonly lanternLayer = new Container();
   private readonly lanternTint = new Graphics();
   private readonly lanternWorld = new Container();
@@ -478,6 +485,14 @@ export class GameView {
       this.emoteLayer.addChild(bubble);
     }
 
+    this.timeOfDaySun = new Sprite(this.vfx.softGlow);
+    this.timeOfDaySun.label = "time-of-day:sun";
+    this.timeOfDaySun.anchor.set(0.5);
+    this.timeOfDaySun.blendMode = "add";
+    this.timeOfDayLayer.label = "time-of-day";
+    this.timeOfDayLayer.visible = false;
+    this.timeOfDayLayer.addChild(this.timeOfDayTint, this.timeOfDaySun);
+
     this.lanternSpotlight = new Sprite(this.vfx.softGlow);
     this.lanternSpotlight.label = "lantern:spotlight";
     this.lanternSpotlight.anchor.set(0.5);
@@ -557,7 +572,13 @@ export class GameView {
     this.battleCritter.label = "battle:critter";
     this.battleCritterAura.label = "battle:critter:aura";
     this.player.scale.set(0.5);
-    this.viewport.addChild(this.scene, this.lanternLayer, this.emissiveLayer, this.glowLayer);
+    this.viewport.addChild(
+      this.scene,
+      this.timeOfDayLayer,
+      this.lanternLayer,
+      this.emissiveLayer,
+      this.glowLayer,
+    );
     this.viewport.mask = this.viewportMask;
     this.root.addChild(
       this.background,
@@ -851,12 +872,23 @@ export class GameView {
     return this.areaView?.area.id ?? "";
   }
 
+  setPhotoMode(on: boolean): void {
+    this.photoMode = on;
+    if (this.label !== undefined) this.label.visible = !on;
+  }
+
+  isPhotoMode(): boolean {
+    return this.photoMode;
+  }
+
   private drawStatic(width: number, height: number, paper: number): void {
     const scale = Math.min(width / this.viewWidth, height / this.viewHeight);
     const letterboxX = (width - this.viewWidth * scale) / 2;
     const letterboxY = (height - this.viewHeight * scale) / 2;
     const viewW = this.viewWidth * scale;
     const viewH = this.viewHeight * scale;
+    this.viewportRect = { x: letterboxX, y: letterboxY, width: viewW, height: viewH };
+    this.timeOfDayCachedKey = "";
     this.background.clear().rect(0, 0, width, height).fill(0xf8edcf);
     this.paper.clear().rect(letterboxX, letterboxY, viewW, viewH).fill(paper);
     this.viewportMask.clear().rect(letterboxX, letterboxY, viewW, viewH).fill(0xffffff);
@@ -1250,6 +1282,7 @@ export class GameView {
       activePet,
       activeRest,
     );
+    this.renderTimeOfDay(state);
     this.renderGlows(state, playerPos, paused);
     const clubhouseBloom = area.id === "clubhouse" && (
       this.world.storyVariable(state.ink, "garden_sprouted") === true ||
@@ -1274,6 +1307,7 @@ export class GameView {
     this.renderBattle(state, width, height, resolution);
     this.depth.sortChildren();
     if (this.label !== undefined) {
+      this.label.visible = !this.photoMode;
       this.label.text =
         `Cloverhollow • tick ${state.tick} · ` +
         `${Math.round(state.player.x)},${Math.round(state.player.y)}`;
@@ -1284,6 +1318,26 @@ export class GameView {
     }
     const fade = fadeAlpha(state.transition, this.world.tunables.doorFadeTicks);
     this.fade.alpha = fade;
+  }
+
+  private renderTimeOfDay(state: State): void {
+    const grade = storyTimeOfDay(this.world, state);
+    const show = grade.alpha > 0 || grade.sunAlpha > 0;
+    this.timeOfDayLayer.visible = show;
+    if (!show) return;
+    const { x, y, width, height } = this.viewportRect;
+    const key = `${x}|${y}|${width}|${height}|${grade.tint}`;
+    if (this.timeOfDayCachedKey !== key) {
+      this.timeOfDayCachedKey = key;
+      this.timeOfDayTint.clear().rect(x, y, width, height).fill(grade.tint);
+    }
+    this.timeOfDayTint.alpha = grade.alpha;
+    this.timeOfDaySun.tint = grade.sunTint;
+    this.timeOfDaySun.alpha = grade.sunAlpha;
+    this.timeOfDaySun.position.set(x + width * 0.16, y + height * 0.12);
+    this.timeOfDaySun.width = width * 0.95;
+    this.timeOfDaySun.height = height * 0.85;
+    this.timeOfDaySun.rotation = -0.22;
   }
 
   private renderGlows(state: State, playerPos: Point, snapLantern = false): void {
@@ -2716,6 +2770,8 @@ export class GameView {
     clubhouseDisplay: number;
     petting: string | null;
     resting: string | null;
+    timeOfDay: TimeOfDayPhase;
+    photoMode: boolean;
     battle: {
       phase: string | null;
       talk: {
@@ -2794,6 +2850,8 @@ export class GameView {
       clubhouseDisplay: this.clubhouseDisplayCount,
       petting: this.activePetReaction(state)?.id ?? null,
       resting: this.activeRestSpot(state)?.spot.id ?? null,
+      timeOfDay: storyTimeOfDay(this.world, state).phase,
+      photoMode: this.photoMode,
       battle: {
         phase: state.battle?.phase ?? null,
         talk: state.battle?.talk === null || state.battle?.talk === undefined

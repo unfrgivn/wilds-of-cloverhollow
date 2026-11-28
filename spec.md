@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 203)
+Last updated: 2026-11-28 (Milestone 204)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -559,8 +559,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   re-exported by `src/platform/scores.ts`, dry plus warm stereo ConvolverNode
   reverb), and procedural ambience (`src/platform/ambience.ts`) through a
   shared `DynamicsCompressorNode`. Music arranges its 10 instrument voices
-  across a balanced stereo chamber soundstage (`VOICE_PAN` in
-  `src/platform/music.ts`, within `[-0.4, 0.4]` via feature-guarded per-voice
+  across a balanced stereo chamber soundstage (`VOICE_PAN`, `phraseDynamics`,
+  `hasMicroTiming`, `midiToHz`, `rampParam`, and `scheduleInstrumentNote`
+  extracted cleanly into `src/platform/music-synth.ts` and re-exported
+  identically from `src/platform/music.ts` in Milestone 204 / Track E19D,
+  within `[-0.4, 0.4]` via feature-guarded per-voice
   `StereoPannerNode`s cleaned up on track crossfade) and shapes every note with
   deterministic `phraseDynamics` (a smooth 16-step sinusoidal phrase breath in
   `[0.92, 1.07]`, subtle `0..8 ms` pluck micro-timing on melodic voices with
@@ -5215,7 +5218,10 @@ trunks keep its two exits.
   `Amber`, `Clover`) in canonical `STAR_GEM_VARIABLES` order with faceted
   jewel-tinted SVG icons (zero `<text>` nodes), found locations/notes for
   collected gems, Grandpa Barnaby's gentle italic field hints for undiscovered
-  gems, a `N/7` or golden `★ 7/7 COMPLETE!` header badge, and clean dismiss on
+  gems, a `N/7` or golden `★ 7/7 COMPLETE!` header badge, full keyboard vertical
+  scrolling (`ArrowDown`/`ArrowUp`/`PageDown`/`PageUp`/`Home`/`End` via
+  `applyModalScrollKey` in `src/ui/journal-nav.ts`, plus `Enter`/`Space` on the
+  focused `×` close button, Milestone 204 / Track E19D), and clean dismiss on
   backdrop click, `×` close button (44×44 px), `Escape`, `X`, or Gamepad `B`
   restoring focus directly to `.journal-gems` and playing `card-open` /
   `card-close` UI foley via `onOverlayChange`.
@@ -5244,7 +5250,10 @@ trunks keep its two exits.
   `874×402` phone (2-column scrollable on narrow `< 680 px` viewports) with
   progress pills on locked ribbons and golden `★ 16/16 VALLEY LEGEND!`
   celebration (`"★ All 16 Valley Merit Ribbons Stitched — True Cloverhollow
-  Legend!"`) at `16/16`, full `Escape`/`X`/`B`/backdrop/`×` dismiss,
+  Legend!"`) at `16/16`, full keyboard vertical scrolling
+  (`ArrowDown`/`ArrowUp`/`PageDown`/`PageUp`/`Home`/`End` via
+  `applyModalScrollKey`, plus `Enter`/`Space` on the focused `×` close button,
+  Milestone 204 / Track E19D), full `Escape`/`X`/`B`/backdrop/`×` dismiss,
   reduced-motion and iOS tap-selection hygiene, and two zero-baseline-diff entry
   points: `.journal-ribbons-btn` (`"★ Ribbons · N/16"`) in the `FIELD TREASURES`
   modal header and the hand-stitched `.journal-ribbons-banner`
@@ -5260,7 +5269,10 @@ trunks keep its two exits.
   `src/ui/ribbon-toast.css`, `RIBBON_TOAST_DURATION_MS = 3200`, `role="status"`,
   `aria-live="polite"`, `data-ribbon-id`, colored stitched rosette SVG with zero
   `<text>` nodes, `"RIBBON EARNED"` eyebrow + `"<Title> ★"`, safe-area top-right
-  on desktop / top-center on touch, hidden in photo/title/cutscene/credits), and
+  on desktop / top-center on touch, hidden in photo/title/cutscene/credits as
+  well as while Dream Memory Shrine `data-shrine="open"`, Room Decor Picker
+  `data-decor="open"`, or Harmony Flute Wheel `data-flute-wheel="open"` is open
+  in Milestone 204 / Track E19D), and
   plays the warm 5-note `"ribbon-earned"` chime (`C5 -> E5 -> G5 -> B5 -> C6`,
   `0.42 s`, gains `<= 0.08` in `src/platform/audio-effects.ts`) paired with a
   `"celebrate"` haptic.
@@ -5406,7 +5418,11 @@ trunks keep its two exits.
   field modal overlay, `journal.scrollActivePage`, `journal.navigateFocus`, and
   `journal.activateFocused` provide mouse-free navigation across all three tabs
   using pure `cycleIndex`, `computeJournalScrollDelta`, `pickNotesScrollTarget`,
-  and `isElementVisible`:
+  `isElementVisible`, and modal scroll helpers `modalScrollDelta` /
+  `applyModalScrollKey` (Milestone 204 / Track E19D, wiring `ArrowDown`/`ArrowUp`
+  `±72 px`, `PageDown`/`PageUp` `±max(120, round(height * 0.75))`, and
+  `Home`/`End` with event propagation stopped across the Grand 16-Ribbon Merit
+  Tapestry, Star Gem Field Ledger, and Field Treasures Card):
   - `NOTES` / `STICKERS`: `.journal-notes-page` is keyboard focusable
     (`tabindex="0"`, `aria-label="Journal notes"`, crisp `:focus-visible`
     outline with zero resting pixel change). `ArrowDown` / `ArrowUp` (when no

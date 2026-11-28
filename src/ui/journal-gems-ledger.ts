@@ -1,5 +1,6 @@
 import { element, setAttribute, setText } from "./dom";
 import { gemMarkup } from "./icons";
+import { applyModalScrollKey } from "./journal-nav";
 import type { StarGemEntry } from "../core/journal";
 
 const svgNamespace = "http://www.w3.org/2000/svg";
@@ -200,10 +201,16 @@ export function createJournalGemsLedger(options?: {
     isOpen: () => openState,
     handleKeydown: (event) => {
       if (!openState) return false;
-      if (event.key === "Escape") {
+      if (
+        event.key === "Escape" ||
+        ((event.key === "Enter" || event.key === " ") && document.activeElement === closeBtn)
+      ) {
         event.preventDefault();
         event.stopPropagation();
         close();
+      } else if (applyModalScrollKey([grid, card], event.key)) {
+        event.preventDefault();
+        event.stopPropagation();
       }
       return true;
     },

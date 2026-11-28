@@ -2,7 +2,10 @@
 :root[data-photo="on"] .ribbon-toast,
 :root[data-title="open"] .ribbon-toast,
 :root[data-cutscene="open"] .ribbon-toast,
-:root[data-credits="open"] .ribbon-toast {
+:root[data-credits="open"] .ribbon-toast,
+:root[data-shrine="open"] .ribbon-toast,
+:root[data-decor="open"] .ribbon-toast,
+:root[data-flute-wheel="open"] .ribbon-toast {
   display: none;
 }
 

@@ -1,5 +1,6 @@
 import "./journal-ribbons.css";
 import { element, setAttribute, setText, syncAttachedAfter } from "./dom";
+import { applyModalScrollKey } from "./journal-nav";
 import type { MeritRibbonEntry, MeritRibbonSummary } from "../core/ribbons";
 
 const svgNamespace = "http://www.w3.org/2000/svg";
@@ -301,10 +302,16 @@ export function createJournalRibbonsShowcase(options?: {
     isOpen: () => openState,
     handleKeydown: (event) => {
       if (!openState) return false;
-      if (event.key === "Escape") {
+      if (
+        event.key === "Escape" ||
+        ((event.key === "Enter" || event.key === " ") && document.activeElement === closeBtn)
+      ) {
         event.preventDefault();
         event.stopPropagation();
         close();
+      } else if (applyModalScrollKey([grid, card], event.key)) {
+        event.preventDefault();
+        event.stopPropagation();
       }
       return true;
     },

@@ -1,6 +1,61 @@
 export type JournalNavDirection = "up" | "down" | "left" | "right";
 export type JournalNavPage = "notes" | "map" | "options";
 
+export type ModalScrollAction = {
+  mode: "delta" | "top" | "bottom";
+  amount: number;
+};
+
+/** Maps a keyboard scroll key to a modal vertical scroll action, or null for non-scroll keys. */
+export function modalScrollDelta(key: string, pageHeight: number): ModalScrollAction | null {
+  const safeHeight = Number.isFinite(pageHeight) ? pageHeight : 0;
+  const pageStep = Math.max(120, Math.round(safeHeight * 0.75));
+  switch (key) {
+    case "ArrowDown":
+      return { mode: "delta", amount: 72 };
+    case "ArrowUp":
+      return { mode: "delta", amount: -72 };
+    case "PageDown":
+      return { mode: "delta", amount: pageStep };
+    case "PageUp":
+      return { mode: "delta", amount: -pageStep };
+    case "Home":
+      return { mode: "top", amount: 0 };
+    case "End":
+      return { mode: "bottom", amount: 0 };
+    default:
+      return null;
+  }
+}
+
+/** Applies a scroll key to the first overflowing modal container (or first non-null). */
+export function applyModalScrollKey(
+  containers: readonly (HTMLElement | null)[],
+  key: string,
+): boolean {
+  let target: HTMLElement | null = null;
+  for (const container of containers) {
+    if (container === null) continue;
+    if (container.scrollHeight > container.clientHeight + 1) {
+      target = container;
+      break;
+    }
+    if (target === null) target = container;
+  }
+  if (target === null) return false;
+  const action = modalScrollDelta(key, target.clientHeight);
+  if (action === null) return false;
+  const maxScroll = Math.max(0, target.scrollHeight - target.clientHeight);
+  if (action.mode === "top") {
+    target.scrollTop = 0;
+  } else if (action.mode === "bottom") {
+    target.scrollTop = maxScroll;
+  } else {
+    target.scrollTop = Math.max(0, Math.min(maxScroll, target.scrollTop + action.amount));
+  }
+  return true;
+}
+
 /** Steps an index forward or backward across a list with wrap-around. */
 export function cycleIndex(current: number, length: number, delta: -1 | 1): number {
   if (length <= 0) return -1;

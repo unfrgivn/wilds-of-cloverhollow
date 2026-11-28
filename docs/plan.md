@@ -8922,6 +8922,38 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
 - Gates: `just check` (273 unit files / 2,037 tests, all 77 sims + 7 sim
   scripts, 23 QA packs, purity, lint), `just build` (`index` `374.46 kB < 500 kB`),
   20/20 Chromium & WebKit e2e, and 99/99 Chromium `ui-gallery` tests.
+
+## Milestone 204: Full Keyboard Scrolling Across Journal Modal Cards (Merit Tapestry, Star Gem Ledger & Field Treasures), `ribbon-toast` Complete Modal Hygiene & `src/platform/music-synth.ts` Modular Split (Elevation Track E19D) **Status:** ✅ Completed (2026-11-28)
+- Pure UI keyboard scrolling parity, modal toast hygiene, and Web Audio voice
+  synth modularization with zero `src/core/` edits, zero save-version bumps,
+  zero visual baseline shifts, and bit-identical replay hashes across all 77+
+  recorded and headless sims:
+  - **Full Keyboard Scrolling Across Scrollable Journal Modal Cards
+    (`src/ui/journal-nav.ts`, `src/ui/journal-ribbons.ts`,
+    `src/ui/journal-gems-ledger.ts`, `src/ui/journal-field-note.ts`):**
+    Exports pure `modalScrollDelta` (`ArrowDown`/`ArrowUp` `±72 px`,
+    `PageDown`/`PageUp` `±max(120, round(pageHeight * 0.75))`, `Home`/`End`)
+    and DOM helper `applyModalScrollKey`, wiring vertical keyboard scrolling
+    (and `Enter`/`Space` close-button activation on Merit Tapestry & Star Gem
+    Ledger) with propagation stopped across the Grand 16-Ribbon Merit Tapestry,
+    Star Gem Field Ledger, and Field Treasures Card.
+  - **Complete Modal Hygiene for `.ribbon-toast` (`src/ui/ribbon-toast.css`):**
+    Hides `.ribbon-toast` while `data-shrine="open"`, `data-decor="open"`, or
+    `data-flute-wheel="open"` is active so toasts never overlap top-right modal
+    close buttons and still appear cleanly once the modal closes.
+  - **Modular `src/platform/music-synth.ts` Split (`src/platform/music.ts`):**
+    Extracts the 10-voice Web Audio instrument synthesizer and shared dynamics
+    helpers (`VOICE_PAN`, `hasMicroTiming`, `phraseDynamics`, `PhraseDynamics`,
+    `midiToHz`, `rampParam`, `scheduleInstrumentNote`) into
+    `src/platform/music-synth.ts` (`481` lines), re-exporting public symbols
+    identically from `src/platform/music.ts` (`909 -> 451` lines).
+- **Evidence:** `tests/unit/milestone-204.test.ts` and real-input Chromium &
+  WebKit `tests/e2e/milestone-204.spec.ts` (`@smoke`).
+- **Gates:** `just check` (275 unit files / 2,045 tests, all 77+ recorded &
+  headless sims with zero hash shifts, 23 QA packs, purity, lint), `just build`
+  (largest non-vendor chunk `< 380 kB`, hook leak + runtime story + harness
+  checks green), and Chromium & WebKit e2e verification (`milestone-204`,
+  `milestone-203`, `soundtrack` 12/12).
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

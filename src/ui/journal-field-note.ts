@@ -16,6 +16,7 @@ import {
 } from "./journal-field-note-data";
 import { createJournalGemsLedger } from "./journal-gems-ledger";
 import { createJournalHeartsAlbum } from "./journal-hearts";
+import { applyModalScrollKey } from "./journal-nav";
 import { createJournalRibbonsShowcase } from "./journal-ribbons";
 import { createJournalWeatherAlmanac } from "./journal-weather";
 import { isKeepsakeId } from "../core/blessings";
@@ -615,6 +616,9 @@ export function createJournalFieldOverlays(options?: {
           event.preventDefault();
           event.stopPropagation();
           closeTreasures();
+        } else if (applyModalScrollKey([treasuresCard], event.key)) {
+          event.preventDefault();
+          event.stopPropagation();
         }
         return true;
       }

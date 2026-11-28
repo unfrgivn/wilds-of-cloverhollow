@@ -1,32 +1,20 @@
 import {
-  targetInteractable,
-  targetPuzzleAction,
-  wildMarks,
-  type Area,
-  type CreditEntry,
-  type NpcLifeSnapshot,
-  type Point,
-  type State,
-  type World,
+  targetInteractable, targetPuzzleAction, wildMarks,
+  type Area, type CreditEntry, type NpcLifeSnapshot, type Point, type State, type World,
 } from "../core";
 import type { NpcChatterView } from "../ui/npc-chatter";
 import type { AtmosphereOptions } from "./atmosphere-recipes";
 import type { BattleRenderInfo } from "./battle-view";
 import {
-  cutsceneCameraPoint,
-  interpolatePoint,
-  smoothFollowCamera,
-  worldToScreen,
+  cutsceneCameraPoint, interpolatePoint, smoothFollowCamera, worldToScreen,
 } from "./camera";
-import type { RestSpot } from "./companions";
+import { findPettableCompanion, findRestSpot, type RestSpot } from "./companions";
 import type { CutsceneRenderInfo } from "./cutscene-render";
 import type {
-  AmbientFrameInfo,
-  CritterFrameInfo,
-  NpcFrameInfo,
-  PartyFrameInfo,
+  AmbientFrameInfo, CritterFrameInfo, NpcFrameInfo, PartyFrameInfo,
 } from "./entity-layer";
 import { transitionZoom } from "./fade";
+import { findPebbleSkipSpot } from "./micro-delights";
 import type { NpcLifeRenderInfo } from "./npc-life";
 import type { MicroDelightsRenderInfo } from "./micro-delights-render";
 import { computeLanternBlend, PET_REACTION_DURATION } from "./overworld-render";
@@ -346,36 +334,37 @@ export function computeStoryAtmosphereOptions(
 
 /** Projects the active overworld interaction prompt into CSS screen coordinates. */
 export function computePromptScreenView(
-  world: World,
-  state: State,
-  camera: Point | undefined,
-  viewWidth: number,
-  viewHeight: number,
-  canvasWidth: number,
-  canvasHeight: number,
+  world: World, state: State, camera: Point | undefined,
+  viewWidth: number, viewHeight: number, canvasWidth: number, canvasHeight: number,
 ): PromptScreenView {
+  if (camera === undefined) return { visible: false, label: "", x: 0, y: 0 };
+  const project = (worldPoint: Point): Point =>
+    worldToScreen(worldPoint, camera, viewWidth, viewHeight, canvasWidth, canvasHeight);
   const interactable = targetInteractable(world, state);
-  const puzzle = interactable === undefined ? targetPuzzleAction(world, state) : undefined;
-  const target = interactable ?? puzzle;
-  if (target === undefined || camera === undefined) {
+  const target = interactable ?? targetPuzzleAction(world, state);
+  if (target !== undefined) {
+    const point = project(target.point);
+    const isHeart = target.prompt === "Heart";
+    return {
+      visible: true,
+      label: isHeart ? "♥ HEART" : (target.prompt ?? "Look").toUpperCase(),
+      x: point.x, y: point.y,
+      ...(isHeart ? { tone: "heart" } : {}),
+    };
+  }
+  if (
+    !isOverworldClear(state) ||
+    findPettableCompanion(world, state) !== null ||
+    findRestSpot(world, state) !== null
+  ) {
     return { visible: false, label: "", x: 0, y: 0 };
   }
-  const point = worldToScreen(
-    target.point,
-    camera,
-    viewWidth,
-    viewHeight,
-    canvasWidth,
-    canvasHeight,
-  );
-  const isHeart = target.prompt === "Heart";
-  return {
-    visible: true,
-    label: isHeart ? "♥ HEART" : (target.prompt ?? "Look").toUpperCase(),
-    x: point.x,
-    y: point.y,
-    ...(isHeart ? { tone: "heart" } : {}),
-  };
+  const skipSpot = findPebbleSkipSpot(world, state);
+  if (skipSpot !== null) {
+    const point = project({ x: skipSpot.x, y: skipSpot.y });
+    return { visible: true, label: "SKIP", x: point.x, y: point.y };
+  }
+  return { visible: false, label: "", x: 0, y: 0 };
 }
 
 /** Projects the active ambient NPC chatter bubble into CSS px, or returns null when hidden. */

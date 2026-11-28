@@ -10000,6 +10000,38 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   scripts, 23 QA packs, purity, lint), `just build` (`index` `< 365 kB`),
   Chromium & WebKit `milestone-236`/`ending`/`milestone-100`/`160`/`164`/`215`/`229`,
   and 99/99 Chromium `ui-gallery` tests.
+
+## Milestone 237: Track E16 Discoverable `"SKIP"` / `"PET"` Shoreline & Sanctuary Prompts + Key Hints WCAG `aria-pressed` Parity + `src/ui/journal-shelves.ts` Modular Split (Elevation Track E19V) **Status:** ✅ Completed (2026-11-28)
+- Track E16 Discoverable Shoreline & Sanctuary Prompts + Key Hints WCAG
+  `aria-pressed` Parity (`src/ui/hud-hints.ts`, `src/shell/view-models.ts`,
+  `src/render/view-projections.ts`):
+  - Extends `HudInteractContext` with optional `hasPebbleSkip` and
+    `hasSanctuaryPet` and updates `resolveHudInteractHint` with exact priority
+    (`hasInteractable` > `isResting` `"Stand"` > `pettableCompanion` in front
+    cone `"Pet"` > `hasRestSpot` `"Rest"` > `hasPebbleSkip` `"Skip"` >
+    `hasSanctuaryPet` `"Pet"` > inactive `"Talk"`), wired through
+    `buildHudHintsView` via `findPebbleSkipSpot` and
+    `findNearbySanctuaryCritter`.
+  - Adds live WCAG 4.1.2 `aria-pressed` syncing on `lantern` and `mute` pills
+    alongside dynamic `aria-label` parity on `interact` in `createHudHints`.
+  - Updates `computePromptScreenView` to project a floating `"SKIP"` prompt at
+    `park-pond-skip`, `bay-surf-skip`, and `island-cove-skip` while yielding to
+    real interactables, puzzles, pettable companions, rest spots, and overlays.
+- Modular `src/ui/journal-shelves.ts` extraction (`src/ui/journal.ts`
+  `677 -> 386` lines, `src/ui/journal-shelves.ts` `287` lines):
+  - Extracts Stickers, Prizes, Arcade Bests, Fish Catch Book, and Keepsakes
+    collection shelves cleanly so every `.ts` file in `src/ui/` is strictly
+    `< 650` lines (largest remaining: `src/ui/journal-field-note.ts` at `646`
+    lines) with zero visual or DOM differences.
+- Evidence: `tests/unit/milestone-237.test.ts` and
+  `tests/e2e/milestone-237.spec.ts` (`@smoke`, Chromium & WebKit).
+- Gates: `just check` (305 unit files / 2,155 tests, all 77 recorded + 7
+  headless sims with zero hash shifts, 23 QA packs, purity, lint), `just build`
+  (largest non-vendor production chunk `index` `< 365 kB`, hook leak + runtime
+  story + harness checks green), Chromium & WebKit (`milestone-237`,
+  `milestone-236`, `milestone-188`, `accessibility`), 10/10 Chromium (`park`,
+  `flute`, `bay`, `island`, `sanctuary`, `0` snapshot diffs), and 12/12
+  Chromium & WebKit `ui-gallery` `journal` (`0` snapshot diffs).
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

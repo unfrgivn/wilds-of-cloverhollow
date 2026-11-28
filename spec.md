@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 236)
+Last updated: 2026-11-28 (Milestone 237)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -5577,7 +5577,10 @@ trunks keep its two exits.
   `data-journal="open"` while the book is open.
 
 ### 9.1 Journal layout
-- The journal (`src/ui/journal.ts`) is a modal open book inside the safe area,
+- The journal (`src/ui/journal.ts`, with right-page collection shelves — Stickers,
+  Prizes, Arcade Bests, Fish Catch Book, and Keepsakes — modularized into
+  `src/ui/journal-shelves.ts` in Milestone 237 / Track E19V so every `.ts` file
+  in `src/ui/` stays `< 640` lines) is a modal open book inside the safe area,
   above every other layer (`--z-journal`). The left page is NOTES: ruled notes
   in the order the game passes (newest first), an empty line ("Nothing yet.
   Look around!") when there are none, and scrolling only when they overflow.
@@ -5952,12 +5955,18 @@ trunks keep its two exits.
   (`J` / `Y`), context-aware Confirm (`Z` / `A`, resolved via
   `resolveHudInteractHint`: active interactable prompt or `Talk`, `Stand` while
   resting, `Pet` when actively facing a pettable companion with forward dot
-  `>= 0.15`, `Rest` at a rest spot, or inactive `Talk`), Lantern (`L` / `X`,
-  shown once unlocked and glowing lavender when lit), Flute (`F` / `RB`, shown
+  `>= 0.15`, `Rest` at a rest spot, `Skip` at a shoreline pebble-skipping spot,
+  `Pet` beside a calm Sanctuary critter, or inactive `Talk`, Milestone 237 /
+  Track E19V; `computePromptScreenView` in `src/render/view-projections.ts`
+  likewise projects a crisp floating `SKIP` world prompt at `park-pond-skip`,
+  `bay-surf-skip`, and `island-cove-skip` while yielding to real interactables,
+  puzzles, pettable companions, and rest spots), Lantern (`L` / `X`,
+  shown once unlocked, glowing lavender when lit, and syncing WCAG 4.1.2
+  `aria-pressed`), Flute (`F` / `RB`, shown
   once unlocked), Rainbow Lasso (`R` / `LB`, `[data-hint="lasso"]`,
   `aria-label="Throw Rainbow Lasso"`, shown beside Flute once `has_lasso` is
   unlocked and clicking pulses the overworld lasso input, Milestone 202), Mute
-  (`M`), and Photo (`P` / `View`, `[data-hint="photo"]`,
+  (`M`, syncing WCAG 4.1.2 `aria-pressed`), and Photo (`P` / `View`, `[data-hint="photo"]`,
   shown beside Mute whenever `canPhoto` is true in the free overworld outside
   Photo Mode). During battle `command` phase (outside the treat tray and touch
   mode) with Key Hints enabled, a single compact die-cut pill
@@ -5970,10 +5979,11 @@ trunks keep its two exits.
   standard-pad activity and back to `"keyboard"` on real keydowns, Milestone
   117). Every visible `.hud-hint` pill and `.hud-battle-hint` is directly
   clickable and keyboard-activatable (`HudHintAction`, `onAction`,
-  `role="button"`, `tabindex="0"`, synced `aria-label`, click + `Enter`/`Space`
-  with propagation stopped so clicks never trigger canvas steering, Milestone
-  130), letting one-handed mouse/trackpad players open Journal, interact
-  (`Talk`/`Pet`/`Rest`/`Stand`), toggle Lantern/Flute/Lasso/Mute, enter Photo
+  `role="button"`, `tabindex="0"`, live dynamic `aria-label` on `interact`,
+  live `aria-pressed` on `lantern` and `mute`, click + `Enter`/`Space`
+  with propagation stopped so clicks never trigger canvas steering, Milestones
+  130 & 236 / Track E19V), letting one-handed mouse/trackpad players open Journal, interact
+  (`Talk`/`Pet`/`Rest`/`Stand`/`Skip`), toggle Lantern/Flute/Lasso/Mute, enter Photo
   Mode, and toggle the Battle Field Guide while keeping identical visual
   geometry.
   Both hide automatically when Key Hints is off or during touch mode,

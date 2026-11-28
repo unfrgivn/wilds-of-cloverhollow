@@ -39,6 +39,7 @@ import {
 import type { AudioLevel } from "../platform/audio-settings";
 import type { MinigameRecords } from "../platform/minigame-records";
 import { findPettableCompanion, findRestSpot } from "../render/companions";
+import { findNearbySanctuaryCritter, findPebbleSkipSpot } from "../render/micro-delights";
 import type { BattleCheckGeometry } from "../render/view";
 import type { AtlasFrame, AtlasImage } from "../ui/atlas";
 import {
@@ -711,6 +712,7 @@ export type HudHintsViewParams = {
 export function buildHudHintsView(params: HudHintsViewParams): HudHintsView {
   const { world, state, overworldFree, isResting } = params;
   const interactTarget = overworldFree ? targetInteractable(world, state) : undefined;
+  const freeAction = overworldFree && interactTarget === undefined && !isResting;
   const interactHint = overworldFree
     ? resolveHudInteractHint({
         hasInteractable: interactTarget !== undefined,
@@ -718,10 +720,10 @@ export function buildHudHintsView(params: HudHintsViewParams): HudHintsView {
         isResting,
         player: state.player,
         facing: state.facing,
-        pettableCompanion:
-          interactTarget === undefined && !isResting ? findPettableCompanion(world, state) : null,
-        hasRestSpot:
-          interactTarget === undefined && !isResting && findRestSpot(world, state) !== null,
+        pettableCompanion: freeAction ? findPettableCompanion(world, state) : null,
+        hasRestSpot: freeAction && findRestSpot(world, state) !== null,
+        hasPebbleSkip: freeAction && findPebbleSkipSpot(world, state) !== null,
+        hasSanctuaryPet: freeAction && findNearbySanctuaryCritter(world, state) !== null,
       })
     : { canInteract: false, interactLabel: "Talk" };
   const battlePeekHint =

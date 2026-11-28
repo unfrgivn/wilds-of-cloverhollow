@@ -1,8 +1,7 @@
 import "./journal.css";
-import { applyAtlasCrop, type AtlasImage } from "./atlas";
-import { element, setAttribute, setText, syncAttachedAfter } from "./dom";
+import { element, setAttribute, setText } from "./dom";
 import {
-  coinMarkup, cookieMarkup, gemMarkup, heartMarkup, icon, keepsakeIcon, ticketMarkup,
+  coinMarkup, cookieMarkup, gemMarkup, heartMarkup, icon, ticketMarkup,
 } from "./icons";
 import {
   createJournalFieldOverlays, type JournalFieldNoteFish, type JournalFieldNoteSticker,
@@ -13,9 +12,10 @@ import {
   createJournalOptionsPage, makeJournalButton, makeSliderButton, syncSlider, wireSlider,
   type JournalOptionsHandlers, type JournalOptionsView,
 } from "./journal-options";
-import { formatArcadeRecordPills, type MinigameRecords } from "../platform/minigame-records";
+import { createJournalShelves } from "./journal-shelves";
+import type { MinigameRecords } from "../platform/minigame-records";
 import type {
-  AtlasFilter, CarriedTreat, JournalKeepsake, KeepsakeId, StarGemEntry,
+  AtlasFilter, CarriedTreat, JournalKeepsake, StarGemEntry,
 } from "../core/journal";
 import type { CozyWeatherMode } from "../core/weather";
 import type { LevelStats } from "../core/levels";
@@ -58,22 +58,6 @@ export type JournalView = JournalOptionsView & JournalMapView & {
   }[];
 };
 
-type Slot = {
-  root: HTMLDivElement;
-  image: HTMLDivElement;
-  unknown: HTMLDivElement;
-  name: HTMLDivElement;
-  imageKey: string;
-};
-
-type KeepsakeSlot = {
-  root: HTMLDivElement;
-  charm: HTMLDivElement;
-  unknown: HTMLDivElement;
-  name: HTMLDivElement;
-  iconId: KeepsakeId | null;
-};
-
 const journalPages: readonly JournalPage[] = ["notes", "map", "options"];
 
 /** Steps cleanly across Journal tabs with wrap-around in either direction. */
@@ -83,112 +67,6 @@ export function stepJournalPage(current: JournalPage, delta: -1 | 1): JournalPag
 }
 
 const svgNamespace = "http://www.w3.org/2000/svg";
-
-function wireInspectable(root: HTMLElement, onInspect?: () => void): void {
-  if (onInspect === undefined) return;
-  root.addEventListener("click", () => onInspect());
-  root.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      onInspect();
-    }
-  });
-}
-
-function createSlotShell(
-  grid: HTMLElement,
-  rootClass: string,
-  mediaClass: string,
-  unknownLabel: string,
-  onInspect?: () => void,
-): {
-  root: HTMLDivElement;
-  media: HTMLDivElement;
-  unknown: HTMLDivElement;
-  name: HTMLDivElement;
-} {
-  const root = element("div", rootClass);
-  const media = element("div", mediaClass);
-  media.setAttribute("role", "img");
-  const unknown = element("div", "journal-unknown");
-  unknown.textContent = "?";
-  unknown.setAttribute("aria-label", unknownLabel);
-  const name = element("div", "journal-name");
-  root.append(media, unknown, name);
-  wireInspectable(root, onInspect);
-  grid.append(root);
-  return { root, media, unknown, name };
-}
-
-function addSlot(
-  grid: HTMLElement,
-  onInspect?: () => void,
-  unknownLabel = "A sticker still to find",
-): Slot {
-  const s = createSlotShell(
-    grid, "journal-slot", "journal-sticker-image die-cut", unknownLabel, onInspect,
-  );
-  return { root: s.root, image: s.media, unknown: s.unknown, name: s.name, imageKey: "" };
-}
-
-function addKeepsakeSlot(grid: HTMLElement, onInspect?: () => void): KeepsakeSlot {
-  const s = createSlotShell(
-    grid, "journal-slot journal-keepsake-slot", "journal-keepsake-charm",
-    "A keepsake still to find", onInspect,
-  );
-  return { root: s.root, charm: s.media, unknown: s.unknown, name: s.name, iconId: null };
-}
-
-function syncInspectableSlot(root: HTMLElement, inspectable: boolean, ariaLabel: string): void {
-  root.classList.toggle("is-inspectable", inspectable);
-  if (inspectable) {
-    setAttribute(root, "tabindex", "0");
-    setAttribute(root, "role", "button");
-    setAttribute(root, "aria-label", ariaLabel);
-  } else {
-    for (const attr of ["tabindex", "role", "aria-label"]) {
-      if (root.hasAttribute(attr)) root.removeAttribute(attr);
-    }
-  }
-}
-
-function makeCompleteRibbon(): HTMLSpanElement {
-  const ribbon = element("span", "journal-complete-ribbon");
-  ribbon.textContent = "★ Complete!";
-  return ribbon;
-}
-
-function syncSlotVisual(
-  slot: Slot,
-  owned: boolean,
-  name: string,
-  image: AtlasImage | null,
-): void {
-  slot.image.hidden = !owned;
-  slot.unknown.hidden = owned;
-  slot.name.hidden = !owned;
-  setText(slot.name, owned ? name : "");
-  setAttribute(slot.root, "data-owned", String(owned));
-  if (image === null) {
-    slot.imageKey = "";
-    return;
-  }
-  setAttribute(slot.image, "aria-label", name);
-  const key =
-    `${image.src}#${image.frame.x},${image.frame.y},${image.frame.w},${image.frame.h}`;
-  if (slot.imageKey !== key) {
-    applyAtlasCrop(slot.image, image);
-    slot.imageKey = key;
-  }
-}
-
-function syncChild(parent: Element, node: Element, show: boolean): void {
-  if (show) {
-    if (!node.isConnected) parent.append(node);
-  } else if (node.isConnected) {
-    node.remove();
-  }
-}
 
 // Fae's supplies, each a pill with its count: a gold coin and a cookie for
 // her snacks on the notes page's heading row (`journal-supply`), and her
@@ -274,32 +152,6 @@ export function createJournal(root: HTMLElement): JournalControl {
   const members = element("div", "journal-members");
   notesPage.append(notesHead, treatsStrip, members, notes, empty);
 
-  const stickersPage = element("section", "journal-page journal-stickers-page");
-  const stickersHeading = element("h2", "journal-heading");
-  stickersHeading.textContent = "STICKERS";
-  const stickersComplete = makeCompleteRibbon();
-  const grid = element("div", "journal-stickers");
-  const prizesHeading = element("h3", "journal-prizes-heading");
-  prizesHeading.append("PRIZES");
-  const tickets = supply("tickets", "Tickets");
-  prizesHeading.append(tickets.root);
-  const prizesComplete = makeCompleteRibbon();
-  const prizesGrid = element("div", "journal-stickers journal-prizes");
-  const recordsStrip = element("div", "journal-records-strip");
-  recordsStrip.setAttribute("role", "region");
-  recordsStrip.setAttribute("aria-label", "Arcade and fishing records");
-  const fishHeading = element("h3", "journal-prizes-heading journal-fish-heading");
-  const fishCount = element("span", "journal-section-count");
-  fishHeading.append("FISH", fishCount);
-  const fishComplete = makeCompleteRibbon();
-  const fishGrid = element("div", "journal-stickers journal-fish");
-  const keepsakesHeading = element("h3", "journal-prizes-heading journal-keepsakes-heading");
-  const keepsakesCount = element("span", "journal-section-count");
-  keepsakesHeading.append("KEEPSAKES", keepsakesCount);
-  const keepsakesComplete = makeCompleteRibbon();
-  const keepsakesGrid = element("div", "journal-stickers journal-keepsakes");
-  stickersPage.append(stickersHeading, grid, prizesHeading, prizesGrid);
-
   let latestView: JournalView | null = null;
   let onPageChange: (page: JournalPage) => void = () => undefined;
   let onMapSelect: (selected: boolean) => void = () => undefined;
@@ -323,6 +175,13 @@ export function createJournal(root: HTMLElement): JournalControl {
     onSelectTrack: optionsPage.selectTrack, onResetTrack: optionsPage.resetJukebox,
     onJukeboxFilter: () => onJukeboxFilter(),
   });
+  const shelves = createJournalShelves({
+    ticketsPill: supply("tickets", "Tickets"),
+    onInspectSticker: (id) => fieldOverlays.inspect({ kind: "sticker", id }, latestView),
+    onInspectPrize: (prize) => fieldOverlays.openPrize(prize, latestView),
+    onInspectFish: (id) => fieldOverlays.inspect({ kind: "fish", id }, latestView),
+    onInspectKeepsake: (id) => fieldOverlays.inspect({ kind: "keepsake", id }, latestView),
+  });
   const mapPage = createJournalMapPage(() => fieldOverlays.openTreasures(latestView), {
     onSelectLand: (landId) => onMapSelect(landId !== null),
     onFilterChange: (filter) => onMapFilter(filter),
@@ -337,7 +196,7 @@ export function createJournal(root: HTMLElement): JournalControl {
   tabs.append(notesTab, mapTab, optionsTab);
 
   book.append(
-    label, close, notesPage, stickersPage, mapPage.root, optionsPage.root, tabs,
+    label, close, notesPage, shelves.root, mapPage.root, optionsPage.root, tabs,
     fieldOverlays.fieldBackdrop, fieldOverlays.treasuresBackdrop,
     fieldOverlays.gemsOverlay, fieldOverlays.ribbonsOverlay,
   );
@@ -346,7 +205,6 @@ export function createJournal(root: HTMLElement): JournalControl {
   let page: JournalPage = "notes";
   let wasVisible = false;
   let treatsSignature = "";
-  let recordsSignature = "";
 
   const applyPage = (next: JournalPage, notify: boolean): void => {
     fieldOverlays.closeAll();
@@ -358,7 +216,7 @@ export function createJournal(root: HTMLElement): JournalControl {
     setAttribute(mapTab, "aria-selected", String(page === "map"));
     setAttribute(optionsTab, "aria-selected", String(page === "options"));
     notesPage.hidden = page !== "notes";
-    stickersPage.hidden = page !== "notes";
+    shelves.root.hidden = page !== "notes";
     mapPage.root.hidden = page !== "map";
     optionsPage.root.hidden = page !== "options";
     if (notify && changed) onPageChange(page);
@@ -372,7 +230,7 @@ export function createJournal(root: HTMLElement): JournalControl {
   optionsTab.addEventListener("click", () => setPage("options"));
 
   const nav = createJournalNavController({
-    book, notesPage, stickersPage,
+    book, notesPage, stickersPage: shelves.root,
     optionsPage: optionsPage.root,
     soundPage: optionsPage.soundPage,
     playPage: optionsPage.playPage,
@@ -394,10 +252,6 @@ export function createJournal(root: HTMLElement): JournalControl {
     wireSlider(volume.button, volume.value, () => optionsPage.setAudioLevel),
   );
 
-  const slots: Slot[] = [];
-  const prizeSlots: Slot[] = [];
-  const fishSlots: Slot[] = [];
-  const keepsakeSlots: KeepsakeSlot[] = [];
   return {
     setPage, stepPage,
     scrollActivePage: nav.scrollActivePage,
@@ -429,7 +283,6 @@ export function createJournal(root: HTMLElement): JournalControl {
       wasVisible = view.visible;
       if (!view.visible) return;
       setText(coins.count, String(view.coins));
-      setText(tickets.count, String(view.tickets));
       setText(snacks.count, String(view.snacks));
       const showGems = view.gems !== undefined && view.gems.found > 0;
       if (showGems && view.gems !== undefined) {
@@ -519,158 +372,14 @@ export function createJournal(root: HTMLElement): JournalControl {
                 `Life ${member.stats.life} · Guard ${member.stats.guard}`,
         );
       });
-      while (slots.length < view.stickers.length) {
-        const slotIndex = slots.length;
-        slots.push(addSlot(grid, () => {
-          const current = latestView?.stickers[slotIndex];
-          if (current === undefined || !current.owned || current.fieldNote == null) return;
-          fieldOverlays.inspect({ kind: "sticker", id: current.id }, latestView);
-        }));
-      }
-      while (slots.length > view.stickers.length) slots.pop()?.root.remove();
-      view.stickers.forEach((sticker, index) => {
-        const slot = slots[index];
-        if (slot === undefined) return;
-        const image = sticker.owned ? sticker.image : null;
-        const inspectable = image !== null && sticker.fieldNote != null;
-        setAttribute(slot.root, "data-sticker", sticker.id);
-        syncSlotVisual(slot, image !== null, sticker.name, image);
-        syncInspectableSlot(slot.root, inspectable, `Inspect ${sticker.name}`);
-      });
-      const allStickersOwned =
-        view.stickers.length > 0 && view.stickers.every((sticker) => sticker.owned);
-      stickersHeading.classList.toggle("is-complete", allStickersOwned);
-      syncChild(stickersHeading, stickersComplete, allStickersOwned);
 
-      while (prizeSlots.length < view.prizes.length) {
-        const slotIndex = prizeSlots.length;
-        prizeSlots.push(addSlot(prizesGrid, () => {
-          const current = latestView?.prizes[slotIndex];
-          if (current === undefined || !current.owned || current.image === null) return;
-          fieldOverlays.openPrize(current, latestView);
-        }, "A prize still to win"));
-      }
-      while (prizeSlots.length > view.prizes.length) prizeSlots.pop()?.root.remove();
-      view.prizes.forEach((prize, index) => {
-        const slot = prizeSlots[index];
-        if (slot === undefined) return;
-        const image = prize.owned ? prize.image : null;
-        setAttribute(slot.root, "data-prize", prize.id);
-        syncSlotVisual(slot, image !== null, prize.name, image);
-        syncInspectableSlot(slot.root, image !== null, `Inspect ${prize.name} prize note`);
-      });
-      const allPrizesOwned =
-        view.prizes.length > 0 && view.prizes.every((prize) => prize.owned);
-      syncChild(prizesHeading, prizesComplete, allPrizesOwned);
-
-      const arcadePills =
-        view.arcadeRecords === undefined ? [] : formatArcadeRecordPills(view.arcadeRecords);
-      const showRecords = arcadePills.length > 0;
-      syncAttachedAfter(prizesGrid, recordsStrip, showRecords);
-      if (showRecords) {
-        const nextRecordsSignature = arcadePills
-          .map((item) => `${item.id}:${item.value}`)
-          .join("|");
-        if (nextRecordsSignature !== recordsSignature) {
-          recordsSignature = nextRecordsSignature;
-          const stripLabel = element("span", "journal-records-label");
-          stripLabel.textContent = "BESTS";
-          recordsStrip.replaceChildren(
-            stripLabel,
-            ...arcadePills.map((item) => {
-              const pill = element("span", "journal-record-pill");
-              setAttribute(pill, "data-record", item.id);
-              pill.textContent = `★ ${item.label} · ${item.value}`;
-              return pill;
-            }),
-          );
-        }
-      } else if (recordsSignature !== "") {
-        recordsSignature = "";
-        recordsStrip.replaceChildren();
-      }
-
-      const fishAnchor = showRecords ? recordsStrip : prizesGrid;
-      const fishList = view.fish ?? [];
-      const fishOwned = fishList.filter((item) => item.owned).length;
-      const showFish = fishOwned > 0;
-      syncAttachedAfter(fishAnchor, fishHeading, showFish);
-      syncAttachedAfter(fishHeading, fishGrid, showFish);
-      if (showFish) {
-        setText(fishCount, `${fishOwned}/${fishList.length}`);
-        syncChild(fishHeading, fishComplete, fishList.length > 0 && fishOwned >= fishList.length);
-        while (fishSlots.length < fishList.length) {
-          const slotIndex = fishSlots.length;
-          fishSlots.push(addSlot(fishGrid, () => {
-            const current = latestView?.fish?.[slotIndex];
-            if (current === undefined || !current.owned) return;
-            fieldOverlays.inspect({ kind: "fish", id: current.id }, latestView);
-          }, "A fish still to catch"));
-        }
-        while (fishSlots.length > fishList.length) fishSlots.pop()?.root.remove();
-        fishList.forEach((item, index) => {
-          const slot = fishSlots[index];
-          if (slot === undefined) return;
-          const image = item.owned ? item.image : null;
-          setAttribute(slot.root, "data-fish", item.id);
-          slot.root.classList.toggle("is-rare", item.owned && item.rare);
-          syncInspectableSlot(slot.root, item.owned, `Inspect ${item.name}`);
-          syncSlotVisual(slot, item.owned, item.name, image);
-        });
-      }
-
-      const keepsakesList = view.keepsakes ?? [];
-      const keepsakesOwned = keepsakesList.filter((item) => item.owned).length;
-      const showKeepsakes = keepsakesOwned > 0;
-      const keepsakesAnchor = showFish ? fishGrid : fishAnchor;
-      syncAttachedAfter(keepsakesAnchor, keepsakesHeading, showKeepsakes);
-      syncAttachedAfter(keepsakesHeading, keepsakesGrid, showKeepsakes);
-      if (showKeepsakes) {
-        setText(keepsakesCount, `${keepsakesOwned}/${keepsakesList.length}`);
-        syncChild(
-          keepsakesHeading,
-          keepsakesComplete,
-          keepsakesList.length > 0 && keepsakesOwned >= keepsakesList.length,
-        );
-        while (keepsakeSlots.length < keepsakesList.length) {
-          const slotIndex = keepsakeSlots.length;
-          keepsakeSlots.push(addKeepsakeSlot(keepsakesGrid, () => {
-            const current = latestView?.keepsakes?.[slotIndex];
-            if (current === undefined || !current.owned) return;
-            fieldOverlays.inspect({ kind: "keepsake", id: current.id }, latestView);
-          }));
-        }
-        while (keepsakeSlots.length > keepsakesList.length) keepsakeSlots.pop()?.root.remove();
-        keepsakesList.forEach((item, index) => {
-          const slot = keepsakeSlots[index];
-          if (slot === undefined) return;
-          slot.charm.hidden = !item.owned;
-          slot.unknown.hidden = item.owned;
-          slot.name.hidden = !item.owned;
-          setText(slot.name, item.owned ? item.name : "");
-          setAttribute(slot.root, "data-owned", String(item.owned));
-          setAttribute(slot.root, "data-keepsake", item.id);
-          syncInspectableSlot(slot.root, item.owned, `Inspect ${item.name}`);
-          if (item.owned) {
-            setAttribute(slot.root, "title", item.source);
-            setAttribute(slot.charm, "aria-label", item.name);
-            if (slot.iconId !== item.id) {
-              slot.charm.replaceChildren(keepsakeIcon(item.id));
-              slot.iconId = item.id;
-            }
-          } else {
-            if (slot.root.hasAttribute("title")) slot.root.removeAttribute("title");
-            if (slot.iconId !== null) {
-              slot.charm.replaceChildren();
-              slot.iconId = null;
-            }
-          }
-        });
-      }
-      fieldOverlays.syncAll(view, showKeepsakes ? keepsakesGrid : keepsakesAnchor);
+      const shelvesResult = shelves.render(view);
+      fieldOverlays.syncAll(view, shelvesResult.lastAnchor);
       mapPage.render(view, {
-        fishOwned, fishTotal: fishList.length,
-        keepsakesOwned, keepsakesTotal: keepsakesList.length,
+        fishOwned: shelvesResult.fishOwned,
+        fishTotal: shelvesResult.fishTotal,
+        keepsakesOwned: shelvesResult.keepsakesOwned,
+        keepsakesTotal: shelvesResult.keepsakesTotal,
       });
     },
   };

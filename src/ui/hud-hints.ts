@@ -95,6 +95,8 @@ export type HudInteractContext = {
   facing: Direction;
   pettableCompanion: Point | null;
   hasRestSpot: boolean;
+  hasPebbleSkip?: boolean;
+  hasSanctuaryPet?: boolean;
 };
 
 const FACING_VECTORS: Readonly<Record<Direction, Point>> = {
@@ -118,8 +120,9 @@ export function isFacingPoint(origin: Point, facing: Direction, target: Point): 
 /**
  * Resolves the context-aware Z keycap label while roaming the overworld:
  * real interactables win, then Stand (while resting), Pet (only when facing a
- * pettable companion within the forward cone), Rest (at a cozy rest spot), or
- * inactive Talk.
+ * pettable companion within the forward cone), Rest (at a cozy rest spot),
+ * Skip (at a shoreline pebble-skipping spot), Pet (beside a calm Sanctuary
+ * critter), or inactive Talk.
  */
 export function resolveHudInteractHint(context: HudInteractContext): HudInteractHint {
   if (context.hasInteractable) {
@@ -136,6 +139,12 @@ export function resolveHudInteractHint(context: HudInteractContext): HudInteract
   }
   if (context.hasRestSpot) {
     return { canInteract: true, interactLabel: "Rest" };
+  }
+  if (context.hasPebbleSkip === true) {
+    return { canInteract: true, interactLabel: "Skip" };
+  }
+  if (context.hasSanctuaryPet === true) {
+    return { canInteract: true, interactLabel: "Pet" };
   }
   return { canInteract: false, interactLabel: "Talk" };
 }
@@ -200,12 +209,14 @@ export function createHudHints(root: HTMLElement): {
   const interactPill = makeHintPill("interact", "Z", "Talk", fire);
   const lanternPill = makeHintPill("lantern", "L", "Lantern", fire);
   lanternPill.root.hidden = true;
+  lanternPill.root.setAttribute("aria-pressed", "false");
   const flutePill = makeHintPill("flute", "F", "Flute", fire);
   flutePill.root.hidden = true;
   const lassoPill = makeHintPill("lasso", "R", "Lasso", fire);
   lassoPill.root.hidden = true;
   lassoPill.root.setAttribute("aria-label", "Throw Rainbow Lasso");
   const mutePill = makeHintPill("mute", "M", "Mute", fire);
+  mutePill.root.setAttribute("aria-pressed", "false");
   const photoPill = makeHintPill("photo", "P", "Photo", fire);
   photoPill.root.hidden = true;
 
@@ -273,6 +284,7 @@ export function createHudHints(root: HTMLElement): {
       const lanternOn = view.hasLantern && view.lanternOn;
       lanternPill.root.hidden = !view.hasLantern;
       lanternPill.root.classList.toggle("is-on", lanternOn);
+      lanternPill.root.setAttribute("aria-pressed", String(view.lanternOn));
       lanternPill.root.setAttribute("aria-label", lanternOn ? "Lantern on" : "Lantern");
 
       flutePill.root.hidden = !view.hasFlute;
@@ -280,6 +292,7 @@ export function createHudHints(root: HTMLElement): {
 
       const muteText = view.muted ? "Muted" : "Mute";
       mutePill.root.classList.toggle("is-muted", view.muted);
+      mutePill.root.setAttribute("aria-pressed", String(view.muted));
       setText(mutePill.label, muteText);
       mutePill.root.setAttribute("aria-label", muteText);
 

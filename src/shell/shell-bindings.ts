@@ -1,9 +1,11 @@
 import { Rectangle, type Application } from "pixi.js";
 import type { JukeboxTrack, Point, State, TextSpeed, World } from "../core";
+import { weatherForArea, type CozyWeatherKind } from "../core/weather";
 import type { AudioController } from "../platform/audio";
 import type { AudioLevel } from "../platform/audio-settings";
 import type { GameSettingsController } from "../platform/game-settings";
 import type { TouchInput } from "../platform/touch";
+import { getCozyWeatherMode } from "../platform/weather-prefs";
 import type { HudHintAction } from "../ui/hud-hints";
 import type { JournalControl } from "../ui/journal";
 import { postcardToastMessage, type PostcardCapture } from "../ui/postcard";
@@ -109,6 +111,7 @@ export function bindShellUiControls(deps: ShellUiBindingDeps): void {
   ui.journal.onWeatherSelect((mode) => {
     sound.playEffect(mode === "clear" ? "toggle-off" : "tool-sparkle");
     lightHaptic();
+    invalidate();
   });
   ui.journal.onToggleAudio(withInvalidate(() => {
     sound.toggle();
@@ -234,6 +237,7 @@ export function createPostcardSnapper(deps: {
   shutterFlash: { trigger: () => void };
   photoToast: { show: (message: string) => void };
   renderNow: () => void;
+  getWeather?: () => CozyWeatherKind;
 }): (options?: { download?: boolean }) => Promise<PostcardCapture | null> {
   return async (options) => {
     if (!deps.isPhotoMode() || !deps.canPhotoMode()) return null;
@@ -249,9 +253,13 @@ export function createPostcardSnapper(deps: {
       clearColor: 0xf8edcf,
     });
     const sourceCanvas = extracted instanceof HTMLCanvasElement ? extracted : deps.app.canvas;
-    return deliverAreaPostcard(deps.world, deps.getState(), sourceCanvas, {
+    const current = deps.getState();
+    const weather =
+      deps.getWeather?.() ?? weatherForArea(current.area, current.tick, getCozyWeatherMode()).kind;
+    return deliverAreaPostcard(deps.world, current, sourceCanvas, {
       download: options?.download !== false,
       preferShare: document.documentElement.dataset.touch === "on",
+      weather,
       onDelivered: (capture, delivery) => {
         if (deps.isPhotoMode()) {
           deps.photoToast.show(postcardToastMessage(delivery, capture.caption));

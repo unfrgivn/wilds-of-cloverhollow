@@ -604,6 +604,17 @@ ios/            Capacitor iOS project (from Milestone 4).
   harmonics and `arcade-hum` distant Star Racer cabinet twinkles, Milestone 152)
   and deterministic `ambiencePan` (`[-0.55, 0.55]`, guarded `StereoPannerNode`s
   disconnected on `onended`), and cleans up all nodes and timers on stop.
+  Dynamic Cozy Weather acoustic soundscapes (`src/platform/weather-ambience.ts`,
+  Elevation Track E17+E19G, Milestone 211) layer gentle bandpass-filtered
+  pink-noise beds and stereo-panned sine/triangle accents (`WEATHER_AMBIENCE_SPECS`,
+  `weatherAmbienceSpec`, `weatherAmbiencePan`, `createWeatherAmbienceLayer`)
+  for all 4 active outdoor weather modes (`sunshower`, `breeze-petals`,
+  `snow-flurry`, `twilight-fireflies`) directly into `createAmbiencePlayer`'s
+  `masterGain` so weather audio automatically shares ambience mute, volume,
+  ducking, and the `1400 Hz` Journal warm filter while creating zero extra Web
+  Audio nodes on `"clear"`; pure `resolveSoundtrackWeather` hushes weather
+  soundscapes to `"clear"` on title, battle, finale, and all 19 sheltered
+  indoor areas, surfaced read-only in `MusicDebugInfo.weather`.
   Character-voiced talking blips and key-aligned UI clicks
   (`src/platform/voices.ts` backed by pure declarative speaker/scale tables in
   `src/platform/voice-catalog.ts`, Milestones 80, 142, 152, 160 & 205 / Track
@@ -1012,11 +1023,15 @@ ios/            Capacitor iOS project (from Milestone 4).
   viewport via Pixi `app.renderer.extract.canvas`,
   frames it inside a warm cream watercolor postcard border (`#fbf6e8` margin,
   `#47321f` hand-inked inner rule, four-leaf clover emblem, region + active
-  companion subcaption via `formatPostcardCompanions` / `postcardMetadata` in
-  `src/ui/postcard.ts` and `captureAreaPostcard` / `deliverAreaPostcard` in
-  `src/shell/feedback.ts`,
+  companion subcaption via `formatPostcardCompanions` / `postcardMetadata` /
+  `postcardWeatherLabel` in `src/ui/postcard.ts` and `captureAreaPostcard` /
+  `deliverAreaPostcard` in `src/shell/feedback.ts`,
   stamping `"with Maddie"`, `"with Maddie & Sue"`, `"with Maddie, Sue & Jordan"`,
   or trimming `> 4` followers to the first 3 plus `"& friends"`, Milestone 136,
+  and appending the live cozy weather stamp (`"Rainbow Sunshower"`,
+  `"Petal Breeze"`, `"Snow Flurry"`, or `"Twilight Fireflies"`) whenever an
+  outdoor weather mode is active while leaving `"clear"` / sheltered indoor
+  postcards byte-identical, Milestone 211 / Track E17+E19G,
   and bottom-right `"<Area> · Wilds of Cloverhollow"` stamp),
   and delivers `cloverhollow-postcard-<areaId>.png` via `deliverPostcard`
   (`src/ui/postcard.ts`, Milestone 160): on touch/iOS (`preferShare` active when
@@ -5985,7 +6000,10 @@ trunks keep its two exits.
   reports the selected level (`0.25`, `0.5`, `0.75`, or `1`), `sound.state()`
   returns the AudioContext's state string (`running`, `suspended`,
   `interrupted`, `closed`, or `unavailable`), and `sound.music()` returns
-  `{ track, ambience, duck, title, playing, muted, level, ambienceMuted }`.
+  `{ track, ambience, weather, duck, title, playing, muted, level, ambienceMuted, adaptive }`.
+  The sticker/UI gallery (`src/dev/ui-gallery.ts`) delegates its declarative
+  fixture tables and view builders to `src/dev/ui-gallery-fixtures.ts`
+  (Milestone 211 / Track E19G) with zero visual or state changes.
   Harness builds also log `[cloverhollow] audio {state}` on every state change,
   `[cloverhollow] music {track, ambience, duck, title}` on soundtrack changes,
   and `[cloverhollow] sound {tick, cue, played}` per cue, for native checks.

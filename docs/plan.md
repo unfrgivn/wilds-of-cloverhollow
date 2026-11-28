@@ -9109,6 +9109,43 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   non-vendor chunk), `just ios-device-build` (`Release-iphoneos/App.app`), and
   221/221 Chromium & WebKit e2e tests across `accessibility`, `catch`,
   `lifeguard`, `art`, and `ui-gallery` without `--update-snapshots`.
+
+## Milestone 211: Dynamic Cozy Weather Acoustic Soundscapes, Weather-Stamped Photo Mode Postcards & `src/dev/ui-gallery-fixtures.ts` Modular Split (Elevation Track E17+E19G) **Status:** ✅ Completed (2026-11-28)
+- Dynamic Cozy Weather Acoustic Soundscapes (`src/platform/weather-ambience.ts`,
+  `src/platform/ambience.ts`, `src/platform/audio.ts`, `src/main.ts`):
+  - Adds pure `WEATHER_AMBIENCE_SPECS`, `weatherAmbienceSpec`,
+    `weatherAmbiencePan`, `resolveSoundtrackWeather`, and procedural
+    `createWeatherAmbienceLayer` for all 4 active outdoor weather modes
+    (`sunshower`, `breeze-petals`, `snow-flurry`, `twilight-fireflies`),
+    routed directly into `createAmbiencePlayer`'s `masterGain` so weather audio
+    automatically shares ambience mute, volume, ducking, and the `1400 Hz`
+    Journal warm low-pass filter with zero Web Audio nodes on `"clear"` and
+    automatic silence on title, battle, finale, and all 19 sheltered indoor
+    areas.
+  - Exposes live resolved weather read-only on `MusicDebugInfo.weather` via
+    `AudioController.setWeather` and triggers immediate re-render invalidation
+    on Valley Sky Almanac selections.
+- Weather-Stamped Photo Mode Postcards (`src/ui/postcard.ts`,
+  `src/shell/feedback.ts`, `src/shell/shell-bindings.ts`):
+  - Adds pure `postcardWeatherLabel` (`"Rainbow Sunshower"`, `"Petal Breeze"`,
+    `"Snow Flurry"`, `"Twilight Fireflies"`, or `""`) and backwards-compatible
+    optional 5th `weather` parameter on `postcardMetadata`, threading live
+    area weather from `createPostcardSnapper` -> `deliverAreaPostcard` ->
+    `captureAreaPostcard` and returning `subcaption` on `PostcardCapture`.
+- Modular `src/dev/ui-gallery-fixtures.ts` Extraction (`src/dev/ui-gallery.ts`
+  `909 -> 368` lines, `src/dev/ui-gallery-fixtures.ts` `430` lines):
+  - Extracts dialogue tables, credits entries, title/journal views, and battle
+    HUD/command/feeling/check fixtures with zero behavioral or visual diffs.
+- Evidence: `tests/unit/milestone-211.test.ts` and
+  `tests/e2e/milestone-211.spec.ts` (`@smoke` Chromium + WebKit); zero
+  `src/core` changes, zero replay hash shifts, zero baseline diffs.
+- Gates: `just check` (279 unit files / 2,058 tests, all 77 recorded + 7
+  headless sims with zero hash shifts, 23 QA packs, purity, lint), `just build`
+  (largest non-vendor chunk `386.59 kB < 500 kB`, hook leak + runtime story +
+  harness checks green), 20/20 Chromium & WebKit e2e tests (`milestone-211`,
+  `milestone-187`, `milestone-160`, `soundtrack`), and 99/99 Chromium
+  `ui-gallery` tests (`0` snapshot diffs).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

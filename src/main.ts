@@ -38,7 +38,8 @@ import {
   shouldClearRest,
 } from "./shell/feedback";
 import { createSaveSession, createSaveStore } from "./shell/save-storage";
-import { createAudio, projectMusicMix } from "./platform/audio";
+import { createAudio, projectMusicMix, resolveSoundtrackWeather } from "./platform/audio";
+import { getCozyWeatherMode, subscribeCozyWeather } from "./platform/weather-prefs";
 import { createHaptics } from "./platform/haptics";
 import { findPettableCompanion, findRestSpot } from "./render/companions";
 import {
@@ -155,7 +156,7 @@ async function boot(): Promise<void> {
   const minigameRecords = createMinigameRecords(invalidate);
   let activeArcadeRecord: ArcadeRecordBadge | null = null;
   let fishStreak = 0;
-  syncReducedMotion();
+  syncReducedMotion(); subscribeCozyWeather(invalidate);
   const hudHints = createHudHints(uiRoot);
   const saveToast = createSaveToast(uiRoot);
   const areaBanner = createAreaBanner(uiRoot);
@@ -489,6 +490,7 @@ async function boot(): Promise<void> {
       titleOpen: titleOrQaOpen, jukeboxActive: jukeboxTrack !== null,
       track: soundtrack.track, duck: soundtrack.duck,
     }));
+    sound.setWeather(resolveSoundtrackWeather(state, getCozyWeatherMode(), titleOrQaOpen));
     devLog?.logMusic(soundtrack);
     const arcadeState = arcadeView(content.world, state, gameSettings.gentleTiming());
     const inputMode = inputShortcuts.inputMode();

@@ -24,6 +24,7 @@ import {
   newlyEarnedRibbons,
   type MeritRibbonSummary,
 } from "../core/ribbons";
+import type { CozyWeatherKind } from "../core/weather";
 import type { CompanionAudioEffect, SoundPlayContext } from "../platform/audio";
 import type { HapticKind } from "../platform/haptics";
 import type { MinigameRecordsController } from "../platform/minigame-records";
@@ -588,6 +589,7 @@ export function captureAreaPostcard(
   areaId: string,
   sourceCanvas: HTMLCanvasElement,
   partyNames?: readonly string[],
+  weather?: CozyWeatherKind,
 ): PostcardCapture | null {
   const area = world.areas[areaId];
   const areaName = area?.name ?? areaId;
@@ -595,12 +597,13 @@ export function captureAreaPostcard(
     area?.land === undefined
       ? undefined
       : world.lands.find((entry) => entry.id === area.land);
-  const meta = postcardMetadata(areaId, areaName, land?.name ?? "", partyNames);
+  const meta = postcardMetadata(areaId, areaName, land?.name ?? "", partyNames, weather);
   const composed = composePostcardFrame(sourceCanvas, meta.caption, meta.subcaption);
   if (composed === null) return null;
   return {
     filename: meta.filename,
     caption: meta.caption,
+    subcaption: meta.subcaption,
     width: composed.width,
     height: composed.height,
     dataUrl: composed.dataUrl,
@@ -616,6 +619,7 @@ export async function deliverAreaPostcard(
     download?: boolean;
     preferShare?: boolean;
     partyNames?: readonly string[];
+    weather?: CozyWeatherKind;
     onDelivered?: (
       capture: PostcardCapture,
       delivery: Exclude<PostcardDeliveryResult, "cancelled">,
@@ -627,7 +631,13 @@ export async function deliverAreaPostcard(
     state.party
       .map((member) => world.party[member.id]?.name ?? "")
       .filter((name) => name.length > 0);
-  const capture = captureAreaPostcard(world, state.area, sourceCanvas, partyNames);
+  const capture = captureAreaPostcard(
+    world,
+    state.area,
+    sourceCanvas,
+    partyNames,
+    options?.weather,
+  );
   if (capture === null) return null;
   if (options?.download !== false) {
     const delivery = await deliverPostcard(capture, { preferShare: options?.preferShare });

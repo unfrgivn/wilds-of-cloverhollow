@@ -1,3 +1,4 @@
+import type { CozyWeatherKind } from "../core/weather";
 import { element, svgElement } from "./dom";
 
 export type PostcardMetadata = {
@@ -9,6 +10,7 @@ export type PostcardMetadata = {
 export type PostcardCapture = {
   filename: string;
   caption: string;
+  subcaption: string;
   width: number;
   height: number;
   dataUrl: string;
@@ -62,23 +64,44 @@ export function formatPostcardCompanions(names: readonly string[]): string {
   return `with ${head} & ${last}`;
 }
 
+const POSTCARD_WEATHER_LABELS: Readonly<Record<Exclude<CozyWeatherKind, "clear">, string>> = {
+  sunshower: "Rainbow Sunshower",
+  "breeze-petals": "Petal Breeze",
+  "snow-flurry": "Snow Flurry",
+  "twilight-fireflies": "Twilight Fireflies",
+};
+
+/** Returns the cozy weather stamp for Photo Mode postcards, or `""` for clear/sheltered skies. */
+export function postcardWeatherLabel(weather?: CozyWeatherKind): string {
+  if (weather === undefined || weather === "clear") return "";
+  return POSTCARD_WEATHER_LABELS[weather];
+}
+
 /** Pure formatter for Photo Mode postcard filenames, captions, and region labels. */
 export function postcardMetadata(
   areaId: string,
   areaName: string,
   landName: string,
   partyNames?: readonly string[],
+  weather?: CozyWeatherKind,
 ): PostcardMetadata {
   const slug = slugAreaId(areaId);
   const cleanArea = areaName.trim().length > 0 ? areaName.trim() : "Cloverhollow";
   const cleanLand = landName.trim();
   const companions = partyNames === undefined ? "" : formatPostcardCompanions(partyNames);
-  const subcaption =
+  const weatherLabel = postcardWeatherLabel(weather);
+  const baseSub =
     cleanLand.length > 0 && companions.length > 0
       ? `${cleanLand} · ${companions}`
       : cleanLand.length > 0
         ? cleanLand
         : companions;
+  const subcaption =
+    weatherLabel.length > 0
+      ? baseSub.length > 0
+        ? `${baseSub} · ${weatherLabel}`
+        : weatherLabel
+      : baseSub;
   return {
     filename: `cloverhollow-postcard-${slug}.png`,
     caption: `${cleanArea} · Wilds of Cloverhollow`,

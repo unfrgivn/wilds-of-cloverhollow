@@ -43,10 +43,12 @@ import {
   trackScaleNotes,
   type VoiceExpression,
 } from "./voices";
+import { resolveSoundtrackWeather, type ActiveWeatherKind } from "./weather-ambience";
 
 export {
   effectRecipe,
   projectMusicMix,
+  resolveSoundtrackWeather,
   soundCueRecipe,
   type AudioRecipe,
   type AudioSegment,
@@ -70,6 +72,7 @@ export type AudioState = "running" | "suspended" | "interrupted" | "closed" | "u
 export type MusicDebugInfo = {
   track: MusicTrack;
   ambience: AmbienceBed;
+  weather: ActiveWeatherKind;
   duck: boolean;
   title: string;
   playing: boolean;
@@ -115,6 +118,7 @@ export type AudioController = {
   setLevel: (level: AudioLevel) => void;
   level: () => AudioLevel;
   setSoundtrack: (next: SoundtrackState, adaptive?: MusicAdaptiveState) => void;
+  setWeather: (weather: ActiveWeatherKind) => void;
   toggleMusic: () => void;
   musicMuted: () => boolean;
   setMusicLevel: (level: AudioLevel) => void;
@@ -168,6 +172,7 @@ export function createAudio(
     title: trackTitles.silent,
   };
   let adaptiveState: MusicAdaptiveState = DEFAULT_ADAPTIVE_STATE;
+  let currentWeather: ActiveWeatherKind = "clear";
   const store = createPreferenceStore(preferenceKey);
   let context: AudioContext | null = null;
   let master: GainNode | null = null;
@@ -279,6 +284,12 @@ export function createAudio(
     ambiencePlayer?.setWarmFilter(nextAdaptive.journalWarm);
   };
 
+  const setWeather = (next: ActiveWeatherKind): void => {
+    if (next === currentWeather) return;
+    currentWeather = next;
+    ambiencePlayer?.setWeather(next);
+  };
+
   const ensureContext = (): AudioContext | null => {
     if (context !== null) return context;
     const Constructor = globalThis.AudioContext;
@@ -323,6 +334,7 @@ export function createAudio(
       tensionLayer: adaptiveState.tensionLayer,
     });
     ambiencePlayer.setBed(soundtrack.ambience);
+    ambiencePlayer.setWeather(currentWeather);
     ambiencePlayer.setWarmFilter(adaptiveState.journalWarm);
     syncPlayers();
     return context;
@@ -612,6 +624,7 @@ export function createAudio(
     setLevel,
     level: () => level,
     setSoundtrack,
+    setWeather,
     toggleMusic,
     musicMuted: () => musicMuted,
     setMusicLevel,
@@ -621,6 +634,7 @@ export function createAudio(
     music: () => ({
       track: soundtrack.track,
       ambience: soundtrack.ambience,
+      weather: currentWeather,
       duck: soundtrack.duck,
       title: soundtrack.title,
       playing:

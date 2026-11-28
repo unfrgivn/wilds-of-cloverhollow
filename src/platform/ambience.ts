@@ -4,9 +4,11 @@ import {
   AMBIENCE_JOURNAL_GAIN_SCALE,
   AMBIENCE_OPEN_FILTER_HZ,
 } from "./music-mix";
+import { createWeatherAmbienceLayer, type ActiveWeatherKind } from "./weather-ambience";
 
 export type AmbiencePlayer = {
   setBed: (bed: AmbienceBed) => void;
+  setWeather: (weather: ActiveWeatherKind) => void;
   setMix: (next: { active: boolean; gain: number }) => void;
   setWarmFilter: (warm: boolean) => void;
   sync: () => void;
@@ -128,14 +130,17 @@ export function createAmbiencePlayer(
   }
 
   let desiredBed: AmbienceBed = "none";
+  let desiredWeather: ActiveWeatherKind = "clear";
   let mixActive = false;
   let mixGain = 0;
   let lastMasterTarget = -1;
   let warmActive = false;
   let activeBed: ActiveBed | null = null;
+  const weatherLayer = createWeatherAmbienceLayer(context, masterGain, getPink);
 
-  const canRun = (): boolean =>
-    context.state === "running" && mixActive && desiredBed !== "none";
+  const canRunAudio = (): boolean => context.state === "running" && mixActive;
+  const canRunBed = (): boolean => canRunAudio() && desiredBed !== "none";
+  const hasActiveLayer = (): boolean => desiredBed !== "none" || desiredWeather !== "clear";
 
   const stopBed = (bed: ActiveBed | null, immediate = false): void => {
     if (bed === null || bed.stopped) return;
@@ -459,6 +464,27 @@ export function createAmbiencePlayer(
       sources.push(src);
       return src;
     };
+    const makeFilter = (type: BiquadFilterType, freq: number, q?: number): BiquadFilterNode => {
+      const filter = context.createBiquadFilter();
+      filter.type = type;
+      filter.frequency.setValueAtTime(freq, now);
+      if (q !== undefined) filter.Q.setValueAtTime(q, now);
+      nodes.push(filter);
+      return filter;
+    };
+    const makeGain = (value: number): GainNode => {
+      const g = context.createGain();
+      g.gain.setValueAtTime(value, now);
+      nodes.push(g);
+      return g;
+    };
+    const makeLfo = (freq: number, depth: number): [OscillatorNode, GainNode] => {
+      const lfo = context.createOscillator();
+      lfo.type = "sine";
+      lfo.frequency.setValueAtTime(freq, now);
+      sources.push(lfo);
+      return [lfo, makeGain(depth)];
+    };
 
     const bed: ActiveBed = {
       bed: kind,
@@ -472,147 +498,61 @@ export function createAmbiencePlayer(
 
     if (kind === "town-breeze") {
       const src = addPink();
-      const bp = context.createBiquadFilter();
-      bp.type = "bandpass";
-      bp.frequency.setValueAtTime(750, now);
-      bp.Q.setValueAtTime(0.7, now);
-      const level = context.createGain();
-      level.gain.setValueAtTime(0.55, now);
-      nodes.push(bp, level);
-      src.connect(bp).connect(level).connect(gain);
+      src.connect(makeFilter("bandpass", 750, 0.7)).connect(makeGain(0.55)).connect(gain);
       src.start(now);
       scheduleAccent(bed, AMBIENCE_ACCENT_CADENCE_MS[kind], (pan) => playBirdChirp(gain, pan));
     } else if (kind === "ocean") {
       const src = addPink();
-      const lp = context.createBiquadFilter();
-      lp.type = "lowpass";
-      lp.frequency.setValueAtTime(480, now);
-      lp.Q.setValueAtTime(0.6, now);
-      const waveGain = context.createGain();
-      waveGain.gain.setValueAtTime(0.65, now);
-      const lfo = context.createOscillator();
-      lfo.type = "sine";
-      lfo.frequency.setValueAtTime(0.13, now);
-      const lfoDepth = context.createGain();
-      lfoDepth.gain.setValueAtTime(0.32, now);
-      sources.push(lfo);
-      nodes.push(lp, waveGain, lfoDepth);
+      const waveGain = makeGain(0.65);
+      const [lfo, lfoDepth] = makeLfo(0.13, 0.32);
       lfo.connect(lfoDepth).connect(waveGain.gain);
-      src.connect(lp).connect(waveGain).connect(gain);
+      src.connect(makeFilter("lowpass", 480, 0.6)).connect(waveGain).connect(gain);
       src.start(now);
       lfo.start(now);
       scheduleAccent(bed, AMBIENCE_ACCENT_CADENCE_MS[kind], (pan) => playWaveShimmer(gain, pan));
     } else if (kind === "mountain-wind") {
       const src = addPink();
-      const bp = context.createBiquadFilter();
-      bp.type = "bandpass";
-      bp.frequency.setValueAtTime(580, now);
-      bp.Q.setValueAtTime(1.6, now);
-      const lfo = context.createOscillator();
-      lfo.type = "sine";
-      lfo.frequency.setValueAtTime(0.09, now);
-      const depth = context.createGain();
-      depth.gain.setValueAtTime(220, now);
-      const level = context.createGain();
-      level.gain.setValueAtTime(0.7, now);
-      sources.push(lfo);
-      nodes.push(bp, depth, level);
+      const bp = makeFilter("bandpass", 580, 1.6);
+      const [lfo, depth] = makeLfo(0.09, 220);
       lfo.connect(depth).connect(bp.frequency);
-      src.connect(bp).connect(level).connect(gain);
+      src.connect(bp).connect(makeGain(0.7)).connect(gain);
       src.start(now);
       lfo.start(now);
       scheduleAccent(bed, AMBIENCE_ACCENT_CADENCE_MS[kind], (pan) => playMountainGust(gain, pan));
     } else if (kind === "hearth") {
       const src = addPink();
-      const lp = context.createBiquadFilter();
-      lp.type = "lowpass";
-      lp.frequency.setValueAtTime(260, now);
-      lp.Q.setValueAtTime(0.8, now);
-      const level = context.createGain();
-      level.gain.setValueAtTime(0.85, now);
-      nodes.push(lp, level);
-      src.connect(lp).connect(level).connect(gain);
+      src.connect(makeFilter("lowpass", 260, 0.8)).connect(makeGain(0.85)).connect(gain);
       src.start(now);
       scheduleAccent(bed, AMBIENCE_ACCENT_CADENCE_MS[kind], (pan) => playHearthCrackle(gain, pan));
     } else if (kind === "forest") {
       const src = addPink();
-      const bp = context.createBiquadFilter();
-      bp.type = "bandpass";
-      bp.frequency.setValueAtTime(1100, now);
-      bp.Q.setValueAtTime(0.9, now);
-      const level = context.createGain();
-      level.gain.setValueAtTime(0.5, now);
-      const low = context.createBiquadFilter();
-      low.type = "lowpass";
-      low.frequency.setValueAtTime(320, now);
-      const lowLevel = context.createGain();
-      lowLevel.gain.setValueAtTime(0.35, now);
-      nodes.push(bp, level, low, lowLevel);
-      src.connect(bp).connect(level).connect(gain);
-      src.connect(low).connect(lowLevel).connect(gain);
+      src.connect(makeFilter("bandpass", 1100, 0.9)).connect(makeGain(0.5)).connect(gain);
+      src.connect(makeFilter("lowpass", 320)).connect(makeGain(0.35)).connect(gain);
       src.start(now);
       scheduleAccent(bed, AMBIENCE_ACCENT_CADENCE_MS[kind], (pan) =>
         playBirdChirp(gain, pan, 0.085),
       );
     } else if (kind === "enchanted-shimmer") {
       const src = addPink();
-      const bp = context.createBiquadFilter();
-      bp.type = "bandpass";
-      bp.frequency.setValueAtTime(1300, now);
-      bp.Q.setValueAtTime(1, now);
-      const level = context.createGain();
-      level.gain.setValueAtTime(0.38, now);
-      nodes.push(bp, level);
-      src.connect(bp).connect(level).connect(gain);
+      src.connect(makeFilter("bandpass", 1300, 1)).connect(makeGain(0.38)).connect(gain);
       src.start(now);
       scheduleAccent(bed, AMBIENCE_ACCENT_CADENCE_MS[kind], (pan) => playEnchantedChime(gain, pan));
     } else if (kind === "cavern-drips") {
       const src = addPink();
-      const lp = context.createBiquadFilter();
-      lp.type = "lowpass";
-      lp.frequency.setValueAtTime(280, now);
-      lp.Q.setValueAtTime(0.7, now);
-      const lowLevel = context.createGain();
-      lowLevel.gain.setValueAtTime(0.34, now);
-      const hush = context.createBiquadFilter();
-      hush.type = "bandpass";
-      hush.frequency.setValueAtTime(950, now);
-      hush.Q.setValueAtTime(1.1, now);
-      const hushLevel = context.createGain();
-      hushLevel.gain.setValueAtTime(0.18, now);
-      nodes.push(lp, lowLevel, hush, hushLevel);
-      src.connect(lp).connect(lowLevel).connect(gain);
-      src.connect(hush).connect(hushLevel).connect(gain);
+      src.connect(makeFilter("lowpass", 280, 0.7)).connect(makeGain(0.34)).connect(gain);
+      src.connect(makeFilter("bandpass", 950, 1.1)).connect(makeGain(0.18)).connect(gain);
       src.start(now);
       scheduleAccent(bed, AMBIENCE_ACCENT_CADENCE_MS[kind], (pan) => playCaveDrop(gain, pan));
     } else if (kind === "cafe-murmur") {
       const src = addPink();
-      const lp = context.createBiquadFilter();
-      lp.type = "lowpass";
-      lp.frequency.setValueAtTime(360, now);
-      lp.Q.setValueAtTime(0.7, now);
-      const level = context.createGain();
-      level.gain.setValueAtTime(0.42, now);
-      nodes.push(lp, level);
-      src.connect(lp).connect(level).connect(gain);
+      src.connect(makeFilter("lowpass", 360, 0.7)).connect(makeGain(0.42)).connect(gain);
       src.start(now);
       scheduleAccent(bed, AMBIENCE_ACCENT_CADENCE_MS[kind], (pan) => playCafeClink(gain, pan));
     } else {
       // "arcade-hum": soft warm indoor room tone
       const src = addPink();
-      const lp = context.createBiquadFilter();
-      lp.type = "lowpass";
-      lp.frequency.setValueAtTime(300, now);
-      const level = context.createGain();
-      level.gain.setValueAtTime(0.45, now);
-      const hum = context.createOscillator();
-      hum.type = "sine";
-      hum.frequency.setValueAtTime(120, now);
-      const humGain = context.createGain();
-      humGain.gain.setValueAtTime(0.06, now);
-      sources.push(hum);
-      nodes.push(lp, level, humGain);
-      src.connect(lp).connect(level).connect(gain);
+      const [hum, humGain] = makeLfo(120, 0.06);
+      src.connect(makeFilter("lowpass", 300)).connect(makeGain(0.45)).connect(gain);
       hum.connect(humGain).connect(gain);
       src.start(now);
       hum.start(now);
@@ -623,12 +563,13 @@ export function createAmbiencePlayer(
 
   const sync = (): void => {
     const now = context.currentTime;
-    const targetGain = canRun() ? mixGain : 0;
+    const targetGain = canRunAudio() && hasActiveLayer() ? mixGain : 0;
     if (targetGain !== lastMasterTarget) {
       lastMasterTarget = targetGain;
       rampParam(masterGain.gain, targetGain, now, 0.2);
     }
-    if (!canRun()) {
+    weatherLayer.sync(mixActive);
+    if (!canRunBed()) {
       if (activeBed !== null) {
         stopBed(activeBed, true);
         activeBed = null;
@@ -651,6 +592,15 @@ export function createAmbiencePlayer(
         return;
       }
       desiredBed = bed;
+      sync();
+    },
+    setWeather: (weather) => {
+      if (weather === desiredWeather) {
+        weatherLayer.sync(mixActive);
+        return;
+      }
+      desiredWeather = weather;
+      weatherLayer.setWeather(weather);
       sync();
     },
     setMix: (next) => {

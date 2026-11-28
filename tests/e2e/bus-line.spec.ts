@@ -3,9 +3,12 @@ import {
   longFlowTimeout,
   openHarness,
   playAfter,
+  queueScript,
   readState,
+  recording,
   resetPaused,
   step,
+  walk,
 } from "./helpers";
 
 test.describe.configure({ timeout: longFlowTimeout });
@@ -59,6 +62,33 @@ test("the bus line carries Fae from Cloverhollow to the bay and home", async ({ 
   expect(Math.abs(state.player.y - 985)).toBeLessThan(8);
   expect(state.facing).toBe("up");
 
+  // Before walking to Bubblegum Bay on foot, the plaza stop explains discover-on-foot travel.
+  await press(page);
+  state = await readState(page);
+  expect(state.dialogue?.knot).toBe("bus_stop");
+  expect(state.dialogue?.choices).toEqual([]);
+  const beforeLines = await talk(page, 0);
+  expect(beforeLines.some((line) => line.includes("walked the trail there"))).toBe(true);
+  expect((await readState(page)).area).toBe("plaza");
+
+  // Reaching Bubblegum Bay on foot (east-road.json) unlocks the Star-Line bus both ways.
+  await resetPaused(page, "new-game");
+  const eastRoad = recording("tests/sim/scripts/new-game/east-road.json");
+  await queueScript(page, eastRoad);
+  await step(page, eastRoad.reduce((total, segment) => total + segment.ticks, 0));
+  expect((await readState(page)).area).toBe("bay");
+
+  await walk(page, "x", 355);
+  await hold(page, "ArrowUp", 1);
+  await press(page);
+  state = await readState(page);
+  expect(state.dialogue?.choices).toEqual(["Cloverhollow!", "Not yet."]);
+  await talk(page, 0);
+  await step(page, 40);
+  state = await readState(page);
+  expect(state.area).toBe("plaza");
+
+  await hold(page, "ArrowUp", 1);
   await press(page);
   state = await readState(page);
   expect(state.dialogue?.choices).toEqual(["Bubblegum Bay!", "Not yet."]);

@@ -83,7 +83,7 @@ test("real keys from Pinecone Pass down the Cliffside Trail to Bubblegum Bay", a
       battle.shown) {
       bunnyShot = true;
       await expect(page.locator(".battle-command-label"))
-        .toHaveText(["Soothe", "Play", "Snack", "Run"]);
+        .toHaveText(["Soothe", "Recover", "Snack", "Run"]);
       await page.setViewportSize({ width: 874, height: 402 });
       await expect(page).toHaveScreenshot("trail-bunny-battle.png");
       await page.setViewportSize({ width: 1280, height: 720 });
@@ -142,7 +142,7 @@ test("real keys over the footbridge to the lookout, and down into the bay", asyn
       state.battle.revealed >= state.battle.message.length && !gullShot) {
       gullShot = true;
       await expect(page.locator(".battle-command-label"))
-        .toHaveText(["Soothe", "Play", "Snack", "Run"]);
+        .toHaveText(["Soothe", "Recover", "Snack", "Run"]);
       // The mini-boss is drawn 260 units tall (the critters, 190): check it
       // clears the HUD and the menu on a desktop and on a phone.
       await expect(page).toHaveScreenshot("trail-gull-battle-1280.png");

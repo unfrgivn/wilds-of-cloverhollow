@@ -397,6 +397,7 @@ const FACING_VECTORS: Readonly<Record<Direction, Point>> = {
 
 const PET_FRONT_RANGE = 78;
 const PET_CLOSE_RANGE = 56;
+const PET_HUMAN_STEP = 52;
 const PET_FRONT_DOT = 0.15;
 
 function canUseOverworldAction(state: State): boolean {
@@ -422,13 +423,19 @@ function matchPettableCompanion(world: World, state: State): CompanionMatch | nu
   const facing = FACING_VECTORS[state.facing];
   let bestFront: CompanionMatch | null = null;
   let bestClose: CompanionMatch | null = null;
+  let humansAhead = 0;
 
   for (const member of state.party) {
-    if (!PETTABLE_IDS.has(member.id)) continue;
+    if (!PETTABLE_IDS.has(member.id)) {
+      humansAhead += 1;
+      continue;
+    }
+    const frontRange = PET_FRONT_RANGE + humansAhead * PET_HUMAN_STEP;
+    const closeRange = PET_CLOSE_RANGE + humansAhead * PET_HUMAN_STEP;
     const dx = member.x - state.player.x;
     const dy = member.y - state.player.y;
     const distance = Math.hypot(dx, dy);
-    if (distance > PET_FRONT_RANGE) continue;
+    if (distance > frontRange) continue;
     const dot = distance === 0 ? 1 : (dx * facing.x + dy * facing.y) / distance;
     const inFront = dot >= PET_FRONT_DOT;
     const height = world.party[member.id]?.box.height ?? 48;
@@ -444,7 +451,7 @@ function matchPettableCompanion(world: World, state: State): CompanionMatch | nu
       if (bestFront === null || candidate.distance < bestFront.distance) {
         bestFront = candidate;
       }
-    } else if (distance <= PET_CLOSE_RANGE) {
+    } else if (distance <= closeRange) {
       if (bestClose === null || candidate.distance < bestClose.distance) {
         bestClose = candidate;
       }
@@ -456,7 +463,8 @@ function matchPettableCompanion(world: World, state: State): CompanionMatch | nu
 
 /**
  * Finds the best pettable animal companion near Fae (preferring one in front
- * within 78u, falling back to the closest within 56u). Always yields to real
+ * within 78u + 52u per human party member ahead in line, falling back to the
+ * closest within 56u + 52u per human ahead). Always yields to real
  * interactables and active overlays.
  */
 export function findPettableCompanion(world: World, state: State): PettableCompanion | null {

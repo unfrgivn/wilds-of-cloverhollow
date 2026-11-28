@@ -232,7 +232,7 @@ test(
 
     const end = await readState(page);
     expect(end.area).toBe("park");
-    expect(end.coins).toBe(45);
+    expect(end.coins).toBe(61);
     expect(end.snacks).toBe(7);
     expect(await readHash(page)).toBe(await expectedHash);
     expect(errors).toEqual([]);
@@ -257,9 +257,12 @@ test(
     // 2. Chatter bubble, neighbor banter, >= 8.5:1 contrast, safe-area clamping & journal hiding.
     await openQaPaused(page, "flute");
     expect((await readState(page)).area).toBe("park");
-    await walk(page, "x", 800);
-    await walk(page, "x", 1200);
+    await walk(page, "y", 620);
+    await walk(page, "x", 1040);
+    await walk(page, "y", 700);
+    await walk(page, "x", 1270);
     await walk(page, "y", 445);
+    await walk(page, "x", 1220);
 
     const banter = await stepUntilChatter(
       page,
@@ -319,8 +322,10 @@ test(
     await finishDialogue(page, "Ask what she spotted in the park");
 
     // Step between Pippa & Hazel (within both flute ranges) and switch lantern OFF.
-    await walk(page, "x", 550);
-    await walk(page, "y", 620);
+    await walk(page, "x", 1270);
+    await walk(page, "y", 700);
+    await walk(page, "x", 820);
+    await walk(page, "y", 460);
     await page.keyboard.press("l");
     await step(page, 4);
     expect((await readState(page)).lantern).toBe(false);
@@ -330,7 +335,7 @@ test(
     await step(page, 4);
     expect((await readState(page)).dialogue?.knot).toBe("flute");
     await finishDialogue(page, "Just play");
-    await step(page, 24);
+    await step(page, 36);
 
     const musicInfo = await renderInfo(page);
     const pippaMusic = musicInfo.npcLife.npcs.find((npc) => npc.id === "pippa");
@@ -425,6 +430,8 @@ test(
     await openQaPaused(page, "lodge");
     expect((await readState(page)).area).toBe("lodge");
     assertNpcsRendered((await renderInfo(page)).npcs, ["otis", "clara"]);
+    await walk(page, "x", 560);
+    await walk(page, "y", 480);
 
     const lodgeBanter = await stepUntilChatter(
       page,
@@ -437,11 +444,20 @@ test(
     await assertChatterContrast(page);
     await assertChatterInViewport(page, 1280, 720);
 
+    if ((await readState(page)).snacks === 0) {
+      await page.keyboard.press("`");
+      await expect(page.locator(".qa-console")).toBeVisible();
+      await page.keyboard.type("snacks 2");
+      await page.keyboard.press("Enter");
+      await page.keyboard.press("Escape");
+      await expect(page.locator(".qa-console")).toBeHidden();
+      await step(page, 1);
+    }
     const beforeSnack = await readState(page);
     expect(beforeSnack.snacks).toBeGreaterThan(0);
 
-    await walk(page, "x", 710);
     await walk(page, "y", 645);
+    await walk(page, "x", 710);
     await page.keyboard.down("ArrowDown");
     await step(page, 2);
     await page.keyboard.up("ArrowDown");

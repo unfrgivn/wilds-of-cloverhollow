@@ -78,6 +78,6 @@ test("plaza props are solid where they meet the ground", async ({ page }) => {
   await step(page, 40);
   await page.keyboard.up("ArrowLeft");
   const state = await page.evaluate(() => window.__cloverhollow?.getState());
-  expect(state?.player.x).toBeCloseTo(1159, 0);
+  expect(state?.player.x).toBeCloseTo(1153, 0);
   expect(state?.player.y).toBe(550);
 });

@@ -125,23 +125,28 @@ test(
       }
     }
 
-    // Command cycling shifts the eager medallion to the highlighted party member.
-    expect(await portraitMoods(page)).toEqual({ fae: "eager", maddie: "cozy", sue: "cozy" });
-    await tapKey(page, "ArrowDown");
-    expect(await portraitMoods(page)).toEqual({ fae: "cozy", maddie: "eager", sue: "cozy" });
-    await tapKey(page, "ArrowDown");
-    expect(await portraitMoods(page)).toEqual({ fae: "cozy", maddie: "cozy", sue: "eager" });
-    await tapKey(page, "ArrowUp");
-    await tapKey(page, "ArrowUp");
-    expect(await portraitMoods(page)).toEqual({ fae: "eager", maddie: "cozy", sue: "cozy" });
+    const activeMembers = async (): Promise<string[]> =>
+      page.locator('.battle-portrait[data-active="true"]').evaluateAll((nodes) =>
+        nodes.map((node) => node.getAttribute("data-member") ?? ""),
+      );
 
-    // Charge 3 GREAT checks to make Together! ready -> all medallions turn radiant.
+    // Per-member turns: Fae is eager & active throughout her Turn 1 command menu.
+    expect(await portraitMoods(page)).toEqual({ fae: "eager", sue: "cozy", maddie: "cozy" });
+    expect(await activeMembers()).toEqual(["fae"]);
+    await tapKey(page, "ArrowDown");
+    expect(await portraitMoods(page)).toEqual({ fae: "eager", sue: "cozy", maddie: "cozy" });
+    expect(await activeMembers()).toEqual(["fae"]);
+    await tapKey(page, "ArrowUp");
+    expect(await portraitMoods(page)).toEqual({ fae: "eager", sue: "cozy", maddie: "cozy" });
+
+    // Charge 3 GREAT checks to make Together! ready -> all medallions turn radiant,
+    // while Turn 2 hands the eager/active medallion to Sue and Turn 3 to Maddie.
     await tapKey(page, "Enter");
     await playBattleCheck(page);
     expect(await portraitMoods(page)).toEqual({
       fae: "cheering",
-      maddie: "cheering",
       sue: "cheering",
+      maddie: "cheering",
     });
     await advanceUntil(page, (battle) => battle?.phase === "check");
     await playBattleCheck(page);
@@ -149,6 +154,11 @@ test(
       page,
       (battle) => battle?.phase === "command" && battle.revealed >= battle.message.length,
     );
+
+    // Turn 2 is Sue's turn: Sue's medallion shifts to eager/active.
+    expect(await portraitMoods(page)).toEqual({ fae: "cozy", sue: "eager", maddie: "cozy" });
+    expect(await activeMembers()).toEqual(["sue"]);
+
     await tapKey(page, "Enter");
     await playBattleCheck(page);
     await advanceUntil(page, (battle) => battle?.phase === "check");
@@ -161,18 +171,10 @@ test(
     await expect(page.locator(".battle-together-btn")).toBeVisible();
     expect(await portraitMoods(page)).toEqual({
       fae: "radiant",
-      maddie: "radiant",
       sue: "radiant",
+      maddie: "radiant",
     });
-    const activeMembers = async (): Promise<string[]> =>
-      page.locator('.battle-portrait[data-active="true"]').evaluateAll((nodes) =>
-        nodes.map((node) => node.getAttribute("data-member") ?? ""),
-      );
-    expect(await activeMembers()).toEqual(["fae"]);
-    await tapKey(page, "ArrowDown");
     expect(await activeMembers()).toEqual(["maddie"]);
-    await tapKey(page, "ArrowUp");
-    expect(await activeMembers()).toEqual(["fae"]);
 
     // Check clearance again while Together! button is visible below ENERGY.
     const [readyPortraitRect] = await visibleRects(page, ".battle-portraits");

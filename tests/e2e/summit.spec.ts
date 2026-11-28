@@ -107,8 +107,8 @@ test("real keys: Alpine Summit Overlook & Ski Lift match Bun hash at 1280 & 874"
     const end = await readState(page);
     expect(end.area).toBe("pass");
     expect(end.player).toEqual({ x: 485, y: 490 });
-    expect(end.coins).toBe(122);
-    expect(end.snacks).toBe(5);
+    expect(end.coins).toBe(130);
+    expect(end.snacks).toBe(3);
     expect(await readHash(page)).toBe(await expectedHash);
   },
 );

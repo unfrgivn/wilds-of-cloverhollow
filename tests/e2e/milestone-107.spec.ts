@@ -82,9 +82,7 @@ test(
     // Opening a fresh battle must never spawn spurious popups.
     await expect(page.locator(".battle-popup")).toHaveCount(0);
 
-    // Choose Sue's Cast (index 2) or Soothe (index 0) and land a GREAT check for a calm boost.
-    await tapKey(page, "ArrowDown");
-    await tapKey(page, "ArrowDown");
+    // Choose Fae's Soothe (index 0) and land a GREAT check for a live calm boost popup.
     await tapKey(page, "Enter");
     await playBattleCheck(page);
 

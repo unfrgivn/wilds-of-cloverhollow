@@ -55,13 +55,13 @@ test.describe("real keyboard movement", () => {
 
   test("real keys stop at the room wall, radius respected", async () => {
     await resetPaused(movementPage);
-    // 120 ticks at 4 units per tick is far more than the 240 units to the wall.
+    // 120 ticks at 4 units per tick is far more than the 246 units to the wall.
     await movementPage.keyboard.down("ArrowLeft");
     await step(movementPage, 120);
     await movementPage.keyboard.up("ArrowLeft");
     const x = (await readState(movementPage)).player.x;
-    expect(x).toBeGreaterThanOrEqual(60);
-    expect(x).toBeLessThan(60.01);
+    expect(x).toBeGreaterThanOrEqual(54);
+    expect(x).toBeLessThan(54.01);
   });
 
   test("real keys stop at a blocker, radius respected", async () => {
@@ -70,8 +70,8 @@ test.describe("real keyboard movement", () => {
     await step(movementPage, 150);
     await movementPage.keyboard.up("ArrowRight");
     const x = (await readState(movementPage)).player.x;
-    expect(x).toBeLessThanOrEqual(830.01);
-    expect(x).toBeGreaterThan(800);
+    expect(x).toBeLessThanOrEqual(836.01);
+    expect(x).toBeGreaterThan(835.99);
   });
 });
 

@@ -581,7 +581,12 @@ export type ReplayTickQuery =
   | "flute-command"
   | "lasso-steady-command"
   | "kid-lasso-windup"
-  | "lean-check";
+  | "lasso-windup-command"
+  | "lean-check"
+  | "lean-normal-check"
+  | "catch-all-lanes-check"
+  | "taco-ready"
+  | "fish-dock-ready";
 
 export function bunFindReplayTick(
   scriptPath: string,

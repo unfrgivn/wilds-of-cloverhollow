@@ -28,7 +28,7 @@ test("real keys: Wildlife Sanctuary living meadow matches Bun hash at 1280x720 a
     const expectedVisibleNpcs = [
       "fern",
       "sanctuary-bluebird",
-      "sanctuary-bunny",
+      "sanctuary-cat",
       "sanctuary-frog",
       "sanctuary-hamster",
       "sanctuary-moon-owl",
@@ -108,8 +108,8 @@ test("real keys: Wildlife Sanctuary living meadow matches Bun hash at 1280x720 a
 
     const end = await readState(page);
     expect(end.area).toBe("hills");
-    expect(end.coins).toBe(175);
-    expect(end.snacks).toBe(11);
+    expect(end.coins).toBe(191);
+    expect(end.snacks).toBe(10);
     expect(await readHash(page)).toBe(await expectedHash);
   },
 );

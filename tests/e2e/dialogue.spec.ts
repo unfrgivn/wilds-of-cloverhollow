@@ -85,8 +85,8 @@ test("real keys: the window, a choice, the journal, and the window again", {
   expect(await dialogueAttribute(page)).toBeUndefined();
 
   const before = await readState(page);
-  await hold(page, "ArrowDown", 12);
-  await hold(page, "ArrowLeft", 48);
+  await hold(page, "ArrowDown", 17);
+  await hold(page, "ArrowLeft", 42);
   const after = await readState(page);
   expect(after.player.x, "Fae walks again after the dialogue").toBeLessThan(before.player.x);
   await expect(prompt).toBeVisible();

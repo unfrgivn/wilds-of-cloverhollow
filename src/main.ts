@@ -451,6 +451,7 @@ async function boot(): Promise<void> {
     canvas: app.canvas,
     canSteer: () => canOverworldSteer(overlayContext()),
     playerScreen: () => view.playerScreenPoint(state),
+    playerWorld: () => state.player,
     onMove: (dir) => touch.setPointerArrow(dir.x === 0 && dir.y === 0 ? null : dir),
     onTapNearPlayer: () => {
       if (

@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import {
+  bunFindReplayTick,
   longFlowTimeout,
   openHarness,
   openMap,
@@ -457,15 +458,18 @@ test(
 
     // 3) Open Bubblegum Bay Fishing: verify user-select: none and suppressed bite/card animations.
     await resetPaused(page, "new-game");
-    const bayScript = recording("tests/sim/scripts/new-game/golden-bay.json");
-    const fishScript = recording("tests/sim/scripts/new-game/fish.json");
-    const talkIndex = fishScript.findIndex(
-      (segment, index) => index >= bayScript.length && segment.frame.confirm,
-    );
-    const arriveAtDock = fishScript.slice(0, talkIndex > 0 ? talkIndex : bayScript.length + 8);
-    const arriveTicks = arriveAtDock.reduce((total, segment) => total + segment.ticks, 0);
+    const fishPath = "tests/sim/scripts/new-game/fish.json";
+    const dockTick = bunFindReplayTick(fishPath, "new-game", "fish-dock-ready");
+    const arriveAtDock: ReturnType<typeof recording> = [];
+    let fishTicks = 0;
+    for (const segment of recording(fishPath)) {
+      if (fishTicks >= dockTick) break;
+      const take = Math.min(segment.ticks, dockTick - fishTicks);
+      arriveAtDock.push({ frame: segment.frame, ticks: take });
+      fishTicks += take;
+    }
     await queueScript(page, arriveAtDock);
-    await step(page, arriveTicks);
+    await step(page, dockTick);
     await page.keyboard.press("z");
     await step(page, 2);
     await page.keyboard.press("z");

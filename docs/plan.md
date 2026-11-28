@@ -7929,6 +7929,36 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   purity, lint), `just build` (`index` `363.98 kB < 500 kB`), 22/22 targeted
   Chromium & WebKit e2e, and 99/99 Chromium `ui-gallery` tests.
 
+## Milestone 183: Post-PR #14 Real UX Fixes (Hold-Steer Release Guard & Full-Party Petting Reach) & Complete E2E Assertion Recovery **Status:** ✅ Completed (2026-11-27)
+- Fixes two real player-facing UX bugs surfaced after PR #14 (`bf8a689c`) with
+  zero `src/core` changes and zero replay hash shifts across all 74 recorded
+  sims:
+  - **Hold-steer release guard (`src/shell/overworld-pointer.ts`,
+    `src/main.ts`):** exports `isOverworldGroundTap` (and
+    `DEFAULT_OVERWORLD_TAP_PLAYER_TRAVEL = 20`) and tracks Fae's screen & world
+    position from `pointerdown` to `pointerup` so releasing a short press-and-hold
+    steer (`playerTravel > 20`) never misclassifies the release as an
+    `onTapGround` click-to-walk auto-path.
+  - **Full-party pettable companion reach (`src/render/companions.ts`):** scales
+    `matchPettableCompanion` front/close reach by `+52u` per human companion
+    ahead of the pet in canonical party order (`["sue", "jordan", "maddie"]`) —
+    keeping 0-human reach unchanged (`78u`/`56u`), restoring Maddie petting in
+    `plaza-party` (`130u`/`108u`) and full-party `clubhouse`/late game
+    (`182u`/`160u`) while keeping `findRestSpot` priority intact when Fae rests
+    on benches/beanbags facing away from Maddie.
+- Repairs all remaining post-PR #14 non-snapshot e2e assertion failures across
+  the full Playwright suite (`harness`, `bedroom`, `plaza`, `downstairs`,
+  `dialogue`, `bay`, `bus`, `bus-line`, `jordan`, `showcase-polish`, `catch`,
+  `lean`, `milestone-107`, `taco`, `milestone-163`, `accessibility`,
+  `milestone-127`, `living-npcs`, `sanctuary`, `treats-compendium`, `cafe`,
+  `ending`, `festival`, `fish`, `flute`, `friend-homes`, `milo-rosie`,
+  `plaza-shops`, `raccoon`, `summit`, `trail`) using `bunFindReplayTick`
+  (`tools/sim/find-tick.ts`) for tick-resilient replay syncs
+  (`lean-normal-check`, `catch-all-lanes-check`, `taco-ready`,
+  `fish-dock-ready`).
+- Evidence: `tests/unit/milestone-183.test.ts` (7 tests), `just check`,
+  `just build`, and Chromium + WebKit e2e verification of the repaired specs.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

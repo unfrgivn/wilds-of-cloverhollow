@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import {
+  bunFindReplayTick,
   longFlowTimeout,
   openHarness,
   queueScript,
@@ -104,15 +105,18 @@ test.describe("Milestone 127: Direct Mouse & Touch Pointer Play", () => {
       await resetPaused(page, "new-game");
 
       // Arrive at Bubblegum Bay and walk onto Sue's dock (before opening fishing).
-      const bayScript = recording("tests/sim/scripts/new-game/golden-bay.json");
-      const fishScript = recording("tests/sim/scripts/new-game/fish.json");
-      const talkIndex = fishScript.findIndex(
-        (segment, index) => index >= bayScript.length && segment.frame.confirm,
-      );
-      const arriveAtDock = fishScript.slice(0, talkIndex > 0 ? talkIndex : bayScript.length + 8);
-      const arriveTicks = arriveAtDock.reduce((total, segment) => total + segment.ticks, 0);
+      const fishPath = "tests/sim/scripts/new-game/fish.json";
+      const dockTick = bunFindReplayTick(fishPath, "new-game", "fish-dock-ready");
+      const arriveAtDock: ReturnType<typeof recording> = [];
+      let ticks = 0;
+      for (const segment of recording(fishPath)) {
+        if (ticks >= dockTick) break;
+        const take = Math.min(segment.ticks, dockTick - ticks);
+        arriveAtDock.push({ frame: segment.frame, ticks: take });
+        ticks += take;
+      }
       await queueScript(page, arriveAtDock);
-      await step(page, arriveTicks);
+      await step(page, dockTick);
 
       // Open fishing via mouse clicks on the floating prompt, dialogue, and choice (zero keys!).
       const prompt = page.locator(".sticker-prompt");

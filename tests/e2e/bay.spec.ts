@@ -79,7 +79,7 @@ test("after chapter one, real keys take Fae down the east road into the bay", as
     const area = (await readState(page)).area;
     if (areas.at(-1) !== area) areas.push(area);
   });
-  expect(areas).toEqual(["park", "plaza", "bay"]);
+  expect(areas).toEqual(["park", "plaza", "lane", "crossing", "boardwalk", "bay"]);
   const state = await readState(page);
   expect(state.player).toEqual({ x: 180, y: 545 });
   expect(state.facing).toBe("right");
@@ -120,10 +120,10 @@ test("real keys: down the dock to Sue, she joins, and casts at the bluebird", as
   expect(lines[0]).toBe("Whoa, hi! Careful, these planks are a little wobbly.");
   expect(lines.at(-1)).toBe("Are you kidding? Of course! Let me grab my rod.");
   const joined = await readState(page);
-  expect(joined.party.map((member) => member.id)).toEqual(["maddie", "sue"]);
+  expect(joined.party.map((member) => member.id)).toEqual(["sue", "maddie"]);
   const info = await renderInfo(page);
   expect(info.npcs.map((npc) => npc.id), "her person is gone").not.toContain("sue");
-  expect(info.party.map((member) => member.id)).toEqual(["maddie", "sue"]);
+  expect(info.party.map((member) => member.id)).toEqual(["sue", "maddie"]);
 
   // Back down the dock together.
   await walk(page, "x", 1150);
@@ -167,13 +167,25 @@ test("real keys: down the dock to Sue, she joins, and casts at the bluebird", as
     await press(page);
   }
   await expect(page.locator(".battle-command-label"))
-    .toHaveText(["Soothe", "Play", "Cast", "Snack", "Run"]);
+    .toHaveText(["Soothe", "Recover", "Snack", "Run"]);
   await expect(page).toHaveScreenshot("bay-bluebird-battle.png");
 
+  // Turn 1 is Fae's turn; choose Recover to hand the turn cleanly to Sue.
   await hold(page, "ArrowDown", 1);
   await step(page, 1);
-  await hold(page, "ArrowDown", 1);
-  expect((await readBattle(page))?.selected).toBe(2);
+  expect((await readBattle(page))?.selected).toBe(1);
+  await press(page);
+  for (let count = 0; count < 40; count += 1) {
+    const battle = await readBattle(page);
+    if (battle?.phase === "command" && battle.revealed >= battle.message.length) break;
+    if (battle?.phase === "check" && battle.check !== null) await playBattleCheck(page);
+    else await press(page);
+  }
+
+  // Turn 2 is Sue's turn, with Cast at index 0.
+  await expect(page.locator(".battle-command-label"))
+    .toHaveText(["Cast", "Recover", "Snack", "Run"]);
+  expect((await readBattle(page))?.selected).toBe(0);
   await press(page);
   const check = await readBattle(page);
   expect(check?.phase).toBe("check");

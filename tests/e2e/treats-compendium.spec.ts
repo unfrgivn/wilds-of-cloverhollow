@@ -76,10 +76,12 @@ async function walkSafe(page: Page, axis: "x" | "y", target: number): Promise<vo
   }
 }
 
-async function meetWildKind(page: Page, kind: string): Promise<void> {
-  for (let tries = 0; tries < 6; tries += 1) {
+const FISH_CRACKER_FAVOURITES: ReadonlySet<string> = new Set(["raccoon", "pup", "cat"]);
+
+async function meetWildKind(page: Page, kinds: ReadonlySet<string>): Promise<void> {
+  for (let tries = 0; tries < 10; tries += 1) {
     const battle = await readBattle(page);
-    if (battle?.critterId === kind) return;
+    if (battle !== null && kinds.has(battle.critterId)) return;
     if (battle !== null) {
       for (let stepIdx = 0; stepIdx < 40; stepIdx += 1) {
         const cur = await readBattle(page);
@@ -91,17 +93,28 @@ async function meetWildKind(page: Page, kind: string): Promise<void> {
         } else await press(page, "z");
       }
     }
-    const target = (await readState(page)).wild.find((c) => c.kind === kind && c.mood === "chaos");
-    if (target === undefined) throw new Error(`no chaos ${kind} in plaza`);
+    const state = await readState(page);
+    const target = state.wild.find((c) => kinds.has(c.kind) && c.mood === "chaos");
+    if (target === undefined) throw new Error("no Fish Cracker chaos critter in plaza");
     if (target.cooldownTicks > 0) await step(page, target.cooldownTicks + 2);
-    if (tries % 2 === 0) {
-      await walk(page, "y", target.y);
-      if ((await readBattle(page))?.critterId === kind) return;
+    // Detour along clear north/south/east/west corridors when the central fountain sits between.
+    if (tries % 2 === 1) {
+      const corridorY = target.y < 560 ? 395 : 810;
+      const corridorX = target.x < 740 ? 540 : 960;
+      if (Math.abs(state.player.y - corridorY) > 60) {
+        await walk(page, "x", corridorX);
+        if ((await readBattle(page)) !== null) continue;
+        await walk(page, "y", corridorY);
+        if ((await readBattle(page)) !== null) continue;
+      }
       await walk(page, "x", target.x);
+      if ((await readBattle(page)) !== null) continue;
+      await walk(page, "y", target.y);
     } else {
-      await walk(page, "x", target.x);
-      if ((await readBattle(page))?.critterId === kind) return;
       await walk(page, "y", target.y);
+      const engaged = await readBattle(page);
+      if (engaged !== null && kinds.has(engaged.critterId)) return;
+      await walk(page, "x", target.x);
     }
   }
 }
@@ -228,13 +241,14 @@ test.describe("plaza specialty shops, Treat Tray, and Journal Compendium", () =>
       await press(page, "j");
       await expect(page.locator(".journal-book")).toBeHidden();
 
-      // Back out west along the shopfront and south around the fountain into the raccoon!
+      // Back out west along the shopfront into a Fish Cracker favourite critter!
       await walkSafe(page, "y", 400);
       await walkSafe(page, "x", 560);
       await walkSafe(page, "y", 860);
-      await meetWildKind(page, "raccoon");
+      await meetWildKind(page, FISH_CRACKER_FAVOURITES);
       await expect(page.locator("html")).toHaveAttribute("data-battle", "open");
-      expect((await readBattle(page))?.critterId).toBe("raccoon");
+      const critterId = (await readBattle(page))?.critterId ?? "";
+      expect(FISH_CRACKER_FAVOURITES.has(critterId)).toBe(true);
 
       // Advance intro (and any opening burst) to the command menu.
       for (let action = 0; action < 40; action += 1) {

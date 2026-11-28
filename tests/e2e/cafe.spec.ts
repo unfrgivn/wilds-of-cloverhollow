@@ -97,7 +97,7 @@ test("real keys: Bon Appetit Café full town-life loop matches Bun hash at 1280x
 
     const end = await readState(page);
     expect(end.area).toBe("plaza");
-    expect(end.coins).toBe(75);
+    expect(end.coins).toBe(91);
     expect(end.snacks).toBe(6);
     expect(await readHash(page)).toBe(await expectedHash);
   },

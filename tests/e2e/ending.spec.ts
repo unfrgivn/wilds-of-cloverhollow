@@ -105,7 +105,7 @@ test("real keys wake Fae from the dream, and Continue returns to it",
     await expect(page.locator(".credits-screen")).toBeHidden();
     await expect(page.locator(".title-option-label")).toHaveText(["Continue", "New game"]);
     await expect(page.locator(".title-option-detail"))
-      .toHaveText("The Enchanted Forest · 9 stickers");
+      .toHaveText("The Enchanted Forest · 10 stickers");
     await take("title");
 
     // Continue: the title closes without a core tick, on exactly the dream.

@@ -99,6 +99,12 @@ test("after the hall pass a fizzy raccoon waits; calmed, it tells the password",
   expect(state.stickers).toEqual(["ringtail-raccoon"]);
   expect(state.coins).toBe(8);
 
+  // Dismiss any post-battle level-up notice before talking to the raccoon.
+  for (let notice = 0; notice < 6 && (await page.locator(".sticker-dialogue").isVisible());
+    notice += 1) {
+    await press(page);
+  }
+
   // A step closer, and it's someone to talk to.
   await hold(page, "ArrowUp", 3);
   await expect(page.locator(".sticker-prompt span")).toHaveText("TALK");

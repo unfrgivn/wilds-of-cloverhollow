@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 import {
+  bunFindReplayTick,
   bunHash,
   longFlowTimeout,
   openHarness,
@@ -117,8 +118,8 @@ test("real keys: Chef Mateo's Taco Truck ready, serving, order-clear, and spotle
     const end = await readState(page);
     expect(end.area).toBe("hills");
     expect(end.arcade).toBeNull();
-    expect(end.coins).toBe(162);
-    expect(end.snacks).toBe(10);
+    expect(end.coins).toBe(186);
+    expect(end.snacks).toBe(9);
     expect(await readHash(page)).toBe(await expectedHash);
   });
 
@@ -135,10 +136,11 @@ test(
 
     // Fast-forward the recorded run directly to Chef Mateo's Taco Truck ready screen
     // (1 tick past open so dialogue confirm is released).
-    const targetTicks = 13217;
+    const tacoPath = "tests/sim/scripts/new-game/taco.json";
+    const targetTicks = bunFindReplayTick(tacoPath, "new-game", "taco-ready");
     const upTo: ReturnType<typeof recording> = [];
     let ticks = 0;
-    for (const segment of recording("tests/sim/scripts/new-game/taco.json")) {
+    for (const segment of recording(tacoPath)) {
       if (ticks >= targetTicks) break;
       const take = Math.min(segment.ticks, targetTicks - ticks);
       upTo.push({ frame: segment.frame, ticks: take });
@@ -149,7 +151,7 @@ test(
 
     const readyState = await readState(page);
     if (readyState.arcade?.game !== "taco") {
-      throw new Error("Expected Taco Truck ready state at tick 13216");
+      throw new Error(`Expected Taco Truck ready state at tick ${targetTicks}`);
     }
     expect(readyState.arcade.phase).toBe("ready");
     await expect(page.locator(".taco-stage")).toBeVisible();

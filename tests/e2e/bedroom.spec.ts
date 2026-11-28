@@ -47,7 +47,7 @@ test.describe("bedroom", () => {
     await openHarness(page);
     await resetPaused(page, "new-game");
     // Up into the bed's foot: its footprint stops her a collider's radius
-    // (20 units) short of the painted foot, at y ~378 there.
+    // (14 units) short of the painted foot, at y ~378 there.
     await page.keyboard.down("ArrowLeft");
     await step(page, 25);
     await page.keyboard.up("ArrowLeft");
@@ -55,7 +55,7 @@ test.describe("bedroom", () => {
     await step(page, 30);
     await page.keyboard.up("ArrowUp");
     const stopped = await readState(page);
-    expect(stopped.player.y).toBeCloseTo(398, 0);
+    expect(stopped.player.y).toBeCloseTo(392, 0);
 
     // Beside its footboard, north of its front, the bed is drawn over her;
     // south of it, she's drawn over the bed.

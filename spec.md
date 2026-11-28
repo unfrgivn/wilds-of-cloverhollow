@@ -209,9 +209,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   `resolveSoundtrack`, `createAreaBannerTracker`, `createJournalNotesCache`,
   `captureAreaPostcard`, `deliverAreaPostcard`, `shouldPlayToolEventChime`,
   `createToolEventChimeSync`, `createNpcChatterSync`) live in `src/shell/feedback.ts`; desktop mouse/pen
-  overworld press-and-hold steering and near-player tap detection
-  (`computeOverworldSteer`, `isOverworldTap`, `bindOverworldPointerSteer`) live
-  in `src/shell/overworld-pointer.ts`; and
+  overworld press-and-hold steering and tap classification
+  (`computeOverworldSteer`, `isOverworldTap`, `isOverworldGroundTap`,
+  `bindOverworldPointerSteer`) live in `src/shell/overworld-pointer.ts`; and
   shell keyboard/gamepad overlay & journal shortcut orchestration
   (`canPhotoMode`, `canPhotoFromJournal`, `canBattlePeek`, `canOverworldSteer`,
   `isJournalShortcutActive`, `isOverworldFree`, `isBannerEligible`,
@@ -336,7 +336,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   overworld `confirm` only when Fae is resting (`view.isResting()`), at a rest
   spot (`findRestSpot`), or beside a pettable companion (`findPettableCompanion`)
   so random canvas clicks never open unintended dialogue while clicking near
-  Maddie or a bench cleanly pets or rests.
+  Maddie or a bench cleanly pets or rests. Crisp open-ground clicks outside the
+  near-player radius trigger `onTapGround` only when `isOverworldGroundTap`
+  holds (Milestone 183: `<= 12 px` pointer drag, `<= 260 ms` duration, outside
+  `isOverworldTap`, and Fae's screen and world travel during the press stays
+  `<= 20` units/px, so releasing a brief hold-steer never triggers accidental
+  click-to-walk auto-pathing).
 
 ### 3.2.1 iOS shell decisions (Milestone 4)
 - WKWebView exposes the Gamepad API when the web view is first responder. With
@@ -1278,8 +1283,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   gradient queries (`gradientAt`), and navigation auditing
   (`auditAreaNavigation`, `navigationQualityErrors` in
   `src/content/area-checks.ts`). Crisp ground clicks/taps outside the
-  near-player pet/rest radius (`onTapGround` in `src/shell/overworld-pointer.ts`)
-  walk Fae smoothly around obstacles along the corridor centerline, cancelling
+  near-player pet/rest radius (`isOverworldGroundTap` + `onTapGround` in
+  `src/shell/overworld-pointer.ts`, guarding against accidental click-to-walk
+  when hold-steering already walked Fae `> 20` px/units during the press,
+  Milestone 183) walk Fae smoothly around obstacles along the corridor
+  centerline, cancelling
   immediately on any manual directional/button input or overlay. Playable areas
   show subtle diegetic exit approach cues near triggers and a warm watercolor
   destination ring while pathing (respecting `reducedMotion`); the dev hook
@@ -2152,7 +2160,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   - `findPettableCompanion` & `findRestSpot` (`src/render/companions.ts`): on a
     fresh overworld confirm press when no real interactable (`targetInteractable`)
     or overlay is active, Fae can pet Maddie or any active Flute Friend
-    (`pond-pup`, `acorn-squirrel`, `ribbon-bunny`) within range (triggering a
+    (`pond-pup`, `acorn-squirrel`, `ribbon-bunny`) within range — `78u` in front
+    and `56u` close with zero human followers ahead, scaling by `+52u` per human
+    party member standing ahead of the pet in canonical party order (`130u`/`108u`
+    behind 1 human, `182u`/`160u` behind 2 humans, Milestone 183) while
+    `findRestSpot` still wins whenever Fae stands at a rest spot facing away from
+    a farther pet (triggering a
     42-tick joyful squash-and-stretch double bounce, affectionate nod, 3 rising
     `emoteHeart` + pastel `sparkle` puffs, and a synthesized species affection
     cue via `AudioController.playEffect`), or relax at curated painted benches,

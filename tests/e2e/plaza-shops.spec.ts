@@ -134,7 +134,7 @@ test("real keys: Cloverhollow Grocery Market & Sweet Scoop Ice Cream Parlor matc
 
     const end = await readState(page);
     expect(end.area).toBe("plaza");
-    expect(end.coins).toBe(99);
+    expect(end.coins).toBe(107);
     expect(end.snacks).toBe(4);
     expect(end.treats).toEqual({
       "orchard-apple": 1,

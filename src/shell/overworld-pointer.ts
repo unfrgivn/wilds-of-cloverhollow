@@ -5,6 +5,7 @@ export const DEFAULT_OVERWORLD_RAMP_RADIUS = 64;
 export const DEFAULT_OVERWORLD_TAP_DRAG = 12;
 export const DEFAULT_OVERWORLD_TAP_DURATION_MS = 260;
 export const DEFAULT_OVERWORLD_TAP_RADIUS = 96;
+export const DEFAULT_OVERWORLD_TAP_PLAYER_TRAVEL = 20;
 
 export type OverworldPointerEvent = {
   pointerId: number;
@@ -33,6 +34,7 @@ export type OverworldPointerSteerOptions = {
   canvas: OverworldPointerTarget;
   canSteer: () => boolean;
   playerScreen: () => Point | null;
+  playerWorld?: () => Point | null;
   onMove: (dir: Point) => void;
   onTapNearPlayer?: () => void;
   onTapGround?: (screenPoint: Point) => void;
@@ -130,6 +132,40 @@ export function isOverworldTap(
 }
 
 /**
+ * Returns true when a pointerdown/pointerup pair qualifies as an open-ground
+ * click-to-walk tap: brief, low-drag, outside the near-player pet/rest radius,
+ * and without hold-steering already walking Fae while the button was held.
+ */
+export function isOverworldGroundTap(
+  downPoint: Point,
+  upPoint: Point,
+  elapsedMs: number,
+  downPlayer: Point | null,
+  upPlayer: Point | null,
+  options?: {
+    maxDurationMs?: number;
+    maxDrag?: number;
+    maxPlayerTravel?: number;
+  },
+): boolean {
+  const maxDurationMs = options?.maxDurationMs ?? DEFAULT_OVERWORLD_TAP_DURATION_MS;
+  const maxDrag = options?.maxDrag ?? DEFAULT_OVERWORLD_TAP_DRAG;
+  const maxPlayerTravel = options?.maxPlayerTravel ?? DEFAULT_OVERWORLD_TAP_PLAYER_TRAVEL;
+  if (!Number.isFinite(elapsedMs) || elapsedMs < 0 || elapsedMs > maxDurationMs) {
+    return false;
+  }
+  const drag = Math.hypot(upPoint.x - downPoint.x, upPoint.y - downPoint.y);
+  if (!Number.isFinite(drag) || drag > maxDrag) return false;
+  if (downPlayer === null || upPlayer === null) return false;
+  const playerTravel = Math.hypot(upPlayer.x - downPlayer.x, upPlayer.y - downPlayer.y);
+  if (!Number.isFinite(playerTravel) || playerTravel > maxPlayerTravel) return false;
+  if (isOverworldTap(downPoint, upPoint, elapsedMs, upPlayer, maxDrag, maxDurationMs)) {
+    return false;
+  }
+  return true;
+}
+
+/**
  * Sticky-proof desktop mouse/pen press-and-hold overworld steering on the game
  * canvas. Ignores touch pointers (leaving the virtual joystick untouched) and
  * secondary mouse buttons, tracks one active pointer, recomputes per tick via
@@ -144,6 +180,8 @@ export function bindOverworldPointerSteer(
   let activePointerId: number | null = null;
   let lastPointer: Point = { x: 0, y: 0 };
   let downPoint: Point = { x: 0, y: 0 };
+  let downPlayer: Point | null = null;
+  let downWorld: Point | null = null;
   let downTime = 0;
   let lastMoveEvent: OverworldPointerEvent | null = null;
   let photoPointerId: number | null = null;
@@ -173,6 +211,8 @@ export function bindOverworldPointerSteer(
     if (options.isPhotoMode?.() !== true) photoPointerId = null;
     if (activePointerId === null) return;
     activePointerId = null;
+    downPlayer = null;
+    downWorld = null;
     lastMoveEvent = null;
     options.onMove({ x: 0, y: 0 });
   };
@@ -217,6 +257,8 @@ export function bindOverworldPointerSteer(
     activePointerId = event.pointerId;
     lastPointer = { x: event.clientX, y: event.clientY };
     downPoint = { x: event.clientX, y: event.clientY };
+    downPlayer = options.playerScreen();
+    downWorld = options.playerWorld?.() ?? null;
     downTime = now();
     lastMoveEvent = null;
     emitSteer();
@@ -256,17 +298,19 @@ export function bindOverworldPointerSteer(
     if (activePointerId === null || event.pointerId !== activePointerId) return;
     const upPoint: Point = { x: event.clientX, y: event.clientY };
     const elapsedMs = now() - downTime;
-    const drag = Math.hypot(upPoint.x - downPoint.x, upPoint.y - downPoint.y);
-    const canTap =
-      options.canSteer() &&
-      Number.isFinite(elapsedMs) &&
-      elapsedMs >= 0 &&
-      elapsedMs <= DEFAULT_OVERWORLD_TAP_DURATION_MS &&
-      Number.isFinite(drag) &&
-      drag <= DEFAULT_OVERWORLD_TAP_DRAG;
-    const player = canTap ? options.playerScreen() : null;
-    const nearTap = canTap && isOverworldTap(downPoint, upPoint, elapsedMs, player);
-    const groundTap = canTap && !nearTap && player !== null;
+    const canSteerNow = options.canSteer();
+    const player = canSteerNow ? options.playerScreen() : null;
+    const upWorld = canSteerNow ? (options.playerWorld?.() ?? null) : null;
+    const worldTravel =
+      downWorld !== null && upWorld !== null
+        ? Math.hypot(upWorld.x - downWorld.x, upWorld.y - downWorld.y)
+        : 0;
+    const nearTap = canSteerNow && isOverworldTap(downPoint, upPoint, elapsedMs, player);
+    const groundTap =
+      canSteerNow &&
+      Number.isFinite(worldTravel) &&
+      worldTravel <= DEFAULT_OVERWORLD_TAP_PLAYER_TRAVEL &&
+      isOverworldGroundTap(downPoint, upPoint, elapsedMs, downPlayer, player);
     release();
     if (nearTap) options.onTapNearPlayer?.();
     else if (groundTap) options.onTapGround?.(upPoint);

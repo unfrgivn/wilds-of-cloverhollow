@@ -1,18 +1,14 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import {
-  longFlowTimeout, openHarness, playBattleCheck, queueScript, readBattle, recording, renderInfo,
-  resetPaused, step,
+  bunFindReplayTick, longFlowTimeout, openHarness, playBattleCheck, queueScript, readBattle,
+  recording, renderInfo, resetPaused, step,
 } from "./helpers";
 
 // Milestone 41: the Zoomie Pup's burst is a catch. The park's recorded pup
-// battle (tools/sim/record-pup.ts) is replayed to the tick its second catch
-// starts, a big one (six toys) over all three lanes, then the catch is played
-// with real arrow keys, or on touch with the arrow stickers. `caught` is that
-// tick (re-recording the run moves it: find it with
-// `bun tools/sim/run.ts tests/sim/scripts/park/pup-win.json --fixture park
-// --trace`).
+// battle (tools/sim/record-pup.ts) is replayed to the tick its 3-lane catch
+// starts, then played with real arrow keys, or on touch with the arrow stickers.
 const path = "tests/sim/scripts/park/pup-win.json";
-const caught = 488;
+const caught = bunFindReplayTick(path, "park", "catch-all-lanes-check");
 
 test.describe.configure({ timeout: longFlowTimeout });
 

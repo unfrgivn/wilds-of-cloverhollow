@@ -124,7 +124,7 @@ test("real keys: Milo's Sketch Loft & Rosie's Flower Cottage match Bun hash at 1
 
     const end = await readState(page);
     expect(end.area).toBe("park");
-    expect(end.coins).toBe(127);
+    expect(end.coins).toBe(150);
     expect(end.snacks).toBe(3);
     expect(await readHash(page)).toBe(await expectedHash);
   },

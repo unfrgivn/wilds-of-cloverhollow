@@ -1,14 +1,27 @@
 import { readFileSync } from "node:fs";
 import { loadContent } from "../../src/content/load";
 import { parseScript } from "../../src/content/script";
-import { battleView, createState, step, type BattleView, type State } from "../../src/core";
+import {
+  battleView,
+  createState,
+  step,
+  targetInteractable,
+  type BattleView,
+  type State,
+  type World,
+} from "../../src/core";
 
 export type ReplayTickQuery =
   | "owl-peek"
   | "flute-command"
   | "lasso-steady-command"
   | "kid-lasso-windup"
-  | "lean-check";
+  | "lasso-windup-command"
+  | "lean-check"
+  | "lean-normal-check"
+  | "catch-all-lanes-check"
+  | "taco-ready"
+  | "fish-dock-ready";
 
 function isReplayTickQuery(value: string): value is ReplayTickQuery {
   return (
@@ -16,11 +29,41 @@ function isReplayTickQuery(value: string): value is ReplayTickQuery {
     value === "flute-command" ||
     value === "lasso-steady-command" ||
     value === "kid-lasso-windup" ||
-    value === "lean-check"
+    value === "lasso-windup-command" ||
+    value === "lean-check" ||
+    value === "lean-normal-check" ||
+    value === "catch-all-lanes-check" ||
+    value === "taco-ready" ||
+    value === "fish-dock-ready"
   );
 }
 
-function matches(query: ReplayTickQuery, state: State, view: BattleView | null): boolean {
+function matches(
+  world: World,
+  query: ReplayTickQuery,
+  state: State,
+  view: BattleView | null,
+): boolean {
+  if (query === "taco-ready") {
+    return (
+      state.arcade?.game === "taco" &&
+      state.arcade.phase === "ready" &&
+      !state.previousInput.confirm
+    );
+  }
+  if (query === "fish-dock-ready") {
+    return (
+      state.area === "bay" &&
+      state.dialogue === null &&
+      state.arcade === null &&
+      state.battle === null &&
+      state.transition === null &&
+      world.storyVariable(state.ink, "sue_joined") === true &&
+      state.stickers.includes("bay-bluebird") &&
+      targetInteractable(world, state)?.id === "dock-end" &&
+      !state.previousInput.confirm
+    );
+  }
   const battle = state.battle;
   if (battle === null) return false;
   switch (query) {
@@ -49,17 +92,28 @@ function matches(query: ReplayTickQuery, state: State, view: BattleView | null):
         battle.revealed >= battle.message.length
       );
     case "kid-lasso-windup":
+    case "lasso-windup-command":
       return (
         battle.critterId === "hooded-kid" &&
         battle.phase === "command" &&
         view?.lassoAssist?.available === true &&
         view.lassoAssist.windUp === true &&
-        !battle.lassoUsed &&
         battle.windUp !== null &&
-        battle.windUp.popped.every((p) => !p)
+        battle.windUp.popped.every((popped) => !popped) &&
+        !battle.lassoUsed &&
+        battle.revealed >= battle.message.length
       );
     case "lean-check":
       return battle.check?.kind === "lean";
+    case "lean-normal-check":
+      return battle.check?.kind === "lean" && battle.check.tick === 0 && !battle.check.big;
+    case "catch-all-lanes-check":
+      return (
+        battle.check?.kind === "catch" &&
+        battle.check.tick === 0 &&
+        battle.check.spec.arrivals.length >= 4 &&
+        new Set(battle.check.lanes).size === 3
+      );
   }
 }
 
@@ -84,7 +138,7 @@ for (const segment of segments) {
     state = step(content.world, state, segment.frame).state;
     tick += 1;
     const view = state.battle === null ? null : battleView(content.world, state);
-    if (matches(rawQuery, state, view)) {
+    if (matches(content.world, rawQuery, state, view)) {
       console.log(JSON.stringify({ tick }));
       process.exit(0);
     }

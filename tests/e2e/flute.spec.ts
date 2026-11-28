@@ -79,7 +79,7 @@ test("real keys: a pat and a snack, the flute, a friend along, and the pond", as
   expect({ bondShot, followShot, battleShot, pondShot })
     .toEqual({ bondShot: true, followShot: true, battleShot: true, pondShot: true });
   expect(parties.slice(-3)).toEqual([
-    "maddie,sue,jordan", "maddie,sue,jordan,pond-pup", "maddie,sue,jordan",
+    "sue,jordan,maddie", "sue,jordan,maddie,pond-pup", "sue,jordan,maddie",
   ]);
   const end = await readState(page);
   expect({ area: end.area, party: end.party.length }).toEqual({ area: "park", party: 3 });

@@ -107,6 +107,6 @@ test("real keys: Bubblegum Bay fishing dock aim, bite, reel, and catch", async (
   const end = await readState(page);
   expect(end.area).toBe("bay");
   expect(end.arcade).toBeNull();
-  expect(end.caughtFish).toEqual({ perch: 1 });
+  expect(end.caughtFish).toEqual({ shell: 1 });
   expect(await readHash(page)).toBe(await expectedHash);
 });

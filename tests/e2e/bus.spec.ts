@@ -9,6 +9,7 @@ import {
   renderInfo,
   resetPaused,
   step,
+  walk,
 } from "./helpers";
 
 test.describe.configure({ timeout: longFlowTimeout });
@@ -32,26 +33,13 @@ async function talk(page: Page, choice = 0): Promise<void> {
   }
   throw new Error("conversation did not close");
 }
-// From the east road's spawn (1550, 550) to the bus stop, facing it: a route
-// the core found (tools/sim/recorder.ts `approach`, round the plaza's props and
-// the frog's reach).
-const roadToStop: [string[], number][] = [
-  [["ArrowLeft", "ArrowUp"], 5], [["ArrowLeft"], 25], [["ArrowLeft", "ArrowDown"], 125],
-  [["ArrowLeft"], 5], [["ArrowLeft", "ArrowDown"], 10], [["ArrowLeft"], 10],
-  [["ArrowLeft", "ArrowDown"], 15], [["ArrowLeft"], 5], [["ArrowLeft", "ArrowDown"], 10],
-  [["ArrowLeft"], 5], [["ArrowUp"], 1], [[], 1],
-];
-async function walkFromRoadToStop(page: Page): Promise<void> {
-  for (const [keys, ticks] of roadToStop) {
-    for (const key of keys) await page.keyboard.down(key);
-    await step(page, ticks);
-    for (const key of keys) await page.keyboard.up(key);
-  }
-}
-
 test("the bus stop stays put while the bluebird is in chaos", async ({ page }) => {
-  await openHarness(page); await resetPaused(page, "bay");
-  await hold(page, "ArrowLeft", 40); await step(page, 40); await walkFromRoadToStop(page);
+  await openHarness(page); await resetPaused(page, "plaza");
+  await walk(page, "y", 900);
+  await walk(page, "x", 760);
+  await walk(page, "y", 985);
+  await walk(page, "x", 878);
+  await hold(page, "ArrowUp", 1);
   expect((await readState(page)).stickers).not.toContain("bay-bluebird");
   await press(page);
   expect((await readState(page)).dialogue?.knot).toBe("bus_stop");

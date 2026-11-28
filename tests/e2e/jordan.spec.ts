@@ -44,9 +44,9 @@ async function talk(page: Page): Promise<string[]> {
   throw new Error("the talk never ended");
 }
 
-// Fights with real keys: Juggle first (down to it with the arrow keys), then
-// Soothe while Jordan rests ("finding pinecones"), confirming as each ring
-// closes. Returns Juggle's result lines.
+// Fights with real keys: holds off with Recover until Jordan's turn, then uses
+// Jordan's Juggle (index 0) and each member's signature move after that,
+// confirming as each check closes. Returns Juggle's result lines.
 async function fight(page: Page): Promise<string[]> {
   const results: string[] = [];
   let juggled = false;
@@ -55,7 +55,9 @@ async function fight(page: Page): Promise<string[]> {
     const battle = await readBattle(page);
     if (battle === null) return results;
     if (battle.phase === "command" && battle.revealed >= battle.message.length) {
-      const wanted = juggled ? 0 : 3;
+      const firstLabel = (await page.locator(".battle-command-label").first().textContent()) ?? "";
+      const isJordanTurn = firstLabel.trim() === "Juggle";
+      const wanted = !juggled && !isJordanTurn ? 1 : 0;
       for (let move = 0; move < 6 && (await readBattle(page))?.selected !== wanted; move += 1) {
         const selected = (await readBattle(page))?.selected ?? 0;
         await hold(page, selected < wanted ? "ArrowDown" : "ArrowUp", 1);
@@ -63,11 +65,11 @@ async function fight(page: Page): Promise<string[]> {
       }
       expect((await readBattle(page))?.selected).toBe(wanted);
       await press(page);
-      juggled = true;
+      if (isJordanTurn) juggled = true;
       continue;
     }
     if (battle.phase === "check" && battle.check !== null) {
-      if (!juggleShot) {
+      if (!juggleShot && battle.command === "juggle") {
         juggleShot = true;
         await step(page, 20);
         await expect(page).toHaveScreenshot("jordan-juggle-mid-chain.png");
@@ -100,10 +102,10 @@ test("Fae meets Jordan, Juggle calms the hamster, and he gives her his lantern",
   const meeting = await talk(page);
   expect(meeting[0]).toBe("Whoa, watch out! That hamster's gone totally fizzy!");
   let state = await readState(page);
-  expect(state.party.map((member) => member.id)).toEqual(["maddie", "sue", "jordan"]);
+  expect(state.party.map((member) => member.id)).toEqual(["sue", "jordan", "maddie"]);
   let info = await renderInfo(page);
   expect(info.npcs.map((npc) => npc.id)).not.toContain("jordan");
-  expect(info.party.map((member) => member.id)).toEqual(["maddie", "sue", "jordan"]);
+  expect(info.party.map((member) => member.id)).toEqual(["sue", "jordan", "maddie"]);
 
   // The four of them step back toward the bus stop, out of the hamster's
   // sight (it comes after anyone it notices within 180 units of it), and
@@ -156,12 +158,12 @@ test("Fae meets Jordan, Juggle calms the hamster, and he gives her his lantern",
     await press(page);
   }
   await expect(page.locator(".battle-command-label"))
-    .toHaveText(["Soothe", "Play", "Cast", "Juggle", "Snack", "Run"]);
+    .toHaveText(["Soothe", "Recover", "Snack", "Run"]);
   await expect(page).toHaveScreenshot("hamster-battle-1280.png");
   await page.setViewportSize({ width: 874, height: 402 });
   await step(page, 2);
   await expect(page.locator(".battle-command-label"))
-    .toHaveText(["Soothe", "Play", "Cast", "Juggle", "Snack", "Run"]);
+    .toHaveText(["Soothe", "Recover", "Snack", "Run"]);
   await expect(page).toHaveScreenshot("hamster-battle-874.png");
   await page.setViewportSize({ width: 1280, height: 720 });
   await step(page, 2);

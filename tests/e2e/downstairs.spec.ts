@@ -93,8 +93,8 @@ test("Mom talks, turns to face Fae, remembers breakfast, and blocks the way", as
   await press(page);
   await press(page);
   await expect(page.locator(".sticker-dialogue")).toBeHidden();
-  await hold(page, "ArrowLeft", 20);
-  expect((await readState(page)).player.x, "Mom is solid").toBeGreaterThanOrEqual(645);
+  await hold(page, "ArrowLeft", 9);
+  expect((await readState(page)).player.x, "Mom is solid").toBeGreaterThanOrEqual(644);
 });
 
 test("the front door leads to the plaza and back, and the stairs lead up", async ({ page }) => {

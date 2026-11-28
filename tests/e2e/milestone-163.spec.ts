@@ -1,5 +1,6 @@
 import { expect, test, type Locator, type Page, type TestInfo } from "@playwright/test";
 import {
+  bunFindReplayTick,
   longFlowTimeout,
   openHarness,
   queueScript,
@@ -104,10 +105,11 @@ test.describe("Milestone 163: Cloverhollow Jubilee OST & Taco Truck Personal Bes
       await resetPaused(page, "new-game");
 
       // Fast-forward to Chef Mateo's Taco Truck ready screen cleanly.
-      const targetTicks = 13217;
+      const tacoPath = "tests/sim/scripts/new-game/taco.json";
+      const targetTicks = bunFindReplayTick(tacoPath, "new-game", "taco-ready");
       const upTo: ReturnType<typeof recording> = [];
       let ticks = 0;
-      for (const segment of recording("tests/sim/scripts/new-game/taco.json")) {
+      for (const segment of recording(tacoPath)) {
         if (ticks >= targetTicks) break;
         const take = Math.min(segment.ticks, targetTicks - ticks);
         upTo.push({ frame: segment.frame, ticks: take });

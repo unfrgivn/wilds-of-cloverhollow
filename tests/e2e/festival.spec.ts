@@ -130,7 +130,7 @@ test("real keys: Post-Finale Sunny Cloverhollow Sanctuary Festival matches Bun h
 
     const end = await readState(page);
     expect(end.area).toBe("sanctuary");
-    expect(end.coins).toBe(302);
+    expect(end.coins).toBe(318);
     expect(end.snacks).toBe(8);
     expect(await readHash(page)).toBe(await expectedHash);
   },

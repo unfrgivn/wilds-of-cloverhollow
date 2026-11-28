@@ -1,17 +1,15 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import {
-  longFlowTimeout, openHarness, playBattleCheck, queueScript, readBattle, recording, renderInfo,
-  resetPaused, step,
+  bunFindReplayTick, longFlowTimeout, openHarness, playBattleCheck, queueScript, readBattle,
+  recording, renderInfo, resetPaused, step,
 } from "./helpers";
 
 // Milestone 48: a gust burst is a lean. The bay's recorded bluebird battle
-// (tools/sim/record-bay.ts) is replayed to the tick its first burst starts, a
-// normal lean (a gentle puff, then a strong one), then the lean is played
-// with real arrow keys, or on touch with the arrow stickers. `leaning` is
-// that tick (re-recording the run moves it: find it with
-// `bun tools/sim/run.ts tests/sim/scripts/bay/bay.json --fixture bay --trace`).
+// (tools/sim/record-bay.ts) is replayed to the tick its normal lean starts
+// (two gentle puffs), then played with real arrow keys, or on touch with the
+// arrow stickers.
 const path = "tests/sim/scripts/bay/bay.json";
-const leaning = 1024;
+const leaning = bunFindReplayTick(path, "bay", "lean-normal-check");
 
 test.describe.configure({ timeout: longFlowTimeout });
 

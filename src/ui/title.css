@@ -142,6 +142,18 @@
   box-shadow: 0 5px 0 var(--sticker-ink);
   transform: translateY(-2px);
 }
+.title-option:focus-visible,
+.title-confirm-button:focus-visible {
+  outline: 3px solid #6b9e56;
+  outline-offset: 3px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .title-option:not([aria-selected="true"]):hover,
+  .title-confirm-button:not([aria-selected="true"]):hover {
+    background: #fff9e6;
+    transform: translateY(-2px);
+  }
+}
 .title-option[aria-selected="true"]::before,
 .title-confirm-button[aria-selected="true"]::before {
   content: "";
@@ -231,7 +243,9 @@
     transition: none;
   }
   .title-option[aria-selected="true"],
-  .title-confirm-button[aria-selected="true"] {
+  .title-confirm-button[aria-selected="true"],
+  .title-option:not([aria-selected="true"]):hover,
+  .title-confirm-button:not([aria-selected="true"]):hover {
     transform: none;
   }
 }
@@ -240,6 +254,8 @@
   transition: none;
 }
 :root[data-reduced-motion="on"] .title-option[aria-selected="true"],
-:root[data-reduced-motion="on"] .title-confirm-button[aria-selected="true"] {
+:root[data-reduced-motion="on"] .title-confirm-button[aria-selected="true"],
+:root[data-reduced-motion="on"] .title-option:not([aria-selected="true"]):hover,
+:root[data-reduced-motion="on"] .title-confirm-button:not([aria-selected="true"]):hover {
   transform: none;
 }

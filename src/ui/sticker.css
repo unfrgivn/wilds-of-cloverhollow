@@ -569,6 +569,32 @@
   transform: translateY(-3px) rotate(-1deg);
 }
 
+.sticker-choice:focus-visible,
+.sticker-prompt:focus-visible {
+  outline: 3px solid #6b9e56;
+  outline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .sticker-choice:not([aria-selected="true"]):hover {
+    background: #fff9e6;
+    transform: translateY(-1px);
+  }
+  .sticker-prompt:hover {
+    filter: brightness(1.03);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sticker-choice:not([aria-selected="true"]):hover {
+    transform: none;
+  }
+}
+
+:root[data-reduced-motion="on"] .sticker-choice:not([aria-selected="true"]):hover {
+  transform: none;
+}
+
 .sticker-prompt {
   position: fixed;
   z-index: var(--z-prompt);

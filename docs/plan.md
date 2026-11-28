@@ -7238,6 +7238,45 @@ the old trail, the owl, and the clubhouse claim.
 - Gates: `just check`, `just build` (`< 400 kB` every non-vendor chunk), and
   82/82 targeted Chromium & WebKit e2e tests.
 
+## Milestone 169: Universal Desktop Tactile Hover (`@media (hover: hover)`), WCAG 2.4.7 `:focus-visible` Polish Across All Primary Menus & Painted World Map Pin-Select Foley **Status:** ✅ Completed (2026-11-27)
+- Zero `src/core` changes, zero replay hash shifts across all 74 recorded sims,
+  and zero Playwright snapshot modifications.
+- Universal Desktop Tactile Hover (`@media (hover: hover) and (pointer: fine)`)
+  & WCAG 2.4.7 `:focus-visible` Polish (`src/ui/title.css`, `src/ui/sticker.css`,
+  `src/ui/battle.css`, `src/ui/journal.css`, `src/ui/qa.css`):
+  - Adds touch-safe `@media (hover: hover) and (pointer: fine)` tactile lift/tint
+    and accessible `3px solid #6b9e56` `:focus-visible` rings across Title,
+    Dialogue, Battle, and Journal interactive controls with 100%
+    `@media (prefers-reduced-motion: reduce)` and
+    `:root[data-reduced-motion="on"]` hover-transform suppression parity.
+  - Syncs `aria-selected` across Journal tab buttons (`NOTES`, `MAP`, `OPTIONS`)
+    so inactive-tab hover never affects the active tab.
+  - Hides `.qa-touch-trigger` under `:root[data-credits="open"]` alongside
+    photo/title/console states so the dev touch QA pill never floats over
+    THE END credits on phones.
+- Interactive World Map Pin-Select Foley (`src/ui/journal-map.ts`,
+  `src/ui/journal.ts`, `src/main.ts`):
+  - Adds optional `onSelectLand?: (landId: string | null) => void` to
+    `createJournalMapPage` and `onMapSelect` on `createJournal`, wired in
+    `src/main.ts` (`930` lines) to `sound.playEffect("title-move")` +
+    `lightHaptic()` on revealed land clicks and keyboard/gamepad pin steps.
+- East Hall Cozy Rest Clearance (`src/render/companions.ts`):
+  - Relocated `east-hall-sunbeam` to `(680, 560)` (`seatX: 680, seatY: 556`) to
+    stay cleanly clear of Bert's dispersed `(860, 650)` position from
+    Milestone 166, restoring `milestone-89.test.ts` and `milestone-159.test.ts`
+    to green.
+- Evidence: `tests/unit/milestone-169.test.ts` (WCAG 2.4.7 `:focus-visible`,
+  `@media (hover: hover)` guard, reduced-motion parity, `.qa-touch-trigger`
+  credits hide, and `src/main.ts` line budget gates) and
+  `tests/e2e/milestone-169.spec.ts` (`@smoke`, Chromium & WebKit: Valley Map
+  pin-select Land Field Guide update + `"title-move"` foley, and keyboard
+  `:focus-visible` outline verification).
+- Gates: `just check` (232 unit files / 1,687 tests, all 74 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (all non-vendor
+  chunks `< 400 kB`, production hook leak + harness checks green), and 199/199
+  Chromium & WebKit targeted + UI gallery baseline e2e tests (`0` snapshot
+  diffs on all 99 `ui-gallery` baselines).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

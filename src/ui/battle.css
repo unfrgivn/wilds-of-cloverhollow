@@ -323,10 +323,11 @@
 .battle-lasso-btn {
   background: #fdecd8;
 }
-.battle-together-btn:hover,
-.battle-flute-btn:hover,
-.battle-lasso-btn:hover {
-  transform: translateY(-2px);
+.battle-together-btn:focus-visible,
+.battle-flute-btn:focus-visible,
+.battle-lasso-btn:focus-visible {
+  outline: 3px solid #6b9e56;
+  outline-offset: 2px;
 }
 .battle-together-btn:active,
 .battle-flute-btn:active,
@@ -661,6 +662,24 @@
   color: var(--sticker-ink);
   cursor: not-allowed;
   animation: none;
+}
+.battle-command:focus-visible {
+  outline: 3px solid #6b9e56;
+  outline-offset: 2px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .battle-together-btn:hover,
+  .battle-flute-btn:hover,
+  .battle-lasso-btn:hover {
+    transform: translateY(-2px);
+  }
+  .battle-command:not(:disabled):not([aria-disabled="true"]):not([aria-selected="true"]):hover {
+    background: #fff9e6;
+    transform: translateY(-2px);
+  }
+  .battle-calm.is-peekable:hover {
+    filter: brightness(1.03);
+  }
 }
 .battle-command-icon-slot {
   display: inline-flex;
@@ -1196,6 +1215,12 @@
   .battle-together-btn::after {
     display: none;
   }
+  .battle-command:not(:disabled):not([aria-disabled="true"]):not([aria-selected="true"]):hover,
+  .battle-together-btn:hover,
+  .battle-flute-btn:hover,
+  .battle-lasso-btn:hover {
+    transform: none;
+  }
   .battle-popup {
     animation: battle-popup-fade 450ms ease-out forwards;
   }
@@ -1230,6 +1255,13 @@
 }
 :root[data-reduced-motion="on"] .battle-together-btn::after {
   display: none;
+}
+:root[data-reduced-motion="on"]
+  .battle-command:not(:disabled):not([aria-disabled="true"]):not([aria-selected="true"]):hover,
+:root[data-reduced-motion="on"] .battle-together-btn:hover,
+:root[data-reduced-motion="on"] .battle-flute-btn:hover,
+:root[data-reduced-motion="on"] .battle-lasso-btn:hover {
+  transform: none;
 }
 
 /* Die-cut Paper-Mario battle popups (Milestone 104): ephemeral calm gain,

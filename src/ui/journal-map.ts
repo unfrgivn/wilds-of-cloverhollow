@@ -41,6 +41,10 @@ export type JournalMapPage = {
   stepLandFocus: (delta: -1 | 1) => boolean;
 };
 
+export type JournalMapOptions = {
+  onSelectLand?: (landId: string | null) => void;
+};
+
 // The bus line's stop sign, as on the sprite: a gold star on a blue roundel
 // atop a pole.
 export function busStopIcon(): SVGSVGElement {
@@ -71,7 +75,10 @@ export function busRoutePath(
   return `M ${from.x} ${from.y} Q ${cx} ${cy} ${to.x} ${to.y}`;
 }
 
-export function createJournalMapPage(onOpenTreasures: () => void): JournalMapPage {
+export function createJournalMapPage(
+  onOpenTreasures: () => void,
+  options?: JournalMapOptions,
+): JournalMapPage {
   const mapPage = element("section", "journal-map-page");
   const mapStage = element("div", "journal-map-stage");
   const map = element("div", "journal-map");
@@ -182,6 +189,7 @@ export function createJournalMapPage(onOpenTreasures: () => void): JournalMapPag
     selectedLandId = target.getAttribute("data-land");
     hoveredLandId = null;
     if (latestView !== null) syncMapDetail(latestView);
+    if (selectedLandId !== null) options?.onSelectLand?.(selectedLandId);
     return true;
   };
 
@@ -214,6 +222,7 @@ export function createJournalMapPage(onOpenTreasures: () => void): JournalMapPag
             item.addEventListener("click", () => {
               selectedLandId = selectedLandId === land.id ? null : land.id;
               if (latestView !== null) syncMapDetail(latestView);
+              options?.onSelectLand?.(selectedLandId);
             });
             item.addEventListener("pointerenter", () => {
               hoveredLandId = land.id;

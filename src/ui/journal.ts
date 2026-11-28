@@ -239,6 +239,7 @@ export type JournalControl = JournalOptionsHandlers & {
   dismissOverlay: () => boolean;
   stepOverlay: (delta: -1 | 1) => boolean;
   onPageChange: (callback: (page: JournalPage) => void) => void;
+  onMapSelect: (callback: () => void) => void;
   onOverlayChange: (callback: (open: boolean) => void) => void;
   onOverlayStep: (callback: () => void) => void;
   onClose: (callback: () => void) => void;
@@ -308,6 +309,7 @@ export function createJournal(root: HTMLElement): JournalControl {
 
   let latestView: JournalView | null = null;
   let onPageChange: (page: JournalPage) => void = () => undefined;
+  let onMapSelect: () => void = () => undefined;
   let onOverlayChange: (open: boolean) => void = () => undefined;
   let onOverlayStep: () => void = () => undefined;
   let onClose: () => void = () => undefined;
@@ -317,7 +319,9 @@ export function createJournal(root: HTMLElement): JournalControl {
     onVisibilityChange: (open) => onOverlayChange(open),
     onStep: () => onOverlayStep(),
   });
-  const mapPage = createJournalMapPage(() => fieldOverlays.openTreasures(latestView));
+  const mapPage = createJournalMapPage(() => fieldOverlays.openTreasures(latestView), {
+    onSelectLand: () => onMapSelect(),
+  });
   const sliderSteppers = new Map<EventTarget, (direction: -1 | 1) => void>();
   const optionsPage = createJournalOptionsPage({
     sliderSteppers,
@@ -349,6 +353,9 @@ export function createJournal(root: HTMLElement): JournalControl {
     if (!changed && book.getAttribute("data-journal-page") === next) return;
     page = next;
     setAttribute(book, "data-journal-page", page);
+    setAttribute(notesTab, "aria-selected", String(page === "notes"));
+    setAttribute(mapTab, "aria-selected", String(page === "map"));
+    setAttribute(optionsTab, "aria-selected", String(page === "options"));
     notesPage.hidden = page !== "notes";
     stickersPage.hidden = page !== "notes";
     mapPage.root.hidden = page !== "map";
@@ -399,6 +406,7 @@ export function createJournal(root: HTMLElement): JournalControl {
     dismissOverlay: () => fieldOverlays.dismiss(),
     stepOverlay: (delta) => fieldOverlays.stepFieldNote(delta),
     onPageChange: (cb) => { onPageChange = cb; },
+    onMapSelect: (cb) => { onMapSelect = cb; },
     onOverlayChange: (cb) => { onOverlayChange = cb; },
     onOverlayStep: (cb) => { onOverlayStep = cb; },
     onClose: (cb) => { onClose = cb; },

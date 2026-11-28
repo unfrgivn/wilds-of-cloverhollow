@@ -329,11 +329,11 @@ export const REST_SPOTS: readonly RestSpot[] = [
   {
     id: "east-hall-sunbeam",
     area: "east-hall",
-    x: 880,
-    y: 600,
+    x: 680,
+    y: 560,
     radius: 60,
-    seatX: 880,
-    seatY: 596,
+    seatX: 680,
+    seatY: 556,
     facing: "down",
   },
   {

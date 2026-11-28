@@ -588,7 +588,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   `SoundCue[]`. Title transitions map via pure `titleEffectForTransition`
   (adding `"light"` haptic on `"title-start"`), Journal tab flips fire
   `onPageChange` (`"page-turn"` + `"light"` haptic without double-playing
-  `"choice-move"`), Field Note / Field Treasures cards fire `onOverlayChange`
+  `"choice-move"`), painted Valley Map pin clicks and keyboard/gamepad land-pin
+  steps fire `onMapSelect` (`"title-move"` wooden-marimba pin tick + `"light"`
+  haptic, Milestone 169), Field Note / Field Treasures cards fire
+  `onOverlayChange`
   only on real user open/dismiss flips (`"card-open"` / `"card-close"` +
   `"light"` haptic on open), Battle Field Guide Peek plays `"card-open"` /
   `"card-close"` during active battle only, Photo Mode plays `"toggle-on"` /
@@ -4235,7 +4238,14 @@ trunks keep its two exits.
   exact); Clubhouse Microwave deterministic turntable oval sway while cooking
   and celebratory pop on `ding`; smooth choice/command/title transitions,
   `.touch-button:active` tactile squash, and subtle inner-label float on
-  `.sticker-prompt` keeping its arrow tip anchored.
+  `.sticker-prompt` keeping its arrow tip anchored. Universal desktop tactile
+  hover feedback (`@media (hover: hover) and (pointer: fine)` so touch devices
+  never stick) and WCAG 2.4.7 `:focus-visible` rings (`3px solid #6b9e56`) apply
+  across Title (`src/ui/title.css`), Dialogue (`src/ui/sticker.css`), Battle
+  (`src/ui/battle.css`), and Journal (`src/ui/journal.css`) with zero resting
+  pixel changes and full `@media (prefers-reduced-motion: reduce)` +
+  `:root[data-reduced-motion="on"]` hover-transform suppression parity
+  (Milestone 169).
 - Tactile Minigame Personal Bests & Die-Cut Arcade Score Popups (Milestone 112,
   extended to Clubhouse Microwave in Milestone 118, Claw Machine popups in
   Milestone 137, and Chef Mateo's Taco Truck Kitchen personal bests in
@@ -4467,8 +4477,10 @@ trunks keep its two exits.
     map pin or `.journal-treasures-btn` has focus, or Gamepad D-Pad / Left Stick
     in any direction) steps across revealed Land Guide pins and the visible
     Field Treasures button via `mapPage.stepLandFocus`, immediately updating
-    `.journal-map-detail`, while `ArrowLeft` / `ArrowRight` with no map pin
-    focused keeps tab-flipping compatibility.
+    `.journal-map-detail` and playing the wooden-marimba `"title-move"` pin-select
+    foley + `"light"` haptic via `onSelectLand` / `journal.onMapSelect` (also
+    fired when clicking a revealed land pin, Milestone 169), while `ArrowLeft` /
+    `ArrowRight` with no map pin focused keeps tab-flipping compatibility.
   - `OPTIONS`: `ArrowUp` / `ArrowDown` (skipping focused volume sliders so
     existing ARIA slider adjustment stays intact) and Gamepad D-Pad / Left Stick
     cycle visible option buttons (`scrollIntoView({ block: "nearest" })`);
@@ -4833,8 +4845,8 @@ trunks keep its two exits.
   while a quick tap of `Q` on the title still opens `.qa-menu`); tapping
   `.qa-badge` opens it in QA mode; and on touch (`data-touch="on"`), a compact
   dev/harness-only `.qa-touch-trigger` (`"QA"`) opens it during live gameplay
-  when no QA pack is active (hidden on title, photo mode, QA menu, and while
-  open, and replaced by `.qa-badge` once a pack or `Sandbox` activates).
+  when no QA pack is active (hidden on title, credits, photo mode, QA menu, and
+  while open, and replaced by `.qa-badge` once a pack or `Sandbox` activates).
   Backquote, Escape, or `Close (Esc)` closes it. Opening via keyboard focuses
   `.qa-console-input`. While open the world is frozen (no core ticks run), and
   the root carries `data-qa-console="open"`. Its header shows `"QA console"`,

@@ -545,6 +545,7 @@
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
+  transition: transform 110ms ease-out, background-color 110ms ease-out;
 }
 .journal-map-page {
   position: absolute;
@@ -1171,6 +1172,7 @@
   white-space: nowrap;
   writing-mode: vertical-rl;
   transform: rotate(180deg);
+  transition: transform 110ms ease-out, background-color 110ms ease-out;
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
@@ -1179,6 +1181,48 @@
 .journal-book[data-journal-page="map"] .journal-map-tab,
 .journal-book[data-journal-page="options"] .journal-options-tab {
   background: #f2d88e;
+}
+.journal-tab:focus-visible,
+.journal-close:focus-visible,
+.journal-opt-toggle:focus-visible,
+.journal-opt-slider:focus-visible {
+  outline: 3px solid #6b9e56;
+  outline-offset: 2px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .journal-tab:not([aria-selected="true"]):hover {
+    background: #fff9e6;
+    transform: translateX(2px) rotate(180deg);
+  }
+  .journal-close:hover {
+    background: #fff9e6;
+    transform: scale(1.05);
+  }
+  .journal-opt-toggle:hover {
+    filter: brightness(1.03);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .journal-tab,
+  .journal-close {
+    transition: none;
+  }
+  .journal-tab:not([aria-selected="true"]):hover {
+    transform: rotate(180deg);
+  }
+  .journal-close:hover {
+    transform: none;
+  }
+}
+:root[data-reduced-motion="on"] .journal-tab,
+:root[data-reduced-motion="on"] .journal-close {
+  transition: none;
+}
+:root[data-reduced-motion="on"] .journal-tab:not([aria-selected="true"]):hover {
+  transform: rotate(180deg);
+}
+:root[data-reduced-motion="on"] .journal-close:hover {
+  transform: none;
 }
 .journal-book[data-journal-page="map"] .journal-page,
 .journal-book[data-journal-page="options"] .journal-page {

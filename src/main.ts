@@ -171,6 +171,7 @@ async function boot(): Promise<void> {
   let jukeboxTrack: JukeboxTrack | null = null;
   const playPageTurn = (): void => { sound.playEffect("page-turn"); lightHaptic(); };
   journal.onPageChange(playPageTurn);
+  journal.onMapSelect(() => { sound.playEffect("title-move"); lightHaptic(); });
   journal.onOverlayStep(playPageTurn);
   journal.onOverlayChange((open) => {
     sound.playEffect(open ? "card-open" : "card-close");

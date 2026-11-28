@@ -9497,6 +9497,28 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
 - Gates: `just check` (288 unit files / 2,090 tests, all 77 sims + all sim
   scripts, 23 QA packs, purity, lint), `just build` (`index` `391.95 kB < 500 kB`),
   16/16 Chromium & WebKit e2e, and 99/99 Chromium `ui-gallery` tests.
+
+## Milestone 222: Pixi-Free `battle-check-choreography.ts` & `asset-touch.ts` Modular Splits (Elevation Track E19M) **Status:** ✅ Completed (2026-11-28)
+- Modular Extraction of Pixi-Free `src/render/battle-check-choreography.ts`
+  (`src/render/battle-choreography.ts` `798 -> 432` lines,
+  `src/render/battle-check-choreography.ts` `359` lines):
+  - Extracts `applyPartySkillChoreography` and `applyInteractiveCheckChoreography`
+    into Pixi-free, DOM-free `src/render/battle-check-choreography.ts` while
+    preserving `computeBattleChoreography`, `battleStageMood`, and every public
+    re-export identically with zero `src/core` edits and zero visual diffs.
+- Modular Extraction of `src/shell/asset-touch.ts`
+  (`src/shell/assets.ts` `778 -> 581` lines, `src/shell/asset-touch.ts`
+  `179` lines):
+  - Extracts atlas path constants, touch-sink adapters, and atlas-path planning
+    helpers into Pixi-free `src/shell/asset-touch.ts`, re-exporting every symbol
+    identically from `src/shell/assets.ts` and unifying lazy overlay creation.
+- Evidence: `tests/unit/milestone-222.test.ts` (reference-identical re-exports,
+  Pixi/DOM purity, and strict modular line budgets).
+- Gates: `just check` (all unit files + 77 recorded & 7 headless sims with zero
+  hash shifts, 23 QA packs, purity, lint), `just build` (largest non-vendor
+  chunk `< 400 kB`, hook leak + runtime story + harness checks green), and
+  Chromium & WebKit e2e (`milestone-158`, `milestone-199`, `milestone-172`,
+  `milestone-221`).
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

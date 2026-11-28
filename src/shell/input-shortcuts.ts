@@ -521,6 +521,11 @@ export function createInputShortcuts(
     const bumperStep = deps.gamepad.consumeBumperStep();
     const navStep = deps.gamepad.consumeNavStep();
     const journalConfirmEdge = deps.gamepad.consumeConfirmEdge();
+    if (ctx.photoMode && canPhotoMode(ctx) && bumperStep !== 0) {
+      deps.gamepad.clearTaps();
+      deps.onCyclePhotoWeather?.(bumperStep);
+      return;
+    }
     if (deps.encoreShrine?.isOpen() === true) {
       if (photoAction === "exit") {
         deps.encoreShrine.close();

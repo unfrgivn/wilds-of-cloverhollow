@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 221)
+Last updated: 2026-11-28 (Milestone 222)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -235,7 +235,14 @@ ios/            Capacitor iOS project (from Milestone 4).
   sharing `RAINBOW_LASSO_COLORS`) live in Pixi-free
   `src/render/battle-vfx-checks-v2.ts` (all re-exported identically through
   `src/render/battle-vfx-stage.ts`, `src/render/battle-vfx.ts`, and
-  `src/render/battle-choreography.ts`, Milestones 137, 157, 173, 198 & 216). The Pixi battle stage container, sprites, check
+  `src/render/battle-choreography.ts`, Milestones 137, 157, 173, 198 & 216),
+  while per-skill and per-check actor choreography
+  (`applyPartySkillChoreography` for Soothe/Play/Cast/Juggle and
+  `applyInteractiveCheckChoreography` for `lean`, `catch`, `peekaboo`, `echo`,
+  `trace`, `which-one`, `whack`, and `spin-snag`) lives in Pixi-free, DOM-free
+  `src/render/battle-check-choreography.ts` (composed by
+  `computeBattleChoreography` in `src/render/battle-choreography.ts`, Milestone
+  221 / Track E19M). The Pixi battle stage container, sprites, check
   geometry, and `renderBattle` orchestration live in `BattleViewController`
   (`src/render/battle-view.ts`, mounted by `GameView` in `src/render/view.ts`),
   delegating blurred backdrop texture caching/invalidation, stage wash scrim,
@@ -259,7 +266,14 @@ ios/            Capacitor iOS project (from Milestone 4).
   `ensureMoleOverlay`, `ensureCometOverlay`, `ensureArcadeOverlay`,
   `ensureCookOverlay`, `ensureFishOverlay`, `warmAreaOverlays`,
   `warmAreaMedia`, `warmJournalAssets`, `warmBattlePortraits`) live in
-  `src/shell/assets.ts`, while the pure shell UI view-model projectors
+  `src/shell/assets.ts`, with pure touch-sink adapters and atlas-path planning
+  helpers (`MOLE_ATLAS`, `FOOD_ATLAS`, `FISH_ATLAS`, `TACO_ATLAS`,
+  `COMET_ATLAS`, `FAE_ATLAS`, `BATTLE_CHECKS_V2_ATLAS`, `MoleHoleTouch`,
+  `BattleCheckTouchSink`, `BattleCheckBindTarget`, `bindBattleCheckTouch`,
+  `createTacoToppingHandler`, `createMoleHoleHandler`, `areaMediaAtlases`,
+  `ownedJournalAtlases`, `battlePortraitAtlases`) extracted into Pixi-free
+  `src/shell/asset-touch.ts` and re-exported identically through
+  `src/shell/assets.ts` (Milestone 222 / Track E19M), while the pure shell UI view-model projectors
   (`cropCreditFrame`, `battleCheckOverlay`, `buildBattleHudView`,
   `buildCreditsView`, `buildDialogueView`, `buildHudHintsView`,
   `buildJournalView`, `buildRewardStickerView`) live in Pixi-free

@@ -265,6 +265,24 @@ function briskCheckSpec(spec: CheckSpec): CheckSpec {
       inputTicks: Math.max(60, spec.inputTicks - 18),
     };
   }
+  if (spec.kind === "which-one") {
+    return {
+      ...spec,
+      swapTicks: Math.max(12, Math.round(spec.swapTicks * 0.85)),
+      pickTicks: Math.max(60, spec.pickTicks - 20),
+    };
+  }
+  if (spec.kind === "whack") {
+    return {
+      ...spec,
+      stayTicks: Math.max(16, Math.round(spec.stayTicks * 0.84)),
+    };
+  }
+  if (spec.kind === "spin-snag") {
+    const greatWindow = Math.max(3, Math.round(spec.greatWindow * 0.8));
+    const goodWindow = Math.max(greatWindow + 2, Math.round(spec.goodWindow * 0.8));
+    return { ...spec, greatWindow, goodWindow };
+  }
   return {
     ...spec,
     reachRadius: Math.max(68, Math.round(spec.reachRadius * 0.84)),

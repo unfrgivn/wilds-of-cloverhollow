@@ -40,7 +40,10 @@ import {
   battleTalkDialogueView,
   talkChoicesShown,
   type BattleCheckView as BattleCheckOverlayView,
+  type BattleFoePlateItem,
   type BattleHudView,
+  type BattleIntentItem,
+  type CommandMenuView,
 } from "../ui/battle";
 import { evaluateBattlePortraits } from "../ui/battle-portraits";
 import { DEFAULT_ENDING_POSTCARD, type CreditsView } from "../ui/credits";
@@ -89,11 +92,41 @@ export function cropCreditFrame(frame: AtlasFrame): AtlasFrame {
   return { x, y, w, h };
 }
 
+const BATTLE_ARROW_CHECKS = new Set([
+  "catch", "lean", "echo", "which-one", "whack", "spin-snag",
+]);
+
+/** Returns true for battle check kinds that actively consume directional arrows. */
+export function keepsBattleArrows(checkKind: string | undefined): boolean {
+  return checkKind !== undefined && BATTLE_ARROW_CHECKS.has(checkKind);
+}
+
+/** Projects battle command list onto CommandMenuView with resolved Dual Combo art. */
+export function buildCommandMenuView(
+  state: Pick<State, "battle">,
+  battle: BattleView | null,
+  checkV2Art: (frameName: string) => AtlasImage | null,
+): CommandMenuView {
+  return {
+    visible: battle !== null && state.battle?.phase === "command" && battle.talk === null,
+    commands: (battle?.commands ?? []).map((cmd) => ({
+      ...cmd,
+      ...(cmd.combo === true && cmd.comboEmblem !== undefined
+        ? { comboArt: checkV2Art(cmd.comboEmblem) }
+        : {}),
+    })),
+    selected: battle?.selected ?? 0,
+    activeActor: battle?.activeActor,
+    treatTray: battle?.treatTray ?? null,
+  };
+}
+
 /** Projects core battle check state + canvas geometry onto the DOM battle check overlay view. */
 export function battleCheckOverlay(
   battle: BattleView | null,
   geometry: BattleCheckGeometry | null,
   resolveToy: (frameName: string) => AtlasImage | null,
+  resolveCheckV2: (frameName: string) => AtlasImage | null = () => null,
 ): BattleCheckOverlayView | null {
   const check = battle?.check ?? null;
   if (battle === null || check === null || geometry === null) return null;
@@ -153,6 +186,59 @@ export function battleCheckOverlay(
       demoIndex: check.demoIndex,
       entered: check.entered,
       time: check.time,
+    };
+  }
+  if (check.kind === "which-one" && geometry.kind === "which-one") {
+    return {
+      ...geometry,
+      ...shared,
+      phase: check.phase,
+      hidingCup: check.hidingCup,
+      cupSlots: check.cupSlots,
+      activeSwap: check.activeSwap,
+      cursor: check.cursor,
+      picked: check.picked,
+      targetSlot: check.targetSlot,
+      time: check.time,
+      revealProgress: check.revealProgress,
+      cups: [
+        resolveCheckV2("cup-mint"),
+        resolveCheckV2("cup-butter"),
+        resolveCheckV2("cup-sky"),
+      ],
+      star: resolveCheckV2("cup-star"),
+    };
+  }
+  if (check.kind === "whack" && geometry.kind === "whack") {
+    return {
+      ...geometry,
+      ...shared,
+      activeSlot: check.activeSlot,
+      activeIndex: check.activeIndex,
+      activeProgress: check.activeProgress,
+      results: check.results,
+      lastSwing: check.lastSwing,
+      art: {
+        slot: resolveCheckV2("ticket-slot"),
+        pop: resolveCheckV2("ticket-pop"),
+        hit: resolveCheckV2("ticket-hit"),
+      },
+    };
+  }
+  if (check.kind === "spin-snag" && geometry.kind === "spin-snag") {
+    return {
+      ...geometry,
+      ...shared,
+      phase: check.phase,
+      turns: check.turns,
+      spinsNeeded: check.spinsNeeded,
+      lastSector: check.lastSector,
+      spinTime: check.spinTime,
+      snagProgress: check.snagProgress,
+      snagTarget: check.snagTarget,
+      greatWindow: check.greatWindow,
+      goodWindow: check.goodWindow,
+      coil: resolveCheckV2("lasso-coil"),
     };
   }
   return null;
@@ -541,7 +627,12 @@ export function buildDialogueView(params: DialogueViewParams): DialogueView | nu
       activeCmd !== null &&
       !battle.message.startsWith("Fae plays her flute!") &&
       !battle.message.startsWith("Fae twirls her rainbow lasso")
-        ? battleCommandPreview(activeCmd, battle.critterName, feelingLabel)
+        ? battleCommandPreview(
+            activeCmd,
+            battle.critterName,
+            feelingLabel,
+            (battle.foes?.length ?? 1) > 1,
+          )
         : null;
     return {
       speaker: null,
@@ -644,13 +735,15 @@ export type BattleHudViewParams = {
   canPeek: boolean;
   peekOpen: boolean;
   speakerPortrait: (speaker: string | null) => AtlasImage | null;
+  checkV2Art?: (frameName: string) => AtlasImage | null;
   inputMode?: HudInputMode;
 };
 
 /** Projects core battle state, party portraits, and Field Guide peek onto BattleHudView. */
 export function buildBattleHudView(params: BattleHudViewParams): BattleHudView {
-  const { world, state, battle, partyCommands, paused, canPeek, peekOpen, speakerPortrait } =
-    params;
+  const {
+    world, state, battle, partyCommands, paused, canPeek, peekOpen, speakerPortrait, checkV2Art,
+  } = params;
   const activeBattle = battle !== null;
   const hideActions =
     state.battle?.phase === "check" || state.battle?.phase === "burstResult";
@@ -668,6 +761,7 @@ export function buildBattleHudView(params: BattleHudViewParams): BattleHudView {
         })
       : [];
   const poppedCount = battle?.windUp?.bubbles.filter((item) => item.popped).length ?? 0;
+  const bossPhase2 = battle?.bossPhase2 ?? null;
   const popupSnapshot =
     activeBattle && state.battle !== null && state.battle.phase !== "reward" && battle !== null
       ? {
@@ -686,9 +780,34 @@ export function buildBattleHudView(params: BattleHudViewParams): BattleHudView {
             state.battle.phase === "check" &&
             state.battle.check?.side === "critter",
           recovered: state.battle.phase === "result" && state.battle.command === "recover",
+          bossPhase2: bossPhase2 !== null,
         }
       : null;
   const critter = world.critters[state.battle?.critterId ?? ""];
+  const resolveIntent = (
+    intent: NonNullable<BattleView["intent"]> | null | undefined,
+  ): BattleIntentItem | null =>
+    intent === null || intent === undefined
+      ? null
+      : {
+          kind: intent.kind,
+          label: intent.label,
+          detail: intent.detail,
+          art: checkV2Art?.(intent.frame) ?? null,
+        };
+  const multiFoes: BattleFoePlateItem[] | undefined =
+    battle?.foes !== undefined && battle.foes.length > 1
+      ? battle.foes.map((foe) => ({
+          index: foe.index,
+          critterId: foe.critterId,
+          name: foe.name,
+          calm: foe.calm,
+          calmMax: foe.calmMax,
+          soothed: foe.soothed,
+          targeted: foe.targeted,
+          intent: resolveIntent(foe.intent),
+        }))
+      : undefined;
   return {
     visible: showBattleHud,
     energy: battle?.energy ?? 0,
@@ -707,6 +826,18 @@ export function buildBattleHudView(params: BattleHudViewParams): BattleHudView {
     peekOpen,
     peek: peekOpen ? battlePeekData(world, state) : null,
     inputMode: params.inputMode,
+    ...(multiFoes === undefined ? {} : { foes: multiFoes }),
+    bossPhase2: bossPhase2 === null
+      ? null
+      : {
+          bossId: bossPhase2.bossId,
+          bossName: bossPhase2.bossName,
+          phaseTitle: bossPhase2.phaseTitle,
+          signatureLine: bossPhase2.signatureLine,
+          accentHex: bossPhase2.accentHex,
+          rhythmLabel: bossPhase2.rhythmLabel,
+        },
+    bossIntent: bossPhase2 === null ? null : resolveIntent(battle?.intent),
   };
 }
 

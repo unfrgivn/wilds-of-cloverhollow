@@ -2,6 +2,7 @@ import { execFile, spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import type { Page } from "@playwright/test";
 import type { ActionFrame, State } from "../../src/core";
+import { whichOneTargetSlot } from "../../src/core/checks-v2";
 import { parseScript } from "../../src/content/script";
 import type { CloverhollowHook } from "../../src/dev/hook";
 
@@ -227,6 +228,69 @@ export async function playBattleCheck(page: Page): Promise<void> {
     }
     return;
   }
+  if (check.kind === "which-one") {
+    const shuffleEnd = check.spec.showTicks + check.spec.shuffles * check.spec.swapTicks;
+    if (check.tick <= shuffleEnd) await step(page, shuffleEnd - check.tick + 1);
+    const target = whichOneTargetSlot(check.hidingCup, check.swaps);
+    for (let moves = 0; moves < 4; moves += 1) {
+      const current = (await readBattle(page))?.check;
+      if (current?.kind !== "which-one" || current.cursor === target) break;
+      await page.keyboard.down("ArrowRight");
+      await step(page, 1);
+      await page.keyboard.up("ArrowRight");
+      await step(page, 1);
+    }
+    await page.keyboard.down("Enter");
+    await step(page, 1);
+    await page.keyboard.up("Enter");
+    return;
+  }
+  if (check.kind === "whack") {
+    const stride = check.spec.stayTicks + check.spec.gapTicks;
+    const keyMap: Record<string, string> = {
+      up: "ArrowUp",
+      right: "ArrowRight",
+      down: "ArrowDown",
+      left: "ArrowLeft",
+      middle: "Enter",
+    };
+    for (let index = 0; index < check.spec.pops; index += 1) {
+      const active = (await readBattle(page))?.check;
+      if (active?.kind !== "whack") break;
+      if (active.results[index] !== "pending") continue;
+      const targetTick = index * stride + 1;
+      if (active.tick < targetTick) await step(page, targetTick - active.tick);
+      const key = keyMap[active.slots[index] ?? "middle"] ?? "Enter";
+      await page.keyboard.down(key);
+      await step(page, 1);
+      await page.keyboard.up(key);
+      const after = await readBattle(page);
+      if (after?.phase !== "check") break;
+      await step(page, 1);
+    }
+    return;
+  }
+  if (check.kind === "spin-snag") {
+    const dirKeys: readonly string[] = ["ArrowUp", "ArrowRight", "ArrowDown", "ArrowLeft"];
+    for (let guard = 0; guard < 24; guard += 1) {
+      const active = (await readBattle(page))?.check;
+      if (active?.kind !== "spin-snag" || active.turns >= active.spec.spinsNeeded) break;
+      const nextSector = active.lastSector < 0 ? 0 : (active.lastSector + 1) % 4;
+      const key = dirKeys[nextSector] ?? "ArrowUp";
+      await page.keyboard.down(key);
+      await step(page, 1);
+      await page.keyboard.up(key);
+    }
+    const snagging = (await readBattle(page))?.check;
+    if (snagging?.kind !== "spin-snag") return;
+    const wait = snagging.spec.targetTick - 1 - snagging.snagTick;
+    if (wait > 0) await step(page, wait);
+    await page.keyboard.down("Enter");
+    await step(page, 1);
+    await page.keyboard.up("Enter");
+    return;
+  }
+  if (check.kind !== "chain") return;
   for (const arrival of check.spec.arrivals) {
     const current = await readBattle(page);
     const active = current?.check;

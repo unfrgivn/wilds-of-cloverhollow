@@ -3,6 +3,15 @@ import { element, setAttribute, setText } from "./dom";
 import { feelingMarkup, heartMarkup, icon } from "./icons";
 import type { FeelingId } from "../core";
 
+export {
+  createBossIntentSticker,
+  createFoeFormationHud,
+  createPhase2Banner,
+  type BattleFoePlateItem,
+  type BattleIntentItem,
+  type BossPhase2BannerView,
+} from "./battle-foes";
+
 export type BattleCommand = {
   id: string;
   label: string;
@@ -10,6 +19,11 @@ export type BattleCommand = {
   disabled: boolean;
   // The feeling this command answers this turn, shown as a badge.
   feeling: FeelingId | null;
+  combo?: boolean;
+  comboCost?: number;
+  comboEmblem?: string;
+  targetScope?: "single" | "splash" | "ricochet" | "all";
+  comboArt?: AtlasImage | null;
 };
 
 export type BattleTreatItem = {
@@ -132,6 +146,7 @@ export function battleCommandPreview(
   command: BattleCommand,
   critterName: string,
   feelingLabel: string | null,
+  multiFoe = false,
 ): string {
   if (command.disabled && command.detail !== null) {
     if (command.id === "snack") return "No snacks or treats left right now.";
@@ -143,9 +158,13 @@ export function battleCommandPreview(
   } else if (command.id === "play") {
     base = "Maddie bounces in with a playful pounce!";
   } else if (command.id === "cast") {
-    base = "Sue casts a sparkling lure. Hold to charge!";
+    base = multiFoe
+      ? "Sue casts a sparkling lure. Splashes adjacent foes!"
+      : "Sue casts a sparkling lure. Hold to charge!";
   } else if (command.id === "juggle") {
-    base = "Jordan juggles glowing stars. Tap on the beat!";
+    base = multiFoe
+      ? "Jordan juggles glowing stars. Ricochets across targets!"
+      : "Jordan juggles glowing stars. Tap on the beat!";
   } else if (command.id === "recover") {
     base = "Take a calm breath to restore 1 leaf and ready your move.";
   } else if (command.id === "snack") {
@@ -154,6 +173,14 @@ export function battleCommandPreview(
     base = "Listen closely and speak from the heart.";
   } else if (command.id === "run") {
     base = "Step back calmly to explore more.";
+  } else if (command.id === "combo:yarn-ball-lullaby") {
+    base = "Fae & Maddie weave a cozy yarn lullaby! +1 leaf & softer bursts!";
+  } else if (command.id === "combo:bubblegum-lasso-spin") {
+    base = "Fae & Sue spin a bubblegum lasso across every critter!";
+  } else if (command.id === "combo:rainbow-splash-juggle") {
+    base = "Sue & Jordan unleash a rainbow star volley across all foes!";
+  } else if (command.id === "combo:cloverhollow-harmony") {
+    base = "All four friends shine in harmony across the whole field! +1 leaf!";
   } else {
     base = `${command.label} helps calm ${critterName}.`;
   }
@@ -296,13 +323,25 @@ export function createCommandMenu(root: HTMLElement): {
       view.commands.forEach((command, index) => {
         const item = buttons[index];
         if (item === undefined) return;
-        if (item.icon.id !== command.id) {
-          item.icon.node.replaceChildren(commandIcon(command.id));
-          item.icon.id = command.id;
+        const isCombo = command.combo === true;
+        const comboArt = isCombo ? (command.comboArt ?? null) : null;
+        const iconKey = comboArt !== null
+          ? `${command.id}|${comboArt.src}:${comboArt.frame.x},${comboArt.frame.y}`
+          : command.id;
+        if (item.icon.id !== iconKey) {
+          if (comboArt !== null) {
+            const artNode = element("span", "battle-command-combo-art");
+            applyAtlasCrop(artNode, comboArt);
+            item.icon.node.replaceChildren(artNode);
+          } else {
+            item.icon.node.replaceChildren(commandIcon(command.id));
+          }
+          item.icon.id = iconKey;
         }
         setText(item.label, command.label);
         setText(item.detail, command.detail ?? "");
         item.detail.hidden = command.detail === null;
+        item.detail.classList.toggle("is-combo-cost", isCombo);
         setAttribute(
           item.button,
           "aria-selected",
@@ -310,6 +349,7 @@ export function createCommandMenu(root: HTMLElement): {
         );
         setAttribute(item.button, "aria-disabled", String(command.disabled));
         item.button.disabled = command.disabled;
+        item.button.classList.toggle("is-combo", isCombo);
         item.button.classList.toggle("is-match", command.feeling !== null);
         if (item.badge.feeling !== command.feeling) {
           drawFeeling(item.badge.node, command.feeling);

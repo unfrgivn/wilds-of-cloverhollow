@@ -24,6 +24,7 @@ export type ActionFrame = {
   lasso?: boolean;
   dash?: boolean;
   choose?: number;
+  target?: number;
   pointer?: { x: number; y: number };
 };
 export type FollowTunables = {
@@ -834,6 +835,8 @@ export type StickerCatalogue = {
 export type BattleContent = {
   // The sprite atlas of the toys a catch throws (Milestone 41).
   toyAtlas: string;
+  // The v2 checks, enemy intents, and dual-combo emblems atlas (Track E7).
+  checksV2Atlas?: string;
   hints: {
     charge: string;
     chain: string;
@@ -842,6 +845,9 @@ export type BattleContent = {
     trace: string;
     peekaboo: string;
     echo: string;
+    "which-one": string;
+    whack: string;
+    "spin-snag": string;
   };
   commands: {
     soothe: { label: string; check: CheckSpec };
@@ -987,6 +993,29 @@ export type EchoSpec = {
   gapTicks: number;
   inputTicks: number;
 };
+export type WhichOneSpec = {
+  kind: "which-one";
+  showTicks: number;
+  shuffles: number;
+  swapTicks: number;
+  pickTicks: number;
+};
+export type WhackSlot = "up" | "right" | "down" | "left" | "middle";
+export type WhackSpec = {
+  kind: "whack";
+  pops: number;
+  stayTicks: number;
+  gapTicks: number;
+};
+export type SpinSnagSpec = {
+  kind: "spin-snag";
+  spinsNeeded: number;
+  spinTicks: number;
+  snagTicks: number;
+  targetTick: number;
+  greatWindow: number;
+  goodWindow: number;
+};
 export type CheckSpec =
   | RingSpec
   | ChargeSpec
@@ -995,7 +1024,10 @@ export type CheckSpec =
   | LeanSpec
   | TraceSpec
   | PeekabooSpec
-  | EchoSpec;
+  | EchoSpec
+  | WhichOneSpec
+  | WhackSpec
+  | SpinSnagSpec;
 // "critter": Fae's side acts on the critter; "fae": the critter's burst.
 export type CheckSide = "critter" | "fae";
 export type BeatResult = "pending" | "hit" | "miss";
@@ -1008,6 +1040,37 @@ export type PeekabooState = {
   spotted: number[];
   peeksCleared: number;
   result: Grade | null;
+  big: boolean;
+};
+export type WhichOneState = {
+  kind: "which-one";
+  side: CheckSide;
+  tick: number;
+  spec: WhichOneSpec;
+  hidingCup: number;
+  swaps: [number, number][];
+  cursor: number;
+  picked: number | null;
+  big: boolean;
+};
+export type WhackState = {
+  kind: "whack";
+  side: CheckSide;
+  tick: number;
+  spec: WhackSpec;
+  slots: WhackSlot[];
+  results: BeatResult[];
+  lastSwing: { slot: WhackSlot; hit: boolean; ticksLeft: number } | null;
+  big: boolean;
+};
+export type SpinSnagState = {
+  kind: "spin-snag";
+  side: CheckSide;
+  tick: number;
+  spec: SpinSnagSpec;
+  lastSector: number;
+  turns: number;
+  snagTick: number;
   big: boolean;
 };
 // A check in play: a copy of its spec, its tick, and its own progress. `big`
@@ -1077,7 +1140,10 @@ export type CheckState =
       activeNote: EchoNote | null;
       activeTicks: number;
       big: boolean;
-    };
+    }
+  | WhichOneState
+  | WhackState
+  | SpinSnagState;
 // The commands every battle has; the party's commands come from its roster.
 export type SharedCommandId = "soothe" | "snack" | "run";
 export type FriendCommand = {
@@ -1168,6 +1234,53 @@ export type BattlePhase =
   | "reward"
   | "rest"
   | "run";
+export type BattleFoe = {
+  critterId: string;
+  calm: number;
+  calmMax: number;
+  soothed: boolean;
+  feelings: (FeelingId | null)[];
+  windUp: { feelings: FeelingId[]; popped: boolean[]; left: number } | null;
+};
+export type CommandTargetScope = "single" | "splash" | "ricochet" | "all";
+export type EnemyIntentKind =
+  | "puffing-up"
+  | "calling-cheer"
+  | "swirling-scribbles"
+  | "sharing-fizz";
+export type EnemyIntentView = {
+  kind: EnemyIntentKind;
+  label: string;
+  frame: string;
+  detail: string;
+};
+export type BossPhase2View = {
+  bossId: string;
+  bossName: string;
+  phaseTitle: string;
+  signatureLine: string;
+  moodTint: number;
+  waveATint: number;
+  waveBTint: number;
+  spotlightTint: number;
+  accentHex: string;
+  rhythmLabel: string;
+};
+export type BattleFoeView = {
+  index: number;
+  critterId: string;
+  name: string;
+  calm: number;
+  calmMax: number;
+  soothed: boolean;
+  targeted: boolean;
+  battleHeight: number;
+  auraCentre: Point;
+  bodyCentre: Point;
+  feeling: { id: FeelingId; label: string } | null;
+  windUp: { bubbles: { id: FeelingId; label: string; popped: boolean }[] } | null;
+  intent: EnemyIntentView | null;
+};
 export type Battle = {
   // The critter kind; `den` is the recurring critter's den, or null for a set
   // piece (whose id is the kind's).
@@ -1217,6 +1330,12 @@ export type Battle = {
   treatMenu?: boolean;
   treatSelected?: number;
   encore?: BattleEncore;
+  // Multi-critter formation fields (Track E7): omitted in single-foe battles.
+  foes?: BattleFoe[];
+  targetIndex?: number;
+  formationId?: string;
+  signatureBurst?: CheckSpec;
+  bigSignatureBurst?: CheckSpec;
 };
 export type BattleCheckView =
   | { kind: "ring"; side: CheckSide; progress: number; target: number }
@@ -1283,6 +1402,41 @@ export type BattleCheckView =
       demoIndex: number;
       entered: number;
       time: number;
+    }
+  | {
+      kind: "which-one";
+      side: CheckSide;
+      phase: "show" | "shuffle" | "pick";
+      hidingCup: number;
+      cupSlots: [number, number, number];
+      activeSwap: { pair: [number, number]; progress: number } | null;
+      cursor: number;
+      picked: number | null;
+      targetSlot: number;
+      time: number;
+      revealProgress: number;
+    }
+  | {
+      kind: "whack";
+      side: CheckSide;
+      activeSlot: WhackSlot | null;
+      activeIndex: number;
+      activeProgress: number;
+      results: BeatResult[];
+      lastSwing: { slot: WhackSlot; hit: boolean } | null;
+    }
+  | {
+      kind: "spin-snag";
+      side: CheckSide;
+      phase: "spin" | "snag";
+      turns: number;
+      spinsNeeded: number;
+      lastSector: number;
+      spinTime: number;
+      snagProgress: number;
+      snagTarget: number;
+      greatWindow: [number, number];
+      goodWindow: [number, number];
     };
 export type TreatTrayItem = {
   id: string;
@@ -1312,6 +1466,10 @@ export type BattleView = {
     disabled: boolean;
     // The feeling this command answers this turn, if any (its badge).
     feeling: FeelingId | null;
+    combo?: boolean;
+    comboCost?: number;
+    comboEmblem?: string;
+    targetScope?: CommandTargetScope;
   }[];
   selected: number;
   energy: number;
@@ -1344,6 +1502,11 @@ export type BattleView = {
   lassoSteady: boolean;
   treatTray: TreatTrayView | null;
   encore?: { bossId: string; modifiers: EncoreModifierId[] };
+  foes?: BattleFoeView[];
+  targetIndex?: number;
+  formationId?: string | null;
+  intent?: EnemyIntentView | null;
+  bossPhase2?: BossPhase2View | null;
 };
 // `party` overrides who starts in the party (test fixtures); the default is
 // every roster member with `start: true`, in roster order.
@@ -1351,6 +1514,7 @@ export type Fixture = {
   area: string; spawn: string; seed?: number; party?: string[];
   variables?: Record<string, boolean>;
   calms?: Record<string, number>;
+  battleFormation?: string;
 };
 // One friend in the party: member 0 follows Fae, member i follows member i-1,
 // each along its own breadcrumb trail of its leader's recent positions.

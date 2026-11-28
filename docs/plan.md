@@ -7504,10 +7504,11 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   Pins (`content/badges.json`) with Pin Point (PP) budget in Journal; single
   consolidated `SaveData.version = 11` migration with clean `upgrades[10]`.
 - **Track E7 (Multi-Critter Formations, Multi-Phase Boss AI, Dual Combos & New Checks, Art Wave B):**
-  1-to-3 critter encounters with targeting and AoE skills; telegraphed enemy
-  intent and 50% Calm Phase-2 mini-boss/boss shifts; bespoke Dual-Friend
-  Synergy Combos; 3 new battle checks from `docs/battle-ideas.md` (`Which One?`
-  cup shuffle, `Whack` ticket slots, `Spin & Snag` lasso).
+  ✅ Completed (Milestone 196, 2026-11-28) — 1-to-3 critter biome formations
+  with targeting, splash/ricochet/Flute Chorus AoE, telegraphed enemy intent
+  stickers, 50% Calm Phase-2 mini-boss shifts, 4 Dual-Friend Synergy Combos
+  with bespoke stage VFX, 3 new battle checks (`which-one`, `whack`,
+  `spin-snag`), and Art Wave B3 (`battle-checks-v2.webp`).
 
 ### Phase 3: Clubhouse Inventor Hub & Meaningful Economy
 - **Track E8 (Clubhouse Magical Garden & Fae's Inventor Workbench, Art Wave B):**
@@ -8618,6 +8619,62 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   `art/review/e9b-{decor-picker-clubhouse-1280,decor-picker-phone-874,clubhouse-decorated-1280,clubhouse-visitor-dialogue-1280,bedroom-shelf-1280}.jpg`.
 - **Gates:** `just check`, `just build` (`< 500 kB` every non-vendor chunk),
   and Playwright e2e verification.
+
+## Milestone 196: Multi-Critter Formations, Multi-Phase Boss AI, Dual-Friend Synergy Combos & v2 Battle Checks (Elevation Track E7, Art Wave B3) **Status:** ✅ Completed (2026-11-28)
+- Eliminates battle repetition with Paper Mario / Mario & Luigi-style tactical
+  encounters while keeping `src/core` 100% pure (zero trig, deterministic),
+  Save `v10` untouched, and all 74 existing single-foe sim scripts and 23 QA
+  packs hash-identical:
+  - **Multi-Critter Formations (1 to 3 Foes) (`src/core/battle-formations.ts`,
+    `src/core/battle.ts`, `src/core/battle-view.ts`,
+    `src/render/battle-layout.ts`, `src/render/battle-formation-render.ts`,
+    `src/render/battle-stage-render.ts`, `src/render/battle-view.ts`,
+    `src/ui/battle-foes.ts`):** supports 1–3 foes on stage with Left/Right and
+    tap/click target selection (`ActionFrame.target`, golden-coral
+    `battle:target-indicator` chevron), individual Calm bars, 8 authored biome
+    formations (`bay-pair` Zoomie Pup + Snappy Crab, `woods-pair` Sneaky
+    Raccoon + Zippy Squirrel, `pass-pair` Slippy Penguin + Snowball Hamster,
+    `cavern-pair` Duzzy Bat + Glimmer Mole, 3-foe trios `bay-trio`,
+    `woods-trio`, `pass-trio`, and `arcade-encore` Mr. Pip + Zoomie Pup),
+    partner atlas preloading in `areaEntityAtlases`, and differentiated
+    single-target vs. AoE skills (Sue's `cast` adjacent splash, Jordan's
+    `juggle` ricochet, Fae's Flute Chorus all-foe calm).
+  - **Telegraphed Enemy Intent & 50% Calm Boss Phase-2 AI
+    (`src/core/boss-ai.ts`, `src/ui/battle-foes.ts`, `src/ui/battle-popups.ts`,
+    `src/render/battle-stage-render.ts`):** die-cut intent stickers
+    (`Puffing Up`, `Calling Cheer`, `Swirling Scribbles`, `Sharing Fizz`) with
+    Art Wave B3 emblems, plus automatic Phase-2 shifts at `>= 50%` Calm across
+    all 10 mini-bosses (Grumpy Gull, Mr. Pip, Coach Ash / Gym Pup, Ms. Rowan,
+    Mrs. Flurry, Ms. Coral, Mr. Bell, Chef Mateo, the Hooded Kid, and Starey
+    Owl) with custom per-boss watercolor mood lighting tints, `.battle-phase2-banner`
+    crest + signature line, `PHASE 2! ★` popup, and upgraded check rhythms.
+  - **Dual-Friend Synergy Combos (`src/core/combos.ts`,
+    `src/render/battle-vfx-combos.ts`, `src/render/battle-vfx-stage.ts`,
+    `src/ui/battle-overlays.ts`):** unlocks *Yarn-Ball Lullaby* (Fae + Maddie,
+    2★), *Bubblegum Lasso Spin* (Fae + Sue, 2★, using `spin-snag`), *Rainbow
+    Splash-Juggle* (Sue + Jordan, 2★), and *Cloverhollow Harmony* (Full Party,
+    3★) directly in `.battle-commands` when stars and matching companions are
+    ready, with full-width phone grid buttons, Art Wave B3 emblems, and
+    reduced-motion-safe Pixi-free VFX choreography.
+  - **3 New Battle Checks & Art Wave B3 (`src/core/checks-v2.ts`,
+    `src/core/checks.ts`, `src/ui/battle-checks-v2.ts`, `src/ui/battle-checks.ts`,
+    `art/recipes/battle-checks-v2.json`,
+    `public/assets/battle/battle-checks-v2.{webp,json}`):** `which-one` (3-Cup
+    Shuffle), `whack` (5-Slot Popping Tickets), and `spin-snag` (Lasso Spin &
+    Snag) with full keyboard, gamepad, direct pointer/touch, Gentle Timing, and
+    Boss Encore Brisk Breeze support, backed by 16 Gemini watercolor sprites
+    packed into a 130 KB WebP atlas verified in
+    `art/review/battle-checks-v2-sheet.jpg`.
+- **Evidence:** `tests/unit/e7-multifoe-combos.test.ts` &
+  `tests/unit/e7-step3-render-ui.test.ts` (zero-mock core/render/UI unit tests),
+  `tools/sim/e7-formations.ts` (headless deterministic formation sim wired into
+  `tools/sim/balance.ts`), `tests/e2e/e7-multifoe-combos.spec.ts` (`@smoke`
+  Chromium + WebKit desktop & phone touch e2e), updated `vision`-verified
+  `battle-depth.spec.ts` `battle-together-ready` baselines, and 8
+  `vision`-verified review sheets in
+  `art/review/{battle-checks-v2-sheet,e7-bay-duo-formation-desktop,e7-dual-combo-menu-desktop,e7-spin-snag-check,e7-woods-duo-phone,e7-which-one-cups,e7-whack-tickets,e7-boss-phase2-pip}.jpg`.
+- **Gates:** `just check`, `just build` (`< 500 kB` every non-vendor chunk, zero
+  hook leak), and Chromium + WebKit Playwright e2e verification.
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

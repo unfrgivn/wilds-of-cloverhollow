@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 195)
+Last updated: 2026-11-28 (Milestone 196)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -4391,6 +4391,92 @@ trunks keep its two exits.
   atlases when Fae plays her flute in battle. The shell logs `[cloverhollow]
   battle` with phase and message changes, and `renderInfo()` exposes the phase,
   the check's geometry, and critter frame.
+- **Multi-Critter Formations, Multi-Phase Boss AI, Dual-Friend Synergy Combos &
+  v2 Battle Checks (Elevation Track E7, Art Wave B3, Milestone 196; Save `v10`
+  unchanged, single-foe battles 100% hash-identical):**
+  - **Multi-Critter Formations (`src/core/battle-formations.ts`,
+    `src/render/battle-formation-render.ts`, `src/render/battle-layout.ts`,
+    `src/render/battle-stage-render.ts`, `src/ui/battle-foes.ts`):** supports
+    1 to 3 foes on stage via optional `Battle.foes`, `targetIndex`,
+    `formationId`, and `signatureBurst` (all omitted on single-foe battles so
+    existing single-foe state hashes, PRNG draws, and layouts remain
+    bit-identical). Includes 8 authored formations across biomes (`bay-pair`
+    Zoomie Pup + Snappy Crab, `woods-pair` Sneaky Raccoon + Zippy Squirrel with
+    `which-one`, `pass-pair` Slippy Penguin + Snowball Hamster, `cavern-pair`
+    Duzzy Bat + Glimmer Mole, 3-foe trios `bay-trio`, `woods-trio`, `pass-trio`,
+    and `arcade-encore` Fizzy Mr. Pip + Zoomie Pup with `whack`), triggered on
+    repeat biome visits once Fae has `>= 2` battle companions and has calmed
+    each species once, or via configured `Fixture.battleFormation`
+    (`bay-duo`, `woods-duo`, `arcade-encore`) / `startFormationBattle`.
+    `areaEntityAtlases` preloads formation partner atlases for those biomes.
+    During `command` phase with `>= 2` active foes, Left/Right edges or clicking
+    a `.battle-foe-plate` (`ActionFrame.target` via `TouchInput.tapTarget`)
+    switches `targetIndex`, moving the coral-gold `battle:target-indicator`
+    chevron over the targeted foe. Skills differentiate cleanly by
+    `commandTargetScope`: `soothe` and `play` are single-target; Sue's `cast`
+    splashes adjacent active foes (`|i - target| === 1`, 50% calm); Jordan's
+    `juggle` ricochets across additional active foes (`65%` / `40%` on `great`,
+    `45%` on `good`); and Fae's Flute Chorus calms all active foes gently.
+    Individually soothed foes switch to `calm_idle_01` with zero aura while
+    remaining foes fight on; clearing all foes pays combined coins, XP,
+    stickers, and species calms.
+  - **Telegraphed Enemy Intent & 50% Calm Boss Phase-2 AI
+    (`src/core/boss-ai.ts`, `src/ui/battle-foes.ts`,
+    `src/render/battle-stage-render.ts`, `src/ui/battle-popups.ts`):**
+    `resolveEnemyIntent` projects die-cut intent stickers (`Puffing Up`,
+    `Calling Cheer`, `Swirling Scribbles`, `Sharing Fizz`) with Art Wave B3
+    emblems (`intent-puffing`, `intent-cheer`, `intent-scribbles`,
+    `intent-fizz`) onto every multi-foe plate and onto single-foe mini-boss
+    plates during Phase 2. Every mini-boss (`gull`, `arcade-keeper`,
+    `gym-pup` / `coach`, `art-teacher`, `lodge-keeper`, `lifeguard`,
+    `principal`, `taco-chef`, `hooded-kid`, and `moon-owl`) shifts into
+    **Phase 2** deterministically at `>= 50%` Calm (outside Talk/end phases),
+    applying per-boss custom watercolor stage mood lighting tints, rendering the
+    die-cut `.battle-phase2-banner` crest and signature line, firing a
+    `PHASE 2! ★` popup on transition, and tightening burst check rhythm via
+    `upgradeBossPhase2Check` (while keeping PRNG draws and legacy single-foe
+    replay timings intact).
+  - **Dual-Friend Synergy Combos (`src/core/combos.ts`,
+    `src/render/battle-vfx-combos.ts`, `src/render/battle-vfx-stage.ts`,
+    `src/ui/battle-overlays.ts`):** when `sparkle >= 2` (or `3` for full party)
+    outside Talk mode, matching party combos involving the active turn actor
+    unlock inside `.battle-commands` (appended after `run`, spanning full width
+    on `< 1000 px` phone grids, styled with golden ribbon borders, `★2`/`★3`
+    star cost badges, and Art Wave B3 combo emblems):
+    - *Fae + Maddie: Yarn-Ball Lullaby* (`combo:yarn-ball-lullaby`, `2` stars,
+      ring check, single-target calm + `+1` leaf + `+1` `burstSoften` + pops 1
+      wind-up bubble).
+    - *Fae + Sue: Bubblegum Lasso Spin* (`combo:bubblegum-lasso-spin`, `2`
+      stars, `spin-snag` check, multi-foe splash calm + `+4` coins on `great` +
+      pops 1 wind-up bubble).
+    - *Sue + Jordan: Rainbow Splash-Juggle* (`combo:rainbow-splash-juggle`, `2`
+      stars, 5-beat star chain, high formation calm + pops 2 wind-up bubbles).
+    - *Full Party: Cloverhollow Harmony* (`combo:cloverhollow-harmony`, `3`
+      stars, 4-beat grand finale star chain, full-formation burst + `+1` leaf +
+      pops all wind-up bubbles + `together-active` twilight sunburst).
+    Each combo has a Pixi-free partner choreography & VFX emitter in
+    `src/render/battle-vfx-combos.ts` (re-exported through
+    `src/render/battle-vfx-stage.ts`, `src/render/battle-vfx.ts`, and
+    `src/render/battle-choreography.ts`) with full `reducedMotion` parity.
+  - **Three New Battle Checks (`src/core/checks-v2.ts`, `src/core/checks.ts`,
+    `src/ui/battle-checks-v2.ts`, `src/ui/battle-checks.ts`,
+    `content/battle.json`):** all three are pure, zero-trig, validated by
+    `checkSpec` (`spin-snag` also permitted in `faeSideCheck`), softened by
+    `gentleCheckSpec` and `briskCheckSpec`, labeled by `checkMechanicLabel`,
+    and playable via keyboard, gamepad, and direct mouse/touch:
+    - `which-one` (3-Cup Shuffle): reveals `cup-star` under one of three pastel
+      watercolor cups (`cup-mint`, `cup-butter`, `cup-sky`), plays deterministic
+      seeded swaps, then lets the player pick via Left/Right + Confirm or direct
+      cup tap (`great` exact cup, `good` adjacent, `miss` far/timeout).
+    - `whack` (Popping Ticket Slots): pops arcade tickets (`ticket-pop` /
+      `ticket-hit`) from 5 plus-shaped `ticket-slot` bezels; press Up/Right/
+      Down/Left or Confirm (middle), or tap any slot directly (one swing per pop
+      to prevent mashing; `battle-beat` per hit).
+    - `spin-snag` (Lasso Spin & Snag): circle directions (arrow keys, stick,
+      directional petal taps, or finger/mouse circle via `pointer` in `0..1000`
+      using zero-trig dominant-axis quadrants) for `spinsNeeded` quarter-turns
+      (`battle-beat` per turn, rejecting opposite-axis bouncing), then press
+      Confirm or tap `SNAG!` as the golden ring meets the dashed target.
 
 ### 8.2 Arcade games (Milestones 44 to 46, and 59) and the clubhouse microwave (52)
 - The claw machine, skee-ball, Boop-a-Mole, and Comet Cruise, once Mr. Pip
@@ -5909,6 +5995,16 @@ trunks keep its two exits.
   hood-drop, and 6 optional party Heart-to-Hearts). Every kept generated asset
   still records its recipe in `art/recipes/` and commits JPEG review sheets to
   `art/review/`.
+- Art Wave B3 (Milestone 196, `art/recipes/battle-checks-v2.json`,
+  `public/assets/battle/battle-checks-v2.{webp,json}`, `130 KB` 640x640 RGBA
+  WebP, 16 frames at 160x160): 3 pastel watercolor shuffle cups (`cup-mint`,
+  `cup-butter`, `cup-sky`), golden star charm (`cup-star`), arcade ticket slot
+  and popping/hit tickets (`ticket-slot`, `ticket-pop`, `ticket-hit`), coiled
+  rainbow lasso (`lasso-coil`), 4 die-cut intent emblems (`intent-puffing`,
+  `intent-cheer`, `intent-scribbles`, `intent-fizz`), and 4 die-cut Dual Combo
+  emblems (`combo-lullaby`, `combo-lasso`, `combo-juggle`, `combo-harmony`),
+  keyed with `tools/art/key-alpha.ts --despill edge --holes` and verified via
+  `vision` in `art/review/battle-checks-v2-sheet.jpg`.
 - Style bible: `docs/art/style-bible.md`.
 
 ## 13. Out of scope until the owner adds it

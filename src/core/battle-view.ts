@@ -1,5 +1,6 @@
 import type {
   Battle,
+  BattleFoeView,
   BattleView,
   Critter,
   FeelingId,
@@ -9,7 +10,15 @@ import type {
   TreatTrayItem,
   World,
 } from "./types";
+import {
+  activeTargetIndex,
+  battleEnergyMax,
+  battleFoes,
+  commandTargetScope,
+} from "./battle-formations";
+import { bossPhase2View, resolveEnemyIntent } from "./boss-ai";
 import { checkHint, viewCheck } from "./checks";
+import { availableDualCombos, dualComboById, isDualComboCommand } from "./combos";
 import { encoreFeelingBonus, hasEncoreModifier } from "./encore";
 import { answers, bubbleAnswered } from "./feelings";
 import type { runInk } from "./ink";
@@ -313,6 +322,7 @@ export function battleCommands(
         detail: null,
         disabled: false,
         feeling: feeling("soothe"),
+        targetScope: commandTargetScope("soothe"),
       }
     : (() => {
         const rest = battle.rest[memberCommand.id] ?? 0;
@@ -322,11 +332,33 @@ export function battleCommands(
           detail: rest > 0 ? memberCommand.resting : null,
           disabled: rest > 0,
           feeling: feeling(memberCommand.id),
+          targetScope: commandTargetScope(memberCommand.id),
         };
       })();
   const totalSnacks = state.snacks + totalTreatCount(state.treats);
   const pureHeart = hasEncoreModifier(battle, "pure-heart");
   const canRun = critter.canRun || battle.encore !== undefined;
+  const dualCombos = availableDualCombos(world, state, battle, actor.id).map((combo) => ({
+    id: combo.id,
+    label: combo.label,
+    detail: `★${combo.cost}`,
+    disabled: false,
+    feeling: null,
+    combo: true,
+    comboCost: combo.cost,
+    comboEmblem: combo.emblem,
+    targetScope: combo.targetScope,
+  }));
+  const runCommands: BattleView["commands"] = canRun
+    ? [{
+        id: "run",
+        label: world.battle.commands.run.label,
+        detail: battle.encore !== undefined ? "Exit dream" : null,
+        disabled: false,
+        feeling: null,
+        targetScope: "single",
+      }]
+    : [];
   return [
     primary,
     {
@@ -335,6 +367,7 @@ export function battleCommands(
       detail: "+1 leaf",
       disabled: false,
       feeling: null,
+      targetScope: "single",
     },
     {
       id: "snack",
@@ -344,14 +377,10 @@ export function battleCommands(
         : world.battle.commands.snack.snackDetail.replace("N", String(totalSnacks)),
       disabled: pureHeart || totalSnacks === 0,
       feeling: pureHeart ? null : feeling("snack"),
+      targetScope: "single",
     },
-    ...(canRun ? [{
-      id: "run",
-      label: world.battle.commands.run.label,
-      detail: battle.encore !== undefined ? "Exit dream" : null,
-      disabled: false,
-      feeling: null,
-    }] : []),
+    ...runCommands,
+    ...dualCombos,
   ];
 }
 
@@ -420,11 +449,16 @@ export function battleView(world: World, state: State): BattleView | null {
       : -1;
   const actor = acting >= 0 ? acting : null;
   const checkView = check === null ? null : viewCheck(check, actor);
+  const comboSpec = isDualComboCommand(battle.command) ? dualComboById(battle.command) : null;
   const hint = check === null
     ? null
     : battle.command === "together" && check.kind === "chain"
       ? (check.tick < (check.spec.arrivals[0] ?? 0) ? world.battle.together.hint : null)
-      : checkHint(check, world.battle.hints);
+      : comboSpec !== null && check.kind === "chain"
+        ? (check.tick < (check.spec.arrivals[0] ?? 0) ? comboSpec.hint : null)
+        : comboSpec !== null && check.kind === "ring"
+          ? (check.tick < 18 ? comboSpec.hint : null)
+          : checkHint(check, world.battle.hints);
   // The bubble shows in the menu, and over the result (with its heart, if
   // the choice answered it); never over a check, which needs the room. A
   // wind-up's bubbles take its place.
@@ -468,6 +502,41 @@ export function battleView(world: World, state: State): BattleView | null {
         selected: Math.max(0, Math.min(trayItems.length - 1, battle.treatSelected ?? 0)),
       };
   const turnActor = activeBattleActor(world, state);
+  const foes = battleFoes(world, battle);
+  const targetIndex = activeTargetIndex(battle, foes);
+  const foeViews: BattleFoeView[] = foes.map((foe, index) => {
+    const entry = world.critters[foe.critterId] ?? critter;
+    const foeNow = foe.feelings[0] ?? null;
+    const foeFeeling = foe.windUp === null && foeNow !== null && shown
+      ? { id: foeNow, label: world.battle.feelings[foeNow].label }
+      : null;
+    const foeWindUp = foe.windUp !== null && shown
+      ? {
+          bubbles: foe.windUp.feelings.map((id, bubbleIndex) => ({
+            id,
+            label: world.battle.feelings[id].label,
+            popped: foe.windUp?.popped[bubbleIndex] === true,
+          })),
+        }
+      : null;
+    return {
+      index,
+      critterId: entry.id,
+      name: entry.name,
+      calm: foe.calm,
+      calmMax: foe.calmMax,
+      soothed: foe.soothed,
+      targeted: index === targetIndex,
+      battleHeight: entry.battleHeight,
+      auraCentre: entry.auraCentre,
+      bodyCentre: entry.bodyCentre,
+      feeling: foeFeeling,
+      windUp: foeWindUp,
+      intent: resolveEnemyIntent(world, battle, entry, foe, index, foes.length),
+    };
+  });
+  const intent = foeViews[targetIndex]?.intent ?? null;
+  const bossPhase2 = bossPhase2View(battle, critter, talkActive);
   return {
     critterId: critter.id,
     critterName: critter.name,
@@ -481,7 +550,7 @@ export function battleView(world: World, state: State): BattleView | null {
     commands: battleCommands(world, state),
     selected: battle.selected,
     energy: battle.energy,
-    energyMax: critter.energyMax,
+    energyMax: battleEnergyMax(world, battle, critter),
     calm: battle.calm,
     calmMax: critter.calmMax,
     check: checkView,
@@ -501,5 +570,10 @@ export function battleView(world: World, state: State): BattleView | null {
     ...(battle.encore === undefined
       ? {}
       : { encore: { bossId: battle.encore.bossId, modifiers: battle.encore.modifiers } }),
+    foes: foeViews,
+    targetIndex,
+    formationId: battle.formationId ?? null,
+    intent,
+    bossPhase2,
   };
 }

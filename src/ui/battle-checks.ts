@@ -1,5 +1,6 @@
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
 import { element, setAttribute, setText, svgElement } from "./dom";
+import { createBattleChecksV2, type BattleCheckV2View } from "./battle-checks-v2";
 import {
   bindPointerHold,
   bindPointerMoveHold,
@@ -11,6 +12,7 @@ import {
 import type { ChainLook, EchoNote, PeekabooStatus, Point } from "../core";
 
 export type TimingGrade = "great" | "good" | "miss";
+export type { BattleCheckV2View };
 
 export type BattleCheckView =
   | {
@@ -135,7 +137,8 @@ export type BattleCheckView =
       grade: TimingGrade | null;
       hint: string | null;
       hintAt: { x: number; y: number };
-    };
+    }
+  | BattleCheckV2View;
 
 const gradeGap = 6;
 // A lean's puff dots: their spacing, and how far over the track they sit.
@@ -177,10 +180,19 @@ export function createBattleCheck(root: HTMLElement): {
   onEchoNote: (callback: (note: EchoNote) => void) => void;
   onConfirmHold: (callback: (held: boolean) => void) => void;
   onDirectionHold: (callback: (dir: Point) => void) => void;
+  onCheckChoice: (callback: (index: number) => void) => void;
+  onSpinArrow: (callback: (dir: Point) => void) => void;
+  onSnagConfirm: (callback: () => void) => void;
+  onSpinPointer: (callback: (phase: "down" | "move" | "up", event: PointerEvent) => void) => void;
 } {
   let echoNoteHandler: (note: EchoNote) => void = () => undefined;
   let confirmHoldHandler: (held: boolean) => void = () => undefined;
   let directionHoldHandler: (dir: Point) => void = () => undefined;
+  let checkChoiceHandler: (index: number) => void = () => undefined;
+  let spinArrowHandler: (dir: Point) => void = () => undefined;
+  let snagConfirmHandler: () => void = () => undefined;
+  let spinPointerHandler: (phase: "down" | "move" | "up", event: PointerEvent) => void =
+    () => undefined;
   let activeView: BattleCheckView | null = null;
   let confirmActive = false;
   let directionalActive = false;
@@ -295,6 +307,13 @@ export function createBattleCheck(root: HTMLElement): {
     return button;
   });
   echoLayer.append(echoHead, echoTimer, echoPad);
+  const checksV2 = createBattleChecksV2(root, {
+    onChooseSlot: (slot) => checkChoiceHandler(slot),
+    onWhackSlot: (slotIndex) => checkChoiceHandler(slotIndex),
+    onSpinArrow: (dir) => spinArrowHandler(dir),
+    onSnagConfirm: () => snagConfirmHandler(),
+    onSpinPointer: (phase, event) => spinPointerHandler(phase, event),
+  });
   const hint = element("div", "battle-check-hint");
   const grade = element("div", "battle-grade");
   grade.setAttribute("role", "status");
@@ -331,6 +350,18 @@ export function createBattleCheck(root: HTMLElement): {
     onDirectionHold: (callback) => {
       directionHoldHandler = callback;
     },
+    onCheckChoice: (callback) => {
+      checkChoiceHandler = callback;
+    },
+    onSpinArrow: (callback) => {
+      spinArrowHandler = callback;
+    },
+    onSnagConfirm: (callback) => {
+      snagConfirmHandler = callback;
+    },
+    onSpinPointer: (callback) => {
+      spinPointerHandler = callback;
+    },
     render: (view) => {
       activeView = view;
       confirmActive = view !== null && isConfirmCheckKind(view.kind) && view.grade === null;
@@ -349,6 +380,9 @@ export function createBattleCheck(root: HTMLElement): {
       hide(peekabooLayer, view?.kind !== "peekaboo");
       hide(echoLayer, view?.kind !== "echo");
       hide(hint, view?.hint === null || view === null);
+      const isV2 = view !== null &&
+        (view.kind === "which-one" || view.kind === "whack" || view.kind === "spin-snag");
+      if (!isV2) checksV2.render(null, () => undefined);
       if (view === null) {
         grade.hidden = true;
         return;
@@ -357,6 +391,10 @@ export function createBattleCheck(root: HTMLElement): {
         setText(hint, view.hint);
         hint.style.left = `${view.hintAt.x}px`;
         hint.style.top = `${view.hintAt.y}px`;
+      }
+      if (isV2) {
+        checksV2.render(view, (g, gx, gy) => renderGrade(grade, g, gx, gy));
+        return;
       }
       if (view.kind === "ring") {
         const size = view.radius * 2;

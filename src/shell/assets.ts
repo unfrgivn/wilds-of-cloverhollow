@@ -7,6 +7,7 @@ import {
   type ClawView,
   type CometView,
   type CookView,
+  type EchoNote,
   type FishView,
   type MoleHole,
   type MoleView,
@@ -55,12 +56,14 @@ import { createTaco, type TacoInfo } from "../ui/taco";
 export {
   battleCheckOverlay,
   buildBattleHudView,
+  buildCommandMenuView,
   buildCreditsView,
   buildDialogueView,
   buildHudHintsView,
   buildJournalView,
   buildRewardStickerView,
   cropCreditFrame,
+  keepsBattleArrows,
   type AtlasFrameResolver,
   type BattleHudViewParams,
   type DialogueViewParams,
@@ -77,6 +80,7 @@ export const FISH_ATLAS = "assets/arcade/fish-catches.json";
 export const TACO_ATLAS = "assets/arcade/taco-ingredients.json";
 export const COMET_ATLAS = "assets/arcade/comet.json";
 export const FAE_ATLAS = "assets/characters/fae/fae.json";
+export const BATTLE_CHECKS_V2_ATLAS = "assets/battle/battle-checks-v2.json";
 
 export type MoleHoleTouch = {
   setButton: (button: "confirm", down: boolean) => void;
@@ -99,6 +103,62 @@ const TOPPING_ARROWS: Readonly<Record<TacoTopping, Point>> = {
   salsa: { x: 0, y: 1 },
   avocado: { x: -1, y: 0 },
 };
+
+const ECHO_ARROWS: readonly Point[] = [
+  { x: 0, y: -1 },
+  { x: 1, y: 0 },
+  { x: 0, y: 1 },
+  { x: -1, y: 0 },
+];
+
+export type BattleCheckTouchSink = {
+  setButton: (button: "confirm", down: boolean) => void;
+  tapButton: (button: "confirm") => void;
+  tapChoice: (index: number) => void;
+  tapArrow: (direction: Point) => void;
+  setPointerArrow: (direction: Point | null) => void;
+  beginTrace: (event: PointerEvent) => void;
+  moveTrace: (event: PointerEvent) => void;
+  endTrace: (event: PointerEvent) => void;
+};
+
+export type BattleCheckBindTarget = {
+  onConfirmHold: (callback: (held: boolean) => void) => void;
+  onDirectionHold: (callback: (dir: Point) => void) => void;
+  onEchoNote: (callback: (note: EchoNote) => void) => void;
+  onCheckChoice: (callback: (index: number) => void) => void;
+  onSpinArrow: (callback: (dir: Point) => void) => void;
+  onSnagConfirm: (callback: () => void) => void;
+  onSpinPointer: (callback: (phase: "down" | "move" | "up", event: PointerEvent) => void) => void;
+};
+
+/** Wires all v1 + v2 battle check overlay callbacks onto TouchInput and returns confirm-hold. */
+export function bindBattleCheckTouch(
+  battleCheck: BattleCheckBindTarget,
+  touch: BattleCheckTouchSink,
+): (held: boolean) => void {
+  const handleConfirmHold = (held: boolean): void => {
+    touch.setButton("confirm", held);
+    if (held) touch.tapButton("confirm");
+  };
+  battleCheck.onConfirmHold(handleConfirmHold);
+  battleCheck.onDirectionHold((dir) => {
+    touch.setPointerArrow(dir.x === 0 && dir.y === 0 ? null : dir);
+  });
+  battleCheck.onEchoNote((note) => {
+    const direction = ECHO_ARROWS[note];
+    if (direction !== undefined) touch.tapArrow(direction);
+  });
+  battleCheck.onCheckChoice((index) => touch.tapChoice(index));
+  battleCheck.onSpinArrow((dir) => touch.tapArrow(dir));
+  battleCheck.onSnagConfirm(() => touch.tapButton("confirm"));
+  battleCheck.onSpinPointer((phase, event) => {
+    if (phase === "down") touch.beginTrace(event);
+    else if (phase === "move") touch.moveTrace(event);
+    else touch.endTrace(event);
+  });
+  return handleConfirmHold;
+}
 
 /** Maps Taco Truck bowl taps to 1-tick directional arrow presses. */
 export function createTacoToppingHandler(
@@ -233,9 +293,11 @@ export type ShellAssets = {
   speakerPortrait: (speaker: string | null, expression?: PortraitExpression) => AtlasImage | null;
   fishArt: (frameName: string) => AtlasImage | null;
   toyArt: (frameName: string) => AtlasImage | null;
+  checkV2Art: (frameName: string) => AtlasImage | null;
   seedCoreSheets: () => void;
   cacheAreaNpcPortraits: (area: Area) => void;
   preloadCoreAtlasMeta: () => Promise<void>;
+  warmBootBattleAtlases: () => Promise<void>;
   ensureClawOverlay: () => Promise<void>;
   ensureSkeeOverlay: () => Promise<void>;
   ensureMoleOverlay: () => Promise<void>;
@@ -399,6 +461,9 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
     };
   };
 
+  const checkV2Art = (frameName: string): AtlasImage | null =>
+    atlasFrame(BATTLE_CHECKS_V2_ATLAS, frameName);
+
   const seedCoreSheets = (): void => {
     const faeSheet = Assets.get<Spritesheet | undefined>("fae-sheet");
     if (faeSheet !== undefined) atlasJsonCache.set(FAE_ATLAS, faeSheet.data);
@@ -428,7 +493,16 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
     await Promise.all([
       ensureAtlasMeta(PORTRAITS_ATLAS),
       ensureAtlasMeta(world.arcade.atlas),
+      ensureAtlasMeta(BATTLE_CHECKS_V2_ATLAS),
       ...critterJsonFiles.map((file) => ensureAtlasMeta(file)),
+    ]);
+  };
+
+  const warmBootBattleAtlases = async (): Promise<void> => {
+    await Promise.all([
+      decodeAtlasImage(FAE_ATLAS),
+      decodeAtlasImage(world.battle.toyAtlas),
+      decodeAtlasImage(BATTLE_CHECKS_V2_ATLAS),
     ]);
   };
 
@@ -625,9 +699,10 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
   };
 
   const warmBattlePortraits = async (snapshot: State): Promise<void> => {
-    await Promise.all(
-      battlePortraitAtlases(world, snapshot).map((atlas) => decodeAtlasImage(atlas)),
-    );
+    await Promise.all([
+      decodeAtlasImage(BATTLE_CHECKS_V2_ATLAS),
+      ...battlePortraitAtlases(world, snapshot).map((atlas) => decodeAtlasImage(atlas)),
+    ]);
   };
 
   const warmEncoreArt = async (bossIds: readonly string[]): Promise<void> => {
@@ -700,35 +775,12 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
     null;
 
   return {
-    loadMapCentres,
-    ensureAtlasMeta,
-    hasAtlasMeta,
-    domAtlas,
-    decodeAtlasImage,
-    atlasFrame,
-    stickerArt,
-    prizeArt,
-    speakerPortrait,
-    fishArt,
-    toyArt,
-    seedCoreSheets,
-    cacheAreaNpcPortraits,
-    preloadCoreAtlasMeta,
-    ensureClawOverlay,
-    ensureSkeeOverlay,
-    ensureMoleOverlay,
-    ensureCometOverlay,
-    ensureArcadeOverlay,
-    ensureCookOverlay,
-    ensureFishOverlay,
-    ensureTacoOverlay,
-    warmAreaOverlays,
-    warmAreaMedia,
-    warmJournalAssets,
-    warmJournalOnRender,
-    warmBattlePortraits,
-    warmEncoreArt,
-    renderOverlays,
-    overlayInfo,
+    loadMapCentres, ensureAtlasMeta, hasAtlasMeta, domAtlas, decodeAtlasImage, atlasFrame,
+    stickerArt, prizeArt, speakerPortrait, fishArt, toyArt, checkV2Art, seedCoreSheets,
+    cacheAreaNpcPortraits, preloadCoreAtlasMeta, warmBootBattleAtlases,
+    ensureClawOverlay, ensureSkeeOverlay, ensureMoleOverlay, ensureCometOverlay,
+    ensureArcadeOverlay, ensureCookOverlay, ensureFishOverlay, ensureTacoOverlay,
+    warmAreaOverlays, warmAreaMedia, warmJournalAssets, warmJournalOnRender,
+    warmBattlePortraits, warmEncoreArt, renderOverlays, overlayInfo,
   };
 }

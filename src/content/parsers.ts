@@ -276,7 +276,8 @@ export function checkSpec(value: unknown, file: string, name: string): CheckSpec
   const kind = value.kind;
   field(
     kind === "ring" || kind === "charge" || kind === "chain" || kind === "catch" ||
-      kind === "lean" || kind === "trace" || kind === "peekaboo" || kind === "echo",
+      kind === "lean" || kind === "trace" || kind === "peekaboo" || kind === "echo" ||
+      kind === "which-one" || kind === "whack" || kind === "spin-snag",
     file,
     `${name}.kind`,
   );
@@ -425,6 +426,43 @@ export function checkSpec(value: unknown, file: string, name: string): CheckSpec
     field(inputTicks >= notes * 10, file, `${name}.inputTicks`);
     return { kind, notes, demoTicks, gapTicks, inputTicks };
   }
+  if (kind === "which-one") {
+    const showTicks = intField("showTicks");
+    const shuffles = intField("shuffles");
+    const swapTicks = intField("swapTicks");
+    const pickTicks = intField("pickTicks");
+    field(showTicks >= 8, file, `${name}.showTicks`);
+    field(shuffles >= 1 && shuffles <= 12, file, `${name}.shuffles`);
+    field(swapTicks >= 6, file, `${name}.swapTicks`);
+    field(pickTicks >= 30, file, `${name}.pickTicks`);
+    return { kind, showTicks, shuffles, swapTicks, pickTicks };
+  }
+  if (kind === "whack") {
+    const pops = intField("pops");
+    const stayTicks = intField("stayTicks");
+    const gapTicks = intField("gapTicks");
+    field(pops >= 2 && pops <= 12, file, `${name}.pops`);
+    field(stayTicks >= 10, file, `${name}.stayTicks`);
+    field(gapTicks >= 2, file, `${name}.gapTicks`);
+    return { kind, pops, stayTicks, gapTicks };
+  }
+  if (kind === "spin-snag") {
+    const spinsNeeded = intField("spinsNeeded");
+    const spinTicks = intField("spinTicks");
+    const snagTicks = intField("snagTicks");
+    const targetTick = intField("targetTick");
+    const greatWindow = intField("greatWindow");
+    const goodWindow = intField("goodWindow");
+    field(spinsNeeded >= 2 && spinsNeeded <= 16, file, `${name}.spinsNeeded`);
+    field(spinTicks >= spinsNeeded * 8, file, `${name}.spinTicks`);
+    field(0 <= greatWindow && greatWindow <= goodWindow, file, `${name}.greatWindow`);
+    field(
+      targetTick - goodWindow >= 1 && targetTick + goodWindow < snagTicks,
+      file,
+      `${name}.targetTick`,
+    );
+    return { kind, spinsNeeded, spinTicks, snagTicks, targetTick, greatWindow, goodWindow };
+  }
   const travelTicks = intField("travelTicks");
   field(travelTicks >= 1, file, `${name}.travelTicks`);
   const arrivals = intList("arrivals");
@@ -466,7 +504,8 @@ export function faeSideCheck(value: unknown, file: string, name: string): CheckS
   const spec = checkSpec(value, file, name);
   field(
     spec.kind !== "catch" && spec.kind !== "lean" && spec.kind !== "trace" &&
-      spec.kind !== "peekaboo" && spec.kind !== "echo",
+      spec.kind !== "peekaboo" && spec.kind !== "echo" &&
+      spec.kind !== "which-one" && spec.kind !== "whack",
     file,
     `${name}.kind`,
   );

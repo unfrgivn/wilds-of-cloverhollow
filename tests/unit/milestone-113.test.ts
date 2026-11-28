@@ -44,6 +44,9 @@ describe("Milestone 110: Battle Field Guide Peek & Interactive Map Land Guide", 
       trace: "Shape Trace",
       peekaboo: "Peekaboo Freeze",
       echo: "Musical Echo Chimes",
+      "which-one": "3-Cup Shuffle",
+      whack: "Pop-Up Ticket Whack",
+      "spin-snag": "Lasso Spin & Snag",
     };
     const allKinds: readonly CheckKind[] = [
       "ring",
@@ -54,6 +57,9 @@ describe("Milestone 110: Battle Field Guide Peek & Interactive Map Land Guide", 
       "trace",
       "peekaboo",
       "echo",
+      "which-one",
+      "whack",
+      "spin-snag",
     ];
     expect(Object.keys(expected).sort()).toEqual([...allKinds].sort());
     for (const kind of allKinds) {

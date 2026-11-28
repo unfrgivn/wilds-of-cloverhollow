@@ -10,6 +10,15 @@ import type {
   PeekabooState,
   PeekabooStatus,
 } from "./types";
+import {
+  checkDrawsV2,
+  checkHintV2,
+  createCheckV2,
+  gentleCheckV2Spec,
+  pickFromDrawV2,
+  stepCheckV2,
+  viewCheckV2,
+} from "./checks-v2";
 
 // Which way Fae leans: back (-1), neither, or forward into the wind (1).
 export type Lean = -1 | 0 | 1;
@@ -23,6 +32,8 @@ export type CheckInput = {
   lean: Lean;
   pointer?: { x: number; y: number };
   move?: { x: number; y: number };
+  previousMove?: { x: number; y: number };
+  choose?: number;
   echoNote?: EchoNote | null;
 };
 
@@ -127,6 +138,9 @@ export function gentleCheckSpec(spec: CheckSpec): CheckSpec {
       inputTicks: spec.inputTicks + 36,
     };
   }
+  if (spec.kind === "which-one" || spec.kind === "whack" || spec.kind === "spin-snag") {
+    return gentleCheckV2Spec(spec);
+  }
   return {
     ...spec,
     reachRadius: Math.round(spec.reachRadius * 1.35),
@@ -225,6 +239,10 @@ export function createCheck(
       big,
     };
   }
+  if (effective.kind === "which-one" || effective.kind === "whack" ||
+      effective.kind === "spin-snag") {
+    return createCheckV2(effective, side, big, picks);
+  }
   return {
     kind: "chain",
     side,
@@ -260,6 +278,9 @@ export function stepCheck(
   if (check.kind === "trace") return stepTrace(check, tick, input.pointer, input.move);
   if (check.kind === "peekaboo") return stepPeekaboo(check, tick, input.confirmHeld);
   if (check.kind === "echo") return stepEcho(check, tick, input.echoNote ?? null);
+  if (check.kind === "which-one" || check.kind === "whack" || check.kind === "spin-snag") {
+    return stepCheckV2(check, tick, input);
+  }
   return stepChain(check, tick, input.confirmEdge);
 }
 
@@ -573,6 +594,9 @@ export function laneFromDraw(value: number): number {
 
 /** How many seeded draws a check takes as it starts: one per toy, puff, or chime. */
 export function checkDraws(spec: CheckSpec): number {
+  if (spec.kind === "which-one" || spec.kind === "whack" || spec.kind === "spin-snag") {
+    return checkDrawsV2(spec);
+  }
   return spec.kind === "catch"
     ? spec.arrivals.length
     : spec.kind === "lean"
@@ -586,9 +610,12 @@ export function checkDraws(spec: CheckSpec): number {
 
 /**
  * What one draw in 0..1 picks: a lean puff's force, a trace path index, an
- * echo chime note (0..3), or a catch toy's lane.
+ * echo chime note (0..3), a whack slot (0..4), or a catch/cup index (0..2).
  */
 export function pickFromDraw(spec: CheckSpec, value: number): number {
+  if (spec.kind === "which-one" || spec.kind === "whack" || spec.kind === "spin-snag") {
+    return pickFromDrawV2(spec, value);
+  }
   if (spec.kind === "trace")
     return Math.min(spec.paths.length - 1, Math.floor(value * spec.paths.length));
   if (spec.kind === "echo") return Math.min(3, Math.floor(value * 4));
@@ -702,6 +729,9 @@ export function viewCheck(check: CheckState, actor: number | null): BattleCheckV
       time: inDemo ? 0 : Math.max(0, Math.min(1, remaining)),
     };
   }
+  if (check.kind === "which-one" || check.kind === "whack" || check.kind === "spin-snag") {
+    return viewCheckV2(check);
+  }
   return {
     kind: "chain",
     side: check.side,
@@ -720,18 +750,24 @@ export function viewCheck(check: CheckState, actor: number | null): BattleCheckV
  * press, a chain or catch before its first landing, a lean before its first
  * puff, a peekaboo before Fae starts tiptoeing, an echo until her first chime.
  */
-export function checkHint(check: CheckState, hints: BattleContent["hints"]): string | null {
-  if (check.kind === "charge") return check.held === 0 ? hints.charge : null;
+export function checkHint(
+  check: CheckState,
+  hints: Partial<BattleContent["hints"]>,
+): string | null {
+  if (check.kind === "charge") return check.held === 0 ? (hints.charge ?? null) : null;
   if (check.kind === "chain" || check.kind === "catch")
-    return check.tick < (check.spec.arrivals[0] ?? 0) ? hints[check.kind] : null;
+    return check.tick < (check.spec.arrivals[0] ?? 0) ? (hints[check.kind] ?? null) : null;
   if (check.kind === "lean")
-    return check.tick < (check.spec.starts[0] ?? 0) ? hints.lean : null;
-  if (check.kind === "trace") return check.results[1] === "pending" ? hints.trace : null;
+    return check.tick < (check.spec.starts[0] ?? 0) ? (hints.lean ?? null) : null;
+  if (check.kind === "trace") return check.results[1] === "pending" ? (hints.trace ?? null) : null;
   if (check.kind === "peekaboo")
-    return check.tick < 28 && check.progress === 0 ? hints.peekaboo : null;
+    return check.tick < 28 && check.progress === 0 ? (hints.peekaboo ?? null) : null;
   if (check.kind === "echo") {
     const demoEnd = check.spec.notes * (check.spec.demoTicks + check.spec.gapTicks);
-    return check.tick <= demoEnd || check.entered === 0 ? hints.echo : null;
+    return check.tick <= demoEnd || check.entered === 0 ? (hints.echo ?? null) : null;
+  }
+  if (check.kind === "which-one" || check.kind === "whack" || check.kind === "spin-snag") {
+    return checkHintV2(check, hints);
   }
   return null;
 }

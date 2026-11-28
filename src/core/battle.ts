@@ -3,10 +3,23 @@ import type {
   World,
 } from "./types";
 import {
+  addTreat, applyPlainSnack, battleMessage, consumeTreat, moveOn, purchaseTreat, restTurn,
+  stepFluteAssist, stepLassoAssist, stepTalkPhase, stepTreatMenu,
+} from "./battle-assists";
+import {
+  activeFoeIndices, activeTargetIndex, advanceMultiFoeTurn, allFoesSoothed, applyMultiFoeReward,
+  applySkillToFoes, battleEnergyMax, buildFormationBattle, creditBattlePartyXp, cycleTargetIndex,
+  formationById, formationRewards, initMultiFoeFeelings, resolveBiomeFormation,
+  resolveDualComboCheck, syncBattleTarget, updateTargetFoe,
+} from "./battle-formations";
+import {
   activeBlessingEffects, applyBlessingCheckSpec, applyCalmSparkleBonus, effectiveRoamTunables,
 } from "./blessings";
+import { isBossPhase2, upgradeBossPhase2Check } from "./boss-ai";
+import { dualComboById, isDualComboCommand } from "./combos";
 import {
-  checkDraws, createCheck, echoNoteFromEdge, laneFromStick, leanFromStick, pickFromDraw, stepCheck,
+  checkDraws, createCheck, echoNoteFromEdge, gentleCheckSpec, laneFromStick, leanFromStick,
+  pickFromDraw, stepCheck,
 } from "./checks";
 import { firstTouch, oldFriend } from "./encounter";
 import {
@@ -22,10 +35,9 @@ import { battleParty, restingParty } from "./party";
 import { nextRandom } from "./random";
 import { inkFacts, sendHome } from "./roam";
 import {
-  activeBattleActor, addTreat, answerFeeling, battleCalmXp, battleCommands, battleTurnRoster,
-  battleView, calmLimit, consumeTreat, critterSideCommand, fluteAssistFriends, inTalkMode,
-  nextCommand, nextSparkle, purchaseTreat, recoverMessage, restTurn, revealCharacters, taggedGrade,
-  talkContent, talkLine, togetherCalm, totalTreatCount, treatTrayItems, type TextSpeed,
+  activeBattleActor, answerFeeling, battleCalmXp, battleCommands, battleTurnRoster, battleView,
+  calmLimit, critterSideCommand, inTalkMode, nextCommand, nextSparkle, recoverMessage,
+  revealCharacters, talkContent, talkLine, togetherCalm, totalTreatCount, type TextSpeed,
 } from "./battle-view";
 
 export {
@@ -86,19 +98,6 @@ function drawWindUp(
   return [drawn, rolled];
 }
 
-function battleMessage(
-  battle: Battle,
-  text: string,
-  phase: Battle["phase"],
-): Battle {
-  return { ...battle, phase, message: text, revealed: 0, phaseTicks: 0 };
-}
-
-// A message that isn't the check's own result: the check and its grade go.
-function moveOn(battle: Battle, text: string, phase: Battle["phase"]): Battle {
-  return { ...battleMessage(battle, text, phase), check: null, lastGrade: null };
-}
-
 function firstEnabledCommand(commands: ReturnType<typeof battleCommands>): number {
   const index = commands.findIndex((command) => !command.disabled);
   return index >= 0 ? index : 0;
@@ -132,6 +131,13 @@ function nextTurn(world: World, state: State, battle: Battle, critter: Critter):
     return { ...state, battle: withSelected({ ...fresh, feelings: [], windUp: null }) };
   // After a caught opening's burst, turn 1's feelings are the first drawn.
   if (battle.turn === 0) return { ...state, battle: withSelected(fresh) };
+  if (fresh.foes !== undefined) {
+    const advanced = advanceMultiFoeTurn(world, state, fresh, turn);
+    return {
+      ...advanced.state,
+      battle: withSelected({ ...advanced.battle, message: advanced.message }),
+    };
+  }
   const going = battle.windUp;
   if (going !== null && going.left > 1)
     return {
@@ -165,42 +171,6 @@ function nextTurn(world: World, state: State, battle: Battle, critter: Critter):
       windUp: null,
       feelings: [...battle.feelings.slice(1), ...drawn],
     }),
-  };
-}
-
-function closeTreatMenu(battle: Battle): Battle {
-  const { treatMenu: _menu, treatSelected: _selected, ...rest } = battle;
-  return rest;
-}
-
-function applyPlainSnack(
-  world: World,
-  state: State,
-  nextBase: State,
-  battle: Battle,
-  critter: Critter,
-  answered: boolean,
-  windUp: Battle["windUp"],
-): State {
-  const message = battleMessage(battle, critter.lines.snack, "result");
-  const healBonus = activeBlessingEffects(world, state).snackHealBonus;
-  return {
-    ...nextBase,
-    snacks: state.snacks - 1,
-    battle: {
-      ...message,
-      answered,
-      windUp,
-      rest: restTurn(battle.rest),
-      energy: Math.min(
-        critter.energyMax,
-        battle.energy + critter.commands.snack.energy + healBonus,
-      ),
-      calm: Math.min(
-        calmLimit(critter),
-        battle.calm + critter.commands.snack.calm + (answered ? world.battle.feelingBonus : 0),
-      ),
-    },
   };
 }
 
@@ -264,6 +234,30 @@ function revealBattleInstant(state: State, instant: boolean): State {
   };
 }
 
+export function startFormationBattle(
+  world: World,
+  state: State,
+  formationIdOrCritterIds: string | readonly string[],
+  textSpeed?: TextSpeed,
+): Battle {
+  if (typeof formationIdOrCritterIds === "string") {
+    const formation = formationById(formationIdOrCritterIds);
+    if (formation === null) {
+      throw new Error(`Unknown battle formation: ${formationIdOrCritterIds}`);
+    }
+    return buildFormationBattle(world, state, formation.critterIds, {
+      formationId: formation.id,
+      title: formation.title,
+      signatureBurst: formation.signatureBurst,
+      bigSignatureBurst: formation.bigSignatureBurst,
+      instantText: textSpeed === "instant",
+    });
+  }
+  return buildFormationBattle(world, state, formationIdOrCritterIds, {
+    instantText: textSpeed === "instant",
+  });
+}
+
 export function startBattle(
   world: World,
   state: State,
@@ -279,6 +273,21 @@ export function startBattle(
   const jump = wildTouch === undefined
     ? "even"
     : firstTouch(wildTouch, effectiveRoamTunables(world, state), state.player, player);
+  const formation = friend ? null : resolveBiomeFormation(world, state, critter, wildTouch);
+  if (formation !== null) {
+    const ordered = [critter.id, ...formation.critterIds.filter((id) => id !== critter.id)];
+    return buildFormationBattle(world, state, ordered, {
+      den: wildTouch?.den ?? null,
+      entry: state.player,
+      formationId: formation.id,
+      title: formation.title,
+      signatureBurst: formation.signatureBurst,
+      bigSignatureBurst: formation.bigSignatureBurst,
+      surpriseCalm: jump === "surprised" ? world.battle.firstTouch.surprise : undefined,
+      turn: jump === "caught" ? 0 : 1,
+      instantText: textSpeed === "instant",
+    });
+  }
   const named = (line: string): string => line.replace("{name}", critter.name);
   const { firstTouch: touchContent, oldFriends } = world.battle;
   const message = friend
@@ -350,67 +359,9 @@ function stepBattleInner(
   };
   let next = { ...battle, phaseTicks: battle.phaseTicks + 1 };
   if (next.phase === "talk" && next.talk !== undefined && next.talk !== null) {
-    const talk = next.talk;
-    if (talk.revealed < talk.text.length) {
-      const revealed = confirm
-        ? talk.text.length
-        : revealCharacters(world, textSpeed, talk.revealed, talk.text.length);
-      return { ...nextBase, battle: { ...next, talk: { ...talk, revealed } } };
-    }
-    const count = talk.choices.length;
-    const tapped = input.choose !== undefined && input.choose >= 0 && input.choose < count
-      ? input.choose
-      : undefined;
-    const chosen = tapped ?? (confirm && count > 0 ? talk.selected : undefined);
-    if (chosen !== undefined) {
-      const result = runInk(
-        world.story,
-        next.encore?.talkInk ?? state.ink,
-        { type: "choose", index: chosen },
-        inkFacts(world, state),
-      );
-      const grade = taggedGrade(result);
-      const amount = grade === null ? 0 : talkContent(critter).calm[grade];
-      const completedTalk = talk.turn === talkContent(critter).knots.length - 1;
-      const updated = { ...talkLine(result, talk), knot: talk.knot, turn: talk.turn, grade };
-      const synced = withEncoreTalkInk(next, result.ink);
-      return {
-        ...nextBase,
-        ink: synced.preserveStoryInk ? state.ink : result.ink,
-        battle: {
-          ...synced.battle,
-          talk: updated,
-          calm: completedTalk
-            ? critter.calmMax
-            : Math.min(calmLimit(critter), next.calm + amount),
-          lastGrade: grade,
-        },
-      };
-    }
-    if (count > 0) {
-      const up = input.move.y < -0.5 && state.previousInput.move.y >= -0.5;
-      const down = input.move.y > 0.5 && state.previousInput.move.y <= 0.5;
-      if (up || down) {
-        const selected = (talk.selected + (down ? 1 : -1) + count) % count;
-        return { ...nextBase, battle: { ...next, talk: { ...talk, selected } } };
-      }
-      return { ...nextBase, battle: next };
-    }
-    if (!confirm) return { ...nextBase, battle: next };
-    const result = runInk(
-      world.story, next.encore?.talkInk ?? state.ink, { type: "next" }, inkFacts(world, state),
+    return stepTalkPhase(
+      world, state, nextBase, next, critter, input, confirm, textSpeed, nextTurn,
     );
-    const synced = withEncoreTalkInk(next, result.ink);
-    const nextState = { ...nextBase, ink: synced.preserveStoryInk ? state.ink : result.ink };
-    if (result.line !== null || result.choices.length > 0)
-      return { ...nextState, battle: { ...synced.battle, talk: talkLine(result, talk) } };
-    const completed = { ...synced.battle, talk: null, lastGrade: talk.grade };
-    if (completed.calm >= critter.calmMax)
-      return {
-        ...nextState,
-        battle: moveOn({ ...completed, talkMode: false }, critter.lines.soothed, "soothed"),
-      };
-    return nextTurn(world, nextState, { ...completed, phase: "command" }, critter);
   }
   if (next.revealed < next.message.length) {
     const revealed = confirm
@@ -427,6 +378,20 @@ function stepBattleInner(
       const talkMode = talkValue !== null && next.calm >= talkValue.talkAt;
       if (talkMode && talkValue === null)
         throw new Error(`Critter ${critter.id} has no Talk content`);
+      if (next.foes !== undefined) {
+        const openingMulti = next.turn === 0
+          ? moveOn(next, critter.lines.burst, "burst")
+          : moveOn(next, talkMode ? talkValue.prompt : critter.lines.command, "command");
+        const [withFeelings, rolledMulti] = initMultiFoeFeelings(world, nextBase, {
+          ...openingMulti,
+          actorIndex: 0,
+          talkMode,
+        });
+        const selectedMulti = withFeelings.phase === "command"
+          ? firstEnabledCommand(battleCommands(world, { ...rolledMulti, battle: withFeelings }))
+          : 0;
+        return { ...rolledMulti, battle: { ...withFeelings, selected: selectedMulti } };
+      }
       const [feelings, rolledFeelings] = !talkMode && feelingsOn(world, state)
         ? drawFeelings(world, nextBase, critter, 3) : [[], nextBase];
       const effWindUp = encoreWindUpSpec(critter.windUp, next.encore?.modifiers ?? []);
@@ -453,23 +418,41 @@ function stepBattleInner(
         ? firstEnabledCommand(battleCommands(world, { ...rolled, battle: entered })) : 0;
       return { ...rolled, battle: { ...entered, selected } };
     } else if (next.phase === "result") {
-      // Calm enough, it's soothed, any wind-up over with it. In a wind-up it
-      // puffs on with no burst until its last turn; then, every bubble
-      // popped, it fizzles, else it lets go (spec 8).
-      const going = next.windUp;
-      if (next.calm >= critter.calmMax)
-        next = { ...moveOn(next, critter.lines.soothed, "soothed"), windUp: null };
-      else if (going !== null && going.left > 1) return nextTurn(world, nextBase, next, critter);
-      else if (going !== null && going.popped.every((popped) => popped))
-        next = {
-          ...moveOn(next, critter.windUp?.lines.fizzle ?? critter.lines.burst, "fizzle"),
-          windUp: null,
-        };
-      else next = moveOn(next, critter.lines.burst, "burst");
+      if (next.foes !== undefined) {
+        if (allFoesSoothed(next.foes)) {
+          next = { ...moveOn(next, critter.lines.soothed, "soothed"), windUp: null };
+        } else {
+          const active = syncBattleTarget(next, next.foes, activeTargetIndex(next, next.foes));
+          const activeCritter = world.critters[active.critterId] ?? critter;
+          const going = active.windUp;
+          if (going !== null && going.left > 1) {
+            return nextTurn(world, nextBase, active, activeCritter);
+          }
+          if (going !== null && going.popped.every((popped) => popped)) {
+            const fizzled = updateTargetFoe(active, { windUp: null });
+            next = {
+              ...moveOn(
+                fizzled,
+                activeCritter.windUp?.lines.fizzle ?? activeCritter.lines.burst,
+                "fizzle",
+              ),
+              windUp: null,
+            };
+          } else next = moveOn(active, activeCritter.lines.burst, "burst");
+        }
+      } else {
+        const going = next.windUp;
+        if (next.calm >= critter.calmMax)
+          next = { ...moveOn(next, critter.lines.soothed, "soothed"), windUp: null };
+        else if (going !== null && going.left > 1) return nextTurn(world, nextBase, next, critter);
+        else if (going !== null && going.popped.every((popped) => popped))
+          next = {
+            ...moveOn(next, critter.windUp?.lines.fizzle ?? critter.lines.burst, "fizzle"),
+            windUp: null,
+          };
+        else next = moveOn(next, critter.lines.burst, "burst");
+      }
     } else if (next.phase === "burst") {
-      // After a wind-up its size is set: big if nothing was popped, else
-      // small. Otherwise the big roll comes first. Then one draw per catch
-      // toy (its lane) or lean puff (its force).
       const letGo = next.windUp;
       const [roll, afterRoll]: [number, State] =
         letGo === null ? nextRandom(nextBase) : [1, nextBase];
@@ -478,8 +461,16 @@ function stepBattleInner(
         : letGo.popped.every((popped) => !popped);
       const steady = next.lassoSteady === true;
       const big = steady ? false : rolledBig;
-      const baseSpec = big ? (critter.burst.big ?? critter.burst.check) : critter.burst.check;
-      const encoreSpec = applyEncoreCheckSpec(baseSpec, next.encore?.modifiers ?? [], gentleTiming);
+      const regularBurst = next.signatureBurst ?? critter.burst.check;
+      const bigBurst = next.bigSignatureBurst ?? next.signatureBurst ??
+        critter.burst.big ?? critter.burst.check;
+      const rawSpec = big ? bigBurst : regularBurst;
+      const phasedSpec = isBossPhase2(critter, next.calm, next.phase, inTalkMode(next, critter))
+        ? upgradeBossPhase2Check(rawSpec, critter.id)
+        : rawSpec;
+      const encoreSpec = applyEncoreCheckSpec(
+        phasedSpec, next.encore?.modifiers ?? [], gentleTiming,
+      );
       const spec = applyBlessingCheckSpec(encoreSpec, activeBlessingEffects(world, state));
       let rolled = afterRoll;
       const picks: number[] = [];
@@ -489,10 +480,14 @@ function stepBattleInner(
         rolled = after;
       }
       const { lassoSteady: _lassoSteady, ...withoutSteady } = next;
+      const cleared = steady ? withoutSteady : next;
+      const withClearedWindUp = cleared.foes === undefined
+        ? cleared
+        : updateTargetFoe(cleared, { windUp: null });
       return {
         ...rolled,
         battle: {
-          ...startCheck(steady ? withoutSteady : next, "fae", spec, big, picks),
+          ...startCheck(withClearedWindUp, "fae", spec, big, picks),
           windUp: null,
         },
       };
@@ -503,7 +498,18 @@ function stepBattleInner(
     else if (next.phase === "soothed") {
       const encoreNext = encoreSoothedBattle(state, next);
       if (encoreNext !== null) next = encoreNext;
-      else {
+      else if (next.foes !== undefined) {
+        const rewards = formationRewards(world, state, next.foes);
+        const fresh = rewards.primaryStickerName !== null;
+        const rawLine = (fresh ? world.battle.rewards.sticker : world.battle.rewards.coins)
+          .replace("{sticker}", rewards.primaryStickerName ?? critter.sticker.name)
+          .replace("{coins}", String(rewards.coins));
+        const line = `${rawLine.replace(/[.!]$/, "")}, +${rewards.xp} XP!`;
+        next = {
+          ...battleMessage(next, line, "reward"),
+          rewardSticker: rewards.newStickers[0] ?? null,
+        };
+      } else {
         // Every calm pays; the sticker comes once per species (spec 8).
         const fresh = !state.stickers.includes(critter.sticker.id);
         const xp = battleCalmXp(world, critter);
@@ -520,16 +526,12 @@ function stepBattleInner(
     } else if (next.phase === "reward") {
       const encoreWon = encoreVictoryState(nextBase, state, next);
       if (encoreWon !== null) return encoreWon;
+      if (next.foes !== undefined) {
+        return afterCalm(world, applyMultiFoeReward(world, state, nextBase, next));
+      }
       const den = next.den;
       const xp = battleCalmXp(world, critter);
       const coinsReward = critter.coins + activeBlessingEffects(world, state).jubileeCoinBonus;
-      const battleIds = next.command === "together"
-        ? new Set(battleParty(world, state.party).map((member) => member.id))
-        : null;
-      const ownerId = battleIds !== null
-        ? undefined
-        : state.party.find((candidate) =>
-            world.party[candidate.id]?.command?.id === next.command)?.id;
       return afterCalm(world, {
         ...nextBase,
         ...(den === null
@@ -538,9 +540,7 @@ function stepBattleInner(
               item.den === den ? { ...item, mood: "calm" } : item) }),
         coins: state.coins + coinsReward,
         xp: state.xp + xp,
-        party: state.party.map((member) =>
-          (battleIds !== null ? battleIds.has(member.id) : member.id === ownerId)
-            ? { ...member, xp: member.xp + xp } : member),
+        party: creditBattlePartyXp(world, state, next.command, xp),
         calms: { ...state.calms, [critter.species]: (state.calms[critter.species] ?? 0) + 1 },
         stickers: next.rewardSticker === null
           ? state.stickers
@@ -577,129 +577,50 @@ function stepBattleInner(
   }
   if (next.phase === "command") {
     if (next.treatMenu === true) {
-      const items = treatTrayItems(world, state, critter);
-      const currentSelected = Math.max(0, Math.min(items.length - 1, next.treatSelected ?? 0));
-      const cancelEdge = input.cancel && !state.previousInput.cancel;
-      if (cancelEdge) return { ...nextBase, battle: closeTreatMenu(next) };
-      const up = input.move.y < -0.5 && state.previousInput.move.y >= -0.5;
-      const down = input.move.y > 0.5 && state.previousInput.move.y <= 0.5;
-      if (up || down) {
-        const nextSel = (currentSelected + (down ? 1 : -1) + items.length) % items.length;
-        return { ...nextBase, battle: { ...next, treatSelected: nextSel } };
-      }
-      const tapped = input.choose !== undefined && input.choose >= 0 &&
-        input.choose < items.length ? input.choose : undefined;
-      if (tapped === undefined && !confirm) return { ...nextBase, battle: next };
-      const picked = items[tapped ?? currentSelected];
-      if (picked === undefined || picked.id === "back")
-        return { ...nextBase, battle: closeTreatMenu(next) };
-      const { answered, windUp } = answerFeeling(world, next, "snack");
-      const closed = closeTreatMenu(next);
-      if (picked.id === "snack")
-        return applyPlainSnack(world, state, nextBase, closed, critter, answered, windUp);
-      const treat = world.treats.find((item) => item.id === picked.id);
-      if (treat === undefined) return { ...nextBase, battle: closed };
-      const isFav = treat.favourites.includes(critter.species);
-      const calmGain = (isFav ? treat.favouriteCalm : treat.calm) +
-        (answered ? world.battle.feelingBonus : 0);
-      const healBonus = activeBlessingEffects(world, state).snackHealBonus;
-      const message = battleMessage(closed, isFav ? treat.favouriteLine : treat.useLine, "result");
-      return {
-        ...consumeTreat(nextBase, treat.id),
-        battle: {
-          ...message,
-          answered,
-          windUp,
-          rest: restTurn(closed.rest),
-          energy: Math.min(critter.energyMax, closed.energy + treat.energy + healBonus),
-          calm: Math.min(calmLimit(critter), closed.calm + calmGain),
-        },
-      };
+      return stepTreatMenu(world, state, nextBase, next, critter, input, confirm);
     }
-    // The lantern, once Fae has it, shows the turn-after feeling too, for the
-    // rest of the battle (spec 8); not in a wind-up, whose bubbles hide it.
     const lanternEdge = input.lantern === true && state.previousInput.lantern !== true;
     if (lanternEdge && !next.lanternPeek && next.feelings.length > 0 && next.windUp === null &&
         world.storyVariable(state.ink, "has_lantern") === true)
       return { ...nextBase, battle: { ...next, lanternPeek: true } };
     const talkActive = inTalkMode(next, critter);
-    // Flute Friends in battle (spec 8): once per battle, befriended animals help
-    // on a fresh flute press without consuming Fae's turn.
     const fluteEdge = input.flute === true && state.previousInput.flute !== true;
     if (fluteEdge && next.fluteUsed !== true && !talkActive) {
-      const friends = fluteAssistFriends(world, state);
-      if (friends !== null) {
-        const { kind, hasPup, hasSquirrel, hasBunny } = friends;
-        const assist = world.battle.fluteAssist;
-        const harmonyCalm = activeBlessingEffects(world, state).fluteAssistCalmBonus;
-        const calmGain =
-          (hasPup ? assist.pupCalm : 0) + (hasBunny ? assist.bunnyCalm : 0) + harmonyCalm;
-        const energyGain = hasSquirrel ? assist.squirrelEnergy : 0;
-        const softenGain = hasSquirrel ? assist.squirrelSoften : 0;
-        const togetherGain = hasBunny && battleParty(world, state.party).length >= 2
-          ? assist.bunnyTogether
-          : 0;
-        const nextCalm = Math.min(calmLimit(critter), next.calm + calmGain);
-        const nextEnergy = Math.min(critter.energyMax, next.energy + energyGain);
-        const nextSparkleCount = togetherGain > 0
-          ? Math.min(world.battle.together.chargeMax, (next.sparkle ?? 0) + togetherGain)
-          : next.sparkle;
-        const updated: Battle = {
-          ...next,
-          calm: nextCalm,
-          energy: nextEnergy,
-          fluteUsed: true,
-          ...(softenGain > 0 ? { burstSoften: (next.burstSoften ?? 0) + softenGain } : {}),
-          ...(nextSparkleCount !== undefined ? { sparkle: nextSparkleCount } : {}),
-        };
-        if (nextCalm >= critter.calmMax)
-          return {
-            ...nextBase,
-            battle: { ...moveOn(updated, critter.lines.soothed, "soothed"), windUp: null },
-          };
-        return { ...nextBase, battle: battleMessage(updated, assist.lines[kind], "command") };
-      }
+      const assisted = stepFluteAssist(world, state, nextBase, next, critter);
+      if (assisted !== null) return assisted;
     }
-    // Coach Ash's rainbow lasso in battle (spec 8): once per battle, pops an
-    // active wind-up bubble or snags coins and steadies the next burst without
-    // consuming Fae's turn.
     const lassoEdge = input.lasso === true && state.previousInput.lasso !== true;
     if (lassoEdge && next.lassoUsed !== true && !talkActive && (next.talk ?? null) === null &&
         world.storyVariable(state.ink, "has_lasso") === true) {
-      const assist = world.battle.lassoAssist;
-      const nextCalm = Math.min(calmLimit(critter), next.calm + assist.calm);
-      const going = next.windUp;
-      const popIndex = going?.popped.findIndex((popped) => !popped) ?? -1;
-      if (going !== null && popIndex >= 0) {
-        const windUp = {
-          ...going,
-          popped: going.popped.map((popped, index) => popped || index === popIndex),
-        };
-        const updated: Battle = { ...next, calm: nextCalm, windUp, lassoUsed: true };
-        if (nextCalm >= critter.calmMax)
-          return {
-            ...nextBase,
-            battle: { ...moveOn(updated, critter.lines.soothed, "soothed"), windUp: null },
-          };
-        return { ...nextBase, battle: battleMessage(updated, assist.lines.windUp, "command") };
-      }
-      const updated: Battle = { ...next, calm: nextCalm, lassoUsed: true, lassoSteady: true };
-      const rewardedBase = { ...nextBase, coins: state.coins + assist.coins };
-      if (nextCalm >= critter.calmMax)
-        return {
-          ...rewardedBase,
-          battle: { ...moveOn(updated, critter.lines.soothed, "soothed"), windUp: null },
-        };
-      return { ...rewardedBase, battle: battleMessage(updated, assist.lines.snag, "command") };
+      return stepLassoAssist(world, state, nextBase, next, critter);
     }
-    // Together! party sparkle finisher (spec 8): once charged, a fresh cancel
-    // press launches the star chain check, pops all wind-up bubbles, and ticks
-    // resting friends without resting anyone.
+    // Multi-critter target cycling (Track E7): Left/Right or direct `input.target`.
+    if (!talkActive && next.foes !== undefined && activeFoeIndices(next.foes).length >= 2) {
+      const currentTarget = activeTargetIndex(next, next.foes);
+      if (
+        input.target !== undefined &&
+        input.target !== currentTarget &&
+        next.foes[input.target]?.soothed === false
+      ) {
+        return { ...nextBase, battle: syncBattleTarget(next, next.foes, input.target) };
+      }
+      const leftEdge = input.move.x < -0.5 && state.previousInput.move.x >= -0.5;
+      const rightEdge = input.move.x > 0.5 && state.previousInput.move.x <= 0.5;
+      if (leftEdge || rightEdge) {
+        const nextTarget = cycleTargetIndex(next.foes, currentTarget, rightEdge ? 1 : -1);
+        return { ...nextBase, battle: syncBattleTarget(next, next.foes, nextTarget) };
+      }
+    }
     const cancelEdge = input.cancel && !state.previousInput.cancel;
     if (cancelEdge && !talkActive && battleParty(world, state.party).length >= 2 &&
         (next.sparkle ?? 0) >= world.battle.together.chargeMax) {
       const going = next.windUp;
       const windUp = going === null ? null : { ...going, popped: going.popped.map(() => true) };
+      const poppedFoes = next.foes?.map((foe) =>
+        foe.windUp === null
+          ? foe
+          : { ...foe, windUp: { ...foe.windUp, popped: foe.windUp.popped.map(() => true) } },
+      );
       const baseSpec = world.battle.together.check;
       const encoreSpec = applyEncoreCheckSpec(baseSpec, next.encore?.modifiers ?? [], gentleTiming);
       const spec = applyBlessingCheckSpec(encoreSpec, activeBlessingEffects(world, state));
@@ -709,6 +630,7 @@ function stepBattleInner(
         battle: startCheck(
           {
             ...withoutSparkle,
+            ...(poppedFoes === undefined ? {} : { foes: poppedFoes }),
             command: "together",
             answered: true,
             windUp,
@@ -750,7 +672,7 @@ function stepBattleInner(
           command: "recover",
           answered: false,
           rest: nextRest,
-          energy: Math.min(critter.energyMax, next.energy + 1 + healBonus),
+          energy: Math.min(battleEnergyMax(world, next, critter), next.energy + 1 + healBonus),
         },
       };
     }
@@ -790,6 +712,28 @@ function stepBattleInner(
       const { answered, windUp } = answerFeeling(world, next, chosen.id);
       return applyPlainSnack(world, state, nextBase, next, critter, answered, windUp);
     }
+    if (isDualComboCommand(chosen.id)) {
+      const combo = dualComboById(chosen.id);
+      if (combo !== null) {
+        const remainingSparkle = Math.max(0, (next.sparkle ?? 0) - combo.cost);
+        const { sparkle: _sparkle, ...withoutSparkle } = next;
+        const spec = gentleTiming ? gentleCheckSpec(combo.check) : combo.check;
+        return {
+          ...nextBase,
+          battle: startCheck(
+            {
+              ...withoutSparkle,
+              ...(remainingSparkle > 0 ? { sparkle: remainingSparkle } : {}),
+              command: combo.id,
+              answered: false,
+              rest: restTurn(next.rest),
+            },
+            "critter",
+            spec,
+          ),
+        };
+      }
+    }
     const friend = critter.commands.friends[chosen.id];
     const partyOwner = state.party.find(
       (member) => world.party[member.id]?.command?.id === chosen.id,
@@ -818,19 +762,38 @@ function stepBattleInner(
       lane: laneFromStick(input.move.y),
       lean: leanFromStick(input.move.x),
       move: input.move,
+      previousMove: state.previousInput.move,
+      choose: input.choose,
       pointer: input.pointer,
       echoNote: echoNoteFromEdge(state.previousInput.move, input.move),
     });
     const result = stepped.grade;
-    // The check stays in the battle through its result, as it ended: the
-    // last beat popped, the meter where it was let go.
     const ended = { ...next, check: stepped.check };
     if (result === null) return { ...nextBase, battle: ended };
     if (check.side === "critter") {
       const sparkleBonus = activeBlessingEffects(world, state).calmSparkleBonus;
+      if (isDualComboCommand(next.command)) {
+        const combo = dualComboById(next.command);
+        if (combo !== null) {
+          return resolveDualComboCheck(world, state, nextBase, ended, critter, combo, result);
+        }
+      }
       if (next.command === "together") {
-        const gained = applyCalmSparkleBonus(togetherCalm(world, state, result), sparkleBonus);
-        const calm = Math.min(calmLimit(critter), next.calm + gained);
+        const gain = applyCalmSparkleBonus(togetherCalm(world, state, result), sparkleBonus);
+        if (ended.foes !== undefined) {
+          const targetIdx = activeTargetIndex(ended, ended.foes);
+          const applied = applySkillToFoes(world, ended.foes, targetIdx, "together", gain, result);
+          const synced = syncBattleTarget(ended, applied.foes, targetIdx, false);
+          return {
+            ...nextBase,
+            battle: battleMessage(
+              { ...synced, lastGrade: result },
+              world.battle.together.lines[result],
+              "result",
+            ),
+          };
+        }
+        const calm = Math.min(calmLimit(critter), next.calm + gain);
         return {
           ...nextBase,
           battle: battleMessage(
@@ -853,9 +816,6 @@ function stepBattleInner(
         : result === "good"
           ? command.numbers.good
           : 0;
-      // Missing a critter-side timing check deals 0 calm and leaves feelings /
-      // wind-up bubbles unpopped; landed checks (great or good) apply feeling
-      // answers and calm gain.
       const resolved = result === "miss"
         ? { answered: false, windUp: next.windUp }
         : answerFeeling(world, next, next.command ?? "soothe");
@@ -863,14 +823,41 @@ function stepBattleInner(
         ? actorStats.power : command.numbers.calm) +
         (bonus > 0 ? actorStats.magic : 0) +
         (resolved.answered ? encoreFeelingBonus(world, next) : 0);
-      const calm = result === "miss"
-        ? next.calm
-        : Math.min(
-            calmLimit(critter),
-            next.calm + applyCalmSparkleBonus(rawCalmGain, sparkleBonus),
-          );
+      const primaryGain = result === "miss"
+        ? 0
+        : applyCalmSparkleBonus(rawCalmGain, sparkleBonus);
       const sparkle = nextSparkle(world, state, next, result, false);
       const { sparkle: _oldSparkle, ...withoutSparkle } = ended;
+      if (ended.foes !== undefined) {
+        const targetIdx = activeTargetIndex(ended, ended.foes);
+        const withWindUp = ended.foes.map((foe, idx) =>
+          idx === targetIdx ? { ...foe, windUp: resolved.windUp } : foe);
+        const applied = applySkillToFoes(
+          world,
+          withWindUp,
+          targetIdx,
+          next.command ?? "soothe",
+          primaryGain,
+          result,
+        );
+        const synced = syncBattleTarget(
+          { ...withoutSparkle, ...(sparkle === undefined ? {} : { sparkle }) },
+          applied.foes,
+          targetIdx,
+          false,
+        );
+        return {
+          ...nextBase,
+          battle: battleMessage(
+            { ...synced, answered: resolved.answered, lastGrade: result },
+            command.lines[result],
+            "result",
+          ),
+        };
+      }
+      const calm = result === "miss"
+        ? next.calm
+        : Math.min(calmLimit(critter), next.calm + primaryGain);
       return {
         ...nextBase,
         battle: battleMessage(

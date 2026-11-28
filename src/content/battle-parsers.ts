@@ -258,7 +258,13 @@ export function parseBattleContent(
       typeof hints.trace === "string" &&
       typeof hints.peekaboo === "string" &&
       typeof hints.echo === "string" &&
-      hints.echo.trim().length > 0,
+      hints.echo.trim().length > 0 &&
+      typeof hints["which-one"] === "string" &&
+      hints["which-one"].trim().length > 0 &&
+      typeof hints.whack === "string" &&
+      hints.whack.trim().length > 0 &&
+      typeof hints["spin-snag"] === "string" &&
+      hints["spin-snag"].trim().length > 0,
     file,
     "hints",
   );
@@ -286,6 +292,13 @@ export function parseBattleContent(
   );
   const toyAtlas = value.toyAtlas;
   field(typeof toyAtlas === "string" && toyAtlas.endsWith(".json"), file, "toyAtlas");
+  const checksV2Atlas = value.checksV2Atlas;
+  field(
+    checksV2Atlas === undefined ||
+      (typeof checksV2Atlas === "string" && checksV2Atlas.endsWith(".json")),
+    file,
+    "checksV2Atlas",
+  );
   // All five feelings, each with its label and the command that answers it.
   const feelings = value.feelings;
   field(record(feelings) && Object.keys(feelings).every(isFeelingId), file, "feelings");
@@ -337,6 +350,7 @@ export function parseBattleContent(
   field(record(lassoRaw) && record(lassoRaw.lines), file, "lassoAssist");
   return {
     toyAtlas,
+    ...(checksV2Atlas === undefined ? {} : { checksV2Atlas }),
     hints: {
       charge: hints.charge,
       chain: hints.chain,
@@ -345,6 +359,9 @@ export function parseBattleContent(
       trace: hints.trace,
       peekaboo: hints.peekaboo,
       echo: hints.echo,
+      "which-one": hints["which-one"],
+      whack: hints.whack,
+      "spin-snag": hints["spin-snag"],
     },
     commands: {
       soothe: command("soothe"),

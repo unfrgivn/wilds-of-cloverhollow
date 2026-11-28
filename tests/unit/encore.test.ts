@@ -102,7 +102,7 @@ function playCheckToGrade(state: State, gentleTiming = false): State {
         (peek) => tick >= peek.start - 2 && tick < peek.end,
       );
       next = advance(next, unsafe ? none : press({ confirm: true }), 1, gentleTiming);
-    } else {
+    } else if (check.kind === "echo") {
       const stride = check.spec.demoTicks + check.spec.gapTicks;
       const demoEnd = check.spec.notes * stride;
       if (check.tick < demoEnd) {
@@ -119,6 +119,8 @@ function playCheckToGrade(state: State, gentleTiming = false): State {
         next = advance(next, press({ move }), 1, gentleTiming);
         next = advance(next, none, 1, gentleTiming);
       }
+    } else {
+      next = advance(next, none, 1, gentleTiming);
     }
   }
   return next;

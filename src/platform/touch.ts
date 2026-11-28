@@ -21,6 +21,7 @@ export class TouchInput {
   private readonly buttons = new Set<Button>();
   private readonly tapped = new Set<Button>();
   private choice: number | undefined;
+  private target: number | undefined;
   private stickId: number | undefined;
   private origin: Point | undefined;
   private move: Point = { x: 0, y: 0 };
@@ -56,6 +57,7 @@ export class TouchInput {
       ...(this.hasButton("lasso") ? { lasso: true } : {}),
       ...(this.dashOn ? { dash: true } : {}),
       choose: this.choice,
+      ...(this.target === undefined ? {} : { target: this.target }),
     };
   }
 
@@ -124,6 +126,7 @@ export class TouchInput {
     this.arrowTap = undefined;
     this.traceTap = undefined;
     this.choice = undefined;
+    this.target = undefined;
     return frame;
   }
 
@@ -133,6 +136,10 @@ export class TouchInput {
 
   tapChoice(index: number): void {
     this.choice = index;
+  }
+
+  tapTarget(index: number): void {
+    this.target = index;
   }
 
   /** Holds a check's arrow: a step along one axis, like the stick's. */

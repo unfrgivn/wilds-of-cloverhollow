@@ -80,6 +80,7 @@ export function combineInputFrames(
     ...(keyboard.lasso || touch.lasso || gamepad.lasso ? { lasso: true } : {}),
     ...(keyboard.dash || touch.dash || gamepad.dash ? { dash: true } : {}),
     choose: touch.choose,
+    ...(touch.target === undefined ? {} : { target: touch.target }),
     // A finger on a trace (spec 3.2): only touch has one, and only while down.
     ...(touch.pointer === undefined ? {} : { pointer: touch.pointer }),
   };

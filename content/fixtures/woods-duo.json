@@ -1,0 +1,18 @@
+{
+  "area": "woods",
+  "spawn": "east",
+  "seed": 26,
+  "party": [
+    "sue",
+    "jordan",
+    "maddie"
+  ],
+  "variables": {
+    "sue_joined": true,
+    "jordan_joined": true,
+    "has_flute": true,
+    "has_lasso": true,
+    "pup_friend": true
+  },
+  "battleFormation": "woods-pair"
+}

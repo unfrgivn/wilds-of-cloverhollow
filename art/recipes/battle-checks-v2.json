@@ -1,0 +1,85 @@
+{
+  "asset": "battle-checks-v2",
+  "wave": "Art Wave B3 (Elevation Track E7)",
+  "date": "2026-11-27",
+  "status": "owner-review-ready",
+  "model": "gemini-3-pro-image-preview",
+  "aspectRatio": "1:1",
+  "imageSize": "1K",
+  "generationCalls": "5 total (4 initial 2x2 sheets + 1 single-sprite regeneration for cup-star on pure green #00FF00 to eliminate outer glow halo; see art/scratch/generation-log.jsonl in main checkout).",
+  "references": [
+    "docs/art/concepts/ui/ui_kit_sticker_style_for_a_cozy_.png",
+    "docs/art/concepts/props/arcade_props.png",
+    "docs/art/concepts/props/tools_lasso_flute_journal.png",
+    "docs/art/concepts/vfx/vfx_particles.png"
+  ],
+  "sources": [
+    {
+      "id": "cups",
+      "raw": "art/source/battle-checks-v2/cups-raw.png",
+      "selectedGeneration": "1795844102521-gemini-3-pro-image-preview-0.png",
+      "key": "#FF00FF",
+      "frames": [
+        "cup-mint",
+        "cup-butter",
+        "cup-sky"
+      ]
+    },
+    {
+      "id": "cup-star",
+      "raw": "art/source/battle-checks-v2/cup-star-raw.png",
+      "selectedGeneration": "1795844264812-gemini-3-pro-image-preview-0.png",
+      "key": "#00FF00",
+      "frames": [
+        "cup-star"
+      ]
+    },
+    {
+      "id": "tickets",
+      "raw": "art/source/battle-checks-v2/tickets-raw.png",
+      "selectedGeneration": "1795844101483-gemini-3-pro-image-preview-0.png",
+      "key": "#00FF00",
+      "frames": [
+        "ticket-slot",
+        "ticket-pop",
+        "ticket-hit",
+        "lasso-coil"
+      ]
+    },
+    {
+      "id": "intents",
+      "raw": "art/source/battle-checks-v2/intents-raw.png",
+      "selectedGeneration": "1795844100377-gemini-3-pro-image-preview-0.png",
+      "key": "#00FF00",
+      "frames": [
+        "intent-puffing",
+        "intent-cheer",
+        "intent-scribbles",
+        "intent-fizz"
+      ]
+    },
+    {
+      "id": "combos",
+      "raw": "art/source/battle-checks-v2/combos-raw.png",
+      "selectedGeneration": "1795844102628-gemini-3-pro-image-preview-0.png",
+      "key": "#FF00FF",
+      "frames": [
+        "combo-lullaby",
+        "combo-lasso",
+        "combo-juggle",
+        "combo-harmony"
+      ]
+    }
+  ],
+  "postProcessing": {
+    "keyAlpha": "bun tools/art/key-alpha.ts --fuzz 24% --despill edge --holes",
+    "packing": "4x4 atlas of 160x160 transparent RGBA cells (640x640 WebP, quality 90, method 6, Lanczos resize into 148x148 inner bounds)",
+    "outputs": [
+      "public/assets/battle/battle-checks-v2.webp",
+      "public/assets/battle/battle-checks-v2.json"
+    ]
+  },
+  "review": [
+    "art/review/battle-checks-v2-sheet.jpg"
+  ]
+}

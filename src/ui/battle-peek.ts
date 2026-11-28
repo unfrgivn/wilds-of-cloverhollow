@@ -35,6 +35,12 @@ export function checkMechanicLabel(kind: CheckKind): string {
       return "Peekaboo Freeze";
     case "echo":
       return "Musical Echo Chimes";
+    case "which-one":
+      return "3-Cup Shuffle";
+    case "whack":
+      return "Pop-Up Ticket Whack";
+    case "spin-snag":
+      return "Lasso Spin & Snag";
   }
 }
 
@@ -65,6 +71,12 @@ function peekTip(critter: Critter): string {
       return "Hold confirm to charge, then release inside the green band.";
     case "ring":
       return "Press confirm right as the shrinking ring meets the dashed circle.";
+    case "which-one":
+      return "Keep your eyes on the hiding cup as they shuffle, then pick it!";
+    case "whack":
+      return "Tap the matching direction as each ticket pops (confirm for middle).";
+    case "spin-snag":
+      return "Circle directions to spin the lasso, then confirm on the star!";
   }
 }
 

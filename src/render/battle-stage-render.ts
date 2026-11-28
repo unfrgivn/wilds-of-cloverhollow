@@ -48,16 +48,14 @@ export class BattleStageRenderer {
   readonly backdropSprite = new Sprite();
   readonly wash = new Graphics();
   readonly turnIndicator = new Graphics();
+  readonly targetIndicator = new Graphics();
   readonly vfxLayer = new Container();
   readonly underlaySprites: readonly Sprite[];
   readonly shadowSprites: readonly Sprite[];
 
   // Not clipped to the viewport, so the blur samples the whole painting.
   private readonly backdropBlur = new BlurFilter({
-    strength: 4,
-    quality: 2,
-    resolution: 0.5,
-    clipToViewport: false,
+    strength: 4, quality: 2, resolution: 0.5, clipToViewport: false,
   });
   private backdropBounds: BattleBackdropBounds | null = null;
   private backdropTexture: Texture | undefined;
@@ -69,6 +67,7 @@ export class BattleStageRenderer {
   private readonly spotlight: Sprite;
   private readonly sunburst: Sprite;
   private readonly critterShadow: Sprite;
+  private readonly extraFoeShadows: readonly [Sprite, Sprite];
   private readonly faeShadow: Sprite;
   private readonly partyShadows = new Map<string, Sprite>();
   private readonly vfxSprites: Sprite[] = [];
@@ -87,12 +86,17 @@ export class BattleStageRenderer {
     this.turnIndicator.visible = false;
     // Floating die-cut golden/cream chevron pointing down at the active actor.
     this.turnIndicator
-      .poly([-13, -18, 13, -18, 0, 2])
-      .fill({ color: 0x47321f })
-      .poly([-10.5, -16, 10.5, -16, 0, -0.5])
-      .fill({ color: 0xfffdf7 })
-      .poly([-7.5, -14, 7.5, -14, 0, -3.5])
-      .fill({ color: 0xffe27a });
+      .poly([-13, -18, 13, -18, 0, 2]).fill({ color: 0x47321f })
+      .poly([-10.5, -16, 10.5, -16, 0, -0.5]).fill({ color: 0xfffdf7 })
+      .poly([-7.5, -14, 7.5, -14, 0, -3.5]).fill({ color: 0xffe27a });
+    // Floating coral-gold chevron above the targeted foe in multi-foe formations.
+    this.targetIndicator.label = "battle:target-indicator";
+    this.targetIndicator.visible = false;
+    this.targetIndicator
+      .poly([-14, -20, 14, -20, 0, 2]).fill({ color: 0x47321f })
+      .poly([-11, -18, 11, -18, 0, -0.5]).fill({ color: 0xfffdf7 })
+      .poly([-8, -16, 8, -16, 0, -3.5]).fill({ color: 0xff8b6b })
+      .poly([-4.5, -14.5, 4.5, -14.5, 0, -7]).fill({ color: 0xffe27a });
     for (let i = 0; i < BATTLE_VFX_POOL_SIZE; i += 1) {
       const particle = new Sprite(this.vfx.sparkle);
       particle.label = `battle:vfx:${i}`;
@@ -135,6 +139,11 @@ export class BattleStageRenderer {
     this.sunburst.visible = false;
 
     this.critterShadow = makeShadowSprite(this.vfx.contactShadow, "battle:shadow:critter");
+    const extraShadow1 = makeShadowSprite(this.vfx.contactShadow, "battle:shadow:foe-1");
+    const extraShadow2 = makeShadowSprite(this.vfx.contactShadow, "battle:shadow:foe-2");
+    extraShadow1.visible = false;
+    extraShadow2.visible = false;
+    this.extraFoeShadows = [extraShadow1, extraShadow2];
     this.faeShadow = makeShadowSprite(this.vfx.contactShadow, "battle:shadow:fae");
     for (const id of Object.keys(world.party)) {
       const shadow = makeShadowSprite(this.vfx.contactShadow, `battle:shadow:${id}`);
@@ -143,16 +152,10 @@ export class BattleStageRenderer {
     }
 
     this.underlaySprites = [
-      this.moodWaveA,
-      this.moodWaveB,
-      this.spotlight,
-      this.groundStage,
-      this.sunburst,
+      this.moodWaveA, this.moodWaveB, this.spotlight, this.groundStage, this.sunburst,
     ];
     this.shadowSprites = [
-      this.critterShadow,
-      this.faeShadow,
-      ...this.partyShadows.values(),
+      this.critterShadow, extraShadow1, extraShadow2, this.faeShadow, ...this.partyShadows.values(),
     ];
   }
 
@@ -174,6 +177,8 @@ export class BattleStageRenderer {
     this.wash.visible = false;
     this.backdropSprite.visible = false;
     this.turnIndicator.visible = false;
+    this.targetIndicator.visible = false;
+    for (const shadow of this.extraFoeShadows) shadow.visible = false;
     this.backdropBounds = null;
     this.fluteSeen = false;
     this.fluteCameoStartTick = undefined;
@@ -253,31 +258,35 @@ export class BattleStageRenderer {
     critterX: number,
     critterY: number,
     reducedMotion: boolean,
+    phase2Tint?: { waveA: number; waveB: number; spotlight: number },
   ): void {
     // Drifting watercolour mood washes and radial spotlight kept strictly
     // inside the central 70% so all four painted corners stay untouched.
     const moodLayout = computeBattleStageMoodLayout(
-      mood,
-      reducedMotion ? 0 : tick,
-      viewWidth,
-      viewHeight,
+      mood, reducedMotion ? 0 : tick, viewWidth, viewHeight,
     );
+    const usePhase2 = phase2Tint !== undefined && mood !== "rest" &&
+      mood !== "soothed" && mood !== "together-active";
     this.moodWaveA.position.set(moodLayout.waveA.x, moodLayout.waveA.y);
     this.moodWaveA.width = moodLayout.waveA.width;
     this.moodWaveA.height = moodLayout.waveA.height;
-    this.moodWaveA.tint = moodLayout.waveA.tint;
-    this.moodWaveA.alpha = moodLayout.waveA.alpha;
+    this.moodWaveA.tint = usePhase2 ? phase2Tint.waveA : moodLayout.waveA.tint;
+    this.moodWaveA.alpha = usePhase2
+      ? Math.max(moodLayout.waveA.alpha, 0.22)
+      : moodLayout.waveA.alpha;
 
     this.moodWaveB.position.set(moodLayout.waveB.x, moodLayout.waveB.y);
     this.moodWaveB.width = moodLayout.waveB.width;
     this.moodWaveB.height = moodLayout.waveB.height;
-    this.moodWaveB.tint = moodLayout.waveB.tint;
-    this.moodWaveB.alpha = moodLayout.waveB.alpha;
+    this.moodWaveB.tint = usePhase2 ? phase2Tint.waveB : moodLayout.waveB.tint;
+    this.moodWaveB.alpha = usePhase2
+      ? Math.max(moodLayout.waveB.alpha, 0.19)
+      : moodLayout.waveB.alpha;
 
     this.spotlight.position.set(moodLayout.spotlight.x, moodLayout.spotlight.y);
     this.spotlight.width = moodLayout.spotlight.width;
     this.spotlight.height = moodLayout.spotlight.height;
-    this.spotlight.tint = moodLayout.spotlight.tint;
+    this.spotlight.tint = usePhase2 ? phase2Tint.spotlight : moodLayout.spotlight.tint;
     this.spotlight.alpha = moodLayout.spotlight.alpha;
 
     const stageCenterX = Math.max(
@@ -305,18 +314,29 @@ export class BattleStageRenderer {
   }
 
   updateCritterShadow(
-    x: number,
-    y: number,
-    battleHeight: number,
-    swell: number,
-    lift: number,
+    x: number, y: number, battleHeight: number, swell: number, lift: number,
+  ): void {
+    this.applyFoeShadow(this.critterShadow, x, y, battleHeight, swell, lift);
+  }
+
+  updateExtraFoeShadow(
+    slot: 1 | 2, visible: boolean, x: number, y: number,
+    battleHeight: number, swell: number, lift: number,
+  ): void {
+    const shadow = slot === 1 ? this.extraFoeShadows[0] : this.extraFoeShadows[1];
+    shadow.visible = visible;
+    if (visible) this.applyFoeShadow(shadow, x, y, battleHeight, swell, lift);
+  }
+
+  private applyFoeShadow(
+    shadow: Sprite, x: number, y: number, battleHeight: number, swell: number, lift: number,
   ): void {
     const base = Math.min(190, Math.max(92, battleHeight * 0.58));
     const shadowScale = (1 + (swell - 1) * 0.65) * lift;
-    this.critterShadow.position.set(x, y);
-    this.critterShadow.width = base * shadowScale;
-    this.critterShadow.height = base * 0.32 * (1 + (swell - 1) * 0.5) * lift;
-    this.critterShadow.alpha = 0.34 * lift;
+    shadow.position.set(x, y);
+    shadow.width = base * shadowScale;
+    shadow.height = base * 0.32 * (1 + (swell - 1) * 0.5) * lift;
+    shadow.alpha = 0.34 * lift;
   }
 
   updateFaeShadow(x: number, y: number, lift: number): void {
@@ -350,6 +370,16 @@ export class BattleStageRenderer {
     const bob = reducedMotion ? 0 : Math.sin(tick / 10) * 5;
     this.turnIndicator.visible = true;
     this.turnIndicator.position.set(head.x, head.y + bob);
+  }
+
+  updateTargetIndicator(head: Point | undefined, tick: number, reducedMotion: boolean): void {
+    if (head === undefined) {
+      this.targetIndicator.visible = false;
+      return;
+    }
+    const bob = reducedMotion ? 0 : Math.sin(tick / 8) * 5;
+    this.targetIndicator.visible = true;
+    this.targetIndicator.position.set(head.x, head.y - 8 + bob);
   }
 
   /** Renders Flute Friend on-stage cameo sprites + shadows and returns cameo sparkle particles. */

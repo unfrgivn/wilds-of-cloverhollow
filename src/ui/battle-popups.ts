@@ -29,6 +29,7 @@ export type BattlePopupSnapshot = {
   lanternPeek?: boolean;
   togetherActive?: boolean;
   recovered?: boolean;
+  bossPhase2?: boolean;
 };
 
 /**
@@ -87,6 +88,10 @@ export function classifyBattlePopup(
 
   if (!prev.togetherActive && next.togetherActive === true) {
     popups.push({ kind: "big", text: "TOGETHER! ★", side: "fae" });
+  }
+
+  if (!prev.bossPhase2 && next.bossPhase2 === true) {
+    popups.push({ kind: "big", text: "PHASE 2! ★", side: "critter" });
   }
 
   return popups;

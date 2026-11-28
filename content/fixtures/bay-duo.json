@@ -1,0 +1,18 @@
+{
+  "area": "bay",
+  "spawn": "plaza-road",
+  "seed": 1,
+  "party": [
+    "sue",
+    "jordan",
+    "maddie"
+  ],
+  "variables": {
+    "sue_joined": true,
+    "jordan_joined": true,
+    "has_flute": true,
+    "has_lasso": true,
+    "pup_friend": true
+  },
+  "battleFormation": "bay-pair"
+}

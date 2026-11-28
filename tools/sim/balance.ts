@@ -9,6 +9,7 @@ import {
 import { levelForXp, statsForCommand } from "../../src/core/levels";
 import { loadContent } from "../../src/content/load";
 import { parseScript } from "../../src/content/script";
+import { runE7FormationSim } from "./e7-formations";
 
 // Replay the careful-player routes used by the story, then compare the Fae
 // level with the local encounter. The golden-path runs (Milestone 68) make
@@ -200,3 +201,4 @@ console.log(
     `fish trade +${fishTrade.ticketsPerCatch}t/+${fishTrade.coinsPerCatch}c, ` +
     `${content.world.treatBaskets.length} gift baskets balanced`,
 );
+runE7FormationSim();

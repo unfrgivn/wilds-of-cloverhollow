@@ -53,6 +53,68 @@ export function stripComments(source: string): string {
   return output;
 }
 
+/** Blanks string literal prose (keeping line breaks and `${...}` code) for token scans. */
+export function stripStringLiterals(source: string): string {
+  let output = "";
+  let index = 0;
+  let quote: "'" | '"' | "`" | undefined;
+  let templateDepth = 0;
+  const braceStack: number[] = [];
+  while (index < source.length) {
+    const char = source[index] ?? "";
+    const next = source[index + 1] ?? "";
+    if (quote !== undefined) {
+      if (char === "\\") {
+        output += next === "\n" ? " \n" : "  ";
+        index += 2;
+        continue;
+      }
+      if (quote === "`" && char === "$" && next === "{") {
+        output += "${";
+        templateDepth += 1;
+        braceStack.push(0);
+        quote = undefined;
+        index += 2;
+        continue;
+      }
+      if (char === quote) {
+        output += char;
+        quote = undefined;
+        index += 1;
+        continue;
+      }
+      output += char === "\n" ? "\n" : " ";
+      index += 1;
+      continue;
+    }
+    if (templateDepth > 0) {
+      if (char === "{") {
+        braceStack[braceStack.length - 1] = (braceStack[braceStack.length - 1] ?? 0) + 1;
+      } else if (char === "}") {
+        const depth = braceStack[braceStack.length - 1] ?? 0;
+        if (depth === 0) {
+          braceStack.pop();
+          templateDepth -= 1;
+          quote = "`";
+          output += "}";
+          index += 1;
+          continue;
+        }
+        braceStack[braceStack.length - 1] = depth - 1;
+      }
+    }
+    if (char === "'" || char === '"' || char === "`") {
+      quote = char;
+      output += char;
+      index += 1;
+      continue;
+    }
+    output += char;
+    index += 1;
+  }
+  return output;
+}
+
 function files(directory: string): string[] {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const path = join(directory, entry.name);
@@ -81,9 +143,10 @@ export function importErrors(file: string, code: string): string[] {
 if (import.meta.main) {
   for (const file of files("src/core")) {
     const code = stripComments(readFileSync(file, "utf8"));
-    const match = banned.exec(code);
+    const tokenCode = stripStringLiterals(code);
+    const match = banned.exec(tokenCode);
     if (match !== null) {
-      const line = code.slice(0, match.index).split("\n").length;
+      const line = tokenCode.slice(0, match.index).split("\n").length;
       throw new Error(`forbidden token "${match[0]}" in ${file}:${line}`);
     }
     const imports = importErrors(file, code);

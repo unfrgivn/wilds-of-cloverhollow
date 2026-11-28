@@ -7893,6 +7893,42 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
 - **Gates:** `just check`, `just build` (`< 500 kB` every non-vendor chunk),
   and Chromium/WebKit e2e verification.
 
+## Milestone 182: Keepsake Dream Blessings Catalog & Storybook Field Note / Field Treasures Integration (Elevation Track E9A) **Status:** ✅ Completed (2026-11-27)
+- Implements Elevation Track E9A's **Keepsake Dream Blessings** for all 13
+  Clubhouse Keepsakes (`src/core/blessings.ts`) and surfaces them inside every
+  Keepsake Field Note Card and the Field Treasures Card
+  (`src/ui/journal-blessings.ts`, `src/ui/journal-blessings.css`,
+  `src/ui/journal-field-note.ts`) — zero `src/core/sim.ts` changes, zero
+  save-version bumps, zero replay hash drift across all 74 sims, and zero visual
+  baseline diffs across all 99 `ui-gallery` baselines.
+- Pure core Keepsake Dream Blessings engine (`src/core/blessings.ts`, 215 lines):
+  - Exhaustive `KEEPSAKE_BLESSINGS` catalog across all 13 `KeepsakeId` entries
+    (`Chime Resonance`, `Lucky Star Arcade`, `Prismatic Calm`, `Quiet Footsteps`,
+    `Fiesta Whisk`, `Meadow Vitality`, `Tide Reader`, `Pinecone Footing`,
+    `Golden Pass`, `Steady Watercolor`, `Summit Starlight`, `Coastal Harmony`,
+    `Sunny Jubilee`) across 4 categories (`battle`, `explore`, `arcade`, `craft`).
+  - Exported `keepsakeBlessingFor`, `dreamBlessingBonuses`,
+    `evaluateKeepsakeBlessings`, and `evaluateKeepsakeBlessingsFromIds` with
+    guaranteed twin parity.
+  - Hardened `tools/purity.ts` with `stripStringLiterals()` so prose strings
+    inside `src/core` never false-trigger global-identifier purity scans while
+    preserving `${...}` template expression scanning.
+- Storybook Dream Blessing UI (`src/ui/journal-blessings.ts`,
+  `src/ui/journal-blessings.css`, `src/ui/journal-field-note.ts`):
+  - Mounted `.journal-blessing-plaque` (sparkle star SVG with zero `<text>`
+    nodes, category eyebrow, accent stripe, effect capsule, poetic summary) on
+    Keepsake Field Note Cards and `.journal-treasures-blessings` (`N/13 Active`
+    / golden `★ 13/13 All Dream Blessings Active!` with colored-dot chips) on
+    the Field Treasures Card, with full reduced-motion and Safari/iOS
+    tap-selection hygiene.
+- Evidence: `tests/unit/milestone-182.test.ts`,
+  `tests/e2e/milestone-182.spec.ts` (`@smoke` Chromium + WebKit), and review
+  captures `art/review/m179-keepsake-blessing-1280.jpg` and
+  `m179-treasures-blessings-874.jpg` independently verified via `vision`.
+- Gates: `just check` (246 unit files / 1,780 tests, all 74 sims, 23 QA packs,
+  purity, lint), `just build` (`index` `363.98 kB < 500 kB`), 22/22 targeted
+  Chromium & WebKit e2e, and 99/99 Chromium `ui-gallery` tests.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

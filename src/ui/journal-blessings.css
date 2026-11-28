@@ -1,0 +1,232 @@
+.journal-blessing-plaque[hidden],
+.journal-treasures-blessings[hidden],
+.journal-treasures-blessings-chips[hidden] {
+  display: none;
+}
+
+.journal-blessing-plaque {
+  margin-top: 8px;
+  padding: 6px 9px 7px;
+  box-sizing: border-box;
+  border: 1.5px solid var(--sticker-ink);
+  border-left-width: 4px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #fffdf4 0%, #f9eec9 100%);
+  box-shadow:
+    inset 0 0 0 1px #fffaf0,
+    0 1px 0 #47321f22;
+  color: var(--sticker-ink);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.journal-blessing-eyebrow-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.journal-blessing-star {
+  display: block;
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+}
+
+.journal-blessing-eyebrow {
+  color: #5a4028;
+  font-size: 9.5px;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.journal-blessing-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin-top: 3px;
+  min-width: 0;
+}
+
+.journal-blessing-title {
+  color: var(--sticker-ink);
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.journal-blessing-effect {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 8px;
+  border: 1.5px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: #fffaf2;
+  color: var(--sticker-ink);
+  font-size: 10.5px;
+  font-weight: 800;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.journal-blessing-summary {
+  margin: 3px 0 0;
+  color: var(--sticker-ink);
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.journal-treasures-blessings {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 5px 8px;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #fffdf4 0%, #f9eec9 100%);
+  box-shadow:
+    inset 0 0 0 1px #fffaf0,
+    0 1px 0 #47321f22;
+  color: var(--sticker-ink);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  animation: field-note-pop 170ms cubic-bezier(0.22, 1.3, 0.36, 1);
+}
+
+.journal-treasures-blessings.is-complete {
+  background: linear-gradient(180deg, #fff6c9 0%, #f9de7a 100%);
+  box-shadow:
+    inset 0 0 0 1.5px #c98f22,
+    0 1px 0 #47321f33;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journal-treasures-blessings {
+    animation: none;
+  }
+}
+
+:root[data-reduced-motion="on"] .journal-treasures-blessings {
+  animation: none;
+}
+
+.journal-treasures-blessings-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
+}
+
+.journal-treasures-blessings-label {
+  color: var(--sticker-ink);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+}
+
+.journal-treasures-blessings-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px 4px;
+  min-width: 0;
+}
+
+.journal-blessing-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 1px 7px 1px 5px;
+  border: 1.5px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: #fffaf2;
+  color: var(--sticker-ink);
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.journal-blessing-dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  border: 1px solid var(--sticker-ink);
+  border-radius: 50%;
+  background: var(--blessing-accent, #f2c44d);
+}
+
+@media (max-height: 500px) {
+  .journal-blessing-plaque {
+    margin-top: 5px;
+    padding: 4px 8px 5px;
+  }
+
+  .journal-blessing-star {
+    width: 12px;
+    height: 12px;
+  }
+
+  .journal-blessing-eyebrow {
+    font-size: 9px;
+  }
+
+  .journal-blessing-main {
+    margin-top: 2px;
+    gap: 3px 6px;
+  }
+
+  .journal-blessing-title {
+    font-size: 12px;
+  }
+
+  .journal-blessing-effect {
+    padding: 1px 6px;
+    font-size: 9.5px;
+  }
+
+  .journal-blessing-summary {
+    margin-top: 2px;
+    font-size: 10.5px;
+    line-height: 1.2;
+  }
+
+  .journal-treasures-blessings {
+    gap: 3px;
+    padding: 3px 7px;
+  }
+
+  .journal-treasures-blessings-label {
+    font-size: 10px;
+  }
+
+  .journal-treasures-blessings-chips {
+    gap: 2px 2.5px;
+  }
+
+  .journal-blessing-chip {
+    gap: 3px;
+    padding: 0.5px 5px 0.5px 4px;
+    font-size: 9.5px;
+    line-height: 1.2;
+  }
+
+  .journal-blessing-dot {
+    width: 5.5px;
+    height: 5.5px;
+  }
+}

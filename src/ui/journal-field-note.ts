@@ -1,8 +1,10 @@
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
 import { element, setAttribute, setText } from "./dom";
 import { feelingMarkup, heartMarkup, icon, keepsakeIcon } from "./icons";
+import { createBlessingPlaque, createTreasuresBlessingsStrip } from "./journal-blessings";
 import { createJournalGemsLedger } from "./journal-gems-ledger";
 import { createJournalRibbonsShowcase } from "./journal-ribbons";
+import { isKeepsakeId } from "../core/blessings";
 import type { CritterFieldNote, JournalKeepsake, StarGemEntry } from "../core/journal";
 import { evaluateMeritRibbonsFromJournal } from "../core/ribbons";
 import type { TreasuresSummary } from "../core/treasures";
@@ -320,7 +322,8 @@ export function createJournalFieldOverlays(options?: {
     fieldFeelingsRow.row,
     fieldLovesRow.row,
   );
-  fieldBody.append(fieldName, fieldSub, fieldMeta, fieldBlurb);
+  const blessingPlaque = createBlessingPlaque();
+  fieldBody.append(fieldName, fieldSub, fieldMeta, fieldBlurb, blessingPlaque.root);
   fieldCard.append(fieldClose, fieldLeft, fieldBody);
   fieldBackdrop.append(fieldCard);
 
@@ -343,6 +346,7 @@ export function createJournalFieldOverlays(options?: {
   treasuresHead.append(treasuresTitleWrap, treasuresClose);
   const treasuresStamps = element("div", "journal-treasures-stamps");
   treasuresStamps.hidden = true;
+  const treasuresBlessings = createTreasuresBlessingsStrip();
   const keepsakesSection = element("section", "journal-treasures-section");
   const keepsakesHead = element("div", "journal-treasures-section-head");
   const treasuresKeepsakesHeading = element("span", "journal-treasures-section-title");
@@ -362,6 +366,7 @@ export function createJournalFieldOverlays(options?: {
   treasuresCard.append(
     treasuresHead,
     treasuresStamps,
+    treasuresBlessings.root,
     keepsakesSection,
     catchSection,
   );
@@ -403,6 +408,7 @@ export function createJournalFieldOverlays(options?: {
     inspectedItem = null;
     fieldSignature = "";
     fieldPager.hidden = true;
+    blessingPlaque.hide();
     fieldBackdrop.hidden = true;
   };
 
@@ -525,6 +531,12 @@ export function createJournalFieldOverlays(options?: {
     }
 
     setText(treasuresKeepsakesCount, `${summary.unlockedKeepsakes}/${summary.totalKeepsakes}`);
+    treasuresBlessings.update(
+      summary.keepsakes
+        .filter((item) => item.unlocked)
+        .map((item) => item.id)
+        .filter(isKeepsakeId),
+    );
     treasuresKeepsakesGrid.replaceChildren(
       ...summary.keepsakes.map((item) => {
         const card = element(
@@ -596,6 +608,7 @@ export function createJournalFieldOverlays(options?: {
     fieldFeelingsRow.row.hidden = true;
     fieldLovesRow.row.hidden = true;
     setText(fieldBlurb, meta.blurb);
+    blessingPlaque.hide();
   };
 
   const syncFieldNote = (view: JournalFieldNoteSource): void => {
@@ -660,6 +673,7 @@ export function createJournalFieldOverlays(options?: {
         }),
       );
       setText(fieldBlurb, fieldNoteBlurb(note));
+      blessingPlaque.hide();
       return;
     }
     if (inspectedItem.kind === "prize") {
@@ -713,6 +727,7 @@ export function createJournalFieldOverlays(options?: {
       fieldFeelingsRow.row.hidden = true;
       fieldLovesRow.row.hidden = true;
       setText(fieldBlurb, fish.blurb);
+      blessingPlaque.hide();
       return;
     }
     const keepsake = (view.keepsakes ?? []).find(
@@ -750,6 +765,7 @@ export function createJournalFieldOverlays(options?: {
     fieldFeelingsRow.row.hidden = true;
     fieldLovesRow.row.hidden = true;
     setText(fieldBlurb, keepsake.memory);
+    blessingPlaque.update(keepsake.id);
   };
 
   const stepFieldNote = (delta: -1 | 1): boolean => {

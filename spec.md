@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 181)
+Last updated: 2026-11-27 (Milestone 182)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -4923,8 +4923,21 @@ trunks keep its two exits.
       and Fae's 1-line catch note (`JournalFish.blurb`).
     - Owned Keepsakes (`kind: "keepsake"`): displays a large inline SVG charm
       (`keepsakeIcon` in `.journal-field-charm`), name, `"Clubhouse Keepsake"`,
-      `Found in: <source>`, `Displayed: <displaySpot>`, and Fae's 1-line
-      memory (`JournalKeepsake.memory`).
+      `Found in: <source>`, `Displayed: <displaySpot>`, Fae's 1-line memory
+      (`JournalKeepsake.memory`), and a warm cream-and-gold **Dream Blessing
+      Plaque** (`.journal-blessing-plaque`, hidden for stickers/prizes/fish)
+      from pure `src/core/blessings.ts` (`KEEPSAKE_BLESSINGS`,
+      `keepsakeBlessingFor`, `dreamBlessingBonuses`,
+      `evaluateKeepsakeBlessings`, `evaluateKeepsakeBlessingsFromIds`,
+      Milestone 179 / Elevation Track E9A), showing the blessing's sparkle star
+      emblem (zero `<text>` SVG nodes), `DREAM BLESSING · <CATEGORY>` eyebrow,
+      accent border, title, effect pill (`effectNote`), and 1-line poetic
+      `summary`. The `FIELD TREASURES` modal also displays a compact
+      `.journal-treasures-blessings` strip (`"✦ Dream Blessings · N/13 Active"`
+      or golden `"★ 13/13 All Dream Blessings Active!"` with active title chips,
+      styled in `src/ui/journal-blessings.css` and built in
+      `src/ui/journal-blessings.ts` with full reduced-motion and Safari/iOS
+      tap-selection hygiene).
     - **Interactive Scrapbook Specimen Browser** (Milestone 146, pure
       `inspectableShelfIds` & `stepInspectedItem` in `src/ui/journal-field-note.ts`,
       wired via `journal.stepOverlay` / `journal.onOverlayStep` and

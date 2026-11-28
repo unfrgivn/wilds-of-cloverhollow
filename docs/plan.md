@@ -7454,10 +7454,13 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   synchronously from disk in Bun/Vitest/sim). Hash-safe, save `v10`.
 
 ### Phase 1: Living Canvas, Expressive Sprites & Storybook Dialogue (Hash-Safe)
-- **Track E1 (Camera Director & Living Ground Reactivity):** Dialogue partner
-  framing + `#cam:`/`#zoom:` Ink tags, reduced-motion-safe trauma screen-shake,
-  foreground depth parallax, surface-aware footstep puffs, bending grass/puddle
-  ripples, and unified cold-press watercolor paper grain overlay.
+- **Track E1 (Camera Director & Living Ground Reactivity):** ✅ Completed
+  (Milestone 181) — Dialogue partner framing + `#cam:`/`#zoom:`/`#shake:` Ink
+  tags, reduced-motion-safe quadratic trauma screen-shake, foreground/ambient
+  depth parallax, zero-allocation surface-aware footstep VFX (dust, snow
+  crystals, sand flecks, concentric water ripples, grass flecks), reactive
+  grass-tuft / wildflower sway, and unified cold-press watercolor paper grain
+  across the Pixi stage and CSS UI.
 - **Track E2 (Expressive Sprite Action Poses & Paper-Flip Motion, Art Wave A):**
   Expressive pose strips (`sit`, `cheer`, `shock`, `tool_lantern`, `tool_lasso`,
   `tool_flute`, `talk`, `dash_lean`) for Fae, Maddie, Sue, Jordan, and core
@@ -7830,6 +7833,63 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   `art/review/e15-atlas-late-1280.jpg`, `art/review/e15-atlas-phone-874.jpg`) and
   `vision`-verified MAP visual baselines (`journal-map-1280`, `journal-map-874`,
   `journal-map-routes-1280` Chromium & WebKit).
+
+## Milestone 181: Presentation Camera Director, Tactile Juice & Living Ground Reactivity (Elevation Track E1) **Status:** ✅ Completed (2026-11-27)
+- Elevates overworld presentation into a living hand-painted storybook without
+  altering a single core simulation tick, replay hash, or `SaveData.version`
+  (`v10`, 100% presentation-only).
+- **Presentation Camera Director (`src/render/camera.ts`, Pixi-free):**
+  - Added pure `resolveDialogueFocus` (55/45 player-to-partner framing with
+    `+44u` downward focus clearance above the dialogue card, `220u` max pull
+    clamp, supporting `partnerPoint`, visible NPCs, calm critters, area
+    interactables/glows, and narration) paired with smooth conversation zoom
+    (`DIALOGUE_ZOOM = 1.07`, damped via `CAMERA_ZOOM_DAMP = 0.12`) safely
+    clamped via `clampZoomToArea` and `clampCameraToArea` so zoomed edges never
+    expose black bars.
+  - Added pure zero-`inkjs` tag extraction (`extractInkCurrentTags`) and
+    `parseCameraTags` for `# cam: x,y`, `# zoom: z`, and `# shake: s` Ink
+    directives.
+  - Added deterministic quadratic trauma screen-shake (`createCameraTraumaState`,
+    `addCameraTrauma`, `stepCameraTrauma`, `detectTraumaImpulse`) for chaos
+    battle entries, chaos bursts, lasso snaps, heavy `GREAT!` / `Together!`
+    impacts, and dialogue beats, strictly clamped to `{ x: 0, y: 0 }` under
+    Reduced Motion, paused harness mode, or `harness`.
+  - Added bounded foreground/ambient depth parallax (`computeParallaxOffset`)
+    for `atmosphere.over` and `ambientLayer`, plus zoom-aware `worldToScreen` /
+    `screenToWorld` round-trip projections and stateful `CameraDirector` wired
+    cleanly in `src/render/view.ts` (comfortably under the `760`-line budget).
+- **Living Ground Reactivity (`src/render/ground-reactivity.ts` +
+  `src/render/overworld-effects.ts`):**
+  - Replaced per-frame footstep array churn with a zero-allocation 32-slot
+    circular pool (`FOOTSTEP_POOL_SIZE = 32`) classified via
+    `classifyFootstepEffect` and `isNearWaterShore` from existing
+    `content/surfaces/*.json`: stone/indoor `dust`, `snow-sparkle` (cool snow
+    puffs + hand-inked pastel frost crystals), `sand-fleck` (golden puffs +
+    hopping grains), concentric elliptical `water-ripple` rings + aqua glints
+    near shorelines/ponds/streams/fountain, and `grass-fleck` (sage puffs +
+    leaf flecks), smoothly faded via `(1 - u * u)`.
+  - Added a zero-allocation 28-slot `grassLayer` (`GRASS_TUFT_POOL_SIZE = 28`)
+    scattering deterministic hand-inked watercolor grass tufts and meadow
+    wildflowers across `grass` surfaces around Fae and party feet, swaying in
+    the breeze and bending away from nearby feet (`computeGrassTuftSway`),
+    strictly suppressed under Reduced Motion, paused harness mode, and
+    `harness`.
+- **Unified Cold-Press Watercolor Paper Grain (`src/render/paper-grain.ts`):**
+  - Deterministic multi-octave toroidal cold-press cotton-rag texture generator
+    (`generateColdPressPaperGrainPixels`, `generateCssPaperGrainPixels`),
+    cached Pixi `Texture`, `PaperGrainOverlay` (`multiply`, `alpha = 0.05`
+    across the live overworld & battle stage; exact `alpha = 0.035` world-anchored
+    scene sprite in paused harness mode for zero baseline drift), and matching
+    idempotent CSS paper-grain unity hook (`--cloverhollow-paper-grain` /
+    `data-paper-grain="live"`).
+- **Evidence:** `tests/unit/camera-ground.test.ts` (real content surface tests,
+  camera clamping/framing/tag/trauma/parallax/tuft/paper-grain unit tests, zero
+  mocks), `tests/e2e/e1-camera-ground.spec.ts` (real key presses on Chromium &
+  WebKit `@smoke` verifying dialogue framing/zoom, multi-biome surface footsteps
+  & grass tufts, Reduced Motion, CSS/stage paper grain, and paused determinism),
+  and four `vision`-verified review captures in `art/review/`
+  (`e1-dialogue-camera.jpg`, `e1-park-grass-footsteps.jpg`,
+  `e1-pass-snow-sparkles.jpg`, `e1-bay-ripples-sand.jpg`).
 - **Gates:** `just check`, `just build` (`< 500 kB` every non-vendor chunk),
   and Chromium/WebKit e2e verification.
 

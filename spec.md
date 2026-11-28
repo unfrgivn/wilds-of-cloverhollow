@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 180)
+Last updated: 2026-11-27 (Milestone 181)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -690,7 +690,36 @@ ios/            Capacitor iOS project (from Milestone 4).
   `harness`, or paused harness stepping); during live running play (`snap`
   false), it applies a subtle facing look-ahead (`±22u` x / `±14u` y) through
   `followCamera` and smoothly damps toward it (`0.14` per frame, snapping within
-  `0.15u`), clamped cleanly to area bounds.
+  `0.15u`), clamped cleanly to area bounds. Presentation-only `CameraDirector`
+  (`src/render/camera.ts`, Milestone 181 / Track E1, Pixi-free, hash-safe) wraps
+  `smoothFollowCamera` with:
+  - Dialogue partner midpoint framing (`resolveDialogueFocus`, 55/45 player-to-partner
+    weighting with `+44u` downward camera focus clearance so conversing sprites sit
+    cleanly above the bottom dialogue card, max `220u` pull clamp, supporting
+    `dialogue.partnerPoint`, visible NPCs, calm critters, area interactables/glows,
+    and narration fallback) paired with smooth subtle conversation zoom
+    (`DIALOGUE_ZOOM = 1.07`, damped via `CAMERA_ZOOM_DAMP = 0.12`, safely clamped
+    by `clampZoomToArea` and `clampCameraToArea` so margins never expose black bars).
+  - Optional Ink camera directive tags (`# cam: x,y`, `# zoom: 1.12`, `# shake: 0.5`)
+    extracted purely from serialized `state.ink` JSON via `extractInkCurrentTags`
+    and parsed by `parseCameraTags` (zero `inkjs` dependency in render and zero
+    `src/core` mutations).
+  - Deterministic quadratic trauma screen-shake (`createCameraTraumaState`,
+    `addCameraTrauma`, `stepCameraTrauma`, `detectTraumaImpulse`; max `±7u` x /
+    `±5u` y, `TRAUMA_DECAY_PER_TICK = 0.038`) triggered on chaos battle entry,
+    chaos bursts, lasso snaps, heavy `GREAT!` / `Together!` impacts, and impact
+    dialogue beats, strictly clamped to `{ x: 0, y: 0 }` when
+    `isReducedMotionActive()` is true, when `paused` in harness mode, or in
+    `harness`.
+  - Subtle bounded foreground/ambient depth parallax (`computeParallaxOffset`:
+    `atmosphere.over` at `0.04` / max `18u` outdoors, `0.015` / max `6u` indoors;
+    `ambientLayer` at `0.025` / max `12u` outdoors), strictly `{ x: 0, y: 0 }`
+    when paused, under Reduced Motion, or in `harness`.
+  - `worldToScreen` and `screenToWorld` accept an optional `zoom = 1` factor for
+    round-trip screen/world coordinate accuracy during live dialogue zoom.
+  - Under `paused === true` with no explicit Ink camera directive, `CameraDirector`
+    snaps bit-for-bit to `followCamera` at `zoom = 1` to preserve exact paused
+    harness visual baselines.
 - Depth: the area ground layer is always at the back; characters y-sort by
   their feet, and props sort against them column by column by the front edge
   of their footprints (section 6.2).
@@ -782,9 +811,16 @@ ios/            Capacitor iOS project (from Milestone 4).
   Motion (`isReducedMotionActive()`), paused harness mode, fresh arrival, area
   switches, and harness resets snap instantaneously to settled state with zero
   wipe ring or drift; a pooled `emoteLayer` sits
-  above `depth` and below `paperGrain`; and a world-anchored `paperGrain`
-  `TilingSprite` (`multiply`, alpha `0.035`) gently unifies sprites, shadows, and
-  paintings.
+  above `depth` and below `paperGrain`; and `PaperGrainOverlay`
+  (`src/render/paper-grain.ts`, Milestone 181 / Track E1) generates a deterministic
+  seamless 256x256 multi-octave cold-press cotton-rag watercolor paper texture
+  once (`generateColdPressPaperGrainPixels`) and blends it across the Pixi stage
+  (`multiply`, `PAPER_GRAIN_LIVE_ALPHA = 0.05` across both overworld and battle
+  stages in live play, with world-anchored `tilePosition` in overworld, paired
+  with a matching subtle CSS unity hook `--cloverhollow-paper-grain` /
+  `data-paper-grain="live"` over sticker UI cards; under `paused` harness mode,
+  it preserves the exact world-anchored `sceneSprite` at `alpha = 0.035` and
+  `data-paper-grain="paused"` for baseline fidelity; hidden in `harness`).
   Door fades use cubic smoothstep easing (`fadeAlpha`) paired with a subtle
   viewport-centered page-turn zoom (`transitionZoom` in `src/render/fade.ts`:
   `1.00 -> 1.022` on `"out"`, `0.972 -> 1.00` on `"in"`, strictly clipped inside
@@ -952,12 +988,29 @@ ios/            Capacitor iOS project (from Milestone 4).
   standing friends' relaxed weight-shift sway; falling back to `idleBreathing`
   below 180 ticks), continuous hover bob and banking tilt on `fairy-*` NPCs
   (`fairyHover`, with grounded altitude-scaled shadows), and playful startle
-  jumps, snappy hops, and forward lean on roaming critters (`roamerHop`). In
-  live play (advancing 1..5 ticks per render in the same non-harness area), each
-  Fae half-stride spawns two surface-tinted gouache `puff` particles
-  (`surfaceAt` in `footstepLayer`) behind her feet; when Reduced Motion is
-  active (`isReducedMotionActive()`), `updateFootsteps` clears active puffs and
-  returns early so walking stays calm and particle-free (Milestone 119).
+  jumps, snappy hops, and forward lean on roaming critters (`roamerHop`).
+  **Living Ground Reactivity** (`src/render/ground-reactivity.ts`, mounted and
+  re-exported through `src/render/overworld-effects.ts`, Milestones 119 & 181 /
+  Track E1, presentation-only, zero per-frame allocations): in non-harness
+  areas advancing `1..5` ticks per render, each half-stride writes into a
+  pre-allocated 32-slot circular footstep pool (`FOOTSTEP_POOL_SIZE = 32`)
+  keyed from `content/surfaces/*.json` via `classifyFootstepEffect(surface, areaId,
+  point)` and `isNearWaterShore`: warm gouache dust puffs (`dust`) on stone, wood,
+  tile, and carpet; cool snow powder + hand-inked pastel frost crystals
+  (`snow-sparkle`) on snow; golden sand puffs + hopping grains (`sand-fleck`) on
+  dry sand; concentric elliptical teal/aqua rings + coastal glints (`water-ripple`)
+  along wet shorelines, pond banks, stream stepping stones, cavern pools, and the
+  plaza fountain rim; and sage puffs + leaf flecks (`grass-fleck`) on grass,
+  fading smoothly via `(1 - u * u)`. In live running play (`!paused &&
+  !reducedMotion`), a pre-allocated 28-slot `grassLayer` (`GRASS_TUFT_POOL_SIZE
+  = 28`) scatters deterministic hand-inked watercolor grass tufts and meadow
+  wildflowers across nearby `grass` surfaces (excluding wet shore zones) that
+  sway gently in the breeze and bend smoothly away from Fae and party feet
+  (`computeGrassTuftSway`). When Reduced Motion is active
+  (`isReducedMotionActive()`), `updateFootsteps` and `updateGrassTufts` clear all
+  active particles and tufts and return early so walking stays calm and
+  particle-free; paused harness mode also keeps `grassLayer` hidden for exact
+  visual baseline stability.
 - Hand-painted overworld emote bubbles (`src/render/emotes.ts`, Milestones 85 &
   144, render-only, skipped on `harness`, dialogue, battles, and arcades): pure
   deterministic `evaluateOverworldEmotes` drives a pooled 20-slot `emoteLayer`

@@ -10,7 +10,6 @@ import {
   npcLivePoint,
   npcVisible,
   presentCritters,
-  surfaceAt,
   type Area,
   type NpcEmoteKind,
   type NpcLifeSnapshot,
@@ -19,10 +18,25 @@ import {
   type World,
 } from "../core";
 import { makeShadowSprite } from "./battle-view";
+import { interpolatePoint } from "./camera";
 import { evaluateClubhouseDisplay, evaluateSunberryMotes } from "./clubhouse-display";
 import type { RestSpot } from "./companions";
 import { evaluateOverworldEmotes } from "./emotes";
-import { interpolatePoint } from "./camera";
+import {
+  classifyFootstepEffect,
+  computeGrassTuftSway,
+  FOOTSTEP_POOL_SIZE,
+  FOOTSTEP_VFX_STYLES,
+  GRASS_TUFT_POOL_SIZE,
+  GroundReactivityController,
+  isNearWaterShore,
+  sampleNearbyGrassTufts,
+  type FootstepVfxKind,
+  type FootstepVfxStyle,
+  type GrassMover,
+  type GrassSwayResult,
+  type GrassTuftPlacement,
+} from "./ground-reactivity";
 import {
   computeCompanionEmoteSpecs,
   computeLanternMote,
@@ -31,15 +45,26 @@ import {
   evaluateStarGemGlints,
   LANTERN_MOTE_COUNT,
   LANTERN_MOTE_TINTS,
-  spawnFootstepPuffs,
-  spawnNpcFootstepPuff,
-  type FootstepPuff,
 } from "./overworld-render";
 import { storyTimeOfDay } from "./time-of-day";
 import type { VfxTextures } from "./vfx-textures";
 
+export {
+  classifyFootstepEffect,
+  computeGrassTuftSway,
+  FOOTSTEP_POOL_SIZE,
+  FOOTSTEP_VFX_STYLES,
+  GRASS_TUFT_POOL_SIZE,
+  isNearWaterShore,
+  sampleNearbyGrassTufts,
+  type FootstepVfxKind,
+  type FootstepVfxStyle,
+  type GrassMover,
+  type GrassSwayResult,
+  type GrassTuftPlacement,
+};
+
 export const CLUBHOUSE_PRIZES_ALIAS = "clubhouse-prizes";
-const FOOTSTEP_POOL_SIZE = 24;
 const EMOTE_POOL_SIZE = 24;
 
 type EmoteSpriteItem = {
@@ -61,23 +86,19 @@ export type ViewportRect = {
 };
 
 /**
- * Owns pooled overworld visual effects: footstep puffs, blacklight lantern
- * motes, prismatic Star Gem glints, Clubhouse Living Display perches and
- * sunberry shimmer motes, overworld emotes, and time-of-day grading.
+ * Owns pooled overworld visual effects: living ground reactivity (delegated to
+ * `GroundReactivityController`), blacklight lantern motes, prismatic Star Gem
+ * glints, Clubhouse Living Display perches, overworld emotes, and time-of-day
+ * grading.
  */
 export class OverworldEffectsController {
-  readonly footstepLayer = new Container();
+  readonly grassLayer: Container;
+  readonly footstepLayer: Container;
   readonly lanternMoteLayer = new Container();
   readonly emoteLayer = new Container();
   readonly timeOfDayLayer = new Container();
 
-  private readonly footstepSprites: Sprite[] = [];
-  private footstepPuffs: FootstepPuff[] = [];
-  private lastFootstepArea = "";
-  private lastFootstepTick: number | undefined;
-  private lastFootstepStride: number | undefined;
-  private readonly lastNpcFootstepStride = new Map<string, number>();
-
+  private readonly ground: GroundReactivityController;
   private readonly lanternMotes: Sprite[] = [];
 
   private readonly starGemLayer = new Container();
@@ -123,15 +144,9 @@ export class OverworldEffectsController {
     private readonly depthLayer: Container,
     emissiveLayer: Container,
   ) {
-    this.footstepLayer.label = "footsteps";
-    for (let i = 0; i < FOOTSTEP_POOL_SIZE; i += 1) {
-      const puff = new Sprite(this.vfx.puff);
-      puff.label = `footstep:${i}`;
-      puff.anchor.set(0.5);
-      puff.visible = false;
-      this.footstepSprites.push(puff);
-      this.footstepLayer.addChild(puff);
-    }
+    this.ground = new GroundReactivityController(this.world, this.vfx);
+    this.grassLayer = this.ground.grassLayer;
+    this.footstepLayer = this.ground.footstepLayer;
 
     this.lanternMoteLayer.label = "lantern:motes";
     for (let i = 0; i < LANTERN_MOTE_COUNT; i += 1) {
@@ -167,7 +182,15 @@ export class OverworldEffectsController {
   }
 
   get footstepPuffCount(): number {
-    return this.footstepPuffs.length;
+    return this.ground.footstepPuffCount;
+  }
+
+  get lastFootstepKind(): FootstepVfxKind | null {
+    return this.ground.lastFootstepKind;
+  }
+
+  get grassTuftCount(): number {
+    return this.ground.grassTuftCount;
   }
 
   get starGemGlintCount(): number {
@@ -179,11 +202,11 @@ export class OverworldEffectsController {
   }
 
   clearFootsteps(): void {
-    this.footstepPuffs = [];
-    this.lastFootstepTick = undefined;
-    this.lastFootstepStride = undefined;
-    this.lastNpcFootstepStride.clear();
-    for (const sprite of this.footstepSprites) sprite.visible = false;
+    this.ground.clearFootsteps();
+  }
+
+  clearGrassTufts(): void {
+    this.ground.clearGrassTufts();
   }
 
   clearStarGemGlints(): void {
@@ -218,103 +241,17 @@ export class OverworldEffectsController {
     playerPos: Point,
     reducedMotion: boolean,
   ): void {
-    if (reducedMotion) {
-      this.clearFootsteps();
-      return;
-    }
-    const active = areaId !== "harness" &&
-      state.battle === null &&
-      state.arcade === null &&
-      state.transition === null;
-    if (!active) {
-      if (areaId !== this.lastFootstepArea ||
-          (this.lastFootstepTick !== undefined && state.tick < this.lastFootstepTick)) {
-        this.clearFootsteps();
-      }
-      for (const sprite of this.footstepSprites) sprite.visible = false;
-      this.lastFootstepArea = areaId;
-      this.lastFootstepTick = state.tick;
-      return;
-    }
-    if (areaId !== this.lastFootstepArea ||
-        (this.lastFootstepTick !== undefined && state.tick < this.lastFootstepTick)) {
-      this.clearFootsteps();
-    }
-    const halfStride = this.world.tunables.walkCycleUnits / 2;
-    const stride = Math.floor(state.motion.distance / halfStride);
-    if (
-      state.motion.moving &&
-      this.lastFootstepArea === areaId &&
-      this.lastFootstepTick !== undefined &&
-      this.lastFootstepStride !== undefined
-    ) {
-      const delta = state.tick - this.lastFootstepTick;
-      if (delta >= 1 && delta <= 5 && stride > this.lastFootstepStride) {
-        const map = this.world.surfaces[areaId];
-        const surface = map === undefined ? "grass" : surfaceAt(map, state.player);
-        this.footstepPuffs.push(
-          ...spawnFootstepPuffs(playerPos, state.facing, surface, stride, state.tick),
-        );
-        if (this.footstepPuffs.length > FOOTSTEP_POOL_SIZE) {
-          this.footstepPuffs = this.footstepPuffs.slice(-FOOTSTEP_POOL_SIZE);
-        }
-      }
-    }
-    const area = this.world.areas[areaId];
-    if (area !== undefined) {
-      const canEmit =
-        this.lastFootstepArea === areaId &&
-        this.lastFootstepTick !== undefined &&
-        state.tick - this.lastFootstepTick >= 1 &&
-        state.tick - this.lastFootstepTick <= 5;
-      for (const npc of area.npcs) {
-        if (npc.stroll === undefined || !npcVisible(this.world, state, npc)) continue;
-        const live = npcLivePoint(state, npc);
-        const npcStride = Math.floor(live.distance / 36);
-        const prevNpcStride = this.lastNpcFootstepStride.get(npc.id);
-        if (
-          canEmit &&
-          live.moving &&
-          prevNpcStride !== undefined &&
-          npcStride !== prevNpcStride
-        ) {
-          const map = this.world.surfaces[areaId];
-          const surface = map === undefined ? "grass" : surfaceAt(map, live);
-          this.footstepPuffs.push(
-            spawnNpcFootstepPuff(live, live.facing, surface, npcStride, state.tick),
-          );
-          if (this.footstepPuffs.length > FOOTSTEP_POOL_SIZE) {
-            this.footstepPuffs = this.footstepPuffs.slice(-FOOTSTEP_POOL_SIZE);
-          }
-        }
-        this.lastNpcFootstepStride.set(npc.id, npcStride);
-      }
-    }
-    this.lastFootstepArea = areaId;
-    this.lastFootstepTick = state.tick;
-    this.lastFootstepStride = stride;
+    this.ground.updateFootsteps(state, areaId, playerPos, reducedMotion);
+  }
 
-    this.footstepPuffs = this.footstepPuffs.filter((puff) => {
-      const age = state.tick - puff.bornTick;
-      return age >= 0 && age < puff.life;
-    });
-    for (let i = 0; i < this.footstepSprites.length; i += 1) {
-      const sprite = this.footstepSprites[i];
-      if (sprite === undefined) continue;
-      const puff = this.footstepPuffs[i];
-      if (puff === undefined) {
-        sprite.visible = false;
-        continue;
-      }
-      const age = state.tick - puff.bornTick;
-      const u = age / puff.life;
-      sprite.visible = true;
-      sprite.position.set(puff.x + puff.vx * age, puff.y + puff.vy * age);
-      sprite.scale.set(puff.baseScale * (0.65 + u * 0.75));
-      sprite.rotation = puff.rotation + u * 0.35;
-      sprite.tint = puff.tint;
-      sprite.alpha = puff.baseAlpha * (1 - u) * (1 - u);
-    }
+  updateGrassTufts(
+    state: State,
+    area: Area,
+    playerPos: Point,
+    reducedMotion: boolean,
+    paused: boolean,
+  ): void {
+    this.ground.updateGrassTufts(state, area, playerPos, reducedMotion, paused);
   }
 
   updateLanternMotes(
@@ -527,16 +464,19 @@ export class OverworldEffectsController {
     npcLife: NpcLifeSnapshot,
     reducedMotion = false,
   ): void {
-    const active = area.id !== "harness" &&
+    const active =
+      area.id !== "harness" &&
       state.battle === null &&
       state.arcade === null;
     if (!active) {
       this.emoteLayer.visible = false;
       for (const sprite of this.emoteSprites) sprite.visible = false;
-      if (area.id !== this.lastEmoteArea ||
-          (this.lastEmoteTick !== undefined && state.tick < this.lastEmoteTick) ||
-          state.battle !== null ||
-          state.arcade !== null) {
+      if (
+        area.id !== this.lastEmoteArea ||
+        (this.lastEmoteTick !== undefined && state.tick < this.lastEmoteTick) ||
+        state.battle !== null ||
+        state.arcade !== null
+      ) {
         this.activeDialoguePartner = null;
         this.recentTalk = null;
       }
@@ -545,8 +485,10 @@ export class OverworldEffectsController {
       return;
     }
 
-    if (area.id !== this.lastEmoteArea ||
-        (this.lastEmoteTick !== undefined && state.tick < this.lastEmoteTick)) {
+    if (
+      area.id !== this.lastEmoteArea ||
+      (this.lastEmoteTick !== undefined && state.tick < this.lastEmoteTick)
+    ) {
       this.activeDialoguePartner = null;
       this.recentTalk = null;
     }
@@ -555,31 +497,41 @@ export class OverworldEffectsController {
     if (state.dialogue !== null) {
       const knot = state.dialogue.knot;
       const npc = area.npcs.find(
-        (item) => item.id !== "bus-stop" && npcVisible(this.world, state, item) &&
+        (item) =>
+          item.id !== "bus-stop" &&
+          npcVisible(this.world, state, item) &&
           item.knot === knot,
       );
       if (npc !== undefined) {
-        const critter = npc.visibleWhenCalmed === undefined
-          ? undefined
-          : this.world.critters[npc.visibleWhenCalmed];
+        const critter =
+          npc.visibleWhenCalmed === undefined
+            ? undefined
+            : this.world.critters[npc.visibleWhenCalmed];
         const profile = this.world.npcProfiles[npc.id];
-        const height = critter !== undefined
-          ? critter.overworldHeight
-          : npc.id === "oliver" || npc.id.startsWith("fairy-")
-            ? 84
-            : profile !== undefined
-              ? profile.adult ? 174 : 146
-              : computeNpcOverworldHeight(npc, critter);
-        const live = reducedMotion && npc.stroll !== undefined
-          ? npc.point
-          : npcLivePoint(state, npc);
+        const height =
+          critter !== undefined
+            ? critter.overworldHeight
+            : npc.id === "oliver" || npc.id.startsWith("fairy-")
+              ? 84
+              : profile !== undefined
+                ? profile.adult
+                  ? 174
+                  : 146
+                : computeNpcOverworldHeight(npc, critter);
+        const live =
+          reducedMotion && npc.stroll !== undefined
+            ? npc.point
+            : npcLivePoint(state, npc);
         this.activeDialoguePartner = { npcId: npc.id, x: live.x, y: live.y, height };
       } else {
         const calm = present
           .filter((item) => item.mood === "calm" && item.kind.calmKnot === knot)
-          .sort((a, b) =>
-            (a.point.x - state.player.x) ** 2 + (a.point.y - state.player.y) ** 2 -
-            ((b.point.x - state.player.x) ** 2 + (b.point.y - state.player.y) ** 2))[0];
+          .sort(
+            (a, b) =>
+              (a.point.x - state.player.x) ** 2 +
+              (a.point.y - state.player.y) ** 2 -
+              ((b.point.x - state.player.x) ** 2 + (b.point.y - state.player.y) ** 2),
+          )[0];
         if (calm !== undefined) {
           this.activeDialoguePartner = {
             npcId: null,
@@ -634,17 +586,20 @@ export class OverworldEffectsController {
     npcLife.npcs.forEach((entry, index) => {
       if (entry.emote === null) return;
       if (entry.id === activeChatterNpcId || entry.id === recentTalkNpcId) return;
-      const height = entry.id === "oliver" || entry.id.startsWith("fairy-")
-        ? 84
-        : entry.adult
-          ? 174
-          : 146;
-      const npcObj = !reducedMotion && previousState !== undefined && alpha < 1
-        ? area.npcs.find((item) => item.id === entry.id && item.stroll !== undefined)
-        : undefined;
-      const pos = npcObj !== undefined && previousState !== undefined
-        ? interpolatePoint(npcLivePoint(previousState, npcObj), entry, alpha)
-        : { x: entry.x, y: entry.y };
+      const height =
+        entry.id === "oliver" || entry.id.startsWith("fairy-")
+          ? 84
+          : entry.adult
+            ? 174
+            : 146;
+      const npcObj =
+        !reducedMotion && previousState !== undefined && alpha < 1
+          ? area.npcs.find((item) => item.id === entry.id && item.stroll !== undefined)
+          : undefined;
+      const pos =
+        npcObj !== undefined && previousState !== undefined
+          ? interpolatePoint(npcLivePoint(previousState, npcObj), entry, alpha)
+          : { x: entry.x, y: entry.y };
       npcEmotes.push({
         id: entry.id,
         x: pos.x,
@@ -711,9 +666,10 @@ export class OverworldEffectsController {
       const content = this.world.party[activePet.id];
       if (member !== undefined && content !== undefined) {
         const prevMember = previousState?.party.find((entry) => entry.id === activePet.id);
-        petPos = prevMember !== undefined && alpha < 1
-          ? interpolatePoint(prevMember, member, alpha)
-          : member;
+        petPos =
+          prevMember !== undefined && alpha < 1
+            ? interpolatePoint(prevMember, member, alpha)
+            : member;
         petHeight = content.box.height;
       }
     }

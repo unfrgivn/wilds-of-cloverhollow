@@ -371,7 +371,7 @@ async function boot(): Promise<void> {
     world: content.world,
     ui: {
       journal, touch, battleCheck, dialogueBox, prompt, commandMenu,
-      rewardSticker, battleHud, credits, hudHints,
+      rewardSticker, battleHud, credits, hudHints, photoToast,
     },
     sound, gameSettings, getState: () => state,
     getJukeboxTrack: () => jukeboxTrack, setJukeboxTrack: (track) => { jukeboxTrack = track; },

@@ -2,6 +2,7 @@ import { targetInteractable, type JukeboxTrack, type State, type World } from ".
 import { evaluateMeritRibbons, newlyEarnedRibbons, type MeritRibbonSummary } from "../core/ribbons";
 import { weatherForArea, type CozyWeatherKind, type CozyWeatherMode } from "../core/weather";
 import type { CompanionAudioEffect } from "../platform/audio";
+import { createPostcardId, savePostcardToAlbum } from "../platform/postcard-album";
 import { findPettableCompanion, findRestSpot, type RestSpot } from "../render/companions";
 import {
   findNearbySanctuaryCritter, findPebbleSkipSpot, type PebbleSkipSpot,
@@ -9,8 +10,8 @@ import {
 import { areaBannerInfo, type AreaBannerContext, type AreaBannerView } from "../ui/area-banner";
 import { createNpcChatter, type NpcChatterView } from "../ui/npc-chatter";
 import {
-  composePostcardFrame, deliverPostcard, postcardMetadata, type PostcardCapture,
-  type PostcardDeliveryResult,
+  composePostcardFrame, createPostcardAlbumCopy, deliverPostcard, postcardMetadata,
+  type PostcardCapture, type PostcardDeliveryResult,
 } from "../ui/postcard";
 import { createRibbonToast } from "../ui/ribbon-toast";
 
@@ -186,13 +187,20 @@ export async function deliverAreaPostcard(
       .map((member) => world.party[member.id]?.name ?? "")
       .filter((name) => name.length > 0);
   const capture = captureAreaPostcard(
-    world,
-    state.area,
-    sourceCanvas,
-    partyNames,
-    options?.weather,
+    world, state.area, sourceCanvas, partyNames, options?.weather,
   );
   if (capture === null) return null;
+  const copy = createPostcardAlbumCopy(
+    sourceCanvas, capture.caption, capture.subcaption, options?.weather,
+  );
+  if (copy !== null) {
+    savePostcardToAlbum({
+      id: createPostcardId(state.area), filename: capture.filename,
+      caption: capture.caption, subcaption: capture.subcaption,
+      ...(options?.weather !== undefined ? { weather: options.weather } : {}),
+      dataUrl: copy.dataUrl,
+    });
+  }
   if (options?.download !== false) {
     const delivery = await deliverPostcard(capture, { preferShare: options?.preferShare });
     if (delivery !== "cancelled") options?.onDelivered?.(capture, delivery, options?.weather);

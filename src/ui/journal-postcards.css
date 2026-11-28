@@ -1,0 +1,330 @@
+.journal-postcards-overlay[hidden],
+.journal-postcards-btn[hidden],
+.journal-postcards-empty[hidden],
+.journal-postcards-grid[hidden],
+.journal-postcards-lightbox[hidden],
+.journal-lightbox-sub[hidden],
+.journal-lightbox-status[hidden] { display: none; }
+
+.journal-postcards-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  min-height: 30px; padding: 3px 11px;
+  border: 2px solid var(--sticker-ink); border-radius: 999px;
+  background: linear-gradient(180deg, #fffdf8 0%, #dcefe0 100%);
+  box-shadow: inset 0 0 0 1.5px #fffdf7, 0 2px 0 #47321f33;
+  color: var(--sticker-ink); font: 900 11.5px/1.2 var(--sticker-font);
+  white-space: nowrap; cursor: pointer; touch-action: manipulation;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  transition: transform 110ms ease-out, background-color 110ms ease-out;
+}
+
+.journal-postcards-btn:focus-visible,
+.journal-postcards-close:focus-visible,
+.journal-postcard-tile:focus-visible,
+.journal-lightbox-back:focus-visible,
+.journal-lightbox-prev:focus-visible,
+.journal-lightbox-next:focus-visible,
+.journal-lightbox-save:focus-visible,
+.journal-lightbox-remove:focus-visible { outline: 3px solid #6b9e56; outline-offset: 2px; }
+
+.journal-postcards-overlay {
+  position: absolute; inset: 12px; z-index: 8;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 16px; background: rgb(71 50 31 / 0.36);
+}
+
+.journal-postcards-card {
+  position: relative; display: flex; flex-direction: column; gap: 10px;
+  width: min(786px, calc(100% - 14px)); max-height: calc(100% - 10px);
+  overflow: hidden; box-sizing: border-box; padding: 10px 14px 12px;
+  border: 5px solid var(--sticker-rim); outline: 2px solid var(--sticker-ink);
+  border-radius: 20px; background: linear-gradient(180deg, #fbf6e9 0%, #f5ebd7 100%);
+  box-shadow: var(--sticker-shadow); color: var(--sticker-ink);
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+}
+
+.journal-postcards-card:focus,
+.journal-postcards-card:focus-visible { outline: 2px solid var(--sticker-ink); }
+
+.journal-postcards-head,
+.journal-postcards-empty,
+.journal-postcards-grid,
+.journal-postcards-lightbox {
+  animation: postcards-album-pop 170ms cubic-bezier(0.22, 1.3, 0.36, 1);
+}
+
+@keyframes postcards-album-pop {
+  from { transform: translateY(5px) scale(0.97); }
+  to { transform: translateY(0) scale(1); }
+}
+
+.journal-postcards-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; flex: 0 0 auto;
+}
+
+.journal-postcards-title-wrap {
+  display: inline-flex; align-items: center; flex-wrap: wrap; gap: 8px; flex: 1 1 auto; min-width: 0;
+}
+
+.journal-postcards-emblem { width: 26px; height: 26px; flex: 0 0 auto; display: block; }
+
+.journal-postcards-title {
+  margin: 0; color: var(--sticker-ink); font-size: 15px; font-weight: 900; letter-spacing: 0.08em;
+}
+
+.journal-postcards-count {
+  display: inline-flex; align-items: center; padding: 2px 9px;
+  border: 2px solid var(--sticker-ink); border-radius: 999px;
+  background: #f9ebc0; box-shadow: 0 1px 0 #47321f22; color: var(--sticker-ink);
+  font-size: 11px; font-weight: 900; font-variant-numeric: tabular-nums;
+  line-height: 1.2; white-space: nowrap;
+}
+
+.journal-postcards-count.is-full {
+  background: linear-gradient(180deg, #fff5be 0%, #f6d45c 100%);
+  box-shadow: inset 0 0 0 1.5px #c98f22, 0 1px 0 #47321f33;
+}
+
+.journal-postcards-close {
+  flex: 0 0 44px; width: 44px; height: 44px;
+  border: 4px solid var(--sticker-rim); outline: 2px solid var(--sticker-ink); border-radius: 50%;
+  background: var(--sticker-paper); color: var(--sticker-ink);
+  cursor: pointer; font: 700 22px var(--sticker-font); touch-action: manipulation;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  transition: transform 110ms ease-out, background-color 110ms ease-out;
+}
+
+.journal-postcards-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px; padding: 28px 20px; border: 2px dashed #c8b28c; border-radius: 16px;
+  background: radial-gradient(circle at 50% 30%, #fffdf6 0%, #f3e6cc 100%); text-align: center;
+}
+
+.journal-postcards-empty-icon { width: 54px; height: 54px; display: block; }
+.journal-postcards-empty-title { margin: 0; color: var(--sticker-ink); font-size: 15px; font-weight: 900; }
+.journal-postcards-empty-note {
+  margin: 0; max-width: 420px; color: var(--sticker-taupe);
+  font-size: 12.5px; font-weight: 700; line-height: 1.4;
+}
+
+.journal-postcards-grid {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px;
+  flex: 1 1 auto; min-height: 0; overflow-x: hidden; overflow-y: auto;
+  padding: 14px 12px 12px; border: 1.5px dashed #c7ae85; border-radius: 14px;
+  background:
+    radial-gradient(#d5bc9255 1px, transparent 1px) 0 0 / 12px 12px,
+    linear-gradient(180deg, #efe2c6 0%, #e7d6b3 100%);
+  scrollbar-width: thin; scrollbar-color: #b89a70 #f2e5cb;
+}
+
+.journal-postcard-tile {
+  position: relative; display: flex; flex-direction: column; gap: 6px;
+  min-width: 0; width: 100%; box-sizing: border-box; padding: 7px 7px 8px;
+  border: 2px solid var(--sticker-ink); border-radius: 12px;
+  background: linear-gradient(180deg, #fffef9 0%, #faf1de 100%);
+  box-shadow: inset 0 0 0 1.5px #fffdf7, 0 4px 0 #47321f22, 0 6px 12px #47321f22;
+  color: var(--sticker-ink); font-family: var(--sticker-font); text-align: left;
+  cursor: pointer; touch-action: manipulation;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  transition: transform 120ms ease-out, box-shadow 120ms ease-out;
+}
+
+.journal-postcard-tile[data-postcard-tilt="left"] { transform: rotate(-0.9deg); }
+.journal-postcard-tile[data-postcard-tilt="right"] { transform: rotate(0.85deg); }
+
+.journal-postcard-tile::before {
+  content: ""; position: absolute; top: -7px; left: 50%; width: 38px; height: 11px;
+  transform: translateX(-50%) rotate(-2deg); border: 1px solid #47321f38; border-radius: 3px;
+  background: rgb(252 238 188 / 0.86); pointer-events: none;
+}
+
+.journal-postcard-tile[data-postcard-tilt="right"]::before {
+  transform: translateX(-50%) rotate(2.5deg); background: rgb(212 237 210 / 0.86);
+}
+
+.journal-postcard-thumb-wrap {
+  display: block; width: 100%; overflow: hidden;
+  border: 1.5px solid #47321f55; border-radius: 7px; background: #f4ead2;
+}
+
+.journal-postcard-thumb {
+  display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: contain; background: #fbf6e8;
+}
+
+.journal-postcard-tile-copy { display: flex; flex-direction: column; gap: 1.5px; min-width: 0; }
+
+.journal-postcard-tile-caption {
+  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  color: var(--sticker-ink); font-size: 11.5px; font-weight: 900; line-height: 1.2;
+}
+
+.journal-postcard-tile-sub {
+  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  color: var(--sticker-taupe); font-size: 9.8px; font-weight: 700; line-height: 1.2;
+}
+
+.journal-postcards-lightbox {
+  display: flex; flex-direction: column; gap: 8px; flex: 1 1 auto; min-height: 0;
+}
+
+.journal-lightbox-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; flex: 0 0 auto;
+}
+
+.journal-lightbox-back,
+.journal-lightbox-prev,
+.journal-lightbox-next,
+.journal-lightbox-save,
+.journal-lightbox-remove {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 32px; padding: 3px 12px;
+  border: 2px solid var(--sticker-ink); border-radius: 999px;
+  background: #fffaf0; box-shadow: inset 0 0 0 1.5px #fffdf7, 0 2px 0 #47321f2a;
+  color: var(--sticker-ink); font: 900 11.5px/1.2 var(--sticker-font);
+  white-space: nowrap; cursor: pointer; touch-action: manipulation;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  transition: transform 110ms ease-out, background-color 110ms ease-out;
+}
+
+.journal-lightbox-nav { display: inline-flex; align-items: center; gap: 6px; }
+.journal-lightbox-prev,
+.journal-lightbox-next { min-width: 34px; padding: 2px 10px; font-size: 15px; }
+.journal-lightbox-prev:disabled,
+.journal-lightbox-next:disabled { opacity: 0.45; cursor: default; }
+
+.journal-lightbox-pos {
+  color: var(--sticker-taupe); font-size: 11.5px; font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+.journal-lightbox-content {
+  display: flex; flex-direction: column; gap: 8px; flex: 1 1 auto; min-height: 0;
+}
+
+.journal-lightbox-frame {
+  display: flex; align-items: center; justify-content: center; flex: 1 1 auto; min-height: 0;
+  padding: 8px; border: 2px dashed #cbb58e; border-radius: 14px;
+  background: linear-gradient(180deg, #f3e7ce 0%, #ecdcba 100%);
+}
+
+.journal-lightbox-img {
+  display: block; max-width: 100%; max-height: 315px; width: auto; height: auto;
+  object-fit: contain; border: 2px solid var(--sticker-ink); border-radius: 10px;
+  background: #fbf6e8; box-shadow: 0 5px 0 #47321f22, 0 8px 16px #47321f24;
+}
+
+.journal-lightbox-meta {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; flex: 0 0 auto;
+  padding: 6px 10px; border: 1.5px solid #47321f38; border-radius: 12px; background: #fffbf1;
+}
+
+.journal-lightbox-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 auto; }
+
+.journal-lightbox-caption {
+  color: var(--sticker-ink); font-size: 13px; font-weight: 900; line-height: 1.25;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.journal-lightbox-sub {
+  color: var(--sticker-taupe); font-size: 11px; font-weight: 700; line-height: 1.25;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.journal-lightbox-status {
+  display: inline-flex; align-self: flex-start; margin-top: 2px; padding: 1px 8px;
+  border: 1.5px solid #598546; border-radius: 999px; background: #e7f6dc;
+  color: #355726; font-size: 10px; font-weight: 900;
+}
+
+.journal-lightbox-actions { display: inline-flex; align-items: center; gap: 7px; flex: 0 0 auto; }
+.journal-lightbox-save { background: linear-gradient(180deg, #fffdf6 0%, #cfecc8 100%); }
+.journal-lightbox-remove { background: linear-gradient(180deg, #fffdf8 0%, #f8d8d2 100%); }
+
+@media (hover: hover) and (pointer: fine) {
+  .journal-postcards-btn:hover { background: linear-gradient(180deg, #fffdf9 0%, #cce8d2 100%); transform: translateY(-1px); }
+  .journal-postcards-close:hover { background: #fff9e6; transform: scale(1.05); }
+  .journal-postcard-tile:hover {
+    transform: translateY(-2px) scale(1.015);
+    box-shadow: inset 0 0 0 1.5px #fffdf7, 0 6px 0 #47321f28, 0 10px 18px #47321f2a;
+  }
+  .journal-lightbox-back:hover,
+  .journal-lightbox-prev:hover:not(:disabled),
+  .journal-lightbox-next:hover:not(:disabled) { background: #fff3d2; transform: translateY(-1px); }
+  .journal-lightbox-save:hover { background: linear-gradient(180deg, #fffef9 0%, #bce5b3 100%); transform: translateY(-1px); }
+  .journal-lightbox-remove:hover { background: linear-gradient(180deg, #fffef9 0%, #f5c6bd 100%); transform: translateY(-1px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journal-postcards-btn, .journal-postcards-close, .journal-postcard-tile,
+  .journal-lightbox-back, .journal-lightbox-prev, .journal-lightbox-next,
+  .journal-lightbox-save, .journal-lightbox-remove { transition: none; }
+  .journal-postcard-tile[data-postcard-tilt="left"],
+  .journal-postcard-tile[data-postcard-tilt="right"],
+  .journal-postcard-tile:hover, .journal-postcards-btn:hover,
+  .journal-postcards-close:hover, .journal-lightbox-back:hover,
+  .journal-lightbox-prev:hover, .journal-lightbox-next:hover,
+  .journal-lightbox-save:hover, .journal-lightbox-remove:hover { transform: none; }
+  .journal-postcards-head, .journal-postcards-empty,
+  .journal-postcards-grid, .journal-postcards-lightbox { animation: none; }
+}
+
+:root[data-reduced-motion="on"] .journal-postcards-btn,
+:root[data-reduced-motion="on"] .journal-postcards-close,
+:root[data-reduced-motion="on"] .journal-postcard-tile,
+:root[data-reduced-motion="on"] .journal-lightbox-back,
+:root[data-reduced-motion="on"] .journal-lightbox-prev,
+:root[data-reduced-motion="on"] .journal-lightbox-next,
+:root[data-reduced-motion="on"] .journal-lightbox-save,
+:root[data-reduced-motion="on"] .journal-lightbox-remove { transition: none; }
+
+:root[data-reduced-motion="on"] .journal-postcard-tile[data-postcard-tilt="left"],
+:root[data-reduced-motion="on"] .journal-postcard-tile[data-postcard-tilt="right"],
+:root[data-reduced-motion="on"] .journal-postcard-tile:hover,
+:root[data-reduced-motion="on"] .journal-postcards-btn:hover,
+:root[data-reduced-motion="on"] .journal-postcards-close:hover,
+:root[data-reduced-motion="on"] .journal-lightbox-back:hover,
+:root[data-reduced-motion="on"] .journal-lightbox-prev:hover,
+:root[data-reduced-motion="on"] .journal-lightbox-next:hover,
+:root[data-reduced-motion="on"] .journal-lightbox-save:hover,
+:root[data-reduced-motion="on"] .journal-lightbox-remove:hover { transform: none; }
+
+:root[data-reduced-motion="on"] .journal-postcards-head,
+:root[data-reduced-motion="on"] .journal-postcards-empty,
+:root[data-reduced-motion="on"] .journal-postcards-grid,
+:root[data-reduced-motion="on"] .journal-postcards-lightbox { animation: none; }
+
+@media (max-width: 900px), (max-height: 500px) {
+  .journal-postcards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; padding: 10px 9px; }
+}
+
+@media (max-height: 500px) {
+  .journal-postcards-overlay { inset: 8px; }
+  .journal-postcards-btn { min-height: 26px; padding: 2px 8px; font-size: 10.5px; }
+  .journal-postcards-card { gap: 5px; padding: 6px 10px 7px; }
+  .journal-postcards-emblem { width: 21px; height: 21px; }
+  .journal-postcards-title { font-size: 13px; }
+  .journal-postcards-count { padding: 1px 8px; font-size: 9.8px; }
+  .journal-postcards-empty { padding: 14px 12px; gap: 5px; }
+  .journal-postcards-empty-icon { width: 40px; height: 40px; }
+  .journal-postcards-empty-title { font-size: 13px; }
+  .journal-postcards-empty-note { font-size: 11px; }
+  .journal-postcard-tile { padding: 5px 5px 6px; gap: 4px; }
+  .journal-postcard-tile-caption { font-size: 10.5px; }
+  .journal-postcard-tile-sub { font-size: 8.8px; }
+  .journal-lightbox-back, .journal-lightbox-prev, .journal-lightbox-next,
+  .journal-lightbox-save, .journal-lightbox-remove { min-height: 28px; padding: 2px 10px; font-size: 10.2px; }
+  .journal-lightbox-content { flex-direction: row; align-items: stretch; gap: 8px; }
+  .journal-lightbox-frame { flex: 1 1 58%; padding: 5px; }
+  .journal-lightbox-img { max-height: 196px; }
+  .journal-lightbox-meta {
+    flex: 0 1 42%; flex-direction: column; align-items: stretch; justify-content: space-between;
+    padding: 8px 9px; gap: 6px;
+  }
+  .journal-lightbox-caption { font-size: 11.5px; white-space: normal; }
+  .journal-lightbox-sub { font-size: 10px; white-space: normal; }
+  .journal-lightbox-actions { flex-wrap: wrap; }
+}
+
+:root[data-touch="on"] .journal-lightbox-back,
+:root[data-touch="on"] .journal-lightbox-save,
+:root[data-touch="on"] .journal-lightbox-remove { min-height: 44px; padding: 4px 13px; }

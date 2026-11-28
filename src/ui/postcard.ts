@@ -1,6 +1,12 @@
 import type { CozyWeatherKind } from "../core/weather";
 import { element, svgElement } from "./dom";
-export { composePostcard, composePostcardFrame, type ComposedPostcard } from "./postcard-canvas";
+export {
+  composePostcard,
+  composePostcardFrame,
+  createPostcardAlbumCopy,
+  type ComposedPostcard,
+  type PostcardImageSource,
+} from "./postcard-canvas";
 
 export type PostcardMetadata = {
   filename: string;

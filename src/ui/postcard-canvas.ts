@@ -6,6 +6,19 @@ export type ComposedPostcard = {
   height: number;
 };
 
+export type PostcardImageSource = HTMLCanvasElement | HTMLImageElement;
+
+function isImageElement(source: PostcardImageSource): source is HTMLImageElement {
+  return typeof HTMLImageElement !== "undefined" && source instanceof HTMLImageElement;
+}
+
+function sourceDimensions(source: PostcardImageSource): { width: number; height: number } {
+  if (isImageElement(source)) {
+    return { width: source.naturalWidth, height: source.naturalHeight };
+  }
+  return { width: source.width, height: source.height };
+}
+
 function drawRoundedRect(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -257,81 +270,53 @@ function formatStampText(caption: string): string {
   return `Wilds of Cloverhollow · ${trimmed}`;
 }
 
-/**
- * Composes a live WebGL snapshot onto an offscreen 2D canvas framed inside a
- * warm cream watercolor postcard border with thin hand-inked rules and a
- * bottom-right storybook stamp.
- */
-export function composePostcardFrame(
-  sourceCanvas: HTMLCanvasElement,
-  caption: string,
-  subcaption = "",
-  weather?: CozyWeatherKind,
-): ComposedPostcard | null {
-  const srcWidth = sourceCanvas.width;
-  const srcHeight = sourceCanvas.height;
+function renderPostcardCanvas(
+  source: PostcardImageSource, caption: string, subcaption = "", weather?: CozyWeatherKind,
+): HTMLCanvasElement | null {
+  const { width: srcWidth, height: srcHeight } = sourceDimensions(source);
   if (srcWidth <= 0 || srcHeight <= 0) return null;
-
   const padX = Math.max(24, Math.round(srcWidth * 0.032));
   const padTop = padX;
   const padBottom = Math.max(60, Math.round(srcHeight * 0.095));
   const width = srcWidth + padX * 2;
   const height = srcHeight + padTop + padBottom;
-
   const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
+  canvas.width = width; canvas.height = height;
   const ctx = canvas.getContext("2d");
   if (ctx === null) return null;
 
-  // Cozy warm cream watercolor paper stock.
   ctx.fillStyle = "#fbf6e8";
   ctx.fillRect(0, 0, width, height);
-
-  // Subtle inner cream mat trim and hand-drawn outer border.
   const outerInset = Math.max(8, Math.round(padX * 0.26));
   const outerRadius = Math.max(10, Math.round(padX * 0.34));
   ctx.strokeStyle = "#e6dac0";
   ctx.lineWidth = Math.max(2, Math.round(padX * 0.08));
   drawRoundedRect(
-    ctx,
-    outerInset,
-    outerInset,
-    width - outerInset * 2,
-    height - outerInset * 2,
-    outerRadius,
+    ctx, outerInset, outerInset, width - outerInset * 2, height - outerInset * 2, outerRadius,
   );
   ctx.stroke();
 
   ctx.strokeStyle = "#47321f";
   ctx.lineWidth = Math.max(2, Math.round(srcWidth * 0.002));
   drawRoundedRect(
-    ctx,
-    outerInset + 4,
-    outerInset + 4,
-    width - (outerInset + 4) * 2,
-    height - (outerInset + 4) * 2,
-    Math.max(8, outerRadius - 3),
+    ctx, outerInset + 4, outerInset + 4, width - (outerInset + 4) * 2,
+    height - (outerInset + 4) * 2, Math.max(8, outerRadius - 3),
   );
   ctx.stroke();
 
-  // Live painting window with a crisp hand-inked inner rule.
-  ctx.drawImage(sourceCanvas, padX, padTop, srcWidth, srcHeight);
+  ctx.drawImage(source, padX, padTop, srcWidth, srcHeight);
   ctx.strokeStyle = "#47321f";
   ctx.lineWidth = Math.max(2, Math.round(srcWidth * 0.0022));
   ctx.strokeRect(padX, padTop, srcWidth, srcHeight);
 
-  // Bottom strip: clover emblem + region subcaption on left, storybook stamp on right.
   const stripMidY = padTop + srcHeight + padBottom * 0.52;
   const fontSize = Math.max(16, Math.round(padBottom * 0.34));
   const subFontSize = Math.max(13, Math.round(padBottom * 0.25));
   const cloverSize = Math.max(10, Math.round(padBottom * 0.19));
-
   drawCloverStamp(ctx, padX + cloverSize + 4, stripMidY, cloverSize);
 
-  const hasWeatherStamp = weather !== undefined && weather !== "clear";
   let subX = padX + cloverSize * 2 + 16;
-  if (hasWeatherStamp) {
+  if (weather !== undefined && weather !== "clear") {
     const gap = Math.max(10, Math.round(cloverSize * 0.85));
     const stampSize = Math.round(cloverSize * 1.05);
     const stampX = padX + cloverSize * 2 + 4 + gap + stampSize;
@@ -342,8 +327,7 @@ export function composePostcardFrame(
   const stampText = formatStampText(caption);
   ctx.fillStyle = "#47321f";
   ctx.font = `800 ${fontSize}px Nunito, "Trebuchet MS", sans-serif`;
-  ctx.textAlign = "right";
-  ctx.textBaseline = "middle";
+  ctx.textAlign = "right"; ctx.textBaseline = "middle";
   const stampWidth = ctx.measureText(stampText).width;
   ctx.fillText(stampText, width - padX - 4, stripMidY);
 
@@ -352,20 +336,48 @@ export function composePostcardFrame(
     const maxSubWidth = Math.max(120, width - padX - 20 - stampWidth - subX);
     ctx.fillStyle = "#6f5947";
     ctx.font = `700 ${subFontSize}px Nunito, "Trebuchet MS", sans-serif`;
-    ctx.textAlign = "left";
-    ctx.textBaseline = "middle";
+    ctx.textAlign = "left"; ctx.textBaseline = "middle";
     ctx.fillText(cleanSub.toUpperCase(), subX, stripMidY, maxSubWidth);
   }
+  return canvas;
+}
 
+/** Composes a live canvas or painted image inside a warm cream watercolor postcard border. */
+export function composePostcardFrame(
+  source: PostcardImageSource, caption: string, subcaption = "", weather?: CozyWeatherKind,
+): ComposedPostcard | null {
+  const canvas = renderPostcardCanvas(source, caption, subcaption, weather);
+  if (canvas === null) return null;
   const dataUrl = canvas.toDataURL("image/png");
   if (!dataUrl.startsWith("data:image/png;base64,")) return null;
-  return { dataUrl, width, height };
+  return { dataUrl, width: canvas.width, height: canvas.height };
+}
+
+/** Composes a compact JPEG scrapbook copy (`maxWidth = 640`, quality `0.85`) for localStorage. */
+export function createPostcardAlbumCopy(
+  source: PostcardImageSource, caption: string, subcaption = "",
+  weather?: CozyWeatherKind, maxWidth = 640,
+): ComposedPostcard | null {
+  const full = renderPostcardCanvas(source, caption, subcaption, weather);
+  if (full === null) return null;
+  let target = full;
+  if (maxWidth > 0 && full.width > maxWidth) {
+    const compact = document.createElement("canvas");
+    compact.width = maxWidth;
+    compact.height = Math.max(1, Math.round((full.height * maxWidth) / full.width));
+    const ctx = compact.getContext("2d");
+    if (ctx !== null) {
+      ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(full, 0, 0, compact.width, compact.height);
+      target = compact;
+    }
+  }
+  const dataUrl = target.toDataURL("image/jpeg", 0.85);
+  if (!/^data:image\/(?:jpeg|png);base64,/.test(dataUrl)) return null;
+  return { dataUrl, width: target.width, height: target.height };
 }
 
 /** Composes a framed Cloverhollow Postcard PNG and returns its data URL. */
-export function composePostcard(
-  sourceCanvas: HTMLCanvasElement,
-  caption: string,
-): string | null {
-  return composePostcardFrame(sourceCanvas, caption)?.dataUrl ?? null;
+export function composePostcard(source: PostcardImageSource, caption: string): string | null {
+  return composePostcardFrame(source, caption)?.dataUrl ?? null;
 }

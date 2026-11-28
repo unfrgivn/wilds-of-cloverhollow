@@ -64,7 +64,26 @@
     0 7px 0 #47321f22,
     0 12px 20px #47321f28,
     inset 0 0 0 1.5px #e6d8bc;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition: transform 140ms ease-out, box-shadow 140ms ease-out;
   animation: credits-postcard-settle 280ms ease-out;
+}
+.credits-postcard:focus-visible {
+  outline: 3px solid #6b9e56;
+  outline-offset: 3px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .credits-postcard:hover {
+    transform: translateY(-2px) rotate(-0.6deg) scale(1.015);
+    box-shadow:
+      0 9px 0 #47321f26,
+      0 15px 24px #47321f30,
+      inset 0 0 0 1.5px #e6d8bc;
+  }
 }
 .credits-postcard-frame {
   position: relative;
@@ -236,9 +255,11 @@
 :root[data-credits="open"] .touch-lantern,
 :root[data-credits="open"] .touch-flute { display: none; }
 @media (prefers-reduced-motion: reduce) {
-  .credits-postcard { animation: none; }
+  .credits-postcard { animation: none; transition: none; }
+  .credits-postcard:hover { transform: rotate(-1.2deg); }
 }
-:root[data-reduced-motion="on"] .credits-postcard { animation: none; }
+:root[data-reduced-motion="on"] .credits-postcard { animation: none; transition: none; }
+:root[data-reduced-motion="on"] .credits-postcard:hover { transform: rotate(-1.2deg); }
 @media (max-height: 460px) and (max-width: 999px) {
   .credits-screen {
     gap: 8px;

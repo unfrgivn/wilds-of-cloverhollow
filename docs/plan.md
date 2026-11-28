@@ -9958,6 +9958,48 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   `milestone-201`, `milestone-202`, `soundtrack`), and 3/3 Chromium
   (`e9b-decor-economy`).
 
+## Milestone 236: Fae's Photo Postcard Scrapbook Album (`src/ui/journal-postcards.ts`) & Click-to-Save Commemorative Ending Credits Postcard **Status:** ✅ Completed (2026-11-28)
+- Automatically collects Fae's snapped Photo Mode postcards into a quota-safe
+  `localStorage` **Postcard Scrapbook Album** browsable inside Fae's Journal
+  (pinned watercolor polaroid corkboard, inline lightbox preview, 1-click Save
+  PNG / Web Share, and Remove) AND makes the painted watercolor Ending Postcard
+  on the Credits spread clickable (or `P` key) to compose & save a personalized
+  commemorative keepsake postcard stamped with the player's actual journey
+  summary — zero `src/core` changes, zero save-version bumps, zero replay hash
+  drift across all 77 sims, and zero visual baseline diffs across all 99
+  `ui-gallery` and `ending.spec` baselines.
+- Quota-safe Postcard Scrapbook Album store (`src/platform/postcard-album.ts`,
+  177 lines; routed into `audio-scores` in `vite.config.ts`):
+  - Strict type-guarded `parsePostcardAlbum`, FIFO `POSTCARD_ALBUM_LIMIT = 6`
+    (`cloverhollow-postcards`), automatic oldest-first eviction retry on
+    `QuotaExceededError`, and live subscribers.
+- Image-source postcard framing & click-to-save Ending Credits Postcard
+  (`src/ui/postcard-canvas.ts`, `src/ui/postcard.ts`,
+  `src/shell/{overworld-feedback,shell-bindings}.ts`, `src/ui/credits.{ts,css}`,
+  `src/ui/sticker.css`, `src/main.ts`):
+  - Extended `composePostcardFrame` to accept `HTMLCanvasElement | HTMLImageElement`
+    and added compact `createPostcardAlbumCopy(..., maxWidth = 640)` JPEG
+    scrapbook thumbnails (~40 KB).
+  - Made `figure.credits-postcard` keyboard/click/P-key interactive with zero
+    visual change at rest, saving a personalized commemorative keepsake PNG +
+    album copy with `camera-shutter` foley, light haptic, and `"Keepsake postcard
+    saved!"` toast without closing Credits.
+- Journal Postcard Scrapbook Album modal (`src/ui/journal-postcards.{ts,css}`,
+  `src/ui/journal-field-note.ts`):
+  - Registered `"postcards"` as a 6th `TreasuresPeer` (`.journal-postcards-btn`
+    `"📷 Photos · N"` in Field Treasures header) with hand-inked camera SVGs
+    (zero `<text>` nodes), empty state, 3×2 corkboard grid, responsive phone
+    lightbox (`← Back to Album`, `‹ N / M ›`, `Save PNG`, `Remove`), full Steam
+    Deck / Gamepad / keyboard nav, focus restoration, Reduced Motion parity, and
+    Safari/iOS tap-selection hygiene.
+- Evidence: `tests/unit/milestone-236.test.ts`,
+  `tests/e2e/milestone-236.spec.ts` (`@smoke` Chromium + WebKit), and review
+  captures `art/review/m234-postcard-album-1280.jpg` and
+  `m234-postcard-lightbox-874.jpg` independently verified via `vision`.
+- Gates: `just check` (302 unit files / 2,142 tests, all 77 sims + all sim
+  scripts, 23 QA packs, purity, lint), `just build` (`index` `< 365 kB`),
+  Chromium & WebKit `milestone-236`/`ending`/`milestone-100`/`160`/`164`/`215`/`229`,
+  and 99/99 Chromium `ui-gallery` tests.
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

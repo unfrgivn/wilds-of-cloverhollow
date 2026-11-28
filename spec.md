@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 235)
+Last updated: 2026-11-28 (Milestone 236)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -80,7 +80,7 @@ reference material only.
   `audio-cue-recipes.ts`, `audio-effects.ts`, `audio-playback.ts`,
   `audio-settings.ts`, `voices.ts`, `voice-catalog.ts`, `music-synth.ts`,
   `music-mix.ts`, `ambience.ts`, `weather-ambience.ts`, `home-record-prefs.ts`,
-  `includeDependenciesRecursively: false`, priority 18),
+  `postcard-album.ts`, `includeDependenciesRecursively: false`, priority 18),
   `ui-overlays` (`src/ui/*`, `includeDependenciesRecursively: false`, priority
   17), `render-engine` (`includeDependenciesRecursively: false`, including
   `src/platform/reduced-motion.ts` and `src/platform/weather-prefs.ts` so
@@ -1188,14 +1188,27 @@ ios/            Capacitor iOS project (from Milestone 4).
   delivery (`"shared"` or `"downloaded"`), `createPhotoToast` renders a gentle
   top-center `.photo-toast` storybook pill (`role="status"`, `aria-live="polite"`,
   `#47321f` ink on `#fbf6e8`, `pointer-events: none`, excluded from Pixi WebGL
-  capture, defensively hidden whenever `:root:not([data-photo="on"])`, with full
+  capture, defensively hidden whenever
+  `:root:not([data-photo="on"]):not([data-credits="open"]):not([data-journal="open"])`, with full
   `@media (prefers-reduced-motion: reduce)` and `:root[data-reduced-motion="on"]`
   transition/animation suppression) announcing `"Postcard shared · <Area>"` or
   `"Postcard saved · <Area>"` (appending `" · <Weather>"` via
   `postcardWeatherLabel` whenever an active outdoor cozy weather mode is
   present while keeping `undefined` / `"clear"` strings unchanged, Milestone
   216 / Track E19J) via `postcardToastMessage` for `1800 ms` and hiding
-  immediately on Photo Mode exit or harness reset. Pressing `P` again,
+  immediately on Photo Mode exit or harness reset. Every snapped Photo Mode
+  postcard (and commemorative Ending Credits postcard) also tucks a compact
+  JPEG copy (`createPostcardAlbumCopy`, `maxWidth = 640`, quality `0.85`,
+  ~35–55 kB) into Fae's quota-safe `localStorage["cloverhollow-postcards"]`
+  **Postcard Scrapbook Album** (`src/platform/postcard-album.ts`, FIFO newest-first
+  limit `POSTCARD_ALBUM_LIMIT = 6` with automatic oldest-first eviction on
+  `QuotaExceededError`), browsable inside Fae's Journal (`FIELD TREASURES`
+  header `.journal-postcards-btn` `"📷 Photos"` / `"📷 Photos · N"`,
+  `src/ui/journal-postcards.{ts,css}`, Milestone 234) with a 3×2 watercolor
+  corkboard grid (2-column compact at `874×402`), inline lightbox preview,
+  1-click `Save PNG` / Web Share delivery, `Remove`, 2D keyboard/gamepad
+  navigation, Reduced Motion & Safari/iOS tap hygiene, and zero `<text>` SVG
+  emblems. Pressing `P` again,
   `Escape`, gamepad Select/B (button 8 / button 1), right-clicking the canvas on
   desktop (`contextmenu` prevented via `photoModePointerAction`), or opening any
   overlay exits Photo Mode automatically.
@@ -3587,7 +3600,16 @@ trunks keep its two exits.
   whole catalogue plus the illustrated ending postcard) fit without scrolling;
   on a phone the sheet scrolls. On touch only the confirm button shows, at least
   44 px and clear of the entries. Reduced Motion disables `.credits-postcard`'s
-  settle animation.
+  settle animation and hover transform. Clicking `figure.credits-postcard`
+  (`tabindex="0"`, `role="button"`, `aria-label="Save commemorative ending postcard"`,
+  zero visual change at rest), activating it with `Enter`/`Space` while focused,
+  or pressing `P` while Credits is open invokes `createCredits` `onSavePostcard`
+  without closing Credits (`src/ui/credits.{ts,css}`, `src/shell/shell-bindings.ts`,
+  Milestone 234), composing a personalized commemorative keepsake PNG via
+  `composePostcardFrame(image, "Wilds of Cloverhollow", summary.join(" · "))`,
+  tucking a compact copy into Fae's Postcard Scrapbook Album, playing
+  `"camera-shutter"` + light haptic, delivering via `deliverPostcard`, and
+  announcing `"Keepsake postcard saved!"` in `.photo-toast`.
 - The shell steps the core on every credits tick, and the core holds the
   world still (only the tick, the previous input, and the resting pose
   change), so the ticks and their input stay a replay's.

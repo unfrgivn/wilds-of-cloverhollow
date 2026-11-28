@@ -244,7 +244,7 @@
 }
 
 .photo-toast[hidden],
-:root:not([data-photo="on"]) .photo-toast {
+:root:not([data-photo="on"]):not([data-credits="open"]):not([data-journal="open"]) .photo-toast {
   display: none;
 }
 

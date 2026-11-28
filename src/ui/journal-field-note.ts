@@ -11,6 +11,7 @@ import { createJournalEncoreCase } from "./journal-encore";
 import { createJournalGemsLedger } from "./journal-gems-ledger";
 import { createJournalHeartsAlbum } from "./journal-hearts";
 import { createJournalJukeboxAlbum } from "./journal-jukebox";
+import { createJournalPostcardsAlbum } from "./journal-postcards";
 import { applyModalScrollKey, type JournalNavDirection } from "./journal-nav";
 import {
   activateOverlayButton, scrollOverlayContainer, stepOverlayFocus,
@@ -234,10 +235,10 @@ export function createJournalFieldOverlays(options?: {
     treasuresBackdrop.hidden = true;
   };
 
-  const PEER_KEYS = ["jukebox", "encore", "hearts", "weather", "ribbons"] as const;
+  const PEER_KEYS = ["jukebox", "encore", "hearts", "weather", "ribbons", "postcards"] as const;
   type TreasuresPeer = (typeof PEER_KEYS)[number];
   const returnToTreasures: Record<TreasuresPeer, boolean> = {
-    weather: false, ribbons: false, hearts: false, encore: false, jukebox: false,
+    weather: false, ribbons: false, hearts: false, encore: false, jukebox: false, postcards: false,
   };
   const attachOverlay = (overlay: HTMLElement): void => {
     const host = options?.focusRoot ?? treasuresBackdrop.parentElement;
@@ -272,20 +273,26 @@ export function createJournalFieldOverlays(options?: {
     onSelectTrack: options?.onSelectTrack, onResetTrack: options?.onResetTrack,
     onFilterChange: options?.onJukeboxFilter,
   });
+  const postcardsAlbum = createJournalPostcardsAlbum({
+    ...peerHooks("postcards"),
+    onAction: options?.onJukeboxFilter, onStep: options?.onStep,
+  });
   const peerModals = {
     weather: weatherAlmanac, ribbons: ribbonsShowcase, hearts: heartsAlbum,
-    encore: encoreCase, jukebox: jukeboxAlbum,
+    encore: encoreCase, jukebox: jukeboxAlbum, postcards: postcardsAlbum,
   };
   treasuresTitleWrap.append(
     ribbonsShowcase.treasuresBtn, weatherAlmanac.treasuresBtn,
-    heartsAlbum.treasuresBtn, encoreCase.treasuresBtn, jukeboxAlbum.treasuresBtn,
+    heartsAlbum.treasuresBtn, encoreCase.treasuresBtn,
+    jukeboxAlbum.treasuresBtn, postcardsAlbum.treasuresBtn,
   );
   const gemsLedger = createJournalGemsLedger({
     onBeforeOpen: () => clearPeers("gems"),
     onVisibilityChange: () => syncVisibility(),
   });
   const childModals = [
-    jukeboxAlbum, encoreCase, heartsAlbum, weatherAlmanac, ribbonsShowcase, gemsLedger,
+    postcardsAlbum, jukeboxAlbum, encoreCase, heartsAlbum,
+    weatherAlmanac, ribbonsShowcase, gemsLedger,
   ] as const;
   const hasOpen = (): boolean =>
     treasuresOpen || inspectedItem !== null || childModals.some((modal) => modal.isOpen());
@@ -536,6 +543,10 @@ export function createJournalFieldOverlays(options?: {
     "jukebox", jukeboxAlbum.overlay,
     () => jukeboxAlbum.open(latestView, jukeboxAlbum.treasuresBtn),
   ));
+  postcardsAlbum.treasuresBtn.addEventListener("click", () => openFromTreasures(
+    "postcards", postcardsAlbum.overlay,
+    () => postcardsAlbum.open(postcardsAlbum.treasuresBtn),
+  ));
 
   const closeAll = (): void => { clearPeers(); lastNotifiedOpen = false; };
   const topOverlay = (): HTMLElement | null =>
@@ -587,7 +598,7 @@ export function createJournalFieldOverlays(options?: {
       syncFieldNote(view); syncTreasures(view);
       gemsLedger.sync(view.starGems); syncRibbons(view, ribbonsAnchor);
       heartsAlbum.sync(view.heartToHearts); encoreCase.sync(view.encoreSummary);
-      jukeboxAlbum.sync(view);
+      jukeboxAlbum.sync(view); postcardsAlbum.sync();
     },
     stepFieldNote,
     navigateOverlay: (direction) => {

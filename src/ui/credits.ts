@@ -22,6 +22,11 @@ export const DEFAULT_ENDING_POSTCARD: CreditsPostcardView = {
   caption: "Morning walk to school · Cloverhollow",
 };
 
+export type CreditsSavePostcardPayload = {
+  image: HTMLImageElement;
+  summary: readonly string[];
+};
+
 export type CreditsView = {
   visible: boolean;
   entries: CreditsEntryView[];
@@ -63,8 +68,11 @@ function cloverStampSvg(): SVGSVGElement {
 export function createCredits(root: HTMLElement): {
   render: (view: CreditsView) => void;
   onClose: (callback: () => void) => void;
+  onSavePostcard: (callback: (payload: CreditsSavePostcardPayload) => void) => void;
 } {
   let closeHandler: () => void = () => undefined;
+  let savePostcardHandler: (payload: CreditsSavePostcardPayload) => void = () => undefined;
+  let latestSummary: readonly string[] = [];
   const screen = document.createElement("section");
   screen.className = "credits-screen";
   screen.setAttribute("role", "dialog");
@@ -72,15 +80,50 @@ export function createCredits(root: HTMLElement): {
   screen.setAttribute("aria-label", "Credits");
   screen.tabIndex = -1;
   screen.hidden = true;
+  const triggerSavePostcard = (): void => {
+    if (screen.hidden || postcardFigure.hidden) return;
+    savePostcardHandler({ image: postcardImg, summary: latestSummary });
+  };
   screen.addEventListener("click", () => {
     if (!screen.hidden) closeHandler();
   });
   screen.addEventListener("keydown", (event) => {
     if (screen.hidden || event.repeat) return;
+    if (
+      (event.key === "p" || event.key === "P") &&
+      !event.ctrlKey &&
+      !event.metaKey &&
+      !event.altKey
+    ) {
+      event.preventDefault();
+      event.stopPropagation();
+      triggerSavePostcard();
+      return;
+    }
     if (event.key === "Escape" || event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       closeHandler();
     }
+  });
+  document.addEventListener("keydown", (event) => {
+    if (screen.hidden || event.repeat) return;
+    if (
+      (event.key !== "p" && event.key !== "P") ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.altKey
+    ) {
+      return;
+    }
+    if (
+      event.target instanceof HTMLElement &&
+      (screen.contains(event.target) || event.target.closest("input, textarea") !== null)
+    ) {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    triggerSavePostcard();
   });
 
   const hero = document.createElement("div");
@@ -91,6 +134,22 @@ export function createCredits(root: HTMLElement): {
 
   const postcardFigure = document.createElement("figure");
   postcardFigure.className = "credits-postcard";
+  postcardFigure.tabIndex = 0;
+  postcardFigure.setAttribute("role", "button");
+  postcardFigure.setAttribute("aria-label", "Save commemorative ending postcard");
+  postcardFigure.title = "Click or press P to save your commemorative postcard";
+  postcardFigure.addEventListener("click", (event) => {
+    event.stopPropagation();
+    triggerSavePostcard();
+  });
+  postcardFigure.addEventListener("keydown", (event) => {
+    if (screen.hidden || event.repeat) return;
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      event.stopPropagation();
+      triggerSavePostcard();
+    }
+  });
   const postcardFrame = document.createElement("div");
   postcardFrame.className = "credits-postcard-frame";
   const postcardImg = document.createElement("img");
@@ -141,11 +200,15 @@ export function createCredits(root: HTMLElement): {
     onClose: (callback) => {
       closeHandler = callback;
     },
+    onSavePostcard: (callback) => {
+      savePostcardHandler = callback;
+    },
     render: (view) => {
       const wasHidden = screen.hidden;
       screen.hidden = !view.visible;
       if (!view.visible) {
         shown = "";
+        latestSummary = [];
         atlases = [];
         return;
       }
@@ -153,6 +216,7 @@ export function createCredits(root: HTMLElement): {
         screen.focus({ preventScroll: true });
       }
       const summary = view.summary ?? [];
+      latestSummary = summary;
       const postcard = view.postcard === undefined ? DEFAULT_ENDING_POSTCARD : view.postcard;
       const key = JSON.stringify({ entries: view.entries, summary, postcard });
       if (key === shown) return;

@@ -12,10 +12,15 @@ import type { AudioLevel } from "../platform/audio-settings";
 import type { GameSettingsController } from "../platform/game-settings";
 import type { TouchInput } from "../platform/touch";
 import { getHomeRecordTrack } from "../platform/home-record-prefs";
+import { createPostcardId, savePostcardToAlbum } from "../platform/postcard-album";
 import { getCozyWeatherMode, setCozyWeatherMode } from "../platform/weather-prefs";
+import type { CreditsSavePostcardPayload } from "../ui/credits";
 import type { HudHintAction } from "../ui/hud-hints";
 import type { JournalControl } from "../ui/journal";
-import { postcardToastMessage, type PostcardCapture } from "../ui/postcard";
+import {
+  composePostcardFrame, createPostcardAlbumCopy, deliverPostcard, postcardToastMessage,
+  type PostcardCapture,
+} from "../ui/postcard";
 import { deliverAreaPostcard, stepJukeboxTrack } from "./feedback";
 import { bindWebGlRecovery } from "./lifecycle";
 
@@ -46,8 +51,12 @@ export type ShellUiTargets = {
     onPeekToggle: (handler: () => void) => void;
     onPeekClose: (handler: () => void) => void;
   };
-  credits: { onClose: (handler: () => void) => void };
+  credits: {
+    onClose: (handler: () => void) => void;
+    onSavePostcard: (handler: (payload: CreditsSavePostcardPayload) => void) => void;
+  };
   hudHints: { onAction: (handler: (action: HudHintAction) => void) => void };
+  photoToast: { show: (message: string) => void; hide: () => void };
 };
 
 export type ShellUiBindingDeps = {
@@ -178,7 +187,35 @@ export function bindShellUiControls(deps: ShellUiBindingDeps): void {
   ui.battleHud.onPeekToggle(() => deps.setBattlePeek(!deps.getBattlePeekOpen()));
   ui.battleHud.onPeekClose(() => deps.setBattlePeek(false));
   ui.journal.onClose(() => ui.touch.tapButton("cancel"));
-  ui.credits.onClose(() => ui.touch.tapButton("confirm"));
+  ui.credits.onClose(() => {
+    ui.photoToast.hide();
+    ui.touch.tapButton("confirm");
+  });
+  ui.credits.onSavePostcard(({ image, summary }) => {
+    const caption = "Wilds of Cloverhollow";
+    const subcaption = summary.length > 0 ? summary.join(" · ") : "Thank you for playing!";
+    const filename = "cloverhollow-keepsake-ending.png";
+    const composed = composePostcardFrame(image, caption, subcaption);
+    if (composed === null) return;
+    const albumCopy = createPostcardAlbumCopy(image, caption, subcaption);
+    if (albumCopy !== null) {
+      savePostcardToAlbum({
+        id: createPostcardId("ending"),
+        filename,
+        caption,
+        subcaption,
+        dataUrl: albumCopy.dataUrl,
+      });
+    }
+    sound.playEffect("camera-shutter");
+    lightHaptic();
+    void deliverPostcard(
+      { dataUrl: composed.dataUrl, filename, caption },
+      { preferShare: document.documentElement.dataset.touch === "on" },
+    ).then((delivery) => {
+      if (delivery !== "cancelled") ui.photoToast.show("Keepsake postcard saved!");
+    });
+  });
 
   ui.hudHints.onAction((action) => {
     if (action === "interact") ui.touch.tapButton("confirm");

@@ -194,10 +194,7 @@ function syncChild(parent: Element, node: Element, show: boolean): void {
 // her snacks on the notes page's heading row (`journal-supply`), and her
 // tickets on the PRIZES heading (`journal-tickets`, the same pill).
 const supplyMarkup = {
-  coins: coinMarkup,
-  snacks: cookieMarkup,
-  gems: gemMarkup,
-  tickets: ticketMarkup,
+  coins: coinMarkup, snacks: cookieMarkup, gems: gemMarkup, tickets: ticketMarkup,
 } as const;
 
 function supply(kind: keyof typeof supplyMarkup, label: string): {
@@ -237,6 +234,7 @@ export type JournalControl = JournalOptionsHandlers & {
   onOverlayChange: (callback: (open: boolean) => void) => void;
   onOverlayStep: (callback: () => void) => void;
   onWeatherSelect: (callback: (mode: CozyWeatherMode) => void) => void;
+  onJukeboxFilter: (callback: () => void) => void;
   onClose: (callback: () => void) => void;
 };
 
@@ -309,6 +307,7 @@ export function createJournal(root: HTMLElement): JournalControl {
   let onOverlayChange: (open: boolean) => void = () => undefined;
   let onOverlayStep: () => void = () => undefined;
   let onWeatherSelect: (mode: CozyWeatherMode) => void = () => undefined;
+  let onJukeboxFilter: () => void = () => undefined;
   let onClose: () => void = () => undefined;
 
   const sliderSteppers = new Map<EventTarget, (direction: -1 | 1) => void>();
@@ -322,6 +321,7 @@ export function createJournal(root: HTMLElement): JournalControl {
     onStep: () => onOverlayStep(),
     onWeatherSelect: (mode) => onWeatherSelect(mode),
     onSelectTrack: optionsPage.selectTrack, onResetTrack: optionsPage.resetJukebox,
+    onJukeboxFilter: () => onJukeboxFilter(),
   });
   const mapPage = createJournalMapPage(() => fieldOverlays.openTreasures(latestView), {
     onSelectLand: (landId) => onMapSelect(landId !== null),
@@ -415,6 +415,7 @@ export function createJournal(root: HTMLElement): JournalControl {
     onOverlayChange: (cb) => { onOverlayChange = cb; },
     onOverlayStep: (cb) => { onOverlayStep = cb; },
     onWeatherSelect: (cb) => { onWeatherSelect = cb; },
+    onJukeboxFilter: (cb) => { onJukeboxFilter = cb; },
     onClose: (cb) => { onClose = cb; },
     ...optionsPage.handlers,
     render: (view) => {
@@ -668,10 +669,8 @@ export function createJournal(root: HTMLElement): JournalControl {
       }
       fieldOverlays.syncAll(view, showKeepsakes ? keepsakesGrid : keepsakesAnchor);
       mapPage.render(view, {
-        fishOwned,
-        fishTotal: fishList.length,
-        keepsakesOwned,
-        keepsakesTotal: keepsakesList.length,
+        fishOwned, fishTotal: fishList.length,
+        keepsakesOwned, keepsakesTotal: keepsakesList.length,
       });
     },
   };

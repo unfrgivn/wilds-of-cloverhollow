@@ -221,17 +221,21 @@ ios/            Capacitor iOS project (from Milestone 4).
   `isTalkTheater`, `isRecoverTheater`, `RECOVER_SPARKLE_TINTS`, `RAINBOW_HEARTS`,
   `SPARKLE_TINTS`, `RELIEF_PETALS`, `radialBurst`, `applyTalkTheater`,
   `applySnackTheater`, `applyRecoverTheater`, `applySoothedAndReward`) live in
-  Pixi-free `src/render/battle-theater.ts` (Milestone 174), and the six stage
-  VFX choreography emitters (`isLassoActionActive`, `emitRainbowLassoVfx`,
-  `echoNoteColor`, `emitEchoChimeVfx`, `emitSoothedConfettiVfx`,
-  `emitLeanWindVfx`, `emitPeekabooVfx`, `emitTraceBrushVfx`) live in Pixi-free
-  `src/render/battle-vfx-stage.ts`, and the three Track E7 v2 battle check stage
-  VFX emitters (`WHICH_ONE_VFX_COLORS`, `emitWhichOneVfx`, `WHACK_VFX_COLORS`,
-  `emitWhackVfx`, `SPIN_SNAG_COLORS`, `emitSpinSnagVfx`, sharing
-  `RAINBOW_LASSO_COLORS`) live in Pixi-free `src/render/battle-vfx-checks-v2.ts`
-  (all re-exported identically through `src/render/battle-vfx-stage.ts`,
-  `src/render/battle-vfx.ts`, and `src/render/battle-choreography.ts`,
-  Milestones 137, 157, 173 & 198). The Pixi battle stage container, sprites, check
+  Pixi-free `src/render/battle-theater.ts` (Milestone 174), the core battle
+  check stage VFX emitters (`ECHO_CHIME_COLORS`, `echoNoteColor`,
+  `emitEchoChimeVfx`, `LEAN_WIND_TINTS`, `emitLeanWindVfx`,
+  `PEEKABOO_WARNING_TINT`, `PEEKABOO_WATCH_TINTS`, `PEEKABOO_DUST_TINT`,
+  `emitPeekabooVfx`, `TRACE_BRUSH_COLORS`, `emitTraceBrushVfx`) live in
+  Pixi-free `src/render/battle-vfx-checks.ts` (Milestone 216 / Track E19J), the
+  Lasso / Soothed Confetti / Rest Faint emitters (`isLassoActionActive`,
+  `emitRainbowLassoVfx`, `emitSoothedConfettiVfx`, `applyRestFaint`) live in
+  Pixi-free `src/render/battle-vfx-stage.ts`, and the three Track E7 v2 battle
+  check stage VFX emitters (`WHICH_ONE_VFX_COLORS`, `emitWhichOneVfx`,
+  `WHACK_VFX_COLORS`, `emitWhackVfx`, `SPIN_SNAG_COLORS`, `emitSpinSnagVfx`,
+  sharing `RAINBOW_LASSO_COLORS`) live in Pixi-free
+  `src/render/battle-vfx-checks-v2.ts` (all re-exported identically through
+  `src/render/battle-vfx-stage.ts`, `src/render/battle-vfx.ts`, and
+  `src/render/battle-choreography.ts`, Milestones 137, 157, 173, 198 & 216). The Pixi battle stage container, sprites, check
   geometry, and `renderBattle` orchestration live in `BattleViewController`
   (`src/render/battle-view.ts`, mounted by `GameView` in `src/render/view.ts`),
   delegating blurred backdrop texture caching/invalidation, stage wash scrim,
@@ -1070,7 +1074,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   capture, defensively hidden whenever `:root:not([data-photo="on"])`, with full
   `@media (prefers-reduced-motion: reduce)` and `:root[data-reduced-motion="on"]`
   transition/animation suppression) announcing `"Postcard shared · <Area>"` or
-  `"Postcard saved · <Area>"` via `postcardToastMessage` for `1800 ms` and hiding
+  `"Postcard saved · <Area>"` (appending `" · <Weather>"` via
+  `postcardWeatherLabel` whenever an active outdoor cozy weather mode is
+  present while keeping `undefined` / `"clear"` strings unchanged, Milestone
+  216 / Track E19J) via `postcardToastMessage` for `1800 ms` and hiding
   immediately on Photo Mode exit or harness reset. Pressing `P` again,
   `Escape`, gamepad Select/B (button 8 / button 1), right-clicking the canvas on
   desktop (`contextmenu` prevented via `photoModePointerAction`), or opening any
@@ -1105,8 +1112,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   primitive/geometry JSON validators in
   `src/content/parsers.ts`, Milestone 97, arcade/minigame content &
   calibration parsers in `src/content/arcade-parsers.ts`, Milestone 110, and
-  battle/critter/party/feeling/sticker/level/treat parsers & validators in
-  `src/content/battle-parsers.ts`, Milestone 121, and pure area/lands/tunables/
+  battle/critter/feeling parsers & validators in
+  `src/content/battle-parsers.ts` (Milestone 121), party/sticker/level/treat/
+  encore/gift-basket parsers & validators in `src/content/progression-parsers.ts`
+  (re-exported identically through `src/content/battle-parsers.ts`, Milestone
+  216 / Track E19J), and pure area/lands/tunables/
   fixture/character/ground/map/surface parsers in `src/content/area-parsers.ts`,
   re-exported from `src/content/load.ts`, Milestone 154) load on demand with
   their area (and warm on door fade-out prefetch) and unload on the same
@@ -5427,7 +5437,13 @@ trunks keep its two exits.
   showing track number `01`–`33`, colored accent border, bold title, region tag,
   1-line mood note, and golden `"♪ Playing"` badge on the active track. Clicking
   any track plays it live unducked through the real Web Audio Music Box
-  synthesizer with subtle toggle foley, full 2D arrow/`PageUp`/`PageDown`/`Home`/`End`
+  synthesizer with subtle toggle foley, switching category filters plays
+  `"paper-flip"` + light haptic via `onFilterChange` / `onJukeboxFilter` (only
+  when the selected filter changes), resetting back to the live Area Theme via
+  `onResetJukebox` plays `"sticker-peel"` + light haptic, and opening the album
+  auto-scrolls the active visible track button into view via
+  `scrollIntoView({ block: "nearest" })` (Milestone 216 / Track E19J), alongside
+  full 2D arrow/`PageUp`/`PageDown`/`Home`/`End`
   keyboard navigation with `scrollIntoView({ block: "nearest" })`, Reduced Motion
   and Safari/iOS tap-selection parity, and backdrop/`×`/`Escape`/`X`/`B` dismiss
   restoring Field Treasures and focus directly to `.journal-album-btn`.

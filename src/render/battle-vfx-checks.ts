@@ -1,0 +1,428 @@
+import type {
+  BattleCheckView,
+  CheckState,
+  EchoNote,
+  PeekabooStatus,
+} from "../core";
+import type { BattleVfxParticle } from "./battle-vfx";
+
+function clamp01(value: number): number {
+  return Math.max(0, Math.min(1, value));
+}
+
+export type EchoColor = "red" | "yellow" | "green" | "blue";
+
+export const ECHO_CHIME_COLORS: Readonly<Record<EchoColor, number>> = {
+  red: 0xff7d9a,
+  yellow: 0xffd966,
+  green: 0x8cd99a,
+  blue: 0x7ec8f2,
+};
+
+const ECHO_NOTE_TO_COLOR: readonly [EchoColor, EchoColor, EchoColor, EchoColor] = [
+  "red",
+  "yellow",
+  "green",
+  "blue",
+];
+
+export function echoNoteColor(note: EchoNote): EchoColor {
+  return ECHO_NOTE_TO_COLOR[note];
+}
+
+export type EchoChimeMotion = {
+  critterOffsetY: number;
+  critterRotation: number;
+  faeOffsetY: number;
+  faeRotation: number;
+};
+
+export const LEAN_WIND_TINTS: readonly number[] = [0x7ac7ea, 0x82d8be];
+export const PEEKABOO_WARNING_TINT = 0xffd966;
+export const PEEKABOO_WATCH_TINTS: readonly number[] = [0x9bc8ff, 0xd4b6fa];
+export const PEEKABOO_DUST_TINT = 0xfff3d8;
+export const TRACE_BRUSH_COLORS: readonly number[] = [
+  0xff85a8, 0xffd666, 0x8de0a8, 0x7ec8f2, 0xc9a8ff,
+];
+
+export type TraceBrushMotion = {
+  faeOffsetX: number;
+  faeOffsetY: number;
+  faeRotation: number;
+};
+
+export function emitEchoChimeVfx(
+  vfx: BattleVfxParticle[],
+  check: Extract<CheckState, { kind: "echo" }>,
+  echoView: Extract<BattleCheckView, { kind: "echo" }> | null,
+  reducedMotion = false,
+): EchoChimeMotion {
+  const neutral: EchoChimeMotion = {
+    critterOffsetY: 0, critterRotation: 0, faeOffsetY: 0, faeRotation: 0,
+  };
+  const stride = check.spec.demoTicks + check.spec.gapTicks;
+  const demoEnd = check.spec.notes * stride;
+  const phase: "demo" | "input" =
+    echoView !== null ? echoView.phase : check.tick <= demoEnd ? "demo" : "input";
+  const litNote: EchoNote | null = echoView !== null ? echoView.litNote : check.activeNote;
+  if (litNote === null) return neutral;
+
+  const tint = ECHO_CHIME_COLORS[echoNoteColor(litNote)];
+  const rawU =
+    phase === "demo"
+      ? check.activeTicks > 0
+        ? clamp01((check.activeTicks - 1) / Math.max(1, check.spec.demoTicks))
+        : 0.35
+      : check.activeTicks > 0
+        ? clamp01((14 - check.activeTicks) / 14)
+        : 0.35;
+  const u = reducedMotion ? 0.38 : rawU;
+  const pulse = Math.sin((0.18 + u * 0.78) * Math.PI);
+  const pitchShift = (litNote - 1.5) * 6;
+
+  if (phase === "demo") {
+    // Critter shifts left (-20) during foe-side checks; center the note halo cleanly over it.
+    vfx.push(
+      {
+        texture: "softGlow",
+        blend: "normal",
+        anchor: "critter",
+        offsetX: -22,
+        offsetY: -114 - u * 18,
+        scaleX: 1.42 + pulse * 0.24,
+        scaleY: 1.15 + pulse * 0.2,
+        rotation: 0,
+        alpha: 0.52 * pulse,
+        tint,
+      },
+      {
+        texture: "energyRing",
+        blend: "normal",
+        anchor: "critter",
+        offsetX: -22,
+        offsetY: -116 - u * 20,
+        scaleX: 0.56 + u * 0.56,
+        scaleY: 0.44 + u * 0.42,
+        rotation: reducedMotion ? 0 : -0.06,
+        alpha: 0.94 * (1 - u * 0.58),
+        tint,
+      },
+    );
+    const noteOffsetsX: readonly number[] = [-72, -38, -4, 30];
+    const noteOffsetsY: readonly number[] = [-108, -138, -118, -148];
+    for (let i = 0; i < 4; i += 1) {
+      const sway = reducedMotion ? 0 : Math.sin(u * Math.PI * 2 + i * 1.1) * 5;
+      const scale = (0.56 + (i % 2) * 0.16) * (0.8 + pulse * 0.28);
+      vfx.push({
+        texture: "sparkle",
+        blend: "normal",
+        anchor: "critter",
+        offsetX: (noteOffsetsX[i] ?? -22) + sway,
+        offsetY: (noteOffsetsY[i] ?? -120) - u * 26 - pitchShift,
+        scaleX: scale,
+        scaleY: scale,
+        rotation: reducedMotion ? 0 : u * 1.6 + i * 0.65,
+        alpha: 0.96 * pulse,
+        tint,
+      });
+    }
+    if (reducedMotion) return neutral;
+    return {
+      critterOffsetY: -(2.5 + 5.5 * Math.sin(u * Math.PI)),
+      critterRotation: Math.sin((litNote + 1) * 1.3 + u * Math.PI * 2) * 0.045,
+      faeOffsetY: 0,
+      faeRotation: 0,
+    };
+  }
+
+  vfx.push(
+    {
+      texture: "softGlow",
+      blend: "normal",
+      anchor: "fae",
+      offsetX: 14,
+      offsetY: -56 - u * 18,
+      scaleX: 1.24 + pulse * 0.22,
+      scaleY: 1.02 + pulse * 0.18,
+      rotation: 0,
+      alpha: 0.54 * pulse,
+      tint,
+    },
+    {
+      texture: "energyRing",
+      blend: "normal",
+      anchor: "fae",
+      offsetX: 20 + u * 24,
+      offsetY: -58 - u * 22,
+      scaleX: 0.48 + u * 0.52,
+      scaleY: 0.38 + u * 0.42,
+      rotation: reducedMotion ? 0 : 0.12,
+      alpha: 0.88 * (1 - u * 0.6),
+      tint,
+    },
+  );
+  for (let i = 0; i < 4; i += 1) {
+    const arcT = 0.08 + u * 0.34 + i * 0.055;
+    const archLift = Math.sin(arcT * Math.PI) * 58;
+    const sway = reducedMotion ? 0 : Math.sin(u * Math.PI * 2 + i) * 5;
+    const scale = (0.5 + (i % 2) * 0.16) * (0.8 + pulse * 0.28);
+    vfx.push({
+      texture: "sparkle",
+      blend: "normal",
+      anchor: "between",
+      t: arcT,
+      offsetX: (i - 1.5) * 10,
+      offsetY: -44 - archLift - (i % 2) * 10 + sway - pitchShift,
+      scaleX: scale,
+      scaleY: scale,
+      rotation: reducedMotion ? 0 : u * 1.8 + i * 0.7,
+      alpha: 0.96 * pulse,
+      tint,
+    });
+  }
+  if (reducedMotion) return neutral;
+  return {
+    critterOffsetY: 0,
+    critterRotation: 0,
+    faeOffsetY: -(2 + 4.5 * Math.sin(u * Math.PI)),
+    faeRotation: Math.sin((litNote + 1) * 1.1 + u * Math.PI * 2) * 0.04,
+  };
+}
+
+export function emitLeanWindVfx(
+  vfx: BattleVfxParticle[],
+  blowing: boolean,
+  tick: number,
+  reducedMotion = false,
+): void {
+  if (!blowing) return;
+  const wispLanes: readonly number[] = [-46, -24, -4, 16, -34, 30];
+  for (let i = 0; i < 6; i += 1) {
+    const phase = ((tick * 0.042 + i / 6) % 1 + 1) % 1;
+    const t = reducedMotion ? 0.22 + (i / 5) * 0.44 : 0.66 - phase * 0.5;
+    const fade = reducedMotion ? 0.94 : Math.pow(Math.sin(phase * Math.PI), 0.55);
+    const wave = reducedMotion ? 0 : Math.sin(phase * Math.PI * 2 + i * 1.1) * 5;
+    vfx.push({
+      texture: "mistWisp",
+      blend: "normal",
+      anchor: "between",
+      t,
+      offsetX: 0,
+      offsetY: (wispLanes[i] ?? 0) + wave,
+      scaleX: 1.0 + (i % 3) * 0.14,
+      scaleY: 0.34 + (i % 2) * 0.06,
+      rotation: reducedMotion ? 0 : -0.04 + ((i % 3) - 1) * 0.025,
+      alpha: Math.min(0.96, 0.98 * fade),
+      tint: LEAN_WIND_TINTS[i % LEAN_WIND_TINTS.length] ?? 0x7ac7ea,
+    });
+  }
+
+  const fleckLanes: readonly number[] = [-30, 4, 24];
+  for (let i = 0; i < 3; i += 1) {
+    const phase = ((tick * 0.055 + i / 3 + 0.16) % 1 + 1) % 1;
+    const t = reducedMotion ? 0.26 + i * 0.18 : 0.64 - phase * 0.48;
+    const fade = reducedMotion ? 0.94 : Math.pow(Math.sin(phase * Math.PI), 0.55);
+    const wave = reducedMotion ? 0 : Math.cos(phase * Math.PI * 2 + i) * 6;
+    vfx.push({
+      texture: "sparkle",
+      blend: "normal",
+      anchor: "between",
+      t,
+      offsetX: 0,
+      offsetY: (fleckLanes[i] ?? 0) + wave,
+      scaleX: 0.94 + (i % 2) * 0.14,
+      scaleY: 0.5 + (i % 2) * 0.08,
+      rotation: reducedMotion ? 0 : -0.08 + Math.sin(phase * Math.PI * 2 + i) * 0.06,
+      alpha: Math.min(0.98, 0.98 * fade),
+      tint: LEAN_WIND_TINTS[(i + 1) % LEAN_WIND_TINTS.length] ?? 0x82d8be,
+    });
+  }
+}
+
+export function emitPeekabooVfx(
+  vfx: BattleVfxParticle[],
+  status: PeekabooStatus,
+  progress: number,
+  tick: number,
+  reducedMotion = false,
+  progressRatio = 0,
+): void {
+  if (status === "warning") {
+    const pulse = reducedMotion ? 0.5 : 0.5 + 0.5 * Math.sin(tick * 0.35);
+    vfx.push({
+      texture: "softGlow",
+      blend: "normal",
+      anchor: "critter",
+      offsetX: 4,
+      offsetY: -128,
+      scaleX: 1.55 + pulse * 0.2,
+      scaleY: 1.12 + pulse * 0.14,
+      rotation: 0,
+      alpha: 0.44 + pulse * 0.12,
+      tint: PEEKABOO_WARNING_TINT,
+    });
+    const sparkX: readonly number[] = [-42, 4, 48];
+    const sparkY: readonly number[] = [-132, -150, -128];
+    for (let i = 0; i < 3; i += 1) {
+      const twinkle = reducedMotion ? 0.5 : 0.5 + 0.5 * Math.sin(tick * 0.42 + i * 1.4);
+      const scale = 0.52 + twinkle * 0.18;
+      vfx.push({
+        texture: "sparkle",
+        blend: "normal",
+        anchor: "critter",
+        offsetX: sparkX[i] ?? 0,
+        offsetY: (sparkY[i] ?? -136) - (reducedMotion ? 0 : twinkle * 4),
+        scaleX: scale,
+        scaleY: scale,
+        rotation: reducedMotion ? 0 : tick * 0.08 + i * 0.7,
+        alpha: 0.82 + twinkle * 0.16,
+        tint: PEEKABOO_WARNING_TINT,
+      });
+    }
+    return;
+  }
+
+  if (status === "watching") {
+    const pulse = reducedMotion ? 0.5 : 0.5 + 0.5 * Math.sin(tick * 0.24);
+    vfx.push(
+      {
+        texture: "softGlow",
+        blend: "normal",
+        anchor: "critter",
+        offsetX: -112,
+        offsetY: -22,
+        scaleX: 1.85 + pulse * 0.16,
+        scaleY: 1.45 + pulse * 0.12,
+        rotation: 0,
+        alpha: 0.34 + pulse * 0.08,
+        tint: PEEKABOO_WATCH_TINTS[1] ?? 0xd4b6fa,
+      },
+      {
+        texture: "energyRing",
+        blend: "normal",
+        anchor: "critter",
+        offsetX: -16,
+        offsetY: -12,
+        scaleX: 2.48 + pulse * 0.14,
+        scaleY: 2.28 + pulse * 0.12,
+        rotation: reducedMotion ? 0 : -0.05 + Math.sin(tick * 0.12) * 0.04,
+        alpha: 0.8 + pulse * 0.1,
+        tint: PEEKABOO_WATCH_TINTS[0] ?? 0x9bc8ff,
+      },
+    );
+    const starX: readonly number[] = [-142, -112, -132, 114];
+    const starY: readonly number[] = [-82, -18, 38, -94];
+    for (let i = 0; i < 4; i += 1) {
+      const twinkle = reducedMotion ? 0.5 : 0.5 + 0.5 * Math.sin(tick * 0.3 + i * 1.25);
+      const scale = 0.66 + (i % 2) * 0.14 + twinkle * 0.12;
+      vfx.push({
+        texture: "sparkle",
+        blend: "normal",
+        anchor: "critter",
+        offsetX: starX[i] ?? -100,
+        offsetY: (starY[i] ?? -20) + (reducedMotion ? 0 : Math.sin(tick * 0.2 + i) * 4),
+        scaleX: scale,
+        scaleY: scale,
+        rotation: reducedMotion ? 0 : tick * 0.06 + i * 0.75,
+        alpha: 0.88 + twinkle * 0.1,
+        tint: PEEKABOO_WATCH_TINTS[i % PEEKABOO_WATCH_TINTS.length] ?? 0x9bc8ff,
+      });
+    }
+    return;
+  }
+
+  if (progress <= 0) return;
+  const tiptoeShift = 34 * clamp01(progressRatio);
+  for (let i = 0; i < 2; i += 1) {
+    const cycle = reducedMotion ? 0.35 + i * 0.25 : ((tick + i * 11) % 22) / 22;
+    const fade = reducedMotion ? 0.92 : Math.sin(cycle * Math.PI);
+    const scale = 0.26 + cycle * 0.1;
+    vfx.push({
+      texture: "puff",
+      blend: "normal",
+      anchor: "fae",
+      offsetX: tiptoeShift - 24 - i * 14 - cycle * 12,
+      offsetY: 64 - i * 4 - cycle * 9,
+      scaleX: scale,
+      scaleY: scale * 0.82,
+      rotation: reducedMotion ? 0 : -0.18 - i * 0.14,
+      alpha: 0.45 * fade,
+      tint: PEEKABOO_DUST_TINT,
+    });
+  }
+}
+
+export function emitTraceBrushVfx(
+  vfx: BattleVfxParticle[],
+  check: Extract<CheckState, { kind: "trace" }>,
+  view: Extract<BattleCheckView, { kind: "trace" }> | null,
+  tick: number,
+  reducedMotion = false,
+): TraceBrushMotion {
+  const neutral: TraceBrushMotion = { faeOffsetX: 0, faeOffsetY: 0, faeRotation: 0 };
+  const points = view !== null ? view.path.points : check.path.points;
+  const results = view !== null ? view.results : check.results;
+  const brush = view !== null ? view.brush : check.brush;
+  const checkpoint = view !== null ? view.checkpoint : check.checkpoint;
+
+  const first = points[0];
+  const brushMoved =
+    first !== undefined && Math.hypot(brush.x - first.x, brush.y - first.y) > 1;
+  const hits = results.filter((result) => result === "hit").length;
+  // Point 0 auto-resolves on tick 1 as the starting dot; segments completed beyond point 0
+  // track active tracing progress cleanly from 0..1 without perturbing tick-0/idle frames.
+  const totalSegments = Math.max(1, points.length - 1);
+  const progress = clamp01(Math.max(0, hits - 1) / totalSegments);
+  const drawing = brushMoved || checkpoint >= 2 || hits >= 2;
+  if (progress <= 0 && !drawing) return neutral;
+
+  const glowIndex = Math.min(
+    TRACE_BRUSH_COLORS.length - 1,
+    Math.floor(progress * TRACE_BRUSH_COLORS.length),
+  );
+  const glowTint = TRACE_BRUSH_COLORS[glowIndex] ?? 0xff85a8;
+  const glowPulse = reducedMotion ? 0.5 : 0.5 + 0.5 * Math.sin(tick * 0.24);
+  vfx.push({
+    texture: "softGlow",
+    blend: "normal",
+    anchor: "fae",
+    offsetX: 44,
+    offsetY: -34,
+    scaleX: 1.05 + progress * 0.35 + glowPulse * 0.14,
+    scaleY: 0.92 + progress * 0.3 + glowPulse * 0.12,
+    rotation: 0,
+    alpha: 0.26 + progress * 0.16 + glowPulse * 0.08,
+    tint: glowTint,
+  });
+
+  const sparkleCount = Math.min(6, Math.max(2, 2 + Math.round(progress * 4)));
+  const offsetsX: readonly number[] = [30, 48, 36, 58, 26, 62];
+  const offsetsY: readonly number[] = [-18, -36, -50, -24, -40, -54];
+  for (let i = 0; i < sparkleCount; i += 1) {
+    const baseX = offsetsX[i] ?? 42;
+    const baseY = offsetsY[i] ?? -34;
+    const driftX = reducedMotion ? 0 : Math.sin(tick * 0.22 + i * 1.3) * 3;
+    const driftY = reducedMotion ? 0 : Math.cos(tick * 0.26 + i * 1.1) * 3;
+    const twinkle = reducedMotion ? 0.5 : 0.5 + 0.5 * Math.sin(tick * 0.32 + i * 1.4);
+    const scale = (0.56 + (i % 2) * 0.16) * (0.85 + progress * 0.2 + twinkle * 0.15);
+    vfx.push({
+      texture: "sparkle",
+      blend: "normal",
+      anchor: "fae",
+      offsetX: Math.max(24, Math.min(64, baseX + driftX)),
+      offsetY: Math.max(-56, Math.min(-10, baseY + driftY)),
+      scaleX: scale,
+      scaleY: scale,
+      rotation: reducedMotion ? 0 : tick * 0.09 + i * 0.75,
+      alpha: Math.min(0.96, 0.82 + progress * 0.1 + twinkle * 0.08),
+      tint: TRACE_BRUSH_COLORS[i % TRACE_BRUSH_COLORS.length] ?? 0xff85a8,
+    });
+  }
+
+  if (reducedMotion) return neutral;
+  return {
+    faeOffsetX: 6 * Math.sin(tick * 0.22),
+    faeOffsetY: -3 * Math.abs(Math.sin(tick * 0.22)),
+    faeRotation: 0.05 * Math.sin(tick * 0.22),
+  };
+}

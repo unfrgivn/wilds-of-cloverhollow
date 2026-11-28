@@ -11,15 +11,16 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 
 export type AlbumFilter = "all" | TrackCategory;
 export type JournalJukeboxSnapshot = { nowPlaying?: string; jukebox?: JukeboxMeta };
+export type JournalJukeboxOptions = {
+  onBeforeOpen?: () => void; onVisibilityChange?: (open: boolean) => void; onClose?: () => void;
+  onSelectTrack?: (track: JukeboxTrack) => void; onResetTrack?: () => void;
+  onFilterChange?: () => void;
+};
 export type JournalJukeboxAlbum = {
-  overlay: HTMLDivElement;
-  treasuresBtn: HTMLButtonElement;
+  overlay: HTMLDivElement; treasuresBtn: HTMLButtonElement;
   open: (snapshot: JournalJukeboxSnapshot | null, returnTarget?: HTMLElement | null) => void;
-  sync: (snapshot: JournalJukeboxSnapshot) => void;
-  close: () => void;
-  clear: () => void;
-  isOpen: () => boolean;
-  handleKeydown: (event: KeyboardEvent) => boolean;
+  sync: (snapshot: JournalJukeboxSnapshot) => void; close: () => void; clear: () => void;
+  isOpen: () => boolean; handleKeydown: (event: KeyboardEvent) => boolean;
 };
 
 const FILTER_DEFS: readonly { id: AlbumFilter; label: string }[] = [
@@ -116,13 +117,7 @@ function buildTrackCard(
 }
 
 /** Creates the interactive 33-track Storybook Soundtrack Album modal for Fae's Journal. */
-export function createJournalJukeboxAlbum(options?: {
-  onBeforeOpen?: () => void;
-  onVisibilityChange?: (open: boolean) => void;
-  onClose?: () => void;
-  onSelectTrack?: (track: JukeboxTrack) => void;
-  onResetTrack?: () => void;
-}): JournalJukeboxAlbum {
+export function createJournalJukeboxAlbum(options?: JournalJukeboxOptions): JournalJukeboxAlbum {
   const overlay = element("div", "journal-jukebox-overlay");
   overlay.hidden = true;
   const card = element("article", "journal-jukebox-card", overlay);
@@ -171,13 +166,18 @@ export function createJournalJukeboxAlbum(options?: {
 
   let openState = false;
   let lastSig = "";
+  let activeFilter: AlbumFilter = "all";
+  let activeTrack: JukeboxTrack | null = null;
   let returnFocusEl: HTMLElement | null = null;
 
-  const applyFilter = (next: AlbumFilter): void => {
+  const applyFilter = (next: AlbumFilter, notify = true): void => {
+    const changed = next !== activeFilter;
+    activeFilter = next;
     setAttribute(card, "data-album-filter", next);
     for (const item of filterBtns) setAttribute(item.btn, "aria-pressed", String(item.id === next));
     for (const ref of trackRefs) ref.btn.hidden = next !== "all" && ref.meta.category !== next;
     grid.scrollTop = 0;
+    if (notify && changed) options?.onFilterChange?.();
   };
   for (const item of filterBtns) item.btn.addEventListener("click", () => applyFilter(item.id));
   resetBtn.addEventListener("click", () => { options?.onResetTrack?.(); });
@@ -185,33 +185,29 @@ export function createJournalJukeboxAlbum(options?: {
   const clear = (): void => {
     returnFocusEl = null;
     if (!openState && overlay.hidden) return;
-    openState = false;
-    overlay.hidden = true;
+    openState = false; overlay.hidden = true;
   };
   const close = (): void => {
     if (!openState && overlay.hidden) return;
     const target = returnFocusEl;
     clear();
-    options?.onClose?.();
-    options?.onVisibilityChange?.(false);
+    options?.onClose?.(); options?.onVisibilityChange?.(false);
     if (isFocusable(target)) target.focus({ preventScroll: true });
   };
   const sync = (snapshot: JournalJukeboxSnapshot): void => {
     if (!openState) { if (!overlay.hidden) clear(); return; }
     overlay.hidden = false;
-    const activeTrack = resolveActiveTrack(snapshot);
+    activeTrack = resolveActiveTrack(snapshot);
     const jukeboxActive = snapshot.jukebox?.active === true;
     const titleText = activeTrack !== null
-      ? trackAlbumEntry(activeTrack).title
-      : (snapshot.nowPlaying ?? "");
+      ? trackAlbumEntry(activeTrack).title : (snapshot.nowPlaying ?? "");
     const nextSig = `${activeTrack ?? "none"}|${jukeboxActive ? 1 : 0}|${titleText}`;
     if (nextSig === lastSig) return;
     lastSig = nextSig;
     setAttribute(card, "data-jukebox-active", String(jukeboxActive));
     countPill.classList.toggle("is-active", jukeboxActive);
-    const pillText = jukeboxActive && titleText !== ""
-      ? `♪ Playing: ${titleText}` : `${JUKEBOX_ALBUM.length} Themes`;
-    setText(countPill, pillText);
+    setText(countPill, jukeboxActive && titleText !== ""
+      ? `♪ Playing: ${titleText}` : `${JUKEBOX_ALBUM.length} Themes`);
     resetBtn.hidden = !jukeboxActive;
     if (!jukeboxActive && document.activeElement === resetBtn) card.focus({ preventScroll: true });
     for (const ref of trackRefs) {
@@ -234,12 +230,13 @@ export function createJournalJukeboxAlbum(options?: {
       returnFocusEl = returnTarget ??
         (document.activeElement instanceof HTMLElement ? document.activeElement : null);
     }
-    openState = true;
-    overlay.hidden = false;
-    if (!wasOpen) applyFilter("all");
+    openState = true; overlay.hidden = false;
+    if (!wasOpen) applyFilter("all", false);
     lastSig = "";
     sync(snapshot ?? {});
     card.focus({ preventScroll: true });
+    const activeRef = trackRefs.find((ref) => !ref.btn.hidden && ref.meta.track === activeTrack);
+    activeRef?.btn.scrollIntoView?.({ block: "nearest" });
     if (!wasOpen) options?.onVisibilityChange?.(true);
   };
   const handleKeydown = (event: KeyboardEvent): boolean => {

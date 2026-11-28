@@ -103,6 +103,10 @@ export function bindShellUiControls(deps: ShellUiBindingDeps): void {
     sound.playEffect("paper-flip");
     lightHaptic();
   });
+  ui.journal.onJukeboxFilter(() => {
+    sound.playEffect("paper-flip");
+    lightHaptic();
+  });
   ui.journal.onOverlayStep(playPageTurn);
   ui.journal.onOverlayChange((open) => {
     sound.playEffect(open ? "card-open" : "card-close");
@@ -140,7 +144,8 @@ export function bindShellUiControls(deps: ShellUiBindingDeps): void {
   ui.journal.onResetJukebox(() => {
     if (deps.getJukeboxTrack() === null) return;
     deps.setJukeboxTrack(null);
-    playToggleFeedback(false);
+    sound.playEffect("sticker-peel");
+    lightHaptic();
     invalidate();
   });
   ui.journal.onToggleGentleTiming(
@@ -267,9 +272,11 @@ export function createPostcardSnapper(deps: {
       download: options?.download !== false,
       preferShare: document.documentElement.dataset.touch === "on",
       weather,
-      onDelivered: (capture, delivery) => {
+      onDelivered: (capture, delivery, deliveredWeather) => {
         if (deps.isPhotoMode()) {
-          deps.photoToast.show(postcardToastMessage(delivery, capture.caption));
+          deps.photoToast.show(
+            postcardToastMessage(delivery, capture.caption, deliveredWeather ?? weather),
+          );
         }
       },
     });

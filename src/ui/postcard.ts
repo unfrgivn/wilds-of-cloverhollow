@@ -362,10 +362,15 @@ export async function deliverPostcard(
 export function postcardToastMessage(
   delivery: Exclude<PostcardDeliveryResult, "cancelled">,
   caption: string,
+  weather?: CozyWeatherKind,
 ): string {
   const shortCaption = caption.replace(/\s*·\s*Wilds of Cloverhollow$/i, "").trim();
   const label = shortCaption.length > 0 ? shortCaption : caption.trim() || "Wilds of Cloverhollow";
-  return delivery === "shared" ? `Postcard shared · ${label}` : `Postcard saved · ${label}`;
+  const verb = delivery === "shared" ? "shared" : "saved";
+  const weatherLabel = postcardWeatherLabel(weather);
+  return weatherLabel.length > 0
+    ? `Postcard ${verb} · ${label} · ${weatherLabel}`
+    : `Postcard ${verb} · ${label}`;
 }
 
 /** Gentle non-blocking confirmation pill shown after snapping a Photo Mode postcard. */

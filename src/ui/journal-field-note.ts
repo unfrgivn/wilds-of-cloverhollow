@@ -115,6 +115,7 @@ export function createJournalFieldOverlays(options?: {
   onWeatherSelect?: (mode: CozyWeatherMode) => void;
   onSelectTrack?: (track: JukeboxTrack) => void;
   onResetTrack?: () => void;
+  onJukeboxFilter?: () => void;
 }): JournalFieldOverlays {
   const fieldBackdrop = element("div", "journal-field-backdrop");
   fieldBackdrop.hidden = true;
@@ -269,6 +270,7 @@ export function createJournalFieldOverlays(options?: {
   const jukeboxAlbum = createJournalJukeboxAlbum({
     ...peerHooks("jukebox"),
     onSelectTrack: options?.onSelectTrack, onResetTrack: options?.onResetTrack,
+    onFilterChange: options?.onJukeboxFilter,
   });
   const peerModals = {
     weather: weatherAlmanac, ribbons: ribbonsShowcase, hearts: heartsAlbum,

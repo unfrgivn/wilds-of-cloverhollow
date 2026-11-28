@@ -163,6 +163,7 @@ export async function deliverAreaPostcard(
     onDelivered?: (
       capture: PostcardCapture,
       delivery: Exclude<PostcardDeliveryResult, "cancelled">,
+      weather?: CozyWeatherKind,
     ) => void;
   },
 ): Promise<PostcardCapture | null> {
@@ -181,7 +182,7 @@ export async function deliverAreaPostcard(
   if (capture === null) return null;
   if (options?.download !== false) {
     const delivery = await deliverPostcard(capture, { preferShare: options?.preferShare });
-    if (delivery !== "cancelled") options?.onDelivered?.(capture, delivery);
+    if (delivery !== "cancelled") options?.onDelivered?.(capture, delivery, options?.weather);
   }
   return capture;
 }

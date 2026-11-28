@@ -9279,6 +9279,49 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   checks green), and Chromium & WebKit e2e tests (`milestone-215`,
   `milestone-214`, `milestone-124`, `milestone-187`, `milestone-190`,
   `milestone-204`, `milestone-212`).
+
+## Milestone 216: Soundtrack Album Tactile Foley & Active-Track Auto-Scroll, Weather-Aware Photo Toast & `battle-vfx-checks.ts` + `progression-parsers.ts` Modular Splits (Elevation Track E19J) **Status:** ✅ Completed (2026-11-28)
+- 33-Track Soundtrack Album Tactile Foley & Active-Track Auto-Scroll
+  (`src/ui/journal-jukebox.ts`, `src/ui/journal-field-note.ts`,
+  `src/ui/journal.ts`, `src/shell/shell-bindings.ts`):
+  - Adds optional `onFilterChange` on `JournalJukeboxOptions` fired strictly
+    when changing to a different category filter (`next !== activeFilter`),
+    threaded through `journal.onJukeboxFilter` to play `"paper-flip"` + light
+    haptic.
+  - Plays `"sticker-peel"` + light haptic inside `ui.journal.onResetJukebox`
+    when returning to the live Area Theme.
+  - Auto-scrolls the currently playing visible track button into view via
+    `scrollIntoView({ block: "nearest" })` after syncing and focusing on
+    `open()`.
+- Weather-Aware Photo Mode Confirmation Toast (`src/ui/postcard.ts`,
+  `src/shell/overworld-feedback.ts`, `src/shell/shell-bindings.ts`):
+  - Extends `postcardToastMessage(delivery, caption, weather?)` cleanly with
+    backwards-compatible weather stamping (`Postcard saved/shared · <Area> ·
+    <Weather>`) whenever active outdoor cozy weather is present while keeping
+    `undefined` / `"clear"` strings byte-identical, and threads `weather`
+    through `deliverAreaPostcard` and `createPostcardSnapper`.
+- Modular Extraction of Pixi-Free `src/render/battle-vfx-checks.ts`
+  (`src/render/battle-vfx-stage.ts` `827 -> 409` lines,
+  `src/render/battle-vfx-checks.ts` `428` lines):
+  - Extracts Echo Chimes, Wind-Gust Lean, Starry Owl Peekaboo, and Shape Trace
+    Brush VFX constants, types, and emitters into Pixi-free, DOM-free
+    `src/render/battle-vfx-checks.ts` and re-exports every symbol identically
+    through `src/render/battle-vfx-stage.ts`.
+- Modular Extraction of `src/content/progression-parsers.ts`
+  (`src/content/battle-parsers.ts` `836 -> 496` lines,
+  `src/content/progression-parsers.ts` `338` lines):
+  - Extracts party, sticker, level, treat, encore, and gift-basket parsers &
+    validators into `src/content/progression-parsers.ts` and re-exports every
+    symbol identically through `src/content/battle-parsers.ts`.
+- Evidence: `tests/unit/milestone-216.test.ts` and
+  `tests/e2e/milestone-216.spec.ts` (`@smoke`, Chromium + WebKit).
+- Gates: `just check` (284 unit files / 2,076 tests, all 77 recorded + 7
+  headless sims with zero hash shifts, 23 QA packs, purity, lint), `just build`
+  (largest non-vendor chunk `390.92 kB < 500 kB`, hook leak + runtime story +
+  harness checks green), and 20/20 Chromium & WebKit e2e tests (`milestone-216`,
+  `milestone-215`, `milestone-214`, `milestone-211`, `milestone-160`,
+  `milestone-158`, `milestone-199`).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

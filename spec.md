@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 162)
+Last updated: 2026-11-27 (Milestone 163)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -415,7 +415,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   ragtime for `parlor`), `loft` ("Paper Plane Sketchbook", 96 BPM 4/4 C major /
   A minor daydream for `milo-house`), `bloom` ("Rosie's Flower Window", 94 BPM
   3/4 F major pastoral waltz for `rosie-cottage`), `hills` ("Clover Meadow"),
-  `sanctuary` ("Meadow of Friends"), `school` ("Bell & Chalk"), `bay`
+  `sanctuary` ("Meadow of Friends", pre-reveal Wildlife Sanctuary), `festival`
+  ("Cloverhollow Jubilee", 108 BPM 4/4 D major / G major celebration jubilee for
+  post-finale `sanctuary` once `milo_revealed === true`, over `"forest"`
+  ambience), `school` ("Bell & Chalk"), `bay`
   ("Bubblegum Breeze"), `fishing` ("Docked by the Tide", unducked over
   `"ocean"` ambience while `state.arcade.game === "fish"` at Bubblegum Bay's
   dock, ducking only when dialogue opens), `cottage` ("Sea-Glass Sunroom", 88
@@ -433,12 +436,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   Purple Hood", for wind-up mini-bosses, Talk battles, or non-runnable
   battles), `talk` ("Listening Heart", once Talk opens or calm reaches
   `talkAt`), `morning` ("Waking Up", during the morning and credits finale),
-  and `silent` ("Quiet", for `harness`). `jukeboxTracks` exports all 29
+  and `silent` ("Quiet", for `harness`). `jukeboxTracks` exports all 30
   non-silent themes in story/album order (`title`, `home`, `cafe`, `market`,
   `parlor`, `loft`, `bloom`, `school`, `bay`, `fishing`, `cottage`, `island`,
   `pass`, `lodge`, `cabin`, `summit`, `cavern`, `woods`, `clubhouse`, `hills`,
-  `sanctuary`, `arcade`, `taco`, `enchanted`, `enchanted-calm`, `battle`,
-  `boss`, `talk`, `morning`) for the Journal OPTIONS Music Box (shell-only
+  `sanctuary`, `festival`, `arcade`, `taco`, `enchanted`, `enchanted-calm`,
+  `battle`, `boss`, `talk`, `morning`) for the Journal OPTIONS Music Box (shell-only
   override, never saved, plays unducked while the journal is open and returns
   smoothly to the live area theme on close, title, or reset). Ambience beds
   (`none`, `town-breeze`, `ocean`, `mountain-wind`, `hearth`, `forest`,
@@ -449,7 +452,7 @@ ios/            Capacitor iOS project (from Milestone 4).
 - `src/platform/audio.ts` creates a single AudioContext first thing at boot,
   before anything awaits, and resumes it at every chance: right away, on each
   key, pointer, or touch, and whenever a cue plays while it isn't running.
-  Its master chain routes SFX, music (`src/platform/music.ts` over the 29
+  Its master chain routes SFX, music (`src/platform/music.ts` over the 30
   multi-voice scores split across `src/platform/scores-helpers.ts`,
   `src/platform/scores-town.ts`, `src/platform/scores-wilds.ts`,
   `src/platform/scores-interiors.ts`, and `src/platform/scores-expansion.ts`,
@@ -502,7 +505,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   pitch and `[0.65, 1.25]` gain with bit-identical output when `prosody` is
   omitted or `NEUTRAL_PROSODY`), and pitch `choice-move`, `battle-command`, and
   `choice-select` clicks to the active soundtrack's pentatonic scale (across all
-  29 tracks + `silent`).
+  30 tracks + `silent`).
   Browsers hold the context (`suspended`, or WebKit's `interrupted`) until a
   key, click, or tap; a gamepad press is not a user activation in any browser,
   so a pad-only player on the web hears nothing until one. The iOS app's web
@@ -1666,8 +1669,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   `prompt: "Pet"` and unique `pet_*` reactions. Its fixture `sanctuary`
   populates 8 calmed animals with Maddie, Sue, and Jordan; its atmosphere adds
   warm alpine sunbeams, NW lily-pond water glints, and golden wildflower pollen
-  motes; its soundtrack plays `"hills"` ("Clover Meadow") with `"forest"`
-  ambience.
+  motes; its pre-reveal soundtrack plays `"sanctuary"` ("Meadow of Friends")
+  with `"forest"` ambience, shifting to `"festival"` ("Cloverhollow Jubilee")
+  once `milo_revealed` is true.
   - **Post-Finale "Sunny Cloverhollow" Epilogue & Sanctuary Celebration
     Festival**: once `milo_revealed` is true (never beforehand, keeping Milo
     100% unnamed before `calmed("hooded-kid")` and `milo_revealed`), four
@@ -4169,28 +4173,30 @@ trunks keep its two exits.
   `.touch-button:active` tactile squash, and subtle inner-label float on
   `.sticker-prompt` keeping its arrow tip anchored.
 - Tactile Minigame Personal Bests & Die-Cut Arcade Score Popups (Milestone 112,
-  extended to Clubhouse Microwave in Milestone 118 and completed across all 6/6
-  minigames with Claw Machine popups in Milestone 137):
+  extended to Clubhouse Microwave in Milestone 118, Claw Machine popups in
+  Milestone 137, and Chef Mateo's Taco Truck Kitchen personal bests in
+  Milestone 163):
   persistent local personal bests (`src/platform/minigame-records.ts`, stored
   outside the save slot via `@capacitor/preferences` under
   `"cloverhollow-records"` with keys `skee`, `mole`, `comet`, consecutive
-  fishing catch streak `fish`, and cumulative Golden Dishes cooked `cook`,
-  cleanly upgrading legacy 4-key JSON with `cook: 0`; zero `src/core` changes
-  and zero save-version
+  fishing catch streak `fish`, cumulative Golden Dishes cooked `cook`, and Taco
+  Truck Kitchen high score `taco`, cleanly upgrading legacy 4-key and 5-key
+  JSON with `cook: 0` / `taco: 0`; zero `src/core` changes and zero save-version
   bump) and live Paper-Mario die-cut arcade score popups (`src/ui/arcade-popups.ts`
   and `src/ui/arcade-popups.css`). Pure classifiers (`classifySkeePopup`,
   `classifyMolePopup`, `classifyCometPopup`, `classifyFishPopup`,
-  `classifyCookPopup`, `classifyClawPopup`) stay silent on
+  `classifyCookPopup`, `classifyClawPopup`, `classifyTacoPopup`) stay silent on
   initial open, reset, or static `ui-gallery` renders, and spawn crisp
   `#47321f`-inked `.arcade-popup` pills (`+N`, `+50!`, `+100 ★!`, `BOOP! +2`,
   `★ +1`, `NICE CATCH!`, `★ RARE!`, `★ GOLDEN!`, `GOT IT! ★`, `TUG!`,
-  `★ PRIZE!`) in the upper-right margin inside `.arcade-popups`
-  (`aria-live="polite"`, `aria-atomic="false"`, Milestone 138) on live gains or
-  Claw Machine lift/prize transitions.
+  `★ PRIZE!`, `ORDER UP! ★`, `★ SPOTLESS!`) in the upper-right margin inside
+  `.arcade-popups` (`aria-live="polite"`, `aria-atomic="false"`, Milestone 138)
+  on live gains or minigame clear/prize transitions.
   When a live round enters `phase === "result"`, the minigame renders a die-cut
   `.arcade-best-badge` pill (`★ NEW BEST! <best>` in gold when beating a
   non-zero record, or `Best: <best>` in warm cream otherwise) in the vacated
-  HUD/escape slot (centered on the mint bezel above the glass in `src/ui/cook.ts`);
+  HUD/escape slot (centered on the mint bezel above the glass in `src/ui/cook.ts`
+  and centered on the striped awning header in `src/ui/taco.ts`);
   static gallery callers omit the optional second `record`
   argument so gallery baselines stay pixel-identical. All popup and badge
   animations respect both `@media (prefers-reduced-motion: reduce)` and
@@ -4487,10 +4493,11 @@ trunks keep its two exits.
   `src/platform/minigame-records.ts`): attached directly below `.journal-prizes`
   on the right page of `NOTES` (`role="region"`, `aria-label="Arcade and fishing
   records"`, `.journal-records-strip`) only when at least one local minigame
-  personal best is `> 0` (omitted when all five are `0` so fresh Journal layouts
+  personal best is `> 0` (omitted when all six are `0` so fresh Journal layouts
   stay unchanged). Displays a warm-gold `BESTS` label and rounded pastel pills
   in canonical order (`★ Skee-Ball · N`, `★ Boop-a-Mole · N boops`, `★ Comet
-  Cruise · N stars`, `★ Fishing Streak · N`, `★ Golden Dishes · N`) with
+  Cruise · N stars`, `★ Fishing Streak · N`, `★ Golden Dishes · N`,
+  `★ Taco Truck · N pts`) with
   `>= 8.5:1` `#47321f` ink
   contrast and zero horizontal overflow across desktop and phone viewports.
 - Complete Journal Collection Showcase (Milestone 94, pure helpers

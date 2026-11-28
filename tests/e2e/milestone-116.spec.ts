@@ -150,7 +150,7 @@ test.describe("Milestone 116: Journal Arcade Shelf, Keyboard Jukebox & Key Hints
 
       await expect
         .poll(() => page.evaluate(() => window.__cloverhollow?.settings.minigameRecords()))
-        .toEqual({ skee: 220, mole: 14, comet: 18, fish: 5, cook: 0 });
+        .toEqual({ skee: 220, mole: 14, comet: 18, fish: 5, cook: 0, taco: 0 });
 
       await tapKey(page, "j");
       await expect(page.locator(".journal-book")).toBeVisible();
@@ -264,7 +264,7 @@ test.describe("Milestone 116: Journal Arcade Shelf, Keyboard Jukebox & Key Hints
       await expect(nowPlaying).toHaveAttribute("data-browsing", "true");
       await expect(nowPlaying).toHaveAttribute(
         "aria-label",
-        /Track 4 of 29: Pippin's Basket Waltz/,
+        /Track 4 of 30: Pippin's Basket Waltz/,
       );
       expect((await readMusic(page)).duck).toBe(false);
 
@@ -272,7 +272,7 @@ test.describe("Milestone 116: Journal Arcade Shelf, Keyboard Jukebox & Key Hints
       await page.keyboard.press("ArrowLeft");
       await expect.poll(async () => (await readMusic(page)).track).toBe("cafe");
       await expect(nowPlaying).toHaveText("♫ Cinnamon Waltz");
-      await expect(nowPlaying).toHaveAttribute("aria-label", /Track 3 of 29: Cinnamon Waltz/);
+      await expect(nowPlaying).toHaveAttribute("aria-label", /Track 3 of 30: Cinnamon Waltz/);
 
       // Click .journal-now-playing to reset smoothly back to live area theme.
       await nowPlaying.click();

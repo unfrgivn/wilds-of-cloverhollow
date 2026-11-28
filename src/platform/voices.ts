@@ -780,6 +780,7 @@ const TRACK_SCALES: Record<MusicTrack, readonly number[]> = {
   bay: D_MAJOR,
   island: D_MAJOR,
   sanctuary: D_MAJOR,
+  festival: D_MAJOR,
   pass: EB_MAJOR,
   cottage: EB_MAJOR_WARM,
   cavern: D_DORIAN,

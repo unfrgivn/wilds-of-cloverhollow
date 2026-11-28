@@ -193,6 +193,21 @@ export function resolveArcadeOutcome(
       goldenCooked: false,
     };
   }
+  if (nextArcade.game === "taco") {
+    if (nextArcade.score > 0) {
+      return {
+        record: records.submit("taco", nextArcade.score),
+        fishStreak: nextStreak,
+        goldenCooked: false,
+      };
+    }
+    const best = records.bestOf("taco");
+    return {
+      record: best > 0 ? { best, isNewBest: false } : null,
+      fishStreak: nextStreak,
+      goldenCooked: false,
+    };
+  }
   return { record: currentRecord, fishStreak: nextStreak, goldenCooked: false };
 }
 

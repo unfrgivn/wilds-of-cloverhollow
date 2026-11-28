@@ -1,6 +1,6 @@
 import { createPreferenceStore } from "./preference-store";
 
-export type MinigameKey = "skee" | "mole" | "comet" | "fish" | "cook";
+export type MinigameKey = "skee" | "mole" | "comet" | "fish" | "cook" | "taco";
 
 export type MinigameRecords = {
   skee: number;
@@ -8,6 +8,7 @@ export type MinigameRecords = {
   comet: number;
   fish: number;
   cook: number;
+  taco: number;
 };
 
 export type MinigameRecordBadge = {
@@ -40,7 +41,7 @@ function sanitizeScore(value: unknown): number {
 }
 
 export function defaultMinigameRecords(): MinigameRecords {
-  return { skee: 0, mole: 0, comet: 0, fish: 0, cook: 0 };
+  return { skee: 0, mole: 0, comet: 0, fish: 0, cook: 0, taco: 0 };
 }
 
 /** Projects persisted personal bests into canonical Journal pill entries, omitting 0 scores. */
@@ -51,11 +52,13 @@ export function formatArcadeRecordPills(records: MinigameRecords): ArcadeRecordP
   const comet = sanitizeScore(records.comet);
   const fish = sanitizeScore(records.fish);
   const cook = sanitizeScore(records.cook);
+  const taco = sanitizeScore(records.taco);
   if (skee > 0) pills.push({ id: "skee", label: "Skee-Ball", value: String(skee) });
   if (mole > 0) pills.push({ id: "mole", label: "Boop-a-Mole", value: `${mole} boops` });
   if (comet > 0) pills.push({ id: "comet", label: "Comet Cruise", value: `${comet} stars` });
   if (fish > 0) pills.push({ id: "fish", label: "Fishing Streak", value: `${fish}` });
   if (cook > 0) pills.push({ id: "cook", label: "Golden Dishes", value: String(cook) });
+  if (taco > 0) pills.push({ id: "taco", label: "Taco Truck", value: `${taco} pts` });
   return pills;
 }
 
@@ -70,6 +73,7 @@ export function readMinigameRecords(value: string | null): MinigameRecords {
       comet: sanitizeScore(parsed.comet),
       fish: sanitizeScore(parsed.fish),
       cook: sanitizeScore(parsed.cook),
+      taco: sanitizeScore(parsed.taco),
     };
   } catch {
     return defaultMinigameRecords();
@@ -83,6 +87,7 @@ export function writeMinigameRecords(records: MinigameRecords): string {
     comet: sanitizeScore(records.comet),
     fish: sanitizeScore(records.fish),
     cook: sanitizeScore(records.cook),
+    taco: sanitizeScore(records.taco),
   });
 }
 
@@ -97,6 +102,7 @@ export function recordMinigameResult(
     comet: sanitizeScore(records.comet),
     fish: sanitizeScore(records.fish),
     cook: sanitizeScore(records.cook),
+    taco: sanitizeScore(records.taco),
   };
   const nextScore = sanitizeScore(score);
   const previous = clean[game];

@@ -124,6 +124,7 @@ test(
       comet: 0,
       fish: 0,
       cook: 0,
+      taco: 0,
     });
 
     // Reload the page and verify Personal Best persists via Capacitor Preferences.
@@ -135,6 +136,7 @@ test(
       comet: 0,
       fish: 0,
       cook: 0,
+      taco: 0,
     });
     expect(errors).toEqual([]);
   },
@@ -215,6 +217,7 @@ test(
       comet: 0,
       fish: 0,
       cook: 0,
+      taco: 0,
     });
 
     await page.reload();
@@ -225,6 +228,7 @@ test(
       comet: 0,
       fish: 0,
       cook: 0,
+      taco: 0,
     });
     expect(errors).toEqual([]);
   },

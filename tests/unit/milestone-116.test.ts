@@ -21,34 +21,43 @@ describe("Milestone 116: Journal Arcade Records Strip", () => {
         comet: 0,
         fish: Infinity,
         cook: -1,
+        taco: -5,
       }),
     ).toEqual([]);
   });
 
   it("formats partial records in canonical order and skips zero scores", () => {
-    const partial: MinigameRecords = { skee: 0, mole: 14, comet: 0, fish: 5, cook: 0 };
+    const partial: MinigameRecords = { skee: 0, mole: 14, comet: 0, fish: 5, cook: 0, taco: 0 };
     expect(formatArcadeRecordPills(partial)).toEqual([
       { id: "mole", label: "Boop-a-Mole", value: "14 boops" },
       { id: "fish", label: "Fishing Streak", value: "5" },
     ]);
   });
 
-  it("formats all five records in canonical order with exact labels and integer flooring", () => {
-    const full: MinigameRecords = { skee: 220.9, mole: 14.4, comet: 18, fish: 5.2, cook: 3.8 };
+  it("formats all six records in canonical order with exact labels and integer flooring", () => {
+    const full: MinigameRecords = {
+      skee: 220.9,
+      mole: 14.4,
+      comet: 18,
+      fish: 5.2,
+      cook: 3.8,
+      taco: 195.7,
+    };
     expect(formatArcadeRecordPills(full)).toEqual([
       { id: "skee", label: "Skee-Ball", value: "220" },
       { id: "mole", label: "Boop-a-Mole", value: "14 boops" },
       { id: "comet", label: "Comet Cruise", value: "18 stars" },
       { id: "fish", label: "Fishing Streak", value: "5" },
       { id: "cook", label: "Golden Dishes", value: "3" },
+      { id: "taco", label: "Taco Truck", value: "195 pts" },
     ]);
   });
 });
 
-describe("Milestone 116: Keyboard-Accessible 29-Track Music Box Jukebox", () => {
+describe("Milestone 116: Keyboard-Accessible 30-Track Music Box Jukebox", () => {
   it("formats accessible track labels for live area themes and active jukebox browsing", () => {
     const fishingIndex = jukeboxTracks.indexOf("fishing");
-    expect(jukeboxTracks).toHaveLength(29);
+    expect(jukeboxTracks).toHaveLength(30);
     expect(fishingIndex).toBe(9);
     expect(trackTitles.fishing).toBe("Docked by the Tide");
 
@@ -59,7 +68,7 @@ describe("Milestone 116: Keyboard-Accessible 29-Track Music Box Jukebox", () => 
         total: jukeboxTracks.length,
       }),
     ).toBe(
-      "Track 10 of 29: Docked by the Tide — press Left or Right to browse, " +
+      "Track 10 of 30: Docked by the Tide — press Left or Right to browse, " +
         "Enter to return to area theme",
     );
 

@@ -7012,6 +7012,42 @@ the old trail, the owl, and the clubhouse claim.
   purity, lint), `just build` (`< 500 kB` app chunk gate passed), and 30/30
   Chromium & WebKit e2e tests.
 
+## Milestone 163: 30th OST Theme `"Cloverhollow Jubilee"` (Post-Finale Sanctuary Festival) & Complete Taco Truck Personal Best + Journal Record Parity **Status:** ✅ Completed (2026-11-27)
+- Rounds the Music Box Jukebox out to an iconic **30 Original Composed Stereo
+  Chamber Themes** with a joyful Post-Finale Sanctuary Festival jubilee score
+  and closes the final minigame record gap so Chef Mateo's Taco Truck Kitchen
+  persists personal bests, renders its golden `★ NEW BEST!` pill, and appears in
+  Fae's Journal `BESTS` strip — zero `src/core` simulation state changes, zero
+  save-version bumps, zero replay hash drift across all 74 sims, and zero
+  `ui-gallery` baseline regressions.
+- 30th OST theme `"festival"` (`"Cloverhollow Jubilee"`) (`src/core/music.ts`,
+  `src/platform/scores-expansion.ts`, `src/platform/scores.ts`,
+  `src/platform/voices.ts`):
+  - Added `"festival"` (`"Cloverhollow Jubilee"`) right after `"sanctuary"` in
+    `jukeboxTracks` (30 composed themes) and routed `soundtrackFor(...)` in
+    `sanctuary` when `milo_revealed === true` over `"forest"` ambience (keeping
+    pre-reveal `sanctuary` on `"Meadow of Friends"`).
+  - Composed `festivalScore` (108 BPM, 4/4, 16-bar D major / G major jubilee
+    across 6 stereo voices: `harp`, `marimba`, `flute`, `celesta`, `bass`,
+    `shaker`) and mapped `festival: D_MAJOR` in `TRACK_SCALES`.
+- Taco Truck Personal Best & Journal record parity
+  (`src/platform/minigame-records.ts`, `src/shell/feedback.ts`,
+  `src/ui/taco.{ts,css}`):
+  - Extended `MinigameKey` & `MinigameRecords` with `taco: number` (upgrading
+    legacy 4-key & 5-key Preferences JSON cleanly) and added `Taco Truck · N pts`
+    to `formatArcadeRecordPills` (surfaced automatically in Journal `BESTS`).
+  - Wired `taco` result-phase record submission in `src/shell/feedback.ts` and
+    mounted `.arcade-best-badge.taco-best-badge` centered cleanly on the striped
+    awning header in `src/ui/taco.ts` (hidden when `record = null`, keeping all
+    99 `ui-gallery` baselines pixel-identical).
+- Evidence: `tests/unit/milestone-163.test.ts` and
+  `tests/e2e/milestone-163.spec.ts` (`@smoke` Chromium + WebKit); review
+  capture `art/review/m163-taco-best-1280.jpg` and refreshed live
+  `taco-result-{1280,874}` snapshots independently verified via `vision`.
+- Gates: `just check` (226 unit files / 1,652 tests, all 74 sims, 23 QA packs,
+  purity, lint), `just build` (all non-vendor chunks `< 400 kB`), 41/41 Chromium
+  & WebKit e2e, and 99/99 Chromium `ui-gallery` tests.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

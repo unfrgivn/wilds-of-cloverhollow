@@ -277,7 +277,7 @@ test(
 
 test(
   "lodge, clubhouse, sanctuary, interiors, and expansion areas play bespoke themes; " +
-    "Jukebox cycles all 29 tracks",
+    "Jukebox cycles all 30 tracks",
   { tag: "@smoke" },
   async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
@@ -408,7 +408,7 @@ test(
       playing: true,
     });
 
-    // Open journal OPTIONS and cycle cleanly through all 29 jukebox tracks back to sanctuary.
+    // Open journal OPTIONS and cycle cleanly through all 30 jukebox tracks back to sanctuary.
     await page.keyboard.press("j");
     await step(page, 2);
     await page.keyboard.press("ArrowRight");
@@ -419,7 +419,7 @@ test(
     const nextBtn = page.locator(".journal-jukebox-next");
     const visited: string[] = [];
     let prevTrack = "sanctuary";
-    for (let i = 0; i < 29; i += 1) {
+    for (let i = 0; i < 30; i += 1) {
       await nextBtn.click();
       await expect.poll(async () => (await readMusic(page)).track).not.toBe(prevTrack);
       const info = await readMusic(page);
@@ -428,7 +428,7 @@ test(
       expect(info.duck).toBe(false);
       await expect(nowPlaying).toHaveText(`♫ ${info.title}`);
     }
-    expect(new Set(visited).size).toBe(29);
+    expect(new Set(visited).size).toBe(30);
     expect(visited).toContain("market");
     expect(visited).toContain("parlor");
     expect(visited).toContain("loft");
@@ -439,6 +439,7 @@ test(
     expect(visited).toContain("summit");
     expect(visited).toContain("taco");
     expect(visited).toContain("sanctuary");
+    expect(visited).toContain("festival");
     expect(visited).toContain("lodge");
     expect(visited).toContain("clubhouse");
     expect(visited).toContain("fishing");

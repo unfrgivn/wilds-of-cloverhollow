@@ -382,6 +382,12 @@
   color: #3d281c;
 }
 
+/* Personal Best result badge centered on the striped awning header */
+.taco-best-badge {
+  z-index: 15;
+  transform: translate(-50%, -50%);
+}
+
 /* Center shift-result dialogue cleanly beneath the taco window on desktop */
 :root[data-arcade-game="taco"] .sticker-dialogue {
   margin-inline: auto;

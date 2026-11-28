@@ -59,6 +59,7 @@ const ALL_PLAYABLE_TRACKS: readonly PlayableTrack[] = [
   "bloom",
   "hills",
   "sanctuary",
+  "festival",
   "school",
   "bay",
   "fishing",
@@ -103,9 +104,9 @@ function tonalFrequencies(segments: readonly AudioSegment[]): number[] {
 }
 
 describe("Milestone 152: Complete 24-Track World Soundtrack", () => {
-  it("lists 29 unique jukebox tracks in album order with titles, scores, and scales", () => {
-    expect(jukeboxTracks).toHaveLength(29);
-    expect(new Set(jukeboxTracks).size).toBe(29);
+  it("lists 30 unique jukebox tracks in album order with titles, scores, and scales", () => {
+    expect(jukeboxTracks).toHaveLength(30);
+    expect(new Set(jukeboxTracks).size).toBe(30);
 
     expect(jukeboxTracks.indexOf("market")).toBe(jukeboxTracks.indexOf("cafe") + 1);
     expect(jukeboxTracks.indexOf("parlor")).toBe(jukeboxTracks.indexOf("market") + 1);
@@ -129,7 +130,7 @@ describe("Milestone 152: Complete 24-Track World Soundtrack", () => {
         expect(scale[i] ?? 0, `${id} ascending scale`).toBeGreaterThan(scale[i - 1] ?? 0);
       }
     }
-    expect(seenTitles.size).toBe(29);
+    expect(seenTitles.size).toBe(30);
   });
 
   it("gives market, parlor, cottage, and cabin bespoke 16-bar multi-voice chamber scores", () => {
@@ -545,7 +546,7 @@ describe("Milestone 152: Warm Low-Pass Music Ducking & Bar-Quantized Track Resum
     expect(resumeBarStep("cabin", 191, 192, 12)).toBe(180);
 
     const explorationTracks = ALL_PLAYABLE_TRACKS.filter((t) => !FRESH_START_TRACKS.has(t));
-    expect(explorationTracks).toHaveLength(23);
+    expect(explorationTracks).toHaveLength(24);
 
     let sawFourFour = 0;
     let sawThreeFour = 0;

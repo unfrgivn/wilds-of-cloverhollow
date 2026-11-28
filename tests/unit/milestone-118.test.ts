@@ -42,19 +42,19 @@ describe("Milestone 118: Clubhouse Microwave Golden Chef Popups & Records", () =
   it("upgrades legacy 4-key records cleanly and tracks cumulative Golden Dishes", () => {
     const legacyJson = JSON.stringify({ skee: 220, mole: 14, comet: 18, fish: 5 });
     const upgraded = readMinigameRecords(legacyJson);
-    expect(upgraded).toEqual({ skee: 220, mole: 14, comet: 18, fish: 5, cook: 0 });
+    expect(upgraded).toEqual({ skee: 220, mole: 14, comet: 18, fish: 5, cook: 0, taco: 0 });
     expect(formatArcadeRecordPills(upgraded).some((pill) => pill.id === "cook")).toBe(false);
 
     const first = recordMinigameResult(defaultMinigameRecords(), "cook", 1);
     expect(first).toEqual({
-      records: { skee: 0, mole: 0, comet: 0, fish: 0, cook: 1 },
+      records: { skee: 0, mole: 0, comet: 0, fish: 0, cook: 1, taco: 0 },
       best: 1,
       isNewBest: true,
     });
 
     const second = recordMinigameResult(first.records, "cook", first.records.cook + 1);
     expect(second).toEqual({
-      records: { skee: 0, mole: 0, comet: 0, fish: 0, cook: 2 },
+      records: { skee: 0, mole: 0, comet: 0, fish: 0, cook: 2, taco: 0 },
       best: 2,
       isNewBest: true,
     });

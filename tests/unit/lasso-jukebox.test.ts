@@ -271,8 +271,8 @@ describe("Coach Ash's rainbow lasso in battle", () => {
 describe("Journal Music Box jukeboxTracks", () => {
   it("lists every non-silent MusicTrack once with a valid non-empty title", () => {
     const expectedNonSilent = Object.keys(trackTitles).filter((track) => track !== "silent");
-    expect(jukeboxTracks).toHaveLength(29);
-    expect(new Set(jukeboxTracks).size).toBe(29);
+    expect(jukeboxTracks).toHaveLength(30);
+    expect(new Set(jukeboxTracks).size).toBe(30);
     expect([...jukeboxTracks].sort()).toEqual([...expectedNonSilent].sort());
     for (const track of jukeboxTracks) {
       expect(trackTitles[track].trim().length).toBeGreaterThan(0);

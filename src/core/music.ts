@@ -10,6 +10,7 @@ export type MusicTrack =
   | "bloom"
   | "hills"
   | "sanctuary"
+  | "festival"
   | "school"
   | "bay"
   | "fishing"
@@ -56,6 +57,7 @@ export const jukeboxTracks: readonly JukeboxTrack[] = [
   "clubhouse",
   "hills",
   "sanctuary",
+  "festival",
   "arcade",
   "taco",
   "enchanted",
@@ -95,6 +97,7 @@ export const trackTitles: Record<MusicTrack, string> = {
   bloom: "Rosie's Flower Window",
   hills: "Clover Meadow",
   sanctuary: "Meadow of Friends",
+  festival: "Cloverhollow Jubilee",
   school: "Bell & Chalk",
   bay: "Bubblegum Breeze",
   fishing: "Docked by the Tide",
@@ -230,6 +233,10 @@ export function soundtrackFor(
     track = world.storyVariable(state.ink, "forest_fizzy") === false
       ? "enchanted-calm"
       : "enchanted";
+  } else if (state.area === "sanctuary") {
+    track = world.storyVariable(state.ink, "milo_revealed") === true
+      ? "festival"
+      : "sanctuary";
   } else {
     const byArea = areaTracks[state.area];
     if (byArea !== undefined) {

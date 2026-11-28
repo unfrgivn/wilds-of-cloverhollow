@@ -2,6 +2,7 @@ import "./taco.css";
 import {
   classifyTacoPopup,
   createArcadePopupLayer,
+  updateArcadeBestBadge,
   type ArcadeRecordBadge,
 } from "./arcade-popups";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
@@ -115,6 +116,10 @@ export function createTaco(
   const orderBanner = element("div", "taco-order-banner", stage);
   const orderBannerText = element("span", "taco-order-banner-text", orderBanner);
 
+  // Personal Best result badge centered on the striped awning header.
+  const bestBadge = element("div", "arcade-best-badge taco-best-badge", stage);
+  bestBadge.hidden = true;
+
   // Center live taco shell + stacked topping layers on the woven placemat.
   const shell = element("div", "taco-shell", stage);
   let shellLoaded = false;
@@ -164,10 +169,15 @@ export function createTaco(
   let lastKey = "";
   let lastFrontKey = "";
   let lastLayout: TacoLayout | null = null;
+  let lastRecord: ArcadeRecordBadge | null = null;
   let prevPhase: string | null = null;
   let prevScore: number | null = null;
 
-  const draw = (view: TacoView, layout: TacoLayout): void => {
+  const draw = (
+    view: TacoView,
+    layout: TacoLayout,
+    record: ArcadeRecordBadge | null,
+  ): void => {
     place(stage, { x: 0, y: 0, width: layout.width, height: layout.height });
     setStyle(stage, "border-radius", `${layout.radius}px`);
     stage.dataset.scale = String(layout.scale);
@@ -353,23 +363,31 @@ export function createTaco(
       const room = maxWidth / Math.max(1, frontText.scrollWidth);
       if (room < 1) setStyle(frontText, "font-size", `${Math.max(9, Math.floor(tall * room))}px`);
     }
+
+    // Personal Best result badge centered cleanly on the taco truck awning header.
+    setStyle(bestBadge, "left", `${Math.round(layout.width / 2)}px`);
+    setStyle(bestBadge, "top", `${Math.round(layout.ticket.y * 0.5)}px`);
+    setStyle(bestBadge, "font-size", `${Math.max(10, Math.round(layout.scale * 28))}px`);
+    updateArcadeBestBadge(bestBadge, view.phase === "result", record);
   };
 
   document.fonts.addEventListener("loadingdone", () => {
     lastFrontKey = "";
-    if (lastView !== null && lastLayout !== null) draw(lastView, lastLayout);
+    if (lastView !== null && lastLayout !== null) draw(lastView, lastLayout, lastRecord);
   });
 
   return {
-    render: (view, _record = null, inputMode = "keyboard") => {
+    render: (view, record = null, inputMode = "keyboard") => {
       overlay.hidden = view === null;
       lastView = view;
+      lastRecord = record;
       if (view === null) {
         pointerHold.release();
         lastKey = "";
         prevPhase = null;
         prevScore = null;
         popups.clear();
+        bestBadge.hidden = true;
         return;
       }
       const spotless = view.served >= view.totalOrders && view.mistakes === 0;
@@ -381,7 +399,8 @@ export function createTaco(
       const width = overlay.clientWidth - pixels(style.paddingLeft) - pixels(style.paddingRight);
       const height = overlay.clientHeight - pixels(style.paddingTop) - pixels(style.paddingBottom);
       const touch = document.documentElement.dataset.touch === "on" ? "1" : "0";
-      const key = `${width}x${height} ${touch} ${inputMode} ${JSON.stringify(view)}`;
+      const recordKey = record === null ? "" : `${record.best}:${record.isNewBest ? 1 : 0}`;
+      const key = `${width}x${height} ${touch} ${inputMode} ${recordKey} ${JSON.stringify(view)}`;
       if (key === lastKey) return;
       lastKey = key;
       const scale = Math.max(
@@ -389,7 +408,7 @@ export function createTaco(
         Math.min(width / calibration.size.w, height / calibration.size.h),
       );
       lastLayout = layoutTaco(view, calibration, scale, inputMode);
-      draw(view, lastLayout);
+      draw(view, lastLayout, record);
     },
     info: () => {
       if (lastView === null || lastLayout === null) return null;

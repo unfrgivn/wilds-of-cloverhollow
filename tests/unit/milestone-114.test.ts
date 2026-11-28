@@ -16,36 +16,58 @@ import {
 
 describe("Milestone 112: minigame personal best records", () => {
   it("defaults all minigame records to zero", () => {
-    expect(defaultMinigameRecords()).toEqual({ skee: 0, mole: 0, comet: 0, fish: 0, cook: 0 });
+    expect(defaultMinigameRecords()).toEqual({
+      skee: 0,
+      mole: 0,
+      comet: 0,
+      fish: 0,
+      cook: 0,
+      taco: 0,
+    });
   });
 
   it("round-trips valid records through writeMinigameRecords and readMinigameRecords", () => {
-    const sample: MinigameRecords = { skee: 220, mole: 14, comet: 16, fish: 5, cook: 3 };
+    const sample: MinigameRecords = {
+      skee: 220,
+      mole: 14,
+      comet: 16,
+      fish: 5,
+      cook: 3,
+      taco: 195,
+    };
     const encoded = writeMinigameRecords(sample);
     expect(readMinigameRecords(encoded)).toEqual(sample);
   });
 
   it("handles null, malformed JSON, non-objects, negatives, and floats gracefully", () => {
-    const zeros: MinigameRecords = { skee: 0, mole: 0, comet: 0, fish: 0, cook: 0 };
+    const zeros: MinigameRecords = { skee: 0, mole: 0, comet: 0, fish: 0, cook: 0, taco: 0 };
     expect(readMinigameRecords(null)).toEqual(zeros);
     expect(readMinigameRecords("not-json{")).toEqual(zeros);
     expect(readMinigameRecords("42")).toEqual(zeros);
     expect(readMinigameRecords("null")).toEqual(zeros);
     expect(
       readMinigameRecords(
-        JSON.stringify({ skee: 180.9, mole: -4, comet: "12", fish: 3.7, cook: 2.9 }),
+        JSON.stringify({ skee: 180.9, mole: -4, comet: "12", fish: 3.7, cook: 2.9, taco: 145.6 }),
       ),
-    ).toEqual({ skee: 180, mole: 0, comet: 0, fish: 3, cook: 2 });
+    ).toEqual({ skee: 180, mole: 0, comet: 0, fish: 3, cook: 2, taco: 145 });
     expect(readMinigameRecords(JSON.stringify({ skee: 50 }))).toEqual({
       skee: 50,
       mole: 0,
       comet: 0,
       fish: 0,
       cook: 0,
+      taco: 0,
     });
     expect(
-      writeMinigameRecords({ skee: -10, mole: 12.8, comet: Number.NaN, fish: Infinity, cook: -2 }),
-    ).toBe('{"skee":0,"mole":12,"comet":0,"fish":0,"cook":0}');
+      writeMinigameRecords({
+        skee: -10,
+        mole: 12.8,
+        comet: Number.NaN,
+        fish: Infinity,
+        cook: -2,
+        taco: -5,
+      }),
+    ).toBe('{"skee":0,"mole":12,"comet":0,"fish":0,"cook":0,"taco":0}');
   });
 
   it("never triggers isNewBest on zero or negative scores", () => {
@@ -58,11 +80,11 @@ describe("Milestone 112: minigame personal best records", () => {
   });
 
   it("updates best immutably on higher scores and preserves best on equal or lower scores", () => {
-    const initial: MinigameRecords = { skee: 100, mole: 10, comet: 8, fish: 2, cook: 1 };
+    const initial: MinigameRecords = { skee: 100, mole: 10, comet: 8, fish: 2, cook: 1, taco: 80 };
     const beat = recordMinigameResult(initial, "skee", 220);
     expect(beat.isNewBest).toBe(true);
     expect(beat.best).toBe(220);
-    expect(beat.records).toEqual({ skee: 220, mole: 10, comet: 8, fish: 2, cook: 1 });
+    expect(beat.records).toEqual({ skee: 220, mole: 10, comet: 8, fish: 2, cook: 1, taco: 80 });
     // Original object stays untouched.
     expect(initial.skee).toBe(100);
 
@@ -74,7 +96,7 @@ describe("Milestone 112: minigame personal best records", () => {
 
     const floored = recordMinigameResult(beat.records, "fish", 4.9);
     expect(floored).toEqual({
-      records: { skee: 220, mole: 10, comet: 8, fish: 4, cook: 1 },
+      records: { skee: 220, mole: 10, comet: 8, fish: 4, cook: 1, taco: 80 },
       best: 4,
       isNewBest: true,
     });

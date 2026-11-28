@@ -414,9 +414,9 @@ describe("complete 20-track world audio identity", () => {
     ).toBe(true);
   });
 
-  test("covers all 29 jukebox tracks with titles, multi-voice scores, and harmonic scales", () => {
-    expect(jukeboxTracks).toHaveLength(29);
-    expect(new Set(jukeboxTracks).size).toBe(29);
+  test("covers all 30 jukebox tracks with titles, multi-voice scores, and harmonic scales", () => {
+    expect(jukeboxTracks).toHaveLength(30);
+    expect(new Set(jukeboxTracks).size).toBe(30);
     for (const id of jukeboxTracks) {
       expect(trackTitles[id].trim().length, `${id} title`).toBeGreaterThan(0);
       const score = scores[id];
@@ -430,6 +430,7 @@ describe("complete 20-track world audio identity", () => {
     }
     for (const id of [
       "sanctuary",
+      "festival",
       "lodge",
       "clubhouse",
       "fishing",
@@ -460,6 +461,7 @@ describe("composed scores integrity", () => {
     "bloom",
     "hills",
     "sanctuary",
+    "festival",
     "school",
     "bay",
     "fishing",

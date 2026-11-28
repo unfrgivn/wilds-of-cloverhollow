@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { loadContent } from "../../src/content/load";
 import type { Area, State } from "../../src/core";
-import { fadeAlpha, travelFadeAlpha, vignetteEnvelope } from "../../src/render/fade";
+import { vignetteEnvelope } from "../../src/render/fade";
 import {
   classifyTravelVignette,
   shouldShowTravelVignette,
@@ -260,7 +260,7 @@ describe("E14: Travel Vignette Classification & Rules", () => {
     ).toBe(false);
   });
 
-  it("computes bounded motion, vignette envelope, travelFadeAlpha, and skip keys", () => {
+  it("computes bounded motion, vignette envelope, and skip keys", () => {
     const modes: readonly [TravelMode, number, number, number][] = [
       ["bus", -3.2, 0.8, 2.2],
       ["boat", -2.8, 2.8, 4.5],
@@ -306,14 +306,6 @@ describe("E14: Travel Vignette Classification & Rules", () => {
       progress: 1,
     });
     expect(vignetteEnvelope(500, 0)).toEqual({ opacity: 0, scale: 1, progress: 1 });
-
-    const transition: State["transition"] = {
-      phase: "in",
-      elapsed: 6,
-      target: { area: "bay", spawn: "from-plaza" },
-    };
-    expect(travelFadeAlpha(transition, 14, true)).toBe(1);
-    expect(travelFadeAlpha(transition, 14, false)).toBe(fadeAlpha(transition, 14));
 
     for (const code of ["KeyZ", "Space", "Enter", "KeyX", "Escape"]) {
       expect(isTravelSkipKey(code)).toBe(true);

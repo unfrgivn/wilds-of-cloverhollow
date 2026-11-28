@@ -263,11 +263,14 @@ export function createTaco(
     setText(ordersValue, `${view.served}/${view.totalOrders}`);
     setText(scoreValue, `★ ${view.score}`);
 
-    // Touch-aware leave pill during ready.
+    // Touch- and gamepad-aware leave pill during ready.
     escape.hidden = !view.canCancel;
     place(escape, layout.escape);
     const touchOn = document.documentElement.dataset.touch === "on";
-    setText(escapeText, touchOn ? "× · Leave" : "Esc · Leave");
+    setText(
+      escapeText,
+      touchOn ? "× · Leave" : adaptHintForInputMode("Esc · Leave", inputMode),
+    );
     setStyle(escapeText, "font-size", `${Math.max(9, Math.round(layout.escape.height * 0.42))}px`);
 
     // Celebratory ORDER UP! / shift summary ribbon.

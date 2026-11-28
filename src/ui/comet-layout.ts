@@ -1,3 +1,4 @@
+import type { HudInputMode } from "./hud-hints";
 import type { CometCalibration, CometView } from "../core";
 
 // How the Comet Cruise close-up is drawn (spec 8.2).
@@ -60,8 +61,12 @@ export function cometFrame(calibration: CometCalibration): { x: number; y: numbe
 const laneX = (width: number, lane: number): number => width * (1 / 6 + lane / 3);
 
 // The close-up in CSS px.
-export function layoutComet(view: CometView, calibration: CometCalibration, scale: number):
-  CometLayout {
+export function layoutComet(
+  view: CometView,
+  calibration: CometCalibration,
+  scale: number,
+  inputMode: HudInputMode = "keyboard",
+): CometLayout {
   const round = Math.round;
   const frame = cometFrame(calibration);
   const dy = frame.y * scale;
@@ -120,9 +125,18 @@ export function layoutComet(view: CometView, calibration: CometCalibration, scal
     rocket: sprite(laneX(width, view.rocket.position), row, full, rocketFrame, 1),
     objects,
     keys: [
-      { x: round((screen.x - cometLook.capGap) * scale), y: capY, label: "←", side: "left" },
-      { x: round((screen.x + screen.w + cometLook.capGap) * scale), y: capY, label: "→",
-        side: "right" },
+      {
+        x: round((screen.x - cometLook.capGap) * scale),
+        y: capY,
+        label: inputMode === "gamepad" ? "◀" : "←",
+        side: "left",
+      },
+      {
+        x: round((screen.x + screen.w + cometLook.capGap) * scale),
+        y: capY,
+        label: inputMode === "gamepad" ? "▶" : "→",
+        side: "right",
+      },
     ],
   };
 }

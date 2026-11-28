@@ -9557,6 +9557,34 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   `milestone-221`, `milestone-212`), and 10/10 Chromium (`e7-multifoe-combos`,
   `cutscene`, `e9b-decor-economy`).
 
+## Milestone 224: Complete 7-of-7 Minigame Steam Deck / Gamepad Adaptive Hint Parity (`claw`, `skee`, `comet`, `cook`) & `qa-badge` Visual Baseline Sync **Status:** ✅ Completed (2026-11-28)
+- Completes 100% (7/7) adaptive Steam Deck / Gamepad hint parity across every
+  playable minigame (`Claw Machine`, `Skee-Ball`, `Boop-a-Mole`, `Comet Cruise`,
+  `Clubhouse Microwave`, `Bubblegum Bay Fishing`, `Chef Mateo's Taco Truck`) and
+  syncs the `vision`-audited `qa-badge` baseline so `qa.spec.ts` returns to
+  18/18 green — zero `src/core` changes, zero save-version bumps, zero replay
+  hash drift across all 77 sims, and zero visual baseline diffs across all 99
+  `ui-gallery` & minigame baselines.
+- Adaptive 7-of-7 minigame gamepad hints (`src/ui/battle-checks-helpers.ts`,
+  `src/ui/{claw,skee,comet,comet-layout,cook,mole,fish,taco,arcade}.ts`,
+  `src/shell/assets.ts`):
+  - Extended `adaptHintForInputMode` for `Hold/Press/Tap -> Hold/Press/Tap A`,
+    `Confirm/Space/Z -> A`, `Esc -> B` (`B · Pack up`, `B · Leave`), and
+    `Left / Right` / `Arrows` -> `Stick / D-Pad` while leaving keyboard & touch
+    byte-identical.
+  - Threaded `inputMode: HudInputMode` cleanly across all 7 minigames (including
+    `layoutComet` D-Pad `◀`/`▶` lane caps) and unified `src/shell/assets.ts`
+    overlay types to `InputModeOverlay`.
+- Vision-audited `qa-badge` sync:
+  - Verified `qa-badge-actual.png` via `vision` (0 diff pixels on `.qa-badge`,
+    diff strictly from M179 calmed Town Plaza wildflowers) and synced
+    `tests/e2e/qa.spec.ts-snapshots/qa-badge-chromium-darwin.png`.
+- Evidence: `tests/unit/milestone-224.test.ts` and
+  `tests/e2e/milestone-224.spec.ts` (`@smoke` Chromium + WebKit, 8/8 passed).
+- Gates: `just check` (290 unit files / 2,095 tests, all 77 sims + all sim
+  scripts, 23 QA packs, purity, lint), `just build` (`index` `391.98 kB < 500 kB`),
+  18/18 `qa.spec`, 22/22 minigame/gamepad e2e, and 99/99 Chromium `ui-gallery`
+  tests.
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

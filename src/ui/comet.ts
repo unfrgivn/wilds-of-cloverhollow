@@ -6,8 +6,10 @@ import {
   type ArcadeRecordBadge,
 } from "./arcade-popups";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
+import { adaptHintForInputMode } from "./battle-checks-helpers";
 import { element, measure, pixels, place, setStyle, setText, type Box } from "./dom";
 import { cometFrame, layoutComet, type CometLayout, type Rect } from "./comet-layout";
+import type { HudInputMode } from "./hud-hints";
 import { bindPointerHold, resolveCometLaneStep } from "./pointer-hold";
 import type { CometCalibration, CometView } from "../core";
 
@@ -50,7 +52,11 @@ export function createComet(
   onConfirmHold: (held: boolean) => void = () => undefined,
   onLaneStep: (delta: -1 | 1) => void = () => undefined,
 ): {
-  render: (view: CometView | null, record?: ArcadeRecordBadge | null) => void;
+  render: (
+    view: CometView | null,
+    record?: ArcadeRecordBadge | null,
+    inputMode?: HudInputMode,
+  ) => void;
   info: () => CometInfo | null;
 } {
   const overlay = element("section", "comet-overlay", root);
@@ -103,6 +109,7 @@ export function createComet(
   let lastView: CometView | null = null;
   let lastLayout: CometLayout | null = null;
   let lastRecord: ArcadeRecordBadge | null = null;
+  let lastInputMode: HudInputMode = "keyboard";
   let prevCaught: number | null = null;
   const confirmHold = bindPointerHold(
     machine,
@@ -160,6 +167,7 @@ export function createComet(
     view: CometView,
     layout: CometLayout,
     record: ArcadeRecordBadge | null,
+    inputMode: HudInputMode,
   ): void => {
     setStyle(machine, "width", `${layout.width}px`);
     setStyle(machine, "height", `${layout.height}px`);
@@ -170,7 +178,7 @@ export function createComet(
     machine.dataset.phase = view.phase;
     place(marquee, layout.marquee);
     // The hint (or the game's name) on the marquee, measured once to fit.
-    const text = view.hint ?? "COMET CRUISE";
+    const text = view.hint === null ? "COMET CRUISE" : adaptHintForInputMode(view.hint, inputMode);
     marquee.classList.toggle("is-hint", view.hint !== null);
     setText(marqueeText, text);
     const marqueeKey = `${text}|${layout.marquee.width}|${layout.marquee.height}`;
@@ -230,14 +238,17 @@ export function createComet(
   // when it loads (spec 7.1): what's shown is drawn again then.
   document.fonts.addEventListener("loadingdone", () => {
     lastMarqueeKey = "";
-    if (lastView !== null && lastLayout !== null) draw(lastView, lastLayout, lastRecord);
+    if (lastView !== null && lastLayout !== null) {
+      draw(lastView, lastLayout, lastRecord, lastInputMode);
+    }
   });
 
   return {
-    render: (view, record = null) => {
+    render: (view, record = null, inputMode = "keyboard") => {
       overlay.hidden = view === null;
       lastView = view;
       lastRecord = record;
+      lastInputMode = inputMode;
       if (view === null) {
         confirmHold.release();
         lastKey = "";
@@ -256,13 +267,13 @@ export function createComet(
       const height = overlay.clientHeight - pixels(style.paddingTop) -
         pixels(style.paddingBottom);
       const recordKey = record === null ? "" : `${record.best}:${record.isNewBest ? 1 : 0}`;
-      const key = `${width}x${height} ${recordKey} ${JSON.stringify(view)}`;
+      const key = `${width}x${height} ${recordKey} ${inputMode} ${JSON.stringify(view)}`;
       if (key === lastKey) return;
       lastKey = key;
       const shown = cometFrame(calibration);
       const scale = Math.max(0.01, Math.min(width / shown.w, height / shown.h));
-      lastLayout = layoutComet(view, calibration, scale);
-      draw(view, lastLayout, record);
+      lastLayout = layoutComet(view, calibration, scale, inputMode);
+      draw(view, lastLayout, record, inputMode);
     },
     info: () => {
       if (lastView === null || lastLayout === null) return null;

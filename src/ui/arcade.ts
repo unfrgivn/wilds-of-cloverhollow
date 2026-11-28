@@ -3,7 +3,7 @@ import { createClaw, type ClawInfo } from "./claw";
 import { createCook, type CookInfo } from "./cook";
 import { createFish, type FishInfo } from "./fish";
 import { createMole, type MoleInfo } from "./mole";
-import type { MoleInputMode } from "./mole-layout";
+import type { HudInputMode } from "./hud-hints";
 import { createComet, type CometInfo } from "./comet";
 import { createSkee, type SkeeInfo } from "./skee";
 import { createTaco, type TacoInfo } from "./taco";
@@ -59,7 +59,7 @@ export function createArcade(
   render: (
     view: ArcadeView | null,
     record?: ArcadeRecordBadge | null,
-    inputMode?: MoleInputMode,
+    inputMode?: HudInputMode,
   ) => void;
   info: () => ArcadeInfo | null;
 } {
@@ -89,8 +89,16 @@ export function createArcade(
       );
   return {
     render: (view, record = null, inputMode = "keyboard") => {
-      clawUp.render(view?.game === "claw" ? view : null);
-      skeeUp.render(view?.game === "skee" ? view : null, view?.game === "skee" ? record : null);
+      clawUp.render(
+        view?.game === "claw" ? view : null,
+        view?.game === "claw" ? record : null,
+        inputMode,
+      );
+      skeeUp.render(
+        view?.game === "skee" ? view : null,
+        view?.game === "skee" ? record : null,
+        inputMode,
+      );
       moleUp.render(
         view?.game === "mole" ? view : null,
         view?.game === "mole" ? record : null,
@@ -99,10 +107,12 @@ export function createArcade(
       cometUp.render(
         view?.game === "comet" ? view : null,
         view?.game === "comet" ? record : null,
+        inputMode,
       );
       cookUp.render(
         view?.game === "cook" ? view : null,
         view?.game === "cook" ? record : null,
+        inputMode,
       );
       fishUp.render(
         view?.game === "fish" ? view : null,

@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 223)
+Last updated: 2026-11-28 (Milestone 224)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -5251,6 +5251,23 @@ trunks keep its two exits.
   `new-game/m81-festival.json`) plays a spotless 3/3 shift (`+20 coins`,
   `+2 snacks`) and is verified in `tests/unit/taco-replay.test.ts` and
   `tests/e2e/taco.spec.ts` (real keys + direct mouse bowl click `@smoke`).
+- Complete 7-of-7 Minigame Steam Deck / Gamepad Adaptive Hint Parity
+  (Milestone 222): all 7 minigame renderers (`claw.ts`, `skee.ts`, `mole.ts`,
+  `comet.ts`, `cook.ts`, `fish.ts`, `taco.ts`) accept the uniform
+  `render(view, record?, inputMode = "keyboard")` signature, and both
+  `createArcade` (`src/ui/arcade.ts`) and `renderOverlays` (`src/shell/assets.ts`)
+  forward live `inputMode` to all 7. `adaptHintForInputMode`
+  (`src/ui/battle-checks-helpers.ts`) leaves keyboard copy 100% byte-identical
+  while adapting gamepad copy across every minigame (`"Hold to ..."` ->
+  `"Hold A to ..."`, `"Press to ..."` -> `"Press A to ..."`, `"Tap to ..."` ->
+  `"Tap A to ..."`, `"Confirm"`/`"Space"`/`"Z"` -> `"A"`, `"Esc"` -> `"B"` for
+  escape/leave pills such as `"B · Pack up"` / `"B · Leave"`, `"Left / Right"` /
+  `"Arrows"` -> `"Stick / D-Pad"`, and Comet Cruise's playing hint -> `"Catch
+  the stars with Stick / D-Pad and dodge space rocks!"`). `layoutComet`
+  (`src/ui/comet-layout.ts`) also adapts its lane keycaps from `"←"` / `"→"` on
+  keyboard to D-Pad `"◀"` / `"▶"` on gamepad (matching `layoutTaco`), while
+  `layoutMole` keeps `"Z"` -> `"A"` on its center hole. Verified by
+  `tests/unit/milestone-222.test.ts` and `tests/e2e/milestone-222.spec.ts`.
 - Direct mouse & touch pointer play across all 6 minigames (Milestones 127 and
   128): `createClaw`, `createFish`, `createCook`, `createSkee`, `createComet`,
   `createArcade`, and `createShellAssets` accept an optional

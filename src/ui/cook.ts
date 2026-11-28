@@ -6,8 +6,10 @@ import {
   type ArcadeRecordBadge,
 } from "./arcade-popups";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
+import { adaptHintForInputMode } from "./battle-checks-helpers";
 import { element, measure, pixels, place, setStyle, setText, type Box } from "./dom";
 import { cookFront, layoutCook, type CookLayout } from "./cook-layout";
+import type { HudInputMode } from "./hud-hints";
 import { bindPointerHold } from "./pointer-hold";
 import type { CookCalibration, CookView } from "../core";
 
@@ -40,7 +42,11 @@ export function createCook(
   image: string,
   onConfirmHold: (held: boolean) => void = () => undefined,
 ): {
-  render: (view: CookView | null, record?: ArcadeRecordBadge | null) => void;
+  render: (
+    view: CookView | null,
+    record?: ArcadeRecordBadge | null,
+    inputMode?: HudInputMode,
+  ) => void;
   info: () => CookInfo | null;
 } {
   const overlay = element("section", "cook-overlay", root);
@@ -71,6 +77,7 @@ export function createCook(
   let lastView: CookView | null = null;
   let lastLayout: CookLayout | null = null;
   let lastRecord: ArcadeRecordBadge | null = null;
+  let lastInputMode: HudInputMode = "keyboard";
   let prevPhase: string | null = null;
   let lastDish = "";
 
@@ -78,6 +85,7 @@ export function createCook(
     view: CookView,
     layout: CookLayout,
     record: ArcadeRecordBadge | null,
+    inputMode: HudInputMode,
   ): void => {
     place(machine, { x: 0, y: 0, width: layout.width, height: layout.height });
     machine.dataset.scale = String(layout.scale);
@@ -127,7 +135,7 @@ export function createCook(
     // The hint as large as fits the fridge's front: sized from its height, then
     // measured once and shrunk if it runs over.
     place(front, layout.front);
-    const text = cookFront(view);
+    const text = adaptHintForInputMode(cookFront(view), inputMode);
     setText(frontText, text);
     const frontKey = `${text}|${layout.front.width}|${layout.front.height}`;
     if (frontKey !== lastFrontKey) {
@@ -147,14 +155,17 @@ export function createCook(
   // when it loads (spec 7.1): what's shown is drawn again then.
   document.fonts.addEventListener("loadingdone", () => {
     lastFrontKey = "";
-    if (lastView !== null && lastLayout !== null) draw(lastView, lastLayout, lastRecord);
+    if (lastView !== null && lastLayout !== null) {
+      draw(lastView, lastLayout, lastRecord, lastInputMode);
+    }
   });
 
   return {
-    render: (view, record = null) => {
+    render: (view, record = null, inputMode = "keyboard") => {
       overlay.hidden = view === null;
       lastView = view;
       lastRecord = record;
+      lastInputMode = inputMode;
       if (view === null) {
         pointerHold.release();
         lastKey = "";
@@ -171,13 +182,13 @@ export function createCook(
       const height = overlay.clientHeight - pixels(style.paddingTop) -
         pixels(style.paddingBottom);
       const recordKey = record === null ? "" : `${record.best}:${record.isNewBest ? 1 : 0}`;
-      const key = `${width}x${height} ${recordKey} ${JSON.stringify(view)}`;
+      const key = `${width}x${height} ${recordKey} ${inputMode} ${JSON.stringify(view)}`;
       if (key === lastKey) return;
       lastKey = key;
       const scale = Math.max(0.01,
         Math.min(width / calibration.size.w, height / calibration.size.h));
       lastLayout = layoutCook(view, calibration, scale);
-      draw(view, lastLayout, record);
+      draw(view, lastLayout, record, inputMode);
     },
     info: () => {
       if (lastView === null || lastLayout === null) return null;

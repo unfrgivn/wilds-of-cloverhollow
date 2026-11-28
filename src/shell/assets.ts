@@ -103,16 +103,6 @@ export {
   type StickerPrizeArt,
 } from "./view-models";
 
-type Overlay<V, I> = {
-  render: (view: V | null) => void;
-  info: () => I | null;
-};
-
-type RecordOverlay<V, I> = {
-  render: (view: V | null, record?: ArcadeRecordBadge | null) => void;
-  info: () => I | null;
-};
-
 type InputModeOverlay<V, I> = {
   render: (
     view: V | null,
@@ -376,13 +366,13 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
     };
   };
 
-  const clawOverlay = makeLazy<Overlay<ClawView, ClawInfo>>(() =>
+  const clawOverlay = makeLazy<InputModeOverlay<ClawView, ClawInfo>>(() =>
     Promise.all([
       domAtlas(world.arcade.atlas),
       painting("assets/arcade/claw-machine.json", parseClawCalibration),
     ]).then(([, p]) => createClaw(uiRoot, prizeArt, p.calibration, p.image, onConfirmHold)),
   );
-  const skeeOverlay = makeLazy<RecordOverlay<SkeeView, SkeeInfo>>(() =>
+  const skeeOverlay = makeLazy<InputModeOverlay<SkeeView, SkeeInfo>>(() =>
     painting("assets/arcade/skee-lane.json", parseSkeeCalibration).then((p) =>
       createSkee(uiRoot, p.calibration, p.image, onConfirmHold),
     ),
@@ -395,7 +385,7 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
       createMole(uiRoot, (f) => atlasFrame(MOLE_ATLAS, f), p.calibration, p.image, onHole),
     ),
   );
-  const cometOverlay = makeLazy<RecordOverlay<CometView, CometInfo>>(() =>
+  const cometOverlay = makeLazy<InputModeOverlay<CometView, CometInfo>>(() =>
     Promise.all([
       domAtlas(COMET_ATLAS),
       painting("assets/arcade/comet-cabinet.json", parseCometCalibration),
@@ -406,7 +396,7 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
       ),
     ),
   );
-  const cookOverlay = makeLazy<RecordOverlay<CookView, CookInfo>>(() =>
+  const cookOverlay = makeLazy<InputModeOverlay<CookView, CookInfo>>(() =>
     Promise.all([
       domAtlas(FOOD_ATLAS),
       painting("assets/arcade/microwave.json", parseCookCalibration),
@@ -529,10 +519,15 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
       else if (arcadeState.game === "taco" && tacoOverlay.get() === null)
         void ensureTacoOverlay().then(invalidate);
     }
-    clawOverlay.get()?.render(arcadeState?.game === "claw" ? arcadeState : null);
+    clawOverlay.get()?.render(
+      arcadeState?.game === "claw" ? arcadeState : null,
+      arcadeState?.game === "claw" ? record : null,
+      inputMode,
+    );
     skeeOverlay.get()?.render(
       arcadeState?.game === "skee" ? arcadeState : null,
       arcadeState?.game === "skee" ? record : null,
+      inputMode,
     );
     moleOverlay.get()?.render(
       arcadeState?.game === "mole" ? arcadeState : null,
@@ -542,10 +537,12 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
     cometOverlay.get()?.render(
       arcadeState?.game === "comet" ? arcadeState : null,
       arcadeState?.game === "comet" ? record : null,
+      inputMode,
     );
     cookOverlay.get()?.render(
       arcadeState?.game === "cook" ? arcadeState : null,
       arcadeState?.game === "cook" ? record : null,
+      inputMode,
     );
     fishOverlay.get()?.render(
       arcadeState?.game === "fish" ? arcadeState : null,

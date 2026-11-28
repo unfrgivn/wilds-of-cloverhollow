@@ -152,7 +152,8 @@ export const echoChimeMeta: readonly {
 ];
 
 /**
- * Adapts Fishing, Taco Truck, and Battle Check hint copy for Steam Deck / Gamepad
+ * Adapts Minigame (Claw, Skee-Ball, Boop-a-Mole, Comet Cruise, Microwave,
+ * Fishing, Taco Truck) and Battle Check hint copy for Steam Deck / Gamepad
  * while keeping keyboard copy 100% unchanged.
  */
 export function adaptHintForInputMode(
@@ -165,8 +166,20 @@ export function adaptHintForInputMode(
       "Up Beans · Right Cheese · Down Salsa · Left Avocado.",
       "D-Pad ↑ Beans · → Cheese · ↓ Salsa · ← Avocado.",
     )
+    .replace(
+      "Catch the stars and slip past the space rocks!",
+      "Catch the stars with Stick / D-Pad and dodge space rocks!",
+    )
+    .replace(/\bHold to\b/g, "Hold A to")
+    .replace(/\bPress to\b/g, "Press A to")
+    .replace(/\bTap to\b/g, "Tap A to")
     .replace(/\bConfirm\b/g, "A")
-    .replace(/\bconfirm\b/g, "A");
+    .replace(/\bconfirm\b/g, "A")
+    .replace(/\bEsc\b/g, "B")
+    .replace(/\bLeft \/ Right\b/g, "Stick / D-Pad")
+    .replace(/\bArrows\b/g, "Stick / D-Pad")
+    .replace(/\bSpace\b/g, "A")
+    .replace(/\bZ\b/g, "A");
 }
 
 export function clamp01(value: number): number {

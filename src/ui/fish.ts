@@ -393,11 +393,14 @@ export function createFish(
       }
     });
 
-    // Top-right escape pill (touch-aware copy) and Personal Best result badge.
+    // Top-right escape pill (touch- and gamepad-aware copy) and Personal Best result badge.
     escape.hidden = !view.canCancel;
     place(escape, layout.escape);
     const touchOn = document.documentElement.dataset.touch === "on";
-    setText(escapeText, touchOn ? "× · Pack up" : "Esc · Pack up");
+    setText(
+      escapeText,
+      touchOn ? "× · Pack up" : adaptHintForInputMode("Esc · Pack up", inputMode),
+    );
     setStyle(escapeText, "font-size", `${Math.max(9, Math.round(layout.escape.height * 0.42))}px`);
     setStyle(bestBadge, "top", `${layout.escape.y}px`);
     setStyle(bestBadge, "right", `${Math.max(8, Math.round(28 * layout.scale))}px`);

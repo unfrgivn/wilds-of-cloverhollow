@@ -2,13 +2,16 @@ import "./claw.css";
 import {
   classifyClawPopup,
   createArcadePopupLayer,
+  type ArcadeRecordBadge,
   type ClawPopupOutcome,
 } from "./arcade-popups";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
+import { adaptHintForInputMode } from "./battle-checks-helpers";
 import { clawLook, layoutClaw, type ClawLayout, type Line } from "./claw-layout";
 import {
   element, measure, pixels, place, setAttribute, setStyle, setText, svgElement, type Box,
 } from "./dom";
+import type { HudInputMode } from "./hud-hints";
 import { bindPointerHold } from "./pointer-hold";
 import type { ClawCalibration, ClawView } from "../core";
 
@@ -75,7 +78,14 @@ export function createClaw(
   calibration: ClawCalibration,
   cabinet: string,
   onConfirmHold: (held: boolean) => void = () => undefined,
-): { render: (view: ClawView | null) => void; info: () => ClawInfo | null } {
+): {
+  render: (
+    view: ClawView | null,
+    record?: ArcadeRecordBadge | null,
+    inputMode?: HudInputMode,
+  ) => void;
+  info: () => ClawInfo | null;
+} {
   const overlay = element("section", "arcade-overlay", root);
   overlay.setAttribute("aria-label", "Claw machine");
   overlay.hidden = true;
@@ -134,7 +144,7 @@ export function createClaw(
     return box;
   };
 
-  const draw = (view: ClawView, layout: ClawLayout): void => {
+  const draw = (view: ClawView, layout: ClawLayout, inputMode: HudInputMode): void => {
     setStyle(machine, "width", `${layout.width}px`);
     setStyle(machine, "height", `${layout.height}px`);
     machine.dataset.scale = String(layout.scale);
@@ -146,7 +156,7 @@ export function createClaw(
     place(plate, layout.plate);
     // The hint (or the machine's name) is lettered on the blank plate: one
     // line for a word, two balanced lines for a hint, as large as fits.
-    const text = view.hint ?? "CLAW";
+    const text = view.hint === null ? "CLAW" : adaptHintForInputMode(view.hint, inputMode);
     const lines = text.length > 16 ? 2 : 1;
     const perLine = Math.ceil(text.length / lines);
     const font = Math.floor(Math.min(layout.plate.height * (lines === 1 ? 0.5 : 0.36),
@@ -213,7 +223,7 @@ export function createClaw(
   };
 
   return {
-    render: (view) => {
+    render: (view, _record = null, inputMode = "keyboard") => {
       overlay.hidden = view === null;
       lastView = view;
       if (view === null) {
@@ -232,12 +242,12 @@ export function createClaw(
       const width = overlay.clientWidth - pixels(style.paddingLeft) - pixels(style.paddingRight);
       const height = overlay.clientHeight - pixels(style.paddingTop) -
         pixels(style.paddingBottom);
-      const key = `${width}x${height} ${JSON.stringify(view)}`;
+      const key = `${width}x${height} ${inputMode} ${JSON.stringify(view)}`;
       if (key === lastKey) return;
       lastKey = key;
       const scale = Math.max(0.01,
         Math.min(width / calibration.size.w, height / calibration.size.h));
-      draw(view, layoutClaw(view, calibration, scale));
+      draw(view, layoutClaw(view, calibration, scale), inputMode);
     },
     info: () => {
       if (lastView === null) return null;

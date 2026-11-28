@@ -6,6 +6,7 @@ import {
   type ArcadeRecordBadge,
 } from "./arcade-popups";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
+import { adaptHintForInputMode } from "./battle-checks-helpers";
 import { element, measure, pixels, place, setStyle, setText, type Box } from "./dom";
 import { layoutMole, moleFrame, type MoleInputMode, type MoleLayout } from "./mole-layout";
 import type { MoleCalibration, MoleHole, MoleView } from "../core";
@@ -106,6 +107,7 @@ export function createMole(
   let lastView: MoleView | null = null;
   let lastLayout: MoleLayout | null = null;
   let lastRecord: ArcadeRecordBadge | null = null;
+  let lastInputMode: MoleInputMode = "keyboard";
   let prevBoops: number | null = null;
   const frames = new Map<string, AtlasImage | null>();
   const frameArt = (name: string): AtlasImage | null => {
@@ -117,6 +119,7 @@ export function createMole(
     view: MoleView,
     layout: MoleLayout,
     record: ArcadeRecordBadge | null,
+    inputMode: MoleInputMode,
   ): void => {
     setStyle(machine, "width", `${layout.width}px`);
     setStyle(machine, "height", `${layout.height}px`);
@@ -127,7 +130,7 @@ export function createMole(
     machine.dataset.scale = String(layout.scale);
     place(plate, layout.plate);
     // The hint (or the game's name) on the marquee, measured once to fit.
-    const text = view.hint ?? "BOOP-A-MOLE";
+    const text = view.hint === null ? "BOOP-A-MOLE" : adaptHintForInputMode(view.hint, inputMode);
     plate.classList.toggle("is-hint", view.hint !== null);
     setText(plateText, text);
     const plateKey = `${text}|${layout.plate.width}|${layout.plate.height}`;
@@ -194,7 +197,9 @@ export function createMole(
   // when it loads (spec 7.1): what's shown is drawn again then.
   document.fonts.addEventListener("loadingdone", () => {
     lastPlateKey = "";
-    if (lastView !== null && lastLayout !== null) draw(lastView, lastLayout, lastRecord);
+    if (lastView !== null && lastLayout !== null) {
+      draw(lastView, lastLayout, lastRecord, lastInputMode);
+    }
   });
 
   return {
@@ -202,6 +207,7 @@ export function createMole(
       overlay.hidden = view === null;
       lastView = view;
       lastRecord = record;
+      lastInputMode = inputMode;
       if (view === null) {
         lastKey = "";
         prevBoops = null;
@@ -224,7 +230,7 @@ export function createMole(
       const shown = moleFrame(calibration);
       const scale = Math.max(0.01, Math.min(width / shown.w, height / shown.h));
       lastLayout = layoutMole(view, calibration, scale, inputMode);
-      draw(view, lastLayout, record);
+      draw(view, lastLayout, record, inputMode);
     },
     info: () => {
       if (lastView === null || lastLayout === null) return null;

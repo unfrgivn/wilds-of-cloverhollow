@@ -5,9 +5,11 @@ import {
   updateArcadeBestBadge,
   type ArcadeRecordBadge,
 } from "./arcade-popups";
+import { adaptHintForInputMode } from "./battle-checks-helpers";
 import {
   element, measure, pixels, place, setAttribute, setStyle, setText, svgElement, type Box,
 } from "./dom";
+import type { HudInputMode } from "./hud-hints";
 import { bindPointerHold } from "./pointer-hold";
 import { layoutSkee, skeeFrame, type SkeeLayout, type Target } from "./skee-layout";
 import type { SkeeCalibration, SkeeView } from "../core";
@@ -48,7 +50,11 @@ export function createSkee(
   image: string,
   onConfirmHold: (held: boolean) => void = () => undefined,
 ): {
-  render: (view: SkeeView | null, record?: ArcadeRecordBadge | null) => void;
+  render: (
+    view: SkeeView | null,
+    record?: ArcadeRecordBadge | null,
+    inputMode?: HudInputMode,
+  ) => void;
   info: () => SkeeInfo | null;
 } {
   const overlay = element("section", "skee-overlay", root);
@@ -92,6 +98,7 @@ export function createSkee(
   let lastView: SkeeView | null = null;
   let lastLayout: SkeeLayout | null = null;
   let lastRecord: ArcadeRecordBadge | null = null;
+  let lastInputMode: HudInputMode = "keyboard";
   let prevScore: number | null = null;
 
   const targetNodes = (list: TargetNodes[], count: number, className: string): void => {
@@ -116,6 +123,7 @@ export function createSkee(
     view: SkeeView,
     layout: SkeeLayout,
     record: ArcadeRecordBadge | null,
+    inputMode: HudInputMode,
   ): void => {
     setStyle(frame, "width", `${layout.frame.width}px`);
     setStyle(frame, "height", `${layout.frame.height}px`);
@@ -130,7 +138,7 @@ export function createSkee(
     // The hint (or the game's name) lettered on the marquee: one line for the
     // name, two balanced lines for a hint, as large as fits. Sized from the
     // plate's height first, then measured once and shrunk if it runs over.
-    const text = view.hint ?? "SKEE-BALL";
+    const text = view.hint === null ? "SKEE-BALL" : adaptHintForInputMode(view.hint, inputMode);
     const lines = view.hint === null ? 1 : text.length > 16 ? 2 : 1;
     plate.classList.toggle("is-hint", view.hint !== null);
     setText(plateText, text);
@@ -212,14 +220,17 @@ export function createSkee(
   // when it loads (spec 7.1): what's shown is drawn again then.
   document.fonts.addEventListener("loadingdone", () => {
     lastPlateKey = "";
-    if (lastView !== null && lastLayout !== null) draw(lastView, lastLayout, lastRecord);
+    if (lastView !== null && lastLayout !== null) {
+      draw(lastView, lastLayout, lastRecord, lastInputMode);
+    }
   });
 
   return {
-    render: (view, record = null) => {
+    render: (view, record = null, inputMode = "keyboard") => {
       overlay.hidden = view === null;
       lastView = view;
       lastRecord = record;
+      lastInputMode = inputMode;
       if (view === null) {
         pointerHold.release();
         lastKey = "";
@@ -237,13 +248,13 @@ export function createSkee(
       const height = overlay.clientHeight - pixels(style.paddingTop) -
         pixels(style.paddingBottom);
       const recordKey = record === null ? "" : `${record.best}:${record.isNewBest ? 1 : 0}`;
-      const key = `${width}x${height} ${recordKey} ${JSON.stringify(view)}`;
+      const key = `${width}x${height} ${recordKey} ${inputMode} ${JSON.stringify(view)}`;
       if (key === lastKey) return;
       lastKey = key;
       const shown = skeeFrame(calibration);
       const scale = Math.max(0.01, Math.min(width / shown.w, height / shown.h));
       lastLayout = layoutSkee(view, calibration, scale);
-      draw(view, lastLayout, record);
+      draw(view, lastLayout, record, inputMode);
     },
     info: () => {
       if (lastView === null || lastLayout === null) return null;

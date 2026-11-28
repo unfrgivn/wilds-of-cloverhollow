@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 175)
+Last updated: 2026-11-27 (Milestone 176)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -740,6 +740,28 @@ ios/            Capacitor iOS project (from Milestone 4).
   `1.00 -> 1.022` on `"out"`, `0.972 -> 1.00` on `"in"`, strictly clipped inside
   `viewportMask` and `1` outside transitions or in `harness`) and a whisper-soft
   paper-rustle noise tail in the `"door"` sound recipe (`src/platform/audio.ts`).
+  During live fast-travel rides (Star-Line Bus between `plaza`, `bay`, and
+  `pass`; Bay Rowboat between `bay` and `island`; and Alpine Ski Lift between
+  `pass` and `summit`), presentation-only **Illustrated Storybook Travel
+  Vignettes** (`src/render/travel-vignette.ts`, `vignetteEnvelope` /
+  `travelFadeAlpha` in `src/render/fade.ts`, `src/ui/travel-overlay.ts` /
+  `src/ui/travel-overlay.css`, and `src/shell/area-loader.ts`, Milestone 176 /
+  Track E14, Art Wave C2) present one of 5 compact `800x450` hand-painted
+  watercolor WebP diorama cards (`public/assets/travel/{bus-hills,bus-coast,
+  bus-pass,boat-island,lift-summit}.webp`, 42–65 KB each, `art/recipes/travel-vignettes.json`)
+  inside a framed die-cut cream postcard (`z-index: 65`, `data-travel-vignette="open"`,
+  hiding gameplay HUD/touch chrome) for `1680 ms` (`200 ms` fade-in, `220 ms`
+  fade-out) with a `"Next stop: <Destination>!"` header, mode chime
+  (`title-start` / `card-open` / `tool-sparkle`), and animated origin-to-destination
+  progress strip while the target area warms in parallel behind the paper fade.
+  Tapping/clicking the overlay, pressing Confirm/Cancel (`Z`, `Space`, `Enter`,
+  `X`, `Escape`), or pressing a fresh Gamepad A/B edge skips the scenic hold
+  immediately (swallowing confirm/cancel so arrival never re-triggers the travel
+  interactable and playing `"card-close"` while still awaiting any in-flight
+  `setArea`). Paused harness synthetic stepping (`harnessStepping` / `paused`),
+  Reduced Motion (`isReducedMotionActive()`), walking doors, same-area hops, and
+  dark battle-rest fades bypass vignettes instantaneously with zero added delay,
+  preserving 100% deterministic `src/core` hashes and Save `v10` compatibility.
 - Story-driven time-of-day lighting arc (`src/render/time-of-day.ts`, Milestone
   90): pure presentation-only `storyTimeOfDay(world, state)` computes a subtle
   `TimeOfDayGrade` (`morning`, `day`, `golden-hour`, `enchanted-twilight`,

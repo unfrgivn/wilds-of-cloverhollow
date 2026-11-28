@@ -1,0 +1,63 @@
+{
+  "asset": "travel-vignettes",
+  "wave": "Art Wave C2 (Elevation Track E14)",
+  "date": "2026-11-27",
+  "status": "owner-review-ready",
+  "model": "gemini-3-pro-image-preview",
+  "aspectRatio": "16:9",
+  "imageSize": "1K",
+  "generationCalls": "7 total (5 initial cards + 2 refinements for lift-summit and bus-pass; see art/scratch/generation-log.jsonl in main checkout). Selected: bus-hills (1795836776268), bus-coast (1795836776075), bus-pass (1795836775593), boat-island (1795836776003), lift-summit (1795836853727).",
+  "references": [
+    "docs/art/concepts/props/bus_station.png",
+    "docs/art/concepts/environments/beach_cove_environment.png",
+    "docs/art/concepts/environments/pinecone_pass_environment.png",
+    "art/source/areas/hills/hills-final.png",
+    "public/assets/areas/island/props-0.webp"
+  ],
+  "postProcessing": {
+    "command": "magick <raw.png> -filter Lanczos -resize 800x450^ -gravity center -extent 800x450 -strip -quality 86 -define webp:method=6 public/assets/travel/<id>.webp",
+    "dimensions": "800x450 WebP (16:9 full-bleed)",
+    "footprintBytes": {
+      "bus-hills.webp": 66190,
+      "bus-coast.webp": 56472,
+      "bus-pass.webp": 57470,
+      "boat-island.webp": 43258,
+      "lift-summit.webp": 60694
+    }
+  },
+  "cards": [
+    {
+      "id": "bus-hills",
+      "output": "public/assets/travel/bus-hills.webp",
+      "selectedGeneration": "1795836776268-gemini-3-pro-image-preview-0.png",
+      "subject": "Star-Line two-tone butter-yellow and sage-teal pastel minibus rolling along Cloverhollow's sunlit clover hills."
+    },
+    {
+      "id": "bus-coast",
+      "output": "public/assets/travel/bus-coast.webp",
+      "selectedGeneration": "1795836776075-gemini-3-pro-image-preview-0.png",
+      "subject": "Star-Line pastel minibus winding along Bubblegum Bay's coastal cliffside road above turquoise waters and palms."
+    },
+    {
+      "id": "bus-pass",
+      "output": "public/assets/travel/bus-pass.webp",
+      "selectedGeneration": "1795836775593-gemini-3-pro-image-preview-0.png",
+      "subject": "Star-Line pastel minibus climbing Pinecone Pass's snowy spruce-teal pine road past a cozy ski lodge."
+    },
+    {
+      "id": "boat-island",
+      "output": "public/assets/travel/boat-island.webp",
+      "selectedGeneration": "1795836776003-gemini-3-pro-image-preview-0.png",
+      "subject": "Pastel cream-and-mint wooden rowboat gliding across turquoise Bubblegum Bay waters toward Starlight Island's coral-and-cream striped lighthouse."
+    },
+    {
+      "id": "lift-summit",
+      "output": "public/assets/travel/lift-summit.webp",
+      "selectedGeneration": "1795836853727-gemini-3-pro-image-preview-0.png",
+      "subject": "Cozy pastel alpine chairlift (golden-yellow, mint-teal, coral-pink open two-seater chairs) ascending a clean diagonal cable above snow-laden pines toward Alpine Summit Overlook."
+    }
+  ],
+  "review": [
+    "art/review/travel-vignettes-sheet.jpg"
+  ]
+}

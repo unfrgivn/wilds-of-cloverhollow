@@ -42,9 +42,11 @@ import { createHaptics } from "./platform/haptics";
 import { findPettableCompanion, findRestSpot } from "./render/companions";
 import type { AudioLevel } from "./platform/audio-settings";
 import { createGameSettings } from "./platform/game-settings";
+import { isReducedMotionActive } from "./platform/reduced-motion";
 import { createMinigameRecords } from "./platform/minigame-records";
 import type { ArcadeRecordBadge } from "./ui/arcade-popups";
 import { createAreaBanner } from "./ui/area-banner";
+import { createTravelOverlay } from "./ui/travel-overlay";
 import { createHudHints } from "./ui/hud-hints";
 import { createSaveToast } from "./ui/save-toast";
 import {
@@ -151,6 +153,7 @@ async function boot(): Promise<void> {
   const hudHints = createHudHints(uiRoot);
   const saveToast = createSaveToast(uiRoot);
   const areaBanner = createAreaBanner(uiRoot);
+  const travelOverlay = createTravelOverlay(uiRoot);
   const shutterFlash = createShutterFlash(uiRoot);
   const photoToast = createPhotoToast(uiRoot);
   const bannerTracker = createAreaBannerTracker();
@@ -502,7 +505,21 @@ async function boot(): Promise<void> {
       previousState = loadedState;
     },
     invalidate,
+    travelVignette: {
+      isPaused: () => paused, isReducedMotion: () => isReducedMotionActive(),
+      preload: travelOverlay.preload, hide: travelOverlay.hide,
+      onStart: (spec) => { sound.playEffect(spec.chime); lightHaptic(); },
+      render: (v) => travelOverlay.render({
+        ...v, touchActive: document.documentElement.dataset.touch === "on",
+      }),
+    },
   });
+  const skipTravel = (): void => {
+    if (!areaLoader.skipTravelVignette()) return;
+    keyboard.clearTaps(); gamepad.clearTaps(); swallowed.add("confirm"); swallowed.add("cancel");
+    sound.playEffect("card-close");
+  };
+  travelOverlay.onSkip(skipTravel);
   const syncOpenFlag = (
     name: "arcade" | "qaConsole" | "title" | "credits" | "battle" | "talk" | "journal",
     open: boolean,
@@ -584,6 +601,7 @@ async function boot(): Promise<void> {
         qa?.isActive() ?? false,
       ),
     );
+    areaLoader.renderTravelVignette(performance.now());
     title.render({
       visible: titleMode !== null && !qaMenuOpen,
       mode: titleMode ?? "fresh",
@@ -822,6 +840,8 @@ async function boot(): Promise<void> {
   let contextLost = false;
   app.ticker.add(() => {
     inputShortcuts.pollGamepad();
+    const pad = areaLoader.isTravelVignetteActive() ? gamepad.frame() : null;
+    areaLoader.pollTravelGamepadSkip(pad !== null && (pad.confirm || pad.cancel), skipTravel);
     const now = performance.now();
     accumulator += Math.min(now - last, 250);
     last = now;
@@ -881,7 +901,8 @@ async function boot(): Promise<void> {
       world: content.world, fixtures: content.fixtures, fresh,
       speciesXp: saveSession.speciesXp, input, get: () => state, tick,
       ensureArea: areaLoader.ensureArea, render: () => render(), invalidate,
-      paused: () => paused, setPaused: (value) => { paused = value; },
+      paused: () => paused,
+      setPaused: (v) => { paused = v; if (v) areaLoader.cancelTravelVignette(); },
       setStepping: (value) => { harnessStepping = value; },
       applyResetState: async (next) => {
         keyboard.clearTaps(); gamepad.clearTaps(); releasePointer();

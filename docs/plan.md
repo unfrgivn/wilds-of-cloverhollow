@@ -7524,9 +7524,11 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   Crumpled-paper / purple-scribble chaos overlays that peel away with a
   real-time watercolor wash-bloom wipe into flowers and sunlight when chaos is
   calmed.
-- **Track E14 (Illustrated Storybook Travel Vignettes, Art Wave C):** 5 painted
-  animated travel cards (Star-Line Bus hills/coast/pass, Rowboat to Island, Ski
-  Lift to Summit), skippable on tap and instant in paused harness steps.
+- **Track E14 (Illustrated Storybook Travel Vignettes, Art Wave C):** ✅ Completed
+  (Milestone 176, 2026-11-27) — 5 painted animated watercolor travel cards
+  (Star-Line Bus hills/coast/pass, Rowboat to Island, Ski Lift to Summit),
+  skippable on tap/Confirm/Cancel/Gamepad and instant in paused harness steps or
+  Reduced Motion.
 - **Track E15 (Adaptive Vertical Soundtrack, Foley Polish & Smart Interactive Valley Atlas):**
   Bar-synced vertical music layers (boss Phase-2 lift, lantern celesta, Journal
   low-pass filter), organic paper/sticker foley + CC0 footsteps, and upgraded
@@ -7572,6 +7574,53 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   `battle`, and `gems-bunny`.
 - Gates: `just check`, `just build` (`< 410 kB` every non-vendor chunk), and
   28/28 Chromium & WebKit battle/replay e2e tests.
+
+## Milestone 176: Illustrated Storybook Travel Vignettes (Elevation Track E14, Art Wave C2) **Status:** ✅ Completed (2026-11-27)
+- Replaces plain paper fades during live fast-travel rides with *EarthBound* /
+  *Animal Crossing*-inspired painted watercolor storybook travel postcards
+  (100% presentation-only, zero `src/core` edits, bit-identical sim hashes,
+  save `v10`).
+- **Art Wave C2 (`art/recipes/travel-vignettes.json`, `public/assets/travel/`):**
+  - Generated 5 cohesive `800x450` WebP watercolor diorama cards via Gemini
+    (`gemini-3-pro-image-preview`, 7 calls total, 42–65 KB each, 284 KB combined):
+    `bus-hills.webp`, `bus-coast.webp`, `bus-pass.webp`, `boat-island.webp`,
+    and `lift-summit.webp`, matching `docs/art/style-bible.md` and concept
+    vehicle references (`bus_station.png`, `pinecone_pass_environment.png`,
+    `island/props-0.webp`).
+  - Audited every card and the labeled 3×2 review sheet
+    (`art/review/travel-vignettes-sheet.jpg`) plus live desktop/phone renders
+    (`art/review/e14-travel-bus-1280.jpg`, `art/review/e14-travel-boat-874.jpg`)
+    with `vision`.
+- **Pure Route Classifier & Fade Envelope (`src/render/travel-vignette.ts`,
+  `src/render/fade.ts`):**
+  - `classifyTravelVignette` maps all 10 directed fast-travel routes (`plaza`,
+    `bay`, `pass` pairwise bus rides; `bay <-> island` rowboat; `pass <-> summit`
+    ski lift) to their artwork, `"Next stop: <Destination>!"` caption, mode
+    chime (`title-start` / `card-open` / `tool-sparkle`), accent hue, and
+    `1680 ms` hold, returning `null` for walking doors, same-area hops, dark
+    rest fades, and `harness`.
+  - `shouldShowTravelVignette` enforces instant zero-delay bypass during paused
+    harness steps, `paused` mode, and Reduced Motion (`isReducedMotionActive()`).
+  - Added `travelMarkerMotion`, `vignetteEnvelope`, and `travelFadeAlpha`
+    leaving `fadeAlpha` and `transitionZoom` intact.
+- **Postcard Overlay & AreaLoader Integration (`src/ui/travel-overlay.ts`,
+  `src/ui/travel-overlay.css`, `src/shell/area-loader.ts`, `src/main.ts`):**
+  - Framed die-cut cream postcard (`z-index: 65`, `.sticker-ui.travel-overlay`
+    specificity guard against CSS bundle order, dashed stitch border, hand-inked
+    SVG vehicle badge & animated progress-fill route strip, `>= 44 px` touch
+    skip button, safe-area fit on both `1280x720` and `874x402`).
+  - `createAreaLoader` preloads the travel WebP on `syncTransition("out", false)`
+    and runs the scenic hold in parallel with `setArea` / `warmAreaMedia` during
+    live play, supporting instant tap, Confirm/Cancel key, and rising-edge
+    Gamepad A/B skip with button swallowing and clean cancel on `pause()` /
+    `reset()`. `src/main.ts` remains cleanly under 950 lines (`940` lines).
+- **Evidence:** `tests/unit/travel-vignette.test.ts` (real unit tests + WebP
+  integrity audit, zero mocks) and `tests/e2e/travel-vignette.spec.ts` (real
+  keys + pointer tap across Star-Line Bus, Rowboat, Ski Lift, Reduced Motion,
+  and paused harness bypass on Chromium and WebKit `@smoke`), plus
+  `vision`-verified review captures.
+- **Gates:** `just check`, `just build` (`< 500 kB` every non-vendor chunk),
+  and Chromium/WebKit e2e verification.
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.

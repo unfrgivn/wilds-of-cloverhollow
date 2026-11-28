@@ -34,3 +34,5 @@ export * from "./cutscene";
 export * from "./heart-to-hearts";
 export * from "./encore";
 export * from "./puzzles";
+export * from "./blessings";
+export * from "./decor";

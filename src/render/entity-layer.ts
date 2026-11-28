@@ -1,6 +1,10 @@
 import { Assets, Container, Sprite, Spritesheet, Texture } from "pixi.js";
 import {
   cutsceneView,
+  CLUBHOUSE_VISITOR_FOOTPRINT,
+  CLUBHOUSE_VISITOR_POINT,
+  CLUBHOUSE_VISITORS,
+  clubhouseVisitorNpc,
   hiddenFraction,
   npcFacing,
   npcLivePoint,
@@ -115,6 +119,7 @@ export class OverworldEntityLayer {
     npc: Area["npcs"][number];
     sprite: Sprite;
     shadow: Sprite | null;
+    clubhouseVisitor?: boolean;
   }[] = [];
   private npcFrames: NpcFrameInfo[] = [];
   private ambientSprites: {
@@ -221,6 +226,32 @@ export class OverworldEntityLayer {
       }
       return { npc, sprite, shadow };
     });
+    if (area.id === "clubhouse") {
+      const footprint = CLUBHOUSE_VISITOR_FOOTPRINT.map(([x, y]): [number, number] => [x, y]);
+      for (const visitor of CLUBHOUSE_VISITORS) {
+        const sprite = new Sprite();
+        sprite.label = `npc:${visitor.id}`;
+        sprite.scale.set(0.5);
+        sprite.visible = false;
+        this.layers.depth.addChild(sprite);
+        const shadow = makeShadowSprite(this.vfx.contactShadow, `shadow:npc:${visitor.id}`);
+        shadow.visible = false;
+        this.layers.shadowLayer.addChild(shadow);
+        this.npcSprites.push({
+          npc: {
+            id: visitor.id,
+            point: { x: CLUBHOUSE_VISITOR_POINT.x, y: CLUBHOUSE_VISITOR_POINT.y },
+            facing: "right",
+            footprint,
+            knot: visitor.knot,
+            prompt: "Talk",
+          },
+          sprite,
+          shadow,
+          clubhouseVisitor: true,
+        });
+      }
+    }
   }
 
   /** Bounding boxes for every visible figure in the depth layer, in world units. */
@@ -590,9 +621,14 @@ export class OverworldEntityLayer {
     const csOverrides = cutsceneView(state)?.actorOverrides;
     const prevCsOverrides =
       previousState === undefined ? undefined : cutsceneView(previousState)?.actorOverrides;
+    const activeVisitor =
+      state.area === "clubhouse" ? clubhouseVisitorNpc(this.world, state) : null;
     const frames: NpcFrameInfo[] = [];
-    for (const [npcIndex, { npc, sprite, shadow }] of this.npcSprites.entries()) {
-      sprite.visible = npcVisible(this.world, state, npc);
+    for (const [npcIndex, npcEntry] of this.npcSprites.entries()) {
+      const { npc, sprite, shadow, clubhouseVisitor } = npcEntry;
+      sprite.visible = clubhouseVisitor === true
+        ? activeVisitor !== null && activeVisitor.id === npc.id
+        : npcVisible(this.world, state, npc);
       if (shadow !== null) shadow.visible = sprite.visible;
       if (!sprite.visible) continue;
       const csOverride = csOverrides?.[`npc:${npc.id}`];

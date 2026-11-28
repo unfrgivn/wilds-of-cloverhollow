@@ -1,4 +1,5 @@
 import {
+  effectiveAreaNpcs,
   npcLivePoint,
   npcVisible,
   presentCritters,
@@ -73,7 +74,12 @@ export function dialoguePartner(world: World, state: State): Point | null {
   if (state.dialogue === null) return null;
   const knot = state.dialogue.knot;
   const area = world.areas[state.area];
-  const npc = area?.npcs.find((item) => npcVisible(world, state, item) && item.knot === knot);
+  const npc =
+    area === undefined
+      ? undefined
+      : effectiveAreaNpcs(world, state, area).find(
+          (item) => npcVisible(world, state, item) && item.knot === knot,
+        );
   if (npc !== undefined) {
     const live = npcLivePoint(state, npc);
     return { x: live.x, y: live.y };

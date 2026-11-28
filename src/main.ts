@@ -48,6 +48,7 @@ import { isReducedMotionActive } from "./platform/reduced-motion";
 import { createMinigameRecords } from "./platform/minigame-records";
 import type { ArcadeRecordBadge } from "./ui/arcade-popups";
 import { createAreaBanner } from "./ui/area-banner";
+import { createDecorPicker, decorFeedbackEffect } from "./ui/decor-picker";
 import { createTravelOverlay } from "./ui/travel-overlay";
 import { mountEncoreShrineSession, type EncoreShrineSession } from "./ui/encore-shrine";
 import { createHudHints } from "./ui/hud-hints";
@@ -251,7 +252,7 @@ async function boot(): Promise<void> {
   // released, so the press that starts the game can't also act in it.
   const swallowed = new Set<"confirm" | "cancel" | "menu">();
   const resetTransient = (): void => {
-    saveSession.clearDirty(); bannerTracker.clear(); saveToast.hide();
+    saveSession.clearDirty(); bannerTracker.clear(); saveToast.hide(); decorPicker.close(true);
     jukeboxTrack = null; battlePeekOpen = false; activeArcadeRecord = null;
     fishStreak = 0; levelUpNotices.length = 0; toolEventChime.reset(); encoreShrine?.closeSilent();
     setPhotoMode(false, true); releasePointer();
@@ -323,11 +324,21 @@ async function boot(): Promise<void> {
   const notesNow = createJournalNotesCache(content.world);
   let wasJournalOpen = false;
   let wasBattleOpen = false;
+  const decorPicker = createDecorPicker(uiRoot, {
+    world: content.world, getState: () => state,
+    applyState: (next) => {
+      state = next; previousState = next; saveSession.markDirty();
+      if (!(qa?.isRestricted() ?? false)) void saveSession.save(); invalidate();
+    },
+    onFeedback: (cue) => { sound.playEffect(decorFeedbackEffect(cue)); lightHaptic(); },
+    onClose: () => { swallowed.add("cancel"); invalidate(); },
+  });
   document.documentElement.dataset.photo = "off";
   const overlayContext = (): OverlayGateContext => ({
     state, titleMode, photoMode, shrineOpen: encoreShrine?.isOpen() ?? false,
-    qaMenuOpen: qa?.isMenuOpen() ?? false, qaConsoleOpen: qa?.isConsoleOpen() ?? false,
-    qaBlocked: qa?.isBlocked() ?? false, loading: areaLoader.isLoading(),
+    decorPickerOpen: decorPicker.isOpen(), qaMenuOpen: qa?.isMenuOpen() ?? false,
+    qaConsoleOpen: qa?.isConsoleOpen() ?? false, qaBlocked: qa?.isBlocked() ?? false,
+    loading: areaLoader.isLoading(),
   });
   const setPhotoMode = (on: boolean, silent = false): void => {
     const next = on && canPhotoMode(overlayContext());
@@ -423,7 +434,7 @@ async function boot(): Promise<void> {
   const inputShortcuts = createInputShortcuts({
     getContext: overlayContext, getBattlePeekOpen: () => battlePeekOpen,
     setBattlePeek, setPhotoMode, snapPostcard: () => { void snapPostcard({ download: true }); },
-    journal, encoreShrine: encoreShrine.shortcuts(), gamepad,
+    journal, encoreShrine: encoreShrine.shortcuts(), decorPicker, gamepad,
     clearKeyboardTaps: () => keyboard.clearTaps(), swallow: (button) => swallowed.add(button),
     playChoiceMove: () => { sound.play("choice-move", state.tick); }, invalidate,
     ...(qa !== null ? { qa: qa.shortcuts() } : {}),
@@ -497,7 +508,7 @@ async function boot(): Promise<void> {
     });
     prompt.render(
       state.battle === null && state.arcade === null && state.finale !== "credits" &&
-        state.cutscene === undefined && titleMode === null
+        state.cutscene === undefined && titleMode === null && !decorPicker.isOpen()
         ? view.promptView(state)
         : { visible: false, label: "", x: 0, y: 0 },
     );
@@ -528,20 +539,13 @@ async function boot(): Promise<void> {
       canPhoto: canPhotoMode(gate) && !photoMode, canBattlePeek: canBattlePeek(gate),
       inputMode: inputShortcuts.inputMode(),
     }));
-    areaBanner.render(
-      bannerTracker.view(
-        content.world,
-        state,
-        isBannerEligible(gate, hasLevelUpNotice),
-        qa?.isActive() ?? false,
-      ),
-    );
+    areaBanner.render(bannerTracker.view(
+      content.world, state, isBannerEligible(gate, hasLevelUpNotice), qa?.isActive() ?? false,
+    ));
     areaLoader.renderTravelVignette(performance.now());
     title.render({
-      visible: titleMode !== null && !qaMenuOpen,
-      mode: titleMode ?? "fresh",
-      selected: titleSelected,
-      continueDetail: continueDetail(content.world, state),
+      visible: titleMode !== null && !qaMenuOpen, mode: titleMode ?? "fresh",
+      selected: titleSelected, continueDetail: continueDetail(content.world, state),
     });
     qa?.render();
     syncOpenFlag("qaConsole", gate.qaConsoleOpen);
@@ -549,14 +553,12 @@ async function boot(): Promise<void> {
     syncDocumentTitle(formatDocumentTitle(content.world, state, {
       titleOpen: titleMode !== null, creditsOpen,
     }));
-    if (
-      photoMode || titleMode !== null || activeBattle ||
-      state.journalOpen || creditsOpen || state.cutscene !== undefined ||
-      (encoreShrine?.isOpen() ?? false)
-    ) {
-      saveToast.hide();
-    }
+    if (photoMode || titleMode !== null || activeBattle || state.journalOpen || creditsOpen ||
+      state.cutscene !== undefined || (encoreShrine?.isOpen() ?? false) || decorPicker.isOpen()
+    ) saveToast.hide();
     encoreShrine?.render(state);
+    decorPicker.render(!titleOrQaOpen && !gate.qaConsoleOpen && !gate.qaBlocked &&
+      state.cutscene === undefined && !(encoreShrine?.isOpen() ?? false));
     credits.render(buildCreditsView(content.world, state, assets));
     devLog?.logTitle(titleMode);
     syncOpenFlag("title", titleMode !== null); syncOpenFlag("credits", creditsOpen);
@@ -567,9 +569,7 @@ async function boot(): Promise<void> {
     else delete document.documentElement.dataset.check;
     if (checkKind !== "catch" && checkKind !== "lean" && checkKind !== "echo" &&
         state.arcade?.game !== "mole" && state.arcade?.game !== "comet" &&
-        state.arcade?.game !== "taco" && !overworldPointer.isActive()) {
-      touch.releaseArrows();
-    }
+        state.arcade?.game !== "taco" && !overworldPointer.isActive()) touch.releaseArrows();
     if (activeBattle && !wasBattleOpen) void assets.warmBattlePortraits(state).then(invalidate);
     wasBattleOpen = activeBattle;
     battleHud.render(buildBattleHudView({
@@ -650,7 +650,7 @@ async function boot(): Promise<void> {
     if (cancelEdge && inputShortcuts.handleCancelEdge(swallowed.has("cancel")) === "consume-tick") {
       return;
     }
-    if (encoreShrine?.isOpen() === true) return;
+    if (encoreShrine?.isOpen() === true || decorPicker.isOpen()) return;
     const input: ActionFrame = {
       ...frame,
       confirm: frame.confirm && !swallowed.has("confirm"),
@@ -737,6 +737,8 @@ async function boot(): Promise<void> {
         if (!(qa?.isRestricted() ?? false)) void saveSession.saveState(event.state);
       } else if (event.type === "open-encore-shrine") {
         encoreShrine?.open();
+      } else if (event.type === "open-decor") {
+        decorPicker.open(event.room);
       }
     }
     const soundContext = buildSoundContext(state);
@@ -823,7 +825,7 @@ async function boot(): Promise<void> {
   if (qaEnabled) {
     const resetTransientUi = (): void => {
       titleMode = null; jukeboxTrack = null; battlePeekOpen = false; activeArcadeRecord = null;
-      fishStreak = 0; toolEventChime.reset(); setPhotoMode(false, true);
+      fishStreak = 0; toolEventChime.reset(); setPhotoMode(false, true); decorPicker.close(true);
       encoreShrine?.closeSilent(); levelUpNotices.length = 0; swallowed.clear();
     };
     const { installShellHook } = await import("./dev/hook");

@@ -189,6 +189,15 @@ Fae closes the lid gently. # speaker: Fae
 Drawings pinned to the wall: a kid with a big smile, and hearts and flowers. # speaker: Fae
 -> DONE
 
+=== club_decor ===
+Our clubhouse decorating sketchbook and paint-swatch board! We can pick rugs, pennants, warm lights, and cozy bedroom shelf pedestals right here. # speaker: Fae
++ [Open Clubhouse Decor Picker]
+    Ooh, let's check our clubhouse swatches and cozy upgrades! # speaker: Fae # open-decor: clubhouse
+    -> DONE
++ [Not now]
+    The clubhouse already feels super cozy! # speaker: Fae
+    -> DONE
+
 === moon_perch ===
 {not clubhouse_claimed:
     A smooth crescent of mossy bark tucked in the quiet southeast clearing. A few silver-blue owl feathers rest along the branch, waiting for a calmer evening. # speaker: Fae
@@ -550,3 +559,46 @@ You, Dad, Grandpa Barnaby, and Ranger Fern make the finest valley team I've ever
     Every table at Bon Appetit Cafe is buzzing with stories of your Sunny Cloverhollow adventure! # speaker: Chef Bea
     Go raise a toast with Ranger Fern whenever you're ready, star explorer! # speaker: Chef Bea
     -> DONE
+
+=== club_visit_sue ===
+Hey Fae! I climbed up the ladder with a thermos of cold bay lemonade and my favorite tide-pool stories! # speaker: Sue
+{sue_compass: Seeing my Sea-Glass Compass gleaming up here makes the whole clubhouse feel breezy like Bubblegum Bay! # speaker: Sue}
+{bay_boat_charm: Next sunny afternoon, let's row our pastel boat back out to Starlight Island for a picnic! # speaker: Sue}
+{milo_revealed: Having the whole valley calm again means we finally have time to just hang out and read comics! # speaker: Sue|This clubhouse is already the coolest secret headquarters in Whispering Woods! # speaker: Sue}
+-> DONE
+
+=== club_visit_jordan ===
+Hey Fae! I popped up to check on our deck planter boxes and sketch the clouds through the treehouse railing. # speaker: Jordan
+{garden_ripe: Whoa, the strawberries on the deck are bright red and ready to pick! # speaker: Jordan|{garden_planted: Our strawberry sprouts are soaking up all this calm woodland sunshine! # speaker: Jordan}}
+{jordan_clover: Seeing my grandma's Pressed Alpine Clover hanging on our clubhouse wall makes me grin every time! # speaker: Jordan}
+{milo_revealed: Now that Milo's part of our crew too, we're going to need an even bigger comic stack! # speaker: Jordan|Nothing beats a treehouse breeze after hiking down from Pinecone Pass! # speaker: Jordan}
+-> DONE
+
+=== club_visit_milo ===
+Hey Fae! Thanks for letting me hang out in the clubhouse again... it feels way cozier without any purple fizz! # speaker: Milo
+I brought my fresh watercolor sketchbook and a stack of superhero cat comics for the crate. # speaker: Milo
+{milo_loft_visited: Thanks for checking out my Sketch Loft back in town, too—we should trade comic ideas right here on the beanbag! # speaker: Milo}
+{festival_toast_done: That Sanctuary Celebration Festival was the best day I've ever had in Cloverhollow. You're the best friend ever, Fae! # speaker: Milo|Next time you decorate the clubhouse walls, save a tiny corner for a starry rocket doodle, okay? # speaker: Milo}
+-> DONE
+
+=== club_visit_rosie ===
+Hi Fae! I climbed up with a basket of pressed meadow clover for our clubhouse scrapbook! # speaker: Rosie
+{kite_returned: My kite's ribbon bow looks SO cute tucked inside your treasure chest—thank you again for lassoing it down! # speaker: Rosie}
+{rosie_cottage_visited: Visiting my Flower Cottage gave me tons of cozy decorating ideas for your treehouse walls! # speaker: Rosie}
+{garden_planted: Your strawberry planters out on the deck smell just like summer sunshine! # speaker: Rosie}
+{milo_revealed: Everyone in Cloverhollow feels lighter and happier now. I'm so glad we're clubhouse neighbors! # speaker: Rosie|Can I come help water the deck flowers whenever you're out exploring? # speaker: Rosie}
+-> DONE
+
+=== club_visit_barnaby ===
+Ah, hello there, young Fae! These old knees still manage a clubhouse ladder just fine when there's chamomile tea waiting! # speaker: Grandpa Barnaby
+What a splendid little sanctuary you and your friends have built among the Whispering Woods pines. # speaker: Grandpa Barnaby
+{gem_reward_all: My word, seeing that Rainbow Star Geode sparkling with all seven Star Gems warms an old storyteller's heart! # speaker: Grandpa Barnaby|{gem_count() > 0: Keep shining that lantern across the valley, Fae—every Star Gem carries a piece of Cloverhollow's magic! # speaker: Grandpa Barnaby}}
+{milo_revealed: You brought peace all the way to the Ancient Tree itself. Future explorers will tell stories about your kindness! # speaker: Grandpa Barnaby|Mind you keep plenty of cozy treats stocked for the road, my young adventurer! # speaker: Grandpa Barnaby}
+-> DONE
+
+=== club_visit_fern ===
+Howdy, Fae! I swung over from the Wildlife Sanctuary to trade critter field notes in your treehouse! # speaker: Ranger Fern
+{sanctuary_reward_14: That woven Sanctuary Clover Wreath looks right at home on your clubhouse wall—the whole room smells like alpine meadows! # speaker: Ranger Fern}
+{stickers() >= 10: Flipping through your sticker journal is like reading a love letter to every critter in Cloverhollow! # speaker: Ranger Fern}
+{festival_toast_done: Our Sunny Cloverhollow Jubilee was one for the record books—every critter in the meadow is still snoozing happily! # speaker: Ranger Fern|Drop by the Wildlife Sanctuary anytime your friends want to visit calm critters in the clover! # speaker: Ranger Fern}
+-> DONE

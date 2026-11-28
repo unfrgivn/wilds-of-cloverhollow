@@ -11,6 +11,8 @@ import type {
   Wild,
   World,
 } from "./types";
+import { effectiveRoamTunables } from "./blessings";
+import { availableFishToTrade, effectiveAreaNpcs } from "./decor";
 import { totalTreatCount } from "./battle-view";
 import { nextNotice, noticed } from "./encounter";
 import {
@@ -65,6 +67,7 @@ export function inkFacts(world: World, state: State): InkFacts {
     stickers: state.stickers.length,
     treats: totalTreatCount(state.treats),
     bossesCalmed: bossesCalmedCount(world, state),
+    fishCount: availableFishToTrade(state),
   };
 }
 
@@ -328,7 +331,9 @@ export function rollWild(world: World, state: State, area: Area): Pick<State, "w
   const boxWidth = Math.max(0, maxX - playerRadius - boxLeft);
   const boxHeight = Math.max(0, maxY - playerRadius - boxTop);
   const scenery = sceneryArea(world, state.ink, area);
-  const visibleNpcs = area.npcs.filter((npc) => npcVisible(world, state, npc));
+  const visibleNpcs = effectiveAreaNpcs(world, state, area).filter(
+    (npc) => npcVisible(world, state, npc),
+  );
   const solids: SolidBox[] = [
     ...scenery.blockers.map(solidBox),
     ...visibleNpcs.map((npc) => solidBox(npc.footprint)),
@@ -487,6 +492,7 @@ export function stepWild(
 ): Pick<State, "wild" | "rng"> {
   let randomState = state;
   const roam = world.tunables.roam;
+  const effectiveRoam = state.wild.length > 0 ? effectiveRoamTunables(world, state) : roam;
   const scenery = sceneryArea(world, state.ink, area);
   const wild = state.wild.map((previous): Wild => {
     const den = area.recurring?.dens[previous.den];
@@ -497,8 +503,8 @@ export function stepWild(
     const leash = den.radius + roam.sight * 2;
     const inSight = cooldownTicks === 0 && distance(previous, player) <= roam.sight &&
       distance(home, player) <= leash;
-    const notice = nextNotice(previous, inSight, roam);
-    const chasing = noticed({ ...previous, notice }, roam);
+    const notice = nextNotice(previous, inSight, effectiveRoam);
+    const chasing = noticed({ ...previous, notice }, effectiveRoam);
     let target = previous.target;
     let pauseTicks = previous.pauseTicks;
     if (chasing) target = player;

@@ -1,3 +1,4 @@
+import { effectiveRoamTunables } from "./blessings";
 import type { Critter, FirstTouch, Point, State, Wild, WildMark, World } from "./types";
 
 // Meeting a recurring critter (spec 8, Milestone 51). A critter takes a moment
@@ -49,7 +50,8 @@ export function oldFriend(world: World, state: State, critter: Critter): boolean
 
 /** The marks over chaos recurring critters' heads: "?" unaware, then "!". */
 export function wildMarks(world: World, state: State): WildMark[] {
-  const { noticeTicks, alertTicks } = world.tunables.roam;
+  const { noticeTicks, alertTicks } =
+    state.wild.length > 0 ? effectiveRoamTunables(world, state) : world.tunables.roam;
   return state.wild.flatMap((critter): WildMark[] => {
     if (critter.mood !== "chaos" || critter.notice === 0 ||
       critter.notice >= noticeTicks + alertTicks) return [];

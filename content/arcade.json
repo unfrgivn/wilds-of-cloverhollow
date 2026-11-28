@@ -251,6 +251,10 @@
     "hookGravity": 0.0028,
     "hookMaxSpeed": 0.036,
     "reelMaxTicks": 480,
+    "trade": {
+      "ticketsPerCatch": 12,
+      "coinsPerCatch": 14
+    },
     "catches": [
       {
         "id": "minnow",
@@ -292,37 +296,37 @@
         "id": "koi",
         "name": "Rainbow Koi",
         "frame": "koi",
-        "coins": 12,
+        "coins": 11,
         "snacks": 1,
         "rarity": "uncommon",
         "minPower": 0.45,
         "weight": 14,
         "fightSpeed": 0.016,
-        "line": "Whoa! A shimmering Rainbow Koi! Coins +12, Snacks +1."
+        "line": "Whoa! A shimmering Rainbow Koi! Coins +11, Snacks +1."
       },
       {
         "id": "jelly",
         "name": "Moonlight Jelly",
         "frame": "jelly",
-        "coins": 15,
+        "coins": 14,
         "snacks": 0,
         "rarity": "rare",
         "minPower": 0.62,
         "weight": 10,
         "fightSpeed": 0.017,
-        "line": "A glowing Moonlight Jelly! It winks and floats back into the bay. Coins +15."
+        "line": "A glowing Moonlight Jelly! It winks and floats back into the bay. Coins +14."
       },
       {
         "id": "starfish",
         "name": "Golden Starfish Crown",
         "frame": "starfish",
-        "coins": 20,
+        "coins": 18,
         "snacks": 1,
         "rarity": "rare",
         "minPower": 0.78,
         "weight": 7,
         "fightSpeed": 0.019,
-        "line": "JACKPOT! The rare Golden Starfish Crown! Coins +20, Snacks +1!"
+        "line": "JACKPOT! The rare Golden Starfish Crown! Coins +18, Snacks +1!"
       }
     ],
     "lines": {
@@ -344,7 +348,7 @@
     "shiftTicks": 1080,
     "clearTicks": 42,
     "oopsTicks": 20,
-    "coinsPerOrder": 5,
+    "coinsPerOrder": 4,
     "snacksTwoOrders": 1,
     "snacksSpotless": 2,
     "customers": [

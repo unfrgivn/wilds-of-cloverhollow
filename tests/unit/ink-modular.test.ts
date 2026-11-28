@@ -170,7 +170,7 @@ describe("Track E0: Modular story integrity", () => {
     if (!isRecord(defs)) return;
     const keys = Object.keys(defs);
     expect(keys).toContain("global decl");
-    expect(keys.filter((key) => key !== "global decl").length).toBeGreaterThanOrEqual(326);
+    expect(keys.filter((key) => key !== "global decl").length).toBeGreaterThanOrEqual(334);
 
     const { world } = loadContent();
     const prices = Object.fromEntries(

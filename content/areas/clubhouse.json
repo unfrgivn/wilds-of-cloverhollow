@@ -139,6 +139,15 @@
         "y": 452
       },
       "prompt": "Look"
+    },
+    {
+      "id": "club-decor",
+      "knot": "club_decor",
+      "point": {
+        "x": 300,
+        "y": 442
+      },
+      "prompt": "Look"
     }
   ],
   "npcs": [],

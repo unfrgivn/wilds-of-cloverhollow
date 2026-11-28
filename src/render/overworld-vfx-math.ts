@@ -1,4 +1,5 @@
 import {
+  activeBlessingEffects,
   faeBox,
   type Area,
   type Direction,
@@ -325,17 +326,20 @@ export function computeGlowTransform(
   index: number,
   lanternBlend: number,
   reducedMotion = false,
+  visibilityBonus = 0,
 ): { scaleX: number; scaleY: number; alpha: number } {
   const dx = glow.point.x - player.x;
   const dy = glow.point.y - player.y;
   const dist = Math.sqrt(dx * dx + dy * dy);
-  const proximity = dist >= 320 ? 0.78 : 0.78 + 0.22 * (1 - dist / 320);
+  const radius = visibilityBonus > 0 ? 320 * (1 + visibilityBonus) : 320;
+  const proximity = dist >= radius ? 0.78 : 0.78 + 0.22 * (1 - dist / radius);
   const pulse = reducedMotion ? 0.88 : 0.84 + Math.sin(tick / 24 + index * 1.15) * 0.12;
+  const boost = visibilityBonus > 0 ? 1 + visibilityBonus * 0.25 : 1;
   const s = reducedMotion ? 0.5 : 0.5 * (1 + 0.025 * Math.sin(tick / 18 + index * 1.15));
   return {
     scaleX: glow.flip === true ? -s : s,
     scaleY: s,
-    alpha: Math.min(1, pulse * proximity) * Math.max(0.35, lanternBlend),
+    alpha: Math.min(1, pulse * proximity * boost) * Math.max(0.35, lanternBlend),
   };
 }
 
@@ -393,11 +397,16 @@ export function evaluateStarGemGlints(
   const area = world.areas[state.area];
   if (area === undefined) return [];
 
+  const visibilityBonus = activeBlessingEffects(world, state).glowVisibilityBonus;
   const tick = state.tick;
   const bobY = reducedMotion ? 0 : Math.sin(tick * 0.09) * 3;
   const pulse = reducedMotion ? 0.5 : 0.5 + 0.5 * Math.sin(tick * 0.11);
-  const haloSize = 38 + 8 * pulse;
-  const haloAlpha = reducedMotion ? 0.42 : 0.36 + 0.18 * pulse;
+  const baseHaloSize = 38 + 8 * pulse;
+  const haloSize =
+    visibilityBonus > 0 ? baseHaloSize * (1 + visibilityBonus * 0.45) : baseHaloSize;
+  const baseHaloAlpha = reducedMotion ? 0.42 : 0.36 + 0.18 * pulse;
+  const haloAlpha =
+    visibilityBonus > 0 ? Math.min(0.92, baseHaloAlpha + visibilityBonus * 0.28) : baseHaloAlpha;
   const haloTint = reducedMotion ? 0xffe58f : prismaticHaloTint(tick);
   const starScale = 0.34 + 0.12 * pulse;
   const starAlpha = 0.88;

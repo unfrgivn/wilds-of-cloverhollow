@@ -1,3 +1,4 @@
+import { activeBlessingEffects } from "./blessings";
 import { nextRandom } from "./random";
 import type { ActionFrame, ArcadeStep, State, TacoContent, World } from "./types";
 
@@ -140,9 +141,11 @@ export function newTaco(
   }, current];
 }
 
-function finishShift(taco: TacoContent, state: State, game: TacoGame): ArcadeStep {
+function finishShift(world: World, state: State, game: TacoGame): ArcadeStep {
+  const taco = world.arcade.taco;
   const spotless = game.served >= game.orders.length && game.mistakes === 0;
-  const coinsEarned = game.served * taco.coinsPerOrder + (spotless ? taco.coinsPerOrder : 0);
+  const perOrder = taco.coinsPerOrder + activeBlessingEffects(world, state).tacoTipCoins;
+  const coinsEarned = game.served * perOrder + (spotless ? perOrder : 0);
   const snacksEarned = spotless
     ? taco.snacksSpotless
     : game.served >= 2
@@ -251,7 +254,7 @@ export function stepTaco(
             score: game.score + 10,
           };
           return nextTime <= 0
-            ? finishShift(taco, state, stacked)
+            ? finishShift(world, state, stacked)
             : { arcade: stacked, ...kept };
         }
         const missed: TacoGame = {
@@ -262,11 +265,11 @@ export function stepTaco(
           oopsTicks: taco.oopsTicks,
         };
         return nextTime <= 0
-          ? finishShift(taco, state, missed)
+          ? finishShift(world, state, missed)
           : { arcade: missed, ...kept };
       }
       if (nextTime <= 0) {
-        return finishShift(taco, state, { ...game, timeLeft: 0, oopsTicks: 0 });
+        return finishShift(world, state, { ...game, timeLeft: 0, oopsTicks: 0 });
       }
       return {
         arcade: {
@@ -282,7 +285,7 @@ export function stepTaco(
       const nextTicks = game.phaseTicks + 1;
       if (nextTicks >= taco.clearTicks) {
         if (game.orderIndex + 1 < game.orders.length) {
-          if (game.timeLeft <= 0) return finishShift(taco, state, game);
+          if (game.timeLeft <= 0) return finishShift(world, state, game);
           return {
             arcade: {
               ...game,
@@ -296,7 +299,7 @@ export function stepTaco(
             ...kept,
           };
         }
-        return finishShift(taco, state, game);
+        return finishShift(world, state, game);
       }
       return { arcade: { ...game, phaseTicks: nextTicks }, ...kept };
     }

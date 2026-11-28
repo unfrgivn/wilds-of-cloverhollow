@@ -309,6 +309,14 @@ function parseFish(value: unknown, file: string): FishContent {
   field(record(lines) && typeof lines.aim === "string" && typeof lines.wait === "string" &&
     typeof lines.bite === "string" && typeof lines.reel === "string" &&
     typeof lines.early === "string" && typeof lines.missed === "string", file, "fish.lines");
+  let trade: FishContent["trade"];
+  if (value.trade !== undefined) {
+    field(record(value.trade), file, "fish.trade");
+    trade = {
+      ticketsPerCatch: integer(value.trade, "ticketsPerCatch", 1, "fish.trade.ticketsPerCatch"),
+      coinsPerCatch: integer(value.trade, "coinsPerCatch", 1, "fish.trade.coinsPerCatch"),
+    };
+  }
   return {
     aimPeriod: integer(value, "aimPeriod", 8),
     castTicks: integer(value, "castTicks", 1),
@@ -323,6 +331,7 @@ function parseFish(value: unknown, file: string): FishContent {
     hookGravity: ratio(value, "hookGravity", 0.0005, 0.1),
     hookMaxSpeed: ratio(value, "hookMaxSpeed", 0.005, 0.2),
     reelMaxTicks: integer(value, "reelMaxTicks", 60),
+    ...(trade === undefined ? {} : { trade }),
     catches,
     lines: {
       aim: lines.aim,

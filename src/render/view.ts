@@ -2,7 +2,8 @@ import {
   Assets, Container, Graphics, Sprite, type Spritesheet, Text, type Renderer,
 } from "pixi.js";
 import {
-  creditEntries, type Area, type NavField, type Point, type State, type World,
+  activeBlessingEffects, creditEntries, type Area, type NavField, type Point, type State,
+  type World,
 } from "../core";
 import { weatherForArea } from "../core/weather";
 import type { AreaView } from "./area-view";
@@ -159,35 +160,18 @@ export class GameView {
     );
     this.viewport.mask = this.viewportMask;
     this.root.addChild(
-      this.background,
-      this.paper,
-      this.viewport,
-      this.viewportMask,
-      this.cutsceneRender.letterboxLayer,
-      this.battleView.root,
-      this.paperGrain.stageSprite,
-      this.fade,
+      this.background, this.paper, this.viewport, this.viewportMask,
+      this.cutsceneRender.letterboxLayer, this.battleView.root,
+      this.paperGrain.stageSprite, this.fade,
     );
     this.scene.addChild(
-      this.restoration.groundLayer,
-      this.puzzles.groundLayer,
-      this.shadowLayer,
-      this.effects.grassLayer,
-      this.effects.footstepLayer,
-      this.microDelights.pebbleLayer,
-      this.navOverlay.groundLayer,
-      this.atmosphere.under,
-      this.depth,
-      this.ambientLayer,
-      this.atmosphere.over,
-      this.restoration.fxLayer,
-      this.puzzles.fxLayer,
-      this.npcLife.reactionLayer,
-      this.effects.emoteLayer,
-      this.cutsceneRender.emoteLayer,
-      this.microDelights.hopSparkleLayer,
-      this.paperGrain.sceneSprite,
-      this.navOverlay.debugLayer,
+      this.restoration.groundLayer, this.puzzles.groundLayer, this.effects.clubhouseRugLayer,
+      this.shadowLayer, this.effects.grassLayer, this.effects.footstepLayer,
+      this.microDelights.pebbleLayer, this.navOverlay.groundLayer, this.atmosphere.under,
+      this.effects.clubhouseBannerLayer, this.depth, this.ambientLayer, this.atmosphere.over,
+      this.restoration.fxLayer, this.puzzles.fxLayer, this.npcLife.reactionLayer,
+      this.effects.emoteLayer, this.cutsceneRender.emoteLayer, this.microDelights.hopSparkleLayer,
+      this.paperGrain.sceneSprite, this.navOverlay.debugLayer,
     );
     if (options.debugLabel) {
       this.label = new Text({
@@ -512,6 +496,7 @@ export class GameView {
       );
     }
 
+    const glowBonus = activeBlessingEffects(this.world, state).glowVisibilityBonus;
     const drawn: string[] = [];
     this.glowSprites.forEach(({ id, sprite }, index) => {
       const glow = area?.glows.find((item) => item.id === id);
@@ -521,7 +506,7 @@ export class GameView {
         sprite.texture = texture;
         sprite.position.set(glow.point.x, glow.point.y);
         const transform = computeGlowTransform(
-          glow, state.player, state.tick, index, this.lanternBlend, reducedMotion,
+          glow, state.player, state.tick, index, this.lanternBlend, reducedMotion, glowBonus,
         );
         sprite.scale.set(transform.scaleX, transform.scaleY);
         sprite.alpha = transform.alpha;

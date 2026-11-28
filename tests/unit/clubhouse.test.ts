@@ -359,7 +359,7 @@ describe("the clubhouse room", () => {
   it("passes the area checks: the floor, the look points, nobody hidden", () => {
     expect(club.interactables.map((item) => [item.id, item.knot])).toEqual([
       ["club-fridge", "club_fridge"], ["club-garden", "club_garden"], ["comics", "club_comics"],
-      ["bottles", "club_bottles"], ["chest", "club_chest"],
+      ["bottles", "club_bottles"], ["chest", "club_chest"], ["club-decor", "club_decor"],
     ]);
     expect(areaConnectionErrors(world.areas, world.tunables, world.critters, world.party)
       .filter((error) => /^(clubhouse|woods):/.test(error))).toEqual([]);

@@ -36,6 +36,7 @@ import type {
   Recurring,
   SharedCommandId,
   StickerCatalogue,
+  TreatBasket,
   TreatItem,
   WindUp,
 } from "../core";
@@ -781,4 +782,38 @@ export function parseEncoreContent(
     };
   });
   return { baseCoins, coinsPerStar, pureHeartFeelingBonus, modifiers, bosses };
+}
+
+export function parseTreatBaskets(
+  value: unknown,
+  file: string,
+  treats: readonly TreatItem[],
+): TreatBasket[] {
+  field(record(value), file, "object");
+  if (value.baskets === undefined) return [];
+  field(array(value.baskets), file, "baskets");
+  const knownTreats = new Set(treats.map((item) => item.id));
+  const seen = new Set<string>();
+  return value.baskets.map((item, index): TreatBasket => {
+    const label = `baskets[${index}]`;
+    field(record(item), file, label);
+    const id = nonEmptyString(item, "id", file, `${label}.id`);
+    field(/^[a-z][a-z0-9-]*$/.test(id), file, `${label}.id`);
+    field(!seen.has(id), file, `${label}.id (duplicate ${id})`);
+    seen.add(id);
+    const name = nonEmptyString(item, "name", file, `${label}.name`);
+    const price = integerIn(item, "price", 1, file, `${label}.price`);
+    const snacks = integerIn(item, "snacks", 0, file, `${label}.snacks`);
+    field(record(item.treats) && !Array.isArray(item.treats), file, `${label}.treats`);
+    const bundled: Record<string, number> = {};
+    let totalTreats = 0;
+    for (const [treatId, count] of Object.entries(item.treats)) {
+      field(knownTreats.has(treatId), file, `${label}.treats (unknown treat ${treatId})`);
+      field(isInteger(count) && count >= 1 && count <= 20, file, `${label}.treats.${treatId}`);
+      bundled[treatId] = count;
+      totalTreats += count;
+    }
+    field(totalTreats > 0, file, `${label}.treats (must include at least one treat)`);
+    return { id, name, price, treats: bundled, snacks };
+  });
 }

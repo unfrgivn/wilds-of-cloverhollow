@@ -7711,6 +7711,31 @@
           },
           "&&",
           "/ev",
+          {
+            "temp=": "all_prizes"
+          },
+          "\n",
+          "ev",
+          {
+            "x()": "coins"
+          },
+          25,
+          ">=",
+          "/ev",
+          {
+            "temp=": "can_buy_tickets"
+          },
+          "\n",
+          "ev",
+          {
+            "VAR?": "all_prizes"
+          },
+          {
+            "VAR?": "can_buy_tickets"
+          },
+          "!",
+          "&&",
+          "/ev",
           [
             {
               "->": ".^.b",
@@ -7726,7 +7751,7 @@
                 "\n",
                 "done",
                 {
-                  "->": ".^.^.^.32"
+                  "->": ".^.^.^.47"
                 },
                 null
               ]
@@ -7830,6 +7855,10 @@
             "VAR?": "keychain"
           },
           "||",
+          {
+            "VAR?": "can_buy_tickets"
+          },
+          "||",
           "!",
           "/ev",
           [
@@ -7854,7 +7883,7 @@
                 "\n",
                 "done",
                 {
-                  "->": ".^.^.^.97"
+                  "->": ".^.^.^.114"
                 },
                 null
               ]
@@ -7862,10 +7891,51 @@
           ],
           "nop",
           "\n",
-          "^Tickets for prizes! What'll it be? ",
-          "#",
-          "^speaker: Mr. Pip",
-          "/#",
+          "ev",
+          {
+            "VAR?": "all_prizes"
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^You've won every prize on my counter, arcade champ! Need extra tickets for clubhouse decor? ",
+                "#",
+                "^speaker: Mr. Pip",
+                "/#",
+                "\n",
+                {
+                  "->": ".^.^.^.121"
+                },
+                null
+              ]
+            }
+          ],
+          [
+            {
+              "->": ".^.b"
+            },
+            {
+              "b": [
+                "\n",
+                "^Tickets for prizes! What'll it be? ",
+                "#",
+                "^speaker: Mr. Pip",
+                "/#",
+                "\n",
+                {
+                  "->": ".^.^.^.121"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
           "\n",
           "ev",
           "str",
@@ -7917,11 +7987,23 @@
           },
           "ev",
           "str",
+          "^Trade 25 coins for 15 Arcade Tickets",
+          "/str",
+          {
+            "VAR?": "can_buy_tickets"
+          },
+          "/ev",
+          {
+            "*": ".^.c-4",
+            "flg": 5
+          },
+          "ev",
+          "str",
           "^Not now",
           "/str",
           "/ev",
           {
-            "*": ".^.c-4",
+            "*": ".^.c-5",
             "flg": 4
           },
           {
@@ -7986,6 +8068,24 @@
               null
             ],
             "c-4": [
+              "\n",
+              "^Clink-clink! Fifteen shiny orange arcade tickets, fresh off the roll! ",
+              "#",
+              "^speaker: Mr. Pip ",
+              "/#",
+              "#",
+              "^buy-tickets: 25 15 ",
+              "/#",
+              "#",
+              "^sound: chime-yellow",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              null
+            ],
+            "c-5": [
               "\n",
               "^Come back any time! ",
               "#",
@@ -8461,6 +8561,59 @@
         "/#",
         "\n",
         "done",
+        null
+      ],
+      "bedroom_shelf": [
+        [
+          "^My bookshelf! There's a cozy wooden deck right on top for displaying my favorite arcade plushes and prizes. ",
+          "#",
+          "^speaker: Fae",
+          "/#",
+          "\n",
+          "ev",
+          "str",
+          "^Decorate Bedroom Shelf",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 4
+          },
+          "ev",
+          "str",
+          "^Step back",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 4
+          },
+          {
+            "c-0": [
+              "\n",
+              "^Let's pick which cozy plushes perch on the top shelf! ",
+              "#",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^open-decor: bedroom",
+              "/#",
+              "\n",
+              "done",
+              null
+            ],
+            "c-1": [
+              "\n",
+              "^My favorite sunny corner of the room. ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "done",
+              null
+            ]
+          }
+        ],
         null
       ],
       "notice_board": [
@@ -15330,10 +15483,25 @@
           "\n",
           "ev",
           {
+            "x()": "fishCount"
+          },
+          "/ev",
+          {
+            "temp=": "ready_fish"
+          },
+          "\n",
+          "ev",
+          {
             "x()": "coins"
           },
           9,
           "<",
+          {
+            "VAR?": "ready_fish"
+          },
+          0,
+          "==",
+          "&&",
           "/ev",
           [
             {
@@ -15350,7 +15518,7 @@
                 "\n",
                 "done",
                 {
-                  "->": ".^.^.^.20"
+                  "->": ".^.^.^.29"
                 },
                 null
               ]
@@ -15374,11 +15542,53 @@
           },
           "ev",
           "str",
+          "^Trade a bay catch for 12 Arcade Tickets (",
+          "ev",
+          {
+            "VAR?": "ready_fish"
+          },
+          "out",
+          "/ev",
+          "^ ready)",
+          "/str",
+          {
+            "VAR?": "ready_fish"
+          },
+          0,
+          ">",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 5
+          },
+          "ev",
+          "str",
+          "^Trade a bay catch for 14 Coins (",
+          "ev",
+          {
+            "VAR?": "ready_fish"
+          },
+          "out",
+          "/ev",
+          "^ ready)",
+          "/str",
+          {
+            "VAR?": "ready_fish"
+          },
+          0,
+          ">",
+          "/ev",
+          {
+            "*": ".^.c-2",
+            "flg": 5
+          },
+          "ev",
+          "str",
           "^Not now",
           "/str",
           "/ev",
           {
-            "*": ".^.c-1",
+            "*": ".^.c-3",
             "flg": 4
           },
           {
@@ -15398,6 +15608,42 @@
               null
             ],
             "c-1": [
+              "\n",
+              "^Ooh, what a shiny Bubblegum Bay catch! Here are twelve crisp arcade tickets for your trip back to town! ",
+              "#",
+              "^speaker: Bay keeper ",
+              "/#",
+              "#",
+              "^trade-fish: tickets 12 ",
+              "/#",
+              "#",
+              "^sound: chime-blue",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              null
+            ],
+            "c-2": [
+              "\n",
+              "^A fresh bay treasure! Here are fourteen shiny coins for your purse! ",
+              "#",
+              "^speaker: Bay keeper ",
+              "/#",
+              "#",
+              "^trade-fish: coins 14 ",
+              "/#",
+              "#",
+              "^sound: chime-yellow",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              null
+            ],
+            "c-3": [
               "\n",
               "^Enjoy the ocean breeze, Fae! Stop by anytime! ",
               "#",
@@ -21281,6 +21527,59 @@
           ]
         }
       ],
+      "club_decor": [
+        [
+          "^Our clubhouse decorating sketchbook and paint-swatch board! We can pick rugs, pennants, warm lights, and cozy bedroom shelf pedestals right here. ",
+          "#",
+          "^speaker: Fae",
+          "/#",
+          "\n",
+          "ev",
+          "str",
+          "^Open Clubhouse Decor Picker",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 4
+          },
+          "ev",
+          "str",
+          "^Not now",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 4
+          },
+          {
+            "c-0": [
+              "\n",
+              "^Ooh, let's check our clubhouse swatches and cozy upgrades! ",
+              "#",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^open-decor: clubhouse",
+              "/#",
+              "\n",
+              "done",
+              null
+            ],
+            "c-1": [
+              "\n",
+              "^The clubhouse already feels super cozy! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "done",
+              null
+            ]
+          }
+        ],
+        null
+      ],
       "moon_perch": [
         "ev",
         {
@@ -24582,6 +24881,675 @@
             ]
           }
         ],
+        null
+      ],
+      "club_visit_sue": [
+        "^Hey Fae! I climbed up the ladder with a thermos of cold bay lemonade and my favorite tide-pool stories! ",
+        "#",
+        "^speaker: Sue",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "sue_compass"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Seeing my Sea-Glass Compass gleaming up here makes the whole clubhouse feel breezy like Bubblegum Bay! ",
+              "#",
+              "^speaker: Sue",
+              {
+                "->": ".^.^.^.9"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "bay_boat_charm"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Next sunny afternoon, let's row our pastel boat back out to Starlight Island for a picnic! ",
+              "#",
+              "^speaker: Sue",
+              {
+                "->": ".^.^.^.16"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "milo_revealed"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Having the whole valley calm again means we finally have time to just hang out and read comics! ",
+              "#",
+              "^speaker: Sue",
+              {
+                "->": ".^.^.^.24"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          {
+            "->": ".^.b"
+          },
+          {
+            "b": [
+              "^This clubhouse is already the coolest secret headquarters in Whispering Woods! ",
+              "/#",
+              "#",
+              "^speaker: Sue",
+              {
+                "->": ".^.^.^.24"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "club_visit_jordan": [
+        "^Hey Fae! I popped up to check on our deck planter boxes and sketch the clouds through the treehouse railing. ",
+        "#",
+        "^speaker: Jordan",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "garden_ripe"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Whoa, the strawberries on the deck are bright red and ready to pick! ",
+              "#",
+              "^speaker: Jordan",
+              {
+                "->": ".^.^.^.10"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          {
+            "->": ".^.b"
+          },
+          {
+            "b": [
+              "ev",
+              {
+                "VAR?": "garden_planted"
+              },
+              "/ev",
+              [
+                {
+                  "->": ".^.b",
+                  "c": true
+                },
+                {
+                  "b": [
+                    "^ Our strawberry sprouts are soaking up all this calm woodland sunshine! ",
+                    "/#",
+                    "#",
+                    "^speaker: Jordan",
+                    {
+                      "->": ".^.^.^.4"
+                    },
+                    null
+                  ]
+                }
+              ],
+              "nop",
+              {
+                "->": ".^.^.^.10"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "jordan_clover"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Seeing my grandma's Pressed Alpine Clover hanging on our clubhouse wall makes me grin every time! ",
+              "#",
+              "^speaker: Jordan",
+              {
+                "->": ".^.^.^.17"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "milo_revealed"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Now that Milo's part of our crew too, we're going to need an even bigger comic stack! ",
+              "#",
+              "^speaker: Jordan",
+              {
+                "->": ".^.^.^.25"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          {
+            "->": ".^.b"
+          },
+          {
+            "b": [
+              "^Nothing beats a treehouse breeze after hiking down from Pinecone Pass! ",
+              "/#",
+              "#",
+              "^speaker: Jordan",
+              {
+                "->": ".^.^.^.25"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "club_visit_milo": [
+        "^Hey Fae! Thanks for letting me hang out in the clubhouse again... it feels way cozier without any purple fizz! ",
+        "#",
+        "^speaker: Milo",
+        "/#",
+        "\n",
+        "^I brought my fresh watercolor sketchbook and a stack of superhero cat comics for the crate. ",
+        "#",
+        "^speaker: Milo",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "milo_loft_visited"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Thanks for checking out my Sketch Loft back in town, too—we should trade comic ideas right here on the beanbag! ",
+              "#",
+              "^speaker: Milo",
+              {
+                "->": ".^.^.^.14"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "festival_toast_done"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ That Sanctuary Celebration Festival was the best day I've ever had in Cloverhollow. You're the best friend ever, Fae! ",
+              "#",
+              "^speaker: Milo",
+              {
+                "->": ".^.^.^.22"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          {
+            "->": ".^.b"
+          },
+          {
+            "b": [
+              "^Next time you decorate the clubhouse walls, save a tiny corner for a starry rocket doodle, okay? ",
+              "/#",
+              "#",
+              "^speaker: Milo",
+              {
+                "->": ".^.^.^.22"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "club_visit_rosie": [
+        "^Hi Fae! I climbed up with a basket of pressed meadow clover for our clubhouse scrapbook! ",
+        "#",
+        "^speaker: Rosie",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "kite_returned"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ My kite's ribbon bow looks SO cute tucked inside your treasure chest—thank you again for lassoing it down! ",
+              "#",
+              "^speaker: Rosie",
+              {
+                "->": ".^.^.^.9"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "rosie_cottage_visited"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Visiting my Flower Cottage gave me tons of cozy decorating ideas for your treehouse walls! ",
+              "#",
+              "^speaker: Rosie",
+              {
+                "->": ".^.^.^.16"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "garden_planted"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Your strawberry planters out on the deck smell just like summer sunshine! ",
+              "#",
+              "^speaker: Rosie",
+              {
+                "->": ".^.^.^.23"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "milo_revealed"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Everyone in Cloverhollow feels lighter and happier now. I'm so glad we're clubhouse neighbors! ",
+              "#",
+              "^speaker: Rosie",
+              {
+                "->": ".^.^.^.31"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          {
+            "->": ".^.b"
+          },
+          {
+            "b": [
+              "^Can I come help water the deck flowers whenever you're out exploring? ",
+              "/#",
+              "#",
+              "^speaker: Rosie",
+              {
+                "->": ".^.^.^.31"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "club_visit_barnaby": [
+        "^Ah, hello there, young Fae! These old knees still manage a clubhouse ladder just fine when there's chamomile tea waiting! ",
+        "#",
+        "^speaker: Grandpa Barnaby",
+        "/#",
+        "\n",
+        "^What a splendid little sanctuary you and your friends have built among the Whispering Woods pines. ",
+        "#",
+        "^speaker: Grandpa Barnaby",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "gem_reward_all"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ My word, seeing that Rainbow Star Geode sparkling with all seven Star Gems warms an old storyteller's heart! ",
+              "#",
+              "^speaker: Grandpa Barnaby",
+              {
+                "->": ".^.^.^.15"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          {
+            "->": ".^.b"
+          },
+          {
+            "b": [
+              "ev",
+              {
+                "f()": "gem_count"
+              },
+              0,
+              ">",
+              "/ev",
+              [
+                {
+                  "->": ".^.b",
+                  "c": true
+                },
+                {
+                  "b": [
+                    "^ Keep shining that lantern across the valley, Fae—every Star Gem carries a piece of Cloverhollow's magic! ",
+                    "/#",
+                    "#",
+                    "^speaker: Grandpa Barnaby",
+                    {
+                      "->": ".^.^.^.6"
+                    },
+                    null
+                  ]
+                }
+              ],
+              "nop",
+              {
+                "->": ".^.^.^.15"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "milo_revealed"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ You brought peace all the way to the Ancient Tree itself. Future explorers will tell stories about your kindness! ",
+              "#",
+              "^speaker: Grandpa Barnaby",
+              {
+                "->": ".^.^.^.23"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          {
+            "->": ".^.b"
+          },
+          {
+            "b": [
+              "^Mind you keep plenty of cozy treats stocked for the road, my young adventurer! ",
+              "/#",
+              "#",
+              "^speaker: Grandpa Barnaby",
+              {
+                "->": ".^.^.^.23"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "club_visit_fern": [
+        "^Howdy, Fae! I swung over from the Wildlife Sanctuary to trade critter field notes in your treehouse! ",
+        "#",
+        "^speaker: Ranger Fern",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "sanctuary_reward_14"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ That woven Sanctuary Clover Wreath looks right at home on your clubhouse wall—the whole room smells like alpine meadows! ",
+              "#",
+              "^speaker: Ranger Fern",
+              {
+                "->": ".^.^.^.9"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "x()": "stickers"
+        },
+        10,
+        ">=",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Flipping through your sticker journal is like reading a love letter to every critter in Cloverhollow! ",
+              "#",
+              "^speaker: Ranger Fern",
+              {
+                "->": ".^.^.^.18"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "festival_toast_done"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Our Sunny Cloverhollow Jubilee was one for the record books—every critter in the meadow is still snoozing happily! ",
+              "#",
+              "^speaker: Ranger Fern",
+              {
+                "->": ".^.^.^.26"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          {
+            "->": ".^.b"
+          },
+          {
+            "b": [
+              "^Drop by the Wildlife Sanctuary anytime your friends want to visit calm critters in the clover! ",
+              "/#",
+              "#",
+              "^speaker: Ranger Fern",
+              {
+                "->": ".^.^.^.26"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "done",
         null
       ],
       "pup_calm": [
@@ -30360,11 +31328,47 @@
               },
               "ev",
               "str",
+              "^Bon Appetit Trail Basket — 50 coins (2 Brittle, 2 Taffy, 3 Snacks)",
+              "/str",
+              {
+                "VAR?": "spice_returned"
+              },
+              {
+                "x()": "coins"
+              },
+              50,
+              ">=",
+              "&&",
+              "/ev",
+              {
+                "*": ".^.c-2",
+                "flg": 5
+              },
+              "ev",
+              "str",
+              "^Golden Valley Feast Basket — 75 coins (Sunberry, 2 Cones, 2 Brittle, 2 Snacks)",
+              "/str",
+              {
+                "VAR?": "spice_returned"
+              },
+              {
+                "x()": "coins"
+              },
+              75,
+              ">=",
+              "&&",
+              "/ev",
+              {
+                "*": ".^.c-3",
+                "flg": 5
+              },
+              "ev",
+              "str",
               "^Just saying hi!",
               "/str",
               "/ev",
               {
-                "*": ".^.c-2",
+                "*": ".^.c-4",
                 "flg": 4
               },
               {
@@ -30389,6 +31393,38 @@
                   null
                 ],
                 "c-2": [
+                  "\n",
+                  "^A ribbon-tied Bon Appetit Trail Basket packed with brittle, taffy, and three warm trail snacks! ",
+                  "#",
+                  "^speaker: Chef Bea ",
+                  "/#",
+                  "#",
+                  "^buy-basket: cafe-basket 50 ",
+                  "/#",
+                  "#",
+                  "^sound: chime-yellow",
+                  "/#",
+                  "\n",
+                  "done",
+                  null
+                ],
+                "c-3": [
+                  "\n",
+                  "^My grand Golden Valley Feast Basket, tucked with a shimmering Sunberry, cones, brittle, and warm snacks! ",
+                  "#",
+                  "^speaker: Chef Bea ",
+                  "/#",
+                  "#",
+                  "^buy-basket: valley-feast 75 ",
+                  "/#",
+                  "#",
+                  "^sound: chime-yellow",
+                  "/#",
+                  "\n",
+                  "done",
+                  null
+                ],
+                "c-4": [
                   "\n",
                   "^Always a treat to see your smiling face, Fae! Come back anytime. ",
                   "#",
@@ -32529,11 +33565,25 @@
               },
               "ev",
               "str",
+              "^Cloverhollow Market Basket — 45 coins (2 Apples, 2 Crackers, 2 Snacks)",
+              "/str",
+              {
+                "x()": "coins"
+              },
+              45,
+              ">=",
+              "/ev",
+              {
+                "*": ".^.c-3",
+                "flg": 5
+              },
+              "ev",
+              "str",
               "^Just browsing!",
               "/str",
               "/ev",
               {
-                "*": ".^.c-3",
+                "*": ".^.c-4",
                 "flg": 4
               },
               {
@@ -32577,6 +33627,22 @@
                   null
                 ],
                 "c-3": [
+                  "\n",
+                  "^One woven Cloverhollow Market Basket packed with crisp apples, crunchy crackers, and two trail snacks! ",
+                  "#",
+                  "^speaker: Grocer Pippin ",
+                  "/#",
+                  "#",
+                  "^buy-basket: market-basket 45 ",
+                  "/#",
+                  "#",
+                  "^sound: chime-green",
+                  "/#",
+                  "\n",
+                  "done",
+                  null
+                ],
+                "c-4": [
                   "\n",
                   "^Take your time! The jam shelves smell especially cozy today. ",
                   "#",
@@ -33212,11 +34278,25 @@
               },
               "ev",
               "str",
+              "^Sweet Scoop Party Basket — 55 coins (2 Berry Cones, 2 Sundaes, 2 Snacks)",
+              "/str",
+              {
+                "x()": "coins"
+              },
+              55,
+              ">=",
+              "/ev",
+              {
+                "*": ".^.c-2",
+                "flg": 5
+              },
+              "ev",
+              "str",
               "^Just admiring the flavors!",
               "/str",
               "/ev",
               {
-                "*": ".^.c-2",
+                "*": ".^.c-3",
                 "flg": 4
               },
               {
@@ -33247,6 +34327,22 @@
                   null
                 ],
                 "c-2": [
+                  "\n",
+                  "^One pastel Sweet Scoop Party Basket packed with Berry Swirl Cones, Cozy Cocoa Sundaes, and two sweet snacks! ",
+                  "#",
+                  "^speaker: Scooper Penny ",
+                  "/#",
+                  "#",
+                  "^buy-basket: parlor-basket 55 ",
+                  "/#",
+                  "#",
+                  "^sound: chime-blue",
+                  "/#",
+                  "\n",
+                  "done",
+                  null
+                ],
+                "c-3": [
                   "\n",
                   "^Keep cool out there, Fae! Our pastel tubs are always ready for a scoop break! ",
                   "#",

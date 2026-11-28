@@ -56,7 +56,7 @@ describe(
         name: "Golden Starfish Crown",
         owned: true,
         rare: true,
-        coins: 20,
+        coins: 18,
         snacks: 1,
       });
       const minnow = fish.find((entry) => entry.id === "minnow");
@@ -223,7 +223,7 @@ describe(
         hasLasso: true,
       });
       expect(view.hasLasso).toBe(true);
-      expect(view.fish?.find((item) => item.id === "starfish")?.coins).toBe(20);
+      expect(view.fish?.find((item) => item.id === "starfish")?.coins).toBe(18);
       expect(view.keepsakes?.length).toBeGreaterThanOrEqual(8);
 
       const events: string[] = [];

@@ -113,7 +113,9 @@ Comet Cruise! Steer the little rocket, catch the stars, and slip past the space 
     Jars of candy, a ring toss prize, and a big roll of orange tickets behind the counter. # speaker: Fae
     -> DONE
 }
-{won("pinwheel") and won("bouncy-ball") and won("toy-rocket") and won("star-racer-keychain"):
+~ temp all_prizes = won("pinwheel") and won("bouncy-ball") and won("toy-rocket") and won("star-racer-keychain")
+~ temp can_buy_tickets = coins() >= 25
+{all_prizes and not can_buy_tickets:
     You've won every prize on my counter. You're an arcade champ! # speaker: Mr. Pip
     -> DONE
 }
@@ -121,11 +123,15 @@ Comet Cruise! Steer the little rocket, catch the stars, and slip past the space 
 ~ temp ball = not won("bouncy-ball") and tickets() >= 30
 ~ temp rocket = not won("toy-rocket") and tickets() >= 50
 ~ temp keychain = not won("star-racer-keychain") and tickets() >= 80
-{not (pinwheel or ball or rocket or keychain):
+{not (pinwheel or ball or rocket or keychain or can_buy_tickets):
     You have {tickets()} tickets. Skee-ball pays more! # speaker: Mr. Pip
     -> DONE
 }
-Tickets for prizes! What'll it be? # speaker: Mr. Pip
+{all_prizes:
+    You've won every prize on my counter, arcade champ! Need extra tickets for clubhouse decor? # speaker: Mr. Pip
+- else:
+    Tickets for prizes! What'll it be? # speaker: Mr. Pip
+}
 + {pinwheel} [Rainbow Pinwheel, 20 tickets]
     A rainbow pinwheel. Blow on it and it spins! # speaker: Mr. Pip # trade: pinwheel 20
 + {ball} [Star Bouncy Ball, 30 tickets]
@@ -134,6 +140,8 @@ Tickets for prizes! What'll it be? # speaker: Mr. Pip
     A toy rocket, just like the one on my wall. # speaker: Mr. Pip # trade: toy-rocket 50
 + {keychain} [Star Racer Keychain, 80 tickets]
     A Star Racer keychain. Only champs get these! # speaker: Mr. Pip # trade: star-racer-keychain 80
++ {can_buy_tickets} [Trade 25 coins for 15 Arcade Tickets]
+    Clink-clink! Fifteen shiny orange arcade tickets, fresh off the roll! # speaker: Mr. Pip # buy-tickets: 25 15 # sound: chime-yellow
 + [Not now]
     Come back any time! # speaker: Mr. Pip
 - -> DONE

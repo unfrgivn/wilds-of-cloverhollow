@@ -32,6 +32,47 @@ export function totalTreatCount(treats: State["treats"]): number {
   return total;
 }
 
+export function addTreat(state: State, id: string, delta = 1): State {
+  if (delta <= 0) return state;
+  const current = state.treats?.[id] ?? 0;
+  const nextCount = Math.min(99, current + delta);
+  return { ...state, treats: { ...(state.treats ?? {}), [id]: nextCount } };
+}
+
+export function consumeTreat(state: State, id: string): State {
+  const current = state.treats?.[id] ?? 0;
+  if (current <= 0) return state;
+  const remaining: Record<string, number> = {};
+  for (const [key, count] of Object.entries(state.treats ?? {})) {
+    const updated = key === id ? count - 1 : count;
+    if (updated > 0) remaining[key] = updated;
+  }
+  if (Object.keys(remaining).length === 0) {
+    const { treats: _removed, ...rest } = state;
+    return rest;
+  }
+  return { ...state, treats: remaining };
+}
+
+export function purchaseTreat(state: State, id: string, price: number): State {
+  if (price < 0 || state.coins < price) return state;
+  return addTreat({ ...state, coins: state.coins - price }, id, 1);
+}
+
+export function recoverMessage(actor: { id: string; name: string }): string {
+  if (actor.id === "fae") return "Fae takes a slow, steady breath and catches her energy.";
+  if (actor.id === "maddie") return "Maddie curls up for a quick stretch, tail wagging again!";
+  if (actor.id === "sue") return "Sue reels in her line and takes a calm breath.";
+  if (actor.id === "jordan") return "Jordan gathers his pinecones and shakes out his hands.";
+  return `${actor.name} takes a calm breath and regains energy.`;
+}
+
+export function restTurn(rest: Battle["rest"]): Battle["rest"] {
+  return Object.fromEntries(
+    Object.entries(rest).flatMap(([id, turns]) => (turns > 1 ? [[id, turns - 1]] : [])),
+  );
+}
+
 export function inTalkMode(battle: Battle, critter: Critter): boolean {
   return battle.talkMode === true ||
     (battle.talk !== undefined && battle.talk !== null) ||

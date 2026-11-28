@@ -38,6 +38,33 @@ export type FollowTunables = {
   sitDelayTicks: number;
   settleDelayTicks: number;
 };
+export type SwatchPrice = { coins: number; tickets: number };
+export type ClubhouseSwatchId =
+  | "classic"
+  | "sunlit-meadow"
+  | "starlight-cozy"
+  | "bubblegum-beach"
+  | "pinecone-cabin";
+export type EconomyTunables = {
+  swatches: Record<Exclude<ClubhouseSwatchId, "classic">, SwatchPrice>;
+  plushPedestals: SwatchPrice;
+  ticketExchange: { coinsPerBundle: number; ticketsPerBundle: number };
+};
+export type DecorState = {
+  swatch?: ClubhouseSwatchId;
+  unlockedSwatches?: ClubhouseSwatchId[];
+  pedestals?: boolean;
+  bedroomSlots?: string[];
+  visitorOffset?: number;
+  fishTraded?: number;
+};
+export type DisplayAnchor = {
+  x: number;
+  y: number;
+  zIndex: number;
+  scale: number;
+  rotation: number;
+};
 export type Tunables = {
   walkSpeed: number;
   playerRadius: number;
@@ -56,6 +83,7 @@ export type Tunables = {
     noticeTicks: number;
     alertTicks: number;
   };
+  economy?: EconomyTunables;
 };
 // A feet-anchored body box (spec 5): `width` centred on the feet, `height`
 // rising from them. Visibility between a follower and its leader is measured
@@ -109,6 +137,7 @@ export type Area = {
   props: Prop[];
   // The area's prop atlases (Pixi spritesheet JSON URLs), loaded with it.
   atlases: string[];
+  shelfAnchors?: DisplayAnchor[];
   spawns: Record<string, Spawn>;
   puzzles?: AreaPuzzles;
 };
@@ -483,12 +512,20 @@ export type World = {
   arcade: ArcadeContent;
   levels: import("./levels").LevelContent;
   treats: TreatItem[];
+  treatBaskets: TreatBasket[];
   npcProfiles: Record<string, NpcProfile>;
   npcBanter: NpcBanterPair[];
   partyBanter: NpcPartyBanter[];
   toolEvents: NpcToolEvent[];
   cutscenes: Record<string, CutsceneScript>;
   encore?: EncoreContent;
+};
+export type TreatBasket = {
+  id: string;
+  name: string;
+  price: number;
+  treats: Record<string, number>;
+  snacks: number;
 };
 export type TreatItem = {
   id: string;
@@ -693,6 +730,7 @@ export type FishContent = {
   hookGravity: number;
   hookMaxSpeed: number;
   reelMaxTicks: number;
+  trade?: { ticketsPerCatch: number; coinsPerCatch: number };
   catches: FishCatchSpec[];
   lines: {
     aim: string;
@@ -1357,6 +1395,7 @@ export type State = {
     shrine?: "encore";
     ending?: true;
     credits?: true;
+    openDecor?: "clubhouse" | "bedroom";
     partnerPoint?: Point;
   } | null;
   // The set pieces' moods, for the whole game.
@@ -1380,6 +1419,7 @@ export type State = {
   encore?: EncoreRecord;
   puzzles?: Record<string, boolean>;
   puzzleArea?: AreaPuzzleState;
+  decor?: DecorState;
   finale: "morning" | "credits" | null;
   backLink?: { area: string; direction: Direction };
   cutscene?: CutsceneState;
@@ -1433,4 +1473,5 @@ export type Event =
   | { type: "level-up"; member: string; from: number; to: number;
       deltas: { power: number; magic: number; life: number; guard: number } }
   | { type: "ending-save"; state: State }
-  | { type: "open-encore-shrine" };
+  | { type: "open-encore-shrine" }
+  | { type: "open-decor"; room: "clubhouse" | "bedroom" };

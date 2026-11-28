@@ -1,3 +1,4 @@
+import { activeBlessingEffects } from "./blessings";
 import { nextRandom } from "./random";
 import type { ActionFrame, ArcadeOwned, CometContent, State, World } from "./types";
 
@@ -177,10 +178,12 @@ export function stepComet(
   const next: CometGame = { ...game, phaseTicks: game.phaseTicks + 1, lane,
     from, moveTicks, objects, elapsed, caught, letGo, bumps, tickets, wobbleTicks };
   if (!done) return owned(next);
+  const bonus = activeBlessingEffects(world, state).arcadeTicketBonus;
+  const paid = tickets + bonus;
   const message = content.lines.result.replace("{stars}", String(caught))
-    .replace("{total}", String(content.stars)).replace("{tickets}", String(tickets));
-  return { arcade: { ...next, phase: "result", phaseTicks: 0, message, revealed: 0 },
-    prizes: state.prizes, tickets: state.tickets + tickets };
+    .replace("{total}", String(content.stars)).replace("{tickets}", String(paid));
+  return { arcade: { ...next, tickets: paid, phase: "result", phaseTicks: 0, message, revealed: 0 },
+    prizes: state.prizes, tickets: state.tickets + paid };
 }
 
 export function cometView(world: World, game: CometGame): CometView {

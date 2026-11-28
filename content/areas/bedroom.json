@@ -84,6 +84,52 @@
         "y": 560
       },
       "prompt": "Look"
+    },
+    {
+      "id": "shelf",
+      "knot": "bedroom_shelf",
+      "point": {
+        "x": 785,
+        "y": 455
+      },
+      "prompt": "Look"
+    }
+  ],
+  "shelfAnchors": [
+    {
+      "x": 806,
+      "y": 294,
+      "zIndex": 523,
+      "scale": 0.155,
+      "rotation": -0.05
+    },
+    {
+      "x": 828,
+      "y": 320,
+      "zIndex": 524,
+      "scale": 0.16,
+      "rotation": 0.04
+    },
+    {
+      "x": 850,
+      "y": 345,
+      "zIndex": 525,
+      "scale": 0.16,
+      "rotation": -0.04
+    },
+    {
+      "x": 871,
+      "y": 370,
+      "zIndex": 526,
+      "scale": 0.16,
+      "rotation": 0.05
+    },
+    {
+      "x": 892,
+      "y": 395,
+      "zIndex": 527,
+      "scale": 0.155,
+      "rotation": -0.03
     }
   ],
   "spawns": {

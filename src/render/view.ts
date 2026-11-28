@@ -1,14 +1,15 @@
 import {
-  Assets, Container, Graphics, Sprite, Spritesheet, Text, TilingSprite, type Renderer,
+  Assets, Container, Graphics, Sprite, Spritesheet, Text, type Renderer,
 } from "pixi.js";
 import {
   creditEntries, type Area, type NavField, type Point, type State, type World,
 } from "../core";
 import { AreaView } from "./area-view";
-import { screenToWorld, worldToScreen } from "./camera";
+import { CameraDirector, screenToWorld, worldToScreen } from "./camera";
 import { assetUrl } from "../platform/assets";
 import { isReducedMotionActive } from "../platform/reduced-motion";
 import { fadeAlpha } from "./fade";
+import { PaperGrainOverlay, syncPresentationTelemetry } from "./paper-grain";
 import { createVfxTextures, type VfxTextures } from "./vfx-textures";
 import { BiomeAtmosphere } from "./atmosphere";
 import {
@@ -30,7 +31,7 @@ import {
 } from "./overworld-render";
 import {
   computeAreaEvictions, computeDialogueRenderInfo, computeLanternVisuals,
-  computeNoticeMarkViews, computeNpcChatterScreenAnchor, computeOverworldCameraFrame,
+  computeNoticeMarkViews, computeNpcChatterScreenAnchor,
   computePromptScreenView, computeStoryAtmosphereOptions, computeViewportRect,
   resolveActivePetReaction, resolveActiveRestSpot, type GameViewRenderInfo,
   type NoticeMarkView, type PromptScreenView, type ViewportRect,
@@ -69,7 +70,7 @@ export class GameView {
   private readonly viewport = new Container();
   private readonly scene = new Container();
   private readonly shadowLayer = new Container();
-  private readonly paperGrain: TilingSprite;
+  private readonly paperGrain: PaperGrainOverlay;
   private viewportRect: ViewportRect = { x: 0, y: 0, width: 0, height: 0 };
   private photoMode = false;
   private readonly lanternLayer = new Container();
@@ -86,7 +87,7 @@ export class GameView {
   private areaView: AreaView | undefined;
   private viewWidth = 960;
   private viewHeight = 720;
-  private previousCamera: Point | undefined;
+  private readonly cameraDirector = new CameraDirector();
   private staticWidth = 0;
   private staticHeight = 0;
   private staticPaper = 0;
@@ -125,15 +126,7 @@ export class GameView {
       this.emissiveLayer,
     );
     this.battleView = new BattleViewController(this.world, this.vfx, options.renderer);
-    this.paperGrain = new TilingSprite({
-      texture: this.vfx.paperGrain,
-      width: 960,
-      height: 720,
-    });
-    this.paperGrain.label = "paper-grain";
-    this.paperGrain.blendMode = "multiply";
-    this.paperGrain.alpha = 0.035;
-    this.paperGrain.visible = false;
+    this.paperGrain = new PaperGrainOverlay(this.vfx.paperGrain);
 
     this.shadowLayer.label = "shadows";
     this.depth.sortableChildren = true;
@@ -179,11 +172,13 @@ export class GameView {
       this.viewport,
       this.viewportMask,
       this.battleView.root,
+      this.paperGrain.stageSprite,
       this.fade,
     );
     this.scene.addChild(
       this.restoration.groundLayer,
       this.shadowLayer,
+      this.effects.grassLayer,
       this.effects.footstepLayer,
       this.navOverlay.groundLayer,
       this.atmosphere.under,
@@ -193,7 +188,7 @@ export class GameView {
       this.restoration.fxLayer,
       this.npcLife.reactionLayer,
       this.effects.emoteLayer,
-      this.paperGrain,
+      this.paperGrain.sceneSprite,
       this.navOverlay.debugLayer,
     );
     if (options.debugLabel) {
@@ -259,15 +254,13 @@ export class GameView {
     this.entities.mountAmbient(area);
     for (const url of next.textureUrls) this.areaTextureUrls.add(url);
     this.scene.addChildAt(next.ground, 0);
-    this.paperGrain.visible = area.id !== "harness";
-    this.paperGrain.width = area.width;
-    this.paperGrain.height = area.height;
-    this.paperGrain.position.set(0, 0);
+    this.paperGrain.mountArea(area);
     this.entities.mountNpcs(area);
-    this.previousCamera = undefined;
+    this.cameraDirector.reset();
     this.lanternTick = undefined;
     this.staticWidth = 0;
     this.effects.clearFootsteps();
+    this.effects.clearGrassTufts();
     this.effects.clearStarGemGlints();
     this.effects.clearEmotes();
     this.restoration.clear();
@@ -357,8 +350,9 @@ export class GameView {
   }
 
   resetCamera(): void {
-    this.previousCamera = undefined;
+    this.cameraDirector.reset();
     this.effects.clearFootsteps();
+    this.effects.clearGrassTufts();
     this.effects.clearEmotes();
     this.restoration.clear();
     this.npcLife.clear();
@@ -451,112 +445,76 @@ export class GameView {
     const paused = options?.paused ?? false;
     const reducedMotion = isReducedMotionActive();
     const previousState = options?.previousState;
-    const frame = computeOverworldCameraFrame({
-      area,
-      state,
-      previousState,
-      previousCamera: this.previousCamera,
-      width,
-      height,
-      viewWidth: this.viewWidth,
-      viewHeight: this.viewHeight,
-      resolution,
-      doorFadeTicks: this.world.tunables.doorFadeTicks,
-      paused,
-      reducedMotion,
-      alpha: options?.alpha ?? 1,
+    const indoor = INDOOR_AREAS.has(area.id);
+    const frame = this.cameraDirector.step({
+      world: this.world, area, state, previousState, width, height,
+      viewWidth: this.viewWidth, viewHeight: this.viewHeight, resolution,
+      doorFadeTicks: this.world.tunables.doorFadeTicks, paused, reducedMotion,
+      alpha: options?.alpha ?? 1, indoor,
     });
     const { canInterpolate, alpha, playerPos, zoomScale, zoomOffsetX, zoomOffsetY } = frame;
-    this.previousCamera = frame.camera;
+    const prev = canInterpolate ? previousState : undefined;
     for (const layer of [this.scene, this.lanternWorld, this.emissiveLayer, this.glowLayer]) {
       layer.scale.set(zoomScale);
       layer.position.set(zoomOffsetX, zoomOffsetY);
     }
-    const indoor = INDOOR_AREAS.has(area.id);
+    this.atmosphere.over.position.set(frame.parallaxOver.x, frame.parallaxOver.y);
+    this.ambientLayer.position.set(frame.parallaxAmbient.x, frame.parallaxAmbient.y);
     const shadowAlpha = indoor ? 0.24 : 0.3;
     const livingMotion = area.id !== "harness" && !reducedMotion;
     const activePet = this.activePetReaction(state);
     const activeRest = this.activeRestSpot(state);
     this.shadowLayer.visible = area.id !== "harness";
     this.entities.renderPlayer(state, playerPos, shadowAlpha, livingMotion, activeRest, activePet);
+    this.effects.updateGrassTufts(state, area, playerPos, reducedMotion, paused);
     this.effects.updateFootsteps(state, area.id, playerPos, reducedMotion);
-    this.entities.renderParty(
-      state,
-      shadowAlpha,
-      canInterpolate ? previousState : undefined,
-      alpha,
-      livingMotion,
-      activePet,
-    );
+    this.entities.renderParty(state, shadowAlpha, prev, alpha, livingMotion, activePet);
     this.entities.renderCritters(
-      state,
-      this.areaView !== undefined,
-      shadowAlpha,
-      canInterpolate ? previousState : undefined,
-      alpha,
-      livingMotion,
-      reducedMotion,
+      state, this.areaView !== undefined, shadowAlpha, prev, alpha, livingMotion, reducedMotion,
     );
     const npcLife = this.npcLife.update(state, livingMotion, reducedMotion);
     this.entities.renderNpcs(
-      state,
-      shadowAlpha,
-      livingMotion,
-      npcLife,
-      this.npcLife,
-      canInterpolate ? previousState : undefined,
-      alpha,
-      reducedMotion,
+      state, shadowAlpha, livingMotion, npcLife, this.npcLife, prev, alpha, reducedMotion,
     );
     this.npcLife.renderReactions(state, livingMotion);
     this.effects.renderClubhouseDisplay(state, area, reducedMotion);
     this.entities.renderAmbient(state, area, reducedMotion);
     this.effects.renderEmotes(
-      state,
-      area,
-      playerPos,
-      canInterpolate ? previousState : undefined,
-      alpha,
-      activePet,
-      activeRest,
-      npcLife,
-      reducedMotion,
+      state, area, playerPos, prev, alpha, activePet, activeRest, npcLife, reducedMotion,
     );
     this.effects.renderTimeOfDay(state, this.viewportRect);
     this.renderGlows(state, playerPos, paused, reducedMotion);
     this.effects.updateStarGemGlints(state, reducedMotion);
     this.restoration.update(this.world, state, { paused, reducedMotion });
     this.atmosphere.update(
-      area.id,
-      area.width,
-      area.height,
-      state.tick,
-      state.battle === null && state.arcade === null,
-      this.lanternBlend,
+      area.id, area.width, area.height, state.tick,
+      state.battle === null && state.arcade === null, this.lanternBlend,
       computeStoryAtmosphereOptions(this.world, state, area.id, reducedMotion),
     );
-    loaded.update(
-      this.world,
-      state.ink,
-      state.player,
-      state.tick,
-      this.entities.figures(),
-    );
+    loaded.update(this.world, state.ink, state.player, state.tick, this.entities.figures());
     this.navOverlay.render(
       area, state, this.navField, this.navSnapshot, this.photoMode, reducedMotion,
     );
     const overworldVisible = this.battleView.render({
-      state,
-      areaView: loaded,
-      width,
-      height,
-      viewWidth: this.viewWidth,
-      viewHeight: this.viewHeight,
-      reducedMotion,
+      state, areaView: loaded, width, height,
+      viewWidth: this.viewWidth, viewHeight: this.viewHeight, reducedMotion,
     });
+    this.battleView.root.position.set(frame.battleShake.x, frame.battleShake.y);
     this.viewport.visible = overworldVisible;
     this.scene.visible = overworldVisible;
     this.depth.sortChildren();
+    this.paperGrain.update({
+      areaId: area.id, paused, overworldVisible, viewportRect: this.viewportRect,
+      width, height, camera: frame.camera, baseScale: frame.baseScale,
+    });
+    if (import.meta.env.DEV || import.meta.env.MODE === "harness") {
+      syncPresentationTelemetry({
+        zoom: frame.zoom, framing: frame.framing,
+        shake: Math.hypot(frame.shakeOffset.x, frame.shakeOffset.y),
+        grassTufts: this.effects.grassTuftCount,
+        footstepKind: this.effects.lastFootstepKind ?? "none",
+      });
+    }
     if (this.label !== undefined) {
       this.label.visible = !this.photoMode;
       this.label.text =
@@ -615,19 +573,21 @@ export class GameView {
 
   /** Fae's current feet anchor in CSS pixels, or null before the first render. */
   playerScreenPoint(state: State): Point | null {
-    if (this.previousCamera === undefined) return null;
+    const cam = this.cameraDirector.camera;
+    if (cam === undefined) return null;
     return worldToScreen(
-      state.player, this.previousCamera, this.viewWidth, this.viewHeight,
-      window.innerWidth, window.innerHeight,
+      state.player, cam, this.viewWidth, this.viewHeight,
+      window.innerWidth, window.innerHeight, this.cameraDirector.zoom,
     );
   }
 
   /** Converts a CSS-pixel viewport point to world coordinates, or null before first render. */
   screenToWorldPoint(client: Point): Point | null {
-    if (this.previousCamera === undefined) return null;
+    const cam = this.cameraDirector.camera;
+    if (cam === undefined) return null;
     return screenToWorld(
-      client, this.previousCamera, this.viewWidth, this.viewHeight,
-      window.innerWidth, window.innerHeight,
+      client, cam, this.viewWidth, this.viewHeight,
+      window.innerWidth, window.innerHeight, this.cameraDirector.zoom,
     );
   }
 
@@ -647,7 +607,7 @@ export class GameView {
   /** The interaction prompt for this frame, anchored at the target in CSS px. */
   promptView(state: State): PromptScreenView {
     return computePromptScreenView(
-      this.world, state, this.previousCamera, this.viewWidth, this.viewHeight,
+      this.world, state, this.cameraDirector.camera, this.viewWidth, this.viewHeight,
       window.innerWidth, window.innerHeight,
     );
   }
@@ -666,14 +626,14 @@ export class GameView {
   ): NpcChatterView | null {
     return computeNpcChatterScreenAnchor(
       this.world, state, this.npcLife.latest?.chatter ?? null, suppressNpcId,
-      this.previousCamera, this.viewWidth, this.viewHeight, viewportWidth, viewportHeight,
+      this.cameraDirector.camera, this.viewWidth, this.viewHeight, viewportWidth, viewportHeight,
     );
   }
 
   /** The recurring critters' "?" and "!" marks over their heads in CSS px. */
   noticeMarks(state: State): NoticeMarkView[] {
     return computeNoticeMarkViews(
-      this.world, state, this.previousCamera, this.viewWidth, this.viewHeight,
+      this.world, state, this.cameraDirector.camera, this.viewWidth, this.viewHeight,
       window.innerWidth, window.innerHeight,
     );
   }

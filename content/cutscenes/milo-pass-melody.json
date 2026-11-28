@@ -1,0 +1,91 @@
+{
+  "id": "milo-pass-melody",
+  "area": "pass",
+  "trigger": {
+    "kind": "after-knot",
+    "area": "pass",
+    "knot": "snowman",
+    "forbidsVariable": "milo_revealed",
+    "once": true
+  },
+  "steps": [
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "sfx",
+          "cue": "flute-blue"
+        },
+        {
+          "type": "cameraPan",
+          "to": {
+            "x": 960,
+            "y": 560
+          },
+          "ticks": 34,
+          "zoom": 1.08
+        },
+        {
+          "type": "face",
+          "actor": "fae",
+          "direction": "up"
+        },
+        {
+          "type": "face",
+          "actor": "party:0",
+          "direction": "up"
+        },
+        {
+          "type": "emote",
+          "actor": "fae",
+          "kind": "note",
+          "ticks": 28
+        }
+      ]
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "pose",
+          "actor": "fae",
+          "pose": "shock",
+          "ticks": 20,
+          "effect": "pinecone-burst"
+        },
+        {
+          "type": "emote",
+          "actor": "fae",
+          "kind": "exclaim",
+          "ticks": 26
+        },
+        {
+          "type": "emote",
+          "actor": "party:0",
+          "kind": "question",
+          "ticks": 26
+        }
+      ]
+    },
+    {
+      "type": "sayKnot",
+      "knot": "milo_foreshadow_pass"
+    },
+    {
+      "type": "wait",
+      "ticks": 16
+    },
+    {
+      "type": "setFlag",
+      "flag": "milo_pass_melody_seen",
+      "value": true,
+      "scope": "cutscene"
+    },
+    {
+      "type": "cameraPan",
+      "to": "fae",
+      "ticks": 28,
+      "zoom": 1
+    }
+  ]
+}

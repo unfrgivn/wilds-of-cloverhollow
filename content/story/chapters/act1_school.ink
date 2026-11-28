@@ -118,12 +118,12 @@ There's no name on it. # speaker: Fae
 -> DONE
 
 === cubbies ===
-Everyone's cubby has a coat hook and a name tag. # speaker: Fae
-Mine has spare socks and a drawing of Maddie as a dragon. # speaker: Fae
+Everyone's cubby has a coat hook, a crooked paper name tag, and at least one runaway crayon. # speaker: Fae # expr: happy
+Mine holds spare striped socks, my dragon-Maddie drawing, and a tiny folded paper star someone left along the rail. # speaker: Fae # expr: happy
 -> DONE
 
 === reading_corner ===
-A cozy reading rug, with beanbags and a shelf of picture books. # speaker: Fae
+A cozy reading rug piled with squishy beanbags and well-loved picture books. Maddie immediately eyes the sunniest cushion like a tiny orange monarch. # speaker: Fae # expr: happy
 -> DONE
 
 === gym_hall ===
@@ -201,11 +201,11 @@ Oh, and music's next! Ms. Willow's room is down the east hall. # speaker: Coach 
 -> DONE
 
 === ball_bin ===
-A big bin of bouncy balls: red ones, blue ones, and one very flat one. # speaker: Fae
+A giant rolling bin of gym balls: shiny red ones, bouncy blue ones, and one dramatically pancake-flat ball that refuses to retire. # speaker: Fae # expr: happy
 -> DONE
 
 === climbing_rope ===
-A climbing rope, all the way up to the ceiling. There's a little bell at the top! # speaker: Fae
+A thick braided climbing rope stretching all the way to the rafters, with a shiny brass bell at the top! One day I'm ringing that bell on the first try. # speaker: Fae # expr: determined
 -> DONE
 
 === back_door ===
@@ -262,11 +262,11 @@ I need a hall pass to go outside. # speaker: Fae
 -> DONE
 
 === school_board ===
-The bulletin board: a spelling bee, a lost mitten, and a bake sale on Friday. # speaker: Fae
+The hall bulletin board: Friday's spelling bee, a bake sale poster with twelve exclamation points, and one lonely striped mitten pinned under "IS THIS YOURS?!" # speaker: Fae # expr: happy
 -> DONE
 
 === trophies ===
-Trophies for spelling, soccer, and the best pumpkin in Cloverhollow. # speaker: Fae
+Gleaming trophies for spelling, junior soccer, and Cloverhollow's fiercely contested Giant Pumpkin Championship. Maddie checks her reflection in the pumpkin cup. # speaker: Fae # expr: happy
 -> DONE
 
 === school_raccoon ===
@@ -353,19 +353,19 @@ Come in, Fae. The art room is open! # speaker: Ms. Rowan
 -> DONE
 
 === art_easels ===
-Three easels, three blank canvases, and enough paint to make a rainbow. # speaker: Fae
+Three wooden easels, three crisp blank canvases, and enough pastel paint jars to redecorate the entire county. # speaker: Fae # expr: happy
 -> DONE
 
 === art_paintings ===
-The class art wall is covered with bright paintings. A drying rack wobbles beside it. # speaker: Fae
+The art wall bursts with bright student watercolors: swirling galaxies, lopsided cats, and a drying rack wobbling heroically under twelve soggy rainbows. # speaker: Fae # expr: happy
 -> DONE
 
 === art_sink ===
-The sink is full of painty water. Ms. Rowan says brushes need a rinse right away! # speaker: Fae
+A deep porcelain sink swirling with turquoise-and-gold rinse water. Ms. Rowan says tired brushes deserve a gentle bath right away! # speaker: Fae # expr: happy
 -> DONE
 
 === art_markers ===
-An empty purple marker box. Every single purple marker is gone. # speaker: Fae
+A wooden marker caddy where red, gold, and teal sit neatly in rows... and the entire \{color:lavender\}purple\{/color\} slot is wiped clean. Every last one gone. # speaker: Fae # expr: worried
 -> DONE
 
 === music_teacher ===
@@ -574,9 +574,49 @@ Now there's a way back across. Thanks, Coach Ash! # speaker: Fae
 -> DONE
 
 === hopscotch ===
-Fae hops the whole hopscotch on one foot, all the way to 7 and back! # speaker: Fae
+Fae hops the whole chalk hopscotch grid on one sneaker, all the way to 7 and back! Maddie awards a stern ten out of ten tail-flicks. # speaker: Fae # expr: happy # pose: cheer
 -> DONE
 
 === tetherball ===
-Fae gives the tetherball a whack. Round and round it goes! # speaker: Fae
+\{pop\}WHACK!\{/pop\} Fae sends the tetherball orbiting the pole while Maddie tracks every loop like a miniature orange satellite! # speaker: Fae # expr: happy
+-> DONE
+
+// Elevation Track E10: Milo Foreshadowing Beat 1 (School Hall / Classroom).
+// Strict §1.2 secrecy: Milo appears purely as a quiet, self-conscious classmate.
+=== milo_foreshadow_school ===
+~ milo_beat_school = true
+Tucked in the quiet corner beside the art wall, Milo hunches over a worn notebook, humming a soft four-note tune: "\{wave\}da-da-da-DUM...\{/wave\}" # speaker: Fae # expr: neutral # zoom: 1.08
+Mrrrow? Maddie pads straight over and nudges the margin of his page, showing a tiny crayon rocket blasting into huge blank sky. # speaker: Maddie # expr: happy # pose: maddie sit
+Whoa! Hey, Maddie! Milo snaps the sketchbook shut in a hurry and rubs the back of his neck with a wobbly grin. # speaker: Milo # expr: surprised
+Hey, Milo! Are you okay? Your rocket page looked awesome! # speaker: Fae # expr: worried
+Oh, totally fine, Fae! Just... practicing between bells. Everybody in class already has their big thing, you know? Rosie's kites, your adventures... # speaker: Milo # expr: worried
+* [Want to sketch together after school?]
+    Wait, for real?! \{pause:6\}Maybe once I finish one really cool page first. \{whisper\}So it's actually worth showing.\{/whisper\} # speaker: Milo # expr: surprised
+* [That little hummed tune sounded great!]
+    Heh, thanks... I hum it when the room gets too loud. Makes my brain feel like a rocket countdown: \{wave\}da-da-da-DUM...\{/wave\} # speaker: Milo # expr: happy
+- Milo tucks his pencil behind his ear and gives Fae a shy thumbs-up before turning back to the corner desk. # speaker: Fae # expr: neutral
+-> DONE
+
+// Elevation Track E10: Empathetic Mini-Boss Pre-Battle Stress Vignette 2 (Ms. Rowan).
+=== vignette_ms_rowan ===
+~ vignette_rowan_seen = true
+Parent Art Show is TOMORROW! Twenty-eight skies dried upside-down, glitter landed in my tea, and... # speaker: Ms. Rowan # expr: worried # zoom: 1.08
+I had \{shake\}THIRTY-TWO\{/shake\} purple markers at eight o'clock sharp! How is an art teacher supposed to paint a twilight sunset without purple?! # speaker: Ms. Rowan # expr: determined
+One quick sip of bubbly grape soda to calm my nerves, and \{pop\}WHOOSH!\{/pop\} NOW THE HALLWAY IS MY CANVAS! # speaker: Ms. Rowan # expr: surprised # sound: chime-red
+Mrrrow! Maddie hops neatly onto Fae's boot to keep her orange paws safe from flying lilac droplets. # speaker: Maddie # expr: worried
+Aw, Ms. Rowan isn't mean at all! She's just stretched way too thin before the Art Show, and that fizzy drink turned stress into a paint tornado! # speaker: Fae # expr: worried
+{sue_joined: Let's brush this whirlwind back into something pretty so she can actually finish her tea! # speaker: Sue # expr: determined}
+{not sue_joined: Hold steady, Ms. Rowan! We'll help clear the swirls right back into calm color! # speaker: Fae # expr: determined}
+-> DONE
+
+// Elevation Track E10: Empathetic Mini-Boss Pre-Battle Stress Vignette 3 (Mr. Bell).
+=== vignette_mr_bell ===
+~ vignette_bell_seen = true
+The hall intercom is stuck, three kids lost left mittens, and somebody typed "TACONADO TUESDAY" on lunch! # speaker: Mr. Bell # expr: worried # zoom: 1.08
+I still have two hundred and fourteen students' names to greet before the bell, and my spare clipboard vanished into thin air! # speaker: Mr. Bell # expr: determined
+\{shake\}AHEM! TESTING, ONE, TWO, SEVENTEEN!\{/shake\} Why is my voice echoing like a foghorn?! ATTENTION, EVERYBODY, ATTENTION! # speaker: Mr. Bell # expr: surprised # sound: chime-red
+Maddie presses both paws flat over her ears and gives Fae an unmistakable "please turn the principal down" look. # speaker: Fae # expr: worried
+Poor Mr. Bell... he cares so much about keeping the whole school running on time that one fizzy sip made every announcement burst out at once! # speaker: Fae # expr: worried
+{jordan_joined: Let's give him a calm breather before he accidentally announces next month's fire drill too! # speaker: Jordan # expr: determined}
+{not jordan_joined: Take a deep breath, Mr. Bell! We've got your back! # speaker: Fae # expr: determined}
 -> DONE

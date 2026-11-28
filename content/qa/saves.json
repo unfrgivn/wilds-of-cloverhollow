@@ -57,7 +57,7 @@
     "run": "new-game/golden-jordan.json",
     "tick": 10306,
     "interim": false,
-    "hash": "f3f10ca2"
+    "hash": "4f8cdca0"
   },
   {
     "id": "lantern",
@@ -67,7 +67,7 @@
     "run": "new-game/golden-lantern.json",
     "tick": 10929,
     "interim": false,
-    "hash": "d215d854"
+    "hash": "c23d6fab"
   },
   {
     "id": "woods",

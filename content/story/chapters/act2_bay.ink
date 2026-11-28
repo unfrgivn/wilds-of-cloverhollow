@@ -1,55 +1,55 @@
 === sue ===
-Whoa, hi! Careful, these planks are a little wobbly. # speaker: Sue
-I'm Sue. I fish here every day... but today the fish are all fizzy! # speaker: Sue
-And that flappy bluebird keeps kicking sand in my bait bucket. # speaker: Sue
-Wait. Purple fizz? Was it a kid in a purple hood? # speaker: Sue
+Whoa, hi! Careful, these planks are a little wobbly. # speaker: Sue # expr: happy
+I'm Sue! I fish this dock rain or shine, only today the bay fish are doing \{wave\}fizzy backflips\{/wave\}! # speaker: Sue # expr: determined
+And that dramatic bluebird keeps kick-flipping sand straight into my favorite bait bucket. # speaker: Sue # expr: worried
+Hold on... \{color:lavender\}purple fizz\{/color\}? Did a kid in a purple hood tear through here too?! # speaker: Sue # expr: surprised
 * [Yes! I'm following their trail.]
-    I knew it! Count me in. # speaker: Sue
+    Hah, I KNEW it! Grab your gear, captain, count me and my lucky rod in! # speaker: Sue # expr: happy # pose: sue cheer
 * [I think so. Want to help me find out?]
-    Are you kidding? Of course! Let me grab my rod. # speaker: Sue
+    Are you kidding? Of course! Let me grab my rod. # speaker: Sue # expr: happy # pose: sue cheer
  - ~ sue_joined = true
 -> DONE
 
 === bluebird_calm ===
 {bluebird_calm > 1: -> again}
-Chirp! Thank you, Fae. My wings feel calm again. # speaker: Bay Bluebird
-A kid in a purple hood zipped off toward the mountains! # speaker: Bay Bluebird
+Chirp! Thank you, Fae. My feathers finally stopped buzzing like a seaside kazoo! # speaker: Bay Bluebird # expr: happy
+That kid in the purple hood zipped right up the trail toward the snowy mountains! # speaker: Bay Bluebird # expr: determined
 -> DONE
 
 = again
-Chirp-chirp! The bay is peaceful now. # speaker: Bay Bluebird
+Chirp-chirp! Smooth tides, zero sand in Sue's bait bucket. The bay feels sunny again! # speaker: Bay Bluebird # expr: happy
 -> DONE
 
 === gull_calm ===
 {gull_calm > 1: -> again}
-Squawk! Sorry about your snacks. I couldn't help myself! # speaker: Lookout Gull
-A kid in a purple hood fed me a fizzy cracker. Then I wanted ALL the snacks! # speaker: Lookout Gull
-A fizzy cracker? Everywhere that kid goes, things go fizzy. # speaker: Fae
+Squawk! Listen, I am deeply embarrassed about the great sandwich heist. I couldn't stop myself! # speaker: Lookout Gull # expr: worried
+A kid in a purple hood tossed me a fizzy cracker, and suddenly my brain yelled "ACQUIRE ALL SNACKS!" # speaker: Lookout Gull # expr: surprised
+A fizzy cracker? Everywhere that hooded kid sprints, the whole valley gets turned up to eleven. # speaker: Fae # expr: determined
 -> DONE
 = again
-I'm keeping watch over the sea now. No more snack snatching! # speaker: Lookout Gull
+Strict lookout duty from now on. Zero unauthorized picnic raids, scout's honor! # speaker: Lookout Gull # expr: happy
 -> DONE
 
 === crab_calm ===
 {crab_calm > 1: -> again}
 Click-click! Thank you, small friend. My claws feel calm as the tide. # speaker: Sandy Crab
-A kid in a purple hood handed me a fizzy soda bottle, and I snip-snipped it open! # speaker: Sandy Crab
-Then everything went bubbly, and I just HAD to snip everything! # speaker: Sandy Crab
+A kid in a purple hood rolled me a fizzy bottle, and naturally I snip-snipped the cap clean off! # speaker: Sandy Crab # expr: surprised
+Next thing I knew, bubbles went straight to my shell and I was challenging driftwoods to a snip-off! # speaker: Sandy Crab # expr: happy
 -> DONE
 = again
-The tide pools by the south rocks have the best bubbles. Click! # speaker: Sandy Crab
+The south tide pools have the finest afternoon foam. Polite snips only! Click! # speaker: Sandy Crab # expr: happy
 -> DONE
 
 === beach_frog_calm ===
 {beach_frog_calm > 1: -> again}
-Ribbit! The sand feels nice and cool again. Thanks, Fae! # speaker: Beach Frog
+Ribbit! Cool sand between my toes and zero soda bubbles in my tide pool. Five stars, Fae! # speaker: Beach Frog # expr: happy
 -> DONE
 = again
-Ribbit! The frog hops happily around a tide pool. # speaker: Beach Frog
+Ribbit! The frog lounges in a shallow tide pool like a tiny green tourist on vacation. # speaker: Beach Frog # expr: happy
 -> DONE
 
 === bay_sign ===
-BUBBLEGUM BAY. Fishing, splashing, and sandcastles welcome! # speaker: Sign
+BUBBLEGUM BAY. Fishing, splashing, and ambitious sandcastles welcome! (Seagull snack treaties remain strictly unenforced.) # speaker: Sign
 -> DONE
 
 === bay_picnic ===
@@ -73,7 +73,7 @@ The picnic is peaceful now. Ms. Coral shared her watermelon with everyone! # spe
 -> DONE
 
 === shells ===
-Pretty shells! They sound like tiny waves when I shake them. # speaker: Fae
+Pastel pink and cream shells! When Fae holds one to Maddie's ear, Maddie blinks solemnly at the tiny ocean roar inside. # speaker: Fae # expr: happy
 -> DONE
 
 === lifeguard ===
@@ -223,4 +223,28 @@ Ooh! Ten moonlit coins shimmer right beside the glowing bluebell runes! # speake
 -> DONE
 = again
 The bioluminescent Starlight Beacon Verse shimmers softly across the meadow: "As long as the coral tower shines above the tide pool, every friend on Bubblegum Bay finds a warm harbor!" # speaker: Fae
+-> DONE
+
+// Elevation Track E10: Milo Foreshadowing Beat 3 (Bubblegum Bay / East Road).
+// Strict §1.2 secrecy: ZERO Milo name! Only a glowing rocket doodle inside a crumpled wrapper.
+=== milo_foreshadow_bay ===
+~ milo_beat_bay = true
+Half-buried beside the pastel tide shells glints a bent \{color:lavender\}purple-fizz bottlecap\{/color\} tucked inside a crumpled wrapper. # speaker: Fae # expr: surprised # zoom: 1.09
+Fae smooths the damp paper open carefully. There's something faint sketched along the inside fold! # speaker: Fae # expr: determined
+{has_lantern: Under the blacklight lantern's soft violet glow, a tiny hand-drawn \{color:gold\}rocket\{/color\} and three crooked stars shimmer to life beside a scratched-out word!|Catching the bright coastal sunlight, faint lilac ink reveals a tiny hand-drawn \{color:gold\}rocket\{/color\} and three stars beside a scratched-out word!} # speaker: Fae # expr: surprised # sound: chime-blue
+{sue_joined: Whoa, let me see! A rocket doodle? Whoever dropped this doesn't draw like a villain, they draw like a kid from school! # speaker: Sue # expr: surprised}
+Mrrrow? Maddie pats the shiny bottlecap gently with one velvet paw and tilts her ears. # speaker: Maddie # expr: worried # pose: maddie sit
+\{whisper\}Why would somebody scribble out their own little rocket like that...\{/whisper\} I'm saving this clue in my journal. # speaker: Fae # expr: worried
+-> DONE
+
+// Elevation Track E10: Empathetic Mini-Boss Pre-Battle Stress Vignette 4 (Ms. Coral).
+=== vignette_ms_coral ===
+~ vignette_coral_seen = true
+Three runaway beach balls! A flock of gulls staging an organized watermelon heist! And sunscreen straight in my left eyebrow! # speaker: Ms. Coral # expr: worried # zoom: 1.08
+Nineteen kiddos cannonballing at the same second, and I haven't had one quiet breath since sunrise! # speaker: Ms. Coral # expr: determined
+\{shake\}TWEEEEET!\{/shake\} Wait, why does that purple soda make my whistle feel ten times louder?! NOBODY EVEN LOOKS AT THE TIDE! # speaker: Ms. Coral # expr: surprised # sound: chime-red
+Maddie puffs her orange tail to twice its normal width at the shrill whistle blast. # speaker: Maddie # expr: surprised
+Aw, Ms. Coral works nonstop keeping the whole beach safe! That fizzy drink just cranked her lifeguard worries up to tidal-wave volume! # speaker: Fae # expr: worried
+{sue_joined: Hang in there, Ms. Coral! We'll catch every runaway beach ball until the bay feels sunny again! # speaker: Sue # expr: determined}
+{not sue_joined: Don't worry, Ms. Coral! We'll help you catch your breath and save the picnic! # speaker: Fae # expr: determined}
 -> DONE

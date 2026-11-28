@@ -32,6 +32,131 @@
       "journal": [
         "ev",
         {
+          "VAR?": "milo_beat_loft"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Quiet Clue: Under rocket comics by the park, a torn sketch shows a lonely purple-caped hero waving from afar. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "milo_beat_pass"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Quiet Clue: Behind Pinecone Pass's pines, a shy four-note hum drifted past, then tiny tracks vanished. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.11"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "milo_beat_bay"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Quiet Clue: Found a crumpled purple-fizz wrapper at Bubblegum Bay with a glowing tiny rocket doodle inside. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.18"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "milo_beat_plaza"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Quiet Clue: By the plaza market, a classmate shielded a jumpy stray raccoon, muttering town gets too loud. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.25"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "milo_beat_school"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Quiet Clue: A quiet classmate sketched crayon rockets by the art wall and hummed a soft four-note countdown. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.32"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
           "VAR?": "milo_revealed"
         },
         {
@@ -50,7 +175,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.6"
+                "->": ".^.^.^.41"
               },
               null
             ]
@@ -75,7 +200,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.13"
+                "->": ".^.^.^.48"
               },
               null
             ]
@@ -100,7 +225,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.20"
+                "->": ".^.^.^.55"
               },
               null
             ]
@@ -125,7 +250,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.27"
+                "->": ".^.^.^.62"
               },
               null
             ]
@@ -150,7 +275,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.34"
+                "->": ".^.^.^.69"
               },
               null
             ]
@@ -175,7 +300,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.41"
+                "->": ".^.^.^.76"
               },
               null
             ]
@@ -200,7 +325,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.48"
+                "->": ".^.^.^.83"
               },
               null
             ]
@@ -237,7 +362,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.58"
+                "->": ".^.^.^.93"
               },
               null
             ]
@@ -262,7 +387,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.65"
+                "->": ".^.^.^.100"
               },
               null
             ]
@@ -299,7 +424,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.75"
+                "->": ".^.^.^.110"
               },
               null
             ]
@@ -324,7 +449,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.82"
+                "->": ".^.^.^.117"
               },
               null
             ]
@@ -361,7 +486,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.92"
+                "->": ".^.^.^.127"
               },
               null
             ]
@@ -386,7 +511,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.99"
+                "->": ".^.^.^.134"
               },
               null
             ]
@@ -423,7 +548,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.109"
+                "->": ".^.^.^.144"
               },
               null
             ]
@@ -448,7 +573,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.116"
+                "->": ".^.^.^.151"
               },
               null
             ]
@@ -478,7 +603,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.126"
+                "->": ".^.^.^.161"
               },
               null
             ]
@@ -503,7 +628,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.133"
+                "->": ".^.^.^.168"
               },
               null
             ]
@@ -528,7 +653,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.140"
+                "->": ".^.^.^.175"
               },
               null
             ]
@@ -553,7 +678,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.147"
+                "->": ".^.^.^.182"
               },
               null
             ]
@@ -578,7 +703,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.154"
+                "->": ".^.^.^.189"
               },
               null
             ]
@@ -603,7 +728,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.161"
+                "->": ".^.^.^.196"
               },
               null
             ]
@@ -628,7 +753,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.168"
+                "->": ".^.^.^.203"
               },
               null
             ]
@@ -653,7 +778,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.175"
+                "->": ".^.^.^.210"
               },
               null
             ]
@@ -683,7 +808,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.185"
+                "->": ".^.^.^.220"
               },
               null
             ]
@@ -713,7 +838,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.195"
+                "->": ".^.^.^.230"
               },
               null
             ]
@@ -743,7 +868,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.205"
+                "->": ".^.^.^.240"
               },
               null
             ]
@@ -768,7 +893,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.212"
+                "->": ".^.^.^.247"
               },
               null
             ]
@@ -798,7 +923,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.222"
+                "->": ".^.^.^.257"
               },
               null
             ]
@@ -823,7 +948,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.229"
+                "->": ".^.^.^.264"
               },
               null
             ]
@@ -848,7 +973,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.236"
+                "->": ".^.^.^.271"
               },
               null
             ]
@@ -873,7 +998,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.243"
+                "->": ".^.^.^.278"
               },
               null
             ]
@@ -898,7 +1023,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.250"
+                "->": ".^.^.^.285"
               },
               null
             ]
@@ -923,7 +1048,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.257"
+                "->": ".^.^.^.292"
               },
               null
             ]
@@ -953,7 +1078,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.267"
+                "->": ".^.^.^.302"
               },
               null
             ]
@@ -978,7 +1103,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.274"
+                "->": ".^.^.^.309"
               },
               null
             ]
@@ -1003,7 +1128,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.281"
+                "->": ".^.^.^.316"
               },
               null
             ]
@@ -1028,7 +1153,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.288"
+                "->": ".^.^.^.323"
               },
               null
             ]
@@ -1166,7 +1291,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.298"
+                "->": ".^.^.^.333"
               },
               null
             ]
@@ -1195,7 +1320,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.308"
+                "->": ".^.^.^.343"
               },
               null
             ]
@@ -1229,7 +1354,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.321"
+                "->": ".^.^.^.356"
               },
               null
             ]
@@ -1258,7 +1383,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.331"
+                "->": ".^.^.^.366"
               },
               null
             ]
@@ -1292,7 +1417,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.344"
+                "->": ".^.^.^.379"
               },
               null
             ]
@@ -1317,7 +1442,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.351"
+                "->": ".^.^.^.386"
               },
               null
             ]
@@ -1356,7 +1481,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.363"
+                "->": ".^.^.^.398"
               },
               null
             ]
@@ -1381,7 +1506,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.370"
+                "->": ".^.^.^.405"
               },
               null
             ]
@@ -1406,7 +1531,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.377"
+                "->": ".^.^.^.412"
               },
               null
             ]
@@ -1436,7 +1561,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.387"
+                "->": ".^.^.^.422"
               },
               null
             ]
@@ -1466,7 +1591,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.397"
+                "->": ".^.^.^.432"
               },
               null
             ]
@@ -1491,7 +1616,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.404"
+                "->": ".^.^.^.439"
               },
               null
             ]
@@ -1516,7 +1641,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.411"
+                "->": ".^.^.^.446"
               },
               null
             ]
@@ -1546,7 +1671,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.421"
+                "->": ".^.^.^.456"
               },
               null
             ]
@@ -1571,7 +1696,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.428"
+                "->": ".^.^.^.463"
               },
               null
             ]
@@ -1601,7 +1726,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.438"
+                "->": ".^.^.^.473"
               },
               null
             ]
@@ -1626,7 +1751,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.445"
+                "->": ".^.^.^.480"
               },
               null
             ]
@@ -1660,7 +1785,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.458"
+                "->": ".^.^.^.493"
               },
               null
             ]
@@ -1693,7 +1818,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.470"
+                "->": ".^.^.^.505"
               },
               null
             ]
@@ -1718,7 +1843,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.477"
+                "->": ".^.^.^.512"
               },
               null
             ]
@@ -1743,7 +1868,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.484"
+                "->": ".^.^.^.519"
               },
               null
             ]
@@ -1768,7 +1893,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.491"
+                "->": ".^.^.^.526"
               },
               null
             ]
@@ -1793,7 +1918,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.498"
+                "->": ".^.^.^.533"
               },
               null
             ]
@@ -1818,7 +1943,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.505"
+                "->": ".^.^.^.540"
               },
               null
             ]
@@ -1848,7 +1973,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.515"
+                "->": ".^.^.^.550"
               },
               null
             ]
@@ -1873,7 +1998,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.522"
+                "->": ".^.^.^.557"
               },
               null
             ]
@@ -1898,7 +2023,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.529"
+                "->": ".^.^.^.564"
               },
               null
             ]
@@ -1928,7 +2053,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.539"
+                "->": ".^.^.^.574"
               },
               null
             ]
@@ -1953,7 +2078,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.546"
+                "->": ".^.^.^.581"
               },
               null
             ]
@@ -1980,7 +2105,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.555"
+                "->": ".^.^.^.590"
               },
               null
             ]
@@ -2007,7 +2132,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.564"
+                "->": ".^.^.^.599"
               },
               null
             ]
@@ -2032,7 +2157,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.571"
+                "->": ".^.^.^.606"
               },
               null
             ]
@@ -2061,7 +2186,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.581"
+                "->": ".^.^.^.616"
               },
               null
             ]
@@ -2090,7 +2215,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.591"
+                "->": ".^.^.^.626"
               },
               null
             ]
@@ -2124,7 +2249,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.604"
+                "->": ".^.^.^.639"
               },
               null
             ]
@@ -2153,7 +2278,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.614"
+                "->": ".^.^.^.649"
               },
               null
             ]
@@ -2187,7 +2312,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.627"
+                "->": ".^.^.^.662"
               },
               null
             ]
@@ -2221,7 +2346,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.640"
+                "->": ".^.^.^.675"
               },
               null
             ]
@@ -2250,7 +2375,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.650"
+                "->": ".^.^.^.685"
               },
               null
             ]
@@ -2284,7 +2409,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.663"
+                "->": ".^.^.^.698"
               },
               null
             ]
@@ -2309,7 +2434,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.670"
+                "->": ".^.^.^.705"
               },
               null
             ]
@@ -2334,7 +2459,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.677"
+                "->": ".^.^.^.712"
               },
               null
             ]
@@ -2368,7 +2493,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.689"
+                "->": ".^.^.^.724"
               },
               null
             ]
@@ -2393,7 +2518,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.696"
+                "->": ".^.^.^.731"
               },
               null
             ]
@@ -2418,7 +2543,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.703"
+                "->": ".^.^.^.738"
               },
               null
             ]
@@ -2448,7 +2573,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.713"
+                "->": ".^.^.^.748"
               },
               null
             ]
@@ -2478,7 +2603,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.723"
+                "->": ".^.^.^.758"
               },
               null
             ]
@@ -2503,7 +2628,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.730"
+                "->": ".^.^.^.765"
               },
               null
             ]
@@ -2533,7 +2658,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.740"
+                "->": ".^.^.^.775"
               },
               null
             ]
@@ -2563,7 +2688,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.750"
+                "->": ".^.^.^.785"
               },
               null
             ]
@@ -2588,7 +2713,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.757"
+                "->": ".^.^.^.792"
               },
               null
             ]
@@ -2618,7 +2743,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.767"
+                "->": ".^.^.^.802"
               },
               null
             ]
@@ -2648,7 +2773,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.777"
+                "->": ".^.^.^.812"
               },
               null
             ]
@@ -2673,7 +2798,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.784"
+                "->": ".^.^.^.819"
               },
               null
             ]
@@ -2698,7 +2823,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.791"
+                "->": ".^.^.^.826"
               },
               null
             ]
@@ -2728,7 +2853,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.801"
+                "->": ".^.^.^.836"
               },
               null
             ]
@@ -2762,7 +2887,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.814"
+                "->": ".^.^.^.849"
               },
               null
             ]
@@ -2792,7 +2917,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.824"
+                "->": ".^.^.^.859"
               },
               null
             ]
@@ -2817,7 +2942,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.831"
+                "->": ".^.^.^.866"
               },
               null
             ]
@@ -2847,7 +2972,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.841"
+                "->": ".^.^.^.876"
               },
               null
             ]
@@ -2881,7 +3006,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.854"
+                "->": ".^.^.^.889"
               },
               null
             ]
@@ -2915,7 +3040,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.867"
+                "->": ".^.^.^.902"
               },
               null
             ]
@@ -2945,7 +3070,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.877"
+                "->": ".^.^.^.912"
               },
               null
             ]
@@ -2975,7 +3100,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.887"
+                "->": ".^.^.^.922"
               },
               null
             ]
@@ -3005,7 +3130,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.897"
+                "->": ".^.^.^.932"
               },
               null
             ]
@@ -3030,7 +3155,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.904"
+                "->": ".^.^.^.939"
               },
               null
             ]
@@ -3072,7 +3197,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.921"
+                "->": ".^.^.^.956"
               },
               null
             ]
@@ -3106,7 +3231,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.934"
+                "->": ".^.^.^.969"
               },
               null
             ]
@@ -3206,7 +3331,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.944"
+                "->": ".^.^.^.979"
               },
               null
             ]
@@ -3231,7 +3356,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.951"
+                "->": ".^.^.^.986"
               },
               null
             ]
@@ -3261,7 +3386,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.961"
+                "->": ".^.^.^.996"
               },
               null
             ]
@@ -3295,7 +3420,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.973"
+                "->": ".^.^.^.1008"
               },
               null
             ]
@@ -3320,7 +3445,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.980"
+                "->": ".^.^.^.1015"
               },
               null
             ]
@@ -3350,7 +3475,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.990"
+                "->": ".^.^.^.1025"
               },
               null
             ]
@@ -3384,7 +3509,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1003"
+                "->": ".^.^.^.1038"
               },
               null
             ]
@@ -3413,7 +3538,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1013"
+                "->": ".^.^.^.1048"
               },
               null
             ]
@@ -3442,7 +3567,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1023"
+                "->": ".^.^.^.1058"
               },
               null
             ]
@@ -3476,7 +3601,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1036"
+                "->": ".^.^.^.1071"
               },
               null
             ]
@@ -3506,7 +3631,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1046"
+                "->": ".^.^.^.1081"
               },
               null
             ]
@@ -3531,7 +3656,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1053"
+                "->": ".^.^.^.1088"
               },
               null
             ]
@@ -3565,7 +3690,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1065"
+                "->": ".^.^.^.1100"
               },
               null
             ]
@@ -3590,7 +3715,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1072"
+                "->": ".^.^.^.1107"
               },
               null
             ]
@@ -3619,7 +3744,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1082"
+                "->": ".^.^.^.1117"
               },
               null
             ]
@@ -3644,7 +3769,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1089"
+                "->": ".^.^.^.1124"
               },
               null
             ]
@@ -3669,7 +3794,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1096"
+                "->": ".^.^.^.1131"
               },
               null
             ]
@@ -3706,7 +3831,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1111"
+                "->": ".^.^.^.1146"
               },
               null
             ]
@@ -3735,7 +3860,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1120"
+                "->": ".^.^.^.1155"
               },
               null
             ]
@@ -3773,7 +3898,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1135"
+                "->": ".^.^.^.1170"
               },
               null
             ]
@@ -3802,7 +3927,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1145"
+                "->": ".^.^.^.1180"
               },
               null
             ]
@@ -3827,7 +3952,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1152"
+                "->": ".^.^.^.1187"
               },
               null
             ]
@@ -3852,7 +3977,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1159"
+                "->": ".^.^.^.1194"
               },
               null
             ]
@@ -3882,7 +4007,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1169"
+                "->": ".^.^.^.1204"
               },
               null
             ]
@@ -3912,7 +4037,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1179"
+                "->": ".^.^.^.1214"
               },
               null
             ]
@@ -3937,7 +4062,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1186"
+                "->": ".^.^.^.1221"
               },
               null
             ]
@@ -3966,7 +4091,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1196"
+                "->": ".^.^.^.1231"
               },
               null
             ]
@@ -4004,7 +4129,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1212"
+                "->": ".^.^.^.1247"
               },
               null
             ]
@@ -4031,7 +4156,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1221"
+                "->": ".^.^.^.1256"
               },
               null
             ]
@@ -4060,7 +4185,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1231"
+                "->": ".^.^.^.1266"
               },
               null
             ]
@@ -4085,7 +4210,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1238"
+                "->": ".^.^.^.1273"
               },
               null
             ]
@@ -4114,7 +4239,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1249"
+                "->": ".^.^.^.1284"
               },
               null
             ]
@@ -4143,7 +4268,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1260"
+                "->": ".^.^.^.1295"
               },
               null
             ]
@@ -8329,7 +8454,10 @@
             "nop",
             "^ ",
             "#",
-            "^speaker: Fae",
+            "^speaker: Fae ",
+            "/#",
+            "#",
+            "^expr: determined",
             "/#",
             "\n",
             "done",
@@ -8365,7 +8493,10 @@
         "\n",
         "^My journal, right under my pillow where it belongs. ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
         [
@@ -8385,13 +8516,16 @@
           {
             "b": [
               "\n",
-              "^Note to self: fizzing fountain. Go look NOW. ",
+              "^Note to self: fizzing fountain. Go look NOW before the bubbles claim the plaza! ",
               "#",
-              "^speaker: Fae",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^expr: determined",
               "/#",
               "\n",
               {
-                "->": ".^.^.^.14"
+                "->": ".^.^.^.17"
               },
               null
             ]
@@ -8416,11 +8550,14 @@
               "\n",
               "^Note to self: fizzing fountain. Check after school. ",
               "#",
-              "^speaker: Fae",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^expr: determined",
               "/#",
               "\n",
               {
-                "->": ".^.^.^.14"
+                "->": ".^.^.^.17"
               },
               null
             ]
@@ -8433,13 +8570,16 @@
           {
             "b": [
               "\n",
-              "^Mom and Dad gave it to me when Oliver was born. ",
+              "^Mom and Dad gave it to me when baby Oliver was born, so my own adventures would always have a front-row seat. ",
               "#",
-              "^speaker: Fae",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^expr: happy",
               "/#",
               "\n",
               {
-                "->": ".^.^.^.14"
+                "->": ".^.^.^.17"
               },
               null
             ]
@@ -8504,7 +8644,7 @@
           {
             "s0": [
               "pop",
-              "^My sketchbook! I drew Maddie as a dragon yesterday.",
+              "^My sketchbook! I drew Maddie as a dragon yesterday, complete with a very dignified nap hoard of shiny bottle caps.",
               {
                 "->": ".^.^.17"
               },
@@ -8512,7 +8652,7 @@
             ],
             "s1": [
               "pop",
-              "^Paints, pencils, and one very chewed eraser.",
+              "^Watercolor tins, stubby pencils, and one eraser Maddie definitely insists she never chewed.",
               {
                 "->": ".^.^.17"
               },
@@ -8523,7 +8663,10 @@
         ],
         "^ ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
         "done",
@@ -8555,9 +8698,12 @@
         ],
         "nop",
         "\n",
-        "^Maddie's bed. Still warm, and full of orange fur. ",
+        "^Maddie's bed. Still toast-warm, full of orange fur, and shaped like a dramatic cinnamon roll. ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
         "done",
@@ -8653,7 +8799,10 @@
               "\n",
               "^A kid in a purple hood? I bet that's who did it. ",
               "#",
-              "^speaker: Fae",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^expr: determined",
               "/#",
               "\n",
               {
@@ -8672,7 +8821,10 @@
               "\n",
               "^A kid in a purple hood, fizzing up the fountain? Weird. ",
               "#",
-              "^speaker: Fae",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^expr: surprised",
               "/#",
               "\n",
               {
@@ -8724,9 +8876,12 @@
           {
             "b": [
               "\n",
-              "^Pink bubbles... and it smells like bubblegum? ",
+              "^{wave}Pink bubbles...{/wave} and it smells like bubblegum? Maddie sneezes once and gives the stone rim a deeply offended glare. ",
               "#",
-              "^speaker: Fae",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^expr: surprised",
               "/#",
               "\n",
               {
@@ -8769,22 +8924,31 @@
         ],
         "nop",
         "\n",
-        "^Ribbit! Thank you for the song, Fae. My head feels all clear now. ",
+        "^Ribbit! Thank you for the gentle rhythm, Fae. My brain finally stopped doing backflips! ",
         "#",
-        "^speaker: Fountain Frog",
+        "^speaker: Fountain Frog ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
-        "^Something purple fizzed into my fountain last night. It tasted like trouble! ",
+        "^Something fizzy and {color:lavender}purple{/color} splashed into my fountain last night. Tasted like trouble, smelled like grape thunder! ",
         "#",
-        "^speaker: Fountain Frog",
+        "^speaker: Fountain Frog ",
+        "/#",
+        "#",
+        "^expr: worried",
         "/#",
         "\n",
         "done",
         {
           "again": [
-            "^Ribbit! The fountain is singing again. ",
+            "^Ribbit! The fountain is humming in tune again, and not a single bubble smells like candy. ",
             "#",
-            "^speaker: Fountain Frog",
+            "^speaker: Fountain Frog ",
+            "/#",
+            "#",
+            "^expr: happy",
             "/#",
             "\n",
             "done",
@@ -8819,9 +8983,12 @@
         ],
         "nop",
         "\n",
-        "^Three plates, three cups, and a tiny spoon for Oliver. Breakfast is almost ready. ",
+        "^Three plates, three cups, and one tiny spoon for Oliver. Maddie is supervising from floor level with maximal pancake hope. ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
         "done",
@@ -9014,9 +9181,12 @@
         }
       ],
       "island": [
-        "^A big bowl of pancake batter and a whole mountain of blueberries. Yum. ",
+        "^A giant mixing bowl of pancake batter and a precarious mountain of blueberries. Maddie's tail twitches like a tiny orange metronome. ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
         "done",
@@ -9063,12 +9233,18 @@
               "\n",
               "^Oliver claps both chubby hands at Maddie and beams up at Fae. \"Ba! Yay!\" ",
               "#",
-              "^speaker: Oliver",
+              "^speaker: Oliver ",
+              "/#",
+              "#",
+              "^expr: happy",
               "/#",
               "\n",
               "^Mom laughs warmly from the kitchen. \"Even Oliver can tell the valley is calm again!\" ",
               "#",
-              "^speaker: Mom",
+              "^speaker: Mom ",
+              "/#",
+              "#",
+              "^expr: happy",
               "/#",
               "\n",
               {
@@ -9093,12 +9269,18 @@
               "\n",
               "^Oliver spots Fae's shiny Golden Whistle and giggles. \"Ba! Star!\" ",
               "#",
-              "^speaker: Oliver",
+              "^speaker: Oliver ",
+              "/#",
+              "#",
+              "^expr: happy",
               "/#",
               "\n",
-              "^Mom laughs from the kitchen. ",
+              "^Mom laughs from the kitchen, flipping a golden pancake mid-air. ",
               "#",
-              "^speaker: Mom",
+              "^speaker: Mom ",
+              "/#",
+              "#",
+              "^expr: happy",
               "/#",
               "\n",
               {
@@ -9117,12 +9299,18 @@
               "\n",
               "^Oliver shakes his rattle. \"Ba!\" ",
               "#",
-              "^speaker: Oliver",
+              "^speaker: Oliver ",
+              "/#",
+              "#",
+              "^expr: happy",
               "/#",
               "\n",
-              "^Mom laughs from the kitchen. ",
+              "^Mom laughs from the kitchen. \"Careful, Maddie, he's eyeing your tail again!\" ",
               "#",
-              "^speaker: Mom",
+              "^speaker: Mom ",
+              "/#",
+              "#",
+              "^expr: happy",
               "/#",
               "\n",
               {
@@ -9694,14 +9882,20 @@
         }
       ],
       "picnic": [
-        "^A picnic with sandwiches, lemonade, and a basket of berries. ",
+        "^A checkered picnic spread: triangle sandwiches, chilled lemonade, and an empty berry basket. ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: surprised",
         "/#",
         "\n",
-        "^Somebody ate every single berry... and left purple paw prints! ",
+        "^Somebody inhaled every single berry and left a trail of tiny {color:lavender}purple paw prints{/color}! Maddie sniffs one and sneezes dramatically. ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: worried",
         "/#",
         "\n",
         "done",
@@ -9713,16 +9907,19 @@
         "^speaker: Fae",
         "/#",
         "\n",
-        "^But I want to follow the hooded kid's trail first. ",
+        "^First let's untangle the hooded kid's trail right here in town. Maddie agrees, mostly because there might be snacks! ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: determined",
         "/#",
         "\n",
         "done",
         null
       ],
       "park_sign": [
-        "^MEADOW PARK. Please keep your pets on the path! ",
+        "^MEADOW PARK. Please keep your pets on the path! (Cats who pretend they cannot read still count.) ",
         "#",
         "^speaker: Sign",
         "/#",
@@ -9744,9 +9941,12 @@
           },
           {
             "b": [
-              "^ Somebody's pet is barking by the pond. ",
+              "^ Somebody's very enthusiastic pet is barking up a storm by the pond! ",
               "#",
-              "^speaker: Fae",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^expr: surprised",
               {
                 "->": ".^.^.^.13"
               },
@@ -9916,6 +10116,437 @@
             null
           ]
         }
+      ],
+      "milo_foreshadow_plaza": [
+        [
+          "ev",
+          true,
+          "/ev",
+          {
+            "VAR=": "milo_beat_plaza",
+            "re": true
+          },
+          "^By the grocery crates, a jumpy stray raccoon backs into an apple basket while noisy shoppers wave their arms! ",
+          "#",
+          "^speaker: Fae ",
+          "/#",
+          "#",
+          "^expr: surprised ",
+          "/#",
+          "#",
+          "^zoom: 1.07",
+          "/#",
+          "\n",
+          "^Hey! Back off a second! It's not trying to steal anything, it's just {shake}terrified{/shake} of all the yelling! ",
+          "#",
+          "^speaker: Milo ",
+          "/#",
+          "#",
+          "^expr: determined",
+          "/#",
+          "\n",
+          "^Milo kneels slowly and rolls a crisp red apple slice under the wooden crate. ",
+          "#",
+          "^speaker: Fae ",
+          "/#",
+          "#",
+          "^expr: happy",
+          "/#",
+          "\n",
+          "^{whisper}I get it, little guy. Everything in town gets way too loud when nobody stops to listen...{/whisper} ",
+          "#",
+          "^speaker: Milo ",
+          "/#",
+          "#",
+          "^expr: worried",
+          "/#",
+          "\n",
+          "^Mrrrow-purrrr! Maddie trots up and gives Milo's sneaker a tiny, solemn head-bump of approval. ",
+          "#",
+          "^speaker: Maddie ",
+          "/#",
+          "#",
+          "^expr: happy ",
+          "/#",
+          "#",
+          "^pose: maddie sit",
+          "/#",
+          "\n",
+          "^Whoa, Fae! Hey! I didn't see you there. The little guy just looked cornered, you know? ",
+          "#",
+          "^speaker: Milo ",
+          "/#",
+          "#",
+          "^expr: surprised",
+          "/#",
+          "\n",
+          "ev",
+          "str",
+          "^That was really kind of you, Milo.",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 20
+          },
+          "ev",
+          "str",
+          "^Town HAS been super noisy today.",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 20
+          },
+          {
+            "c-0": [
+              "\n",
+              "^Heh... thanks. Critters just want a quiet corner without everybody staring. Catch you at school, Fae! ",
+              "#",
+              "^speaker: Milo ",
+              "/#",
+              "#",
+              "^expr: happy",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              {
+                "#f": 5
+              }
+            ],
+            "c-1": [
+              "\n",
+              "^Right? Sometimes I wish there were a giant volume knob for the whole plaza. See you later, Fae! ",
+              "#",
+              "^speaker: Milo ",
+              "/#",
+              "#",
+              "^expr: worried",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              {
+                "#f": 5
+              }
+            ],
+            "g-0": [
+              "^The raccoon peeks out nibbling its apple slice as Milo gives one quick wave and hurries down the cobblestones. ",
+              "#",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^expr: neutral",
+              "/#",
+              "\n",
+              "done",
+              null
+            ]
+          }
+        ],
+        null
+      ],
+      "milo_foreshadow_loft": [
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "milo_beat_loft",
+          "re": true
+        },
+        "^Sliding a comic back into the wooden crate, Fae spots a creased, torn sketchbook corner tucked under Issue ",
+        "#",
+        "^12. ",
+        "/#",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: surprised ",
+        "/#",
+        "#",
+        "^zoom: 1.09",
+        "/#",
+        "\n",
+        "^Fae unfolds it gently. Drawn in soft pencil and lilac ink is a tiny comic hero in a swirling {color:lavender}purple cape{/color}, standing alone on a hill. ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: worried ",
+        "/#",
+        "#",
+        "^pose: talk",
+        "/#",
+        "\n",
+        "^Down in the valley below, classmates laugh around a sunny treehouse. The caped hero's speech bubble is rubbed fuzzy by an eraser. ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: worried",
+        "/#",
+        "\n",
+        "^Mrrrow... Maddie rests one warm orange paw on the curled paper edge, eyes soft and round. ",
+        "#",
+        "^speaker: Maddie ",
+        "/#",
+        "#",
+        "^expr: worried ",
+        "/#",
+        "#",
+        "^pose: maddie sit",
+        "/#",
+        "\n",
+        "^{whisper}Whoever sketched this didn't want to ruin anyone's day. They just wanted a seat at the table.{/whisper} ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: determined",
+        "/#",
+        "\n",
+        "^Fae folds the torn corner carefully and tucks it right back beneath the stack of rocket comics. ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: neutral",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "vignette_mr_pip": [
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "vignette_pip_seen",
+          "re": true
+        },
+        "^Token jam on Skee-Ball lane two! Claw tangled around that smug raccoon plush AGAIN! ",
+        "#",
+        "^speaker: Mr. Pip ",
+        "/#",
+        "#",
+        "^expr: worried ",
+        "/#",
+        "#",
+        "^zoom: 1.08",
+        "/#",
+        "\n",
+        "^And I spent all morning polishing every joystick, only for somebody to shatter my {color:gold}Star Racer{/color} record and dash without even leaving initials! ",
+        "#",
+        "^speaker: Mr. Pip ",
+        "/#",
+        "#",
+        "^expr: determined",
+        "/#",
+        "\n",
+        "^{shake}BEEP-BOOP-FIZZ!{/shake} Wait... why are my sneakers vibrating?! NOBODY leaves an arcade mess on MY watch! ",
+        "#",
+        "^speaker: Mr. Pip ",
+        "/#",
+        "#",
+        "^expr: surprised ",
+        "/#",
+        "#",
+        "^sound: chime-red",
+        "/#",
+        "\n",
+        "^Mrrrow! Maddie flattens her ears at the whirring cabinets while Fae winces sympathetically. ",
+        "#",
+        "^speaker: Maddie ",
+        "/#",
+        "#",
+        "^expr: worried",
+        "/#",
+        "\n",
+        "^Poor Mr. Pip... he's been juggling ten broken machines all by himself, and that purple soda pushed him straight into overdrive! ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: worried",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "sue_joined"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Don't sweat it, Mr. Pip! Let's calm this high-score storm down and give you a real breather! ",
+              "#",
+              "^speaker: Sue ",
+              "/#",
+              "#",
+              "^expr: determined",
+              {
+                "->": ".^.^.^.54"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "sue_joined"
+        },
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Hang tight, Mr. Pip! We're going to help you catch your breath! ",
+              "#",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^expr: determined",
+              {
+                "->": ".^.^.^.62"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "vignette_chef_mateo": [
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "vignette_mateo_seen",
+          "re": true
+        },
+        "^Twenty minutes chopping fresh cilantro, hand-painting forty sunny flyers, and one gust of hillside wind eats the whole stack! ",
+        "#",
+        "^speaker: Chef Mateo ",
+        "/#",
+        "#",
+        "^expr: worried ",
+        "/#",
+        "#",
+        "^zoom: 1.08",
+        "/#",
+        "\n",
+        "^My grandma's crispy taco shells are a work of art! Does {shake}ANYBODY{/shake} in Cloverhollow care about a proper crunch anymore?! ",
+        "#",
+        "^speaker: Chef Mateo ",
+        "/#",
+        "#",
+        "^expr: determined",
+        "/#",
+        "\n",
+        "^Wait... that purple soda smelled like habanero thunder! {pop}MORE SPICE! EXTRA CRUNCH!{/pop} EVERYBODY TASTE-TESTS RIGHT NOW! ",
+        "#",
+        "^speaker: Chef Mateo ",
+        "/#",
+        "#",
+        "^expr: surprised ",
+        "/#",
+        "#",
+        "^sound: chime-red",
+        "/#",
+        "\n",
+        "^Maddie hides behind Fae's sneakers, squinting suspiciously at a drifting cloud of paprika sparkles. ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: worried",
+        "/#",
+        "\n",
+        "^Aw... he just worked his heart out on those flyers and got worried nobody would show up! ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: worried",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "jordan_joined"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Let's talk tacos with him and remind him the whole valley loves his kitchen! ",
+              "#",
+              "^speaker: Jordan ",
+              "/#",
+              "#",
+              "^expr: determined",
+              {
+                "->": ".^.^.^.54"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "jordan_joined"
+        },
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Let's remind him how much Cloverhollow loves his cooking, one calm word at a time! ",
+              "#",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^expr: determined",
+              {
+                "->": ".^.^.^.62"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "done",
+        null
       ],
       "teacher": [
         [
@@ -10838,23 +11469,32 @@
         null
       ],
       "cubbies": [
-        "^Everyone's cubby has a coat hook and a name tag. ",
+        "^Everyone's cubby has a coat hook, a crooked paper name tag, and at least one runaway crayon. ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
-        "^Mine has spare socks and a drawing of Maddie as a dragon. ",
+        "^Mine holds spare striped socks, my dragon-Maddie drawing, and a tiny folded paper star someone left along the rail. ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
         "done",
         null
       ],
       "reading_corner": [
-        "^A cozy reading rug, with beanbags and a shelf of picture books. ",
+        "^A cozy reading rug piled with squishy beanbags and well-loved picture books. Maddie immediately eyes the sunniest cushion like a tiny orange monarch. ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
         "done",
@@ -11579,18 +12219,24 @@
         null
       ],
       "ball_bin": [
-        "^A big bin of bouncy balls: red ones, blue ones, and one very flat one. ",
+        "^A giant rolling bin of gym balls: shiny red ones, bouncy blue ones, and one dramatically pancake-flat ball that refuses to retire. ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
         "done",
         null
       ],
       "climbing_rope": [
-        "^A climbing rope, all the way up to the ceiling. There's a little bell at the top! ",
+        "^A thick braided climbing rope stretching all the way to the rafters, with a shiny brass bell at the top! One day I'm ringing that bell on the first try. ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: determined",
         "/#",
         "\n",
         "done",
@@ -12029,18 +12675,24 @@
         null
       ],
       "school_board": [
-        "^The bulletin board: a spelling bee, a lost mitten, and a bake sale on Friday. ",
+        "^The hall bulletin board: Friday's spelling bee, a bake sale poster with twelve exclamation points, and one lonely striped mitten pinned under \"IS THIS YOURS?!\" ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
         "done",
         null
       ],
       "trophies": [
-        "^Trophies for spelling, soccer, and the best pumpkin in Cloverhollow. ",
+        "^Gleaming trophies for spelling, junior soccer, and Cloverhollow's fiercely contested Giant Pumpkin Championship. Maddie checks her reflection in the pumpkin cup. ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
         "done",
@@ -12600,36 +13252,48 @@
         }
       ],
       "art_easels": [
-        "^Three easels, three blank canvases, and enough paint to make a rainbow. ",
+        "^Three wooden easels, three crisp blank canvases, and enough pastel paint jars to redecorate the entire county. ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
         "done",
         null
       ],
       "art_paintings": [
-        "^The class art wall is covered with bright paintings. A drying rack wobbles beside it. ",
+        "^The art wall bursts with bright student watercolors: swirling galaxies, lopsided cats, and a drying rack wobbling heroically under twelve soggy rainbows. ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
         "done",
         null
       ],
       "art_sink": [
-        "^The sink is full of painty water. Ms. Rowan says brushes need a rinse right away! ",
+        "^A deep porcelain sink swirling with turquoise-and-gold rinse water. Ms. Rowan says tired brushes deserve a gentle bath right away! ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
         "done",
         null
       ],
       "art_markers": [
-        "^An empty purple marker box. Every single purple marker is gone. ",
+        "^A wooden marker caddy where red, gold, and teal sit neatly in rows... and the entire {color:lavender}purple{/color} slot is wiped clean. Every last one gone. ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: worried",
         "/#",
         "\n",
         "done",
@@ -14745,18 +15409,379 @@
         null
       ],
       "hopscotch": [
-        "^Fae hops the whole hopscotch on one foot, all the way to 7 and back! ",
+        "^Fae hops the whole chalk hopscotch grid on one sneaker, all the way to 7 and back! Maddie awards a stern ten out of ten tail-flicks. ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: happy ",
+        "/#",
+        "#",
+        "^pose: cheer",
         "/#",
         "\n",
         "done",
         null
       ],
       "tetherball": [
-        "^Fae gives the tetherball a whack. Round and round it goes! ",
+        "^{pop}WHACK!{/pop} Fae sends the tetherball orbiting the pole while Maddie tracks every loop like a miniature orange satellite! ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: happy",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "milo_foreshadow_school": [
+        [
+          "ev",
+          true,
+          "/ev",
+          {
+            "VAR=": "milo_beat_school",
+            "re": true
+          },
+          "^Tucked in the quiet corner beside the art wall, Milo hunches over a worn notebook, humming a soft four-note tune: \"{wave}da-da-da-DUM...{/wave}\" ",
+          "#",
+          "^speaker: Fae ",
+          "/#",
+          "#",
+          "^expr: neutral ",
+          "/#",
+          "#",
+          "^zoom: 1.08",
+          "/#",
+          "\n",
+          "^Mrrrow? Maddie pads straight over and nudges the margin of his page, showing a tiny crayon rocket blasting into huge blank sky. ",
+          "#",
+          "^speaker: Maddie ",
+          "/#",
+          "#",
+          "^expr: happy ",
+          "/#",
+          "#",
+          "^pose: maddie sit",
+          "/#",
+          "\n",
+          "^Whoa! Hey, Maddie! Milo snaps the sketchbook shut in a hurry and rubs the back of his neck with a wobbly grin. ",
+          "#",
+          "^speaker: Milo ",
+          "/#",
+          "#",
+          "^expr: surprised",
+          "/#",
+          "\n",
+          "^Hey, Milo! Are you okay? Your rocket page looked awesome! ",
+          "#",
+          "^speaker: Fae ",
+          "/#",
+          "#",
+          "^expr: worried",
+          "/#",
+          "\n",
+          "^Oh, totally fine, Fae! Just... practicing between bells. Everybody in class already has their big thing, you know? Rosie's kites, your adventures... ",
+          "#",
+          "^speaker: Milo ",
+          "/#",
+          "#",
+          "^expr: worried",
+          "/#",
+          "\n",
+          "ev",
+          "str",
+          "^Want to sketch together after school?",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 20
+          },
+          "ev",
+          "str",
+          "^That little hummed tune sounded great!",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 20
+          },
+          {
+            "c-0": [
+              "\n",
+              "^Wait, for real?! {pause:6}Maybe once I finish one really cool page first. {whisper}So it's actually worth showing.{/whisper} ",
+              "#",
+              "^speaker: Milo ",
+              "/#",
+              "#",
+              "^expr: surprised",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              {
+                "#f": 5
+              }
+            ],
+            "c-1": [
+              "\n",
+              "^Heh, thanks... I hum it when the room gets too loud. Makes my brain feel like a rocket countdown: {wave}da-da-da-DUM...{/wave} ",
+              "#",
+              "^speaker: Milo ",
+              "/#",
+              "#",
+              "^expr: happy",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              {
+                "#f": 5
+              }
+            ],
+            "g-0": [
+              "^Milo tucks his pencil behind his ear and gives Fae a shy thumbs-up before turning back to the corner desk. ",
+              "#",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^expr: neutral",
+              "/#",
+              "\n",
+              "done",
+              null
+            ]
+          }
+        ],
+        null
+      ],
+      "vignette_ms_rowan": [
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "vignette_rowan_seen",
+          "re": true
+        },
+        "^Parent Art Show is TOMORROW! Twenty-eight skies dried upside-down, glitter landed in my tea, and... ",
+        "#",
+        "^speaker: Ms. Rowan ",
+        "/#",
+        "#",
+        "^expr: worried ",
+        "/#",
+        "#",
+        "^zoom: 1.08",
+        "/#",
+        "\n",
+        "^I had {shake}THIRTY-TWO{/shake} purple markers at eight o'clock sharp! How is an art teacher supposed to paint a twilight sunset without purple?! ",
+        "#",
+        "^speaker: Ms. Rowan ",
+        "/#",
+        "#",
+        "^expr: determined",
+        "/#",
+        "\n",
+        "^One quick sip of bubbly grape soda to calm my nerves, and {pop}WHOOSH!{/pop} NOW THE HALLWAY IS MY CANVAS! ",
+        "#",
+        "^speaker: Ms. Rowan ",
+        "/#",
+        "#",
+        "^expr: surprised ",
+        "/#",
+        "#",
+        "^sound: chime-red",
+        "/#",
+        "\n",
+        "^Mrrrow! Maddie hops neatly onto Fae's boot to keep her orange paws safe from flying lilac droplets. ",
+        "#",
+        "^speaker: Maddie ",
+        "/#",
+        "#",
+        "^expr: worried",
+        "/#",
+        "\n",
+        "^Aw, Ms. Rowan isn't mean at all! She's just stretched way too thin before the Art Show, and that fizzy drink turned stress into a paint tornado! ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: worried",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "sue_joined"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Let's brush this whirlwind back into something pretty so she can actually finish her tea! ",
+              "#",
+              "^speaker: Sue ",
+              "/#",
+              "#",
+              "^expr: determined",
+              {
+                "->": ".^.^.^.54"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "sue_joined"
+        },
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Hold steady, Ms. Rowan! We'll help clear the swirls right back into calm color! ",
+              "#",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^expr: determined",
+              {
+                "->": ".^.^.^.62"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "vignette_mr_bell": [
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "vignette_bell_seen",
+          "re": true
+        },
+        "^The hall intercom is stuck, three kids lost left mittens, and somebody typed \"TACONADO TUESDAY\" on lunch! ",
+        "#",
+        "^speaker: Mr. Bell ",
+        "/#",
+        "#",
+        "^expr: worried ",
+        "/#",
+        "#",
+        "^zoom: 1.08",
+        "/#",
+        "\n",
+        "^I still have two hundred and fourteen students' names to greet before the bell, and my spare clipboard vanished into thin air! ",
+        "#",
+        "^speaker: Mr. Bell ",
+        "/#",
+        "#",
+        "^expr: determined",
+        "/#",
+        "\n",
+        "^{shake}AHEM! TESTING, ONE, TWO, SEVENTEEN!{/shake} Why is my voice echoing like a foghorn?! ATTENTION, EVERYBODY, ATTENTION! ",
+        "#",
+        "^speaker: Mr. Bell ",
+        "/#",
+        "#",
+        "^expr: surprised ",
+        "/#",
+        "#",
+        "^sound: chime-red",
+        "/#",
+        "\n",
+        "^Maddie presses both paws flat over her ears and gives Fae an unmistakable \"please turn the principal down\" look. ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: worried",
+        "/#",
+        "\n",
+        "^Poor Mr. Bell... he cares so much about keeping the whole school running on time that one fizzy sip made every announcement burst out at once! ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: worried",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "jordan_joined"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Let's give him a calm breather before he accidentally announces next month's fire drill too! ",
+              "#",
+              "^speaker: Jordan ",
+              "/#",
+              "#",
+              "^expr: determined",
+              {
+                "->": ".^.^.^.54"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "jordan_joined"
+        },
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Take a deep breath, Mr. Bell! We've got your back! ",
+              "#",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^expr: determined",
+              {
+                "->": ".^.^.^.62"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
         "/#",
         "\n",
         "done",
@@ -14766,22 +15791,34 @@
         [
           "^Whoa, hi! Careful, these planks are a little wobbly. ",
           "#",
-          "^speaker: Sue",
+          "^speaker: Sue ",
+          "/#",
+          "#",
+          "^expr: happy",
           "/#",
           "\n",
-          "^I'm Sue. I fish here every day... but today the fish are all fizzy! ",
+          "^I'm Sue! I fish this dock rain or shine, only today the bay fish are doing {wave}fizzy backflips{/wave}! ",
           "#",
-          "^speaker: Sue",
+          "^speaker: Sue ",
+          "/#",
+          "#",
+          "^expr: determined",
           "/#",
           "\n",
-          "^And that flappy bluebird keeps kicking sand in my bait bucket. ",
+          "^And that dramatic bluebird keeps kick-flipping sand straight into my favorite bait bucket. ",
           "#",
-          "^speaker: Sue",
+          "^speaker: Sue ",
+          "/#",
+          "#",
+          "^expr: worried",
           "/#",
           "\n",
-          "^Wait. Purple fizz? Was it a kid in a purple hood? ",
+          "^Hold on... {color:lavender}purple fizz{/color}? Did a kid in a purple hood tear through here too?! ",
           "#",
-          "^speaker: Sue",
+          "^speaker: Sue ",
+          "/#",
+          "#",
+          "^expr: surprised",
           "/#",
           "\n",
           "ev",
@@ -14805,9 +15842,15 @@
           {
             "c-0": [
               "\n",
-              "^I knew it! Count me in. ",
+              "^Hah, I KNEW it! Grab your gear, captain, count me and my lucky rod in! ",
               "#",
-              "^speaker: Sue",
+              "^speaker: Sue ",
+              "/#",
+              "#",
+              "^expr: happy ",
+              "/#",
+              "#",
+              "^pose: sue cheer",
               "/#",
               "\n",
               {
@@ -14821,7 +15864,13 @@
               "\n",
               "^Are you kidding? Of course! Let me grab my rod. ",
               "#",
-              "^speaker: Sue",
+              "^speaker: Sue ",
+              "/#",
+              "#",
+              "^expr: happy ",
+              "/#",
+              "#",
+              "^pose: sue cheer",
               "/#",
               "\n",
               {
@@ -14874,22 +15923,31 @@
         ],
         "nop",
         "\n",
-        "^Chirp! Thank you, Fae. My wings feel calm again. ",
+        "^Chirp! Thank you, Fae. My feathers finally stopped buzzing like a seaside kazoo! ",
         "#",
-        "^speaker: Bay Bluebird",
+        "^speaker: Bay Bluebird ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
-        "^A kid in a purple hood zipped off toward the mountains! ",
+        "^That kid in the purple hood zipped right up the trail toward the snowy mountains! ",
         "#",
-        "^speaker: Bay Bluebird",
+        "^speaker: Bay Bluebird ",
+        "/#",
+        "#",
+        "^expr: determined",
         "/#",
         "\n",
         "done",
         {
           "again": [
-            "^Chirp-chirp! The bay is peaceful now. ",
+            "^Chirp-chirp! Smooth tides, zero sand in Sue's bait bucket. The bay feels sunny again! ",
             "#",
-            "^speaker: Bay Bluebird",
+            "^speaker: Bay Bluebird ",
+            "/#",
+            "#",
+            "^expr: happy",
             "/#",
             "\n",
             "done",
@@ -14926,27 +15984,39 @@
         ],
         "nop",
         "\n",
-        "^Squawk! Sorry about your snacks. I couldn't help myself! ",
+        "^Squawk! Listen, I am deeply embarrassed about the great sandwich heist. I couldn't stop myself! ",
         "#",
-        "^speaker: Lookout Gull",
+        "^speaker: Lookout Gull ",
+        "/#",
+        "#",
+        "^expr: worried",
         "/#",
         "\n",
-        "^A kid in a purple hood fed me a fizzy cracker. Then I wanted ALL the snacks! ",
+        "^A kid in a purple hood tossed me a fizzy cracker, and suddenly my brain yelled \"ACQUIRE ALL SNACKS!\" ",
         "#",
-        "^speaker: Lookout Gull",
+        "^speaker: Lookout Gull ",
+        "/#",
+        "#",
+        "^expr: surprised",
         "/#",
         "\n",
-        "^A fizzy cracker? Everywhere that kid goes, things go fizzy. ",
+        "^A fizzy cracker? Everywhere that hooded kid sprints, the whole valley gets turned up to eleven. ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: determined",
         "/#",
         "\n",
         "done",
         {
           "again": [
-            "^I'm keeping watch over the sea now. No more snack snatching! ",
+            "^Strict lookout duty from now on. Zero unauthorized picnic raids, scout's honor! ",
             "#",
-            "^speaker: Lookout Gull",
+            "^speaker: Lookout Gull ",
+            "/#",
+            "#",
+            "^expr: happy",
             "/#",
             "\n",
             "done",
@@ -14988,22 +16058,31 @@
         "^speaker: Sandy Crab",
         "/#",
         "\n",
-        "^A kid in a purple hood handed me a fizzy soda bottle, and I snip-snipped it open! ",
+        "^A kid in a purple hood rolled me a fizzy bottle, and naturally I snip-snipped the cap clean off! ",
         "#",
-        "^speaker: Sandy Crab",
+        "^speaker: Sandy Crab ",
+        "/#",
+        "#",
+        "^expr: surprised",
         "/#",
         "\n",
-        "^Then everything went bubbly, and I just HAD to snip everything! ",
+        "^Next thing I knew, bubbles went straight to my shell and I was challenging driftwoods to a snip-off! ",
         "#",
-        "^speaker: Sandy Crab",
+        "^speaker: Sandy Crab ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
         "done",
         {
           "again": [
-            "^The tide pools by the south rocks have the best bubbles. Click! ",
+            "^The south tide pools have the finest afternoon foam. Polite snips only! Click! ",
             "#",
-            "^speaker: Sandy Crab",
+            "^speaker: Sandy Crab ",
+            "/#",
+            "#",
+            "^expr: happy",
             "/#",
             "\n",
             "done",
@@ -15040,17 +16119,23 @@
         ],
         "nop",
         "\n",
-        "^Ribbit! The sand feels nice and cool again. Thanks, Fae! ",
+        "^Ribbit! Cool sand between my toes and zero soda bubbles in my tide pool. Five stars, Fae! ",
         "#",
-        "^speaker: Beach Frog",
+        "^speaker: Beach Frog ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
         "done",
         {
           "again": [
-            "^Ribbit! The frog hops happily around a tide pool. ",
+            "^Ribbit! The frog lounges in a shallow tide pool like a tiny green tourist on vacation. ",
             "#",
-            "^speaker: Beach Frog",
+            "^speaker: Beach Frog ",
+            "/#",
+            "#",
+            "^expr: happy",
             "/#",
             "\n",
             "done",
@@ -15060,7 +16145,7 @@
         }
       ],
       "bay_sign": [
-        "^BUBBLEGUM BAY. Fishing, splashing, and sandcastles welcome! ",
+        "^BUBBLEGUM BAY. Fishing, splashing, and ambitious sandcastles welcome! (Seagull snack treaties remain strictly unenforced.) ",
         "#",
         "^speaker: Sign",
         "/#",
@@ -15232,9 +16317,12 @@
         }
       ],
       "shells": [
-        "^Pretty shells! They sound like tiny waves when I shake them. ",
+        "^Pastel pink and cream shells! When Fae holds one to Maddie's ear, Maddie blinks solemnly at the tiny ocean roar inside. ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
         "done",
@@ -16587,21 +17675,267 @@
           ]
         }
       ],
+      "milo_foreshadow_bay": [
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "milo_beat_bay",
+          "re": true
+        },
+        "^Half-buried beside the pastel tide shells glints a bent {color:lavender}purple-fizz bottlecap{/color} tucked inside a crumpled wrapper. ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: surprised ",
+        "/#",
+        "#",
+        "^zoom: 1.09",
+        "/#",
+        "\n",
+        "^Fae smooths the damp paper open carefully. There's something faint sketched along the inside fold! ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: determined",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "has_lantern"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Under the blacklight lantern's soft violet glow, a tiny hand-drawn {color:gold}rocket{/color} and three crooked stars shimmer to life beside a scratched-out word!",
+              {
+                "->": ".^.^.^.28"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          {
+            "->": ".^.b"
+          },
+          {
+            "b": [
+              "^Catching the bright coastal sunlight, faint lilac ink reveals a tiny hand-drawn {color:gold}rocket{/color} and three stars beside a scratched-out word!",
+              {
+                "->": ".^.^.^.28"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "^ ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: surprised ",
+        "/#",
+        "#",
+        "^sound: chime-blue",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "sue_joined"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Whoa, let me see! A rocket doodle? Whoever dropped this doesn't draw like a villain, they draw like a kid from school! ",
+              "#",
+              "^speaker: Sue ",
+              "/#",
+              "#",
+              "^expr: surprised",
+              {
+                "->": ".^.^.^.44"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "^Mrrrow? Maddie pats the shiny bottlecap gently with one velvet paw and tilts her ears. ",
+        "#",
+        "^speaker: Maddie ",
+        "/#",
+        "#",
+        "^expr: worried ",
+        "/#",
+        "#",
+        "^pose: maddie sit",
+        "/#",
+        "\n",
+        "^{whisper}Why would somebody scribble out their own little rocket like that...{/whisper} I'm saving this clue in my journal. ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: worried",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "vignette_ms_coral": [
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "vignette_coral_seen",
+          "re": true
+        },
+        "^Three runaway beach balls! A flock of gulls staging an organized watermelon heist! And sunscreen straight in my left eyebrow! ",
+        "#",
+        "^speaker: Ms. Coral ",
+        "/#",
+        "#",
+        "^expr: worried ",
+        "/#",
+        "#",
+        "^zoom: 1.08",
+        "/#",
+        "\n",
+        "^Nineteen kiddos cannonballing at the same second, and I haven't had one quiet breath since sunrise! ",
+        "#",
+        "^speaker: Ms. Coral ",
+        "/#",
+        "#",
+        "^expr: determined",
+        "/#",
+        "\n",
+        "^{shake}TWEEEEET!{/shake} Wait, why does that purple soda make my whistle feel ten times louder?! NOBODY EVEN LOOKS AT THE TIDE! ",
+        "#",
+        "^speaker: Ms. Coral ",
+        "/#",
+        "#",
+        "^expr: surprised ",
+        "/#",
+        "#",
+        "^sound: chime-red",
+        "/#",
+        "\n",
+        "^Maddie puffs her orange tail to twice its normal width at the shrill whistle blast. ",
+        "#",
+        "^speaker: Maddie ",
+        "/#",
+        "#",
+        "^expr: surprised",
+        "/#",
+        "\n",
+        "^Aw, Ms. Coral works nonstop keeping the whole beach safe! That fizzy drink just cranked her lifeguard worries up to tidal-wave volume! ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: worried",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "sue_joined"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Hang in there, Ms. Coral! We'll catch every runaway beach ball until the bay feels sunny again! ",
+              "#",
+              "^speaker: Sue ",
+              "/#",
+              "#",
+              "^expr: determined",
+              {
+                "->": ".^.^.^.54"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "sue_joined"
+        },
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Don't worry, Ms. Coral! We'll help you catch your breath and save the picnic! ",
+              "#",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^expr: determined",
+              {
+                "->": ".^.^.^.62"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
       "jordan": [
         [
           "^Whoa, watch out! That hamster's gone totally fizzy! ",
           "#",
-          "^speaker: Jordan",
+          "^speaker: Jordan ",
+          "/#",
+          "#",
+          "^expr: surprised",
           "/#",
           "\n",
-          "^It keeps throwing snowballs at everyone. Even at the snowman! ",
+          "^It keeps pelting snowballs at hikers, mailboxes, and even our innocent, very polite snowman! ",
           "#",
-          "^speaker: Jordan",
+          "^speaker: Jordan ",
+          "/#",
+          "#",
+          "^expr: worried",
           "/#",
           "\n",
-          "^I'm Jordan, by the way. I've hiked every trail up here. ",
+          "^I'm Jordan, by the way. I know every switchback, shortcut, and pine tree on this mountain! ",
           "#",
-          "^speaker: Jordan",
+          "^speaker: Jordan ",
+          "/#",
+          "#",
+          "^expr: happy",
           "/#",
           "\n",
           "ev",
@@ -16625,9 +17959,15 @@
           {
             "c-0": [
               "\n",
-              "^You got it! I'll keep it busy. ",
+              "^Now you're talking! Stick with me, I'll juggle pinecones to keep its eyes busy! ",
               "#",
-              "^speaker: Jordan",
+              "^speaker: Jordan ",
+              "/#",
+              "#",
+              "^expr: determined ",
+              "/#",
+              "#",
+              "^pose: jordan cheer",
               "/#",
               "\n",
               {
@@ -16639,9 +17979,15 @@
             ],
             "c-1": [
               "\n",
-              "^Somebody in a purple hood zoomed past on a sled, laughing their head off! Let's go after them. ",
+              "^Someone in a purple hood tore right past on a sled, laughing into the wind! Let's track 'em down together! ",
               "#",
-              "^speaker: Jordan",
+              "^speaker: Jordan ",
+              "/#",
+              "#",
+              "^expr: determined ",
+              "/#",
+              "#",
+              "^pose: jordan cheer",
               "/#",
               "\n",
               {
@@ -16694,24 +18040,39 @@
         ],
         "nop",
         "\n",
-        "^Squeak! Thank you. My head feels all cozy again. ",
+        "^Squeak! Oh, thank goodness. My scarf feels warm and my paws finally stopped vibrating! ",
         "#",
-        "^speaker: Hiker Hamster",
+        "^speaker: Hiker Hamster ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
-        "^The kid in the purple hood? They ran off down a secret trail. You can only see it at night... ",
+        "^That kid in the purple hood? They darted down a hidden mountain trail you can only spot after dark... ",
         "#",
-        "^speaker: Hiker Hamster",
+        "^speaker: Hiker Hamster ",
+        "/#",
+        "#",
+        "^expr: worried",
         "/#",
         "\n",
-        "^A trail you can only see at night? ",
+        "^A hidden mountain trail that only shows up at night? ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: surprised",
         "/#",
         "\n",
-        "^Trail markers glow under blacklight! Here, Fae, take my lantern. ",
+        "^Trail blazes glow under ultraviolet light! Here, Fae, take my {color:lavender}blacklight lantern{/color}! ",
         "#",
-        "^speaker: Jordan",
+        "^speaker: Jordan ",
+        "/#",
+        "#",
+        "^expr: happy ",
+        "/#",
+        "#",
+        "^pose: jordan talk",
         "/#",
         "\n",
         "ev",
@@ -16723,20 +18084,29 @@
         },
         "^Jordan hands Fae his blacklight lantern: a big round purple lens on a rainbow handle. ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
-        "^Switch it on and look around. Fizzy tracks glow! ",
+        "^Flick it on and sweep the snowdrifts. Any fizzy trail marks will light right up! ",
         "#",
-        "^speaker: Jordan",
+        "^speaker: Jordan ",
+        "/#",
+        "#",
+        "^expr: determined",
         "/#",
         "\n",
         "done",
         {
           "again": [
-            "^Squeak! Watch out for snowballs. Hee hee. ",
+            "^Squeak! Keep your scarf tucked and watch out for friendly snowballs. Hee hee! ",
             "#",
-            "^speaker: Hiker Hamster",
+            "^speaker: Hiker Hamster ",
+            "/#",
+            "#",
+            "^expr: happy",
             "/#",
             "\n",
             "done",
@@ -16773,27 +18143,39 @@
         ],
         "nop",
         "\n",
-        "^Baa! Thank you. My hooves feel steady again. ",
+        "^Baa! Whew, my wool finally stopped fizzing like static electricity! Thank you, Fae! ",
         "#",
-        "^speaker: Clover Lamb",
+        "^speaker: Clover Lamb ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
-        "^A kid in a purple hood bounced past, and everything went fizzy! ",
+        "^A kid in a purple hood bounded past like a spring-loaded rocket, and suddenly the whole hill started buzzing! ",
         "#",
-        "^speaker: Clover Lamb",
+        "^speaker: Clover Lamb ",
+        "/#",
+        "#",
+        "^expr: surprised",
         "/#",
         "\n",
-        "^That hooded kid again! ",
+        "^That hooded kid is racing straight ahead of us... ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: determined",
         "/#",
         "\n",
         "done",
         {
           "again": [
-            "^The clover up here is extra sweet. Want some? ",
+            "^The mountain clover up here tastes extra crispy and sweet. Share a bite anytime! ",
             "#",
-            "^speaker: Clover Lamb",
+            "^speaker: Clover Lamb ",
+            "/#",
+            "#",
+            "^expr: happy",
             "/#",
             "\n",
             "done",
@@ -16830,27 +18212,39 @@
         ],
         "nop",
         "\n",
-        "^Thank you. My quills feel cozy again. ",
+        "^Oh, thank you kindly. My quills are finally back to polite, cozy posture! ",
         "#",
-        "^speaker: Meadow Hedgehog",
+        "^speaker: Meadow Hedgehog ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
-        "^A kid in a purple hood left a fizzy crumb by the meadow. ",
+        "^A kid in a purple hood dropped one sparkly crumb by the path, and I spun like a pinecone top! ",
         "#",
-        "^speaker: Meadow Hedgehog",
+        "^speaker: Meadow Hedgehog ",
+        "/#",
+        "#",
+        "^expr: worried",
         "/#",
         "\n",
-        "^A fizzy crumb? That sounds familiar. ",
+        "^Another fizzy crumb... everywhere they go, chaos spills out behind them. ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: worried",
         "/#",
         "\n",
         "done",
         {
           "again": [
-            "^My daisy is still tucked safely in my hat. ",
+            "^My little yellow daisy stayed tucked safely inside my hat the whole time! ",
             "#",
-            "^speaker: Meadow Hedgehog",
+            "^speaker: Meadow Hedgehog ",
+            "/#",
+            "#",
+            "^expr: happy",
             "/#",
             "\n",
             "done",
@@ -16892,22 +18286,31 @@
         "^speaker: Waddle Penguin",
         "/#",
         "\n",
-        "^A kid in a purple hood polished my favorite ice slide with fizzy soda. It went to my head! ",
+        "^A kid in a purple hood splashed fizzy purple soda across my favorite ice chute, and whoa, instant turbo-belly! ",
         "#",
-        "^speaker: Waddle Penguin",
+        "^speaker: Waddle Penguin ",
+        "/#",
+        "#",
+        "^expr: surprised",
         "/#",
         "\n",
-        "^Awrk-awrk! I slid all the way down the mountain without steering once! ",
+        "^Awrk-awrk! I zoomed all the way down Pinecone Pass at Mach nine without steering even once! ",
         "#",
-        "^speaker: Waddle Penguin",
+        "^speaker: Waddle Penguin ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
         "done",
         {
           "again": [
-            "^The best sledding hill is up behind the lodge. Belly down, flippers up! ",
+            "^Prime sledding slope is right behind Mrs. Flurry's lodge. Belly down, flippers proud! ",
             "#",
-            "^speaker: Waddle Penguin",
+            "^speaker: Waddle Penguin ",
+            "/#",
+            "#",
+            "^expr: happy",
             "/#",
             "\n",
             "done",
@@ -17012,9 +18415,12 @@
         }
       ],
       "snowman": [
-        "^The snowman has a carrot nose and a very serious pebble smile. ",
+        "^A dignified snowman sporting a crisp carrot nose and a profoundly serious pebble grin. Maddie inspects the carrot suspiciously, then decides snow is beneath her paws. ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
         "done",
@@ -17481,9 +18887,12 @@
         "^speaker: Fae",
         "/#",
         "\n",
-        "^Now THIS is how you warm up after a snowball fight. ",
+        "^Now THIS is peak mountain-trail hospitality. Even Maddie's whiskers are defrosting! ",
         "#",
-        "^speaker: Jordan",
+        "^speaker: Jordan ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
         "done",
@@ -17598,9 +19007,12 @@
         null
       ],
       "lodge_hamster": [
-        "^A little wooden house by the fire. Inside, a round hamster is curled up fast asleep. ",
+        "^A tiny cedar house tucked right beside the hearth, stuffed with fleece scraps and warm pine shavings. ",
         "#",
-        "^speaker: Fae",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
         "^That must be Biscuit! He's snoring tiny squeaks. ",
@@ -19502,22 +20914,31 @@
         ],
         "nop",
         "\n",
-        "^Squeak-squeak! My ears were buzzing like crazy from that purple fizz! ",
+        "^Squeak-squeak! My sonar was bouncing off every stalactite in surround sound from that purple fizz! ",
         "#",
-        "^speaker: Cozy Bat",
+        "^speaker: Cozy Bat ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
-        "^Now I can hear the crystal chimes singing again. Thank you, Fae! ",
+        "^Now I can hear the crystal chimes humming in tune again. You're a true friend, Fae! ",
         "#",
-        "^speaker: Cozy Bat",
+        "^speaker: Cozy Bat ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
         "done",
         {
           "again": [
-            "^Squeak! This cavern is the coziest nap spot on the whole mountain. ",
+            "^Squeak! Best upside-down nap acoustics on the entire mountain. Ten out of ten! ",
             "#",
-            "^speaker: Cozy Bat",
+            "^speaker: Cozy Bat ",
+            "/#",
+            "#",
+            "^expr: happy",
             "/#",
             "\n",
             "done",
@@ -19554,22 +20975,31 @@
         ],
         "nop",
         "\n",
-        "^Sniffle-squeak! Thank goodness that purple dust cleared off my goggles! ",
+        "^Sniffle-squeak! Bless you for clearing that purple sparkle-dust off my digging goggles! ",
         "#",
-        "^speaker: Gem Mole",
+        "^speaker: Gem Mole ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
-        "^I was digging for sparkly quartz and bumped right into a fizzy puddle. You're the nicest! ",
+        "^I was tunneling for pink quartz and nose-dived straight into a fizzy puddle. Thank you kindly! ",
         "#",
-        "^speaker: Gem Mole",
+        "^speaker: Gem Mole ",
+        "/#",
+        "#",
+        "^expr: happy",
         "/#",
         "\n",
         "done",
         {
           "again": [
-            "^Sniffle! Every crystal in this grotto is shining extra bright today. ",
+            "^Sniffle! Every crystal cluster in this grotto is twinkling like lantern light today. ",
             "#",
-            "^speaker: Gem Mole",
+            "^speaker: Gem Mole ",
+            "/#",
+            "#",
+            "^expr: happy",
             "/#",
             "\n",
             "done",
@@ -19577,6 +21007,216 @@
           ],
           "#f": 1
         }
+      ],
+      "milo_foreshadow_pass": [
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "milo_beat_pass",
+          "re": true
+        },
+        "^The snowy ridge falls quiet for three soft heartbeats. From behind the frosted pines drifts a shy, familiar melody... ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: surprised ",
+        "/#",
+        "#",
+        "^zoom: 1.08",
+        "/#",
+        "\n",
+        "^A soft, shy hum drifts right through the frosted pine needles: \"{wave}Da-da-da-DUM... da-da-da-DUM...{/wave}\" ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: surprised ",
+        "/#",
+        "#",
+        "^sound: flute-blue",
+        "/#",
+        "\n",
+        "^Wait... freeze! That soft four-note hum! I've heard somebody hum that exact rocket-countdown tune back at school! ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: surprised ",
+        "/#",
+        "#",
+        "^pose: shock",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "jordan_joined"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Look right there by the pine trunks! Small sneaker tracks paused beside the lodge window, like they wanted to warm up, then bolted! ",
+              "#",
+              "^speaker: Jordan ",
+              "/#",
+              "#",
+              "^expr: worried",
+              {
+                "->": ".^.^.^.41"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "^Mrrrow...? Maddie's ears droop sympathetically as a pine bough shakes loose a curtain of fresh powder. ",
+        "#",
+        "^speaker: Maddie ",
+        "/#",
+        "#",
+        "^expr: worried",
+        "/#",
+        "\n",
+        "^By the time Fae steps around the drift, the snow has folded softly over the trail and the footprints have vanished without a sound. ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: worried",
+        "/#",
+        "\n",
+        "^{whisper}Whoever's out here in the cold... they didn't sound like a troublemaker at all. They sounded lonely.{/whisper} ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: worried",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "vignette_mrs_flurry": [
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "vignette_flurry_seen",
+          "re": true
+        },
+        "^Biscuit slipped out before dawn, forty-seven damp mittens are dripping, and three kettles are whistling at once! ",
+        "#",
+        "^speaker: Mrs. Flurry ",
+        "/#",
+        "#",
+        "^expr: worried ",
+        "/#",
+        "#",
+        "^zoom: 1.08",
+        "/#",
+        "\n",
+        "^And I STILL cannot find the mate to this tiny woolen sock! If {shake}ONE MORE{/shake} snowy boot tracks slush across my freshly mopped porch... ",
+        "#",
+        "^speaker: Mrs. Flurry ",
+        "/#",
+        "#",
+        "^expr: determined",
+        "/#",
+        "\n",
+        "^Oh dear, one sip of that purple soda and my mittens feel like snowball cannons! {pop}NOBODY STEPS ON MY PORCH!{/pop} ",
+        "#",
+        "^speaker: Mrs. Flurry ",
+        "/#",
+        "#",
+        "^expr: surprised ",
+        "/#",
+        "#",
+        "^sound: chime-red",
+        "/#",
+        "\n",
+        "^Maddie ducks bravely behind Fae's ankles as a rogue snowflake lands right on her nose. ",
+        "#",
+        "^speaker: Maddie ",
+        "/#",
+        "#",
+        "^expr: surprised",
+        "/#",
+        "\n",
+        "^Aw, Mrs. Flurry was out searching the freezing woods for her little hamster and juggling the whole lodge alone! ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^expr: worried",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "jordan_joined"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ We already calmed Biscuit, Mrs. Flurry! Let's catch these snowballs and get you back inside by the warm fire! ",
+              "#",
+              "^speaker: Jordan ",
+              "/#",
+              "#",
+              "^expr: determined",
+              {
+                "->": ".^.^.^.54"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "jordan_joined"
+        },
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Hang in there, Mrs. Flurry! Biscuit's safe, and we're going to help you thaw out! ",
+              "#",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^expr: determined",
+              {
+                "->": ".^.^.^.62"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "done",
+        null
       ],
       "old_trail_closed": [
         "^The pines are quiet and snowy. The old trail only appears under the lantern's glow. ",
@@ -54680,6 +56320,50 @@
         false,
         {
           "VAR=": "valley_spice_done"
+        },
+        false,
+        {
+          "VAR=": "milo_beat_school"
+        },
+        false,
+        {
+          "VAR=": "milo_beat_plaza"
+        },
+        false,
+        {
+          "VAR=": "milo_beat_bay"
+        },
+        false,
+        {
+          "VAR=": "milo_beat_pass"
+        },
+        false,
+        {
+          "VAR=": "milo_beat_loft"
+        },
+        false,
+        {
+          "VAR=": "vignette_flurry_seen"
+        },
+        false,
+        {
+          "VAR=": "vignette_rowan_seen"
+        },
+        false,
+        {
+          "VAR=": "vignette_bell_seen"
+        },
+        false,
+        {
+          "VAR=": "vignette_coral_seen"
+        },
+        false,
+        {
+          "VAR=": "vignette_pip_seen"
+        },
+        false,
+        {
+          "VAR=": "vignette_mateo_seen"
         },
         "/ev",
         "end",

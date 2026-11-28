@@ -1,6 +1,12 @@
 import type { Area } from "../core";
 import { isArcadeGameId } from "../core/arcade";
-import { runInk, storyHasKnot, type InkFacts } from "../core/ink";
+import {
+  inkVariable,
+  runInk,
+  setInkVariables,
+  storyHasKnot,
+  type InkFacts,
+} from "../core/ink";
 import { isStorySound } from "../core/sound";
 import { field, record } from "./parsers";
 
@@ -210,6 +216,261 @@ export function miloSecrecyErrors(
     }
     walk(knot, ink, 0);
   }
+  return errors;
+}
+
+export type MiloForeshadowBeatSpec = {
+  readonly id: string;
+  readonly area: string;
+  readonly knot: string;
+  readonly variable: string;
+  readonly cutsceneId: string;
+  readonly mode: "classmate" | "clue";
+};
+
+export const MILO_FORESHADOW_BEATS: readonly MiloForeshadowBeatSpec[] = [
+  {
+    id: "school",
+    area: "classroom",
+    knot: "milo_foreshadow_school",
+    variable: "milo_beat_school",
+    cutsceneId: "milo-school-sketch",
+    mode: "classmate",
+  },
+  {
+    id: "plaza",
+    area: "plaza",
+    knot: "milo_foreshadow_plaza",
+    variable: "milo_beat_plaza",
+    cutsceneId: "milo-plaza-raccoon",
+    mode: "classmate",
+  },
+  {
+    id: "bay",
+    area: "bay",
+    knot: "milo_foreshadow_bay",
+    variable: "milo_beat_bay",
+    cutsceneId: "milo-bay-wrapper",
+    mode: "clue",
+  },
+  {
+    id: "pass",
+    area: "pass",
+    knot: "milo_foreshadow_pass",
+    variable: "milo_beat_pass",
+    cutsceneId: "milo-pass-melody",
+    mode: "clue",
+  },
+  {
+    id: "loft",
+    area: "milo-house",
+    knot: "milo_foreshadow_loft",
+    variable: "milo_beat_loft",
+    cutsceneId: "milo-loft-sketch",
+    mode: "clue",
+  },
+];
+
+export type MinibossVignetteSpec = {
+  readonly id: string;
+  readonly bossId: string;
+  readonly area: string;
+  readonly knot: string;
+  readonly variable: string;
+  readonly cutsceneId: string;
+};
+
+export const MINIBOSS_VIGNETTES: readonly MinibossVignetteSpec[] = [
+  {
+    id: "mrs-flurry",
+    bossId: "lodge-keeper",
+    area: "pass",
+    knot: "vignette_mrs_flurry",
+    variable: "vignette_flurry_seen",
+    cutsceneId: "miniboss-mrs-flurry",
+  },
+  {
+    id: "ms-rowan",
+    bossId: "art-teacher",
+    area: "east-hall",
+    knot: "vignette_ms_rowan",
+    variable: "vignette_rowan_seen",
+    cutsceneId: "miniboss-ms-rowan",
+  },
+  {
+    id: "mr-bell",
+    bossId: "principal",
+    area: "school",
+    knot: "vignette_mr_bell",
+    variable: "vignette_bell_seen",
+    cutsceneId: "miniboss-mr-bell",
+  },
+  {
+    id: "ms-coral",
+    bossId: "lifeguard",
+    area: "bay",
+    knot: "vignette_ms_coral",
+    variable: "vignette_coral_seen",
+    cutsceneId: "miniboss-ms-coral",
+  },
+  {
+    id: "mr-pip",
+    bossId: "arcade-keeper",
+    area: "arcade",
+    knot: "vignette_mr_pip",
+    variable: "vignette_pip_seen",
+    cutsceneId: "miniboss-mr-pip",
+  },
+  {
+    id: "chef-mateo",
+    bossId: "taco-chef",
+    area: "hills",
+    knot: "vignette_chef_mateo",
+    variable: "vignette_mateo_seen",
+    cutsceneId: "miniboss-chef-mateo",
+  },
+];
+
+const CULPRIT_SPOILER_RE = new RegExp(
+  [
+    "\\bpurple\\s+hood\\b",
+    "\\bhooded\\s+kid\\b",
+    "\\bculprit\\b",
+    "\\bfizz(?:y|ing)?\\b",
+    "\\bsoda\\b",
+    "\\bmystic\\s+pond\\b",
+    "\\bchaos\\s+spell\\b",
+    "\\bthe\\s+boss\\b",
+  ].join("|"),
+  "i",
+);
+const LOFT_SPOILER_RE = /\bhood(?:ed)?\b|\bfizz(?:y|ing)?\b|Mystic Pond/i;
+
+type BranchSummary = {
+  readonly path: string;
+  readonly lines: readonly string[];
+  readonly choices: readonly string[];
+  readonly endInk: string;
+};
+
+function collectKnotBranches(
+  story: Record<string, unknown>,
+  ink: string,
+  knot: string,
+  facts?: InkFacts,
+): BranchSummary[] {
+  const branches: BranchSummary[] = [];
+  const start = runInk(story, ink, { type: "start", knot }, facts);
+  const walk = (
+    current: ReturnType<typeof runInk>,
+    path: string,
+    lines: string[],
+    choices: string[],
+    step: number,
+  ): void => {
+    const nextLines = current.line === null ? lines : [...lines, current.line.text];
+    const nextChoices = current.choices.length === 0 ? choices : [...choices, ...current.choices];
+    if (current.ended || step > 80) {
+      branches.push({ path, lines: nextLines, choices: nextChoices, endInk: current.ink });
+      return;
+    }
+    if (current.choices.length > 0) {
+      current.choices.forEach((_, index) => {
+        const picked = runInk(story, current.ink, { type: "choose", index }, facts);
+        walk(picked, `${path}[${index}]`, nextLines, nextChoices, step + 1);
+      });
+      return;
+    }
+    const next = runInk(story, current.ink, { type: "next" }, facts);
+    walk(next, path, nextLines, nextChoices, step + 1);
+  };
+  walk(start, knot, [], [], 0);
+  return branches;
+}
+
+/**
+ * Verifies Elevation Track E10's 5 Milo foreshadowing beats, 5 subtle journal
+ * clues, and 6 empathetic mini-boss pre-battle stress vignettes:
+ * - every variable starts false and flips true across all knot branches,
+ * - classmate beats contain zero culprit-spoiler terms,
+ * - clue beats, journal clues, and mini-boss vignettes never name Milo early.
+ */
+export function miloArcIntegrityErrors(
+  story: Record<string, unknown>,
+  ink: string,
+  facts?: InkFacts,
+): string[] {
+  const errors: string[] = [];
+
+  for (const beat of MILO_FORESHADOW_BEATS) {
+    if (inkVariable(story, ink, beat.variable) !== false) {
+      errors.push(`${beat.id}: variable ${beat.variable} must start false`);
+    }
+    if (!storyHasKnot(story, beat.knot)) {
+      errors.push(`${beat.id}: missing knot ${beat.knot}`);
+      continue;
+    }
+    const branches = collectKnotBranches(story, ink, beat.knot, facts);
+    for (const branch of branches) {
+      if (branch.lines.length === 0) {
+        errors.push(`${branch.path}: emitted zero dialogue lines`);
+      }
+      if (inkVariable(story, branch.endInk, beat.variable) !== true) {
+        errors.push(`${branch.path}: did not set ${beat.variable} = true`);
+      }
+      const allText = [...branch.lines, ...branch.choices].join(" ");
+      if (beat.mode === "classmate" && CULPRIT_SPOILER_RE.test(allText)) {
+        errors.push(`${branch.path}: classmate beat leaked culprit spoiler in "${allText}"`);
+      }
+      if (beat.id === "loft" && LOFT_SPOILER_RE.test(allText)) {
+        errors.push(`${branch.path}: loft beat leaked hood/fizz/pond spoiler`);
+      }
+    }
+    if (beat.mode === "clue") {
+      errors.push(...miloSecrecyErrors(story, ink, [beat.knot], facts));
+    }
+  }
+
+  const allCluesInk = setInkVariables(ink, {
+    milo_beat_school: true,
+    milo_beat_plaza: true,
+    milo_beat_bay: true,
+    milo_beat_pass: true,
+    milo_beat_loft: true,
+    milo_revealed: false,
+  });
+  errors.push(...miloSecrecyErrors(story, allCluesInk, ["journal"], facts));
+  const journalBranches = collectKnotBranches(story, allCluesInk, "journal", facts);
+  const quietClues = (journalBranches[0]?.lines ?? []).filter((line) =>
+    line.startsWith("Quiet Clue:"),
+  );
+  if (quietClues.length !== MILO_FORESHADOW_BEATS.length) {
+    errors.push(
+      `journal: expected ${MILO_FORESHADOW_BEATS.length} Quiet Clue entries, ` +
+        `found ${quietClues.length}`,
+    );
+  }
+
+  for (const vignette of MINIBOSS_VIGNETTES) {
+    if (inkVariable(story, ink, vignette.variable) !== false) {
+      errors.push(`${vignette.id}: variable ${vignette.variable} must start false`);
+    }
+    if (!storyHasKnot(story, vignette.knot)) {
+      errors.push(`${vignette.id}: missing knot ${vignette.knot}`);
+      continue;
+    }
+    const branches = collectKnotBranches(story, ink, vignette.knot, facts);
+    for (const branch of branches) {
+      if (branch.lines.length === 0) {
+        errors.push(`${branch.path}: emitted zero dialogue lines`);
+      }
+      if (inkVariable(story, branch.endInk, vignette.variable) !== true) {
+        errors.push(`${branch.path}: did not set ${vignette.variable} = true`);
+      }
+    }
+    errors.push(...miloSecrecyErrors(story, ink, [vignette.knot], facts));
+  }
+
   return errors;
 }
 

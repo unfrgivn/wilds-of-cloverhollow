@@ -1,0 +1,111 @@
+{
+  "id": "milo-school-sketch",
+  "area": "classroom",
+  "trigger": {
+    "kind": "after-knot",
+    "area": "classroom",
+    "knot": "art_wall",
+    "forbidsVariable": "milo_revealed",
+    "once": true
+  },
+  "steps": [
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "cameraPan",
+          "to": "actor:npc:milo",
+          "ticks": 30,
+          "zoom": 1.08
+        },
+        {
+          "type": "face",
+          "actor": "fae",
+          "direction": "right"
+        },
+        {
+          "type": "face",
+          "actor": "party:0",
+          "direction": "right"
+        },
+        {
+          "type": "emote",
+          "actor": "npc:milo",
+          "kind": "note",
+          "ticks": 28
+        },
+        {
+          "type": "sfx",
+          "cue": "flute-blue"
+        }
+      ]
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "face",
+          "actor": "npc:milo",
+          "direction": "left"
+        },
+        {
+          "type": "pose",
+          "actor": "npc:milo",
+          "pose": "hop",
+          "ticks": 18
+        },
+        {
+          "type": "emote",
+          "actor": "npc:milo",
+          "kind": "exclaim",
+          "ticks": 22
+        },
+        {
+          "type": "emote",
+          "actor": "party:0",
+          "kind": "heart",
+          "ticks": 26
+        }
+      ]
+    },
+    {
+      "type": "sayKnot",
+      "knot": "milo_foreshadow_school"
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "pose",
+          "actor": "npc:milo",
+          "pose": "wave",
+          "ticks": 22
+        },
+        {
+          "type": "emote",
+          "actor": "npc:milo",
+          "kind": "worry",
+          "ticks": 24
+        },
+        {
+          "type": "emote",
+          "actor": "fae",
+          "kind": "heart",
+          "ticks": 26
+        }
+      ]
+    },
+    {
+      "type": "setFlag",
+      "flag": "milo_school_sketch_seen",
+      "value": true,
+      "scope": "cutscene"
+    },
+    {
+      "type": "cameraPan",
+      "to": "fae",
+      "ticks": 26,
+      "zoom": 1
+    }
+  ]
+}

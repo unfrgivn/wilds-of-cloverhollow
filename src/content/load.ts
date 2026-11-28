@@ -191,10 +191,7 @@ import pondPupData from "../../content/party/pond-pup.json";
 import acornSquirrelData from "../../content/party/acorn-squirrel.json";
 import ribbonBunnyData from "../../content/party/ribbon-bunny.json";
 import landsData from "../../content/lands.json";
-import dawnWakeupCutsceneData from "../../content/cutscenes/dawn-wakeup.json";
-import plazaHoodCutsceneData from "../../content/cutscenes/plaza-hood-sighting.json";
-import sueBayCutsceneData from "../../content/cutscenes/sue-bay-intro.json";
-import jordanPassCutsceneData from "../../content/cutscenes/jordan-pass-intro.json";
+import { CUTSCENE_FILES } from "./cutscene-manifest";
 import { createInkState, createStoryReader } from "../core/ink";
 import { parsePropCatalogue, propRuleErrors } from "./props";
 import { field } from "./parsers";
@@ -568,12 +565,8 @@ export function loadContent(options?: {
     areas, characters, party, story,
     storyVariable: (name: string) => storyVariable(initialInk, name),
   };
-  const cutsceneFiles: [unknown, string][] = [
-    [dawnWakeupCutsceneData, "dawn-wakeup"], [plazaHoodCutsceneData, "plaza-hood-sighting"],
-    [sueBayCutsceneData, "sue-bay-intro"], [jordanPassCutsceneData, "jordan-pass-intro"],
-  ];
   const cutscenes: Record<string, CutsceneScript> = {};
-  for (const [data, name] of cutsceneFiles) {
+  for (const [data, name] of CUTSCENE_FILES) {
     const parsed = parseCutscene(data, `content/cutscenes/${name}.json`, cutsceneCtx);
     cutscenes[parsed.id] = parsed;
   }

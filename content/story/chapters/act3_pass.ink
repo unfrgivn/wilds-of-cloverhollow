@@ -1,57 +1,57 @@
 === jordan ===
-Whoa, watch out! That hamster's gone totally fizzy! # speaker: Jordan
-It keeps throwing snowballs at everyone. Even at the snowman! # speaker: Jordan
-I'm Jordan, by the way. I've hiked every trail up here. # speaker: Jordan
+Whoa, watch out! That hamster's gone totally fizzy! # speaker: Jordan # expr: surprised
+It keeps pelting snowballs at hikers, mailboxes, and even our innocent, very polite snowman! # speaker: Jordan # expr: worried
+I'm Jordan, by the way. I know every switchback, shortcut, and pine tree on this mountain! # speaker: Jordan # expr: happy
 * [Let's calm it down together!]
-    You got it! I'll keep it busy. # speaker: Jordan
+    Now you're talking! Stick with me, I'll juggle pinecones to keep its eyes busy! # speaker: Jordan # expr: determined # pose: jordan cheer
 * [Did a kid in a purple hood come by?]
-    Somebody in a purple hood zoomed past on a sled, laughing their head off! Let's go after them. # speaker: Jordan
+    Someone in a purple hood tore right past on a sled, laughing into the wind! Let's track 'em down together! # speaker: Jordan # expr: determined # pose: jordan cheer
 - ~ jordan_joined = true
 -> DONE
 
 === hamster_calm ===
 {hamster_calm > 1: -> again}
-Squeak! Thank you. My head feels all cozy again. # speaker: Hiker Hamster
-The kid in the purple hood? They ran off down a secret trail. You can only see it at night... # speaker: Hiker Hamster
-A trail you can only see at night? # speaker: Fae
-Trail markers glow under blacklight! Here, Fae, take my lantern. # speaker: Jordan
+Squeak! Oh, thank goodness. My scarf feels warm and my paws finally stopped vibrating! # speaker: Hiker Hamster # expr: happy
+That kid in the purple hood? They darted down a hidden mountain trail you can only spot after dark... # speaker: Hiker Hamster # expr: worried
+A hidden mountain trail that only shows up at night? # speaker: Fae # expr: surprised
+Trail blazes glow under ultraviolet light! Here, Fae, take my \{color:lavender\}blacklight lantern\{/color\}! # speaker: Jordan # expr: happy # pose: jordan talk
 ~ has_lantern = true
-Jordan hands Fae his blacklight lantern: a big round purple lens on a rainbow handle. # speaker: Fae
-Switch it on and look around. Fizzy tracks glow! # speaker: Jordan
+Jordan hands Fae his blacklight lantern: a big round purple lens on a rainbow handle. # speaker: Fae # expr: happy
+Flick it on and sweep the snowdrifts. Any fizzy trail marks will light right up! # speaker: Jordan # expr: determined
 -> DONE
 
 = again
-Squeak! Watch out for snowballs. Hee hee. # speaker: Hiker Hamster
+Squeak! Keep your scarf tucked and watch out for friendly snowballs. Hee hee! # speaker: Hiker Hamster # expr: happy
 -> DONE
 
 === lamb_calm ===
 {lamb_calm > 1: -> again}
-Baa! Thank you. My hooves feel steady again. # speaker: Clover Lamb
-A kid in a purple hood bounced past, and everything went fizzy! # speaker: Clover Lamb
-That hooded kid again! # speaker: Fae
+Baa! Whew, my wool finally stopped fizzing like static electricity! Thank you, Fae! # speaker: Clover Lamb # expr: happy
+A kid in a purple hood bounded past like a spring-loaded rocket, and suddenly the whole hill started buzzing! # speaker: Clover Lamb # expr: surprised
+That hooded kid is racing straight ahead of us... # speaker: Fae # expr: determined
 -> DONE
 = again
-The clover up here is extra sweet. Want some? # speaker: Clover Lamb
+The mountain clover up here tastes extra crispy and sweet. Share a bite anytime! # speaker: Clover Lamb # expr: happy
 -> DONE
 
 === hedgehog_calm ===
 {hedgehog_calm > 1: -> again}
-Thank you. My quills feel cozy again. # speaker: Meadow Hedgehog
-A kid in a purple hood left a fizzy crumb by the meadow. # speaker: Meadow Hedgehog
-A fizzy crumb? That sounds familiar. # speaker: Fae
+Oh, thank you kindly. My quills are finally back to polite, cozy posture! # speaker: Meadow Hedgehog # expr: happy
+A kid in a purple hood dropped one sparkly crumb by the path, and I spun like a pinecone top! # speaker: Meadow Hedgehog # expr: worried
+Another fizzy crumb... everywhere they go, chaos spills out behind them. # speaker: Fae # expr: worried
 -> DONE
 = again
-My daisy is still tucked safely in my hat. # speaker: Meadow Hedgehog
+My little yellow daisy stayed tucked safely inside my hat the whole time! # speaker: Meadow Hedgehog # expr: happy
 -> DONE
 
 === penguin_calm ===
 {penguin_calm > 1: -> again}
 Awrk! My flippers feel warm and cozy again. # speaker: Waddle Penguin
-A kid in a purple hood polished my favorite ice slide with fizzy soda. It went to my head! # speaker: Waddle Penguin
-Awrk-awrk! I slid all the way down the mountain without steering once! # speaker: Waddle Penguin
+A kid in a purple hood splashed fizzy purple soda across my favorite ice chute, and whoa, instant turbo-belly! # speaker: Waddle Penguin # expr: surprised
+Awrk-awrk! I zoomed all the way down Pinecone Pass at Mach nine without steering even once! # speaker: Waddle Penguin # expr: happy
 -> DONE
 = again
-The best sledding hill is up behind the lodge. Belly down, flippers up! # speaker: Waddle Penguin
+Prime sledding slope is right behind Mrs. Flurry's lodge. Belly down, flippers proud! # speaker: Waddle Penguin # expr: happy
 -> DONE
 
 === lift_note ===
@@ -71,7 +71,7 @@ The glowing arrow still points west, toward the Whispering Woods. # speaker: Fae
 -> DONE
 
 === snowman ===
-The snowman has a carrot nose and a very serious pebble smile. # speaker: Fae
+A dignified snowman sporting a crisp carrot nose and a profoundly serious pebble grin. Maddie inspects the carrot suspiciously, then decides snow is beneath her paws. # speaker: Fae # expr: happy
 -> DONE
 
 === cocoa_stand ===
@@ -140,7 +140,7 @@ A dizzy penguin keeps belly-sliding loops on the north slope, past the ski lift.
 
 === lodge_fire ===
 The fire crackles and pops. Fae holds her hands out to it. Toasty! # speaker: Fae
-Now THIS is how you warm up after a snowball fight. # speaker: Jordan
+Now THIS is peak mountain-trail hospitality. Even Maddie's whiskers are defrosting! # speaker: Jordan # expr: happy
 -> DONE
 
 === lodge_cocoa ===
@@ -162,7 +162,7 @@ There's a little paper plane doodled in the corner. # speaker: Fae
 -> DONE
 
 === lodge_hamster ===
-A little wooden house by the fire. Inside, a round hamster is curled up fast asleep. # speaker: Fae
+A tiny cedar house tucked right beside the hearth, stuffed with fleece scraps and warm pine shavings. # speaker: Fae # expr: happy
 That must be Biscuit! He's snoring tiny squeaks. # speaker: Fae
 -> DONE
 
@@ -387,18 +387,43 @@ The crystal spring shimmers calm and clear. Nothing else glints on the sandy bot
 
 === bat_calm ===
 {bat_calm > 1: -> again}
-Squeak-squeak! My ears were buzzing like crazy from that purple fizz! # speaker: Cozy Bat
-Now I can hear the crystal chimes singing again. Thank you, Fae! # speaker: Cozy Bat
+Squeak-squeak! My sonar was bouncing off every stalactite in surround sound from that purple fizz! # speaker: Cozy Bat # expr: happy
+Now I can hear the crystal chimes humming in tune again. You're a true friend, Fae! # speaker: Cozy Bat # expr: happy
 -> DONE
 = again
-Squeak! This cavern is the coziest nap spot on the whole mountain. # speaker: Cozy Bat
+Squeak! Best upside-down nap acoustics on the entire mountain. Ten out of ten! # speaker: Cozy Bat # expr: happy
 -> DONE
 
 === crystal_mole_calm ===
 {crystal_mole_calm > 1: -> again}
-Sniffle-squeak! Thank goodness that purple dust cleared off my goggles! # speaker: Gem Mole
-I was digging for sparkly quartz and bumped right into a fizzy puddle. You're the nicest! # speaker: Gem Mole
+Sniffle-squeak! Bless you for clearing that purple sparkle-dust off my digging goggles! # speaker: Gem Mole # expr: happy
+I was tunneling for pink quartz and nose-dived straight into a fizzy puddle. Thank you kindly! # speaker: Gem Mole # expr: happy
 -> DONE
 = again
-Sniffle! Every crystal in this grotto is shining extra bright today. # speaker: Gem Mole
+Sniffle! Every crystal cluster in this grotto is twinkling like lantern light today. # speaker: Gem Mole # expr: happy
+-> DONE
+
+// Elevation Track E10: Milo Foreshadowing Beat 4 (Pinecone Pass / Lodge).
+// Strict §1.2 secrecy: ZERO Milo name! Echoes the four-note countdown hum from Beat 1.
+=== milo_foreshadow_pass ===
+~ milo_beat_pass = true
+The snowy ridge falls quiet for three soft heartbeats. From behind the frosted pines drifts a shy, familiar melody... # speaker: Fae # expr: surprised # zoom: 1.08
+A soft, shy hum drifts right through the frosted pine needles: "\{wave\}Da-da-da-DUM... da-da-da-DUM...\{/wave\}" # speaker: Fae # expr: surprised # sound: flute-blue
+Wait... freeze! That soft four-note hum! I've heard somebody hum that exact rocket-countdown tune back at school! # speaker: Fae # expr: surprised # pose: shock
+{jordan_joined: Look right there by the pine trunks! Small sneaker tracks paused beside the lodge window, like they wanted to warm up, then bolted! # speaker: Jordan # expr: worried}
+Mrrrow...? Maddie's ears droop sympathetically as a pine bough shakes loose a curtain of fresh powder. # speaker: Maddie # expr: worried
+By the time Fae steps around the drift, the snow has folded softly over the trail and the footprints have vanished without a sound. # speaker: Fae # expr: worried
+\{whisper\}Whoever's out here in the cold... they didn't sound like a troublemaker at all. They sounded lonely.\{/whisper\} # speaker: Fae # expr: worried
+-> DONE
+
+// Elevation Track E10: Empathetic Mini-Boss Pre-Battle Stress Vignette 1 (Mrs. Flurry).
+=== vignette_mrs_flurry ===
+~ vignette_flurry_seen = true
+Biscuit slipped out before dawn, forty-seven damp mittens are dripping, and three kettles are whistling at once! # speaker: Mrs. Flurry # expr: worried # zoom: 1.08
+And I STILL cannot find the mate to this tiny woolen sock! If \{shake\}ONE MORE\{/shake\} snowy boot tracks slush across my freshly mopped porch... # speaker: Mrs. Flurry # expr: determined
+Oh dear, one sip of that purple soda and my mittens feel like snowball cannons! \{pop\}NOBODY STEPS ON MY PORCH!\{/pop\} # speaker: Mrs. Flurry # expr: surprised # sound: chime-red
+Maddie ducks bravely behind Fae's ankles as a rogue snowflake lands right on her nose. # speaker: Maddie # expr: surprised
+Aw, Mrs. Flurry was out searching the freezing woods for her little hamster and juggling the whole lodge alone! # speaker: Fae # expr: worried
+{jordan_joined: We already calmed Biscuit, Mrs. Flurry! Let's catch these snowballs and get you back inside by the warm fire! # speaker: Jordan # expr: determined}
+{not jordan_joined: Hang in there, Mrs. Flurry! Biscuit's safe, and we're going to help you thaw out! # speaker: Fae # expr: determined}
 -> DONE

@@ -259,3 +259,18 @@ VAR valley_spice_salt = false
 VAR valley_spice_pine = false
 VAR valley_spice_mint = false
 VAR valley_spice_done = false
+
+// Elevation Track E10: 5 Milo Foreshadowing Beats (strict §1.2 pre-finale secrecy).
+VAR milo_beat_school = false
+VAR milo_beat_plaza = false
+VAR milo_beat_bay = false
+VAR milo_beat_pass = false
+VAR milo_beat_loft = false
+
+// Elevation Track E10: 6 Empathetic Mini-Boss Pre-Battle Stress Vignettes.
+VAR vignette_flurry_seen = false
+VAR vignette_rowan_seen = false
+VAR vignette_bell_seen = false
+VAR vignette_coral_seen = false
+VAR vignette_pip_seen = false
+VAR vignette_mateo_seen = false

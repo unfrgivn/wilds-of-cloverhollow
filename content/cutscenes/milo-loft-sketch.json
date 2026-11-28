@@ -1,0 +1,86 @@
+{
+  "id": "milo-loft-sketch",
+  "area": "milo-house",
+  "trigger": {
+    "kind": "after-knot",
+    "area": "milo-house",
+    "knot": "milo_comics",
+    "forbidsVariable": "milo_revealed",
+    "once": true
+  },
+  "steps": [
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "cameraPan",
+          "to": {
+            "x": 960,
+            "y": 502
+          },
+          "ticks": 28,
+          "zoom": 1.09
+        },
+        {
+          "type": "sfx",
+          "cue": "chime-blue"
+        },
+        {
+          "type": "face",
+          "actor": "fae",
+          "direction": "right"
+        },
+        {
+          "type": "face",
+          "actor": "party:0",
+          "direction": "right"
+        },
+        {
+          "type": "emote",
+          "actor": "fae",
+          "kind": "question",
+          "ticks": 24
+        },
+        {
+          "type": "emote",
+          "actor": "party:0",
+          "kind": "worry",
+          "ticks": 26
+        }
+      ]
+    },
+    {
+      "type": "sayKnot",
+      "knot": "milo_foreshadow_loft"
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "emote",
+          "actor": "fae",
+          "kind": "heart",
+          "ticks": 26
+        },
+        {
+          "type": "emote",
+          "actor": "party:0",
+          "kind": "heart",
+          "ticks": 26
+        }
+      ]
+    },
+    {
+      "type": "setFlag",
+      "flag": "milo_loft_sketch_seen",
+      "value": true,
+      "scope": "cutscene"
+    },
+    {
+      "type": "cameraPan",
+      "to": "fae",
+      "ticks": 26,
+      "zoom": 1
+    }
+  ]
+}

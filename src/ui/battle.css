@@ -18,6 +18,8 @@
 .battle-check-tap[hidden],
 .battle-reward[hidden],
 .battle-peek-card[hidden],
+.battle-peek-intent[hidden],
+.battle-peek-phase2[hidden],
 .battle-calm[hidden],
 .battle-foes[hidden],
 .battle-foe-soothed[hidden],
@@ -1905,11 +1907,21 @@
 .battle-peek-badge.is-check {
   background: #e4f1f7;
 }
+.battle-peek-badge.battle-peek-phase2 {
+  background: #ede0ff;
+  white-space: normal;
+}
 .battle-peek-row {
   display: grid;
   grid-template-columns: 64px minmax(0, 1fr);
   align-items: center;
   gap: 8px;
+}
+.battle-peek-intent-text {
+  color: var(--sticker-ink);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.25;
 }
 .battle-peek-label {
   color: var(--sticker-ink);
@@ -1981,7 +1993,8 @@
   .battle-peek-label {
     font-size: 10px;
   }
-  .battle-peek-hint {
+  .battle-peek-hint,
+  .battle-peek-intent-text {
     font-size: 10.5px;
     line-height: 1.2;
   }

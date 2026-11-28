@@ -1,4 +1,6 @@
 import type { CheckSpec, Critter, State, World } from "../core";
+import { adaptHintForInputMode } from "./battle-checks-helpers";
+import type { HudInputMode } from "./hud-hints";
 
 export type CheckKind = CheckSpec["kind"];
 
@@ -14,6 +16,16 @@ export type BattlePeekData = {
   favouriteTreats: readonly string[];
   knownFeelings: readonly string[] | null;
   tip: string;
+  intentNote?: string | null;
+  phase2Note?: string | null;
+};
+
+export type BattlePeekOptions = {
+  inputMode?: HudInputMode;
+  intentLabel?: string | null;
+  intentDetail?: string | null;
+  phase2Title?: string | null;
+  phase2Rhythm?: string | null;
 };
 
 /** Exhaustive human-readable mechanic label for every battle check kind. */
@@ -87,9 +99,20 @@ function peekTip(critter: Critter): string {
 export function battlePeekData(
   world: Pick<World, "areas" | "battle" | "critters" | "lands" | "storyVariable" | "treats">,
   state: Pick<State, "area" | "battle" | "calms" | "ink" | "stickers">,
+  options?: BattlePeekOptions,
 ): BattlePeekData | null {
   if (state.battle === null) return null;
-  const critter = world.critters[state.battle.critterId];
+  const foes = state.battle.foes;
+  let activeCritterId = state.battle.critterId;
+  if (foes !== undefined && foes.length > 0) {
+    const chosen = foes[state.battle.targetIndex ?? 0];
+    const targeted =
+      chosen !== undefined && !chosen.soothed
+        ? chosen
+        : (foes.find((foe) => !foe.soothed) ?? chosen);
+    if (targeted !== undefined) activeCritterId = targeted.critterId;
+  }
+  const critter = world.critters[activeCritterId];
   if (critter === undefined) return null;
 
   const area = world.areas[state.area];
@@ -127,6 +150,24 @@ export function battlePeekData(
     ? critter.feelings.map((id) => world.battle.feelings[id].label)
     : null;
 
+  const intentLabel = options?.intentLabel ?? null;
+  const intentDetail = options?.intentDetail ?? null;
+  const intentNote =
+    intentLabel !== null && intentLabel !== ""
+      ? intentDetail !== null && intentDetail !== ""
+        ? `${intentLabel} — ${intentDetail}`
+        : intentLabel
+      : null;
+
+  const phase2Title = options?.phase2Title ?? null;
+  const phase2Rhythm = options?.phase2Rhythm ?? null;
+  const phase2Note =
+    phase2Title !== null && phase2Title !== ""
+      ? phase2Rhythm !== null && phase2Rhythm !== ""
+        ? `Phase 2 · ${phase2Title} (${phase2Rhythm})`
+        : `Phase 2 · ${phase2Title}`
+      : null;
+
   return {
     critterId: critter.id,
     name: critter.name,
@@ -138,6 +179,8 @@ export function battlePeekData(
     checkLabel: checkMechanicLabel(critter.burst.check.kind),
     favouriteTreats,
     knownFeelings,
-    tip: peekTip(critter),
+    tip: adaptHintForInputMode(peekTip(critter), options?.inputMode ?? "keyboard"),
+    intentNote,
+    phase2Note,
   };
 }

@@ -4,6 +4,7 @@ import { feelingMarkup, heartMarkup, icon } from "./icons";
 import type { FeelingId } from "../core";
 
 export {
+  createBattlePeekCard,
   createBossIntentSticker,
   createFoeFormationHud,
   createPhase2Banner,

@@ -830,6 +830,14 @@ export function buildBattleHudView(params: BattleHudViewParams): BattleHudView {
           intent: resolveIntent(foe.intent),
         }))
       : undefined;
+  const bossIntent = bossPhase2 === null ? null : resolveIntent(battle?.intent);
+  const targetedFoe =
+    multiFoes === undefined
+      ? undefined
+      : (multiFoes.find((foe) => foe.targeted && !foe.soothed) ??
+        multiFoes.find((foe) => !foe.soothed) ??
+        multiFoes[0]);
+  const peekIntent = targetedFoe !== undefined ? targetedFoe.intent : bossIntent;
   return {
     visible: showBattleHud,
     energy: battle?.energy ?? 0,
@@ -846,7 +854,15 @@ export function buildBattleHudView(params: BattleHudViewParams): BattleHudView {
     popupSnapshot,
     canPeek,
     peekOpen,
-    peek: peekOpen ? battlePeekData(world, state) : null,
+    peek: peekOpen
+      ? battlePeekData(world, state, {
+          inputMode: params.inputMode,
+          intentLabel: peekIntent?.label ?? null,
+          intentDetail: peekIntent?.detail ?? null,
+          phase2Title: bossPhase2?.phaseTitle ?? null,
+          phase2Rhythm: bossPhase2?.rhythmLabel ?? null,
+        })
+      : null,
     inputMode: params.inputMode,
     ...(multiFoes === undefined ? {} : { foes: multiFoes }),
     bossPhase2: bossPhase2 === null
@@ -859,7 +875,7 @@ export function buildBattleHudView(params: BattleHudViewParams): BattleHudView {
           accentHex: bossPhase2.accentHex,
           rhythmLabel: bossPhase2.rhythmLabel,
         },
-    bossIntent: bossPhase2 === null ? null : resolveIntent(battle?.intent),
+    bossIntent,
   };
 }
 

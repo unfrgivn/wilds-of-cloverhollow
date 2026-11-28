@@ -9821,6 +9821,42 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
 - Gates: `just check`, `just build` (`< 360 kB` every non-vendor chunk),
   `just ios-device-build` (`Release-iphoneos/App.app`), 13/13 Chromium & WebKit
   banner/record e2e, and 99/99 Chromium `ui-gallery` tests.
+
+## Milestone 232: Multi-Foe Target-Aware Battle Field Guide Peek (`targetIndex`, Telegraphed Enemy Intent, Boss Phase-2 Note & Gamepad Tip Adaptation) + `atmosphere-rooms.ts` Modular Split (Elevation Track E19S) **Status:** ✅ Completed (2026-11-28)
+- Multi-Foe Target-Aware, Intent-Aware & Gamepad-Adapted Battle Field Guide Peek
+  (`src/ui/battle-peek.ts`, `src/ui/battle-foes.ts`, `src/ui/battle-overlays.ts`,
+  `src/ui/battle.ts`, `src/ui/battle.css`, `src/shell/view-models.ts`):
+  - Resolves `state.battle.foes[state.battle.targetIndex ?? 0]` (falling back to
+    the first un-soothed foe or `state.battle.critterId`) inside DOM-free
+    `battlePeekData(world, state, options?)` so switching targets in 2–3 critter
+    formations immediately updates every Field Guide Peek field.
+  - Adds optional `intentNote` (`<label> — <detail>` / `<label>`) and
+    `phase2Note` (`Phase 2 · <title> (<rhythm>)` / `Phase 2 · <title>`) to
+    `BattlePeekData`, wired from `buildBattleHudView` using the targeted multi-foe
+    intent (or `bossIntent` during Boss Phase 2) and `bossPhase2`, keeping
+    single-foe Turn 1 Peek cards visually identical.
+  - Adapts Peek tactical tips through `adaptHintForInputMode` (`"confirm"` ->
+    `"A"` on `"gamepad"`, byte-identical on keyboard).
+  - Extracts `createBattlePeekCard` (with `.battle-peek-intent` `NEXT MOVE` row
+    and `.battle-peek-phase2` badge, strictly `hidden` when absent) into
+    `src/ui/battle-foes.ts`, slimming `src/ui/battle.ts` from `687` to `586`
+    lines.
+- Modular `src/render/atmosphere-rooms.ts` extraction
+  (`src/render/atmosphere-indoor.ts` `636 -> 336` lines,
+  `src/render/atmosphere-rooms.ts` `303` lines):
+  - Extracts Pixi-free, DOM-free home, cottage, cabin, and `INDOOR_SUNLIT` room
+    atmosphere recipes (`sue-cottage`, `jordan-cabin`, `milo-house`,
+    `rosie-cottage`, and sunlit school/clubhouse rooms) into
+    `src/render/atmosphere-rooms.ts` (`evaluateRoomAtmosphere`), re-exported
+    identically through `src/render/atmosphere-indoor.ts` with zero visual diffs.
+- Evidence: `tests/unit/milestone-232.test.ts` and
+  `tests/e2e/milestone-232.spec.ts` (`@smoke`, Chromium & WebKit).
+- Gates: `just check` (300 unit files / 2,135 tests, all 77 recorded + 7
+  headless sims with zero hash shifts, 23 QA packs, purity, lint), `just build`
+  (largest non-vendor production chunk `index` `< 365 kB`, hook leak + runtime
+  story + harness checks green), Chromium & WebKit (`milestone-232`,
+  `milestone-231`, `milestone-113`, `milestone-115`, `milestone-223`), and 3/3
+  Chromium (`e7-multifoe-combos`).
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

@@ -1,4 +1,5 @@
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
+import type { BattlePeekData } from "./battle-peek";
 import { element, setAttribute, setText } from "./dom";
 import type { EnemyIntentKind } from "../core";
 
@@ -204,5 +205,160 @@ export function createBossIntentSticker(calmSection: HTMLElement): {
   calmSection.append(slot.root);
   return {
     render: (intent) => syncIntentSticker(slot, intent),
+  };
+}
+
+/**
+ * Compact warm-paper Battle Field Guide Peek card (spec 8.1, Milestones 110 & 231).
+ * Shows active targeted foe metadata, optional live Next Move intent row, optional
+ * Boss Phase-2 badge, feelings/treats, and input-adapted tactical tip.
+ */
+export function createBattlePeekCard(root: HTMLElement): {
+  render: (peek: BattlePeekData | null, battleVisible: boolean) => void;
+  onClose: (callback: () => void) => void;
+} {
+  let closeHandler: () => void = () => undefined;
+  const peekCard = element("section", "battle-peek-card");
+  peekCard.tabIndex = -1;
+  peekCard.setAttribute("role", "region");
+  peekCard.setAttribute("aria-label", "Critter field guide");
+  peekCard.hidden = true;
+
+  const peekHead = element("div", "battle-peek-head");
+  const peekTitleRow = element("div", "battle-peek-title-row");
+  const peekName = element("span", "battle-peek-name");
+  const peekLevel = element("span", "battle-peek-level");
+  const peekFam = element("span", "battle-peek-fam");
+  peekTitleRow.append(peekName, peekLevel, peekFam);
+  const peekClose = element("button", "battle-peek-close");
+  peekClose.type = "button";
+  peekClose.textContent = "×";
+  peekClose.setAttribute("aria-label", "Close critter field guide");
+  peekClose.addEventListener("click", () => closeHandler());
+  peekHead.append(peekTitleRow, peekClose);
+
+  const peekMeta = element("div", "battle-peek-meta");
+  const peekLand = element("span", "battle-peek-badge is-land");
+  const peekCheck = element("span", "battle-peek-badge is-check");
+  const peekPhase2 = element("span", "battle-peek-badge battle-peek-phase2");
+  peekPhase2.hidden = true;
+  peekMeta.append(peekLand, peekCheck, peekPhase2);
+
+  const peekIntentRow = element("div", "battle-peek-row battle-peek-intent");
+  peekIntentRow.hidden = true;
+  const peekIntentLabel = element("span", "battle-peek-label");
+  peekIntentLabel.textContent = "NEXT MOVE";
+  const peekIntentBody = element("div", "battle-peek-body");
+  const peekIntentText = element("span", "battle-peek-intent-text");
+  peekIntentBody.append(peekIntentText);
+  peekIntentRow.append(peekIntentLabel, peekIntentBody);
+
+  const peekFeelingsRow = element("div", "battle-peek-row");
+  const peekFeelingsLabel = element("span", "battle-peek-label");
+  peekFeelingsLabel.textContent = "Feelings";
+  const peekFeelingsBody = element("div", "battle-peek-body");
+  peekFeelingsRow.append(peekFeelingsLabel, peekFeelingsBody);
+
+  const peekTreatsRow = element("div", "battle-peek-row");
+  const peekTreatsLabel = element("span", "battle-peek-label");
+  peekTreatsLabel.textContent = "Treats";
+  const peekTreatsBody = element("div", "battle-peek-body");
+  peekTreatsRow.append(peekTreatsLabel, peekTreatsBody);
+
+  const peekTip = element("div", "battle-peek-tip");
+  peekCard.append(
+    peekHead,
+    peekMeta,
+    peekIntentRow,
+    peekFeelingsRow,
+    peekTreatsRow,
+    peekTip,
+  );
+  root.append(peekCard);
+
+  let lastPeekSig = "";
+  let prevPeekOpen = false;
+  let peekReturnFocusEl: HTMLElement | null = null;
+
+  return {
+    onClose: (callback) => {
+      closeHandler = callback;
+    },
+    render: (peek, battleVisible) => {
+      const nextPeekOpen = peek !== null;
+      peekCard.hidden = !nextPeekOpen;
+      if (nextPeekOpen && !prevPeekOpen) {
+        peekReturnFocusEl =
+          document.activeElement instanceof HTMLElement ? document.activeElement : null;
+        peekCard.focus({ preventScroll: true });
+      } else if (!nextPeekOpen && prevPeekOpen) {
+        const returnTarget = peekReturnFocusEl;
+        peekReturnFocusEl = null;
+        if (
+          battleVisible &&
+          returnTarget !== null &&
+          returnTarget.isConnected &&
+          returnTarget.closest("[hidden]") === null
+        ) {
+          returnTarget.focus({ preventScroll: true });
+        }
+      }
+      prevPeekOpen = nextPeekOpen;
+      if (peek === null) return;
+      const intentNote = peek.intentNote ?? null;
+      const phase2Note = peek.phase2Note ?? null;
+      const sig = [
+        peek.critterId,
+        peek.name,
+        peek.level,
+        peek.landName,
+        peek.familiarity,
+        peek.familiarityLabel,
+        peek.checkLabel,
+        peek.favouriteTreats.join(","),
+        peek.knownFeelings === null ? "hidden" : peek.knownFeelings.join(","),
+        peek.tip,
+        intentNote ?? "",
+        phase2Note ?? "",
+      ].join("|");
+      if (sig === lastPeekSig) return;
+      lastPeekSig = sig;
+      setAttribute(peekCard, "data-critter", peek.critterId);
+      setText(peekName, peek.name);
+      setText(peekLevel, `Lv ${peek.level}`);
+      setText(peekFam, peek.familiarityLabel);
+      setAttribute(peekFam, "data-familiarity", peek.familiarity);
+      setText(peekLand, peek.landName);
+      setText(peekCheck, peek.checkLabel);
+      peekPhase2.hidden = phase2Note === null;
+      if (phase2Note !== null) setText(peekPhase2, phase2Note);
+      peekIntentRow.hidden = intentNote === null;
+      if (intentNote !== null) setText(peekIntentText, intentNote);
+      if (peek.knownFeelings !== null && peek.knownFeelings.length > 0) {
+        const pills = peek.knownFeelings.map((feelingLabel) => {
+          const pill = element("span", "battle-peek-feeling");
+          pill.textContent = feelingLabel;
+          return pill;
+        });
+        peekFeelingsBody.replaceChildren(...pills);
+      } else {
+        const hint = element("span", "battle-peek-hint");
+        hint.textContent = "Calm once or carry the lantern to spot feelings.";
+        peekFeelingsBody.replaceChildren(hint);
+      }
+      if (peek.favouriteTreats.length > 0) {
+        const pills = peek.favouriteTreats.map((treatName) => {
+          const pill = element("span", "battle-peek-treat");
+          pill.textContent = `♥ Fav: ${treatName}`;
+          return pill;
+        });
+        peekTreatsBody.replaceChildren(...pills);
+      } else {
+        const hint = element("span", "battle-peek-hint");
+        hint.textContent = "Try treats in battle to discover favourites!";
+        peekTreatsBody.replaceChildren(hint);
+      }
+      setText(peekTip, peek.tip);
+    },
   };
 }

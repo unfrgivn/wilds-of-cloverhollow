@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 231)
+Last updated: 2026-11-28 (Milestone 232)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -951,7 +951,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   `src/render/atmosphere-biomes.ts` (`pass`, `summit`, `mist`, `enchanted`, and
   `cavern` wilds biome recipes re-exported identically through
   `atmosphere-outdoor.ts`, Milestone 218 / Track E19K),
-  `src/render/atmosphere-indoor.ts`, and the `< 120`-line dispatcher barrel
+  `src/render/atmosphere-indoor.ts`, `src/render/atmosphere-rooms.ts`
+  (`sue-cottage`, `jordan-cabin`, `milo-house`, `rosie-cottage`, and
+  `INDOOR_SUNLIT` room recipes re-exported identically through
+  `atmosphere-indoor.ts`, Milestone 232 / Track E19S), and the `< 120`-line
+  dispatcher barrel
   `src/render/atmosphere-recipes.ts`, re-exported from `atmosphere.ts`,
   Milestones 118 and 136; zero `Math.random()`) adds per-biome water glints, lamp pools, drifting
   petals/pollen, snow and lodge chimney smoke, sunbeams, lavender mist, fairy
@@ -4403,26 +4407,38 @@ trunks keep its two exits.
   lavender `#ede0ff`, over the critter on `bossPhase2: false -> true`,
   Milestone 200 / Track E19B).
 - **Battle Field Guide Peek** (Milestone 110, gamepad parity Milestone 114,
-  `src/ui/battle-peek.ts`,
-  `src/ui/battle.ts`, `src/main.ts`): during live battle `command` phase
-  (outside Talk and QA overlays), pressing `I`, gamepad Select (standard button
-  8), or clicking/tapping the top-right
+  multi-foe target/intent/Phase-2 & gamepad tip adaptation Milestone 232 /
+  Track E19S, `src/ui/battle-peek.ts`, `src/ui/battle-foes.ts`,
+  `src/ui/battle.ts`, `src/shell/view-models.ts`, `src/main.ts`): during live
+  battle `command` phase (outside Talk and QA overlays), pressing `I`, gamepad
+  Select (standard button 8), or clicking/tapping the top-right
   foe plate (`.battle-calm`, styled identically at rest so existing battle
   baselines stay unchanged) toggles a compact warm-paper `.battle-peek-card`
-  (`role="region"`, `aria-label="Critter field guide"`, `tabindex="-1"`, `hidden`
-  by default, `z-index: var(--z-prompt)`, `#fbf6e8` card with `#47321f`
-  dark-ink text and pills; opening moves focus to `.battle-peek-card` without
-  altering its 2 px ink outline and closing restores focus to the prior
-  connected, visible trigger element when battle remains active, Milestone
-  152). It shows critter name, level, familiarity (`New Friend` /
-  `Befriended ✓` / `Old Friend ★` using `state.calms[species]` and
-  `world.battle.oldFriends.calms`), region name, check mechanic badge
-  (`checkMechanicLabel`, exhaustive over all 8 `CheckSpec["kind"]` values),
-  known feelings (revealed after calming once or carrying the lantern, else a
-  gentle hint), discovered favourite treats (revealed only after calming once so
-  undiscovered favourites are never spoiled), and a concise `<= 72`-char
-  tactical tip tailored to Talk, Peekaboo, Echo Chimes, wind-ups, or burst check
-  kind. Pressing `Escape`, `X` (`KeyX`), touch `×`, or gamepad B (button 1)
+  (`createBattlePeekCard` in `src/ui/battle-foes.ts`, `role="region"`,
+  `aria-label="Critter field guide"`, `tabindex="-1"`, `hidden` by default,
+  `z-index: var(--z-prompt)`, `#fbf6e8` card with `#47321f` dark-ink text and
+  pills; opening moves focus to `.battle-peek-card` without altering its 2 px
+  ink outline and closing restores focus to the prior connected, visible trigger
+  element when battle remains active, Milestone 152). In multi-foe formations
+  (`state.battle.foes`), `battlePeekData(world, state, options?)` resolves the
+  currently targeted un-soothed foe (`state.battle.foes[targetIndex ?? 0]`,
+  falling back to the first un-soothed foe or `state.battle.critterId`) so
+  switching targets updates every card field immediately. It shows critter name,
+  level, familiarity (`New Friend` / `Befriended ✓` / `Old Friend ★` using
+  `state.calms[species]` and `world.battle.oldFriends.calms`), region name,
+  check mechanic badge (`checkMechanicLabel`, exhaustive over all `CheckSpec["kind"]`
+  values), optional Boss Phase-2 badge (`.battle-peek-phase2`, formatted as
+  `Phase 2 · <title> (<rhythm>)`), optional live `NEXT MOVE` telegraphed intent
+  row (`.battle-peek-intent`, fed from the active targeted multi-foe intent or
+  `bossIntent` during Boss Phase 2 and strictly `hidden` when absent so
+  single-foe Turn 1 Peek cards stay visually identical), known feelings
+  (revealed after calming once or carrying the lantern, else a gentle hint),
+  discovered favourite treats (revealed only after calming once so undiscovered
+  favourites are never spoiled), and a concise `<= 72`-char tactical tip
+  tailored to Talk, Peekaboo, Echo Chimes, wind-ups, or burst check kind and
+  adapted for Steam Deck / Gamepad via `adaptHintForInputMode` (`"confirm"` ->
+  `"A"` on gamepad while keeping keyboard byte-identical). Pressing `Escape`,
+  `X` (`KeyX`), touch `×`, or gamepad B (button 1)
   dismisses only the peek card (swallowing `cancel` and returning early from
   `tick` in `src/main.ts` so `stepBattle` never receives a leaked `cancel` press
   such as launching `Together!` or backing out of the treat tray, Milestone

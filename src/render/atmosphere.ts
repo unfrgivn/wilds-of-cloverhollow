@@ -2,6 +2,7 @@ import { Container, Sprite } from "pixi.js";
 import type { VfxTextures } from "./vfx-textures";
 import {
   evaluateAtmosphere,
+  resolveStoryAtmosphereOptions,
   type AtmosphereBlend,
   type AtmosphereLayer,
   type AtmosphereOptions,
@@ -11,6 +12,7 @@ import {
 
 export {
   evaluateAtmosphere,
+  resolveStoryAtmosphereOptions,
   type AtmosphereBlend,
   type AtmosphereLayer,
   type AtmosphereOptions,

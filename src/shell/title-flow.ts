@@ -1,4 +1,10 @@
-import { journalProgress, type ActionFrame, type State, type World } from "../core";
+import {
+  journalProgress,
+  valleyCompletion,
+  type ActionFrame,
+  type State,
+  type World,
+} from "../core";
 import type { CompanionAudioEffect } from "../platform/audio";
 import type { TitleChoiceId } from "../ui/title";
 
@@ -87,12 +93,16 @@ export function titleFlow(
   return { mode, selected: picked, action: null };
 }
 
-// The line under Continue: where Fae is, sticker count, and up to two highlights.
+// The line under Continue: where Fae is, sticker count, and up to two highlights,
+// or the 100% Valley Explorer crown once every valley collectible is complete.
 export function continueDetail(world: World, state: State): string {
   const area = world.areas[state.area]?.name ?? state.area;
+  const progress = journalProgress(world, state);
+  if (valleyCompletion(progress).complete) {
+    return `${area} · ★ 100% Valley Explorer`;
+  }
   const count = state.stickers.length;
   const parts = [`${area} · ${count} sticker${count === 1 ? "" : "s"}`];
-  const progress = journalProgress(world, state);
   const highlights: string[] = [];
   if (progress.gems.owned > 0) {
     highlights.push(`${progress.gems.owned}/${progress.gems.total} gems`);

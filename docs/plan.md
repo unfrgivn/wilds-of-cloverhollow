@@ -7217,6 +7217,27 @@ the old trail, the owl, and the clubhouse claim.
   Chromium + WebKit e2e verification (`release-playtest`, `milestone-158`,
   `bus`, `qa`; 0 failed, 0 snapshot diffs).
 
+## Milestone 168: Title Screen 100% Valley Explorer Crown & 13-Keepsake Specimen Browser / QA Console Verification **Status:** ✅ Completed (2026-11-27)
+- Celebrates 100% valley completion directly on the Title Screen's `Continue`
+  sticker and verifies 13-keepsake Specimen Browser & unified QA GUI sync —
+  zero `src/core` changes, zero save-version bumps, zero replay hash drift
+  across all 74 sims, and zero visual baseline diffs.
+- Title Screen 100% Valley Explorer crown (`src/shell/title-flow.ts`):
+  - Updated `continueDetail(world, state)` to show
+    `${area} · ★ 100% Valley Explorer` when `valleyCompletion(progress).complete`
+    holds (all 63 valley collectibles), keeping all non-100% saves byte-identical.
+- 13-keepsake Specimen Browser & unified QA GUI verification:
+  - Verified `KEEPSAKE_VARIABLES` / `readQaCheatSnapshot` live sync across all
+    12 story variables and keyboard `ArrowRight` Specimen Browser navigation
+    across all 4 expansion keepsakes (`loft-sketch`, `aurora-rubbing`,
+    `shell-shard`, `festival-ribbon`).
+- Evidence: `tests/unit/milestone-168.test.ts`,
+  `tests/e2e/milestone-168.spec.ts` (`@smoke` Chromium + WebKit), and review
+  capture `art/review/m166-title-master-1280.jpg` independently verified via
+  `vision`.
+- Gates: `just check`, `just build` (`< 400 kB` every non-vendor chunk), and
+  82/82 targeted Chromium & WebKit e2e tests.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

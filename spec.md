@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 166)
+Last updated: 2026-11-27 (Milestone 168)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -673,7 +673,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   overworld critters (scaling slightly as characters
   bounce or hover); a deterministic `BiomeAtmosphere` (`src/render/atmosphere.ts`,
   with pure stateless zero-Pixi particle recipes modularized across
-  `src/render/atmosphere-shared.ts`, `src/render/atmosphere-outdoor.ts`,
+  `src/render/atmosphere-shared.ts`,
+  `src/render/atmosphere-outdoor.ts`,
   `src/render/atmosphere-indoor.ts`, and the `< 120`-line dispatcher barrel
   `src/render/atmosphere-recipes.ts`, re-exported from `atmosphere.ts`,
   Milestones 118 and 136; zero `Math.random()`) adds per-biome water glints, lamp pools, drifting
@@ -2671,7 +2672,10 @@ trunks keep its two exits.
   `"1 sticker"`, `"2 stickers"`), followed by up to two non-zero adventure
   highlights from `journalProgress` in order (`"<found>/<total> gems"`,
   `"<n> keepsake(s)"`, `"<n> fish"`), separated by `" · "` (Milestone 111;
-  unchanged when all three are zero).
+  unchanged when all three are zero). Once `valleyCompletion(progress).complete`
+  is true (all 63 valley collectibles across stickers, prizes, fish, keepsakes,
+  and gems), `continueDetail` crowns the save as
+  `"<area> · ★ 100% Valley Explorer"` (Milestone 168).
 - Dev builds log `[cloverhollow] title {mode, options}` (the visible buttons'
   rects, CSS px) when the mode changes; `just ios-smoke` taps New game from
   them on a fresh install and Continue after the relaunch.

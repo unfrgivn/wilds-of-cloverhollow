@@ -3,6 +3,7 @@ import { evaluateOutdoorAtmosphere } from "./atmosphere-outdoor";
 import {
   addFloatingMotes,
   areaSeed,
+  resolveStoryAtmosphereOptions,
   SUNLIT_MOTE_TINTS,
   type AtmosphereBlend,
   type AtmosphereLayer,
@@ -12,6 +13,7 @@ import {
 } from "./atmosphere-shared";
 
 export {
+  resolveStoryAtmosphereOptions,
   type AtmosphereBlend,
   type AtmosphereLayer,
   type AtmosphereOptions,

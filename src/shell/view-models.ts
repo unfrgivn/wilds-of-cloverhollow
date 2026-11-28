@@ -33,6 +33,7 @@ import {
   countDecorCustomizations,
   countEncoreTrophies,
   countSolvedPuzzles,
+  evaluateMeritRibbons,
 } from "../core/ribbons";
 import type { AudioLevel } from "../platform/audio-settings";
 import type { MinigameRecords } from "../platform/minigame-records";
@@ -864,8 +865,10 @@ export function buildCreditsView(
   world: World,
   state: State,
   art: AtlasFrameResolver,
+  records?: MinigameRecords,
 ): CreditsView {
   const visible = state.finale === "credits";
+  const ribbons = visible ? evaluateMeritRibbons(world, state, records) : null;
   return {
     visible,
     entries: visible
@@ -877,7 +880,12 @@ export function buildCreditsView(
           };
         })
       : [],
-    summary: visible ? creditsSummary(world, state) : [],
+    summary: visible
+      ? creditsSummary(world, state, {
+          ribbonsEarned: ribbons?.earned,
+          ribbonsTotal: ribbons?.total,
+        })
+      : [],
     postcard: visible ? DEFAULT_ENDING_POSTCARD : null,
   };
 }

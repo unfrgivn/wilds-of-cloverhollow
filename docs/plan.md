@@ -8954,6 +8954,34 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   (largest non-vendor chunk `< 380 kB`, hook leak + runtime story + harness
   checks green), and Chromium & WebKit e2e verification (`milestone-204`,
   `milestone-203`, `soundtrack` 12/12).
+
+## Milestone 205: Enriched Ending Credits Journey Summary (Heart-to-Hearts, Boss Encore & 16/16 Ribbons) & `vision`-Audited Overworld Visual Baseline Sync **Status:** ✅ Completed (2026-11-28)
+- Celebrates Fae's Elevation Master Roadmap accomplishments directly on the
+  Illustrated Ending Postcard Credits spread and refreshes all 22
+  `vision`-audited post-Elevation overworld snapshots across `bay`, `park`,
+  `cafe`, `plaza-shops`, `sanctuary`, and `plaza` — zero `src/core/sim.ts`
+  changes, zero save-version bumps, zero replay hash drift across all 77 sims,
+  and zero `ending.spec` / `ui-gallery` regressions.
+- Enriched Ending Credits Journey Summary (`src/core/journal.ts`,
+  `src/shell/view-models.ts`, `src/main.ts`):
+  - Extended `creditsSummary(world, state, options?)` (100% backwards-compatible
+    with 2-arg callers) to append `${h2h}/6 Hearts`, `${trophies}/9 Encore`, and
+    golden `★ 16/16 Ribbons!` pills strictly when earned, leaving default ending
+    saves pixel-identical.
+  - Wired `evaluateMeritRibbons(world, state, records)` into `buildCreditsView`
+    with live `minigameRecords.records()` from `src/main.ts`.
+- Vision-audited overworld baseline sync:
+  - Verified all 22 rendered frames via `vision` across `bay.spec.ts` (5),
+    `cafe.spec.ts` (4), `park.spec.ts` (2), `plaza-shops.spec.ts` (6),
+    `plaza.spec.ts` (1), and `sanctuary.spec.ts` (4, including M191 Dream Memory
+    Shrine prop) reflecting M179 restoration decals, M181 paper grain, M184
+    expressive poses, M185 storybook dialogue, and PR `#14` battle staging.
+- Evidence: `tests/unit/milestone-205.test.ts` (28 targeted unit tests across
+  `milestone-205`, `milestone-105`, `milestone-120`, and `e12-finale`).
+- Gates: `just check` (275 unit files / 2,044 tests, all 77 sims + all sim
+  scripts, 23 QA packs, purity, lint), `just build` (`index` `375.45 kB < 500 kB`),
+  12/12 overworld e2e, 2/2 Chromium & WebKit `ending.spec`, and 99/99 Chromium
+  `ui-gallery` tests.
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

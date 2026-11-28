@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 204)
+Last updated: 2026-11-28 (Milestone 205)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -3339,7 +3339,12 @@ trunks keep its two exits.
   category among Stickers, Star Gems, Fish, Keepsakes, and Prizes, hidden when
   empty; when `valleyCompletion` reaches 100% across all five collections,
   `creditsSummary` prepends a golden `.credits-summary-pill.is-master` pill
-  `\"★ 100% Valley Explorer!\"`, Milestone 120), and \"Thank you for playing!\";
+  `\"★ 100% Valley Explorer!\"`, Milestone 120; Milestone 204 appends Elevation
+  celebration pills only when earned: `\"N/6 Hearts\"` when at least one
+  Heart-to-Heart is completed, `\"N/9 Encore\"` when at least one Boss Encore
+  Star Trophy is earned, and a golden `.credits-summary-pill.is-master` pill
+  `\"★ 16/16 Ribbons!\"` when all 16 Valley Merit Ribbons are stitched via
+  `buildCreditsView` / `evaluateMeritRibbons`), and \"Thank you for playing!\";
   right cast column: FRIENDS and MET ALONG THE WAY, from `creditEntries`
   (`src/core/credits.ts`)). Below 1000 px, the sheet stacks cleanly in single
   column (`hero -> cast -> footer`). FRIENDS is each roster member who

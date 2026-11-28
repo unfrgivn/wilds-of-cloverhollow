@@ -558,7 +558,7 @@ async function boot(): Promise<void> {
     encoreShrine?.render(state, inputMode, touchActive);
     decorPicker.render(!titleOrQaOpen && !gate.qaConsoleOpen && !gate.qaBlocked &&
       state.cutscene === undefined && !(encoreShrine?.isOpen() ?? false));
-    credits.render(buildCreditsView(content.world, state, assets));
+    credits.render(buildCreditsView(content.world, state, assets, minigameRecords.records()));
     devLog?.logTitle(titleMode);
     syncOpenFlag("title", titleMode !== null); syncOpenFlag("credits", creditsOpen);
     syncOpenFlag("battle", activeBattle); syncOpenFlag("cutscene", state.cutscene !== undefined);

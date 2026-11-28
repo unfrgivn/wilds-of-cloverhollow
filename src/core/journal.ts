@@ -1,3 +1,4 @@
+import { heartToHeartSummary } from "./heart-to-hearts";
 import { runInk } from "./ink";
 import { inkFacts } from "./sim";
 import type { FeelingId, State, World } from "./types";
@@ -828,10 +829,17 @@ export function valleyCompletion(progress: JournalProgress): ValleyCompletion {
   return { owned, total, percent, complete };
 }
 
+export type CreditsSummaryOptions = {
+  ribbonsEarned?: number;
+  ribbonsTotal?: number;
+};
+
 /** Compact journey progress pills for the credits screen, omitting zero categories. */
 export function creditsSummary(
-  world: Pick<World, "stickers" | "arcade" | "storyVariable">,
-  state: Pick<State, "stickers" | "prizes" | "caughtFish" | "ink">,
+  world: Pick<World, "stickers" | "arcade" | "storyVariable"> & Partial<Pick<World, "encore">>,
+  state: Pick<State, "stickers" | "prizes" | "caughtFish" | "ink"> &
+    Partial<Pick<State, "encore" | "party" | "finale" | "decor" | "puzzles">>,
+  options?: CreditsSummaryOptions,
 ): string[] {
   const progress = journalProgress(world, state);
   const pills: string[] = [];
@@ -852,6 +860,31 @@ export function creditsSummary(
   }
   if (progress.prizes.owned > 0) {
     pills.push(`${progress.prizes.owned}/${progress.prizes.total} Prizes`);
+  }
+  const h2h = heartToHeartSummary(world, {
+    ink: state.ink,
+    stickers: state.stickers,
+    party: state.party ?? [],
+    finale: state.finale ?? null,
+  });
+  if (h2h.completed > 0) {
+    pills.push(`${h2h.completed}/${h2h.total} Hearts`);
+  }
+  const encoreTrophies = new Set(state.encore?.trophies ?? []).size;
+  if (encoreTrophies > 0) {
+    const encoreTotal =
+      world.encore !== undefined && world.encore.bosses.length > 0
+        ? world.encore.bosses.length
+        : 9;
+    pills.push(`${encoreTrophies}/${encoreTotal} Encore`);
+  }
+  if (
+    options?.ribbonsEarned !== undefined &&
+    options.ribbonsTotal !== undefined &&
+    options.ribbonsTotal > 0 &&
+    options.ribbonsEarned >= options.ribbonsTotal
+  ) {
+    pills.push(`★ ${options.ribbonsEarned}/${options.ribbonsTotal} Ribbons!`);
   }
   return pills;
 }

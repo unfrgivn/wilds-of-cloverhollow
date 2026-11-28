@@ -7548,6 +7548,31 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   Motion / 44 px touch audit, `< 500 kB` chunk audit, full Chromium/WebKit e2e,
   and `just ios-smoke` release pass.
 
+## Milestone 175: Tick-Resilient `battle-depth` & `lasso-jukebox` Repair (`kid-lasso-windup`) & Post-PR `#14` Baseline Sync **Status:** ✅ Completed (2026-11-27)
+- Completes tick-resilient replay discovery across the remaining hardcoded
+  battle-replay specs (`battle-depth.spec.ts` & `lasso-jukebox.spec.ts`) via
+  `bunFindReplayTick` (`tools/sim/find-tick.ts`) and refreshes the remaining 21
+  `vision`-verified PR `#13`/`#14` visual baselines (`battle-depth`,
+  `battle-scene`, `gems-bunny`) so all 6 affected Chromium & WebKit specs return
+  to 100% green — zero `src/` production code changes and zero replay hash drift
+  across all 74 sims.
+- Tick-resilient replay discovery (`tools/sim/find-tick.ts`,
+  `tests/e2e/helpers.ts`, `tests/e2e/battle-depth.spec.ts`,
+  `tests/e2e/lasso-jukebox.spec.ts`):
+  - Added `"kid-lasso-windup"` query to `tools/sim/find-tick.ts` &
+    `ReplayTickQuery`.
+  - Replaced hardcoded ticks (`21531`, `27294`) in `battle-depth.spec.ts` and
+    `lasso-jukebox.spec.ts` with `bunFindReplayTick(...)`.
+- Vision-audited baseline sync:
+  - Refreshed 21 verified Chromium & WebKit PNGs under
+    `battle-depth.spec.ts-snapshots/` (10), `battle-scene.spec.ts-snapshots/`
+    (3), and `gems-bunny.spec.ts-snapshots/` (8).
+- Evidence: `tests/unit/milestone-175.test.ts` and 28/28 Chromium & WebKit e2e
+  pass across `battle-depth`, `lasso-jukebox`, `milestone-158`, `battle-scene`,
+  `battle`, and `gems-bunny`.
+- Gates: `just check`, `just build` (`< 410 kB` every non-vendor chunk), and
+  28/28 Chromium & WebKit battle/replay e2e tests.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

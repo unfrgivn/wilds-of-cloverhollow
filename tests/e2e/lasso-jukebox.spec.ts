@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import type { MusicDebugInfo } from "../../src/platform/audio";
 import {
+  bunFindReplayTick,
   longFlowTimeout,
   openHarness,
   queueScript,
@@ -13,10 +14,8 @@ import {
 
 test.describe.configure({ timeout: longFlowTimeout });
 
-const fluteScript = "tests/sim/scripts/new-game/cavern.json";
-const fluteBattleMenuTick = 21531;
+const fluteScript = "tests/sim/scripts/new-game/golden-flute.json";
 const kidScript = "tests/sim/scripts/new-game/golden-kid.json";
-const kidWindUpTick = 27294;
 
 async function replayTo(page: Page, path: string, targetTick: number): Promise<void> {
   const upTo: ReturnType<typeof recording> = [];
@@ -56,6 +55,7 @@ test(
   "real keys: Coach Ash's rainbow lasso snags coins, adds calm, and steadies burst",
   { tag: "@smoke" },
   async ({ page }) => {
+    const fluteBattleMenuTick = bunFindReplayTick(fluteScript, "new-game", "lasso-steady-command");
     await page.setViewportSize({ width: 1280, height: 720 });
     await openHarness(page);
     await resetPaused(page, "new-game");
@@ -100,10 +100,12 @@ test(
   "real keys: Coach Ash's rainbow lasso pops a mini-boss wind-up bubble",
   { tag: "@smoke" },
   async ({ page }) => {
+    const kidWindUpTick = bunFindReplayTick(kidScript, "new-game", "kid-lasso-windup");
     await page.setViewportSize({ width: 1280, height: 720 });
     await openHarness(page);
     await resetPaused(page, "new-game");
     await replayTo(page, kidScript, kidWindUpTick);
+    await step(page, 120);
 
     const beforeState = await readState(page);
     const beforeBattle = await readBattle(page);

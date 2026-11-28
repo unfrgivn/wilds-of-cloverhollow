@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import {
+  bunFindReplayTick,
   longFlowTimeout,
   openHarness,
   playBattleCheck,
@@ -178,12 +179,12 @@ test("clicking the Together! sticker button launches the finisher on touch phone
   await context.close();
 });
 
-const fluteScript = "tests/sim/scripts/new-game/cavern.json";
-const fluteBattleMenuTick = 21531;
+const fluteScript = "tests/sim/scripts/new-game/golden-flute.json";
 
 test("real keys: Flute Friends assist in battle via F key", {
   tag: "@smoke",
 }, async ({ page }) => {
+  const fluteBattleMenuTick = bunFindReplayTick(fluteScript, "new-game", "flute-command");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
   await resetPaused(page, "new-game");
@@ -200,7 +201,9 @@ test("real keys: Flute Friends assist in battle via F key", {
 
   const before = await readBattle(page);
   expect(before?.phase).toBe("command");
-  expect(before?.calm).toBe(25);
+  const calmBefore = before?.calm ?? -1;
+  expect(calmBefore).toBeGreaterThanOrEqual(0);
+  expect(calmBefore).toBeLessThan(75);
   expect(before?.fluteUsed).toBeUndefined();
   const fluteBtn = page.locator(".battle-flute-btn");
   await expect(fluteBtn).toBeVisible();
@@ -212,7 +215,7 @@ test("real keys: Flute Friends assist in battle via F key", {
   const called = await readBattle(page);
   expect(called?.phase).toBe("command");
   expect(called?.fluteUsed).toBe(true);
-  expect(called?.calm).toBe(50);
+  expect(called?.calm).toBe(calmBefore + 25);
   expect(called?.message).toBe(
     "Fae plays her flute! Pond Pup dashes in with a happy bark, calming the air!",
   );

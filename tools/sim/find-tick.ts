@@ -7,6 +7,7 @@ export type ReplayTickQuery =
   | "owl-peek"
   | "flute-command"
   | "lasso-steady-command"
+  | "kid-lasso-windup"
   | "lean-check";
 
 function isReplayTickQuery(value: string): value is ReplayTickQuery {
@@ -14,6 +15,7 @@ function isReplayTickQuery(value: string): value is ReplayTickQuery {
     value === "owl-peek" ||
     value === "flute-command" ||
     value === "lasso-steady-command" ||
+    value === "kid-lasso-windup" ||
     value === "lean-check"
   );
 }
@@ -45,6 +47,16 @@ function matches(query: ReplayTickQuery, state: State, view: BattleView | null):
         view.lassoAssist.windUp === false &&
         !battle.lassoUsed &&
         battle.revealed >= battle.message.length
+      );
+    case "kid-lasso-windup":
+      return (
+        battle.critterId === "hooded-kid" &&
+        battle.phase === "command" &&
+        view?.lassoAssist?.available === true &&
+        view.lassoAssist.windUp === true &&
+        !battle.lassoUsed &&
+        battle.windUp !== null &&
+        battle.windUp.popped.every((p) => !p)
       );
     case "lean-check":
       return battle.check?.kind === "lean";

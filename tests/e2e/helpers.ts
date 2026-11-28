@@ -580,6 +580,7 @@ export type ReplayTickQuery =
   | "owl-peek"
   | "flute-command"
   | "lasso-steady-command"
+  | "kid-lasso-windup"
   | "lean-check";
 
 export function bunFindReplayTick(

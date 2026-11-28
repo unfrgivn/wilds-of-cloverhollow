@@ -5,8 +5,13 @@ import {
   evaluateBedroomDisplay, evaluateClubhouseDecor, evaluateClubhouseDisplay,
   evaluateSunberryMotes, type ClubhouseDecorVisuals, type RoomDisplayPlacement,
 } from "./clubhouse-display";
+import {
+  ClubhouseEncoreTrophyRenderer,
+  ENCORE_TROPHY_ASSET_PATH,
+} from "./clubhouse-encore-render";
 import type { VfxTextures } from "./vfx-textures";
 
+export { ENCORE_TROPHY_ASSET_PATH };
 export const CLUBHOUSE_PRIZES_ALIAS = "clubhouse-prizes";
 
 type PrizeEntry = { container: Container; shadow: Sprite; pedestal: Graphics; item: Sprite };
@@ -30,6 +35,7 @@ export class ClubhouseDisplayRenderer {
   private readonly prizePool: PrizeEntry[] = [];
   private readonly keepsakePool: KeepsakeEntry[] = [];
   private readonly sunberryPool: Sprite[] = [];
+  private readonly encoreTrophy: ClubhouseEncoreTrophyRenderer;
   private activeDisplayCount = 0;
 
   constructor(
@@ -37,6 +43,7 @@ export class ClubhouseDisplayRenderer {
     private readonly vfx: VfxTextures,
     private readonly depthLayer: Container,
   ) {
+    this.encoreTrophy = new ClubhouseEncoreTrophyRenderer(vfx, depthLayer);
     this.rugLayer.label = "clubhouse:rug";
     this.rugLayer.visible = false;
     this.rugLayer.addChild(this.rugGraphics);
@@ -65,6 +72,7 @@ export class ClubhouseDisplayRenderer {
     }
     for (const entry of this.keepsakePool) entry.container.visible = false;
     for (const mote of this.sunberryPool) mote.visible = false;
+    this.encoreTrophy.hide();
     this.hideDecorLayers();
     this.activeDisplayCount = 0;
   }
@@ -222,6 +230,7 @@ export class ClubhouseDisplayRenderer {
       this.hideDecorLayers();
       for (const entry of this.keepsakePool) entry.container.visible = false;
       for (const mote of this.sunberryPool) mote.visible = false;
+      this.encoreTrophy.hide();
       this.activeDisplayCount = this.renderPrizePlacements(
         evaluateBedroomDisplay(this.world, state),
         "bedroom",
@@ -310,6 +319,7 @@ export class ClubhouseDisplayRenderer {
       const sprite = this.sunberryPool[i];
       if (sprite !== undefined) sprite.visible = false;
     }
-    this.activeDisplayCount = prizeShown + keepsakeShown;
+    const encoreShown = this.encoreTrophy.render(display.encoreTrophy, state.tick, reducedMotion);
+    this.activeDisplayCount = prizeShown + keepsakeShown + encoreShown;
   }
 }

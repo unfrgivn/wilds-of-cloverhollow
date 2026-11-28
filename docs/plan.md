@@ -9146,6 +9146,41 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   `milestone-187`, `milestone-160`, `soundtrack`), and 99/99 Chromium
   `ui-gallery` tests (`0` snapshot diffs).
 
+## Milestone 212: Living Clubhouse Dream Encore Star Trophy Pedestal (`star-trophy.webp`) & Journal Dream Encore Trophy Case **Status:** ✅ Completed (2026-11-28)
+- Completes Track E18's *"Clubhouse trophies"* deliverable by mounting the
+  painted golden `public/assets/props/encore-shrine/star-trophy.webp` inside
+  Fae's Living Clubhouse once any Dream Memory Shrine Boss Encore trophy is
+  earned (scaling golden & lavender star sparkles up to a grand 9/9 crown glow),
+  paired with an interactive **Dream Encore Trophy Case** modal in Fae's Journal
+  — zero `src/core/sim.ts` changes, zero save-version bumps, zero replay hash
+  drift across all 77 sims, and zero visual baseline diffs across all 99
+  `ui-gallery` and Clubhouse baselines.
+- Living Clubhouse Star Trophy (`src/render/clubhouse-display.ts`,
+  `src/render/clubhouse-display-render.ts`, `src/render/clubhouse-encore-render.ts`):
+  - Added pure `ENCORE_TROPHY_PERCH` (`{ x: 264, y: 158, zIndex: 320, scale: 0.44 }`)
+    atop the left wooden wall post (`>= 172 px` clear of all 26 prizes &
+    keepsakes; strictly non-walkable) and `evaluateEncoreTrophySparkles` (2 -> 4
+    -> 6 radiant golden/lavender star sparkles, calm steady zero-rotation glow
+    under `reducedMotion`).
+  - Added `ClubhouseEncoreTrophyRenderer` lazily loading `star-trophy.webp`
+    strictly when `earned >= 1` (`encoreTrophy: null` at 0 trophies).
+- Journal Dream Encore Trophy Case (`src/core/encore.ts`,
+  `src/ui/journal-encore.{ts,css}`, `src/ui/journal-field-note{,-data}.ts`,
+  `src/shell/view-models.ts`):
+  - Exported pure `encoreJournalSummary(world, state)` (spoiler-gated behind
+    `milo_revealed || earned > 0`), mounted `.journal-encore-btn` (`★ Encore ·
+    N/9`) in Field Treasures header, and built a balanced 3×3 showcase modal
+    with hand-inked golden trophy SVGs (zero `<text>` nodes), `3/3 Stars` pips,
+    golden `★ 9/9 ENCORE MASTER!` header & footer, 2D keyboard nav, focus
+    restoration, Reduced Motion parity, and iOS tap-selection hygiene.
+- Evidence: `tests/unit/milestone-212.test.ts`,
+  `tests/e2e/milestone-212.spec.ts` (`@smoke` Chromium + WebKit), and all 3
+  review captures (`art/review/m211-clubhouse-trophy-1280.jpg`,
+  `m211-encore-case-1280.jpg`, `m211-encore-case-874.jpg`) independently
+  verified via `vision`.
+- Gates: `just check` (279 unit files / 2,057 tests, all 77 sims + all sim
+  scripts, 23 QA packs, purity, lint), `just build` (`index` `383.26 kB < 500 kB`),
+  24/24 Chromium & WebKit e2e, and 99/99 Chromium `ui-gallery` tests.
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

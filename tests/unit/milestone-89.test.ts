@@ -78,7 +78,11 @@ describe("Milestone 89: Living Clubhouse display", () => {
       { prizes: allPrizeIds, stickers: ["starry-owl", "taco-chef"] },
       { cavern_chime_rung: true, spice_returned: true, gem_reward_all: true },
     );
-    expect(evaluateClubhouseDisplay(world, plaza)).toEqual({ prizes: [], keepsakes: [] });
+    expect(evaluateClubhouseDisplay(world, plaza)).toEqual({
+      prizes: [],
+      keepsakes: [],
+      encoreTrophy: null,
+    });
   });
 
   it("maps all 13 catalogue prizes onto non-blocking Clubhouse perches", () => {

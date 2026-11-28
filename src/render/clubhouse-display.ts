@@ -84,10 +84,52 @@ export type ClubhouseKeepsakePlacement = {
   sparkleTint: number;
 };
 
+export type ClubhouseEncoreTrophy = {
+  x: number;
+  y: number;
+  zIndex: number;
+  scale: number;
+  earned: number;
+  total: number;
+  complete: boolean;
+};
+
+export type ClubhouseEncoreTrophySparkle = {
+  x: number;
+  y: number;
+  scale: number;
+  alpha: number;
+  tint: number;
+  rotation: number;
+};
+
+export type ClubhouseEncoreTrophyGlow = {
+  haloScale: number;
+  haloAlpha: number;
+  haloTint: number;
+  crownGlow: boolean;
+  sparkles: ClubhouseEncoreTrophySparkle[];
+};
+
 export type ClubhouseDisplay = {
   prizes: ClubhousePrizePlacement[];
   keepsakes: ClubhouseKeepsakePlacement[];
+  encoreTrophy: ClubhouseEncoreTrophy | null;
 };
+
+export type ClubhouseDisplayPlan = ClubhouseDisplay;
+
+/**
+ * Dedicated non-walkable pedestal atop the flat cap of the Clubhouse's left timber
+ * end-post: >= 172 px clear of all 13 prizes & 13 keepsakes, string lights, window,
+ * mini-fridge/microwave, and pennant banners.
+ */
+export const ENCORE_TROPHY_PERCH = {
+  x: 264,
+  y: 158,
+  zIndex: 320,
+  scale: 0.44,
+} as const;
 
 export type ClubhouseSunberryMote = {
   x: number;
@@ -306,11 +348,14 @@ const KEEPSAKE_RULES: readonly KeepsakeRule[] = [
 ];
 
 /**
- * Pure evaluator mapping owned arcade prizes and unlocked quest keepsakes onto
- * non-blocking Clubhouse perches. Returns empty lists outside `clubhouse`.
+ * Pure evaluator mapping owned arcade prizes, unlocked quest keepsakes, and Fae's
+ * Dream Encore Star Trophy onto non-blocking Clubhouse perches.
+ * Returns empty lists and `encoreTrophy: null` outside `clubhouse`.
  */
 export function evaluateClubhouseDisplay(world: World, state: State): ClubhouseDisplay {
-  if (state.area !== "clubhouse") return { prizes: [], keepsakes: [] };
+  if (state.area !== "clubhouse") {
+    return { prizes: [], keepsakes: [], encoreTrophy: null };
+  }
 
   const ownedPrizes = new Set(state.prizes);
   const prizes: ClubhousePrizePlacement[] = [];
@@ -334,7 +379,100 @@ export function evaluateClubhouseDisplay(world: World, state: State): ClubhouseD
     if (rule.unlocked(world, state)) keepsakes.push(rule.placement);
   }
 
-  return { prizes, keepsakes };
+  const total = world.encore?.bosses.length ?? 9;
+  const rawEarned = state.encore?.trophies.length ?? 0;
+  const earned = Math.min(total, rawEarned);
+  const encoreTrophy: ClubhouseEncoreTrophy | null =
+    earned <= 0
+      ? null
+      : {
+          x: ENCORE_TROPHY_PERCH.x,
+          y: ENCORE_TROPHY_PERCH.y,
+          zIndex: ENCORE_TROPHY_PERCH.zIndex,
+          scale: ENCORE_TROPHY_PERCH.scale,
+          earned,
+          total,
+          complete: total > 0 && earned >= total,
+        };
+
+  return { prizes, keepsakes, encoreTrophy };
+}
+
+const ENCORE_SPARKLE_TINTS: readonly number[] = [
+  0xe8a81c,
+  0xf5c238,
+  0x9a75db,
+  0xdf9518,
+  0xf2bd2e,
+  0xa882e6,
+];
+
+const ENCORE_SPARKLE_LOW: readonly (readonly [number, number])[] = [
+  [-28, -42],
+  [28, -28],
+];
+
+const ENCORE_SPARKLE_MID: readonly (readonly [number, number])[] = [
+  [-28, -42],
+  [28, -28],
+  [-30, -18],
+  [26, -48],
+];
+
+const ENCORE_SPARKLE_CROWN: readonly (readonly [number, number])[] = [
+  [0, -64],
+  [-21, -56],
+  [21, -56],
+  [-34, -34],
+  [34, -34],
+  [0, -14],
+];
+
+/**
+ * Pure evaluator for the Clubhouse Dream Encore Star Trophy's golden aura and
+ * twinkling star sparkles: 2 sparkles at 1..4 trophies, 4 at 5..8, and a grand
+ * 6-sparkle radiant crown glow at 9/9 complete. Calm steady zero-rotation glow
+ * under `reducedMotion === true`.
+ */
+export function evaluateEncoreTrophySparkles(
+  trophy: ClubhouseEncoreTrophy,
+  tick: number,
+  reducedMotion = false,
+): ClubhouseEncoreTrophyGlow {
+  const crownGlow = trophy.complete || (trophy.total > 0 && trophy.earned >= trophy.total);
+  const offsets: readonly (readonly [number, number])[] =
+    trophy.earned <= 0
+      ? []
+      : crownGlow
+        ? ENCORE_SPARKLE_CROWN
+        : trophy.earned >= 5
+          ? ENCORE_SPARKLE_MID
+          : ENCORE_SPARKLE_LOW;
+  const t = reducedMotion ? 0 : tick;
+  const haloPulse = reducedMotion ? 0.5 : 0.5 + 0.5 * Math.sin(t * 0.048);
+  const tierBoost = crownGlow ? 1 : trophy.earned >= 5 ? 0.55 : 0.2;
+  const sparkles: ClubhouseEncoreTrophySparkle[] = offsets.map(([ox, oy], index) => {
+    const phase = t * 0.065 + index * 1.05;
+    const pulse = reducedMotion ? 0.6 : 0.5 + 0.5 * Math.sin(phase);
+    const driftX = reducedMotion ? 0 : Math.sin(t * 0.035 + index * 1.4) * 2.2;
+    const driftY = reducedMotion ? 0 : Math.cos(t * 0.04 + index * 1.2) * 2.4;
+    const baseScale = crownGlow ? 0.52 : 0.44;
+    return {
+      x: ox + driftX,
+      y: oy + driftY,
+      scale: baseScale + 0.16 * pulse,
+      alpha: (crownGlow ? 0.78 : 0.68) + 0.22 * pulse,
+      tint: ENCORE_SPARKLE_TINTS[index % ENCORE_SPARKLE_TINTS.length] ?? 0xe8a81c,
+      rotation: reducedMotion ? 0 : Math.sin(t * 0.05 + index * 0.9) * 0.32,
+    };
+  });
+  return {
+    haloScale: 0.44 + tierBoost * 0.16 + haloPulse * 0.05,
+    haloAlpha: 0.18 + tierBoost * 0.12 + haloPulse * 0.05,
+    haloTint: crownGlow ? 0xf5c542 : 0xf0be48,
+    crownGlow,
+    sparkles,
+  };
 }
 
 function storyCount(world: World, state: State, name: string): number {

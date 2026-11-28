@@ -14,6 +14,7 @@ import {
   type JournalFieldNotePrize,
   type JournalFieldNoteSource,
 } from "./journal-field-note-data";
+import { createJournalEncoreCase } from "./journal-encore";
 import { createJournalGemsLedger } from "./journal-gems-ledger";
 import { createJournalHeartsAlbum } from "./journal-hearts";
 import { applyModalScrollKey } from "./journal-nav";
@@ -247,51 +248,45 @@ export function createJournalFieldOverlays(options?: {
     treasuresBackdrop.hidden = true;
   };
 
-  let ribbonsReturnToTreasures = false;
-  let weatherReturnToTreasures = false;
-  let heartsReturnToTreasures = false;
+  type TreasuresPeer = "weather" | "ribbons" | "hearts" | "encore";
+  const returnToTreasures: Record<TreasuresPeer, boolean> = {
+    weather: false, ribbons: false, hearts: false, encore: false,
+  };
   const attachOverlay = (overlay: HTMLElement): void => {
     const host = options?.focusRoot ?? treasuresBackdrop.parentElement;
     if (host !== null && overlay.parentElement !== host) host.append(overlay);
   };
-  const restoreTreasures = (wasFromTreasures: boolean): void => {
-    if (wasFromTreasures && treasuresOpen) treasuresBackdrop.hidden = false;
-  };
-  const clearPeers = (keep?: "weather" | "ribbons" | "hearts" | "gems"): void => {
+  const clearPeers = (keep?: TreasuresPeer | "gems"): void => {
     clearFieldNote();
     if (keep === "gems" || keep === undefined) clearTreasures();
     if (keep !== "gems") gemsLedger.clear();
-    if (keep !== "ribbons") { ribbonsReturnToTreasures = false; ribbonsShowcase.clear(); }
-    if (keep !== "weather") { weatherReturnToTreasures = false; weatherAlmanac.clear(); }
-    if (keep !== "hearts") { heartsReturnToTreasures = false; heartsAlbum.clear(); }
+    for (const key of ["ribbons", "weather", "hearts", "encore"] as const) {
+      if (keep === key) continue;
+      returnToTreasures[key] = false;
+      peerModals[key].clear();
+    }
   };
-  const weatherAlmanac = createJournalWeatherAlmanac({
-    onBeforeOpen: () => clearPeers("weather"),
+  const peerHooks = (key: TreasuresPeer) => ({
+    onBeforeOpen: () => clearPeers(key),
     onClose: () => {
-      restoreTreasures(weatherReturnToTreasures);
-      weatherReturnToTreasures = false;
+      if (returnToTreasures[key] && treasuresOpen) treasuresBackdrop.hidden = false;
+      returnToTreasures[key] = false;
     },
     onVisibilityChange: () => syncVisibility(),
+  });
+  const weatherAlmanac = createJournalWeatherAlmanac({
+    ...peerHooks("weather"),
     onSelectMode: options?.onWeatherSelect,
   });
-  const ribbonsShowcase = createJournalRibbonsShowcase({
-    onBeforeOpen: () => clearPeers("ribbons"),
-    onClose: () => {
-      restoreTreasures(ribbonsReturnToTreasures);
-      ribbonsReturnToTreasures = false;
-    },
-    onVisibilityChange: () => syncVisibility(),
-  });
-  const heartsAlbum = createJournalHeartsAlbum({
-    onBeforeOpen: () => clearPeers("hearts"),
-    onClose: () => {
-      restoreTreasures(heartsReturnToTreasures);
-      heartsReturnToTreasures = false;
-    },
-    onVisibilityChange: () => syncVisibility(),
-  });
+  const ribbonsShowcase = createJournalRibbonsShowcase(peerHooks("ribbons"));
+  const heartsAlbum = createJournalHeartsAlbum(peerHooks("hearts"));
+  const encoreCase = createJournalEncoreCase(peerHooks("encore"));
+  const peerModals = {
+    weather: weatherAlmanac, ribbons: ribbonsShowcase, hearts: heartsAlbum, encore: encoreCase,
+  };
   treasuresTitleWrap.append(
-    ribbonsShowcase.treasuresBtn, weatherAlmanac.treasuresBtn, heartsAlbum.treasuresBtn,
+    ribbonsShowcase.treasuresBtn, weatherAlmanac.treasuresBtn,
+    heartsAlbum.treasuresBtn, encoreCase.treasuresBtn,
   );
   const gemsLedger = createJournalGemsLedger({
     onBeforeOpen: () => clearPeers("gems"),
@@ -299,7 +294,8 @@ export function createJournalFieldOverlays(options?: {
   });
   const hasOpen = (): boolean =>
     treasuresOpen || inspectedItem !== null || gemsLedger.isOpen() ||
-    ribbonsShowcase.isOpen() || weatherAlmanac.isOpen() || heartsAlbum.isOpen();
+    ribbonsShowcase.isOpen() || weatherAlmanac.isOpen() || heartsAlbum.isOpen() ||
+    encoreCase.isOpen();
 
   const syncVisibility = (): void => {
     const nowOpen = hasOpen();
@@ -346,9 +342,10 @@ export function createJournalFieldOverlays(options?: {
       return;
     }
     treasuresBackdrop.hidden =
-      (ribbonsReturnToTreasures && ribbonsShowcase.isOpen()) ||
-      (weatherReturnToTreasures && weatherAlmanac.isOpen()) ||
-      (heartsReturnToTreasures && heartsAlbum.isOpen());
+      (returnToTreasures.ribbons && ribbonsShowcase.isOpen()) ||
+      (returnToTreasures.weather && weatherAlmanac.isOpen()) ||
+      (returnToTreasures.hearts && heartsAlbum.isOpen()) ||
+      (returnToTreasures.encore && encoreCase.isOpen());
     const signature = treasuresSignature(summary);
     if (signature === lastTreasuresSignature) return;
     lastTreasuresSignature = signature;
@@ -502,10 +499,10 @@ export function createJournalFieldOverlays(options?: {
     const source = view ?? latestView;
     if (source === null) return;
     if (treasuresOpen && returnTarget === ribbonsShowcase.treasuresBtn) {
-      ribbonsReturnToTreasures = true;
+      returnToTreasures.ribbons = true;
       treasuresBackdrop.hidden = true;
     } else {
-      ribbonsReturnToTreasures = false;
+      returnToTreasures.ribbons = false;
       clearTreasures();
     }
     ribbonsShowcase.open(evaluateMeritRibbonsFromJournal(source), returnTarget);
@@ -527,18 +524,23 @@ export function createJournalFieldOverlays(options?: {
   ribbonsShowcase.banner.addEventListener("click", () => {
     openRibbons(latestView, ribbonsShowcase.banner);
   });
-  weatherAlmanac.treasuresBtn.addEventListener("click", () => {
-    attachOverlay(weatherAlmanac.overlay);
-    weatherReturnToTreasures = treasuresOpen;
+  const openFromTreasures = (key: TreasuresPeer, overlay: HTMLElement, launch: () => void) => {
+    attachOverlay(overlay);
+    returnToTreasures[key] = treasuresOpen;
     if (treasuresOpen) treasuresBackdrop.hidden = true;
-    weatherAlmanac.open(weatherAlmanac.treasuresBtn);
-  });
-  heartsAlbum.treasuresBtn.addEventListener("click", () => {
-    attachOverlay(heartsAlbum.overlay);
-    heartsReturnToTreasures = treasuresOpen;
-    if (treasuresOpen) treasuresBackdrop.hidden = true;
-    heartsAlbum.open(latestView?.heartToHearts, heartsAlbum.treasuresBtn);
-  });
+    launch();
+  };
+  weatherAlmanac.treasuresBtn.addEventListener("click", () => openFromTreasures(
+    "weather", weatherAlmanac.overlay, () => weatherAlmanac.open(weatherAlmanac.treasuresBtn),
+  ));
+  heartsAlbum.treasuresBtn.addEventListener("click", () => openFromTreasures(
+    "hearts", heartsAlbum.overlay,
+    () => heartsAlbum.open(latestView?.heartToHearts, heartsAlbum.treasuresBtn),
+  ));
+  encoreCase.treasuresBtn.addEventListener("click", () => openFromTreasures(
+    "encore", encoreCase.overlay,
+    () => encoreCase.open(latestView?.encoreSummary, encoreCase.treasuresBtn),
+  ));
 
   const closeAll = (): void => {
     clearPeers();
@@ -546,6 +548,7 @@ export function createJournalFieldOverlays(options?: {
   };
 
   const dismiss = (): boolean => {
+    if (encoreCase.isOpen()) { encoreCase.close(); return true; }
     if (heartsAlbum.isOpen()) { heartsAlbum.close(); return true; }
     if (weatherAlmanac.isOpen()) { weatherAlmanac.close(); return true; }
     if (ribbonsShowcase.isOpen()) { ribbonsShowcase.close(); return true; }
@@ -597,6 +600,7 @@ export function createJournalFieldOverlays(options?: {
       gemsLedger.sync(view.starGems);
       syncRibbons(view, ribbonsAnchor);
       heartsAlbum.sync(view.heartToHearts);
+      encoreCase.sync(view.encoreSummary);
     },
     stepFieldNote,
     closeFieldNote,
@@ -607,6 +611,7 @@ export function createJournalFieldOverlays(options?: {
     hasOpen,
     dismiss,
     handleKeydown: (event) => {
+      if (encoreCase.handleKeydown(event)) return true;
       if (heartsAlbum.handleKeydown(event)) return true;
       if (weatherAlmanac.handleKeydown(event)) return true;
       if (ribbonsShowcase.handleKeydown(event)) return true;

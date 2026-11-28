@@ -29,6 +29,7 @@ import {
   type TextSpeed,
   type World,
 } from "../core";
+import { encoreJournalSummary, type JournalEncoreSummary } from "../core/encore";
 import {
   countDecorCustomizations,
   countEncoreTrophies,
@@ -322,6 +323,7 @@ export function buildJournalView(
   params: JournalViewParams,
 ): JournalView & {
   heartToHearts?: HeartToHeartSummary;
+  encoreSummary?: JournalEncoreSummary;
   encoreTrophies?: number;
   decorCount?: number;
   puzzlesSolved?: number;
@@ -419,6 +421,7 @@ export function buildJournalView(
     reducedMotion: params.reducedMotion,
     treasures: open ? treasuresSummary(world, state) : undefined,
     heartToHearts: open ? heartToHeartSummary(world, state) : undefined,
+    encoreSummary: open ? encoreJournalSummary(world, state) : undefined,
     encoreTrophies: open ? countEncoreTrophies(state.encore) : 0,
     decorCount: open ? countDecorCustomizations(state.decor) : 0,
     puzzlesSolved: open ? countSolvedPuzzles(state.puzzles) : 0,

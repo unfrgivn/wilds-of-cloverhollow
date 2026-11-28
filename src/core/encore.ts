@@ -94,6 +94,24 @@ export type EncoreSummary = {
   trophiesTotal: number;
 };
 
+export type JournalEncoreEntry = {
+  id: string;
+  name: string;
+  title: string;
+  region: string;
+  trophyName: string;
+  won: boolean;
+  stars: number;
+  maxStars: number;
+};
+
+export type JournalEncoreSummary = {
+  unlocked: boolean;
+  earned: number;
+  total: number;
+  entries: JournalEncoreEntry[];
+};
+
 export type EncoreShrineView = EncoreSummary & {
   modifiers: EncoreModifierSpec[];
   bosses: EncoreBossView[];
@@ -568,6 +586,45 @@ export function encoreSummary(
     starsTotal: full.starsTotal,
     trophiesEarned: full.trophiesEarned,
     trophiesTotal: full.trophiesTotal,
+  };
+}
+
+/**
+ * Pure Journal Trophy Case projection across all 9 canonical Encore bosses.
+ * Stays hidden (`unlocked: false`) pre-finale when 0 trophies are earned so no
+ * Milo/finale spoilers leak early and early-game Field Treasures stays clean.
+ */
+export function encoreJournalSummary(
+  world: Pick<World, "storyVariable" | "encore">,
+  state: Pick<State, "ink" | "encore">,
+): JournalEncoreSummary {
+  const bosses = world.encore?.bosses ?? [];
+  const record = state.encore;
+  const trophySet = new Set<string>(record?.trophies ?? []);
+  const maxStars = ENCORE_MODIFIER_IDS.length;
+  const entries: JournalEncoreEntry[] = bosses.map((boss) => {
+    const progress = record?.bosses[boss.critterId];
+    const clearedCount =
+      progress === undefined ? 0 : normalizeEncoreModifiers(progress.modifiersCleared).length;
+    const stars = Math.min(maxStars, Math.max(progress?.bestStars ?? 0, clearedCount));
+    return {
+      id: boss.critterId,
+      name: boss.calmTitle,
+      title: boss.title,
+      region: boss.region,
+      trophyName: boss.trophyName,
+      won: trophySet.has(boss.trophyId),
+      stars,
+      maxStars,
+    };
+  });
+  const earned = entries.filter((entry) => entry.won).length;
+  const unlocked = world.storyVariable(state.ink, "milo_revealed") === true || earned > 0;
+  return {
+    unlocked,
+    earned,
+    total: entries.length,
+    entries,
   };
 }
 

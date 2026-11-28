@@ -109,7 +109,11 @@ describe("E9B Step 2: Bedroom Shelf, Clubhouse Decor, Visiting Friends & Blessin
     expect(evaluateClubhouseDecor(stateIn("bedroom", { coins: 500 }))).toBeNull();
 
     // Preserve exact evaluateClubhouseDisplay shape
-    expect(evaluateClubhouseDisplay(world, baseClub)).toEqual({ prizes: [], keepsakes: [] });
+    expect(evaluateClubhouseDisplay(world, baseClub)).toEqual({
+      prizes: [],
+      keepsakes: [],
+      encoreTrophy: null,
+    });
 
     const nonClassic = CLUBHOUSE_SWATCH_IDS.filter((id) => id !== "classic");
     for (const swatch of nonClassic) {

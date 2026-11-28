@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 210)
+Last updated: 2026-11-28 (Milestone 212)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -2399,8 +2399,24 @@ ios/            Capacitor iOS project (from Milestone 4).
     the front-right timber post at `(976, 344)` — 26 total Living Clubhouse
     items, with Milestone 107 & Milestone 164 spacing polish across the upper
     and lower right shelves, beanbag 2×2 cuddle arc, crate keepsake row, wall
-    planks, timber posts, and left floor perches), each grounded with a
-    miniature contact shadow and subtle breathing sparkle aura.
+      planks, timber posts, and left floor perches), each grounded with a
+      miniature contact shadow and subtle breathing sparkle aura.
+    - **Living Clubhouse Dream Encore Star Trophy Pedestal (Milestone 211):**
+      `evaluateClubhouseDisplay` (`src/render/clubhouse-display.ts`) also
+      projects `encoreTrophy: ClubhouseEncoreTrophy | null` on
+      `ENCORE_TROPHY_PERCH` (`(264, 158)`, `zIndex: 320`, `scale: 0.44` — flat
+      top cap of the left wooden wall end-post, strictly outside
+      `clubhouse.walkable` and `>= 172 px` clear of all 26 prizes/keepsakes,
+      string lights, window, mini-fridge/microwave, and banners). Returns
+      `null` outside `clubhouse` or when `0` Encore trophies are earned (zero
+      visual diff on existing baselines). Once `>= 1` trophy is claimed,
+      `ClubhouseDisplayRenderer` (`src/render/clubhouse-display-render.ts`)
+      lazily loads `public/assets/props/encore-shrine/star-trophy.webp` via
+      Pixi `Assets.load` and renders `clubhouse:encore:star-trophy` with a soft
+      contact shadow, golden aura halo, and `evaluateEncoreTrophySparkles`
+      twinkling star sparkles (`2` at `1..4`, `4` at `5..8`, and a `6`-sparkle
+      radiant crown glow at `9/9`; steady zero-rotation glow under
+      `reducedMotion === true`).
   - **Bedroom Shelf Plush Display, Clubhouse Decor Swatches, Velvet Plush
     Pedestals & Visiting Friends (Milestone 195, Elevation Track E9B):**
     - Pure `src/core/decor.ts` manages optional `state.decor` (omitted when
@@ -4099,6 +4115,24 @@ trunks keep its two exits.
     gamepad `D-Pad`/`L/R`/`A`/`B` copy, and keyboard `Arrows/WASD` copy),
     on-demand boss atlas loading (`GameView.ensureCritterAtlas`), and a floating
     `.encore-battle-banner` during active Encore rematches.
+  - **Journal Dream Encore Trophy Case (Milestone 211):** Pure
+    `encoreJournalSummary` (`src/core/encore.ts`, projected onto
+    `JournalView.encoreSummary` in `src/shell/view-models.ts` and
+    `JournalFieldNoteSource` in `src/ui/journal-field-note-data.ts`) stays
+    locked (`unlocked: false`) pre-finale with `0` trophies (zero Milo/finale
+    spoilers or early-game Field Treasures clutter) and unlocks once
+    `milo_revealed === true` or `earned > 0`. Composed into
+    `src/ui/journal-field-note.ts` via `createJournalEncoreCase`
+    (`src/ui/journal-encore.ts`, `src/ui/journal-encore.css`), the
+    `.journal-encore-btn` (`"★ Encore · N/9"`) pill in Field Treasures opens
+    the `.journal-encore-overlay` 3×3 storybook Trophy Case modal featuring
+    hand-inked golden trophy SVG medallions (zero `<text>` nodes), all 9
+    canonical Encore bosses with Star Challenge star pips (`bestStars/3 Stars`)
+    or `"Unchallenged"` pills, golden `★ 9/9 ENCORE MASTER!` header & footer
+    celebration, 2D keyboard navigation (`Arrow`/`PageUp`/`PageDown`/`Home`/
+    `End`), `Escape`/`X`/`B`/backdrop/`×` dismiss restoring Field Treasures &
+    focus to `.journal-encore-btn`, Reduced Motion parity, and iOS tap hygiene
+    fitting cleanly on both `1280×720` and `874×402`.
 
 ### 8.1 Battle UI layout
 - Battle UI is the sticker DOM layer (`src/ui/battle.ts`): a HUD, a command

@@ -1,4 +1,5 @@
 import type { AtlasImage } from "./atlas";
+import type { JournalEncoreSummary } from "../core/encore";
 import type { HeartToHeartSummary } from "../core/heart-to-hearts";
 import type {
   CritterFieldNote,
@@ -54,6 +55,7 @@ export type JournalFieldNoteSource = {
   treasures?: TreasuresSummary;
   heartToHearts?: HeartToHeartSummary;
   heartToHeartsCompleted?: number;
+  encoreSummary?: JournalEncoreSummary;
   encoreTrophies?: number;
   decorCount?: number;
   puzzlesSolved?: number;

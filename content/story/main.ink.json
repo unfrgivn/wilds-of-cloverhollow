@@ -4401,15 +4401,91 @@
         ],
         "nop",
         "\n",
-        "^Oliver shakes his rattle. \"Ba!\" ",
-        "#",
-        "^speaker: Oliver",
-        "/#",
-        "\n",
-        "^Mom laughs from the kitchen. ",
-        "#",
-        "^speaker: Mom",
-        "/#",
+        [
+          "ev",
+          {
+            "VAR?": "milo_revealed"
+          },
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^Oliver claps both chubby hands at Maddie and beams up at Fae. \"Ba! Yay!\" ",
+              "#",
+              "^speaker: Oliver",
+              "/#",
+              "\n",
+              "^Mom laughs warmly from the kitchen. \"Even Oliver can tell the valley is calm again!\" ",
+              "#",
+              "^speaker: Mom",
+              "/#",
+              "\n",
+              {
+                "->": "oliver.9"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          "ev",
+          {
+            "VAR?": "buster_reward"
+          },
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^Oliver spots Fae's shiny Golden Whistle and giggles. \"Ba! Star!\" ",
+              "#",
+              "^speaker: Oliver",
+              "/#",
+              "\n",
+              "^Mom laughs from the kitchen. ",
+              "#",
+              "^speaker: Mom",
+              "/#",
+              "\n",
+              {
+                "->": "oliver.9"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          {
+            "->": ".^.b"
+          },
+          {
+            "b": [
+              "\n",
+              "^Oliver shakes his rattle. \"Ba!\" ",
+              "#",
+              "^speaker: Oliver",
+              "/#",
+              "\n",
+              "^Mom laughs from the kitchen. ",
+              "#",
+              "^speaker: Mom",
+              "/#",
+              "\n",
+              {
+                "->": "oliver.9"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
         "\n",
         "done",
         {
@@ -4638,10 +4714,153 @@
         ],
         {
           "again": [
-            "^Have a good day, sweetie. Stay curious! ",
-            "#",
-            "^speaker: Mom",
-            "/#",
+            [
+              "ev",
+              {
+                "VAR?": "milo_revealed"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^I'm so proud of you, sweetie! Helping Milo feel seen brought calm right back to the valley. ",
+                  "#",
+                  "^speaker: Mom",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.6"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "sanctuary_reward_14"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Ranger Fern wove you a Sanctuary Clover Wreath? I'm so proud of my little critter friend! ",
+                  "#",
+                  "^speaker: Mom",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.6"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "gem_reward_all"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^All seven Star Gems and Grandpa Barnaby's Rainbow Geode? That calls for celebration pancakes! ",
+                  "#",
+                  "^speaker: Mom",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.6"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "buster_reward"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^What a shiny Golden Star-Line Whistle! You really explored every corner of the valley, sweetie. ",
+                  "#",
+                  "^speaker: Mom",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.6"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "sunberry_harvests"
+              },
+              0,
+              ">",
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^A glowing Golden Sunberry from your garden? Let's top tomorrow's blueberry pancakes with one! ",
+                  "#",
+                  "^speaker: Mom",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.6"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              {
+                "->": ".^.b"
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Have a good day, sweetie. Stay curious! ",
+                  "#",
+                  "^speaker: Mom",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.6"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
             "\n",
             "done",
             null
@@ -7627,6 +7846,31 @@
       "classroom_teacher": [
         "ev",
         {
+          "VAR?": "milo_revealed"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.again"
+              },
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        {
           "CNT?": ".^"
         },
         1,
@@ -7653,7 +7897,7 @@
                 "->": ".^.^.^.pe"
               },
               {
-                "->": ".^.^.^.11"
+                "->": ".^.^.^.17"
               },
               null
             ]
@@ -7680,7 +7924,7 @@
                 "->": ".^.^.^.again"
               },
               {
-                "->": ".^.^.^.19"
+                "->": ".^.^.^.25"
               },
               null
             ]
@@ -7720,7 +7964,7 @@
                 "->": ".^.^.^.pe"
               },
               {
-                "->": ".^.^.^.40"
+                "->": ".^.^.^.46"
               },
               null
             ]
@@ -7731,10 +7975,101 @@
         "done",
         {
           "again": [
-            "^Remember, Fae: a kind word can calm almost anything. ",
-            "#",
-            "^speaker: Ms. Maple",
-            "/#",
+            [
+              "ev",
+              {
+                "VAR?": "milo_revealed"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^I'm so proud of you, Fae! Helping Milo open up brought calm right back to Cloverhollow. ",
+                  "#",
+                  "^speaker: Ms. Maple",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.4"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "sanctuary_reward_14"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Oh, what a lovely woven Sanctuary Clover Wreath! Ranger Fern must be so proud of you, Fae! ",
+                  "#",
+                  "^speaker: Ms. Maple",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.4"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "gem_reward_all"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^All seven valley Star Gems? You have the brightest explorer's eye in Cloverhollow, Fae! ",
+                  "#",
+                  "^speaker: Ms. Maple",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.4"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              {
+                "->": ".^.b"
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Remember, Fae: a kind word can calm almost anything. ",
+                  "#",
+                  "^speaker: Ms. Maple",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.4"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
             "\n",
             "done",
             null
@@ -7771,6 +8106,31 @@
       "milo": [
         "ev",
         {
+          "VAR?": "milo_revealed"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": "milo.epilogue"
+              },
+              {
+                "->": "milo.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        {
           "CNT?": ".^"
         },
         1,
@@ -7788,7 +8148,7 @@
                 "->": "milo.again"
               },
               {
-                "->": "milo.6"
+                "->": "milo.12"
               },
               null
             ]
@@ -7818,6 +8178,67 @@
             "#",
             "^speaker: Milo",
             "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "epilogue": [
+            "^Hey Fae! No more purple fizz! Want to race paper airplanes at recess? For real this time! ",
+            "#",
+            "^speaker: Milo",
+            "/#",
+            "\n",
+            [
+              "ev",
+              {
+                "VAR?": "sanctuary_reward_14"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Whoa, Ranger Fern wove you a Sanctuary Clover Wreath?! You're the real valley legend, Fae! ",
+                  "#",
+                  "^speaker: Milo",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.7"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "buster_reward"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Whoa, a Golden Star-Line Whistle from Buster?! Show me how to blow it after school, okay? ",
+                  "#",
+                  "^speaker: Milo",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.7"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
             "\n",
             "done",
             null
@@ -7908,56 +8329,134 @@
             ],
             "nop",
             "\n",
-            "ev",
-            {
-              "VAR?": "saw_hood"
-            },
-            "/ev",
             [
+              "ev",
+              {
+                "VAR?": "milo_revealed"
+              },
+              "/ev",
               {
                 "->": ".^.b",
                 "c": true
               },
               {
                 "b": [
-                  "^ Did you catch them? They're SO fast. ",
+                  "\n",
+                  "^Wait, the purple hood was Milo all along?! I'm glad the mystery's solved and the halls are calm! ",
                   "#",
                   "^speaker: Rosie",
+                  "/#",
+                  "\n",
                   {
-                    "->": ".^.^.^.13"
+                    "->": ".^.^.^.14"
                   },
                   null
                 ]
               }
             ],
-            "nop",
-            "/#",
-            "\n",
-            "ev",
-            {
-              "VAR?": "saw_hood"
-            },
-            "!",
-            "/ev",
             [
+              "ev",
+              {
+                "VAR?": "kite_returned"
+              },
+              {
+                "VAR?": "buster_reward"
+              },
+              "&&",
+              "/ev",
               {
                 "->": ".^.b",
                 "c": true
               },
               {
                 "b": [
-                  "^ Hurry, Fae! They went down the hall! ",
+                  "\n",
+                  "^Whoa, Buster gave you a Golden Star-Line Whistle?! Even cooler than flying my kite at the park! ",
                   "#",
                   "^speaker: Rosie",
+                  "/#",
+                  "\n",
                   {
-                    "->": ".^.^.^.21"
+                    "->": ".^.^.^.14"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "sue_compass"
+              },
+              {
+                "VAR?": "jordan_clover"
+              },
+              "&&",
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^You visited Sue's cottage AND Jordan's cabin? Our class is going to want a whole story time on that! ",
+                  "#",
+                  "^speaker: Rosie",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.14"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "saw_hood"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Did you catch them? They're SO fast. ",
+                  "#",
+                  "^speaker: Rosie",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.14"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              {
+                "->": ".^.b"
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Hurry, Fae! They went down the hall! ",
+                  "#",
+                  "^speaker: Rosie",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.14"
                   },
                   null
                 ]
               }
             ],
             "nop",
-            "/#",
             "\n",
             "done",
             null
@@ -8555,61 +9054,152 @@
             null
           ],
           "again": [
-            "ev",
-            {
-              "VAR?": "music_quest"
-            },
-            "!",
-            "/ev",
             [
+              "ev",
+              {
+                "VAR?": "milo_revealed"
+              },
+              "/ev",
               {
                 "->": ".^.b",
                 "c": true
               },
               {
                 "b": [
-                  "^ Music is next, Fae! Ms. Willow's room is down the east hall. ",
+                  "\n",
+                  "^Ha! Looks like Milo's hall-sprint record finally met its match in your calm-down team, Fae! ",
                   "#",
                   "^speaker: Coach Ash",
+                  "/#",
+                  "\n",
                   {
-                    "->": ".^.^.^.5"
+                    "->": ".^.^.^.4"
                   },
                   null
                 ]
               }
             ],
-            "nop",
-            "/#",
-            "\n",
-            "ev",
-            {
-              "VAR?": "recess"
-            },
-            "/ev",
             [
+              "ev",
+              {
+                "VAR?": "cavern_chime_rung"
+              },
+              "/ev",
               {
                 "->": ".^.b",
                 "c": true
               },
               {
                 "b": [
-                  "^ Recess! I've propped the back door open. Out you go! ",
+                  "\n",
+                  "^You twirled my Rainbow Lasso to ring Crystal Cavern's star chime? Now THAT'S gold-medal form! ",
                   "#",
                   "^speaker: Coach Ash",
+                  "/#",
+                  "\n",
                   {
-                    "->": ".^.^.^.12"
+                    "->": ".^.^.^.4"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "buster_reward"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^TWEET! A grand salute to Cloverhollow's official Star-Line Explorer! Keep stretching those legs! ",
+                  "#",
+                  "^speaker: Coach Ash",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.4"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              {
+                "->": ".^.b"
+              },
+              {
+                "b": [
+                  "\n",
+                  "ev",
+                  {
+                    "VAR?": "music_quest"
+                  },
+                  "!",
+                  "/ev",
+                  [
+                    {
+                      "->": ".^.b",
+                      "c": true
+                    },
+                    {
+                      "b": [
+                        "^ Music is next, Fae! Ms. Willow's room is down the east hall. ",
+                        "#",
+                        "^speaker: Coach Ash",
+                        {
+                          "->": ".^.^.^.6"
+                        },
+                        null
+                      ]
+                    }
+                  ],
+                  "nop",
+                  "/#",
+                  "\n",
+                  "ev",
+                  {
+                    "VAR?": "recess"
+                  },
+                  "/ev",
+                  [
+                    {
+                      "->": ".^.b",
+                      "c": true
+                    },
+                    {
+                      "b": [
+                        "^ Recess! I've propped the back door open. Out you go! ",
+                        "#",
+                        "^speaker: Coach Ash",
+                        {
+                          "->": ".^.^.^.13"
+                        },
+                        null
+                      ]
+                    }
+                  ],
+                  "nop",
+                  "/#",
+                  "\n",
+                  "^Keep that lasso handy, Fae! And watch out for that purple hood. ",
+                  "#",
+                  "^speaker: Coach Ash",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.4"
                   },
                   null
                 ]
               }
             ],
             "nop",
-            "/#",
-            "\n",
-            "^Keep that lasso handy, Fae! And watch out for that purple hood. ",
-            "#",
-            "^speaker: Coach Ash",
-            "/#",
             "\n",
             "done",
             null
@@ -11777,10 +12367,103 @@
         "done",
         {
           "again": [
-            "^Welcome back, Fae! The easels are ready for you. ",
-            "#",
-            "^speaker: Ms. Rowan",
-            "/#",
+            [
+              "ev",
+              {
+                "VAR?": "milo_revealed"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Milo brought back every purple marker and painted a whole galaxy of stars with me today, Fae! ",
+                  "#",
+                  "^speaker: Ms. Rowan",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.4"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "sanctuary_reward_14"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^I packed my sketchbook for Ranger Fern's meadow! All those calm critters deserve watercolor portraits! ",
+                  "#",
+                  "^speaker: Ms. Rowan",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.4"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "sunberry_harvests"
+              },
+              0,
+              ">",
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Ooh, those glowing Golden Sunberry hues! I've been mixing honey-gold paint to match them all week! ",
+                  "#",
+                  "^speaker: Ms. Rowan",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.4"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              {
+                "->": ".^.b"
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Welcome back, Fae! The easels are ready for you. ",
+                  "#",
+                  "^speaker: Ms. Rowan",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.4"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
             "\n",
             "done",
             null
@@ -12143,35 +12826,126 @@
             null
           ],
           "again": [
-            "^Play that flute whenever you need a friend, Fae! ",
-            "#",
-            "^speaker: Ms. Willow",
-            "/#",
-            "\n",
-            "ev",
-            {
-              "VAR?": "recess"
-            },
-            "/ev",
             [
+              "ev",
+              {
+                "VAR?": "milo_revealed"
+              },
+              "/ev",
               {
                 "->": ".^.b",
                 "c": true
               },
               {
                 "b": [
-                  "^ Now, off to recess! The playing field is out the gym's back door. ",
+                  "\n",
+                  "^Oh, what sweet harmony! Helping Milo find his calm again is the finest song in Cloverhollow, Fae. ",
                   "#",
                   "^speaker: Ms. Willow",
+                  "/#",
+                  "\n",
                   {
-                    "->": ".^.^.^.9"
+                    "->": ".^.^.^.4"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "sanctuary_reward_14"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Your flute and kindness filled Ranger Fern's meadow with calm friends! Pure woodland music, dear! ",
+                  "#",
+                  "^speaker: Ms. Willow",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.4"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "gem_reward_all"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^All seven Star Gems, and Ribbon Bunny hops along to your flute now? Simply enchanting, Fae! ",
+                  "#",
+                  "^speaker: Ms. Willow",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.4"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              {
+                "->": ".^.b"
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Play that flute whenever you need a friend, Fae! ",
+                  "#",
+                  "^speaker: Ms. Willow",
+                  "/#",
+                  "\n",
+                  "ev",
+                  {
+                    "VAR?": "recess"
+                  },
+                  "/ev",
+                  [
+                    {
+                      "->": ".^.b",
+                      "c": true
+                    },
+                    {
+                      "b": [
+                        "^ Now, off to recess! The playing field is out the gym's back door. ",
+                        "#",
+                        "^speaker: Ms. Willow",
+                        {
+                          "->": ".^.^.^.10"
+                        },
+                        null
+                      ]
+                    }
+                  ],
+                  "nop",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.4"
                   },
                   null
                 ]
               }
             ],
             "nop",
-            "/#",
             "\n",
             "done",
             null
@@ -17926,47 +18700,323 @@
           "VAR=": "heard_wish",
           "re": true
         },
-        "^This is the Enchanted Forest. The Ancient Tree dreams the whole land. ",
-        "#",
-        "^speaker: Lavender Fairy",
-        "/#",
-        "\n",
-        "^The Mystic Pond grants wishes. A kid in a purple hood made a wish and drank from it. ",
-        "#",
-        "^speaker: Lavender Fairy",
-        "/#",
-        "\n",
-        "^Then everything went fizzy and purple, with scribbles everywhere. The Ancient Tree can't dream properly with all that fizz! ",
-        "#",
-        "^speaker: Lavender Fairy",
-        "/#",
+        [
+          "ev",
+          {
+            "VAR?": "milo_revealed"
+          },
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^The Ancient Tree is dreaming golden dreams again, Fae! Thank you for bringing back its peace. ",
+              "#",
+              "^speaker: Lavender Fairy",
+              "/#",
+              "\n",
+              [
+                "ev",
+                {
+                  "VAR?": "sanctuary_reward_14"
+                },
+                "/ev",
+                {
+                  "->": ".^.b",
+                  "c": true
+                },
+                {
+                  "b": [
+                    "\n",
+                    "^Even your Sanctuary Clover Wreath shimmers like the meadow's gentlest fairy light! ",
+                    "#",
+                    "^speaker: Lavender Fairy",
+                    "/#",
+                    "\n",
+                    {
+                      "->": ".^.^.^.8"
+                    },
+                    null
+                  ]
+                }
+              ],
+              [
+                "ev",
+                {
+                  "VAR?": "sunberry_harvests"
+                },
+                0,
+                ">",
+                "/ev",
+                {
+                  "->": ".^.b",
+                  "c": true
+                },
+                {
+                  "b": [
+                    "\n",
+                    "^And Golden Sunberries from your garden? The forest remembers kindness grown with care! ",
+                    "#",
+                    "^speaker: Lavender Fairy",
+                    "/#",
+                    "\n",
+                    {
+                      "->": ".^.^.^.8"
+                    },
+                    null
+                  ]
+                }
+              ],
+              "nop",
+              "\n",
+              {
+                "->": ".^.^.^.6"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          {
+            "->": ".^.b"
+          },
+          {
+            "b": [
+              "\n",
+              "^This is the Enchanted Forest. The Ancient Tree dreams the whole land. ",
+              "#",
+              "^speaker: Lavender Fairy",
+              "/#",
+              "\n",
+              "^The Mystic Pond grants wishes. A kid in a purple hood made a wish and drank from it. ",
+              "#",
+              "^speaker: Lavender Fairy",
+              "/#",
+              "\n",
+              "^Then everything went fizzy and purple, with scribbles everywhere. The Ancient Tree can't dream properly with all that fizz! ",
+              "#",
+              "^speaker: Lavender Fairy",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.6"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
         "\n",
         "done",
         null
       ],
       "fairy_mint": [
-        "^The butterflies keep tickling my wings. I keep telling them, \"Again!\" ",
-        "#",
-        "^speaker: Mint Fairy",
-        "/#",
+        [
+          "ev",
+          {
+            "VAR?": "milo_revealed"
+          },
+          {
+            "VAR?": "sanctuary_reward_14"
+          },
+          "&&",
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^The butterflies loop softly again, and they adore your Sanctuary Clover Wreath! \"Again!\" ",
+              "#",
+              "^speaker: Mint Fairy",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.3"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          "ev",
+          {
+            "VAR?": "milo_revealed"
+          },
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^The butterflies are looping softly through the glade again! No more purple fizz! \"Again!\" ",
+              "#",
+              "^speaker: Mint Fairy",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.3"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          {
+            "->": ".^.b"
+          },
+          {
+            "b": [
+              "\n",
+              "^The butterflies keep tickling my wings. I keep telling them, \"Again!\" ",
+              "#",
+              "^speaker: Mint Fairy",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.3"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
         "\n",
         "done",
         null
       ],
       "fairy_sky": [
-        "^The Ancient Tree is older than every tree, even the trees that think they are very old. ",
-        "#",
-        "^speaker: Sky Fairy",
-        "/#",
+        [
+          "ev",
+          {
+            "VAR?": "milo_revealed"
+          },
+          {
+            "VAR?": "gem_reward_all"
+          },
+          "&&",
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^Your calm kindness healed the Ancient Tree, and all seven Star Gems sing with its light! ",
+              "#",
+              "^speaker: Sky Fairy",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.3"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          "ev",
+          {
+            "VAR?": "milo_revealed"
+          },
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^Even the Ancient Tree remembers a kindness as calm and steady as yours, Fae. ",
+              "#",
+              "^speaker: Sky Fairy",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.3"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          {
+            "->": ".^.b"
+          },
+          {
+            "b": [
+              "\n",
+              "^The Ancient Tree is older than every tree, even the trees that think they are very old. ",
+              "#",
+              "^speaker: Sky Fairy",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.3"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
         "\n",
         "done",
         null
       ],
       "fairy_peach": [
-        "^Hee hee! The pond bubbles made my shoes go squeak. ",
-        "#",
-        "^speaker: Peach Fairy",
-        "/#",
+        [
+          "ev",
+          {
+            "VAR?": "milo_revealed"
+          },
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^Hee hee! The pond bubbles are gentle stardust again instead of squeaky purple fizz! ",
+              "#",
+              "^speaker: Peach Fairy",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.2"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          {
+            "->": ".^.b"
+          },
+          {
+            "b": [
+              "\n",
+              "^Hee hee! The pond bubbles made my shoes go squeak. ",
+              "#",
+              "^speaker: Peach Fairy",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.2"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
         "\n",
         "done",
         null
@@ -25582,10 +26632,80 @@
       ],
       "bay_souvenirs": [
         [
-          "^Welcome to the Bubblegum Bay seaside stand! Fresh pastel Sea-Salt Taffy and sunny bay keepsakes! ",
-          "#",
-          "^speaker: Bay keeper",
-          "/#",
+          [
+            "ev",
+            {
+              "VAR?": "buster_reward"
+            },
+            {
+              "VAR?": "bay_boat_charm"
+            },
+            "&&",
+            "/ev",
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^Spotted your pastel rowboat and lucky sea-glass clover out on the bay, Fae! Ready for fresh taffy? ",
+                "#",
+                "^speaker: Bay keeper",
+                "/#",
+                "\n",
+                {
+                  "->": ".^.^.^.3"
+                },
+                null
+              ]
+            }
+          ],
+          [
+            "ev",
+            {
+              "VAR?": "buster_reward"
+            },
+            "/ev",
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^Hey, Buster's Golden Star-Line Whistle! Welcome back to the seaside stand, Star-Line Explorer! ",
+                "#",
+                "^speaker: Bay keeper",
+                "/#",
+                "\n",
+                {
+                  "->": ".^.^.^.3"
+                },
+                null
+              ]
+            }
+          ],
+          [
+            {
+              "->": ".^.b"
+            },
+            {
+              "b": [
+                "\n",
+                "^Welcome to the Bubblegum Bay seaside stand! Fresh pastel Sea-Salt Taffy and sunny bay keepsakes! ",
+                "#",
+                "^speaker: Bay keeper",
+                "/#",
+                "\n",
+                {
+                  "->": ".^.^.^.3"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
           "\n",
           "ev",
           {
@@ -25720,10 +26840,80 @@
       ],
       "pass_souvenirs": [
         [
-          "^Welcome to the Pinecone Pass mountain stand! Warm Maple Pine Brittle and snowy keepsakes! ",
-          "#",
-          "^speaker: Pass keeper",
-          "/#",
+          [
+            "ev",
+            {
+              "VAR?": "buster_reward"
+            },
+            {
+              "VAR?": "sanctuary_gift"
+            },
+            "&&",
+            "/ev",
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^Heard you earned the Wildlife Sanctuary ranger basket up on the ridge, Fae! Warm brittle waiting! ",
+                "#",
+                "^speaker: Pass keeper",
+                "/#",
+                "\n",
+                {
+                  "->": ".^.^.^.3"
+                },
+                null
+              ]
+            }
+          ],
+          [
+            "ev",
+            {
+              "VAR?": "buster_reward"
+            },
+            "/ev",
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^Welcome back, Star-Line Explorer! Buster's Golden Whistle shines bright against the alpine snow! ",
+                "#",
+                "^speaker: Pass keeper",
+                "/#",
+                "\n",
+                {
+                  "->": ".^.^.^.3"
+                },
+                null
+              ]
+            }
+          ],
+          [
+            {
+              "->": ".^.b"
+            },
+            {
+              "b": [
+                "\n",
+                "^Welcome to the Pinecone Pass mountain stand! Warm Maple Pine Brittle and snowy keepsakes! ",
+                "#",
+                "^speaker: Pass keeper",
+                "/#",
+                "\n",
+                {
+                  "->": ".^.^.^.3"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
           "\n",
           "ev",
           {
@@ -26635,10 +27825,128 @@
         },
         {
           "again": [
-            "^Welcome back to Cloverhollow Grocery Market, Fae! Fresh apples and crunchy crackers straight off the shelves! ",
-            "#",
-            "^speaker: Grocer Pippin",
-            "/#",
+            [
+              "ev",
+              {
+                "VAR?": "milo_revealed"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^So happy Milo and the whole valley feel sunny and calm again, Fae! Fresh apples are waiting! ",
+                  "#",
+                  "^speaker: Grocer Pippin",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.5"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "sunberry_harvests"
+              },
+              0,
+              ">",
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^That glowing Golden Sunberry from your clubhouse garden is pure orchard magic, Fae! Welcome back! ",
+                  "#",
+                  "^speaker: Grocer Pippin",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.5"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "sanctuary_reward_14"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Word is Ranger Fern's meadow is brimming with calm critters! That makes an old grocer smile, Fae! ",
+                  "#",
+                  "^speaker: Grocer Pippin",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.5"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "buster_reward"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Well hello, official Star-Line Explorer! That Golden Whistle deserves our crispest orchard apples! ",
+                  "#",
+                  "^speaker: Grocer Pippin",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.5"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              {
+                "->": ".^.b"
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Welcome back to Cloverhollow Grocery Market, Fae! Fresh apples and crunchy crackers straight off the shelves! ",
+                  "#",
+                  "^speaker: Grocer Pippin",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.5"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
             "\n",
             {
               "->": ".^.^.market_shop"
@@ -27212,10 +28520,130 @@
         ],
         {
           "again": [
-            "^Welcome back to Sweet Scoop Ice Cream Parlor, Fae! The waffle cones are extra crispy today! ",
-            "#",
-            "^speaker: Scooper Penny",
-            "/#",
+            [
+              "ev",
+              {
+                "VAR?": "milo_revealed"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Peace is back in Cloverhollow, Fae! I saved extra rainbow victory sprinkles for you and Milo! ",
+                  "#",
+                  "^speaker: Scooper Penny",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.5"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "sue_compass"
+              },
+              {
+                "VAR?": "jordan_clover"
+              },
+              "&&",
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^You visited Sue's beach cottage AND Jordan's mountain cabin? You earned double scoops today, Fae! ",
+                  "#",
+                  "^speaker: Scooper Penny",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.5"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "bay_boat_charm"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^I heard you took a pastel rowboat out across Bubblegum Bay! Sunny harbor cruises deserve ice cream! ",
+                  "#",
+                  "^speaker: Scooper Penny",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.5"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "buster_reward"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Ooh, Buster's Golden Star-Line Whistle! Nothing pairs with explorer whistles like crisp waffle cones! ",
+                  "#",
+                  "^speaker: Scooper Penny",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.5"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              {
+                "->": ".^.b"
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Welcome back to Sweet Scoop Ice Cream Parlor, Fae! The waffle cones are extra crispy today! ",
+                  "#",
+                  "^speaker: Scooper Penny",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.5"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
             "\n",
             {
               "->": ".^.^.parlor_shop"

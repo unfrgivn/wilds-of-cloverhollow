@@ -1,7 +1,9 @@
 import {
+  addBoundedSparkles,
   addFloatingMotes,
   ARCADE_MOTE_TINTS,
   areaSeed,
+  ART_PALETTE_TINTS,
   CAFE_MOTE_TINTS,
   clamp01,
   CLUBHOUSE_BLOOM_TINTS,
@@ -10,8 +12,11 @@ import {
   HEARTH_MOTE_TINTS,
   INDOOR_SUNLIT,
   MARKET_MOTE_TINTS,
+  MARKET_ORCHARD_TINTS,
   MILO_MOTE_TINTS,
+  MUSIC_HARMONY_TINTS,
   PARLOR_MOTE_TINTS,
+  PARLOR_SUNDAE_TINTS,
   pickTint,
   ROSIE_MOTE_TINTS,
   SUNLIT_MOTE_TINTS,
@@ -158,6 +163,23 @@ export function evaluateIndoorAtmosphere(
       minAlpha: 0.17,
       maxAlpha: 0.42,
     });
+    if (options?.marketOrchardGlow === true) {
+      // 5 soft golden-honey orchard sparkles drifting lazily over Grocer Pippin's produce bins.
+      addBoundedSparkles(out, seed, tick, options.reducedMotion === true, {
+        count: 5,
+        tints: MARKET_ORCHARD_TINTS,
+        blend: "normal",
+        minX: 420,
+        spanX: 260,
+        minY: 260,
+        spanY: 130,
+        minAlpha: 0.24,
+        alphaSpan: 0.2,
+        minScale: 0.34,
+        scaleSpan: 0.18,
+        stride: 67,
+      });
+    }
     return out;
   }
 
@@ -209,6 +231,23 @@ export function evaluateIndoorAtmosphere(
         rotation: 0,
         alpha: clamp01(0.18 + twinkle * 0.28),
         tint: pickTint(PARLOR_MOTE_TINTS, i),
+      });
+    }
+    if (options?.parlorSundaeSparkle === true) {
+      // 5 pastel-berry & mint shimmer sparkles floating above Scooper Penny's gelato display.
+      addBoundedSparkles(out, seed, tick, options.reducedMotion === true, {
+        count: 5,
+        tints: PARLOR_SUNDAE_TINTS,
+        blend: "normal",
+        minX: 460,
+        spanX: 300,
+        minY: 250,
+        spanY: 130,
+        minAlpha: 0.24,
+        alphaSpan: 0.2,
+        minScale: 0.34,
+        scaleSpan: 0.18,
+        stride: 71,
       });
     }
     return out;
@@ -555,6 +594,40 @@ export function evaluateIndoorAtmosphere(
           tint: pickTint(CLUBHOUSE_BLOOM_TINTS, i),
         });
       }
+    }
+    if (areaId === "music" && options?.musicRoomHarmony === true) {
+      // 5 warm golden-lavender acoustic sparkles drifting above the piano & chimes.
+      addBoundedSparkles(out, seed, tick, options.reducedMotion === true, {
+        count: 5,
+        tints: MUSIC_HARMONY_TINTS,
+        blend: "normal",
+        minX: 420,
+        spanX: 440,
+        minY: 240,
+        spanY: 180,
+        minAlpha: 0.24,
+        alphaSpan: 0.18,
+        minScale: 0.42,
+        scaleSpan: 0.22,
+        stride: 79,
+      });
+    }
+    if (areaId === "art-room" && options?.artRoomPaletteGlow === true) {
+      // 5 pastel watercolor-palette sparkles floating softly inside the skylight studio.
+      addBoundedSparkles(out, seed, tick, options.reducedMotion === true, {
+        count: 5,
+        tints: ART_PALETTE_TINTS,
+        blend: "normal",
+        minX: 360,
+        spanX: 500,
+        minY: 230,
+        spanY: 210,
+        minAlpha: 0.24,
+        alphaSpan: 0.18,
+        minScale: 0.42,
+        scaleSpan: 0.22,
+        stride: 83,
+      });
     }
     return out;
   }

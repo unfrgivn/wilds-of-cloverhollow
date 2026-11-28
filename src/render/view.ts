@@ -596,38 +596,47 @@ export class GameView {
     state: State,
     reducedMotion: boolean,
   ): AtmosphereOptions | undefined {
+    const flag = (name: string): boolean => this.world.storyVariable(state.ink, name) === true;
+    const busterReward = flag("buster_reward");
     const clubhouseBloom =
-      areaId === "clubhouse" &&
-      (this.world.storyVariable(state.ink, "garden_sprouted") === true ||
-        this.world.storyVariable(state.ink, "garden_ripe") === true);
+      areaId === "clubhouse" && (flag("garden_sprouted") || flag("garden_ripe"));
     const cafeCinnamonSteam =
       areaId === "cafe" &&
-      this.world.storyVariable(state.ink, "spice_returned") === true &&
-      (this.world.storyVariable(state.ink, "buster_reward") === true ||
+      flag("spice_returned") &&
+      (busterReward ||
         state.critters["taco-chef"] === "calm" ||
         state.stickers.includes("taco-chef"));
-    const plazaStarGlow =
-      areaId === "plaza" &&
-      this.world.storyVariable(state.ink, "buster_reward") === true;
-    const passHearthWisps =
-      areaId === "pass" &&
-      this.world.storyVariable(state.ink, "sanctuary_gift") === true;
-    if (
-      !clubhouseBloom &&
-      !cafeCinnamonSteam &&
-      !plazaStarGlow &&
-      !passHearthWisps &&
-      !reducedMotion
-    ) {
-      return undefined;
-    }
-    return {
+    const plazaStarGlow = areaId === "plaza" && busterReward;
+    const passHearthWisps = areaId === "pass" && flag("sanctuary_gift");
+    const sunberryHarvests = this.world.storyVariable(state.ink, "sunberry_harvests");
+    const sunberryCount =
+      typeof sunberryHarvests === "number"
+        ? sunberryHarvests
+        : typeof sunberryHarvests === "string"
+          ? Number(sunberryHarvests)
+          : 0;
+    const marketOrchardGlow =
+      areaId === "market" &&
+      flag("market_note_read") &&
+      Number.isFinite(sunberryCount) &&
+      sunberryCount > 0;
+    const parlorSundaeSparkle = areaId === "parlor" && flag("parlor_note_read") && busterReward;
+    const cavernChimeShimmer = areaId === "cavern" && flag("cavern_chime_rung") && busterReward;
+    const musicRoomHarmony = areaId === "music" && flag("has_flute") && busterReward;
+    const artRoomPaletteGlow = areaId === "art-room" && flag("art_open") && busterReward;
+    const options: AtmosphereOptions = {
       ...(clubhouseBloom ? { clubhouseBloom: true } : {}),
       ...(cafeCinnamonSteam ? { cafeCinnamonSteam: true } : {}),
       ...(plazaStarGlow ? { plazaStarGlow: true } : {}),
       ...(passHearthWisps ? { passHearthWisps: true } : {}),
+      ...(marketOrchardGlow ? { marketOrchardGlow: true } : {}),
+      ...(parlorSundaeSparkle ? { parlorSundaeSparkle: true } : {}),
+      ...(cavernChimeShimmer ? { cavernChimeShimmer: true } : {}),
+      ...(musicRoomHarmony ? { musicRoomHarmony: true } : {}),
+      ...(artRoomPaletteGlow ? { artRoomPaletteGlow: true } : {}),
       ...(reducedMotion ? { reducedMotion: true } : {}),
     };
+    return Object.keys(options).length === 0 ? undefined : options;
   }
 
   private renderGlows(

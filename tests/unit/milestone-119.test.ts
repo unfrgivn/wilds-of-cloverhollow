@@ -84,9 +84,9 @@ describe("Milestone 119: Resilient Background Lifecycle & pagehide Autosave Flus
 });
 
 describe("Milestone 119: 16-Area Cozy Resting & Coastal Trail Butterflies", () => {
-  it("keeps all 22 resting areas inside walkable and clear of blockers and triggers", () => {
+  it("keeps all 32 resting areas inside walkable and clear of blockers and triggers", () => {
     const areas = new Set(REST_SPOTS.map((spot) => spot.area));
-    expect(areas.size).toBe(22);
+    expect(areas.size).toBe(32);
     expect(areas.has("kitchen")).toBe(true);
     expect(areas.has("trail")).toBe(true);
 

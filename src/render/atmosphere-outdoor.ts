@@ -1,10 +1,12 @@
 import {
+  addBoundedSparkles,
   addFloatingMotes,
   addMistRibbons,
   areaSeed,
   AURORA_TINTS,
   BLOSSOM_TINTS,
   BUTTERFLY_TINTS,
+  CAVERN_CHIME_TINTS,
   CAVERN_CRYSTALS,
   CAVERN_EDGE_SHADOWS,
   CAVERN_LANTERNS,
@@ -731,6 +733,23 @@ export function evaluateOutdoorAtmosphere(
       minAlpha: 0.2,
       maxAlpha: 0.52,
     });
+    if (options?.cavernChimeShimmer === true) {
+      // 6 soft prismatic crystal starlight sparkles drifting over the crystal cavern waters.
+      addBoundedSparkles(out, seed, tick, options.reducedMotion === true, {
+        count: 6,
+        tints: CAVERN_CHIME_TINTS,
+        blend: "add",
+        minX: 580,
+        spanX: 600,
+        minY: 360,
+        spanY: 300,
+        minAlpha: 0.24,
+        alphaSpan: 0.2,
+        minScale: 0.34,
+        scaleSpan: 0.22,
+        stride: 73,
+      });
+    }
     return out;
   }
 

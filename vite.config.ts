@@ -4,6 +4,7 @@ export interface ChunkGroup {
   name: string;
   test: RegExp;
   priority: number;
+  includeDependenciesRecursively?: boolean;
 }
 
 export const chunkGroups: ChunkGroup[] = [
@@ -12,6 +13,12 @@ export const chunkGroups: ChunkGroup[] = [
   { name: "story-content", test: /\/content\/story\/main\.ink\.json/, priority: 22 },
   { name: "area-content", test: /\/content\/(areas|props)\//, priority: 20 },
   { name: "audio-scores", test: /\/src\/platform\/scores(-[a-z]+)?\.ts/, priority: 18 },
+  {
+    name: "render-engine",
+    test: /\/src\/render\//,
+    priority: 16,
+    includeDependenciesRecursively: false,
+  },
   { name: "world-content", test: /\/content\/(?!qa\/)/, priority: 15 },
 ];
 

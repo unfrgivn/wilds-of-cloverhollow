@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 158)
+Last updated: 2026-11-27 (Milestone 159)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -75,7 +75,8 @@ reference material only.
   real shapes and narrowing with type guards.
 - Tooling: Vite 8 / Rolldown (dev server and production/harness builds with
   `build.rolldownOptions.output.codeSplitting` into `vendor-pixi`, `vendor-ink`,
-  `story-content`, `area-content`, `audio-scores`, `world-content`, and
+  `story-content`, `area-content`, `audio-scores`, `render-engine`
+  (`includeDependenciesRecursively: false`), `world-content`, and
   `index`/`game` app chunks, keeping all non-vendor app and content chunks
   under 500 kB, enforced automatically on production builds by
   `tools/check-dist.ts` via `just build`, Milestone 154), Bun (package manager
@@ -656,9 +657,21 @@ ios/            Capacitor iOS project (from Milestone 4).
   `plazaStarGlow` in `plaza` when `buster_reward`: 8 pastel-gold `#FFE89A` and
   sky-blue `#B8E8FF` fountain mist sparkles; `passHearthWisps` in `pass` when
   `sanctuary_gift`: 6 cream-gold `#FFF5DF` chimney smoke curls above Mrs.
-  Flurry's Ski Lodge roof; all biomes and story-reactive accents respect
+  Flurry's Ski Lodge roof; plus Milestone 159 bounded accents via
+  `addBoundedSparkles`: `marketOrchardGlow` in `market` when
+  `market_note_read` and `sunberry_harvests > 0`: 5 golden-honey `#FFE399` /
+  `#FFD2A6` sparkles over the produce bins; `parlorSundaeSparkle` in `parlor`
+  when `parlor_note_read` and `buster_reward`: 5 berry/mint `#FFB8D2` /
+  `#AEEBD8` sparkles above the gelato case; `cavernChimeShimmer` in `cavern`
+  when `cavern_chime_rung` and `buster_reward`: 6 additive prismatic `#9AE8FF`
+  / `#D8B8FF` / `#FFE89E` sparkles over the cavern waters; `musicRoomHarmony`
+  in `music` when `has_flute` and `buster_reward`: 5 golden-lavender `#FFE29A`
+  / `#D6C2FF` acoustic sparkles above the piano and chimes; and
+  `artRoomPaletteGlow` in `art-room` when `art_open` and `buster_reward`: 5
+  pastel watercolor `#FFA8C5` / `#FFE082` / `#9CE3B4` / `#9AD4FF` sparkles
+  under the studio skylight; all biomes and story-reactive accents respect
   `reducedMotion` by holding positions and pulses steady across ticks,
-  Milestone 119), and an `emissive`
+  Milestones 119 and 159), and an `emissive`
   light layer mounted above `lanternLayer` (`emissiveLayer`, boosted smoothly
   during lantern dusk for cavern crystals/lanterns, enchanted fairies, plaza lamp
   arches, lodge hearth, and café counter glows, plus cool subterranean edge
@@ -1865,10 +1878,13 @@ ios/            Capacitor iOS project (from Milestone 4).
     `emoteHeart` + pastel `sparkle` puffs, and a synthesized species affection
     cue via `AudioController.playEffect`), or relax at curated painted benches,
     chairs, rugs, picnic blanket, glades, overlooks, and the Clubhouse beanbag
-    across 22 areas (`plaza`, `park`, `bay`, `island`, `cafe`, `market`, `parlor`,
-    `lodge`, `clubhouse`, `sue-cottage`, `jordan-cabin`, `milo-house`,
-    `rosie-cottage`, `sanctuary`,
-    `bedroom`, `kitchen`, `pass`, `summit`, `trail`, `woods`, `hills`, `enchanted`), settling into a cozy seated-rest
+    across all 32 playable areas (`plaza`, `park`, `bay`, `island`, `cafe`,
+    `market`, `parlor`, `lodge`, `clubhouse`, `sue-cottage`, `jordan-cabin`,
+    `milo-house`, `rosie-cottage`, `sanctuary`, `bedroom`, `kitchen`, `pass`,
+    `summit`, `trail`, `woods`, `hills`, `enchanted`, `cavern`, `mist`,
+    `field`, `music`, `art-room`, `arcade`, `school`, `east-hall`, `classroom`,
+    and `gym` — 33 curated spots in total, 100% playable-world coverage,
+    Milestone 159), settling into a cozy seated-rest
     pose with a warm harp chord and lazily drifting `emoteNote` (`♪`) until any
     movement, cancel, menu, or confirm input stands her back up.
   - `renderInfo()` exposes `clubhouseDisplay` (visible display item count),
@@ -1877,17 +1893,24 @@ ios/            Capacitor iOS project (from Milestone 4).
     `starGemGlints` (active prismatic Star Gem glint count),
     `petting` (currently petted companion id or `null`), and `resting` (active
     rest spot id or `null`).
-  - Living Valley Townspeople Milestone Reactions (Milestone 108,
+  - Living Valley Townspeople & Epilogue Heart (Milestones 108 and 159,
     `content/story/main.ink`): zero-drift late-game and post-completion revisit
-    dialogue across ten beloved valley characters (`dad`, `chef_bea`, `barnaby`,
-    `bree`, `toby`, `buster`, `lodge_keeper`, `lifeguard`, `principal`, and
-    `ranger_fern`) reacting warmly to cross-biome achievements (`milo_revealed`,
-    never naming Milo beforehand; `gem_reward_all`; `sanctuary_reward_14`;
-    `sanctuary_visited`; `sanctuary_gift`; `buster_reward`; `sue_compass` and
+    dialogue across twenty-six beloved valley characters — ten townspeople &
+    biome friends (`dad`, `chef_bea`, `barnaby`, `bree`, `toby`, `buster`,
+    `lodge_keeper`, `lifeguard`, `principal`, and `ranger_fern`, Milestone 108)
+    plus sixteen shopkeepers, school faculty, classmates, family, and
+    Enchanted Forest fairies (`grocer_pippin`, `scooper_penny`,
+    `bay_souvenirs`, `pass_souvenirs`, `classroom_teacher`, `rosie`, `coach`,
+    `music_teacher`, `art_teacher`, `mom`, `oliver`, `milo`, `fairy_lavender`,
+    `fairy_mint`, `fairy_sky`, and `fairy_peach`, Milestone 159) — reacting
+    warmly to cross-biome achievements (`milo_revealed`, never naming Milo
+    beforehand; `gem_reward_all`; `sanctuary_reward_14`; `sanctuary_visited`;
+    `sanctuary_gift`; `buster_reward`; `cavern_chime_rung`;
+    `sunberry_harvests > 0`; `kite_returned`; `sue_compass` and
     `jordan_clover`; `sue_cottage_visited` and `jordan_cabin_visited`;
     `bay_boat_charm`; and calmed school/town friends `taco-chef`, `principal`,
-    and `art-teacher`), with every new line sized to fit cleanly in 2 lines
-    inside `.sticker-box`.
+    and `art-teacher`), with every new line sized `<= 105` characters to fit
+    cleanly in 2 lines inside `.sticker-box`.
 - Recess (Milestone 39): the flute's last line rings the bell (`recess`), and
   Coach Ash props the gym's back door open. `field`, "Playing Field", is a
   1650x1100 painted schoolyard behind the school (no concept sheet): the

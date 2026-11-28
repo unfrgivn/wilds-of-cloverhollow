@@ -6854,6 +6854,48 @@ the old trail, the owl, and the clubhouse claim.
   purity, lint), `just build` (`index` `474.11 kB < 500 kB`), 34/34 Chromium &
   WebKit battle e2e, and 95/95 Chromium `ui-gallery` tests.
 
+## Milestone 159: 100% Complete World Cozy Resting (All 32/32 Playable Areas), Story-Reactive Interior & Cavern Atmosphere, Complete Valley Epilogue Heart & `render-engine` Chunk Split **Status:** ✅ Completed (2026-11-27)
+- Completes Cozy Resting across every single non-`harness` playable area in the
+  entire game (33 verified spots across 32/32 areas), adds 5 story-reactive
+  interior/cavern atmospheric accents, completes late-game valley epilogue
+  chatter across 16 story knots, and splits `render-engine` out of `index.js`
+  (`487.71 -> 318.61 kB`) — zero `src/core` changes, zero save-version bumps,
+  zero replay hash drift across all 73 sims, and zero visual baseline diffs.
+- 100% world Cozy Resting coverage (`src/render/companions.ts`):
+  - Added 10 verified, walkable, blocker-free, foreground-prop-clear, and
+    living-NPC-clear spots (`cavern-crystal-bank`, `mist-bellflower-glade`,
+    `field-oak-shade`, `music-room-rug`, `art-room-skylight`, `arcade-lounge`,
+    `school-hall-bench`, `east-hall-sunbeam`, `classroom-reading-rug`,
+    `gym-sideline-mat`) alongside the existing 23 spots (33 total across all 32
+    playable areas).
+- Story-reactive interior & cavern atmosphere (`src/render/atmosphere-shared.ts`,
+  `atmosphere-indoor.ts`, `atmosphere-outdoor.ts`, `view.ts`):
+  - Added `addBoundedSparkles` and 5 story-gated accents (`marketOrchardGlow`,
+    `parlorSundaeSparkle`, `cavernChimeShimmer`, `musicRoomHarmony`,
+    `artRoomPaletteGlow`), all respecting `reducedMotion` cleanly.
+- Complete valley epilogue heart (`content/story/main.ink` -> compiled
+  `content/story/main.ink.json`):
+  - Added crisp 2-line (`<= 105` chars) cross-milestone revisit epilogues across
+    16 knots (`grocer_pippin`, `scooper_penny`, `bay_souvenirs`,
+    `pass_souvenirs`, `classroom_teacher`, `rosie`, `coach`, `music_teacher`,
+    `art_teacher`, `mom`, `oliver`, `milo`, and all 4 Enchanted Forest Fairies)
+    with zero new `VAR`s, strict `milo_revealed` spoiler guard, and byte-identical
+    preservation of all 73 sim paths.
+- Production `render-engine` chunk split (`vite.config.ts`):
+  - Added `{ name: "render-engine", test: /\/src\/render\//, priority: 16, includeDependenciesRecursively: false }`,
+    splitting `render-engine` (`171.88 kB`) cleanly out of `index.js`
+    (`318.61 kB`) with zero circular chunk warnings and > 110 kB headroom below
+    the `< 500 kB` production gate on every non-vendor chunk.
+- Evidence: `tests/unit/milestone-159.test.ts` and
+  `tests/e2e/milestone-159.spec.ts` (`@smoke` Chromium + WebKit); all 8 review
+  captures (`art/review/m147-{pippin-sunberry,penny-milestone}-1280.jpg`,
+  `m150-{cavern-rest,music-rest,coach-epilogue,classroom-rest}-1280.jpg`,
+  `m151-{mom-epilogue,fairy-epilogue}-1280.jpg`) independently verified via
+  `vision`.
+- Gates: `just check` (221 unit files / 1,622 tests, all 73 sims, 23 QA packs,
+  purity, lint), `just build` (all non-vendor chunks `< 390 kB`), and 33/33
+  Chromium & WebKit e2e tests.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

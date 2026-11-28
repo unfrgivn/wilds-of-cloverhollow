@@ -258,8 +258,17 @@ A big bowl of pancake batter and a whole mountain of blueberries. Yum. # speaker
 
 === oliver ===
 {awake: -> morning_oliver}
-Oliver shakes his rattle. "Ba!" # speaker: Oliver
-Mom laughs from the kitchen. # speaker: Mom
+{
+- milo_revealed:
+    Oliver claps both chubby hands at Maddie and beams up at Fae. "Ba! Yay!" # speaker: Oliver
+    Mom laughs warmly from the kitchen. "Even Oliver can tell the valley is calm again!" # speaker: Mom
+- buster_reward:
+    Oliver spots Fae's shiny Golden Whistle and giggles. "Ba! Star!" # speaker: Oliver
+    Mom laughs from the kitchen. # speaker: Mom
+- else:
+    Oliver shakes his rattle. "Ba!" # speaker: Oliver
+    Mom laughs from the kitchen. # speaker: Mom
+}
 -> DONE
 = morning_oliver
 Oliver giggles and points at the fridge drawings. They look like the forest, the fairies, and a purple scribble. # speaker: Fae
@@ -280,7 +289,20 @@ Morning, sleepyhead! Blueberry pancakes are almost ready. # speaker: Mom
     Aww. Now eat up, sweetie. # speaker: Mom
 - -> DONE
 = again
-Have a good day, sweetie. Stay curious! # speaker: Mom
+{
+- milo_revealed:
+    I'm so proud of you, sweetie! Helping Milo feel seen brought calm right back to the valley. # speaker: Mom
+- sanctuary_reward_14:
+    Ranger Fern wove you a Sanctuary Clover Wreath? I'm so proud of my little critter friend! # speaker: Mom
+- gem_reward_all:
+    All seven Star Gems and Grandpa Barnaby's Rainbow Geode? That calls for celebration pancakes! # speaker: Mom
+- buster_reward:
+    What a shiny Golden Star-Line Whistle! You really explored every corner of the valley, sweetie. # speaker: Mom
+- sunberry_harvests > 0:
+    A glowing Golden Sunberry from your garden? Let's top tomorrow's blueberry pancakes with one! # speaker: Mom
+- else:
+    Have a good day, sweetie. Stay curious! # speaker: Mom
+}
 -> DONE
 = morning
 // Mom wakes Fae once; after that, upstairs or down, she sends her to Milo.
@@ -760,6 +782,7 @@ The classroom door is shut. Story time hasn't started yet. # speaker: Fae
 -> DONE
 
 === classroom_teacher ===
+{milo_revealed: -> again}
 {classroom_teacher > 1 and saw_hood and not pe_time: -> pe}
 {classroom_teacher > 1: -> again}
 Today's story is about a dragon who sneezes bubbles instead of fire! # speaker: Ms. Maple
@@ -768,7 +791,16 @@ Everyone in the village got very sticky. Settle in, everyone! # speaker: Ms. Map
 {saw_hood: -> pe}
 -> DONE
 = again
-Remember, Fae: a kind word can calm almost anything. # speaker: Ms. Maple
+{
+- milo_revealed:
+    I'm so proud of you, Fae! Helping Milo open up brought calm right back to Cloverhollow. # speaker: Ms. Maple
+- sanctuary_reward_14:
+    Oh, what a lovely woven Sanctuary Clover Wreath! Ranger Fern must be so proud of you, Fae! # speaker: Ms. Maple
+- gem_reward_all:
+    All seven valley Star Gems? You have the brightest explorer's eye in Cloverhollow, Fae! # speaker: Ms. Maple
+- else:
+    Remember, Fae: a kind word can calm almost anything. # speaker: Ms. Maple
+}
 -> DONE
 = pe
 That's the end of our story! Time for PE, everyone. # speaker: Ms. Maple
@@ -778,6 +810,7 @@ The gym! That's where the kid in the purple hood was headed. # speaker: Fae
 -> DONE
 
 === milo ===
+{milo_revealed: -> epilogue}
 {milo > 1: -> again}
 Fae! Did you hear? Somebody beat the Star Racer high score at the arcade! # speaker: Milo
 I've been trying all year. And they scribbled out their initials, so nobody knows who! # speaker: Milo
@@ -785,6 +818,15 @@ Whoever it was must be really, REALLY good at Star Racer. # speaker: Milo
 -> DONE
 = again
 Milo folds a paper airplane. "This one's a Star Racer!" # speaker: Milo
+-> DONE
+= epilogue
+Hey Fae! No more purple fizz! Want to race paper airplanes at recess? For real this time! # speaker: Milo
+{
+- sanctuary_reward_14:
+    Whoa, Ranger Fern wove you a Sanctuary Clover Wreath?! You're the real valley legend, Fae! # speaker: Milo
+- buster_reward:
+    Whoa, a Golden Star-Line Whistle from Buster?! Show me how to blow it after school, okay? # speaker: Milo
+}
 -> DONE
 
 === rosie ===
@@ -796,8 +838,18 @@ A purple hood? Here, at school? I have to see! # speaker: Fae
 -> DONE
 = again
 {kite_down and not kite_returned: -> kite}
-{saw_hood: Did you catch them? They're SO fast. # speaker: Rosie}
-{not saw_hood: Hurry, Fae! They went down the hall! # speaker: Rosie}
+{
+- milo_revealed:
+    Wait, the purple hood was Milo all along?! I'm glad the mystery's solved and the halls are calm! # speaker: Rosie
+- kite_returned and buster_reward:
+    Whoa, Buster gave you a Golden Star-Line Whistle?! Even cooler than flying my kite at the park! # speaker: Rosie
+- sue_compass and jordan_clover:
+    You visited Sue's cottage AND Jordan's cabin? Our class is going to want a whole story time on that! # speaker: Rosie
+- saw_hood:
+    Did you catch them? They're SO fast. # speaker: Rosie
+- else:
+    Hurry, Fae! They went down the hall! # speaker: Rosie
+}
 -> DONE
 = kite
 My kite! The wind snatched it right out of my hands at the park. # speaker: Rosie
@@ -876,9 +928,18 @@ Keep the lasso. It can pull down things that are up high, and swing you across g
 Oh, and music's next! Ms. Willow's room is down the east hall. # speaker: Coach Ash
 -> DONE
 = again
-{not music_quest: Music is next, Fae! Ms. Willow's room is down the east hall. # speaker: Coach Ash}
-{recess: Recess! I've propped the back door open. Out you go! # speaker: Coach Ash}
-Keep that lasso handy, Fae! And watch out for that purple hood. # speaker: Coach Ash
+{
+- milo_revealed:
+    Ha! Looks like Milo's hall-sprint record finally met its match in your calm-down team, Fae! # speaker: Coach Ash
+- cavern_chime_rung:
+    You twirled my Rainbow Lasso to ring Crystal Cavern's star chime? Now THAT'S gold-medal form! # speaker: Coach Ash
+- buster_reward:
+    TWEET! A grand salute to Cloverhollow's official Star-Line Explorer! Keep stretching those legs! # speaker: Coach Ash
+- else:
+    {not music_quest: Music is next, Fae! Ms. Willow's room is down the east hall. # speaker: Coach Ash}
+    {recess: Recess! I've propped the back door open. Out you go! # speaker: Coach Ash}
+    Keep that lasso handy, Fae! And watch out for that purple hood. # speaker: Coach Ash
+}
 -> DONE
 
 === hoop ===
@@ -1331,7 +1392,16 @@ Come in, Fae. The art room is open! # speaker: Ms. Rowan
 ~ art_open = true
 -> DONE
 = again
-Welcome back, Fae! The easels are ready for you. # speaker: Ms. Rowan
+{
+- milo_revealed:
+    Milo brought back every purple marker and painted a whole galaxy of stars with me today, Fae! # speaker: Ms. Rowan
+- sanctuary_reward_14:
+    I packed my sketchbook for Ranger Fern's meadow! All those calm critters deserve watercolor portraits! # speaker: Ms. Rowan
+- sunberry_harvests > 0:
+    Ooh, those glowing Golden Sunberry hues! I've been mixing honey-gold paint to match them all week! # speaker: Ms. Rowan
+- else:
+    Welcome back, Fae! The easels are ready for you. # speaker: Ms. Rowan
+}
 -> DONE
 
 === art_easels ===
@@ -1376,8 +1446,17 @@ Our class song goes red, yellow, blue... # speaker: Ms. Willow
 {heard_bird: Try it on the xylophone! # speaker: Ms. Willow}
 -> DONE
 = again
-Play that flute whenever you need a friend, Fae! # speaker: Ms. Willow
-{recess: Now, off to recess! The playing field is out the gym's back door. # speaker: Ms. Willow}
+{
+- milo_revealed:
+    Oh, what sweet harmony! Helping Milo find his calm again is the finest song in Cloverhollow, Fae. # speaker: Ms. Willow
+- sanctuary_reward_14:
+    Your flute and kindness filled Ranger Fern's meadow with calm friends! Pure woodland music, dear! # speaker: Ms. Willow
+- gem_reward_all:
+    All seven Star Gems, and Ribbon Bunny hops along to your flute now? Simply enchanting, Fae! # speaker: Ms. Willow
+- else:
+    Play that flute whenever you need a friend, Fae! # speaker: Ms. Willow
+    {recess: Now, off to recess! The playing field is out the gym's back door. # speaker: Ms. Willow}
+}
 -> DONE
 
 === music_bird_calm ===
@@ -2073,21 +2152,51 @@ It looks tired. # speaker: Fae
 
 === fairy_lavender ===
 ~ heard_wish = true
-This is the Enchanted Forest. The Ancient Tree dreams the whole land. # speaker: Lavender Fairy
-The Mystic Pond grants wishes. A kid in a purple hood made a wish and drank from it. # speaker: Lavender Fairy
-Then everything went fizzy and purple, with scribbles everywhere. The Ancient Tree can't dream properly with all that fizz! # speaker: Lavender Fairy
+{
+- milo_revealed:
+    The Ancient Tree is dreaming golden dreams again, Fae! Thank you for bringing back its peace. # speaker: Lavender Fairy
+    {
+    - sanctuary_reward_14:
+        Even your Sanctuary Clover Wreath shimmers like the meadow's gentlest fairy light! # speaker: Lavender Fairy
+    - sunberry_harvests > 0:
+        And Golden Sunberries from your garden? The forest remembers kindness grown with care! # speaker: Lavender Fairy
+    }
+- else:
+    This is the Enchanted Forest. The Ancient Tree dreams the whole land. # speaker: Lavender Fairy
+    The Mystic Pond grants wishes. A kid in a purple hood made a wish and drank from it. # speaker: Lavender Fairy
+    Then everything went fizzy and purple, with scribbles everywhere. The Ancient Tree can't dream properly with all that fizz! # speaker: Lavender Fairy
+}
 -> DONE
 
 === fairy_mint ===
-The butterflies keep tickling my wings. I keep telling them, "Again!" # speaker: Mint Fairy
+{
+- milo_revealed and sanctuary_reward_14:
+    The butterflies loop softly again, and they adore your Sanctuary Clover Wreath! "Again!" # speaker: Mint Fairy
+- milo_revealed:
+    The butterflies are looping softly through the glade again! No more purple fizz! "Again!" # speaker: Mint Fairy
+- else:
+    The butterflies keep tickling my wings. I keep telling them, "Again!" # speaker: Mint Fairy
+}
 -> DONE
 
 === fairy_sky ===
-The Ancient Tree is older than every tree, even the trees that think they are very old. # speaker: Sky Fairy
+{
+- milo_revealed and gem_reward_all:
+    Your calm kindness healed the Ancient Tree, and all seven Star Gems sing with its light! # speaker: Sky Fairy
+- milo_revealed:
+    Even the Ancient Tree remembers a kindness as calm and steady as yours, Fae. # speaker: Sky Fairy
+- else:
+    The Ancient Tree is older than every tree, even the trees that think they are very old. # speaker: Sky Fairy
+}
 -> DONE
 
 === fairy_peach ===
-Hee hee! The pond bubbles made my shoes go squeak. # speaker: Peach Fairy
+{
+- milo_revealed:
+    Hee hee! The pond bubbles are gentle stardust again instead of squeaky purple fizz! # speaker: Peach Fairy
+- else:
+    Hee hee! The pond bubbles made my shoes go squeak. # speaker: Peach Fairy
+}
 -> DONE
 
 === milo_calm ===
@@ -3131,7 +3240,14 @@ All aboard anytime, Star-Line Explorer! Keep that Golden Star-Line Whistle shini
 -> DONE
 
 === bay_souvenirs ===
-Welcome to the Bubblegum Bay seaside stand! Fresh pastel Sea-Salt Taffy and sunny bay keepsakes! # speaker: Bay keeper
+{
+- buster_reward and bay_boat_charm:
+    Spotted your pastel rowboat and lucky sea-glass clover out on the bay, Fae! Ready for fresh taffy? # speaker: Bay keeper
+- buster_reward:
+    Hey, Buster's Golden Star-Line Whistle! Welcome back to the seaside stand, Star-Line Explorer! # speaker: Bay keeper
+- else:
+    Welcome to the Bubblegum Bay seaside stand! Fresh pastel Sea-Salt Taffy and sunny bay keepsakes! # speaker: Bay keeper
+}
 {buster_quest and not stamp_bay:
     ~ stamp_bay = true
     A Star-Line Stamp Card from Buster? Stamp! One shiny Bubblegum Bay wave stamp, all yours! # speaker: Bay keeper # sound: chime-blue
@@ -3147,7 +3263,14 @@ Welcome to the Bubblegum Bay seaside stand! Fresh pastel Sea-Salt Taffy and sunn
 - -> DONE
 
 === pass_souvenirs ===
-Welcome to the Pinecone Pass mountain stand! Warm Maple Pine Brittle and snowy keepsakes! # speaker: Pass keeper
+{
+- buster_reward and sanctuary_gift:
+    Heard you earned the Wildlife Sanctuary ranger basket up on the ridge, Fae! Warm brittle waiting! # speaker: Pass keeper
+- buster_reward:
+    Welcome back, Star-Line Explorer! Buster's Golden Whistle shines bright against the alpine snow! # speaker: Pass keeper
+- else:
+    Welcome to the Pinecone Pass mountain stand! Warm Maple Pine Brittle and snowy keepsakes! # speaker: Pass keeper
+}
 {buster_quest and not stamp_pass:
     ~ stamp_pass = true
     Buster's Star-Line Stamp Card! Stamp! One crisp Pinecone Pass pine stamp, ready to roll! # speaker: Pass keeper # sound: chime-green
@@ -3250,7 +3373,18 @@ Ooh, it smells so fresh and crunchy! Thank you, Grocer Pippin! # speaker: Fae
 Need any critter treats or trail snacks for your backpack today? # speaker: Grocer Pippin
 -> market_shop
 = again
-Welcome back to Cloverhollow Grocery Market, Fae! Fresh apples and crunchy crackers straight off the shelves! # speaker: Grocer Pippin
+{
+- milo_revealed:
+    So happy Milo and the whole valley feel sunny and calm again, Fae! Fresh apples are waiting! # speaker: Grocer Pippin
+- sunberry_harvests > 0:
+    That glowing Golden Sunberry from your clubhouse garden is pure orchard magic, Fae! Welcome back! # speaker: Grocer Pippin
+- sanctuary_reward_14:
+    Word is Ranger Fern's meadow is brimming with calm critters! That makes an old grocer smile, Fae! # speaker: Grocer Pippin
+- buster_reward:
+    Well hello, official Star-Line Explorer! That Golden Whistle deserves our crispest orchard apples! # speaker: Grocer Pippin
+- else:
+    Welcome back to Cloverhollow Grocery Market, Fae! Fresh apples and crunchy crackers straight off the shelves! # speaker: Grocer Pippin
+}
 -> market_shop
 = market_shop
 {coins() < 5:
@@ -3318,7 +3452,18 @@ Every first-time visitor gets a complimentary Cloverhollow Dream Sundae made to 
     {jordan_joined: Now THAT is prime mountain-explorer fuel! # speaker: Jordan}
     -> parlor_shop
 = again
-Welcome back to Sweet Scoop Ice Cream Parlor, Fae! The waffle cones are extra crispy today! # speaker: Scooper Penny
+{
+- milo_revealed:
+    Peace is back in Cloverhollow, Fae! I saved extra rainbow victory sprinkles for you and Milo! # speaker: Scooper Penny
+- sue_compass and jordan_clover:
+    You visited Sue's beach cottage AND Jordan's mountain cabin? You earned double scoops today, Fae! # speaker: Scooper Penny
+- bay_boat_charm:
+    I heard you took a pastel rowboat out across Bubblegum Bay! Sunny harbor cruises deserve ice cream! # speaker: Scooper Penny
+- buster_reward:
+    Ooh, Buster's Golden Star-Line Whistle! Nothing pairs with explorer whistles like crisp waffle cones! # speaker: Scooper Penny
+- else:
+    Welcome back to Sweet Scoop Ice Cream Parlor, Fae! The waffle cones are extra crispy today! # speaker: Scooper Penny
+}
 -> parlor_shop
 = parlor_shop
 {coins() < 10:

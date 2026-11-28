@@ -27,6 +27,11 @@ export type AtmosphereOptions = {
   cafeCinnamonSteam?: boolean;
   plazaStarGlow?: boolean;
   passHearthWisps?: boolean;
+  marketOrchardGlow?: boolean;
+  parlorSundaeSparkle?: boolean;
+  cavernChimeShimmer?: boolean;
+  musicRoomHarmony?: boolean;
+  artRoomPaletteGlow?: boolean;
   reducedMotion?: boolean;
 };
 
@@ -87,7 +92,9 @@ export const FIREFLY_TINTS: readonly number[] = [0xf9da8e, 0xa8f0d8];
 export const HEARTH_MOTE_TINTS: readonly number[] = [0xffe3a8, 0xffcfa0];
 export const CAFE_MOTE_TINTS: readonly number[] = [0xfff2cc, 0xffe0a6, 0xffd29d];
 export const MARKET_MOTE_TINTS: readonly number[] = [0xfff4cc, 0xf9db8e, 0xffd99e];
+export const MARKET_ORCHARD_TINTS: readonly number[] = [0xffe399, 0xffd2a6];
 export const PARLOR_MOTE_TINTS: readonly number[] = [0xffc6df, 0xb8f3e4, 0xfff5d4];
+export const PARLOR_SUNDAE_TINTS: readonly number[] = [0xffb8d2, 0xaeebd8];
 export const SUNLIT_MOTE_TINTS: readonly number[] = [0xfff6dc, 0xf9e4ab];
 export const COTTAGE_MOTE_TINTS: readonly number[] = [0xfff8e2, 0xc7f7ee, 0xffe6ba];
 export const MILO_MOTE_TINTS: readonly number[] = [0xfff6d6, 0xffe49e, 0xd4dcff];
@@ -133,6 +140,9 @@ export const CAVERN_EDGE_SHADOWS: readonly [number, number, number, number][] = 
 ];
 
 export const CAVERN_MOTE_TINTS: readonly number[] = [0xd8b8ff, 0x9cf2eb, 0xf9da8e];
+export const CAVERN_CHIME_TINTS: readonly number[] = [0x9ae8ff, 0xd8b8ff, 0xffe89e];
+export const MUSIC_HARMONY_TINTS: readonly number[] = [0xffe29a, 0xd6c2ff];
+export const ART_PALETTE_TINTS: readonly number[] = [0xffa8c5, 0xffe082, 0x9ce3b4, 0x9ad4ff];
 
 // Pure deterministic hash in [0, 1) from integer inputs (zero Math.random).
 export function hash01(seed: number): number {
@@ -252,6 +262,57 @@ export function addFloatingMotes(
       rotation: 0,
       alpha: clamp01(alpha),
       tint: pickTint(tints, i),
+    });
+  }
+}
+
+export function addBoundedSparkles(
+  out: AtmosphereParticle[],
+  seed: number,
+  tick: number,
+  reducedMotion: boolean,
+  options: {
+    count: number;
+    tints: readonly number[];
+    blend: AtmosphereBlend;
+    minX: number;
+    spanX: number;
+    minY: number;
+    spanY: number;
+    minAlpha: number;
+    alphaSpan: number;
+    minScale: number;
+    scaleSpan: number;
+    stride: number;
+  },
+): void {
+  const t = reducedMotion ? 0 : tick;
+  for (let i = 0; i < options.count; i += 1) {
+    const h0 = hash01(seed + i * options.stride + 11);
+    const h1 = hash01(seed + i * options.stride + 12);
+    const h2 = hash01(seed + i * options.stride + 13);
+    const h3 = hash01(seed + i * options.stride + 14);
+    const swayX = reducedMotion ? 0 : Math.sin(t * 0.02 + i) * 8;
+    const swayY = reducedMotion ? 0 : Math.cos(t * 0.018 + i) * 6;
+    const x =
+      options.minX + wrap(h0 * options.spanX + t * (0.06 + h2 * 0.04) + swayX, options.spanX);
+    const y =
+      options.minY + wrap(h1 * options.spanY - t * (0.05 + h3 * 0.04) + swayY, options.spanY);
+    const twinkle = reducedMotion
+      ? 0.5
+      : 0.5 + 0.5 * Math.sin(t * (0.045 + h3 * 0.035) + i * 1.3);
+    const scale = options.minScale + h2 * options.scaleSpan;
+    out.push({
+      layer: "over",
+      texture: "sparkle",
+      blend: options.blend,
+      x,
+      y,
+      scaleX: scale,
+      scaleY: scale,
+      rotation: 0,
+      alpha: clamp01(options.minAlpha + twinkle * options.alphaSpan),
+      tint: pickTint(options.tints, i),
     });
   }
 }

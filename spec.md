@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 171)
+Last updated: 2026-11-27 (Milestone 173)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -245,7 +245,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   `battle-together`, `prize-won`, `fish-catch`, `level-up`, `sticker`,
   `skee-hundred`, and `taco-order`; `"medium"` on `GREAT!` `battle-hit`,
   `comet-bump`, `lasso-twirl`, `cook-ding`, `taco-oops`, and `battle-faint`;
-  and `"light"` on `claw-grab`, `mole-boop`, `taco-top`, `fish-bite`,
+  and `"light"` on `battle-recover`, `claw-grab`, `mole-boop`, `taco-top`, `fish-bite`,
   `skee-score`, `comet-star`, `flute`, `lantern-on`, `coin`, `item`, and
   companion pet.
 
@@ -409,7 +409,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   `fish-catch` for Bubblegum Bay fishing, and `taco-top`, `taco-oops`, and
   `taco-order` for Chef Mateo's Taco Truck Kitchen (Milestone 165). Battle
   depth adds `battle-together` (a rising C-major-9th sparkle arpeggio when
-  Together! launches, replacing `battle-command`), `battle-faint` (emitted on
+  Together! launches, replacing `battle-command`), `battle-recover` (emitted
+  instead of `battle-hit` when entering `battle.phase === "result"` with
+  `battle.command === "recover"`, Milestone 172), `battle-faint` (emitted on
   entering `battle.phase === "rest"` when Fae runs out of energy and plays her
   cozy fainting choreography, Milestone 165), projects `flute` when Flute
   Friends assist in battle, and adds `lasso-twirl` (a rising rope whoosh and
@@ -421,6 +423,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   ragtime for `parlor`), `loft` ("Paper Plane Sketchbook", 96 BPM 4/4 C major /
   A minor daydream for `milo-house`), `bloom` ("Rosie's Flower Window", 94 BPM
   3/4 F major pastoral waltz for `rosie-cottage`), `hills` ("Clover Meadow"),
+  `road` ("Sunberry Road", 104 BPM 4/4 sunny F major 5-voice country road
+  stroll for connected East Road areas `lane` over `"town-breeze"` and
+  `crossing` over `"forest"`, keeping `boardwalk` on `bay` over `"ocean"`,
+  Milestone 172),
   `sanctuary` ("Meadow of Friends", pre-reveal Wildlife Sanctuary), `festival`
   ("Cloverhollow Jubilee", 108 BPM 4/4 D major / G major celebration jubilee for
   post-finale `sanctuary` once `milo_revealed === true`, over `"forest"`
@@ -442,12 +448,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   Purple Hood", for wind-up mini-bosses, Talk battles, or non-runnable
   battles), `talk` ("Listening Heart", once Talk opens or calm reaches
   `talkAt`), `morning` ("Waking Up", during the morning and credits finale),
-  and `silent` ("Quiet", for `harness`). `jukeboxTracks` exports all 30
+  and `silent` ("Quiet", for `harness`). `jukeboxTracks` exports all 31
   non-silent themes in story/album order (`title`, `home`, `cafe`, `market`,
   `parlor`, `loft`, `bloom`, `school`, `bay`, `fishing`, `cottage`, `island`,
   `pass`, `lodge`, `cabin`, `summit`, `cavern`, `woods`, `clubhouse`, `hills`,
-  `sanctuary`, `festival`, `arcade`, `taco`, `enchanted`, `enchanted-calm`,
-  `battle`, `boss`, `talk`, `morning`) for the Journal OPTIONS Music Box (shell-only
+  `road`, `sanctuary`, `festival`, `arcade`, `taco`, `enchanted`,
+  `enchanted-calm`, `battle`, `boss`, `talk`, `morning`) for the Journal OPTIONS
+  Music Box (shell-only
   override, never saved, plays unducked while the journal is open and returns
   smoothly to the live area theme on close, title, or reset). Ambience beds
   (`none`, `town-breeze`, `ocean`, `mountain-wind`, `hearth`, `forest`,
@@ -512,7 +519,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   pitch and `[0.65, 1.25]` gain with bit-identical output when `prosody` is
   omitted or `NEUTRAL_PROSODY`), and pitch `choice-move`, `battle-command`, and
   `choice-select` clicks to the active soundtrack's pentatonic scale (across all
-  30 tracks + `silent`).
+  31 tracks + `silent`).
   Browsers hold the context (`suspended`, or WebKit's `interrupted`) until a
   key, click, or tap; a gamepad press is not a user activation in any browser,
   so a pad-only player on the web hears nothing until one. The iOS app's web
@@ -629,7 +636,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   vintage kitchen service bell (`1568 Hz` + `3136 Hz` sine resonance) with a
   3-note fiesta bell trill (`783.99 -> 987.77 -> 1174.66 Hz`, `0.36 s`); and
   `battle-faint` plays a tender descending music-box lullaby (`659.25 -> 587.33
-  -> 523.25 -> 440 Hz`, warm sine + triangle blend, `0.50 s`, gains `<= 0.065`).
+  -> 523.25 -> 440 Hz`, warm sine + triangle blend, `0.50 s`, gains `<= 0.065`);
+  and `battle-recover` (Milestone 172) plays a warm ascending leaf-breath triad
+  (`523.25 -> 659.25 -> 783.99 -> 1046.5 Hz` sine + soft triangle shimmer,
+  `0.36 s`, gains `<= 0.08`).
 ## 4. Presentation (locked)
 - Logical view: 720 units tall. Width = 720 x screen aspect, clamped to
   960..1600 (4:3 to 20:9). Letterbox outside that range.
@@ -3699,6 +3709,11 @@ trunks keep its two exits.
     critter outside `|offsetX| >= 90` with a warm golden halo and 10 pastel
     petals & sparkles (5 petals + 5 sparkles), leaving `phase === "reward"` (8
     Relief Bloom petals) untouched.
+  - Battle `Recover` Hit-Stop Guard (Milestone 173): skips the critter result
+    recoil/hit-stop/heart-burst block whenever `isRecoverTheater(battle)` holds
+    (so prior-turn `"great"` / `answered` state never triggers `hitStop`,
+    `stageShake`, critter recoil, or critter heart bursts during `Recover`),
+    paired with bespoke `"battle-recover"` audio & `"light"` haptic feedback.
 - The kid's reveal plays `milo_calm`, clears `forest_fizzy` through `on_calm`,
   and leaves Milo calm under the tree. The sticker catalogue has 24 slots,
   including Milo, Cozy Bat, Gem Mole, Starry Owl, and Chef Mateo. The front-view NPC art is no longer

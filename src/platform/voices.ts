@@ -763,6 +763,7 @@ const D_MINOR_PENTA: readonly number[] = [587.33, 698.46, 783.99, 880.0, 1046.5,
 const TRACK_SCALES: Record<MusicTrack, readonly number[]> = {
   title: F_MAJOR,
   bloom: F_MAJOR,
+  road: F_MAJOR,
   "enchanted-calm": F_MAJOR,
   talk: F_MAJOR,
   morning: F_MAJOR,

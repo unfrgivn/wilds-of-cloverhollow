@@ -20,6 +20,7 @@ export const scores: Record<PlayableTrack, Score> = {
   loft: expansionScores.loft,
   bloom: expansionScores.bloom,
   hills: wildsScores.hills,
+  road: expansionScores.road,
   sanctuary: wildsScores.sanctuary,
   festival: expansionScores.festival,
   school: townScores.school,

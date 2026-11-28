@@ -8,8 +8,8 @@ export type SoundCue =
   | `footstep-${import("./surfaces").Surface}`
   | "door" | "area-arrive" | "coin" | "item" | "sticker"
   | "lantern-on" | "lantern-off" | "battle-start" | "battle-command"
-  | "battle-together" | "battle-hit" | "battle-win" | "battle-run" | "battle-rest" | "battle-faint"
-  | "battle-beat"
+  | "battle-together" | "battle-hit" | "battle-recover" | "battle-win" | "battle-run"
+  | "battle-rest" | "battle-faint" | "battle-beat"
   | "level-up"
   | "claw-move" | "claw-drop" | "claw-grab" | "claw-miss" | "prize-won"
   | "skee-aim" | "skee-roll" | "skee-score" | "skee-hundred" | "tickets-won"
@@ -124,8 +124,13 @@ export function soundCues(
     if (previous.battle.lassoUsed !== true && next.battle.lassoUsed === true)
       cues.push("lasso-twirl");
     if (previous.battle.phase !== next.battle.phase &&
-        (next.battle.phase === "result" || next.battle.phase === "burstResult"))
-      cues.push("battle-hit");
+        (next.battle.phase === "result" || next.battle.phase === "burstResult")) {
+      cues.push(
+        next.battle.phase === "result" && next.battle.command === "recover"
+          ? "battle-recover"
+          : "battle-hit",
+      );
+    }
   }
   if (next.battle?.phase === "rest" && previous.battle?.phase !== "rest") {
     cues.push("battle-faint");

@@ -75,6 +75,9 @@ describe("soundtrackFor", () => {
       "milo-house": ["loft", "none"],
       "rosie-cottage": ["bloom", "none"],
       hills: ["hills", "town-breeze"],
+      lane: ["road", "town-breeze"],
+      crossing: ["road", "forest"],
+      boardwalk: ["bay", "ocean"],
       sanctuary: ["sanctuary", "forest"],
       school: ["school", "none"],
       "east-hall": ["school", "none"],
@@ -414,9 +417,9 @@ describe("complete 20-track world audio identity", () => {
     ).toBe(true);
   });
 
-  test("covers all 30 jukebox tracks with titles, multi-voice scores, and harmonic scales", () => {
-    expect(jukeboxTracks).toHaveLength(30);
-    expect(new Set(jukeboxTracks).size).toBe(30);
+  test("covers all 31 jukebox tracks with titles, multi-voice scores, and harmonic scales", () => {
+    expect(jukeboxTracks).toHaveLength(31);
+    expect(new Set(jukeboxTracks).size).toBe(31);
     for (const id of jukeboxTracks) {
       expect(trackTitles[id].trim().length, `${id} title`).toBeGreaterThan(0);
       const score = scores[id];
@@ -429,6 +432,7 @@ describe("complete 20-track world audio identity", () => {
       expect(scale.length, `${id} scale length`).toBeGreaterThanOrEqual(5);
     }
     for (const id of [
+      "road",
       "sanctuary",
       "festival",
       "lodge",
@@ -460,6 +464,7 @@ describe("composed scores integrity", () => {
     "loft",
     "bloom",
     "hills",
+    "road",
     "sanctuary",
     "festival",
     "school",

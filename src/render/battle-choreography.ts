@@ -615,8 +615,9 @@ export function computeBattleChoreography(
     });
   }
 
-  // 10. Critter result reaction, 3-tick impact hit-stop, & rainbow bursts.
-  if (battle.phase === "result") {
+  // 10. Critter result reaction, 3-tick impact hit-stop, & rainbow bursts
+  // (skipped for Recover so stale prior-turn grades never shake or recoil the critter).
+  if (battle.phase === "result" && !isRecoverTheater(battle)) {
     const impactful =
       battle.lastGrade !== "miss" &&
       (battle.lastGrade === "great" ||

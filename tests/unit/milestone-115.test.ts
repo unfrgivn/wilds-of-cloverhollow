@@ -148,6 +148,7 @@ describe("Milestone 114: modular audio-recipes.ts extraction & audio.ts re-expor
     "battle-command": true,
     "battle-together": true,
     "battle-hit": true,
+    "battle-recover": true,
     "battle-beat": true,
     "claw-move": true,
     "claw-drop": true,

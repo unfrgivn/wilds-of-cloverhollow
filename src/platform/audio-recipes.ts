@@ -232,6 +232,27 @@ export const soundCueRecipes: Record<SoundCue, AudioRecipe> = {
     { wave: "noise", offset: 0, duration: 0.055, gain: 0.024, lowpass: 1200 },
     { wave: "triangle", frequency: 247, offset: 0.02, duration: 0.12, gain: 0.07 },
   ],
+  "battle-recover": [
+    { wave: "sine", frequency: 523.25, offset: 0, duration: 0.14, gain: 0.068, attack: 0.01 },
+    {
+      wave: "triangle",
+      frequency: 659.25,
+      offset: 0.06,
+      duration: 0.14,
+      gain: 0.062,
+      attack: 0.008,
+    },
+    { wave: "sine", frequency: 783.99, offset: 0.12, duration: 0.16, gain: 0.072, attack: 0.008 },
+    { wave: "sine", frequency: 1046.5, offset: 0.18, duration: 0.18, gain: 0.064, attack: 0.01 },
+    {
+      wave: "triangle",
+      frequency: 1567.98,
+      offset: 0.2,
+      duration: 0.14,
+      gain: 0.026,
+      attack: 0.012,
+    },
+  ],
   "battle-beat": [
     { wave: "sine", frequency: 880, offset: 0, duration: 0.075, gain: 0.055 },
     { wave: "sine", frequency: 1320, offset: 0.01, duration: 0.055, gain: 0.025 },

@@ -65,6 +65,7 @@ const MEDIUM_HAPTIC_CUES: ReadonlySet<SoundCue> = new Set<SoundCue>([
 ]);
 
 const LIGHT_HAPTIC_CUES: ReadonlySet<SoundCue> = new Set<SoundCue>([
+  "battle-recover",
   "claw-grab",
   "mole-boop",
   "taco-top",

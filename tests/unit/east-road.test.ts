@@ -141,8 +141,8 @@ describe("east road coastal route (lane, crossing, boardwalk)", () => {
 
   it("registers music, ambience, golden-hour lighting, and outdoor atmosphere", () => {
     const cases: [string, string, string][] = [
-      ["lane", "hills", "town-breeze"],
-      ["crossing", "hills", "forest"],
+      ["lane", "road", "town-breeze"],
+      ["crossing", "road", "forest"],
       ["boardwalk", "bay", "ocean"],
     ];
     for (const [id, track, ambience] of cases) {

@@ -7380,6 +7380,35 @@ the old trail, the owl, and the clubhouse claim.
   overlay guard, `party.spec.ts`, `sue.spec.ts`, and `east-road.spec.ts`
   (`0` snapshot diffs).
 
+## Milestone 173: Bespoke Battle `Recover` Audio/Haptics, Stale-Grade Hit-Stop Guard & 31st OST Theme `"Sunberry Road"` **Status:** ✅ Completed (2026-11-27)
+- Completes the audio/haptic & hit-stop-guard half of Battle `Recover` alongside
+  Milestone 172's `applyRecoverTheater` VFX/popup, and gives PR `#14`'s
+  connected East Road (`lane` & `crossing`) its own EarthBound-inspired country
+  road score — zero `src/core/sim.ts` changes, zero save-version bumps, zero
+  replay hash drift across all 73 sims, and zero visual baseline diffs.
+- Stale-grade `Recover` hit-stop guard (`src/render/battle-choreography.ts`):
+  - Guarded the critter result impact block with `!isRecoverTheater(battle)` so
+    stale prior-turn `"great"` / `answered` state never triggers `hitStop`,
+    `stageShake`, critter recoil, or critter heart bursts during `Recover`.
+- Bespoke `"battle-recover"` audio cue & haptic (`src/core/sound.ts`,
+  `src/platform/audio-recipes.ts`, `src/shell/feedback.ts`):
+  - Added `"battle-recover"` to `SoundCue` (warm ascending `C5 -> E5 -> G5 ->
+    C6` leaf-breath triad, `0.36 s`, gains `<= 0.08`) replacing `"battle-hit"`
+    on `Recover`, and mapped `"battle-recover"` to `"light"` haptic in
+    `hapticForTick`.
+- 31st Original Soundtrack theme `"road"` (`"Sunberry Road"`)
+  (`src/core/music.ts`, `src/platform/scores-expansion.ts`,
+  `src/platform/scores.ts`, `src/platform/voices.ts`):
+  - Composed `roadScore` (104 BPM, 4/4, 16-bar sunny F major 5-voice country
+    road stroll: `harp`, `marimba`, `flute`, `bass`, `shaker`), expanded
+    `jukeboxTracks` to **31 composed themes**, routed `lane` (`"town-breeze"`) &
+    `crossing` (`"forest"`) to `"road"` with bar-quantized resume, and added
+    `road: F_MAJOR` in `TRACK_SCALES`.
+- Evidence: `tests/unit/milestone-173.test.ts` and
+  `tests/e2e/milestone-173.spec.ts` (`@smoke` Chromium + WebKit).
+- Gates: `just check`, `just build` (`< 410 kB` every non-vendor chunk), and
+  targeted Chromium & WebKit e2e tests.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

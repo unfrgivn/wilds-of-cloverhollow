@@ -9,6 +9,7 @@ export type MusicTrack =
   | "loft"
   | "bloom"
   | "hills"
+  | "road"
   | "sanctuary"
   | "festival"
   | "school"
@@ -56,6 +57,7 @@ export const jukeboxTracks: readonly JukeboxTrack[] = [
   "woods",
   "clubhouse",
   "hills",
+  "road",
   "sanctuary",
   "festival",
   "arcade",
@@ -96,6 +98,7 @@ export const trackTitles: Record<MusicTrack, string> = {
   loft: "Paper Plane Sketchbook",
   bloom: "Rosie's Flower Window",
   hills: "Clover Meadow",
+  road: "Sunberry Road",
   sanctuary: "Meadow of Friends",
   festival: "Cloverhollow Jubilee",
   school: "Bell & Chalk",
@@ -132,8 +135,8 @@ const areaTracks: Record<string, MusicTrack> = {
   "milo-house": "loft",
   "rosie-cottage": "bloom",
   hills: "hills",
-  lane: "hills",
-  crossing: "hills",
+  lane: "road",
+  crossing: "road",
   sanctuary: "sanctuary",
   school: "school",
   "east-hall": "school",

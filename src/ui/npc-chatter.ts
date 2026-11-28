@@ -262,6 +262,7 @@ export function createNpcChatter(root: HTMLElement): {
   };
   window.addEventListener("resize", invalidate);
   document.fonts?.addEventListener("loadingdone", invalidate);
+  void document.fonts?.ready.then(invalidate);
 
   return {
     render: (view) => {

@@ -17,6 +17,7 @@ import {
 import type { CompanionAudioEffect, SoundPlayContext } from "../platform/audio";
 import type { HapticKind } from "../platform/haptics";
 import type { MinigameRecordsController } from "../platform/minigame-records";
+import { findPettableCompanion, findRestSpot, type RestSpot } from "../render/companions";
 import type { ArcadeRecordBadge } from "../ui/arcade-popups";
 import { areaBannerInfo, type AreaBannerView } from "../ui/area-banner";
 import type { JukeboxMeta } from "../ui/journal";
@@ -554,4 +555,34 @@ export function createNpcChatterSync(
       }
     }
   };
+}
+
+/** Handles overworld Confirm presses when no interactable is targeted: stand, sit, or pet. */
+export function performOverworldConfirm(
+  world: World,
+  state: State,
+  deps: {
+    isResting: () => boolean;
+    setResting: (spot: RestSpot | null, tick: number) => void;
+    triggerPet: (id: string, tick: number) => void;
+    playEffect: (effect: CompanionAudioEffect) => void;
+    lightHaptic: () => void;
+  },
+): void {
+  if (deps.isResting()) {
+    deps.setResting(null, state.tick);
+    return;
+  }
+  const restSpot = findRestSpot(world, state);
+  if (restSpot !== null) {
+    deps.setResting(restSpot, state.tick);
+    deps.playEffect("rest-sit");
+    return;
+  }
+  const companion = findPettableCompanion(world, state);
+  if (companion !== null) {
+    deps.triggerPet(companion.id, state.tick);
+    deps.playEffect(petEffectForCompanion(companion.id));
+    deps.lightHaptic();
+  }
 }

@@ -1,4 +1,4 @@
-import { journalProgress, type State, type World } from "../core";
+import { journalProgress, type ActionFrame, type State, type World } from "../core";
 import type { CompanionAudioEffect } from "../platform/audio";
 import type { TitleChoiceId } from "../ui/title";
 
@@ -107,4 +107,16 @@ export function continueDetail(world: World, state: State): string {
   }
   parts.push(...highlights.slice(0, 2));
   return parts.join(" · ");
+}
+
+/** Projects consecutive input frames into edge-triggered Title Screen navigation input. */
+export function titleInputFromFrames(frame: ActionFrame, previous: ActionFrame): TitleInput {
+  return {
+    up: frame.move.y < -0.5 && previous.move.y >= -0.5,
+    down: frame.move.y > 0.5 && previous.move.y <= 0.5,
+    left: frame.move.x < -0.5 && previous.move.x >= -0.5,
+    right: frame.move.x > 0.5 && previous.move.x <= 0.5,
+    confirm: frame.confirm && !previous.confirm,
+    cancel: frame.cancel && !previous.cancel,
+  };
 }

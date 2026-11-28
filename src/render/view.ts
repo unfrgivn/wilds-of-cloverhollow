@@ -9,37 +9,27 @@ import {
   type Renderer,
 } from "pixi.js";
 import {
-  targetInteractable,
-  wildMarks,
   creditEntries,
   type Area,
-  type CreditEntry,
   type Point,
   type State,
   type World,
 } from "../core";
 import { AreaView } from "./area-view";
-import { interpolatePoint, smoothFollowCamera, worldToScreen } from "./camera";
+import { worldToScreen } from "./camera";
 import { assetUrl } from "../platform/assets";
 import { isReducedMotionActive } from "../platform/reduced-motion";
-import { fadeAlpha, transitionZoom } from "./fade";
+import { fadeAlpha } from "./fade";
 import { createVfxTextures, type VfxTextures } from "./vfx-textures";
-import { BiomeAtmosphere, type AtmosphereOptions } from "./atmosphere";
+import { BiomeAtmosphere } from "./atmosphere";
 import type { RestSpot } from "./companions";
-import { storyTimeOfDay, type TimeOfDayPhase } from "./time-of-day";
+import { storyTimeOfDay } from "./time-of-day";
 import {
   BattleViewController,
   type BattleCheckGeometry,
   type BattleCheckInfo,
-  type BattleRenderInfo,
 } from "./battle-view";
-import {
-  OverworldEntityLayer,
-  type AmbientFrameInfo,
-  type CritterFrameInfo,
-  type NpcFrameInfo,
-  type PartyFrameInfo,
-} from "./entity-layer";
+import { OverworldEntityLayer } from "./entity-layer";
 import { NpcLifeController, type NpcLifeRenderInfo } from "./npc-life";
 import {
   CLUBHOUSE_PRIZES_ALIAS,
@@ -49,13 +39,34 @@ import type { NpcChatterView } from "../ui/npc-chatter";
 import {
   areaEntityAtlases,
   computeGlowTransform,
-  computeLanternBlend,
   INDOOR_AREAS,
-  PET_REACTION_DURATION,
   type EntityAtlas,
 } from "./overworld-render";
+import {
+  computeAreaEvictions,
+  computeDialogueRenderInfo,
+  computeLanternVisuals,
+  computeNoticeMarkViews,
+  computeNpcChatterScreenAnchor,
+  computeOverworldCameraFrame,
+  computePromptScreenView,
+  computeStoryAtmosphereOptions,
+  computeViewportRect,
+  resolveActivePetReaction,
+  resolveActiveRestSpot,
+  type GameViewRenderInfo,
+  type NoticeMarkView,
+  type PromptScreenView,
+  type ViewportRect,
+} from "./view-projections";
 
-export { areaEntityAtlases, type BattleCheckGeometry, type BattleCheckInfo, type EntityAtlas };
+export {
+  areaEntityAtlases,
+  type BattleCheckGeometry,
+  type BattleCheckInfo,
+  type EntityAtlas,
+  type GameViewRenderInfo,
+};
 
 export type RenderOptions = {
   paused?: boolean;
@@ -86,7 +97,7 @@ export class GameView {
   private readonly scene = new Container();
   private readonly shadowLayer = new Container();
   private readonly paperGrain: TilingSprite;
-  private viewportRect = { x: 0, y: 0, width: 0, height: 0 };
+  private viewportRect: ViewportRect = { x: 0, y: 0, width: 0, height: 0 };
   private photoMode = false;
   private readonly lanternLayer = new Container();
   private readonly lanternTint = new Graphics();
@@ -231,6 +242,13 @@ export class GameView {
     ]);
   }
 
+  private areaAtlasesFor(area: Area): EntityAtlas[] {
+    const entities = areaEntityAtlases(this.world, area);
+    return area.id === "clubhouse"
+      ? [...entities, { alias: CLUBHOUSE_PRIZES_ALIAS, src: assetUrl(this.world.arcade.atlas) }]
+      : entities;
+  }
+
   async setArea(area: Area): Promise<void> {
     const previous = this.areaView;
     const previousEntities = this.currentEntityAliases;
@@ -238,10 +256,7 @@ export class GameView {
     // a reload from memory, not a white wait on the network.
     previous?.destroy();
     this.entities.clearArea();
-    const entities = areaEntityAtlases(this.world, area);
-    const areaAtlases: EntityAtlas[] = area.id === "clubhouse"
-      ? [...entities, { alias: CLUBHOUSE_PRIZES_ALIAS, src: assetUrl(this.world.arcade.atlas) }]
-      : entities;
+    const areaAtlases = this.areaAtlasesFor(area);
     const [next] = await Promise.all([
       AreaView.load(area, this.depth),
       ...areaAtlases.map((entry) => mipmapSheet(entry.alias, entry.src)),
@@ -290,17 +305,18 @@ export class GameView {
     previousEntities: readonly string[],
     nextEntities: readonly string[],
   ): Promise<void> {
-    const previousUrls = new Set(previous?.textureUrls ?? []);
-    const evictions = this.residentUrls.filter((url) =>
-      !next.textureUrls.includes(url) && !previousUrls.has(url));
-    for (const url of evictions) this.areaTextureUrls.delete(url);
+    const { evictedUrls, unloadKeys } = computeAreaEvictions({
+      residentUrls: this.residentUrls,
+      previousUrls: previous?.textureUrls ?? [],
+      nextUrls: next.textureUrls,
+      residentEntityAliases: this.residentEntityAliases,
+      previousEntities,
+      nextEntities,
+      permanentAliases: this.permanentAliases,
+    });
+    for (const url of evictedUrls) this.areaTextureUrls.delete(url);
     this.residentUrls = previous?.textureUrls ?? [];
-    const keepEntities = new Set([...previousEntities, ...nextEntities]);
-    const entityEvictions = this.residentEntityAliases.filter(
-      (alias) => !keepEntities.has(alias) && !this.permanentAliases.has(alias),
-    );
     this.residentEntityAliases = previousEntities;
-    const unloadKeys = [...evictions, ...entityEvictions];
     if (unloadKeys.length > 0)
       await Promise.all(unloadKeys.map((key) => Assets.unload(key)));
   }
@@ -309,10 +325,7 @@ export class GameView {
   // `areaTextureUrls` so the harness sees them cached; a failed prefetch says
   // nothing the arrival's own load won't say louder.
   prefetch(area: Area): void {
-    const entities = areaEntityAtlases(this.world, area);
-    const areaAtlases: EntityAtlas[] = area.id === "clubhouse"
-      ? [...entities, { alias: CLUBHOUSE_PRIZES_ALIAS, src: assetUrl(this.world.arcade.atlas) }]
-      : entities;
+    const areaAtlases = this.areaAtlasesFor(area);
     void Promise.all([
       AreaView.prefetch(area).then((urls) => {
         for (const url of urls) this.areaTextureUrls.add(url);
@@ -344,39 +357,15 @@ export class GameView {
   }
 
   private activePetReaction(state: State): { id: string; elapsed: number } | null {
-    if (this.petReaction === null) return null;
-    const overworldClear =
-      state.battle === null &&
-      state.arcade === null &&
-      state.dialogue === null &&
-      state.transition === null &&
-      !state.journalOpen &&
-      state.finale === null;
-    const elapsed = state.tick - this.petReaction.startTick;
-    if (!overworldClear || elapsed < 0 || elapsed >= PET_REACTION_DURATION) {
-      this.petReaction = null;
-      return null;
-    }
-    return { id: this.petReaction.id, elapsed };
+    const active = resolveActivePetReaction(this.petReaction, state);
+    if (active === null) this.petReaction = null;
+    return active;
   }
 
   private activeRestSpot(state: State): { spot: RestSpot; elapsed: number } | null {
-    if (this.restingSpot === null) return null;
-    const overworldClear =
-      state.battle === null &&
-      state.arcade === null &&
-      state.dialogue === null &&
-      state.transition === null &&
-      !state.journalOpen &&
-      state.finale === null &&
-      !state.motion.moving &&
-      state.area === this.restingSpot.spot.area;
-    const elapsed = state.tick - this.restingSpot.startTick;
-    if (!overworldClear || elapsed < 0) {
-      this.restingSpot = null;
-      return null;
-    }
-    return { spot: this.restingSpot.spot, elapsed };
+    const active = resolveActiveRestSpot(this.restingSpot, state);
+    if (active === null) this.restingSpot = null;
+    return active;
   }
 
   observeNpcTick(state: State): void {
@@ -427,22 +416,18 @@ export class GameView {
   }
 
   private drawStatic(width: number, height: number, paper: number, dark: boolean): void {
-    const scale = Math.min(width / this.viewWidth, height / this.viewHeight);
-    const letterboxX = (width - this.viewWidth * scale) / 2;
-    const letterboxY = (height - this.viewHeight * scale) / 2;
-    const viewW = this.viewWidth * scale;
-    const viewH = this.viewHeight * scale;
-    this.viewportRect = { x: letterboxX, y: letterboxY, width: viewW, height: viewH };
+    const rect = computeViewportRect(width, height, this.viewWidth, this.viewHeight);
+    this.viewportRect = rect;
     this.effects.invalidateTimeOfDay();
     this.background.clear().rect(0, 0, width, height).fill(0xf8edcf);
-    this.paper.clear().rect(letterboxX, letterboxY, viewW, viewH).fill(paper);
-    this.viewportMask.clear().rect(letterboxX, letterboxY, viewW, viewH).fill(0xffffff);
-    this.lanternTint.clear().rect(letterboxX, letterboxY, viewW, viewH).fill(0x140a2e);
+    this.paper.clear().rect(rect.x, rect.y, rect.width, rect.height).fill(paper);
+    this.viewportMask.clear().rect(rect.x, rect.y, rect.width, rect.height).fill(0xffffff);
+    this.lanternTint.clear().rect(rect.x, rect.y, rect.width, rect.height).fill(0x140a2e);
     const fadeColor = dark ? 0x0f0b18 : paper;
     if (dark) {
       this.fade.clear().rect(0, 0, width, height).fill(fadeColor);
     } else {
-      this.fade.clear().rect(letterboxX, letterboxY, viewW, viewH).fill(fadeColor);
+      this.fade.clear().rect(rect.x, rect.y, rect.width, rect.height).fill(fadeColor);
     }
     this.fade.alpha = 0;
     this.staticWidth = width;
@@ -481,52 +466,27 @@ export class GameView {
     const paused = options?.paused ?? false;
     const reducedMotion = isReducedMotionActive();
     const previousState = options?.previousState;
-    const canInterpolate = !paused &&
-      previousState !== undefined &&
-      previousState.area === state.area &&
-      state.transition === null;
-    const alpha = canInterpolate ? Math.max(0, Math.min(1, options?.alpha ?? 1)) : 1;
-    const playerPos = canInterpolate
-      ? interpolatePoint(previousState.player, state.player, alpha)
-      : state.player;
-    const snapCamera = paused ||
-      reducedMotion ||
-      this.previousCamera === undefined ||
-      state.transition !== null ||
-      area.id === "harness";
-    const scale = Math.min(width / this.viewWidth, height / this.viewHeight);
-    const camera = smoothFollowCamera(
-      this.previousCamera,
-      playerPos,
-      state.facing,
-      { width: this.viewWidth, height: this.viewHeight },
+    const frame = computeOverworldCameraFrame({
       area,
-      { x: 80, y: 60 },
-      snapCamera,
-    );
-    this.previousCamera = camera;
-    const letterboxX = (width - this.viewWidth * scale) / 2;
-    const letterboxY = (height - this.viewHeight * scale) / 2;
-    const offsetX =
-      Math.round((letterboxX - camera.x * scale) * resolution) / resolution;
-    const offsetY =
-      Math.round((letterboxY - camera.y * scale) * resolution) / resolution;
-    const zoom = area.id === "harness" || reducedMotion
-      ? 1
-      : transitionZoom(state.transition, this.world.tunables.doorFadeTicks);
-    const zoomScale = scale * zoom;
-    const centerX = width / 2;
-    const centerY = height / 2;
-    const zoomOffsetX = zoom === 1 ? offsetX : centerX + (offsetX - centerX) * zoom;
-    const zoomOffsetY = zoom === 1 ? offsetY : centerY + (offsetY - centerY) * zoom;
-    this.scene.scale.set(zoomScale);
-    this.scene.position.set(zoomOffsetX, zoomOffsetY);
-    this.lanternWorld.scale.set(zoomScale);
-    this.lanternWorld.position.set(zoomOffsetX, zoomOffsetY);
-    this.emissiveLayer.scale.set(zoomScale);
-    this.emissiveLayer.position.set(zoomOffsetX, zoomOffsetY);
-    this.glowLayer.scale.set(zoomScale);
-    this.glowLayer.position.set(zoomOffsetX, zoomOffsetY);
+      state,
+      previousState,
+      previousCamera: this.previousCamera,
+      width,
+      height,
+      viewWidth: this.viewWidth,
+      viewHeight: this.viewHeight,
+      resolution,
+      doorFadeTicks: this.world.tunables.doorFadeTicks,
+      paused,
+      reducedMotion,
+      alpha: options?.alpha ?? 1,
+    });
+    const { canInterpolate, alpha, playerPos, zoomScale, zoomOffsetX, zoomOffsetY } = frame;
+    this.previousCamera = frame.camera;
+    for (const layer of [this.scene, this.lanternWorld, this.emissiveLayer, this.glowLayer]) {
+      layer.scale.set(zoomScale);
+      layer.position.set(zoomOffsetX, zoomOffsetY);
+    }
     const indoor = INDOOR_AREAS.has(area.id);
     const shadowAlpha = indoor ? 0.24 : 0.3;
     const livingMotion = area.id !== "harness" && !reducedMotion;
@@ -587,7 +547,7 @@ export class GameView {
       state.tick,
       state.battle === null && state.arcade === null,
       this.lanternBlend,
-      this.storyAtmosphereOptions(area.id, state, reducedMotion),
+      computeStoryAtmosphereOptions(this.world, state, area.id, reducedMotion),
     );
     loaded.update(
       this.world,
@@ -622,56 +582,6 @@ export class GameView {
     this.fade.alpha = fade;
   }
 
-  private storyAtmosphereOptions(
-    areaId: string,
-    state: State,
-    reducedMotion: boolean,
-  ): AtmosphereOptions | undefined {
-    const flag = (name: string): boolean => this.world.storyVariable(state.ink, name) === true;
-    const busterReward = flag("buster_reward");
-    const clubhouseBloom =
-      areaId === "clubhouse" && (flag("garden_sprouted") || flag("garden_ripe"));
-    const cafeCinnamonSteam =
-      areaId === "cafe" &&
-      flag("spice_returned") &&
-      (busterReward ||
-        state.critters["taco-chef"] === "calm" ||
-        state.stickers.includes("taco-chef"));
-    const plazaStarGlow = areaId === "plaza" && busterReward;
-    const passHearthWisps = areaId === "pass" && flag("sanctuary_gift");
-    const sanctuaryFestival = areaId === "sanctuary" && flag("milo_revealed");
-    const sunberryHarvests = this.world.storyVariable(state.ink, "sunberry_harvests");
-    const sunberryCount =
-      typeof sunberryHarvests === "number"
-        ? sunberryHarvests
-        : typeof sunberryHarvests === "string"
-          ? Number(sunberryHarvests)
-          : 0;
-    const marketOrchardGlow =
-      areaId === "market" &&
-      flag("market_note_read") &&
-      Number.isFinite(sunberryCount) &&
-      sunberryCount > 0;
-    const parlorSundaeSparkle = areaId === "parlor" && flag("parlor_note_read") && busterReward;
-    const cavernChimeShimmer = areaId === "cavern" && flag("cavern_chime_rung") && busterReward;
-    const musicRoomHarmony = areaId === "music" && flag("has_flute") && busterReward;
-    const artRoomPaletteGlow = areaId === "art-room" && flag("art_open") && busterReward;
-    const options: AtmosphereOptions = {
-      ...(clubhouseBloom ? { clubhouseBloom: true } : {}),
-      ...(cafeCinnamonSteam ? { cafeCinnamonSteam: true } : {}),
-      ...(plazaStarGlow ? { plazaStarGlow: true } : {}),
-      ...(passHearthWisps ? { passHearthWisps: true } : {}),
-      ...(marketOrchardGlow ? { marketOrchardGlow: true } : {}),
-      ...(parlorSundaeSparkle ? { parlorSundaeSparkle: true } : {}),
-      ...(cavernChimeShimmer ? { cavernChimeShimmer: true } : {}),
-      ...(musicRoomHarmony ? { musicRoomHarmony: true } : {}),
-      ...(artRoomPaletteGlow ? { artRoomPaletteGlow: true } : {}),
-      ...(sanctuaryFestival ? { sanctuaryFestival: true } : {}),
-      ...(reducedMotion ? { reducedMotion: true } : {}),
-    };
-    return Object.keys(options).length === 0 ? undefined : options;
-  }
-
   private renderGlows(
     state: State,
     playerPos: Point,
@@ -680,40 +590,26 @@ export class GameView {
   ): void {
     const area = this.areaView?.area;
     const sheet = Assets.get<Spritesheet>("glow-sheet");
-    const on = state.lantern && state.battle === null && state.arcade === null;
-    this.lanternBlend = computeLanternBlend(
-      this.lanternBlend,
-      this.lanternTick,
-      state.tick,
-      on,
-      snapLantern,
+    const lantern = computeLanternVisuals(
+      state, playerPos, this.lanternBlend, this.lanternTick, snapLantern, reducedMotion,
     );
+    this.lanternBlend = lantern.blend;
     this.lanternTick = state.tick;
-
-    // Blacklight: deep indigo-plum dusk clipped inside viewportMask, paired with
-    // a luminous UV pool and drifting lavender motes centred on Fae.
-    const showDusk = this.lanternBlend > 0.001 &&
-      state.battle === null &&
-      state.arcade === null;
-    this.lanternLayer.visible = showDusk;
-    if (showDusk) {
-      this.lanternTint.alpha = 0.63 * this.lanternBlend;
-      const centerX = playerPos.x;
-      const centerY = playerPos.y - 46;
-      this.lanternSpotlight.position.set(centerX, centerY);
-      this.lanternSpotlight.alpha =
-        (reducedMotion ? 0.36 : 0.36 + 0.04 * Math.sin(state.tick / 16)) * this.lanternBlend;
+    this.lanternLayer.visible = lantern.showDusk;
+    if (lantern.showDusk) {
+      this.lanternTint.alpha = lantern.tintAlpha;
+      this.lanternSpotlight.position.set(lantern.centerX, lantern.centerY);
+      this.lanternSpotlight.alpha = lantern.spotlightAlpha;
       this.effects.updateLanternMotes(
-        centerX, centerY, state.tick, this.lanternBlend, reducedMotion,
+        lantern.centerX, lantern.centerY, state.tick, lantern.blend, reducedMotion,
       );
     }
 
     const drawn: string[] = [];
     this.glowSprites.forEach(({ id, sprite }, index) => {
       const glow = area?.glows.find((item) => item.id === id);
-      const texture =
-        glow === undefined ? undefined : sheet?.textures[glow.frame];
-      sprite.visible = on && glow !== undefined && texture !== undefined;
+      const texture = glow === undefined ? undefined : sheet?.textures[glow.frame];
+      sprite.visible = lantern.on && glow !== undefined && texture !== undefined;
       if (texture !== undefined && glow !== undefined) {
         sprite.texture = texture;
         sprite.position.set(glow.point.x, glow.point.y);
@@ -732,39 +628,17 @@ export class GameView {
   playerScreenPoint(state: State): Point | null {
     if (this.previousCamera === undefined) return null;
     return worldToScreen(
-      state.player,
-      this.previousCamera,
-      this.viewWidth,
-      this.viewHeight,
-      window.innerWidth,
-      window.innerHeight,
+      state.player, this.previousCamera, this.viewWidth, this.viewHeight,
+      window.innerWidth, window.innerHeight,
     );
   }
 
   /** The interaction prompt for this frame, anchored at the target in CSS px. */
-  promptView(state: State): {
-    visible: boolean;
-    label: string;
-    x: number;
-    y: number;
-  } {
-    const target = targetInteractable(this.world, state);
-    if (target === undefined || this.previousCamera === undefined)
-      return { visible: false, label: "", x: 0, y: 0 };
-    const point = worldToScreen(
-      target.point,
-      this.previousCamera,
-      this.viewWidth,
-      this.viewHeight,
-      window.innerWidth,
-      window.innerHeight,
+  promptView(state: State): PromptScreenView {
+    return computePromptScreenView(
+      this.world, state, this.previousCamera, this.viewWidth, this.viewHeight,
+      window.innerWidth, window.innerHeight,
     );
-    return {
-      visible: true,
-      label: (target.prompt ?? "Look").toUpperCase(),
-      x: point.x,
-      y: point.y,
-    };
   }
 
   /** Latest living-NPC snapshot summary for overworld tool-event feedback. */
@@ -779,166 +653,46 @@ export class GameView {
     viewportHeight: number,
     suppressNpcId: string | null,
   ): NpcChatterView | null {
-    const chatter = this.npcLife.latest?.chatter ?? null;
-    if (
-      chatter === null ||
-      this.previousCamera === undefined ||
-      chatter.alpha <= 0.01 ||
-      chatter.npcId === suppressNpcId ||
-      state.battle !== null ||
-      state.arcade !== null ||
-      state.dialogue !== null ||
-      state.journalOpen ||
-      state.transition !== null ||
-      state.finale === "credits"
-    ) {
-      return null;
-    }
-    const partyMember = this.world.party[chatter.npcId];
-    const headOffset =
-      partyMember !== undefined
-        ? partyMember.box.height + 18
-        : chatter.adult
-          ? 190
-          : 158;
-    const point = worldToScreen(
-      { x: chatter.x, y: chatter.y - headOffset },
-      this.previousCamera,
-      this.viewWidth,
-      this.viewHeight,
-      viewportWidth,
-      viewportHeight,
+    return computeNpcChatterScreenAnchor(
+      this.world, state, this.npcLife.latest?.chatter ?? null, suppressNpcId,
+      this.previousCamera, this.viewWidth, this.viewHeight, viewportWidth, viewportHeight,
     );
-    return {
-      visible: true,
-      npcId: chatter.npcId,
-      speakerName: chatter.speakerName,
-      text: chatter.text,
-      tone: chatter.tone,
-      x: point.x,
-      y: point.y,
-      alpha: chatter.alpha,
-    };
   }
 
-  /**
-   * The recurring critters' "?" and "!" (spec 8.1), each at the bottom
-   * centre of where it hangs, just over the critter's head, in CSS px. None
-   * outside free walking (a battle, a talk, the journal, a door's fade).
-   */
-  noticeMarks(state: State): { key: string; mark: "?" | "!"; x: number; y: number }[] {
-    const camera = this.previousCamera;
-    if (camera === undefined || state.battle !== null || state.dialogue !== null ||
-      state.arcade !== null || state.journalOpen || state.transition !== null) return [];
-    return wildMarks(this.world, state).flatMap((item) => {
-      const kind = this.world.critters[item.kind];
-      if (kind === undefined) return [];
-      const head = { x: item.point.x, y: item.point.y - kind.overworldHeight - 6 };
-      const point = worldToScreen(head, camera, this.viewWidth, this.viewHeight,
-        window.innerWidth, window.innerHeight);
-      return [{ key: item.key, mark: item.mark, x: point.x, y: point.y }];
-    });
+  /** The recurring critters' "?" and "!" marks over their heads in CSS px. */
+  noticeMarks(state: State): NoticeMarkView[] {
+    return computeNoticeMarkViews(
+      this.world, state, this.previousCamera, this.viewWidth, this.viewHeight,
+      window.innerWidth, window.innerHeight,
+    );
   }
 
   battleCheckGeometry(state: State, width: number, height: number): BattleCheckGeometry | null {
-    return this.battleView.battleCheckGeometry(
-      state,
-      width,
-      height,
-      this.viewWidth,
-      this.viewHeight,
-    );
+    return this.battleView.battleCheckGeometry(state, width, height, this.viewWidth,
+      this.viewHeight);
   }
 
   battleFeelingAnchor(state: State, width: number, height: number): Point | null {
-    return this.battleView.battleFeelingAnchor(
-      state,
-      width,
-      height,
-      this.viewWidth,
-      this.viewHeight,
-    );
+    return this.battleView.battleFeelingAnchor(state, width, height, this.viewWidth,
+      this.viewHeight);
   }
 
-  renderInfo(state: State): {
-    area: string;
-    finale: State["finale"];
-    credits: { entries: CreditEntry[] } | null;
-    drawOrder: { label: string; zIndex: number }[];
-    animation: string;
-    frame: number;
-    // Each party member in party order: how hidden it is behind its leader,
-    // and its current animation and frame.
-    party: PartyFrameInfo[];
-    fade: number;
-    cachedAreaTextures: string[];
-    prompt: { visible: boolean; label: string; x: number; y: number };
-    dialogue: {
-      open: boolean;
-      speaker: string | null;
-      revealed: number;
-      length: number;
-      choices: string[];
-      selected: number;
-    };
-    critters: CritterFrameInfo[];
-    npcs: NpcFrameInfo[];
-    npcLife: NpcLifeRenderInfo;
-    ambient: AmbientFrameInfo[];
-    // Each canopy's alpha: below 1 while Fae is behind it.
-    canopies: { id: string; alpha: number }[];
-    // Each prop's current state, whether it lies flat (drawn under everyone)
-    // or is hidden (not there), and its strips: world x range and the y it
-    // sorts by (spec 6).
-    props: {
-      id: string;
-      state: string;
-      flat: boolean;
-      hidden: boolean;
-      strips: { left: number; right: number; zIndex: number }[];
-    }[];
-    lantern: { on: boolean; glows: string[] };
-    // The recurring critters' "?" and "!" over their heads (Milestone 51).
-    marks: { key: string; mark: "?" | "!"; x: number; y: number }[];
-    clubhouseDisplay: number;
-    atmosphereParticles: number;
-    footstepPuffs: number;
-    starGemGlints: number;
-    petting: string | null;
-    resting: string | null;
-    timeOfDay: TimeOfDayPhase;
-    photoMode: boolean;
-    battle: BattleRenderInfo;
-  } {
+  renderInfo(state: State): GameViewRenderInfo {
     const fade = fadeAlpha(state.transition, this.world.tunables.doorFadeTicks);
     return {
       area: this.areaView?.area.id ?? "",
       finale: state.finale,
-      credits: state.finale === "credits"
-        ? { entries: creditEntries(this.world, state) }
-        : null,
+      credits: state.finale === "credits" ? { entries: creditEntries(this.world, state) } : null,
       drawOrder: this.depth.children
         .filter((child) => child.visible)
-        .map((child) => ({
-          label: child.label,
-          zIndex: child.zIndex,
-        })),
+        .map((child) => ({ label: child.label, zIndex: child.zIndex })),
       animation: this.entities.animation,
       frame: this.entities.frame,
       party: this.entities.partyInfo(state),
       fade,
-      cachedAreaTextures: [...this.areaTextureUrls].filter((url) =>
-        Assets.cache.has(url),
-      ),
+      cachedAreaTextures: [...this.areaTextureUrls].filter((url) => Assets.cache.has(url)),
       prompt: this.promptView(state),
-      dialogue: {
-        open: state.dialogue !== null,
-        speaker: state.dialogue?.speaker ?? null,
-        revealed: state.dialogue?.revealed ?? 0,
-        length: state.dialogue?.text.length ?? 0,
-        choices: state.dialogue?.choices ?? [],
-        selected: state.dialogue?.selected ?? 0,
-      },
+      dialogue: computeDialogueRenderInfo(state),
       critters: this.entities.critters,
       npcs: this.entities.npcs,
       npcLife: this.npcLife.renderInfo(),
@@ -959,12 +713,8 @@ export class GameView {
       timeOfDay: storyTimeOfDay(this.world, state).phase,
       photoMode: this.photoMode,
       battle: this.battleView.renderInfo(
-        state,
-        window.innerWidth,
-        window.innerHeight,
-        this.viewWidth,
-        this.viewHeight,
-        this.scene.visible,
+        state, window.innerWidth, window.innerHeight,
+        this.viewWidth, this.viewHeight, this.scene.visible,
       ),
     };
   }

@@ -19,7 +19,8 @@ import { createJournal } from "./ui/journal";
 import { createTitleScreen, type TitleChoiceId } from "./ui/title";
 import { createCredits } from "./ui/credits";
 import {
-  continueDetail, titleEffectForTransition, titleFlow, type TitleInput, type TitleMode,
+  continueDetail, titleEffectForTransition, titleFlow, titleInputFromFrames,
+  type TitleInput, type TitleMode,
 } from "./shell/title-flow";
 import { creditsConfirmAllowed } from "./shell/credits-flow";
 import { createAreaLoader } from "./shell/area-loader";
@@ -32,7 +33,7 @@ import {
 import {
   buildSoundContext, collectLevelUpNotices, createAreaBannerTracker, createJournalNotesCache,
   createNpcChatterSync, createToolEventChimeSync, deliverAreaPostcard, hapticForTick,
-  isOverworldConfirm, petEffectForCompanion, resolveArcadeOutcome, resolveSoundtrack,
+  isOverworldConfirm, performOverworldConfirm, resolveArcadeOutcome, resolveSoundtrack,
   shouldClearRest, stepJukeboxTrack,
 } from "./shell/feedback";
 import { createSaveSession, createSaveStore } from "./shell/save-storage";
@@ -701,14 +702,7 @@ async function boot(): Promise<void> {
       return;
     }
     if (titleMode !== null) {
-      applyTitle({
-        up: frame.move.y < -0.5 && titlePrevious.move.y >= -0.5,
-        down: frame.move.y > 0.5 && titlePrevious.move.y <= 0.5,
-        left: frame.move.x < -0.5 && titlePrevious.move.x >= -0.5,
-        right: frame.move.x > 0.5 && titlePrevious.move.x <= 0.5,
-        confirm: frame.confirm && !titlePrevious.confirm,
-        cancel: frame.cancel && !titlePrevious.cancel,
-      });
+      applyTitle(titleInputFromFrames(frame, titlePrevious));
       titlePrevious = frame;
       cancelDown = frame.cancel;
       if (titleMode === null) {
@@ -767,22 +761,13 @@ async function boot(): Promise<void> {
       view.setResting(null, state.tick);
     }
     if (isOverworldConfirm(confirmEdge, dismissedLevelUp, previous, state)) {
-      if (view.isResting()) {
-        view.setResting(null, state.tick);
-      } else {
-        const restSpot = findRestSpot(content.world, state);
-        if (restSpot !== null) {
-          view.setResting(restSpot, state.tick);
-          sound.playEffect("rest-sit");
-        } else {
-          const companion = findPettableCompanion(content.world, state);
-          if (companion !== null) {
-            view.triggerPet(companion.id, state.tick);
-            sound.playEffect(petEffectForCompanion(companion.id));
-            lightHaptic();
-          }
-        }
-      }
+      performOverworldConfirm(content.world, state, {
+        isResting: () => view.isResting(),
+        setResting: (spot, tickAt) => view.setResting(spot, tickAt),
+        triggerPet: (id, tickAt) => view.triggerPet(id, tickAt),
+        playEffect: (effect) => sound.playEffect(effect),
+        lightHaptic,
+      });
     }
     bannerTracker.update(content.world, previous, state);
     areaLoader.syncTransition(state.transition, harnessStepping);

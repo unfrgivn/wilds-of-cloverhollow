@@ -7190,6 +7190,32 @@ the old trail, the owl, and the clubhouse claim.
   JPEGs (`art/review/living-npcs-dispersed-plaza.jpg`,
   `art/review/living-npcs-dispersed-bay.jpg`,
   `art/review/living-npcs-dispersed-interiors.jpg`).
+## Milestone 167: Pixi-Free `src/render/view-projections.ts` Extraction & Shell Edge/Confirm Helper Split **Status:** ✅ Completed (2026-11-27)
+- Zero `src/core` changes, zero replay hash shifts across all 74 recorded sims,
+  and zero Playwright snapshot modifications.
+- Pixi-Free `src/render/view-projections.ts` Modular Extraction (`src/render/view.ts`
+  965 -> 721 lines, `-244` lines):
+  - Extracts `computeViewportRect`, `computeOverworldCameraFrame`,
+    `isOverworldClear`, `resolveActivePetReaction`, `resolveActiveRestSpot`,
+    `computeAreaEvictions`, `computeStoryAtmosphereOptions` (preserving
+    `sanctuaryFestival` and every biome-reactive story flag),
+    `computePromptScreenView`, `computeNpcChatterScreenAnchor`,
+    `computeNoticeMarkViews`, `computeLanternVisuals`,
+    `computeDialogueRenderInfo`, and `GameViewRenderInfo` into Pixi-free
+    `src/render/view-projections.ts` (473 lines) with zero breadcrumbs.
+- Shell Title-Edge & Overworld-Confirm Helpers (`src/shell/title-flow.ts`,
+  `src/shell/feedback.ts`, `src/main.ts` 944 -> 929 lines):
+  - Exports pure `titleInputFromFrames(frame, previous)` in `src/shell/title-flow.ts`
+    and `performOverworldConfirm(world, state, deps)` in `src/shell/feedback.ts`,
+    keeping `src/main.ts` well below the 950-line budget.
+- Evidence: `tests/unit/milestone-167.test.ts` (3 unit tests covering line
+  budgets, Pixi-free purity, `sanctuaryFestival` atmosphere options, viewport,
+  evictions, prompts, chatter anchors, and notice marks).
+- Gates: `just check` (230 unit files / 1,680 tests, all 74 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (all non-vendor
+  chunks `< 400 kB`, production hook leak + harness checks green), and
+  Chromium + WebKit e2e verification (`release-playtest`, `milestone-158`,
+  `bus`, `qa`; 0 failed, 0 snapshot diffs).
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.

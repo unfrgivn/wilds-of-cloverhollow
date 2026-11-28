@@ -808,8 +808,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   effects in `OverworldEffectsController` inside `src/render/overworld-effects.ts`
   (Milestone 120), overworld entity sprite pools (player, party followers, NPCs,
   critters, and ambient flyers) in `OverworldEntityLayer` inside
-  `src/render/entity-layer.ts` (Milestone 130), reusable primitive/geometry JSON
-  validators in
+  `src/render/entity-layer.ts` (Milestone 130), Pixi-free camera/viewport,
+  eviction, story-atmosphere, prompt, chatter-anchor, notice-mark, and render-info
+  projections in `src/render/view-projections.ts` (Milestone 167), reusable
+  primitive/geometry JSON validators in
   `src/content/parsers.ts`, Milestone 97, arcade/minigame content &
   calibration parsers in `src/content/arcade-parsers.ts`, Milestone 110, and
   battle/critter/party/feeling/sticker/level/treat parsers & validators in

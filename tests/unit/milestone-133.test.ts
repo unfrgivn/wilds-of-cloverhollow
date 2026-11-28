@@ -30,6 +30,9 @@ const ALL_EFFECTS: readonly CompanionAudioEffect[] = [
   "arcade-bell",
   "sanctuary-hop",
   "ribbon-earned",
+  "travel-bus",
+  "travel-boat",
+  "travel-lift",
 ];
 
 const UI_FOLEY_EFFECTS: readonly CompanionAudioEffect[] = [
@@ -45,6 +48,9 @@ const UI_FOLEY_EFFECTS: readonly CompanionAudioEffect[] = [
   "sticker-peel",
   "atlas-pin",
   "ribbon-earned",
+  "travel-bus",
+  "travel-boat",
+  "travel-lift",
 ];
 
 describe("Milestone 133: Tactile Storybook UI Foley & Title Transition Helpers", () => {

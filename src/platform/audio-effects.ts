@@ -8,7 +8,7 @@ export type CompanionAudioEffect =
   | "toggle-on" | "toggle-off" | "tool-sparkle"
   | "paper-flip" | "sticker-peel" | "atlas-pin"
   | "beach-ball-boop" | "pebble-skip" | "shop-bell" | "arcade-bell" | "sanctuary-hop"
-  | "ribbon-earned";
+  | "ribbon-earned" | "travel-bus" | "travel-boat" | "travel-lift";
 
 // Companion petting, cozy resting, and storybook UI foley kept in the platform shell.
 export const effectRecipes: Record<CompanionAudioEffect, AudioRecipe> = {
@@ -207,6 +207,27 @@ export const effectRecipes: Record<CompanionAudioEffect, AudioRecipe> = {
     { wave: "sine", frequency: 784, offset: 0.12, duration: 0.15, gain: 0.072, attack: 0.004 },
     { wave: "sine", frequency: 987.8, offset: 0.18, duration: 0.17, gain: 0.074, attack: 0.004 },
     { wave: "sine", frequency: 1046.5, offset: 0.24, duration: 0.18, gain: 0.078, attack: 0.005 },
+  ],
+  "travel-bus": [
+    { wave: "triangle", frequency: 440, offset: 0, duration: 0.13, gain: 0.068, attack: 0.006 },
+    {
+      wave: "triangle", frequency: 554.37, offset: 0.11, duration: 0.21, gain: 0.072,
+      attack: 0.006,
+    },
+    { wave: "sine", frequency: 220, offset: 0.02, duration: 0.28, gain: 0.044, attack: 0.012 },
+  ],
+  "travel-boat": [
+    { wave: "noise", offset: 0, duration: 0.19, gain: 0.028, lowpass: 1100, attack: 0.016 },
+    {
+      wave: "sine", frequency: 659.25, endFrequency: 784, offset: 0.05, duration: 0.14,
+      gain: 0.058, attack: 0.005,
+    },
+    { wave: "sine", frequency: 880, offset: 0.14, duration: 0.2, gain: 0.056, attack: 0.005 },
+  ],
+  "travel-lift": [
+    { wave: "triangle", frequency: 392, offset: 0, duration: 0.28, gain: 0.048, attack: 0.01 },
+    { wave: "sine", frequency: 1318.5, offset: 0.01, duration: 0.22, gain: 0.062, attack: 0.003 },
+    { wave: "sine", frequency: 1975.5, offset: 0.1, duration: 0.24, gain: 0.044, attack: 0.004 },
   ],
 };
 

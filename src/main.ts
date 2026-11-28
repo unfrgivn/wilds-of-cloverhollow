@@ -3,6 +3,7 @@ import {
   arcadeView, autosaveNeeded, battleView, blankInput, createState, drainTicks, soundCues,
   stableHash, step, type ActionFrame, type JukeboxTrack, type State,
 } from "./core";
+import { weatherForArea } from "./core/weather";
 import { loadBrowserContent } from "./content/load";
 import { Keyboard } from "./platform/keyboard";
 import { combineInputFrames, GamepadInput } from "./platform/gamepad";
@@ -53,6 +54,7 @@ import { createMinigameRecords } from "./platform/minigame-records";
 import type { ArcadeRecordBadge } from "./ui/arcade-popups";
 import { createAreaBanner } from "./ui/area-banner";
 import { createDecorPicker, decorFeedbackEffect } from "./ui/decor-picker";
+import { travelEffectForMode } from "./render/travel-vignette";
 import { createTravelOverlay } from "./ui/travel-overlay";
 import { mountEncoreShrineSession, type EncoreShrineSession } from "./ui/encore-shrine";
 import { createHudHints } from "./ui/hud-hints";
@@ -141,9 +143,7 @@ async function boot(): Promise<void> {
   // While the harness has the game paused, redraw only after something changes;
   // while running, draw every frame as before.
   let drawPending = true;
-  const invalidate = (): void => {
-    drawPending = true;
-  };
+  const invalidate = (): void => { drawPending = true; };
   const withInvalidate = <Args extends unknown[]>(
     fn: (...args: Args) => void,
   ): ((...args: Args) => void) => (...args: Args): void => {
@@ -451,18 +451,17 @@ async function boot(): Promise<void> {
     warmAreaMedia: assets.warmAreaMedia,
     warmBattlePortraits: assets.warmBattlePortraits,
     onLoaded: (loadedState) => {
-      view.resetCamera();
-      navFollower.clear();
-      previousState = loadedState;
+      view.resetCamera(); navFollower.clear(); previousState = loadedState;
     },
     invalidate,
     travelVignette: {
       isPaused: () => paused, isReducedMotion: () => isReducedMotionActive(),
       preload: travelOverlay.preload, hide: travelOverlay.hide,
-      onStart: (spec) => { sound.playEffect(spec.chime); lightHaptic(); },
+      onStart: (spec) => { sound.playEffect(travelEffectForMode(spec.mode)); lightHaptic(); },
       render: (v) => travelOverlay.render({
         ...v, touchActive: document.documentElement.dataset.touch === "on",
         inputMode: inputShortcuts.inputMode(),
+        weather: weatherForArea(state.area, state.tick, getCozyWeatherMode()).kind,
       }),
     },
   });
@@ -550,7 +549,8 @@ async function boot(): Promise<void> {
     areaLoader.renderTravelVignette(performance.now());
     title.render({
       visible: titleMode !== null && !qaMenuOpen, mode: titleMode ?? "fresh",
-      selected: titleSelected, continueDetail: continueDetail(content.world, state),
+      selected: titleSelected,
+      continueDetail: continueDetail(content.world, state, minigameRecords.records()),
     });
     qa?.render(); syncOpenFlag("qaConsole", gate.qaConsoleOpen);
     const creditsOpen = state.finale === "credits";

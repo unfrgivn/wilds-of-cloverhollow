@@ -5,7 +5,9 @@ import {
   type State,
   type World,
 } from "../core";
+import { evaluateMeritRibbons } from "../core/ribbons";
 import type { CompanionAudioEffect } from "../platform/audio";
+import type { MinigameRecords } from "../platform/minigame-records";
 import type { TitleChoiceId } from "../ui/title";
 
 export type TitleMode = "fresh" | "continue" | "confirm";
@@ -94,11 +96,15 @@ export function titleFlow(
 }
 
 // The line under Continue: where Fae is, sticker count, and up to two highlights,
-// or the 100% Valley Explorer crown once every valley collectible is complete.
-export function continueDetail(world: World, state: State): string {
+// the 100% Valley Explorer crown once every valley collectible is complete,
+// or the 16/16 Valley Legend crown once all 16 Valley Merit Ribbons are stitched.
+export function continueDetail(world: World, state: State, records?: MinigameRecords): string {
   const area = world.areas[state.area]?.name ?? state.area;
   const progress = journalProgress(world, state);
   if (valleyCompletion(progress).complete) {
+    if (records !== undefined && evaluateMeritRibbons(world, state, records).complete) {
+      return `${area} · ★ 16/16 Valley Legend`;
+    }
     return `${area} · ★ 100% Valley Explorer`;
   }
   const count = state.stickers.length;

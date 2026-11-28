@@ -9857,6 +9857,41 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   story + harness checks green), Chromium & WebKit (`milestone-232`,
   `milestone-231`, `milestone-113`, `milestone-115`, `milestone-223`), and 3/3
   Chromium (`e7-multifoe-combos`).
+
+## Milestone 233: Weather-Aware Illustrated Travel Vignettes, Bespoke Travel Departure Foley (`bus`/`boat`/`lift`) & `★ 16/16 Valley Legend` Title Crown **Status:** ✅ Completed (2026-11-28)
+- Gives Buster's Star-Line Bus, Bubblegum Bay's Rowboat, and Pinecone Pass's
+  Ski Lift their own storybook departure foley, layers live Cozy Weather sky
+  pills & watercolor weather accents inside the painted Travel Vignette cards
+  when weather is active, and upgrades the Title Screen `Continue` crown to
+  `★ 16/16 Valley Legend` once all 16 Valley Merit Ribbons are stitched — zero
+  `src/core` changes, zero save-version bumps, zero replay hash drift across all
+  77 sims, and zero visual baseline diffs across all 99 `ui-gallery`,
+  `travel-vignette`, `milestone-168`, and `title-gallery` baselines.
+- Bespoke travel departure foley (`src/platform/audio-effects.ts`,
+  `src/render/travel-vignette.ts`, `src/main.ts`):
+  - Added `"travel-bus"` (two-tone warm bus chime-honk), `"travel-boat"` (oar
+    water lap + buoyant aqua droplet chime), and `"travel-lift"` (alpine brass
+    bell shimmer + cable hum) with pure `travelEffectForMode(mode)`, triggered
+    strictly on live animated Travel Vignettes.
+- Weather-aware Illustrated Travel Vignettes (`src/ui/travel-overlay.{ts,css}`,
+  `src/main.ts`):
+  - Extended `TravelOverlayView` with optional `weather?: CozyWeatherKind`,
+    strictly hidden on `"clear"` / `undefined` (0 pixel drift), and rendering
+    upper-right `.travel-weather-pill` (zero-`<text>` `minigameWeatherIcon` +
+    label) and `.travel-weather-fx` watercolor accents inside the postcard
+    window (frozen under Reduced Motion).
+- 16/16 Valley Legend Title Screen crown (`src/shell/title-flow.ts`,
+  `src/main.ts`):
+  - Extended `continueDetail(world, state, records?)` so 63/63 + 16/16 saves
+    display `${area} · ★ 16/16 Valley Legend` while keeping 63/63 `< 16`-ribbon
+    saves on `${area} · ★ 100% Valley Explorer`.
+- Evidence: `tests/unit/milestone-233.test.ts`,
+  `tests/e2e/milestone-233.spec.ts` (`@smoke` Chromium + WebKit), and review
+  captures `art/review/m232-travel-sunshower-1280.jpg` and
+  `m232-title-legend-1280.jpg` independently verified via `vision`.
+- Gates: `just check` (300 unit files / 2,133 tests, all 77 sims + all sim
+  scripts, 23 QA packs, purity, lint), `just build` (`index` `359.84 kB < 360 kB`),
+  45/45 Chromium & WebKit e2e, and 99/99 Chromium `ui-gallery` tests.
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

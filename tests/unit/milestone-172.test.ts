@@ -313,6 +313,9 @@ describe("Milestone 172: Modular src/platform/audio-effects.ts Extraction", () =
     "arcade-bell",
     "sanctuary-hop",
     "ribbon-earned",
+    "travel-bus",
+    "travel-boat",
+    "travel-lift",
   ];
 
   it("re-exports effectRecipes and effectRecipe identically with gentle gains and lean modules",
@@ -335,7 +338,7 @@ describe("Milestone 172: Modular src/platform/audio-effects.ts Extraction", () =
       const recipesSource = readFileSync("src/platform/audio-recipes.ts", "utf8");
       const effectsSource = readFileSync("src/platform/audio-effects.ts", "utf8");
       expect(recipesSource.trimEnd().split("\n").length).toBeLessThan(740);
-      expect(effectsSource.trimEnd().split("\n").length).toBeLessThan(220);
+      expect(effectsSource.trimEnd().split("\n").length).toBeLessThan(250);
       // Type-only import prevents any circular runtime dependency.
       expect(effectsSource).toContain('import type { AudioRecipe } from "./audio-recipes";');
       expect(effectsSource).not.toMatch(/^import\s+\{[^}]*\}\s+from\s+"\.\/audio-recipes"/m);

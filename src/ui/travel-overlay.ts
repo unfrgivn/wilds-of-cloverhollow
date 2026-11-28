@@ -1,7 +1,11 @@
 import "./travel-overlay.css";
+import { weatherLabel, type CozyWeatherKind } from "../core/weather";
 import type { TravelMode, TravelVignetteSpec } from "../render/travel-vignette";
 import { element, setAttribute, setStyle, setText, svgElement } from "./dom";
 import type { HudInputMode } from "./hud-hints";
+import { minigameWeatherIcon } from "./minigame-weather";
+
+type ActiveWeatherKind = Exclude<CozyWeatherKind, "clear">;
 
 export type TravelOverlayView = {
   visible: boolean;
@@ -13,6 +17,7 @@ export type TravelOverlayView = {
   tiltDeg: number;
   touchActive?: boolean;
   inputMode?: HudInputMode;
+  weather?: CozyWeatherKind;
 };
 
 /** Adapts the Travel Vignette skip button label for touch, gamepad, and keyboard input. */
@@ -164,10 +169,20 @@ export function createTravelOverlay(root: HTMLElement): TravelOverlayController 
   art.alt = "";
   art.decoding = "async";
 
+  const weatherFx = element("div", "travel-weather-fx", artWrap);
+  weatherFx.setAttribute("aria-hidden", "true");
+  weatherFx.hidden = true;
+
   const badge = element("div", "travel-badge", artWrap);
   const badgeIconSlot = element("span", "travel-badge-icon", badge);
   const badgeIcons = mountModeIcons(badgeIconSlot);
   const badgeLabel = element("span", "travel-badge-label", badge);
+
+  const weatherPill = element("div", "travel-weather-pill", artWrap);
+  weatherPill.hidden = true;
+  const weatherIconSlot = element("span", "travel-weather-icon", weatherPill);
+  weatherIconSlot.setAttribute("aria-hidden", "true");
+  const weatherLabelEl = element("span", "travel-weather-label", weatherPill);
 
   const footer = element("div", "travel-footer", card);
   const headerRow = element("div", "travel-header-row", footer);
@@ -199,6 +214,7 @@ export function createTravelOverlay(root: HTMLElement): TravelOverlayController 
   let visible = false;
   let lastAssetUrl = "";
   let lastMode: TravelMode | null = null;
+  let lastWeather: ActiveWeatherKind | null = null;
   let skipHandler: ((source: "pointer" | "key") => void) | null = null;
 
   const preload = (assetUrl: string): void => {
@@ -218,6 +234,11 @@ export function createTravelOverlay(root: HTMLElement): TravelOverlayController 
     overlay.hidden = true;
     overlay.removeAttribute("data-vignette-id");
     overlay.removeAttribute("data-travel-mode");
+    weatherFx.hidden = true;
+    weatherPill.hidden = true;
+    weatherFx.removeAttribute("data-weather");
+    weatherPill.removeAttribute("data-weather");
+    lastWeather = null;
     delete document.documentElement.dataset.travelVignette;
   };
 
@@ -251,6 +272,27 @@ export function createTravelOverlay(root: HTMLElement): TravelOverlayController 
     setText(originLabel, spec.originLabel);
     setText(destLabel, spec.destinationLabel);
     setText(skipButton, travelSkipButtonLabel(view));
+
+    const weather = view.weather;
+    if (weather === undefined || weather === "clear") {
+      weatherFx.hidden = true;
+      weatherPill.hidden = true;
+      if (lastWeather !== null) {
+        weatherFx.removeAttribute("data-weather");
+        weatherPill.removeAttribute("data-weather");
+        lastWeather = null;
+      }
+    } else {
+      weatherFx.hidden = false;
+      weatherPill.hidden = false;
+      if (lastWeather !== weather) {
+        lastWeather = weather;
+        setAttribute(weatherFx, "data-weather", weather);
+        setAttribute(weatherPill, "data-weather", weather);
+        weatherIconSlot.replaceChildren(minigameWeatherIcon(weather));
+        setText(weatherLabelEl, weatherLabel(weather));
+      }
+    }
 
     const pct = Math.min(100, Math.max(0, view.progressPct));
     const pctValue = `${pct.toFixed(2)}%`;

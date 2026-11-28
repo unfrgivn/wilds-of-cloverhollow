@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 232)
+Last updated: 2026-11-28 (Milestone 233)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -783,9 +783,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   import of `AudioRecipe` from `./audio-recipes`, zero circular runtime
   dependency), while `AudioSegment`, `AudioRecipe`, and `soundCueRecipe` live in
   `src/platform/audio-recipes.ts` (Milestone 114, re-exporting `soundCueRecipes`
-  identically), and the 22 shell companion, UI & overworld micro-delight foley
+  identically), and the 26 shell companion, UI, travel & overworld micro-delight foley
   recipes (`CompanionAudioEffect`, `effectRecipes`, `effectRecipe`) live in
-  modular `src/platform/audio-effects.ts` (Milestones 172, 180 & 184, type-only
+  modular `src/platform/audio-effects.ts` (Milestones 172, 180, 184, 200 & 232, type-only
   import of `AudioRecipe` from `./audio-recipes`, zero circular runtime
   dependency) and are re-exported identically from
   `src/platform/audio-recipes.ts` and `src/platform/audio.ts` for
@@ -795,6 +795,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   (hollow rubber pop), `"pebble-skip"` (3-skip watery plink-plink-plonk + soft
   splash), `"shop-bell"` (warm brass door chime), `"arcade-bell"` (cheerful
   vintage parlor chime), and `"sanctuary-hop"` (joyful critter chirp-pop).
+  Milestone 232 adds three bespoke travel departure foley recipes (`<= 0.08` gain,
+  `<= 0.34 s`, zero square waves): `"travel-bus"` (vintage two-tone `440 -> 554.37 Hz`
+  bus chime-honk + `220 Hz` octave hum, `0.32 s`), `"travel-boat"` (lowpass `1100 Hz`
+  wooden-oar water lap + `659.25 -> 880 Hz` aqua droplet chime, `0.34 s`), and
+  `"travel-lift"` (`392 Hz` cable chord + `1318.5 -> 1975.5 Hz` alpine brass bell
+  shimmer, `0.34 s`).
 - Tactile storybook UI foley & haptic micro-feedback (Milestones 133 & 180,
   `src/platform/audio-recipes.ts`, `src/platform/audio-effects.ts`,
   `src/platform/audio.ts`, `src/shell/title-flow.ts`,
@@ -1059,9 +1065,16 @@ ios/            Capacitor iOS project (from Milestone 4).
   inside a framed die-cut cream postcard (`z-index: 65`, `data-travel-vignette="open"`,
   hiding gameplay HUD/touch chrome plus `.qa-touch-trigger`, `.npc-chatter`, and
   `.ribbon-toast` as of Milestone 213 / Track E19H) for `1680 ms` (`200 ms` fade-in, `220 ms`
-  fade-out) with a `"Next stop: <Destination>!"` header, mode chime
-  (`title-start` / `card-open` / `tool-sparkle`), and animated origin-to-destination
-  progress strip while the target area warms in parallel behind the paper fade.
+  fade-out) with a `"Next stop: <Destination>!"` header, bespoke departure foley via
+  `travelEffectForMode(mode)` (`"travel-bus"` / `"travel-boat"` / `"travel-lift"`, Milestone 232,
+  strictly skipped on paused instant bypass), optional live Cozy Weather continuity
+  (`TravelOverlayView.weather`, Milestone 232: strictly hidden on `"clear"`/`undefined` for zero
+  baseline drift; on active outdoor skies mounts `.travel-weather-fx` watercolor wash/accents
+  frozen under Reduced Motion and an upper-right `.travel-weather-pill` with zero-`<text>`
+  `minigameWeatherIcon` + `weatherLabel(weather)` resolved via
+  `weatherForArea(state.area, state.tick, getCozyWeatherMode()).kind`), and animated
+  origin-to-destination progress strip while the target area warms in parallel behind the paper
+  fade.
   Tapping/clicking the overlay, pressing Confirm/Cancel (`Z`, `Space`, `Enter`,
   `X`, `Escape`), or pressing a fresh Gamepad A/B edge skips the scenic hold
   immediately (swallowing confirm/cancel so arrival never re-triggers the travel
@@ -3461,7 +3474,11 @@ trunks keep its two exits.
   unchanged when all three are zero). Once `valleyCompletion(progress).complete`
   is true (all 63 valley collectibles across stickers, prizes, fish, keepsakes,
   and gems), `continueDetail` crowns the save as
-  `"<area> · ★ 100% Valley Explorer"` (Milestone 168).
+  `"<area> · ★ 100% Valley Explorer"` (Milestone 168); when the optional 3rd
+  `records?: MinigameRecords` parameter is passed (wired from `minigameRecords.records()` in
+  `src/main.ts`, Milestone 232) and all 16 Valley Merit Ribbons are stitched
+  (`evaluateMeritRibbons(world, state, records).complete`), it upgrades the crown to
+  `"<area> · ★ 16/16 Valley Legend"`.
 - Dev builds log `[cloverhollow] title {mode, options}` (the visible buttons'
   rects, CSS px) when the mode changes; `just ios-smoke` taps New game from
   them on a fresh install and Continue after the relaunch.

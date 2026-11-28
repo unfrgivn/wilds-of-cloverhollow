@@ -9,6 +9,15 @@ export type TravelVignetteId =
 
 export type TravelMode = "bus" | "boat" | "lift";
 
+export type TravelDepartureEffect = "travel-bus" | "travel-boat" | "travel-lift";
+
+/** Maps a live Travel Vignette vehicle mode to its bespoke cozy departure foley. */
+export function travelEffectForMode(mode: TravelMode): TravelDepartureEffect {
+  if (mode === "bus") return "travel-bus";
+  if (mode === "boat") return "travel-boat";
+  return "travel-lift";
+}
+
 export type TravelVignetteSpec = {
   id: TravelVignetteId;
   mode: TravelMode;
@@ -45,19 +54,19 @@ const MODE_DEFAULTS: Record<TravelMode, ModeDefaults> = {
   bus: {
     mode: "bus",
     badgeLabel: "Star-Line Bus",
-    chime: "title-start",
+    chime: travelEffectForMode("bus"),
     accentColor: "#e8c468",
   },
   boat: {
     mode: "boat",
     badgeLabel: "Bay Rowboat",
-    chime: "card-open",
+    chime: travelEffectForMode("boat"),
     accentColor: "#92cdd0",
   },
   lift: {
     mode: "lift",
     badgeLabel: "Alpine Ski Lift",
-    chime: "tool-sparkle",
+    chime: travelEffectForMode("lift"),
     accentColor: "#b8c7e8",
   },
 };

@@ -7522,9 +7522,11 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
 
 ### Phase 5: Showstopping Visuals, Transitions & Interactive Audio (Hash-Safe)
 - **Track E13 (Live Watercolor Chaos-to-Paint Area Restoration, Art Wave C):**
-  Crumpled-paper / purple-scribble chaos overlays that peel away with a
-  real-time watercolor wash-bloom wipe into flowers and sunlight when chaos is
-  calmed.
+  ✅ Completed (Milestone 179, 2026-11-27) — Hand-drawn watercolor chaos
+  scribble / crumpled-paper / fizzy decals that peel away with a 90-frame
+  scalloped watercolor wash-bloom wipe and drifting petal burst into sunlit
+  wildflowers, clovers, and golden dew flourishes across all 9 signature regions
+  when chaos is calmed (instant snap under Reduced Motion and paused harness).
 - **Track E14 (Illustrated Storybook Travel Vignettes, Art Wave C):** ✅ Completed
   (Milestone 176, 2026-11-27) — 5 painted animated watercolor travel cards
   (Star-Line Bus hills/coast/pass, Rowboat to Island, Ski Lift to Summit),
@@ -7711,6 +7713,62 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
 - Gates: `just check` (243 unit files / 1,752 tests, all 74 sims, 23 QA packs,
   purity, lint), `just build` (`index` `349.15 kB < 500 kB`), 29/29 targeted
   Chromium & WebKit e2e, and 99/99 Chromium `ui-gallery` tests.
+
+## Milestone 179: Live Watercolor Chaos-to-Paint Area Restoration (Elevation Track E13, Art Wave C1) **Status:** ✅ Completed (2026-11-27)
+- Directly fulfills `spec.md` §1.3 (*"Chaos appears as scribbles and crumpled
+  paper over the painting. Calming it restores the paint"*) across all 9
+  signature Cloverhollow regions (100% presentation-only, zero `src/core`
+  changes, Save `v10`, bit-identical sim hashes).
+- **Art Wave C1 (`art/recipes/restoration-decals.json`, `public/assets/restoration/`):**
+  - Generated 8 hand-drawn watercolor transparent decals via Gemini
+    (`gemini-3-pro-image-preview`, 5 calls including 1 rejected scene bleed):
+    4 chaos patches (`chaos_scribble_loop`, `chaos_scribble_zigzag`,
+    `chaos_crumple_patch`, `chaos_fizzy_doodle`, extracted from pure white via
+    `tools/art/white-to-alpha.ts`) and 4 restored blooms (`bloom_wildflowers`,
+    `bloom_clover_tuft`, `bloom_meadow_sprig` chroma-keyed from `#FF00FF` with
+    `tools/art/key-alpha.ts --holes` + `tools/art/despill-edge.ts`, plus
+    `bloom_sunbeam_dew` lifted from `#000000` via `tools/art/black-to-alpha.ts`).
+  - Packed into a single lean `1024x512` alpha-WebP atlas
+    (`public/assets/restoration/restoration.webp`, `205.2 KB`, `q92`,
+    `alpha_q 100`, PSNR `42.74 dB`), audited on cream and dark backgrounds
+    (`art/review/restoration-decals-{cream,dark}.jpg`) via `vision`, and logged
+    in `docs/review-queue.md`.
+- **Pure Restoration State Projection (`src/render/restoration-math.ts`):**
+  - Pixi-free pure module mapping all 9 signature zones (`plaza`, `park`, `bay`,
+    `pass`, `woods`, `school`, `hills`, `cavern`, `enchanted`) from chaotic to
+    restored using existing `state.critters`, `state.calms`, `state.stickers`,
+    and `state.ink` facts (including boss flare-ups for Lifeguard, Lodge Keeper,
+    Moon Owl, and Chef Mateo; leaving `harness` and non-restoration areas
+    neutral).
+  - Curated walkable, prop-silhouette-clear, NPC-clear placements across all 9
+    zones (`school` indoor tiles use golden sunbeam dew flourishes only; `park`
+    decals sit strictly on open meadow grass).
+  - Pure 90-frame **Watercolor Wash-Bloom Wipe (`calmPulse`)** progression
+    (`advanceRestorationPulse` + `evaluateRestorationFrame`): defers trigger
+    while battle/arcade obscures the overworld, sweeps radially outward from the
+    area chaos anchor to peel chaos patches and unfurl blooms with a 3-band
+    wash ring and 32 drifting pastel petals/sparkles, and snaps instantaneously
+    under Reduced Motion or paused harness mode.
+- **PixiJS 8 Restoration Renderer (`src/render/restoration.ts` + minimal wiring
+  in `src/render/view.ts`):**
+  - Loads `"restoration-sheet"` alongside permanent core sheets (keeping
+    `src/render/view.ts` cleanly at 732 lines `< 760`), mounts
+    `restoration.groundLayer` directly above `next.ground` and below
+    `shadowLayer` (zero impact on blurred battle backdrops), and renders the
+    organic 64-segment scalloped 3-band wash ring and pooled petal/sparkle burst
+    on `restoration.fxLayer`.
+- **Evidence:** `tests/unit/restoration.test.ts` (real unit tests across all 9
+  zones, prop-silhouette/walkable/surface guards, 90-frame `calmPulse` math,
+  Reduced Motion / paused bypass, and WebP atlas audit),
+  `tests/e2e/restoration.spec.ts` (real-key Plaza Fountain Frog & Meadow Park
+  Zoomie Pup restoration pixel-delta verification, live wash-bloom wipe, and
+  Reduced Motion bypass on Chromium + WebKit `@smoke`), refreshed
+  `vision`-verified `battle.spec.ts-snapshots/overworld-frog-{chaos,calm}-*`
+  baselines (0-byte diff on battle screens), and `vision`-verified comparison
+  sheets (`art/review/e13-plaza-before-after.jpg`,
+  `art/review/e13-park-before-after.jpg`, `art/review/e13-plaza-wipe-mid.jpg`).
+- **Gates:** `just check`, `just build` (every non-vendor JS chunk `< 500 kB`),
+  and Chromium/WebKit Playwright e2e verification.
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.

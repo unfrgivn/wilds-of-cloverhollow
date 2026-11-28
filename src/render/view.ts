@@ -1,20 +1,8 @@
 import {
-  Assets,
-  Container,
-  Graphics,
-  Sprite,
-  Spritesheet,
-  Text,
-  TilingSprite,
-  type Renderer,
+  Assets, Container, Graphics, Sprite, Spritesheet, Text, TilingSprite, type Renderer,
 } from "pixi.js";
 import {
-  creditEntries,
-  type Area,
-  type NavField,
-  type Point,
-  type State,
-  type World,
+  creditEntries, type Area, type NavField, type Point, type State, type World,
 } from "../core";
 import { AreaView } from "./area-view";
 import { screenToWorld, worldToScreen } from "./camera";
@@ -23,59 +11,37 @@ import { isReducedMotionActive } from "../platform/reduced-motion";
 import { fadeAlpha } from "./fade";
 import { createVfxTextures, type VfxTextures } from "./vfx-textures";
 import { BiomeAtmosphere } from "./atmosphere";
+import {
+  AreaRestorationRenderer, RESTORATION_ATLAS_ALIAS, RESTORATION_ATLAS_URL,
+} from "./restoration";
 import type { RestSpot } from "./companions";
 import { storyTimeOfDay } from "./time-of-day";
 import {
-  BattleViewController,
-  type BattleCheckGeometry,
-  type BattleCheckInfo,
+  BattleViewController, type BattleCheckGeometry, type BattleCheckInfo,
 } from "./battle-view";
 import { OverworldEntityLayer } from "./entity-layer";
 import { NpcLifeController, type NpcLifeRenderInfo } from "./npc-life";
 import { NavOverlayController } from "./nav-overlay";
-import {
-  CLUBHOUSE_PRIZES_ALIAS,
-  OverworldEffectsController,
-} from "./overworld-effects";
+import { CLUBHOUSE_PRIZES_ALIAS, OverworldEffectsController } from "./overworld-effects";
 import type { NavPathSnapshot } from "../shell/nav-steer";
 import type { NpcChatterView } from "../ui/npc-chatter";
 import {
-  areaEntityAtlases,
-  computeGlowTransform,
-  INDOOR_AREAS,
-  type EntityAtlas,
+  areaEntityAtlases, computeGlowTransform, INDOOR_AREAS, type EntityAtlas,
 } from "./overworld-render";
 import {
-  computeAreaEvictions,
-  computeDialogueRenderInfo,
-  computeLanternVisuals,
-  computeNoticeMarkViews,
-  computeNpcChatterScreenAnchor,
-  computeOverworldCameraFrame,
-  computePromptScreenView,
-  computeStoryAtmosphereOptions,
-  computeViewportRect,
-  resolveActivePetReaction,
-  resolveActiveRestSpot,
-  type GameViewRenderInfo,
-  type NoticeMarkView,
-  type PromptScreenView,
-  type ViewportRect,
+  computeAreaEvictions, computeDialogueRenderInfo, computeLanternVisuals,
+  computeNoticeMarkViews, computeNpcChatterScreenAnchor, computeOverworldCameraFrame,
+  computePromptScreenView, computeStoryAtmosphereOptions, computeViewportRect,
+  resolveActivePetReaction, resolveActiveRestSpot, type GameViewRenderInfo,
+  type NoticeMarkView, type PromptScreenView, type ViewportRect,
 } from "./view-projections";
 
 export {
-  areaEntityAtlases,
-  type BattleCheckGeometry,
-  type BattleCheckInfo,
-  type EntityAtlas,
-  type GameViewRenderInfo,
+  areaEntityAtlases, type BattleCheckGeometry, type BattleCheckInfo,
+  type EntityAtlas, type GameViewRenderInfo,
 };
 
-export type RenderOptions = {
-  paused?: boolean;
-  alpha?: number;
-  previousState?: State;
-};
+export type RenderOptions = { paused?: boolean; alpha?: number; previousState?: State };
 
 function mipmapSheet(alias: string, src: string): Promise<Spritesheet> {
   return Assets.load<Spritesheet>({
@@ -90,6 +56,7 @@ export class GameView {
   readonly ready: Promise<void>;
   private readonly vfx: VfxTextures;
   private readonly atmosphere: BiomeAtmosphere;
+  private readonly restoration: AreaRestorationRenderer;
   private readonly effects: OverworldEffectsController;
   private readonly entities: OverworldEntityLayer;
   private readonly npcLife: NpcLifeController;
@@ -148,6 +115,7 @@ export class GameView {
   ) {
     this.vfx = createVfxTextures();
     this.atmosphere = new BiomeAtmosphere(this.vfx);
+    this.restoration = new AreaRestorationRenderer(this.vfx);
     this.emissiveLayer.label = "emissive";
     this.emissiveLayer.addChild(this.atmosphere.emissive);
     this.effects = new OverworldEffectsController(
@@ -193,6 +161,7 @@ export class GameView {
       "fae-sheet",
       "glow-sheet",
       "ambient-sheet",
+      RESTORATION_ATLAS_ALIAS,
       world.battle.toyAtlas,
       ...Object.keys(world.party).map((id) => `${id}-sheet`),
     ]);
@@ -213,6 +182,7 @@ export class GameView {
       this.fade,
     );
     this.scene.addChild(
+      this.restoration.groundLayer,
       this.shadowLayer,
       this.effects.footstepLayer,
       this.navOverlay.groundLayer,
@@ -220,6 +190,7 @@ export class GameView {
       this.depth,
       this.ambientLayer,
       this.atmosphere.over,
+      this.restoration.fxLayer,
       this.npcLife.reactionLayer,
       this.effects.emoteLayer,
       this.paperGrain,
@@ -244,6 +215,7 @@ export class GameView {
       ),
       mipmapSheet("glow-sheet", assetUrl("assets/glows/glows.json")),
       mipmapSheet("ambient-sheet", assetUrl("assets/ambient/ambient.json")),
+      mipmapSheet(RESTORATION_ATLAS_ALIAS, assetUrl(RESTORATION_ATLAS_URL)),
       // The toys a catch throws are cropped from this sheet by the DOM
       // overlay, which reads their frames here.
       mipmapSheet(this.world.battle.toyAtlas, assetUrl(this.world.battle.toyAtlas)),
@@ -298,6 +270,7 @@ export class GameView {
     this.effects.clearFootsteps();
     this.effects.clearStarGemGlints();
     this.effects.clearEmotes();
+    this.restoration.clear();
     this.npcLife.clear();
     this.navOverlay.clearArea();
     this.navField = null;
@@ -387,6 +360,7 @@ export class GameView {
     this.previousCamera = undefined;
     this.effects.clearFootsteps();
     this.effects.clearEmotes();
+    this.restoration.clear();
     this.npcLife.clear();
     this.clearCompanionActions();
   }
@@ -551,6 +525,7 @@ export class GameView {
     this.effects.renderTimeOfDay(state, this.viewportRect);
     this.renderGlows(state, playerPos, paused, reducedMotion);
     this.effects.updateStarGemGlints(state, reducedMotion);
+    this.restoration.update(this.world, state, { paused, reducedMotion });
     this.atmosphere.update(
       area.id,
       area.width,

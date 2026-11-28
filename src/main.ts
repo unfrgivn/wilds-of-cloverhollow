@@ -35,7 +35,7 @@ import {
   buildSoundContext, collectLevelUpNotices, createAreaBannerTracker, createJournalNotesCache,
   createNpcChatterSync, createRibbonCelebrationSync, createToolEventChimeSync,
   didSwitchBattleTarget, hapticForTick, isOverworldConfirm, performOverworldConfirm,
-  resolveArcadeOutcome, resolveSoundtrack, shouldClearRest,
+  resolveArcadeOutcome, resolveAreaBannerContext, resolveSoundtrack, shouldClearRest,
 } from "./shell/feedback";
 import { createSaveSession, createSaveStore } from "./shell/save-storage";
 import { createAudio, projectMusicMix, resolveSoundtrackWeather } from "./platform/audio";
@@ -544,9 +544,9 @@ async function boot(): Promise<void> {
       isResting: view.isResting(), hasLantern, hasFlute, muted: sound.muted(),
       canPhoto: canPhotoMode(gate) && !photoMode, canBattlePeek: canBattlePeek(gate), inputMode,
     }), hasLasso });
-    areaBanner.render(bannerTracker.view(
-      content.world, state, isBannerEligible(gate, hasLevelUpNotice), qa?.isActive() ?? false,
-    ));
+    areaBanner.render(bannerTracker.view(content.world, state,
+      isBannerEligible(gate, hasLevelUpNotice), qa?.isActive() ?? false,
+      resolveAreaBannerContext(state, getCozyWeatherMode(), getHomeRecordTrack())));
     areaLoader.renderTravelVignette(performance.now());
     title.render({
       visible: titleMode !== null && !qaMenuOpen, mode: titleMode ?? "fresh",

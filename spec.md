@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 230)
+Last updated: 2026-11-28 (Milestone 231)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -1682,15 +1682,25 @@ ios/            Capacitor iOS project (from Milestone 4).
   target's art is prefetched as the fade-out begins and its tiles and prop
   atlases load concurrently, so the fade covers the load.
 - Storybook area arrival banner (`src/ui/area-banner.ts`, `area-banner.css`,
-  Milestone 85, render/UI-only): on genuine area arrivals (never on initial
+  Milestones 85 & 229, render/UI-only): on genuine area arrivals (never on initial
   boot, fixture resets, QA loads, or `harness`), once the door transition
   finishes, a die-cut parchment ribbon (`z-index: var(--z-hud)`,
   `pointer-events: none`, high-contrast `#47321f`/`#543d2a` on `#f7f2e3`,
-  botanical leaf/star sprigs, `max-width: min(340px, calc(100vw - 220px))` to
-  clear touch buttons on 874x402 phones, shifting down cleanly below `.qa-badge`
-  when a QA pack is active, reduced-motion guarded) glides in over 150 ticks
-  (~2.5 s) showing the area's display title (`areaBannerInfo`) and its land
-  region eyebrow (omitted when the land name matches the area name). It hides
+  botanical leaf/star sprigs, `max-width: min(460px, calc(100vw - 220px))` to
+  clear touch buttons on 874x402 phones while keeping enriched weather and Home
+  Record eyebrows unclipped, shifting down cleanly below `.qa-badge` when a QA
+  pack is active, reduced-motion guarded) glides in over 150 ticks (~2.5 s)
+  showing the area's display title (`areaBannerInfo`) and its land region
+  eyebrow (omitted when the land name matches the area name). When an optional
+  `AreaBannerContext` (`{ weather?, homeRecord? }`) is supplied by the shell
+  (`src/shell/overworld-feedback.ts`, `src/main.ts`), the eyebrow weaves in a
+  non-default suffix separated by ` · ` (or standing alone when the land matches
+  the area): `♪ <Track Title>` when `homeRecord` is pinned in a
+  `HOME_RECORD_AREAS` room (`bedroom`, `clubhouse`, e.g. `"The Forest · ♪
+  Cloverhollow Jubilee"`), or the active outdoor `weatherLabel(weather)` when
+  `weather !== "clear"` outside indoor biomes (e.g. `"Cloverhollow · Rainbow
+  Sunshower"` or `"Rainbow Sunshower"` at Bubblegum Bay); default `"clear"`
+  skies and unpinned rooms keep the legacy eyebrow byte-identical. It hides
   immediately on dialogue, battles, arcade close-ups, journal, title/QA
   overlays, finale, or another transition.
 - Area triggers use `{ id, polygon, target: { area, spawn } }`. A trigger fires

@@ -37,6 +37,7 @@ export {
   isOverworldConfirm,
   performOverworldConfirm,
   petEffectForCompanion,
+  resolveAreaBannerContext,
   shouldPlayToolEventChime,
   type AreaBannerTracker,
   type RibbonCelebrationSync,

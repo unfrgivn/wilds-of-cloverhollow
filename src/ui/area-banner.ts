@@ -1,6 +1,13 @@
 import "./area-banner.css";
 import type { World } from "../core";
+import { HOME_RECORD_AREAS, trackTitles, type JukeboxTrack } from "../core/music";
+import { weatherBiomeForArea, weatherLabel, type CozyWeatherKind } from "../core/weather";
 import { element, setStyle, setText, svgElement } from "./dom";
+
+export type AreaBannerContext = {
+  weather?: CozyWeatherKind;
+  homeRecord?: JukeboxTrack | null;
+};
 
 export type AreaBannerInfo = {
   title: string;
@@ -25,7 +32,11 @@ function smoothstep(t: number): number {
   return clamped * clamped * (3 - 2 * clamped);
 }
 
-export function areaBannerInfo(world: World, areaId: string): AreaBannerInfo | null {
+export function areaBannerInfo(
+  world: World,
+  areaId: string,
+  options?: AreaBannerContext,
+): AreaBannerInfo | null {
   if (areaId === "harness") return null;
   const area = world.areas[areaId];
   if (area === undefined) return null;
@@ -37,7 +48,20 @@ export function areaBannerInfo(world: World, areaId: string): AreaBannerInfo | n
     land.name.trim().toLowerCase() !== title.trim().toLowerCase()
     ? land.name
     : null;
-  return { title, region };
+  let suffix: string | null = null;
+  if (options?.homeRecord != null && HOME_RECORD_AREAS.has(areaId)) {
+    suffix = `♪ ${trackTitles[options.homeRecord]}`;
+  } else if (
+    options?.weather !== undefined &&
+    options.weather !== "clear" &&
+    weatherBiomeForArea(areaId) !== "indoor"
+  ) {
+    suffix = weatherLabel(options.weather);
+  }
+  const finalRegion = suffix !== null
+    ? (region !== null ? `${region} · ${suffix}` : suffix)
+    : region;
+  return { title, region: finalRegion };
 }
 
 export function areaBannerEnvelope(progress: number): AreaBannerEnvelope {

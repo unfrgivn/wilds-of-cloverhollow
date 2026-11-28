@@ -1,12 +1,12 @@
-import { targetInteractable, type State, type World } from "../core";
+import { targetInteractable, type JukeboxTrack, type State, type World } from "../core";
 import { evaluateMeritRibbons, newlyEarnedRibbons, type MeritRibbonSummary } from "../core/ribbons";
-import type { CozyWeatherKind } from "../core/weather";
+import { weatherForArea, type CozyWeatherKind, type CozyWeatherMode } from "../core/weather";
 import type { CompanionAudioEffect } from "../platform/audio";
 import { findPettableCompanion, findRestSpot, type RestSpot } from "../render/companions";
 import {
   findNearbySanctuaryCritter, findPebbleSkipSpot, type PebbleSkipSpot,
 } from "../render/micro-delights";
-import { areaBannerInfo, type AreaBannerView } from "../ui/area-banner";
+import { areaBannerInfo, type AreaBannerContext, type AreaBannerView } from "../ui/area-banner";
 import { createNpcChatter, type NpcChatterView } from "../ui/npc-chatter";
 import {
   composePostcardFrame, deliverPostcard, postcardMetadata, type PostcardCapture,
@@ -56,8 +56,21 @@ export type AreaBannerTracker = {
     state: State,
     eligible: boolean,
     qaOffset: boolean,
+    context?: AreaBannerContext,
   ) => AreaBannerView;
 };
+
+/** Resolves live weather & Home Record flavor context for the area arrival banner. */
+export function resolveAreaBannerContext(
+  state: Pick<State, "area" | "tick">,
+  weatherMode: CozyWeatherMode,
+  homeRecord: JukeboxTrack | null,
+): AreaBannerContext {
+  return {
+    weather: weatherForArea(state.area, state.tick, weatherMode).kind,
+    homeRecord,
+  };
+}
 
 /** Tracks arrival banner lifecycle across area crossings and fade-ins. */
 export function createAreaBannerTracker(duration = 150): AreaBannerTracker {
@@ -92,11 +105,11 @@ export function createAreaBannerTracker(duration = 150): AreaBannerTracker {
         pendingFade = false;
       }
     },
-    view: (world, state, eligible, qaOffset) => {
+    view: (world, state, eligible, qaOffset, context) => {
       if (startTick >= 0 && state.tick < startTick) clear();
       const info =
         area !== null && area === state.area && !pendingFade
-          ? areaBannerInfo(world, state.area)
+          ? areaBannerInfo(world, state.area, context)
           : null;
       const elapsed = startTick >= 0 ? state.tick - startTick : -1;
       if (elapsed >= duration) clear();

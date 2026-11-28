@@ -9800,6 +9800,27 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   + runtime story + harness checks green), 6/6 Chromium & WebKit
   (`milestone-230`, `milestone-228`, `milestone-214`), and 4/4 Chromium
   (`e5-puzzles-tools-dash`).
+
+## Milestone 231: Weather & Home-Record Enriched Area Arrival Banners (`areaBannerInfo`) **Status:** ✅ Completed (2026-11-28)
+- Weaves active outdoor Cozy Weather (`CLOVERHOLLOW · RAINBOW SUNSHOWER`) and
+  pinned Bedroom/Clubhouse Home Records (`THE FOREST · ♪ CLOVERHOLLOW JUBILEE`)
+  cleanly into the storybook Area Arrival Banner eyebrow when non-default — zero
+  `src/core` changes, zero save-version bumps, zero replay hash drift across all
+  77 sims, and zero visual baseline diffs across all 99 `ui-gallery`,
+  `immersion`, and `bus-line` baselines.
+- Enriched Area Arrival Banners (`src/ui/area-banner.{ts,css}`,
+  `src/shell/{overworld-feedback,feedback}.ts`, `src/main.ts`):
+  - Extended `areaBannerInfo(world, areaId, options?)` with `AreaBannerContext`
+    (`{ weather?, homeRecord? }`, 2-arg backwards-compatible, 0-pixel diff on
+    `"clear"` & unpinned rooms), widened `.area-banner` `max-width` cleanly to
+    `min(460px, calc(100vw - 220px))`, and wired pure `resolveAreaBannerContext`.
+- Evidence: `tests/unit/milestone-231.test.ts`,
+  `tests/e2e/milestone-231.spec.ts` (`@smoke` Chromium + WebKit), and review
+  captures `art/review/m229-banner-sunshower-1280.jpg` and
+  `m229-banner-home-record-1280.jpg` independently verified via `vision`.
+- Gates: `just check`, `just build` (`< 360 kB` every non-vendor chunk),
+  `just ios-device-build` (`Release-iphoneos/App.app`), 13/13 Chromium & WebKit
+  banner/record e2e, and 99/99 Chromium `ui-gallery` tests.
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

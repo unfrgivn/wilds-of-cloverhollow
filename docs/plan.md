@@ -7048,6 +7048,43 @@ the old trail, the owl, and the clubhouse claim.
   purity, lint), `just build` (all non-vendor chunks `< 400 kB`), 41/41 Chromium
   & WebKit e2e, and 99/99 Chromium `ui-gallery` tests.
 
+## Milestone 164: Complete 13-Keepsake Showcase & 26-Item Living Clubhouse Museum (`loft-sketch`, `aurora-rubbing`, `shell-shard`, `festival-ribbon`) **Status:** ✅ Completed (2026-11-27)
+- Brings all 4 expansion story keepsakes recorded in `club_chest` to visual
+  life across the Living Clubhouse walls, Journal Keepsakes Gallery (`13/13`),
+  interactive Keepsake Field Note Cards, Field Treasures Card, and QA console
+  `keepsakes on|off` — zero `src/core/sim.ts` changes, zero save-version bumps,
+  zero replay hash drift across all 74 sims, and `< 400 kB` across every
+  non-vendor production JS chunk.
+- Canonical 13-keepsake registry (`src/core/journal.ts`, `src/core/treasures.ts`,
+  `src/dev/console.ts`):
+  - Added `"loft-sketch"` (**Rocket Doodle & Clover**, `milo_loft_visited &&
+    rosie_cottage_visited`), `"aurora-rubbing"` (**Alpine Aurora Sketch**,
+    `summit_aurora_read`), `"shell-shard"` (**Starlight Shell Shard**,
+    `island_shells_solved`), and `"festival-ribbon"` (**Jubilee Festival
+    Ribbon**, `festival_toast_done`) across `journalKeepsakes`,
+    `valleyCompletion` (`63/63`), `treasuresSummary`, and `keepsakeVariables`.
+- Hand-inked SVG charms & 4-column Journal Gallery (`src/ui/icons.ts`,
+  `src/ui/journal.css`):
+  - Added 4 warm-brown-inked (`#47321f`) 48×48 inline SVG charms (zero `<text>`
+    nodes, exported via `keepsakeMarkup`) and upgraded `.journal-keepsakes` to
+    a balanced 4-column gallery fitting all 13 keepsakes cleanly with zero
+    clipping.
+- Watercolor Pixi textures & 26-item Living Clubhouse perches
+  (`src/render/keepsake-textures-expansion.ts`, `src/render/keepsake-textures.ts`,
+  `src/render/clubhouse-display.ts`):
+  - Added 4 matching 48×48 watercolor textures (`keepsakeSketch`,
+    `keepsakeAurora`, `keepsakeShell`, `keepsakeRibbon`, 34 cached VFX textures
+    total) mounted on unobstructed non-walkable walls & timber posts (`>= 50 px`
+    clear of all other items: `loft-sketch` `(326, 376)`, `aurora-rubbing`
+    `(492, 184)`, `shell-shard` `(280, 330)`, `festival-ribbon` `(976, 344)`).
+- Evidence: `tests/unit/milestone-164.test.ts` and
+  `tests/e2e/milestone-164.spec.ts` (`@smoke` Chromium + WebKit); review
+  captures `art/review/m164-clubhouse-26-items-1280.jpg` and
+  `m164-journal-13-keepsakes-1280.jpg` independently verified via `vision`.
+- Gates: `just check` (227 unit files / 1,657 tests, all 74 sims, 23 QA packs,
+  purity, lint), `just build` (all non-vendor chunks `< 400 kB`), and 29/29
+  Chromium & WebKit e2e tests.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

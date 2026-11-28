@@ -84,7 +84,7 @@ export function icon(markup: string, className: string): SVGSVGElement {
 
 // Hand-crafted 48x48 storybook keepsake charms (warm #47321f ink outlines,
 // zero text nodes) matching Fae's Clubhouse keepsakes.
-const keepsakeMarkup: Record<KeepsakeId, string> = {
+export const keepsakeMarkup: Record<KeepsakeId, string> = {
   "star-crystal":
     '<polygon points="14,40 10,25 16,17 22,26 20,40" fill="#89dfd0" stroke="#47321f" ' +
     'stroke-width="2.2" stroke-linejoin="round"/>' +
@@ -220,9 +220,82 @@ const keepsakeMarkup: Record<KeepsakeId, string> = {
     '<polygon points="22.5,26.8 23.8,29.6 26.8,29.9 24.5,31.8 25.2,34.7 22.5,33.1 ' +
     '19.8,34.7 20.5,31.8 18.2,29.9 21.2,29.6" fill="#fff8d4" stroke="#7d521b" ' +
     'stroke-width="1.2" stroke-linejoin="round"/>',
+  "loft-sketch":
+    '<rect x="7.5" y="7.5" width="30" height="33.5" rx="4" fill="#fbf3dc" stroke="#47321f" ' +
+    'stroke-width="2.3" stroke-linejoin="round"/>' +
+    '<circle cx="22.5" cy="8.5" r="3.1" fill="#e87594" stroke="#47321f" stroke-width="1.6"/>' +
+    '<circle cx="21.5" cy="7.6" r="1" fill="#fff5f8"/>' +
+    '<path d="M13 31 L16.5 27.5 M14 33 L18 30.5" stroke="#f6c95e" stroke-width="2.4" ' +
+    'stroke-linecap="round"/>' +
+    '<path d="M15 27.5 L12.5 24 L17.5 23 Z M21 31.5 L24.5 34 L25.5 29 Z" fill="#e87594" ' +
+    'stroke="#47321f" stroke-width="1.5" stroke-linejoin="round"/>' +
+    '<path d="M15.5 28.5 C17 21.5 22.5 16 29.5 14.5 C28 21.5 22.5 27 15.5 28.5 Z" ' +
+    'fill="#c8a8f0" stroke="#47321f" stroke-width="1.9" stroke-linejoin="round"/>' +
+    '<circle cx="22.5" cy="21.5" r="2.3" fill="#89dfd0" stroke="#47321f" stroke-width="1.3"/>' +
+    '<polygon points="13.5,14.5 14.4,16.5 16.4,17.4 14.4,18.3 13.5,20.3 12.6,18.3 ' +
+    '10.6,17.4 12.6,16.5" fill="#ffe37d"/>' +
+    '<path d="M35 33 Q34.5 39 37.5 42.5" fill="none" stroke="#47321f" stroke-width="2" ' +
+    'stroke-linecap="round"/>' +
+    '<circle cx="35" cy="28.8" r="3.4" fill="#86cf84" stroke="#47321f" stroke-width="1.5"/>' +
+    '<circle cx="39.2" cy="33" r="3.4" fill="#72bf74" stroke="#47321f" stroke-width="1.5"/>' +
+    '<circle cx="35" cy="37.2" r="3.4" fill="#86cf84" stroke="#47321f" stroke-width="1.5"/>' +
+    '<circle cx="30.8" cy="33" r="3.4" fill="#72bf74" stroke="#47321f" stroke-width="1.5"/>' +
+    '<circle cx="35" cy="33" r="1.5" fill="#d9f7be"/>',
+  "aurora-rubbing":
+    '<rect x="6.5" y="8" width="35" height="32" rx="5.5" fill="#32386c" stroke="#47321f" ' +
+    'stroke-width="2.4" stroke-linejoin="round"/>' +
+    '<path d="M9.5 24 C14.5 15 21 20 27 14 C31.5 10 35.5 12 38.5 16" fill="none" ' +
+    'stroke="#8ce8d8" stroke-width="5" stroke-linecap="round" opacity="0.72"/>' +
+    '<path d="M9.5 28 C16 19 22 25 29 18.5 C33 15 36.5 16.5 39 19.5" fill="none" ' +
+    'stroke="#d8b8ff" stroke-width="4.4" stroke-linecap="round" opacity="0.88"/>' +
+    '<path d="M11 30.5 C18 24 24 27 31 22 C34.5 19.5 37 20.5 38.8 22.5" fill="none" ' +
+    'stroke="#ffe37d" stroke-width="2.6" stroke-linecap="round" opacity="0.9"/>' +
+    '<polygon points="14,13 14.9,14.8 16.8,15.6 14.9,16.4 14,18.2 13.1,16.4 ' +
+    '11.2,15.6 13.1,14.8" fill="#fff6c4"/>' +
+    '<circle cx="24" cy="12" r="1.2" fill="#fff6c4"/>' +
+    '<circle cx="35" cy="12.5" r="1.4" fill="#fff6c4"/>' +
+    '<path d="M7.5 34.5 Q18 31 25 34 Q33 31.5 40.5 34.5 L40.5 38.5 Q40.5 39.2 39.5 39.2 ' +
+    'L8.5 39.2 Q7.5 39.2 7.5 38.5 Z" fill="#e6f2ff" stroke="#47321f" stroke-width="1.4"/>' +
+    '<polygon points="14,35 17,27 20,35" fill="#4f746c" stroke="#47321f" ' +
+    'stroke-width="1.3" stroke-linejoin="round"/>' +
+    '<polygon points="22,36 25.5,25.5 29,36" fill="#3f625c" stroke="#47321f" ' +
+    'stroke-width="1.3" stroke-linejoin="round"/>' +
+    '<polygon points="30.5,35.5 33.5,28 36.5,35.5" fill="#4f746c" stroke="#47321f" ' +
+    'stroke-width="1.3" stroke-linejoin="round"/>',
+  "shell-shard":
+    '<path d="M18 37 L30 37 L27.5 41 L20.5 41 Z" fill="#f7c8d8" stroke="#47321f" ' +
+    'stroke-width="2.1" stroke-linejoin="round"/>' +
+    '<path d="M19 37 C11 33 7.5 26 9.5 19 C11.5 14 15.5 12 18.5 13 C20 9.5 24 8.5 24 8.5 ' +
+    'C24 8.5 28 9.5 29.5 13 C32.5 12 36.5 14 38.5 19 C40.5 26 37 33 29 37 Z" ' +
+    'fill="#ffd9e6" stroke="#47321f" stroke-width="2.3" stroke-linejoin="round"/>' +
+    '<path d="M24 36 C19 28 18 19 24 11 C30 19 29 28 24 36 Z" fill="#c7f4ec" opacity="0.78"/>' +
+    '<path d="M21 36 C14 29 12 22 15.5 15.5" fill="none" stroke="#d996b2" ' +
+    'stroke-width="1.6" stroke-linecap="round"/>' +
+    '<path d="M24 36 L24 12.5" fill="none" stroke="#92c9be" stroke-width="1.6" ' +
+    'stroke-linecap="round"/>' +
+    '<path d="M27 36 C34 29 36 22 32.5 15.5" fill="none" stroke="#d996b2" ' +
+    'stroke-width="1.6" stroke-linecap="round"/>' +
+    '<path d="M31.5 15.5 L33 19.2 L36.8 20.6 L33 22 L31.5 25.8 L30 22 L26.2 20.6 ' +
+    'L30 19.2 Z" fill="#fff4b8" stroke="#47321f" stroke-width="1.1" stroke-linejoin="round"/>' +
+    '<circle cx="16.5" cy="21" r="1.8" fill="#ffffff" opacity="0.82"/>',
+  "festival-ribbon":
+    '<polygon points="18.5,27 11.5,42.5 18,39.5 22.5,43 23.5,29" fill="#ee849e" ' +
+    'stroke="#47321f" stroke-width="2.1" stroke-linejoin="round"/>' +
+    '<polygon points="29.5,27 36.5,42.5 30,39.5 25.5,43 24.5,29" fill="#7fd1a8" ' +
+    'stroke="#47321f" stroke-width="2.1" stroke-linejoin="round"/>' +
+    '<path d="M24 6.5 L27.5 9.2 L32 8.8 L33.5 13 L37.2 15.5 L36 19.8 L37.8 24 ' +
+    'L34.2 26.8 L33.2 31 L28.8 31.2 L24 33.5 L19.2 31.2 L14.8 31 L13.8 26.8 ' +
+    'L10.2 24 L12 19.8 L10.8 15.5 L14.5 13 L16 8.8 L20.5 9.2 Z" fill="#f8c846" ' +
+    'stroke="#47321f" stroke-width="2.2" stroke-linejoin="round"/>' +
+    '<circle cx="24" cy="20" r="8.8" fill="#fff6d4" stroke="#c48a1c" stroke-width="1.6"/>' +
+    '<polygon points="24,13.6 25.9,17.8 30.5,18.3 27,21.3 28,25.8 24,23.4 ' +
+    '20,25.8 21,21.3 17.5,18.3 22.1,17.8" fill="#ffe37d" stroke="#7d521b" ' +
+    'stroke-width="1.4" stroke-linejoin="round"/>' +
+    '<ellipse cx="18.5" cy="14.5" rx="2.4" ry="1.3" transform="rotate(-30 18.5 14.5)" ' +
+    'fill="#ffffff" opacity="0.8"/>',
 };
 
-/** Hand-crafted inline SVG icon for each of Fae's nine quest keepsakes. */
+/** Hand-crafted inline SVG icon for each of Fae's thirteen quest keepsakes. */
 export function keepsakeIcon(id: KeepsakeId): SVGSVGElement {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("class", "journal-keepsake-icon die-cut");

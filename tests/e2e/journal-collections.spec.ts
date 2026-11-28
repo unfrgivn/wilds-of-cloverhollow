@@ -115,7 +115,7 @@ test(
     await expect(page.locator(".journal-fish-heading")).toContainText("6/6");
     await expect(page.locator(".journal-fish-heading")).toContainText("★ Complete!");
     await expect(page.locator(".journal-keepsakes-heading")).toContainText("KEEPSAKES");
-    await expect(page.locator(".journal-keepsakes-heading")).toContainText("9/9");
+    await expect(page.locator(".journal-keepsakes-heading")).toContainText("13/13");
     await expect(page.locator(".journal-keepsakes-heading")).toContainText("★ Complete!");
 
     // Wait for lazily decoded fish atlas to paint on all 6 fish slots.
@@ -132,9 +132,9 @@ test(
     await expect(page.locator('.journal-fish .journal-slot[data-fish="jelly"]'))
       .toHaveClass(/is-rare/);
 
-    // Verify all 9 keepsake charms render inline SVG with zero <text> nodes.
+    // Verify all 13 keepsake charms render inline SVG with zero <text> nodes.
     const keepsakeSlots = page.locator('.journal-keepsakes .journal-slot[data-owned="true"]');
-    await expect(keepsakeSlots).toHaveCount(9);
+    await expect(keepsakeSlots).toHaveCount(13);
     await expect(page.locator('.journal-keepsakes .journal-slot[data-keepsake="clover-wreath"]'))
       .toContainText("Sanctuary Clover Wreath");
     await expect(page.locator('.journal-keepsakes .journal-slot[data-keepsake="sea-compass"]'))
@@ -143,6 +143,8 @@ test(
       .toContainText("Pressed Alpine Clover");
     await expect(page.locator('.journal-keepsakes .journal-slot[data-keepsake="star-whistle"]'))
       .toContainText("Golden Star-Line Whistle");
+    await expect(page.locator('.journal-keepsakes .journal-slot[data-keepsake="festival-ribbon"]'))
+      .toContainText("Jubilee Festival Ribbon");
     const svgCheck = await page.evaluate(() => {
       const svgs = [...document.querySelectorAll("svg.journal-keepsake-icon")];
       return {
@@ -150,7 +152,7 @@ test(
         textNodes: svgs.reduce((sum, svg) => sum + svg.querySelectorAll("text").length, 0),
       };
     });
-    expect(svgCheck).toEqual({ count: 9, textNodes: 0 });
+    expect(svgCheck).toEqual({ count: 13, textNodes: 0 });
 
     // Scroll to the Keepsakes heading so all 8 keepsakes & pill borders fit cleanly in view.
     await page.locator(".journal-keepsakes-heading").evaluate((heading) => {
@@ -204,7 +206,7 @@ test(
     await expect(page.locator(".journal-book")).toHaveAttribute("data-journal-page", "map");
     await expect(page.locator('.journal-map-pill[data-stat="fish"]')).toHaveText("Fish 6/6");
     await expect(page.locator('.journal-map-pill[data-stat="keepsakes"]'))
-      .toHaveText("Keepsakes 9/9");
+      .toHaveText("Keepsakes 13/13");
 
     const mapContrast = await measureCollectionContrast(page, ".journal-map-pill");
     expect(mapContrast).toHaveLength(4);
@@ -239,12 +241,16 @@ test(
     await runQaCommands(page, ["prizes all", "stickers all", "keepsakes on"]);
 
     const clubInfo = await renderInfo(page);
-    expect(clubInfo.clubhouseDisplay).toBeGreaterThanOrEqual(22);
+    expect(clubInfo.clubhouseDisplay).toBeGreaterThanOrEqual(26);
     for (const label of [
       "clubhouse:keepsake:clover-wreath",
       "clubhouse:keepsake:sea-compass",
       "clubhouse:keepsake:alpine-clover",
       "clubhouse:keepsake:star-whistle",
+      "clubhouse:keepsake:loft-sketch",
+      "clubhouse:keepsake:aurora-rubbing",
+      "clubhouse:keepsake:shell-shard",
+      "clubhouse:keepsake:festival-ribbon",
     ]) {
       expect(clubInfo.drawOrder.some((item) => item.label === label), label).toBe(true);
     }

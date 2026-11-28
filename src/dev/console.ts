@@ -45,6 +45,11 @@ const keepsakeVariables: readonly string[] = [
   "sue_compass",
   "jordan_clover",
   "buster_reward",
+  "milo_loft_visited",
+  "rosie_cottage_visited",
+  "summit_aurora_read",
+  "island_shells_solved",
+  "festival_toast_done",
 ];
 
 // The supplies' caps are the layouts the journal and the battle menu were

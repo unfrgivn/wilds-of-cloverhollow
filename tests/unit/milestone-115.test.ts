@@ -240,7 +240,7 @@ describe("Milestone 114: modular audio-recipes.ts extraction & audio.ts re-expor
 });
 
 describe("Milestone 114: modular keepsake-textures.ts & vfx-textures.ts", () => {
-  it("covers all 9 keepsake keys identically across both modules", () => {
+  it("covers all 13 keepsake keys identically across both modules", () => {
     const expected: readonly KeepsakeTextureKey[] = [
       "keepsakeCrystal",
       "keepsakePin",
@@ -251,6 +251,10 @@ describe("Milestone 114: modular keepsake-textures.ts & vfx-textures.ts", () => 
       "keepsakeCompass",
       "keepsakeClover",
       "keepsakeWhistle",
+      "keepsakeSketch",
+      "keepsakeAurora",
+      "keepsakeShell",
+      "keepsakeRibbon",
     ];
     expect(KEEPSAKE_TEXTURE_KEYS).toEqual(expected);
     expect(VFX_KEEPSAKE_TEXTURE_KEYS).toBe(KEEPSAKE_TEXTURE_KEYS);
@@ -258,7 +262,7 @@ describe("Milestone 114: modular keepsake-textures.ts & vfx-textures.ts", () => 
     // Compile-time verification that every KeepsakeTextureKey belongs to VfxTextureKey.
     const asVfxKeys: readonly VfxTextureKey[] = expected;
     const asReexported: readonly VfxKeepsakeTextureKey[] = expected;
-    expect(asVfxKeys).toHaveLength(9);
-    expect(asReexported).toHaveLength(9);
+    expect(asVfxKeys).toHaveLength(13);
+    expect(asReexported).toHaveLength(13);
   });
 });

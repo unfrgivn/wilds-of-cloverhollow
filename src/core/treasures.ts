@@ -108,6 +108,36 @@ const KEEPSAKE_SPECS: readonly KeepsakeSpec[] = [
     note: "Buster's reward",
     unlocked: (world, state) => world.storyVariable(state.ink, "buster_reward") === true,
   },
+  {
+    id: "loft-sketch",
+    name: "Rocket Doodle & Clover",
+    source: "Milo & Rosie",
+    note: "Loft & garden",
+    unlocked: (world, state) =>
+      world.storyVariable(state.ink, "milo_loft_visited") === true &&
+      world.storyVariable(state.ink, "rosie_cottage_visited") === true,
+  },
+  {
+    id: "aurora-rubbing",
+    name: "Alpine Aurora Sketch",
+    source: "Alpine Summit",
+    note: "Aurora legend",
+    unlocked: (world, state) => world.storyVariable(state.ink, "summit_aurora_read") === true,
+  },
+  {
+    id: "shell-shard",
+    name: "Starlight Shell Shard",
+    source: "Starlight Island",
+    note: "Shell chime",
+    unlocked: (world, state) => world.storyVariable(state.ink, "island_shells_solved") === true,
+  },
+  {
+    id: "festival-ribbon",
+    name: "Jubilee Festival Ribbon",
+    source: "Sanctuary",
+    note: "Jubilee toast",
+    unlocked: (world, state) => world.storyVariable(state.ink, "festival_toast_done") === true,
+  },
 ];
 
 /**

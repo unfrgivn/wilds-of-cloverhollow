@@ -22,7 +22,7 @@ async function runQaCommands(page: Page, commands: readonly string[]): Promise<v
 }
 
 test(
-  "clubhouse renders all 13 prizes and 9 keepsakes, pets Maddie cleanly, and rests on beanbag",
+  "clubhouse renders all 13 prizes and 13 keepsakes, pets Maddie cleanly, and rests on beanbag",
   { tag: "@smoke" },
   async ({ page }, testInfo) => {
     const errors: string[] = [];
@@ -33,13 +33,13 @@ test(
 
     const displayInfo = await renderInfo(page);
     expect(displayInfo.area).toBe("clubhouse");
-    expect(displayInfo.clubhouseDisplay).toBeGreaterThanOrEqual(22);
+    expect(displayInfo.clubhouseDisplay).toBeGreaterThanOrEqual(26);
     expect(
       displayInfo.drawOrder.filter((item) => item.label.startsWith("clubhouse:prize:")),
     ).toHaveLength(13);
     expect(
       displayInfo.drawOrder.filter((item) => item.label.startsWith("clubhouse:keepsake:")),
-    ).toHaveLength(9);
+    ).toHaveLength(13);
 
     // Clean framing at both desktop (1280x720) and phone landscape (874x402).
     const canvas = page.locator("canvas");

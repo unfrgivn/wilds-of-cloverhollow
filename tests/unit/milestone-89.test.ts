@@ -118,7 +118,7 @@ describe("Milestone 89: Living Clubhouse display", () => {
     }
   });
 
-  it("activates all 8 shimmering quest keepsakes when their story or sticker flags hold", () => {
+  it("activates all 13 shimmering quest keepsakes when their story or sticker flags hold", () => {
     const empty = stateIn("clubhouse");
     expect(evaluateClubhouseDisplay(world, empty).keepsakes).toEqual([]);
 
@@ -133,6 +133,11 @@ describe("Milestone 89: Living Clubhouse display", () => {
         sue_compass: true,
         jordan_clover: true,
         buster_reward: true,
+        milo_loft_visited: true,
+        rosie_cottage_visited: true,
+        summit_aurora_read: true,
+        island_shells_solved: true,
+        festival_toast_done: true,
       },
     );
     const display = evaluateClubhouseDisplay(world, full);
@@ -147,6 +152,10 @@ describe("Milestone 89: Living Clubhouse display", () => {
       "sea-compass",
       "alpine-clover",
       "star-whistle",
+      "loft-sketch",
+      "aurora-rubbing",
+      "shell-shard",
+      "festival-ribbon",
     ]);
     expect(display.keepsakes.map((item) => item.texture)).toEqual([
       "keepsakeCrystal",
@@ -158,6 +167,10 @@ describe("Milestone 89: Living Clubhouse display", () => {
       "keepsakeCompass",
       "keepsakeClover",
       "keepsakeWhistle",
+      "keepsakeSketch",
+      "keepsakeAurora",
+      "keepsakeShell",
+      "keepsakeRibbon",
     ]);
   });
 
@@ -352,7 +365,12 @@ describe("Milestone 89: Companion petting & cozy resting", () => {
     expect(world.storyVariable(on.state.ink, "sue_compass")).toBe(true);
     expect(world.storyVariable(on.state.ink, "jordan_clover")).toBe(true);
     expect(world.storyVariable(on.state.ink, "buster_reward")).toBe(true);
-    expect(evaluateClubhouseDisplay(world, on.state).keepsakes).toHaveLength(7);
+    expect(world.storyVariable(on.state.ink, "milo_loft_visited")).toBe(true);
+    expect(world.storyVariable(on.state.ink, "rosie_cottage_visited")).toBe(true);
+    expect(world.storyVariable(on.state.ink, "summit_aurora_read")).toBe(true);
+    expect(world.storyVariable(on.state.ink, "island_shells_solved")).toBe(true);
+    expect(world.storyVariable(on.state.ink, "festival_toast_done")).toBe(true);
+    expect(evaluateClubhouseDisplay(world, on.state).keepsakes).toHaveLength(11);
 
     const off = runConsoleCommand(context, on.state, "keepsakes off");
     expect(off.kind).toBe("applied");

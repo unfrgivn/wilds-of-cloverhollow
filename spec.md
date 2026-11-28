@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 163)
+Last updated: 2026-11-27 (Milestone 164)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -629,18 +629,20 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Depth: the area ground layer is always at the back; characters y-sort by
   their feet, and props sort against them column by column by the front edge
   of their footprints (section 6.2).
-- Procedural watercolor VFX kit (`src/render/vfx-textures.ts` composing the nine
-  keepsake builders from `src/render/keepsake-textures.ts` and re-exporting
+- Procedural watercolor VFX kit (`src/render/vfx-textures.ts` composing the thirteen
+  keepsake builders from `src/render/keepsake-textures.ts` and
+  `src/render/keepsake-textures-expansion.ts` and re-exporting
   `KeepsakeTextureKey`, Milestones 72–73,
-  84, 88, 93, 95–96, 98, 114): twenty-six small cached offscreen-canvas Pixi textures
-  (`contactShadow`, `softGlow`, `sparkle`, `petal`, `waterGlint`, `mistWisp`,
-  `sunbeam`, `sunburst`, `paperGrain`, `puff`, `heart`, `energyRing`, five
-  hand-inked 48x48 comic
-  emote bubbles `emoteQuestion`, `emoteExclaim`, `emoteNote`, `emoteZzz`, and
-  `emoteHeart`, plus nine hand-inked 48x48 quest keepsake tokens
-  `keepsakeCrystal`, `keepsakePin`, `keepsakeGeode`, `keepsakeFeather`,
-  `keepsakeTaco`, `keepsakeWreath`, `keepsakeCompass`, `keepsakeClover`, and
-  `keepsakeWhistle`), rendered with warm plum-brown shadows (`#52455F`), warm
+  84, 88, 93, 95–96, 98, 114, 164): thirty-four small cached offscreen-canvas Pixi
+  textures (`contactShadow`, `softGlow`, `sparkle`, `starGemCharm`, `petal`,
+  `waterGlint`, `mistWisp`, `sunbeam`, `sunburst`, `paperGrain`, `puff`, `heart`,
+  `energyRing`, eight hand-inked 48x48 comic emote bubbles `emoteQuestion`,
+  `emoteExclaim`, `emoteNote`, `emoteZzz`, `emoteHeart`, `emoteSparkle`,
+  `emoteWave`, and `emoteWorry`, plus thirteen hand-inked 48x48 quest keepsake
+  tokens `keepsakeCrystal`, `keepsakePin`, `keepsakeGeode`, `keepsakeFeather`,
+  `keepsakeTaco`, `keepsakeWreath`, `keepsakeCompass`, `keepsakeClover`,
+  `keepsakeWhistle`, `keepsakeSketch`, `keepsakeAurora`, `keepsakeShell`, and
+  `keepsakeRibbon`), rendered with warm plum-brown shadows (`#52455F`), warm
   `#47321F` ink outlines, pastel washes, gouache puffs, and seamless cold-press
   paper tooth. In non-harness areas, a `shadowLayer` sits directly above `ground`
   and below `depth` (with a pooled `footstepLayer` above it) to ground Fae, party
@@ -1924,19 +1926,25 @@ ios/            Capacitor iOS project (from Milestone 4).
     loading `world.arcade.atlas` under alias `clubhouse-prizes` only when
     entering `clubhouse` and evicting it on the same current + previous area
     residency window) onto non-blocking Clubhouse perches (beanbag cushion,
-    right-wall shelves, crate top, and wall nooks) alongside Fae's eight
+    right-wall shelves, crate top, and wall nooks) alongside Fae's thirteen
     shimmering hand-inked quest keepsakes (`star-crystal` on `cavern_chime_rung`,
     `star-pin` on `spice_returned`, `star-geode` on `gem_reward_all`,
     `moon-feather` on sticker `starry-owl`, `taco-badge` on sticker `taco-chef`,
     `clover-wreath` on `sanctuary_reward_14` mounted on the left wood wall at
     `(468, 314)`, `sea-compass` on `sue_compass` perched on the crate
     front-right corner at `(796, 350)`, `alpine-clover` on `jordan_clover`
-    mounted beside the wreath at `(516, 308)`, and `star-whistle` on
-    `buster_reward` perched on the round window sill at `(805, 259)` — 22 total
-    Living Clubhouse items, with Milestone 107 spacing polish across the upper
-    and lower right shelves, beanbag 2×2 cuddle arc, crate keepsake row, and
-    left floor perches), each grounded with a miniature contact shadow and
-    subtle breathing sparkle aura.
+    mounted beside the wreath at `(516, 308)`, `star-whistle` on
+    `buster_reward` perched on the round window sill at `(805, 259)`,
+    `loft-sketch` on `milo_loft_visited && rosie_cottage_visited` pinned on the
+    back-left lower plank wall at `(326, 376)`, `aurora-rubbing` on
+    `summit_aurora_read` hung on the upper-left plank wall at `(492, 184)`,
+    `shell-shard` on `island_shells_solved` mounted on the front-left timber
+    post at `(280, 330)`, and `festival-ribbon` on `festival_toast_done` hung on
+    the front-right timber post at `(976, 344)` — 26 total Living Clubhouse
+    items, with Milestone 107 & Milestone 164 spacing polish across the upper
+    and lower right shelves, beanbag 2×2 cuddle arc, crate keepsake row, wall
+    planks, timber posts, and left floor perches), each grounded with a
+    miniature contact shadow and subtle breathing sparkle aura.
   - `findPettableCompanion` & `findRestSpot` (`src/render/companions.ts`): on a
     fresh overworld confirm press when no real interactable (`targetInteractable`)
     or overlay is active, Fae can pet Maddie or any active Flute Friend
@@ -4441,10 +4449,12 @@ trunks keep its two exits.
   `src/core/treasures.ts`, `src/ui/journal-field-note.ts` mounted by
   `src/ui/journal.ts`): summarizes Fae's Star-Line
   Stamp Card (`buster_quest`, `stamp_bay`, `stamp_pass`, `buster_reward`),
-  all six Clubhouse Keepsakes (`star-crystal`, `star-pin`, `star-geode`,
-  `moon-feather`, `taco-badge`, `star-whistle`), and all six Bubblegum Bay Catch
+  all thirteen Clubhouse Keepsakes (`star-crystal`, `star-pin`, `star-geode`,
+  `moon-feather`, `taco-badge`, `clover-wreath`, `sea-compass`, `alpine-clover`,
+  `star-whistle`, `loft-sketch`, `aurora-rubbing`, `shell-shard`,
+  `festival-ribbon`), and all six Bubblegum Bay Catch
   Book species (`world.arcade.fish.catches` vs `state.caughtFish`). When
-  `hasAny` is true, a golden clickable `Treasures · N/6` pill
+  `hasAny` is true, a golden clickable `Treasures · N/13` pill
   (`.journal-treasures-btn`) appears in the MAP page footer beside Stickers and
   Prizes (hidden when `hasAny` is false so early-game MAP baselines stay
   untouched). Clicking it opens the Field Treasures Card modal
@@ -4540,14 +4550,15 @@ trunks keep its two exits.
     via `atlasImagePath` (zero boot decode when 0 fish are caught) or dashed `?`
     for uncaught species, with a warm gold highlight on caught rare catches
     (`Moonlight Jelly`, `Golden Starfish Crown`).
-  - **8 Keepsakes Gallery shelf**: attached below `FISH` (or `PRIZES`) only once
+  - **13 Keepsakes Gallery shelf**: attached below `FISH` (or `PRIZES`) only once
     at least one keepsake is owned (`journalKeepsakes(world, state)`:
     `star-crystal`, `star-pin`, `star-geode`, `moon-feather`, `taco-badge`,
-    `clover-wreath`, `sea-compass`, `alpine-clover`). Displays
-    `.journal-keepsakes-heading` (`KEEPSAKES`, `N/8` count badge, and golden
-    `★ Complete!` ribbon when all 8 are unlocked; `scroll-margin-top: 8px;
+    `clover-wreath`, `sea-compass`, `alpine-clover`, `star-whistle`,
+    `loft-sketch`, `aurora-rubbing`, `shell-shard`, `festival-ribbon`). Displays
+    `.journal-keepsakes-heading` (`KEEPSAKES`, `N/13` count badge, and golden
+    `★ Complete!` ribbon when all 13 are unlocked; `scroll-margin-top: 8px;
     padding-top: 8px` on `.journal-fish-heading` and `.journal-keepsakes-heading`
-    so pill borders stay clear of the top scroll edge) above a 3-column
+    so pill borders stay clear of the top scroll edge) above a 4-column
     `.journal-keepsakes` grid rendering hand-crafted inline SVG charms
     (`keepsakeIcon` in `src/ui/icons.ts`, zero `<text>` nodes) + names for owned
     keepsakes or dashed `?` for locked keepsakes.
@@ -4608,7 +4619,7 @@ trunks keep its two exits.
       similarly saves and restores focus to its trigger button on dismissal.
   - **Completion Ribbons & MAP Footer Pills**: `STICKERS` and `PRIZES` headings
     also show the golden `★ Complete!` ribbon once every entry in their shelf is
-    owned. The MAP footer dynamically attaches `Fish N/6` and `Keepsakes N/8`
+    owned. The MAP footer dynamically attaches `Fish N/6` and `Keepsakes N/13`
     pills whenever their owned count is greater than 0 (detached at 0).
 
 ## 10. Save and load
@@ -4805,9 +4816,11 @@ trunks keep its two exits.
   on|off`,
   which set exactly the four tool story variables `has_lantern`, `has_lasso`,
   `has_flute`, and `has_map`; and `keepsakes on|off`, which toggles the closed
-  seven quest-keepsake story variables (`cavern_chime_rung`, `spice_returned`,
+  twelve quest-keepsake story variables (`cavern_chime_rung`, `spice_returned`,
   `gem_reward_all`, `sanctuary_reward_14`, `sue_compass`, `jordan_clover`,
-  `buster_reward`; an undeclared story variable is an error). `save <name>`
+  `buster_reward`, `milo_loft_visited`, `rosie_cottage_visited`,
+  `summit_aurora_read`, `island_shells_solved`, `festival_toast_done`; an
+  undeclared story variable is an error). `save <name>`
   keeps the state in a QA-only slot listed in the QA menu; `export` shows the
   state's save file for a bug report or the library. Nothing the console does
   autosaves or touches the player's slot.

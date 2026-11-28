@@ -19,7 +19,11 @@ export type ClubhouseKeepsakeKey =
   | "keepsakeWreath"
   | "keepsakeCompass"
   | "keepsakeClover"
-  | "keepsakeWhistle";
+  | "keepsakeWhistle"
+  | "keepsakeSketch"
+  | "keepsakeAurora"
+  | "keepsakeShell"
+  | "keepsakeRibbon";
 
 export type ClubhouseKeepsakePlacement = {
   id: string;
@@ -199,6 +203,56 @@ const KEEPSAKE_RULES: readonly KeepsakeRule[] = [
       sparkleTint: 0xffd966,
     },
     unlocked: (world, state) => world.storyVariable(state.ink, "buster_reward") === true,
+  },
+  {
+    placement: {
+      id: "loft-sketch",
+      texture: "keepsakeSketch",
+      x: 326,
+      y: 376,
+      zIndex: 320,
+      scale: 0.74,
+      sparkleTint: 0xd8b8ff,
+    },
+    unlocked: (world, state) =>
+      world.storyVariable(state.ink, "milo_loft_visited") === true &&
+      world.storyVariable(state.ink, "rosie_cottage_visited") === true,
+  },
+  {
+    placement: {
+      id: "aurora-rubbing",
+      texture: "keepsakeAurora",
+      x: 492,
+      y: 184,
+      zIndex: 320,
+      scale: 0.76,
+      sparkleTint: 0xb8a8ff,
+    },
+    unlocked: (world, state) => world.storyVariable(state.ink, "summit_aurora_read") === true,
+  },
+  {
+    placement: {
+      id: "shell-shard",
+      texture: "keepsakeShell",
+      x: 280,
+      y: 330,
+      zIndex: 320,
+      scale: 0.76,
+      sparkleTint: 0x9cf2eb,
+    },
+    unlocked: (world, state) => world.storyVariable(state.ink, "island_shells_solved") === true,
+  },
+  {
+    placement: {
+      id: "festival-ribbon",
+      texture: "keepsakeRibbon",
+      x: 976,
+      y: 344,
+      zIndex: 320,
+      scale: 0.78,
+      sparkleTint: 0xffd966,
+    },
+    unlocked: (world, state) => world.storyVariable(state.ink, "festival_toast_done") === true,
   },
 ];
 

@@ -175,10 +175,10 @@ describe("Milestone 104: Lush Celebration Fanfares & Camera Shutter Audio", () =
   });
 });
 
-describe("Milestone 104: Living Clubhouse 22-Item Museum Diorama Spacing", () => {
+describe("Milestone 104: Living Clubhouse 26-Item Museum Diorama Spacing", () => {
   const allPrizeIds = world.arcade.prizes.map((entry) => entry.id);
 
-  it("keeps all 22 perches non-blocking and generously separated across every shelf & nook", () => {
+  it("keeps all 26 perches non-blocking and generously separated across every shelf & nook", () => {
     const full = stateIn(
       "clubhouse",
       { prizes: allPrizeIds, stickers: ["starry-owl", "taco-chef"] },
@@ -190,11 +190,16 @@ describe("Milestone 104: Living Clubhouse 22-Item Museum Diorama Spacing", () =>
         sue_compass: true,
         jordan_clover: true,
         buster_reward: true,
+        milo_loft_visited: true,
+        rosie_cottage_visited: true,
+        summit_aurora_read: true,
+        island_shells_solved: true,
+        festival_toast_done: true,
       },
     );
     const display = evaluateClubhouseDisplay(world, full);
     expect(display.prizes).toHaveLength(13);
-    expect(display.keepsakes).toHaveLength(9);
+    expect(display.keepsakes).toHaveLength(13);
 
     const clubhouse = world.areas.clubhouse;
     if (clubhouse === undefined) throw new Error("Missing clubhouse area");

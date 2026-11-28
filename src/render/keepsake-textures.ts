@@ -1,4 +1,8 @@
 import type { Texture } from "pixi.js";
+import {
+  createExpansionKeepsakeTextures,
+  type ExpansionKeepsakeTextureKey,
+} from "./keepsake-textures-expansion";
 
 export type KeepsakeTextureKey =
   | "keepsakeCrystal"
@@ -9,7 +13,8 @@ export type KeepsakeTextureKey =
   | "keepsakeWreath"
   | "keepsakeCompass"
   | "keepsakeClover"
-  | "keepsakeWhistle";
+  | "keepsakeWhistle"
+  | ExpansionKeepsakeTextureKey;
 
 export const KEEPSAKE_TEXTURE_KEYS: readonly KeepsakeTextureKey[] = [
   "keepsakeCrystal",
@@ -21,6 +26,10 @@ export const KEEPSAKE_TEXTURE_KEYS: readonly KeepsakeTextureKey[] = [
   "keepsakeCompass",
   "keepsakeClover",
   "keepsakeWhistle",
+  "keepsakeSketch",
+  "keepsakeAurora",
+  "keepsakeShell",
+  "keepsakeRibbon",
 ];
 
 export type CanvasContext = {
@@ -738,5 +747,6 @@ export function createKeepsakeTextures(
     keepsakeCompass: buildKeepsakeCompass(makeCanvas, toTexture),
     keepsakeClover: buildKeepsakeClover(makeCanvas, toTexture),
     keepsakeWhistle: buildKeepsakeWhistle(makeCanvas, toTexture),
+    ...createExpansionKeepsakeTextures(makeCanvas, toTexture),
   };
 }

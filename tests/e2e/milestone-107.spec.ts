@@ -219,7 +219,7 @@ test(
 );
 
 test(
-  "Living Clubhouse renders all 22 museum diorama items cleanly spaced",
+  "Living Clubhouse renders all 26 museum diorama items cleanly spaced",
   { tag: "@smoke" },
   async ({ page }, testInfo) => {
     const errors: string[] = [];
@@ -235,13 +235,13 @@ test(
 
     const info = await renderInfo(page);
     expect(info.area).toBe("clubhouse");
-    expect(info.clubhouseDisplay).toBe(22);
+    expect(info.clubhouseDisplay).toBe(26);
     expect(info.drawOrder.filter((item) => item.label.startsWith("clubhouse:prize:"))).toHaveLength(
       13,
     );
     expect(
       info.drawOrder.filter((item) => item.label.startsWith("clubhouse:keepsake:")),
-    ).toHaveLength(9);
+    ).toHaveLength(13);
 
     // Enter Photo Mode so the review capture is completely unobstructed.
     await page.keyboard.press("p");

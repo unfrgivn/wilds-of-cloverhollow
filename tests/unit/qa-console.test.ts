@@ -164,30 +164,30 @@ describe("QA console commands", () => {
     expect(runConsoleCommand(context, start, "wrench on").kind).toBe("error");
   });
 
-  it("keepsakes on|off toggles all six story-variable quest keepsakes", () => {
+  it("keepsakes on|off toggles all twelve story-variable quest keepsakes", () => {
     const start = base();
     const on = runConsoleCommand(context, start, "keepsakes on");
     if (on.kind !== "applied") throw new Error("expected an applied outcome");
-    for (const name of [
+    const vars = [
       "cavern_chime_rung",
       "spice_returned",
       "gem_reward_all",
       "sanctuary_reward_14",
       "sue_compass",
       "jordan_clover",
-    ]) {
+      "buster_reward",
+      "milo_loft_visited",
+      "rosie_cottage_visited",
+      "summit_aurora_read",
+      "island_shells_solved",
+      "festival_toast_done",
+    ];
+    for (const name of vars) {
       expect(variable(on.state, name), name).toBe(true);
     }
     const off = runConsoleCommand(context, on.state, "keepsakes off");
     if (off.kind !== "applied") throw new Error("expected an applied outcome");
-    for (const name of [
-      "cavern_chime_rung",
-      "spice_returned",
-      "gem_reward_all",
-      "sanctuary_reward_14",
-      "sue_compass",
-      "jordan_clover",
-    ]) {
+    for (const name of vars) {
       expect(variable(off.state, name), name).toBe(false);
     }
   });

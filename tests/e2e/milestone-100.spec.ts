@@ -215,7 +215,7 @@ test(
 
     const treasuresBtn = page.locator(".journal-treasures-btn");
     await expect(treasuresBtn).toBeVisible();
-    await expect(treasuresBtn).toHaveText("Treasures · 9/9");
+    await expect(treasuresBtn).toHaveText("Treasures · 13/13");
     await treasuresBtn.click();
 
     const card = page.locator(".journal-treasures-card");
@@ -224,7 +224,7 @@ test(
     await expect(card.locator(".journal-treasures-stamps")).toContainText("✓ Bay Wave Stamp");
     await expect(card.locator(".journal-treasures-stamps")).toContainText("✓ Pass Pine Stamp");
     await expect(card.locator(".journal-stamp-complete")).toHaveText("★ Star-Line Explorer!");
-    await expect(card.locator(".journal-keepsake-item.is-unlocked")).toHaveCount(9);
+    await expect(card.locator(".journal-keepsake-item.is-unlocked")).toHaveCount(13);
     await expect(card).toContainText("Golden Star-Line Whistle");
     await expect(card).toContainText("Shimmering Star Crystal");
     await expect(card.locator(".journal-catch-pill.is-caught")).toHaveCount(4);

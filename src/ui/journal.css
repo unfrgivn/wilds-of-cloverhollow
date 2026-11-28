@@ -446,11 +446,15 @@
   line-height: 1.25;
   white-space: nowrap;
 }
-.journal-fish,
-.journal-keepsakes {
+.journal-fish {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 5px;
   padding: 2px 4px;
+}
+.journal-keepsakes {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  padding: 2px 2px;
 }
 .journal-fish .journal-slot,
 .journal-keepsakes .journal-slot {
@@ -473,11 +477,15 @@
   box-shadow: 0 2px 0 #47321f22;
 }
 .journal-fish .journal-sticker-image,
-.journal-fish .journal-unknown,
-.journal-keepsakes .journal-unknown,
-.journal-keepsake-charm {
+.journal-fish .journal-unknown {
   width: 38px;
   height: 38px;
+  margin: 0 auto;
+}
+.journal-keepsakes .journal-unknown,
+.journal-keepsake-charm {
+  width: 34px;
+  height: 34px;
   margin: 0 auto;
 }
 .journal-keepsake-charm {
@@ -488,14 +496,21 @@
   --cut: 2px;
   --cut-ink: 1px;
   display: block;
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
 }
-.journal-fish .journal-name,
-.journal-keepsakes .journal-name {
+.journal-fish .journal-name {
   margin-top: 2px;
   color: var(--sticker-ink);
   font-size: 10.5px;
+  font-weight: 700;
+  line-height: 1.08;
+  word-break: break-word;
+}
+.journal-keepsakes .journal-name {
+  margin-top: 2px;
+  color: var(--sticker-ink);
+  font-size: 9.5px;
   font-weight: 700;
   line-height: 1.08;
   word-break: break-word;
@@ -1503,12 +1518,12 @@
   .journal-map-summary { gap: 4px; }
   .journal-map-pill, .journal-map-legend { font-size: 10.5px; padding: 1px 6px; }
   .journal-fish .journal-sticker-image,
-  .journal-fish .journal-unknown,
+  .journal-fish .journal-unknown { width: 38px; height: 38px; }
   .journal-keepsakes .journal-unknown,
-  .journal-keepsake-charm { width: 38px; height: 38px; }
-  .journal-keepsake-icon { width: 36px; height: 36px; }
-  .journal-fish .journal-name,
-  .journal-keepsakes .journal-name { font-size: 10px; }
+  .journal-keepsake-charm { width: 34px; height: 34px; }
+  .journal-keepsake-icon { width: 32px; height: 32px; }
+  .journal-fish .journal-name { font-size: 10px; }
+  .journal-keepsakes .journal-name { font-size: 9.5px; }
   .journal-treasures-btn { font-size: 10.5px; padding: 1px 7px; }
   .journal-options-sound-page { padding: 8px 10px 8px 10px; }
   .journal-options-play-page { padding: 8px 22px 6px 10px; }

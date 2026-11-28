@@ -60,6 +60,11 @@ function fullCompletionState(): State {
       sue_compass: true,
       jordan_clover: true,
       buster_reward: true,
+      milo_loft_visited: true,
+      rosie_cottage_visited: true,
+      summit_aurora_read: true,
+      island_shells_solved: true,
+      festival_toast_done: true,
     },
   );
 }
@@ -170,9 +175,9 @@ describe("Milestone 120: Prismatic Overworld Star Gem Glints", () => {
 });
 
 describe("Milestone 120: 100% Valley Explorer Master Crest & QA Gems Command", () => {
-  it("computes valleyCompletion totals and flips complete only at 59/59 (100%)", () => {
+  it("computes valleyCompletion totals and flips complete only at 63/63 (100%)", () => {
     const empty = valleyCompletion(journalProgress(world, stateIn("plaza")));
-    expect(empty).toEqual({ owned: 0, total: 59, percent: 0, complete: false });
+    expect(empty).toEqual({ owned: 0, total: 63, percent: 0, complete: false });
 
     expect(
       valleyCompletion({
@@ -187,15 +192,15 @@ describe("Milestone 120: 100% Valley Explorer Master Crest & QA Gems Command", (
     const almost = fullCompletionState();
     const oneShort = { ...almost, ink: setInkVariables(almost.ink, { gem_hills: false }) };
     expect(valleyCompletion(journalProgress(world, oneShort))).toEqual({
-      owned: 58,
-      total: 59,
+      owned: 62,
+      total: 63,
       percent: 98,
       complete: false,
     });
 
     expect(valleyCompletion(journalProgress(world, almost))).toEqual({
-      owned: 59,
-      total: 59,
+      owned: 63,
+      total: 63,
       percent: 100,
       complete: true,
     });
@@ -218,7 +223,7 @@ describe("Milestone 120: 100% Valley Explorer Master Crest & QA Gems Command", (
       "24/24 Stickers",
       "7/7 Star Gems",
       "6/6 Fish",
-      "9/9 Keepsakes",
+      "13/13 Keepsakes",
       "13/13 Prizes",
     ]);
   });

@@ -45,7 +45,7 @@ function pointInPolygon(point: Point, polygon: Polygon): boolean {
 }
 
 describe("Milestone 95: Complete Journal Collection Showcase", () => {
-  it("journalKeepsakes returns all 8 keepsakes in canonical order and tracks each unlock", () => {
+  it("journalKeepsakes returns all 13 keepsakes in canonical order and tracks each unlock", () => {
     const empty = stateIn("plaza");
     const initial = journalKeepsakes(world, empty);
     expect(
@@ -80,6 +80,30 @@ describe("Milestone 95: Complete Journal Collection Showcase", () => {
         source: "Buster · Star-Line",
         owned: false,
       },
+      {
+        id: "loft-sketch",
+        name: "Rocket Doodle & Clover",
+        source: "Milo & Rosie",
+        owned: false,
+      },
+      {
+        id: "aurora-rubbing",
+        name: "Alpine Aurora Sketch",
+        source: "Alpine Summit",
+        owned: false,
+      },
+      {
+        id: "shell-shard",
+        name: "Starlight Shell Shard",
+        source: "Starlight Island",
+        owned: false,
+      },
+      {
+        id: "festival-ribbon",
+        name: "Jubilee Festival Ribbon",
+        source: "Sanctuary Festival",
+        owned: false,
+      },
     ]);
 
     const checks: {
@@ -96,6 +120,13 @@ describe("Milestone 95: Complete Journal Collection Showcase", () => {
       { id: "sea-compass", variables: { sue_compass: true } },
       { id: "alpine-clover", variables: { jordan_clover: true } },
       { id: "star-whistle", variables: { buster_reward: true } },
+      {
+        id: "loft-sketch",
+        variables: { milo_loft_visited: true, rosie_cottage_visited: true },
+      },
+      { id: "aurora-rubbing", variables: { summit_aurora_read: true } },
+      { id: "shell-shard", variables: { island_shells_solved: true } },
+      { id: "festival-ribbon", variables: { festival_toast_done: true } },
     ];
     for (const check of checks) {
       const state = stateIn("plaza", check.overrides, check.variables);
@@ -139,7 +170,7 @@ describe("Milestone 95: Complete Journal Collection Showcase", () => {
       stickers: { owned: 0, total: world.stickers.catalogue.length },
       prizes: { owned: 0, total: world.arcade.prizes.length },
       fish: { owned: 0, total: 6 },
-      keepsakes: { owned: 0, total: 9 },
+      keepsakes: { owned: 0, total: 13 },
       gems: { owned: 0, total: 7 },
     });
 
@@ -163,18 +194,23 @@ describe("Milestone 95: Complete Journal Collection Showcase", () => {
         sue_compass: true,
         jordan_clover: true,
         buster_reward: true,
+        milo_loft_visited: true,
+        rosie_cottage_visited: true,
+        summit_aurora_read: true,
+        island_shells_solved: true,
+        festival_toast_done: true,
       },
     );
     expect(journalProgress(world, full)).toEqual({
       stickers: { owned: allStickers.length, total: allStickers.length },
       prizes: { owned: allPrizes.length, total: allPrizes.length },
       fish: { owned: 6, total: 6 },
-      keepsakes: { owned: 9, total: 9 },
+      keepsakes: { owned: 13, total: 13 },
       gems: { owned: 7, total: 7 },
     });
   });
 
-  it("Clubhouse display places all 9 keepsakes (22 total) strictly outside walkable floor", () => {
+  it("Clubhouse display places all 13 keepsakes (26 total) strictly outside walkable floor", () => {
     const allPrizes = world.arcade.prizes.map((entry) => entry.id);
     const full = stateIn(
       "clubhouse",
@@ -187,12 +223,17 @@ describe("Milestone 95: Complete Journal Collection Showcase", () => {
         sue_compass: true,
         jordan_clover: true,
         buster_reward: true,
+        milo_loft_visited: true,
+        rosie_cottage_visited: true,
+        summit_aurora_read: true,
+        island_shells_solved: true,
+        festival_toast_done: true,
       },
     );
     const display = evaluateClubhouseDisplay(world, full);
     expect(display.prizes).toHaveLength(13);
-    expect(display.keepsakes).toHaveLength(9);
-    expect(display.prizes.length + display.keepsakes.length).toBe(22);
+    expect(display.keepsakes).toHaveLength(13);
+    expect(display.prizes.length + display.keepsakes.length).toBe(26);
 
     const wreath = display.keepsakes.find((item) => item.id === "clover-wreath");
     expect(wreath).toEqual({

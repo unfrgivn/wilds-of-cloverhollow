@@ -25,7 +25,11 @@ export type KeepsakeId =
   | "clover-wreath"
   | "sea-compass"
   | "alpine-clover"
-  | "star-whistle";
+  | "star-whistle"
+  | "loft-sketch"
+  | "aurora-rubbing"
+  | "shell-shard"
+  | "festival-ribbon";
 export type JournalKeepsake = {
   id: KeepsakeId;
   name: string;
@@ -329,7 +333,7 @@ const FISH_BLURBS: Readonly<Record<string, string>> = {
   starfish: "A dazzling golden starfish from Bubblegum Bay's deepest waters!",
 };
 
-/** All nine quest keepsakes in canonical display order with ownership state. */
+/** All thirteen quest keepsakes in canonical display order with ownership state. */
 export function journalKeepsakes(
   world: Pick<World, "storyVariable">,
   state: Pick<State, "ink" | "stickers">,
@@ -407,6 +411,42 @@ export function journalKeepsakes(
       displaySpot: "Clubhouse Shelf",
       memory: "Buster's golden bus whistle shines like a tiny Star-Line stop sign!",
       owned: flag("buster_reward"),
+    },
+    {
+      id: "loft-sketch",
+      name: "Rocket Doodle & Clover",
+      source: "Milo & Rosie",
+      displaySpot: "Clubhouse Wall",
+      memory:
+        "A starry rocket sketch from Milo's loft tucked beside Rosie's pressed garden clover.",
+      owned: flag("milo_loft_visited") && flag("rosie_cottage_visited"),
+    },
+    {
+      id: "aurora-rubbing",
+      name: "Alpine Aurora Sketch",
+      source: "Alpine Summit",
+      displaySpot: "Clubhouse Wall",
+      memory:
+        "Lavender-and-gold crayon rubbings of the starlit Alpine Summit Overlook legend.",
+      owned: flag("summit_aurora_read"),
+    },
+    {
+      id: "shell-shard",
+      name: "Starlight Shell Shard",
+      source: "Starlight Island",
+      displaySpot: "Clubhouse Post",
+      memory:
+        "A pearlescent pastel shell shard that hums with Starlight Island's four-note chime.",
+      owned: flag("island_shells_solved"),
+    },
+    {
+      id: "festival-ribbon",
+      name: "Jubilee Festival Ribbon",
+      source: "Sanctuary Festival",
+      displaySpot: "Clubhouse Post",
+      memory:
+        "A sunlit golden ribbon from Cloverhollow's grand Wildlife Sanctuary celebration.",
+      owned: flag("festival_toast_done"),
     },
   ];
 }

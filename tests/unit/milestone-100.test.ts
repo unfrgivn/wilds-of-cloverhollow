@@ -198,7 +198,7 @@ describe("Milestone 93: Pure treasuresSummary()", () => {
       complete: false,
     });
     expect(summary.unlockedKeepsakes).toBe(0);
-    expect(summary.totalKeepsakes).toBe(9);
+    expect(summary.totalKeepsakes).toBe(13);
     expect(summary.keepsakes.every((item) => !item.unlocked)).toBe(true);
     expect(summary.caughtFish).toBe(0);
     expect(summary.totalFish).toBe(6);
@@ -241,7 +241,7 @@ describe("Milestone 93: Pure treasuresSummary()", () => {
     });
   });
 
-  it("reports 9/9 keepsakes, 6/6 Catch Book, and completed Star-Line Stamp Card", () => {
+  it("reports 13/13 keepsakes, 6/6 Catch Book, and completed Star-Line Stamp Card", () => {
     const allFish = Object.fromEntries(
       world.arcade.fish.catches.map((entry) => [entry.id, 1]),
     );
@@ -262,6 +262,11 @@ describe("Milestone 93: Pure treasuresSummary()", () => {
         sanctuary_reward_14: true,
         sue_compass: true,
         jordan_clover: true,
+        milo_loft_visited: true,
+        rosie_cottage_visited: true,
+        summit_aurora_read: true,
+        island_shells_solved: true,
+        festival_toast_done: true,
       },
     );
     const summary = treasuresSummary(world, full);
@@ -272,8 +277,8 @@ describe("Milestone 93: Pure treasuresSummary()", () => {
       pass: true,
       complete: true,
     });
-    expect(summary.unlockedKeepsakes).toBe(9);
-    expect(summary.totalKeepsakes).toBe(9);
+    expect(summary.unlockedKeepsakes).toBe(13);
+    expect(summary.totalKeepsakes).toBe(13);
     expect(summary.keepsakes.map((item) => item.id)).toEqual([
       "star-crystal",
       "star-pin",
@@ -284,6 +289,10 @@ describe("Milestone 93: Pure treasuresSummary()", () => {
       "sea-compass",
       "alpine-clover",
       "star-whistle",
+      "loft-sketch",
+      "aurora-rubbing",
+      "shell-shard",
+      "festival-ribbon",
     ]);
     expect(summary.keepsakes.every((item) => item.unlocked)).toBe(true);
     expect(summary.caughtFish).toBe(6);

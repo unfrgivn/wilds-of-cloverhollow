@@ -9023,6 +9023,31 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   checks green), and 31/31 Chromium & WebKit e2e tests (`milestone-206`,
   `milestone-204`, `milestone-194`, `soundtrack` 12/12, `e5-puzzles-tools-dash`
   7/7, `living-npcs`).
+
+## Milestone 207: Journal `OPTIONS` Cozy Dash Controls Parity (`Shift` / `B`), WebKit `art.spec` Compositor Settle Fix & `vision`-Audited Post-Elevation Visual Baseline Sync **Status:** ✅ Completed (2026-11-28)
+- Documents M193's Cozy Dash (`Dash: Shift` / `Dash / Back: B`) cleanly inside
+  Fae's adaptive Journal `OPTIONS` Controls reference card, eliminates a WebKit
+  compositor race on `.sticker-portrait`'s `180 ms` medallion animation in
+  `art.spec.ts`, and refreshes all 68 `vision`-audited post-Elevation snapshots
+  across 11 specs — zero `src/core` changes, zero save-version bumps, and zero
+  replay hash drift across all 77 sims.
+- Adaptive Cozy Dash Controls reference (`src/ui/journal-options.ts`):
+  - Updated `journalControlsLines` keyboard `primary` (`Move: Arrows / WASD ·
+    Dash: Shift · Talk: Z · Journal: J · Mute: M`, crisp `10.5px` single-line
+    fit verified across `874×402`, `1180×820`, and `1280×720`) and gamepad
+    `primary` (`Move: Stick / D-Pad · Talk: A · Dash / Back: B · Journal: Y`).
+- WebKit compositor settle & 68-PNG `vision`-audited baseline sync
+  (`tests/e2e/art.spec.ts`, 11 snapshot folders):
+  - Added finite-animation + 2-rAF `settle(page)` in `art.spec.ts` `shoot()`.
+  - Audited 31 renders via `vision` and synced 68 PNGs across `art`, `cavern`,
+    `gym`, `jordan`, `kitchen`, `lodge`, `school`, `sue`, `woods`, `soundtrack`,
+    and `ui-gallery` (`journal-options`).
+- Evidence: `tests/unit/milestone-207.test.ts` and updated
+  `tests/unit/milestone-122.test.ts`.
+- Gates: `just check` (277 unit files / 2,049 tests, all 77 sims + all sim
+  scripts, 23 QA packs, purity, lint), `just build` (`index` `375.50 kB < 500 kB`),
+  26/26 Chromium & WebKit target e2e, 99/99 Chromium + WebKit `ui-gallery`, and
+  38/38 Chromium & WebKit `ui-gallery-checks` Journal tests.
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

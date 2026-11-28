@@ -175,34 +175,35 @@ describe("Milestone 122: Resilient Save Queue & Error Recovery", () => {
 
 describe("Milestone 122: Adaptive Gamepad Controls Reference in Journal OPTIONS", () => {
   it("returns exact default keyboard controls matching existing journal-options baselines", () => {
+    const primary = "Move: Arrows / WASD · Dash: Shift · Talk: Z · Journal: J · Mute: M";
     expect(
       journalControlsLines("keyboard", { hasLantern: false, hasFlute: false, hasLasso: false }),
     ).toEqual({
-      primary: "Move: Arrows / WASD · Talk: Z · Journal: J · Mute: M",
+      primary,
       tools: "",
     });
     expect(
       journalControlsLines("keyboard", { hasLantern: true, hasFlute: false, hasLasso: false }),
     ).toEqual({
-      primary: "Move: Arrows / WASD · Talk: Z · Journal: J · Mute: M",
+      primary,
       tools: "Lantern: L",
     });
     expect(
       journalControlsLines("keyboard", { hasLantern: true, hasFlute: true, hasLasso: false }),
     ).toEqual({
-      primary: "Move: Arrows / WASD · Talk: Z · Journal: J · Mute: M",
+      primary,
       tools: "Lantern: L · Flute: F",
     });
     expect(
       journalControlsLines("keyboard", { hasLantern: true, hasFlute: true, hasLasso: true }),
     ).toEqual({
-      primary: "Move: Arrows / WASD · Talk: Z · Journal: J · Mute: M",
+      primary,
       tools: "Lantern: L · Flute: F · Lasso: R",
     });
   });
 
   it("returns exact gamepad controller reference for all tool unlock combinations", () => {
-    const primary = "Move: Stick / D-Pad · Talk: A · Back: B · Journal: Y";
+    const primary = "Move: Stick / D-Pad · Talk: A · Dash / Back: B · Journal: Y";
     expect(
       journalControlsLines("gamepad", { hasLantern: false, hasFlute: false, hasLasso: false }),
     ).toEqual({ primary, tools: "Photo / Guide: View" });

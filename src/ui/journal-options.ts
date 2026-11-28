@@ -136,7 +136,7 @@ export function journalControlsLines(
     if (tools.hasLasso) toolParts.push("Lasso: LB");
     toolParts.push("Photo / Guide: View");
     return {
-      primary: "Move: Stick / D-Pad · Talk: A · Back: B · Journal: Y",
+      primary: "Move: Stick / D-Pad · Talk: A · Dash / Back: B · Journal: Y",
       tools: toolParts.join(" · "),
     };
   }
@@ -145,7 +145,7 @@ export function journalControlsLines(
   if (tools.hasFlute) toolParts.push("Flute: F");
   if (tools.hasLasso) toolParts.push("Lasso: R");
   return {
-    primary: "Move: Arrows / WASD · Talk: Z · Journal: J · Mute: M",
+    primary: "Move: Arrows / WASD · Dash: Shift · Talk: Z · Journal: J · Mute: M",
     tools: toolParts.join(" · "),
   };
 }
@@ -350,6 +350,7 @@ export function createJournalOptionsPage(options: {
   const controlsTitle = element("div", "journal-controls-title");
   controlsTitle.textContent = "CONTROLS";
   const controlsLine = element("div", "journal-controls-line");
+  controlsLine.style.fontSize = "10.5px";
   const controlsTools = element("div", "journal-controls-line journal-controls-tools");
   controlsTools.hidden = true;
   const photoBtn = makeJournalButton("journal-photo-btn", "Enter Photo Mode");

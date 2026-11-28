@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 206)
+Last updated: 2026-11-28 (Milestone 207)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -5406,13 +5406,14 @@ trunks keep its two exits.
   `cloverhollow-settings`, upgrading legacy preferences cleanly) above a compact
   adaptive Controls reference card (`journalControlsLines` in
   `src/ui/journal-options.ts`, re-exported from `src/ui/journal.ts`,
-  Milestone 122 / Milestone 146): in default `"keyboard"` mode it displays
-  `Move: Arrows / WASD · Talk: Z · Journal: J · Mute: M` plus unlocked tools
-  (`Lantern: L`, `Flute: F`, `Lasso: R`); when a gamepad is active (`"gamepad"`
-  mode) it switches cleanly to
-  `Move: Stick / D-Pad · Talk: A · Back: B · Journal: Y` plus unlocked tools
-  (`Lantern: X`, `Flute: RB`, `Lasso: LB`) and `Photo / Guide: View`. On touch
-  devices (`:root[data-touch="on"]`) when `canPhotoFromJournal` is true
+  Milestone 122 / Milestone 146 / Milestone 206): in default `"keyboard"` mode
+  it displays
+  `Move: Arrows / WASD · Dash: Shift · Talk: Z · Journal: J · Mute: M` plus
+  unlocked tools (`Lantern: L`, `Flute: F`, `Lasso: R`); when a gamepad is
+  active (`"gamepad"` mode) it switches cleanly to
+  `Move: Stick / D-Pad · Talk: A · Dash / Back: B · Journal: Y` plus unlocked
+  tools (`Lantern: X`, `Flute: RB`, `Lasso: LB`) and `Photo / Guide: View`. On
+  touch devices (`:root[data-touch="on"]`) when `canPhotoFromJournal` is true
   (Milestone 154), `.journal-controls-card.has-photo` replaces the desktop
   keyboard-shortcut text lines with a 44 px tall warm-cream `#fbf6e8` die-cut
   `.journal-photo-btn` pill (`aria-label="Enter Photo Mode"`, shared

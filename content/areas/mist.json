@@ -647,9 +647,9 @@
       {
         "id": "mist-gully-post",
         "kind": "post",
-        "x": 940,
-        "y": 580,
-        "range": 260,
+        "x": 1080,
+        "y": 532,
+        "range": 360,
         "requiresLasso": true
       }
     ],

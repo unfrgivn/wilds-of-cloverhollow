@@ -9063,6 +9063,27 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
 - Gates: `bun run lint`, `just build` (all non-vendor chunks `< 385 kB`), and
   32/32 Chromium & WebKit e2e tests across all 11 Wave-1 specs without
   `--update-snapshots`.
+
+## Milestone 209: `vision`-Audited Post-Elevation Visual Baseline Sync — Wave 2 (Final 15 Overworld Specs) + Cliffside Trail & Misty Path Grapple-Post Grounding Fixes **Status:** ✅ Completed (2026-11-28)
+- Completes Wave 2 of the post-Elevation visual baseline sync across the final
+  15 overworld & exploration specs (`bus-line`, `encounter`, `flute`,
+  `friend-homes`, `gamepad`, `island`, `kits`, `lantern`, `milo-rosie`, `mist`,
+  `raccoon`, `recurring`, `shop`, `summit`, `trail`) AND fixes two real M193
+  grapple-post placement bugs caught during `vision` inspection — zero `src/`
+  edits and zero replay hash drift across all 77 sims.
+- Spatial puzzle grapple-post grounding fixes (`content/areas/trail.json`,
+  `content/areas/mist.json`):
+  - Relocated `trail-grapple` from `(1115, 330)` (floating over pine canopy) to
+    `(1062, 280)` on the open dirt/grass trail edge.
+  - Relocated `mist-gully-post` from `(940, 580)` (straddling the vertical
+    chasm cliff wall) to `(1080, 532)` (`range: 360`) on the flat grass bank
+    beside the rolled-up rope bridge.
+- Vision-audited baseline sync (85 PNGs across all 15 specs, Chromium + WebKit):
+  - Audited rendered frames across every spec via `vision` prior to acceptance.
+- Gates: `just check` (all unit suites + 86/86 puzzle/trail/mist tests, all 77
+  sims, 23 QA packs, purity, lint), `just build` (all non-vendor chunks
+  `< 385 kB`), and 37/37 Chromium & WebKit e2e tests across all 15 Wave-2 specs
+  without `--update-snapshots`.
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

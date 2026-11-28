@@ -1,0 +1,48 @@
+{
+  "asset": "restoration-decals",
+  "date": "2026-11-27",
+  "summary": "Art Wave C1 — 8 hand-drawn watercolor chaos-to-paint area restoration decals (4 chaos scribble/crumple/fizzy patches + 4 sunlit wildflower/clover/meadow/dew-sunbeam bloom accents) packed into a lean 1024x512 alpha-WebP atlas (`public/assets/restoration/restoration.webp`, 205.2 KB, q92, alpha_q 100, PSNR 42.74 dB).",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 5,
+  "rejectedCalls": 1,
+  "references": [
+    "docs/art/concepts/environments/meadow_park_environment.png",
+    "docs/art/concepts/vfx/vfx_particles.png"
+  ],
+  "selectedRawSources": [
+    "art/source/restoration/chaos-sheet-raw.png",
+    "art/source/restoration/chaos-crumple-raw.png",
+    "art/source/restoration/bloom-flora-raw.png",
+    "art/source/restoration/bloom-dew-raw.png"
+  ],
+  "prompts": {
+    "chaosSheet": "2x2 grid of four isolated hand-drawn chaos decals on flat pure white #FFFFFF (loops/spirals, violet zigzag crosshatch over lavender wash, fizzy lavender bubbles/swirls/stars; bottom-left replaced by standalone organic crumple call). Dry purple-lavender crayon & watercolor smudge aesthetic, zero scenery, zero grid lines, zero text.",
+    "chaosCrumple": "Single centered organic irregular-shaped hand-drawn crumpled-paper wrinkle smudge decal on pure flat white #FFFFFF, feathered cloud-like silhouette (zero rectangular border), soft taupe-lavender folded crease shadows and stray violet crayon ticks.",
+    "bloomFlora": "2x2 grid of isolated 3/4 overhead hand-painted watercolor-and-ink meadow flora ground decals on flat pure magenta #FF00FF matching Meadow Park concept style with warm sepia-brown #5B3530 ink contours and zero magenta/pink/purple inside flora (butter-yellow/cream daisies, golden-green four-leaf clovers, sky-blue forget-me-not & apricot buttercup sprig).",
+    "bloomDew": "Single centered lineless warm honey-gold & ivory watercolor sparkle and sunbeam dew flourish decal on flat pure black #000000 matching VFX concept sheet top-right style."
+  },
+  "processing": [
+    "Crop chaos quadrants (TL chaos_scribble_loop, TR chaos_scribble_zigzag, BR chaos_fizzy_doodle) from chaos-sheet-raw.png plus full chaos-crumple-raw.png (chaos_crumple_patch); run tools/art/white-to-alpha.ts; trim, fit within 224x224, center on 256x256 transparent canvas.",
+    "Crop flora quadrants (TL bloom_wildflowers, TR bloom_clover_tuft, BL bloom_meadow_sprig) from bloom-flora-raw.png; run tools/art/key-alpha.ts --key #FF00FF --fuzz 22% --holes --despill none followed by tools/art/despill-edge.ts --key magenta --band 3; trim, fit within 224x224, center on 256x256 transparent canvas.",
+    "Run tools/art/black-to-alpha.ts on bloom-dew-raw.png (bloom_sunbeam_dew); trim, fit within 232x232, center on 256x256 transparent canvas.",
+    "Verify 0 non-zero alpha pixels on the 4 px outer border of all 8 frames; montage into 4x2 (1024x512) atlas and encode with cwebp -q 92 -alpha_q 100 -m 6 (verified PSNR 42.74 dB >= 42 dB)."
+  ],
+  "outputs": [
+    "public/assets/restoration/restoration.webp",
+    "public/assets/restoration/restoration.json"
+  ],
+  "frames": [
+    "chaos_scribble_loop",
+    "chaos_scribble_zigzag",
+    "chaos_crumple_patch",
+    "chaos_fizzy_doodle",
+    "bloom_wildflowers",
+    "bloom_clover_tuft",
+    "bloom_meadow_sprig",
+    "bloom_sunbeam_dew"
+  ],
+  "review": [
+    "art/review/restoration-decals-cream.jpg",
+    "art/review/restoration-decals-dark.jpg"
+  ]
+}

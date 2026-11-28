@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 178)
+Last updated: 2026-11-27 (Milestone 179)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -735,10 +735,34 @@ ios/            Capacitor iOS project (from Milestone 4).
   and story-reactive accents respect
   `reducedMotion` by holding positions and pulses steady across ticks,
   Milestones 119 and 159), and an `emissive`
-  light layer mounted above `lanternLayer` (`emissiveLayer`, boosted smoothly
+  `emissiveLayer` (boosted smoothly
   during lantern dusk for cavern crystals/lanterns, enchanted fairies, plaza lamp
   arches, lodge hearth, and café counter glows, plus cool subterranean edge
-  framing and crossing shimmer rings in `cavern`); a pooled `emoteLayer` sits
+  framing and crossing shimmer rings in `cavern`); **Live Watercolor
+  Chaos-to-Paint Area Restoration** (`src/render/restoration-math.ts`,
+  `src/render/restoration.ts`, wired into `GameView` in `src/render/view.ts`,
+  Milestone 179 / Track E13, Art Wave C1): fulfills §1.3 across all 9 signature
+  regions (`plaza`, `park`, `bay`, `pass`, `woods`, `school`, `hills`, `cavern`,
+  `enchanted`) strictly from existing `state.critters` / `state.calms` /
+  `state.stickers` / `state.ink` facts (100% presentation-only, zero `src/core`
+  changes, Save `v10`, bit-identical sim hashes). Uses a single lean `1024x512`
+  alpha-WebP decal atlas (`public/assets/restoration/restoration.{webp,json}`,
+  `205.2 KB`, 4 chaos patches `chaos_{scribble_loop,scribble_zigzag,crumple_patch,fizzy_doodle}`
+  drawn with `"multiply"` blend and 4 bloom accents `bloom_{wildflowers,clover_tuft,meadow_sprig,sunbeam_dew}`
+  with additive sunbeam dew; `art/recipes/restoration-decals.json`) mounted on
+  `restoration.groundLayer` directly above `next.ground` and below `shadowLayer`
+  (leaving `AreaView.ground` and blurred battle backdrops untouched) at
+  walkable, prop-silhouette-clear coordinates (`school` uses sunlit dew flourishes
+  only on indoor tiles; `park` places all blooms strictly on open meadow grass).
+  When a zone transitions from chaotic to calmed during live overworld play
+  (deferred while battle/arcade hides the overworld), a 90-frame **Watercolor
+  Wash-Bloom Wipe** (`calmPulse` `0 -> 1`, `RESTORATION_PULSE_TICKS = 90`) sweeps
+  an organic scalloped 3-band pastel wash ring and 32 drifting watercolor
+  petals/sparkles outward from the area's chaos anchor on `restoration.fxLayer`,
+  radially peeling chaos patches away and unfurling restored blooms; Reduced
+  Motion (`isReducedMotionActive()`), paused harness mode, fresh arrival, area
+  switches, and harness resets snap instantaneously to settled state with zero
+  wipe ring or drift; a pooled `emoteLayer` sits
   above `depth` and below `paperGrain`; and a world-anchored `paperGrain`
   `TilingSprite` (`multiply`, alpha `0.035`) gently unifies sprites, shadows, and
   paintings.
@@ -851,8 +875,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   (`src/render/area-view.ts`) owns an area's sprites; swapping areas destroys
   them, and the game neither ticks nor renders until the new area has loaded.
   At boot, `GameView` loads only permanent core sheets (`fae-sheet`, party
-  members in `world.party`, `glow-sheet`, `ambient-sheet`, and the battle toy
-  atlas — deduplicating party members that also appear in `world.characters`).
+  members in `world.party`, `glow-sheet`, `ambient-sheet`, `restoration-sheet`,
+  and the battle toy atlas — deduplicating party members that also appear in
+  `world.characters`).
   Per-area NPC and critter atlases (`areaEntityAtlases`, extracted with pure
   stateless overworld render helpers into `src/render/overworld-render.ts`, with
   Pixi-free overworld VFX, lantern, companion emote, backdrop, and Star Gem glint

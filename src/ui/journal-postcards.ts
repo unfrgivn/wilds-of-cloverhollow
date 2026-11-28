@@ -89,14 +89,11 @@ function imageToPngDataUrl(img: HTMLImageElement, fallback: string): string {
 export function createJournalPostcardsAlbum(
   options?: JournalPostcardsOptions,
 ): JournalPostcardsAlbum {
-  const overlay = element("div", "journal-postcards-overlay");
-  overlay.hidden = true;
-  const card = element("article", "journal-postcards-card", overlay);
-  card.tabIndex = -1;
+  const overlay = element("div", "journal-postcards-overlay"); overlay.hidden = true;
+  const card = element("article", "journal-postcards-card", overlay); card.tabIndex = -1;
   setAttribute(card, "role", "dialog"); setAttribute(card, "aria-modal", "true");
   setAttribute(card, "aria-label", "Postcard Album");
   setAttribute(card, "data-album-mode", "grid"); setAttribute(card, "data-album-count", "0");
-
   const head = element("div", "journal-postcards-head", card);
   const titleWrap = element("div", "journal-postcards-title-wrap", head);
   element("h3", "journal-postcards-title", titleWrap).textContent = "POSTCARD ALBUM";
@@ -112,21 +109,18 @@ export function createJournalPostcardsAlbum(
   element("p", "journal-postcards-empty-note", emptyBox).textContent =
     "Press P (or tap the camera in Options) to frame and snap a Cloverhollow memory.";
   const grid = element("div", "journal-postcards-grid", card);
-  const lightbox = element("div", "journal-postcards-lightbox", card);
-  lightbox.hidden = true;
+  const lightbox = element("div", "journal-postcards-lightbox", card); lightbox.hidden = true;
   const lbBar = element("div", "journal-lightbox-bar", lightbox);
   const lbBack = makeButton("journal-lightbox-back", "Back to Postcard Album", "← Back to Album");
   const lbNav = element("div", "journal-lightbox-nav");
   const lbPrev = makeButton("journal-lightbox-prev", "Previous postcard", "‹");
-  const lbPos = element("span", "journal-lightbox-pos");
-  lbPos.setAttribute("aria-live", "polite");
+  const lbPos = element("span", "journal-lightbox-pos"); lbPos.setAttribute("aria-live", "polite");
   const lbNext = makeButton("journal-lightbox-next", "Next postcard", "›");
   lbNav.append(lbPrev, lbPos, lbNext); lbBar.append(lbBack, lbNav);
   const lbContent = element("div", "journal-lightbox-content", lightbox);
   const lbImg = document.createElement("img");
   lbImg.className = "journal-lightbox-img"; lbImg.draggable = false;
   element("div", "journal-lightbox-frame", lbContent).append(lbImg);
-
   const lbMeta = element("div", "journal-lightbox-meta", lbContent);
   const lbText = element("div", "journal-lightbox-text", lbMeta);
   const lbCaption = element("div", "journal-lightbox-caption", lbText);
@@ -154,9 +148,8 @@ export function createJournalPostcardsAlbum(
   const renderState = (forceGrid = false): void => {
     const count = entries.length;
     setText(treasuresBtn, count > 0 ? `📷 Photos · ${count}` : "📷 Photos");
-    setAttribute(
-      treasuresBtn, "aria-label", `Open Postcard Album, ${count} of ${POSTCARD_ALBUM_LIMIT} saved`,
-    );
+    setAttribute(treasuresBtn, "aria-label",
+      `Open Postcard Album, ${count} of ${POSTCARD_ALBUM_LIMIT} saved`);
     setAttribute(card, "data-album-count", String(count));
     setText(countPill, `${count}/${POSTCARD_ALBUM_LIMIT}`);
     countPill.classList.toggle("is-full", count >= POSTCARD_ALBUM_LIMIT);
@@ -210,9 +203,8 @@ export function createJournalPostcardsAlbum(
   const backToGrid = (restoreId?: string | null): void => {
     const focusId = restoreId ?? selectedId;
     selectedId = null; clearStatus(); renderState(); options?.onAction?.();
-    (tileButtons.find((btn) => btn.dataset.postcardId === focusId) ?? card).focus({
-      preventScroll: true,
-    });
+    const target = tileButtons.find((btn) => btn.dataset.postcardId === focusId) ?? card;
+    target.focus({ preventScroll: true });
   };
   const stepLightbox = (delta: -1 | 1): void => {
     if (selectedId === null || entries.length < 2) return;
@@ -248,8 +240,7 @@ export function createJournalPostcardsAlbum(
     void deliverPostcard(
       {
         dataUrl: imageToPngDataUrl(lbImg, current.dataUrl),
-        filename: current.filename,
-        caption: current.caption,
+        filename: current.filename, caption: current.caption,
       },
       { preferShare: document.documentElement.dataset.touch === "on" },
     ).then((delivery) => {
@@ -272,8 +263,8 @@ export function createJournalPostcardsAlbum(
     const wasOpen = openState;
     options?.onBeforeOpen?.();
     if (!openState) {
-      returnFocusEl = returnTarget ??
-        (document.activeElement instanceof HTMLElement ? document.activeElement : null);
+      const active = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      returnFocusEl = returnTarget ?? active;
     }
     openState = true; selectedId = null; clearStatus();
     entries = getPostcardAlbum(); lastGridSig = ""; renderState(true);
@@ -291,6 +282,15 @@ export function createJournalPostcardsAlbum(
     if (selectedId !== null) {
       if (key === "ArrowLeft") { stop(); stepLightbox(-1); }
       else if (key === "ArrowRight") { stop(); stepLightbox(1); }
+      else if (["ArrowDown", "ArrowUp", "Home", "End"].includes(key)) {
+        const btns = [lbBack, lbSave, lbRemove, closeBtn].filter((b) => !b.disabled && !b.hidden);
+        if (btns.length > 0) {
+          const i = btns.findIndex((b) => b === document.activeElement);
+          const next = key === "Home" ? 0 : key === "End" ? btns.length - 1
+            : key === "ArrowDown" ? (i + 1) % btns.length : (i <= 0 ? btns.length - 1 : i - 1);
+          stop(); btns[next]?.focus({ preventScroll: true });
+        }
+      }
       return true;
     }
     if (key === "PageDown" || key === "PageUp") {

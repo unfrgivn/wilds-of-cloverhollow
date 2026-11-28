@@ -10032,6 +10032,37 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   `milestone-236`, `milestone-188`, `accessibility`), 10/10 Chromium (`park`,
   `flute`, `bay`, `island`, `sanctuary`, `0` snapshot diffs), and 12/12
   Chromium & WebKit `ui-gallery` `journal` (`0` snapshot diffs).
+
+## Milestone 238: Postcard Scrapbook Lightbox `>= 44 px` iOS Touch Parity & Keyboard Action Nav + Complete `< 600`-Line `src/ui/` Modularization (`src/ui/journal-treasures-card.ts`) (Elevation Track E19W) **Status:** ✅ Completed (2026-11-28)
+- Postcard Scrapbook Lightbox Touch & Keyboard Parity (`src/ui/journal-postcards.css`,
+  `src/ui/journal-postcards.ts`):
+  - Enforces Apple HIG / WCAG 2.5.5 `min-height: 44px` under `:root[data-touch="on"]`
+    on `.journal-lightbox-back`, `.journal-lightbox-prev`, `.journal-lightbox-next`,
+    `.journal-lightbox-save`, and `.journal-lightbox-remove` (plus `min-width: 44px`
+    on `.journal-lightbox-prev` and `.journal-lightbox-next`), including compact
+    `@media (max-height: 500px)` phone landscape (`874×402`) with zero overflow or
+    clipping and zero desktop visual change.
+  - Extends `handleKeydown()` in Lightbox mode with `ArrowDown`, `ArrowUp`, `Home`,
+    and `End` cycling focus across enabled Lightbox action buttons
+    (`[lbBack, lbSave, lbRemove, closeBtn]`) while keeping `ArrowLeft`/`ArrowRight`
+    stepping postcards.
+- Complete `< 600`-Line `src/ui/` Modularization (`src/ui/journal-treasures-card.ts`,
+  `src/ui/journal-field-note.ts`):
+  - Extracts the self-contained Field Treasures modal card (`createJournalTreasuresCard`)
+    into `src/ui/journal-treasures-card.ts` (`225` lines) and composes it inside
+    `src/ui/journal-field-note.ts` (`646 -> 435` lines) with zero visual, DOM, or
+    export differences, bringing every `.ts` file in `src/ui/` strictly `< 600` lines
+    (largest remaining: `src/ui/battle.ts` at `591` lines).
+- Evidence: `tests/unit/milestone-238.test.ts` and
+  `tests/e2e/milestone-238.spec.ts` (`@smoke`, Chromium & WebKit).
+- Gates: `just check` (306 unit files / 2,155 tests, all 77 recorded + 7
+  headless sims with zero hash shifts, 23 QA packs, purity, lint), `just build`
+  (largest non-vendor production chunk `index` `361.45 kB < 365 kB`, hook leak
+  + runtime story + harness checks green), 14/14 Chromium & WebKit
+  (`milestone-238`, `milestone-236`, `milestone-215`, `milestone-182`,
+  `milestone-100`), and 12/12 Chromium & WebKit `ui-gallery` `journal` (`0`
+  snapshot diffs).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

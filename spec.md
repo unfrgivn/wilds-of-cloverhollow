@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 237)
+Last updated: 2026-11-28 (Milestone 238)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -1207,7 +1207,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   `src/ui/journal-postcards.{ts,css}`, Milestone 234) with a 3×2 watercolor
   corkboard grid (2-column compact at `874×402`), inline lightbox preview,
   1-click `Save PNG` / Web Share delivery, `Remove`, 2D keyboard/gamepad
-  navigation, Reduced Motion & Safari/iOS tap hygiene, and zero `<text>` SVG
+  navigation (including Lightbox `ArrowDown` / `ArrowUp` / `Home` / `End`
+  focus cycling across enabled `← Back to Album`, `Save PNG`, `Remove`, and `×`
+  action buttons alongside `ArrowLeft` / `ArrowRight` postcard stepping, and
+  `:root[data-touch="on"]` Apple HIG / WCAG 2.5.5 `>= 44 px` height on all five
+  Lightbox buttons plus `>= 44 px` width on `‹`/`›` even at `@media
+  (max-height: 500px)` phone landscape with zero overflow or clipping, Milestone
+  238 / Track E19W), Reduced Motion & Safari/iOS tap hygiene, and zero `<text>` SVG
   emblems. Pressing `P` again,
   `Escape`, gamepad Select/B (button 8 / button 1), right-clicking the canvas on
   desktop (`contextmenu` prevented via `photoModePointerAction`), or opening any
@@ -5579,8 +5585,11 @@ trunks keep its two exits.
 ### 9.1 Journal layout
 - The journal (`src/ui/journal.ts`, with right-page collection shelves — Stickers,
   Prizes, Arcade Bests, Fish Catch Book, and Keepsakes — modularized into
-  `src/ui/journal-shelves.ts` in Milestone 237 / Track E19V so every `.ts` file
-  in `src/ui/` stays `< 640` lines) is a modal open book inside the safe area,
+  `src/ui/journal-shelves.ts` in Milestone 237 / Track E19V, and the Field
+  Treasures modal card modularized into `src/ui/journal-treasures-card.ts` and
+  composed into `src/ui/journal-field-note.ts` in Milestone 238 / Track E19W so
+  every `.ts` file in `src/ui/` stays strictly `< 600` lines) is a modal open
+  book inside the safe area,
   above every other layer (`--z-journal`). The left page is NOTES: ruled notes
   in the order the game passes (newest first), an empty line ("Nothing yet.
   Look around!") when there are none, and scrolling only when they overflow.

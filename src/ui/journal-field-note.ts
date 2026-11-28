@@ -2,7 +2,9 @@ import { applyAtlasCrop, type AtlasImage } from "./atlas";
 import { element, setAttribute, setText } from "./dom";
 import { feelingMarkup, heartMarkup, icon, keepsakeIcon } from "./icons";
 import { createJournalGemsLedger } from "./journal-gems-ledger";
+import { createJournalRibbonsShowcase } from "./journal-ribbons";
 import type { CritterFieldNote, JournalKeepsake, StarGemEntry } from "../core/journal";
+import { evaluateMeritRibbonsFromJournal } from "../core/ribbons";
 import type { TreasuresSummary } from "../core/treasures";
 
 export type InspectedJournalItem = {
@@ -49,23 +51,37 @@ export type JournalFieldNoteSource = {
   keepsakes?: readonly JournalKeepsake[];
   starGems?: readonly StarGemEntry[];
   treasures?: TreasuresSummary;
+  stickersOwned?: number;
+  stickersTotal?: number;
+  prizesOwned?: number;
+  prizesTotal?: number;
+  gems?: { found: number; total: number };
+  valleyComplete?: boolean;
+  members?: readonly { id: string }[];
+  arcadeRecords?: { taco?: number };
 };
 
 export type JournalFieldOverlays = {
   fieldBackdrop: HTMLDivElement;
   treasuresBackdrop: HTMLDivElement;
   gemsOverlay: HTMLDivElement;
+  ribbonsOverlay: HTMLDivElement;
+  ribbonsBanner: HTMLButtonElement;
   inspect: (item: InspectedJournalItem, view: JournalFieldNoteSource | null) => void;
   openPrize: (prize: JournalFieldNotePrize, view?: JournalFieldNoteSource | null) => void;
   openTreasures: (view: JournalFieldNoteSource | null) => void;
   openGems: (view: JournalFieldNoteSource | null, returnTarget?: HTMLElement | null) => void;
+  openRibbons: (view: JournalFieldNoteSource | null, returnTarget?: HTMLElement | null) => void;
   syncFieldNote: (view: JournalFieldNoteSource) => void;
   syncTreasures: (view: JournalFieldNoteSource) => void;
   syncGems: (view: JournalFieldNoteSource) => void;
+  syncRibbons: (view: JournalFieldNoteSource, anchor?: Element) => void;
+  syncAll: (view: JournalFieldNoteSource, ribbonsAnchor?: Element) => void;
   stepFieldNote: (delta: -1 | 1) => boolean;
   closeFieldNote: () => void;
   closeTreasures: () => void;
   closeGems: () => void;
+  closeRibbons: () => void;
   closeAll: () => void;
   hasOpen: () => boolean;
   dismiss: () => boolean;
@@ -320,9 +336,11 @@ export function createJournalFieldOverlays(options?: {
   treasuresClose.setAttribute("aria-label", "Close field treasures");
   treasuresClose.textContent = "×";
   const treasuresHead = element("div", "journal-treasures-head");
+  const treasuresTitleWrap = element("div", "journal-treasures-title-wrap");
   const treasuresTitle = element("h3", "journal-treasures-title");
   treasuresTitle.textContent = "FIELD TREASURES";
-  treasuresHead.append(treasuresTitle, treasuresClose);
+  treasuresTitleWrap.append(treasuresTitle);
+  treasuresHead.append(treasuresTitleWrap, treasuresClose);
   const treasuresStamps = element("div", "journal-treasures-stamps");
   treasuresStamps.hidden = true;
   const keepsakesSection = element("section", "journal-treasures-section");
@@ -395,15 +413,35 @@ export function createJournalFieldOverlays(options?: {
     treasuresBackdrop.hidden = true;
   };
 
+  let ribbonsReturnToTreasures = false;
+
+  const ribbonsShowcase = createJournalRibbonsShowcase({
+    onBeforeOpen: () => {
+      clearFieldNote();
+      gemsLedger.clear();
+    },
+    onClose: () => {
+      if (ribbonsReturnToTreasures && treasuresOpen) {
+        treasuresBackdrop.hidden = false;
+      }
+      ribbonsReturnToTreasures = false;
+    },
+    onVisibilityChange: () => syncVisibility(),
+  });
+  treasuresTitleWrap.append(ribbonsShowcase.treasuresBtn);
+
   const gemsLedger = createJournalGemsLedger({
     onBeforeOpen: () => {
       clearFieldNote();
       clearTreasures();
+      ribbonsReturnToTreasures = false;
+      ribbonsShowcase.clear();
     },
     onVisibilityChange: () => syncVisibility(),
   });
 
-  const hasOpen = (): boolean => treasuresOpen || inspectedItem !== null || gemsLedger.isOpen();
+  const hasOpen = (): boolean =>
+    treasuresOpen || inspectedItem !== null || gemsLedger.isOpen() || ribbonsShowcase.isOpen();
 
   const syncVisibility = (): void => {
     const nowOpen = hasOpen();
@@ -449,7 +487,7 @@ export function createJournalFieldOverlays(options?: {
       if (!treasuresBackdrop.hidden) clearTreasures();
       return;
     }
-    treasuresBackdrop.hidden = false;
+    treasuresBackdrop.hidden = ribbonsReturnToTreasures && ribbonsShowcase.isOpen();
     const signature = [
       summary.stamps.started,
       summary.stamps.bay,
@@ -724,6 +762,29 @@ export function createJournalFieldOverlays(options?: {
     return true;
   };
 
+  const syncRibbons = (view: JournalFieldNoteSource, anchor?: Element): void => {
+    const summary = evaluateMeritRibbonsFromJournal(view);
+    const showBanner =
+      view.keepsakes !== undefined && ((view.stickersOwned ?? 0) > 0 || summary.earned > 0);
+    ribbonsShowcase.syncTriggers(summary, showBanner, anchor);
+  };
+
+  const openRibbons = (
+    view: JournalFieldNoteSource | null,
+    returnTarget?: HTMLElement | null,
+  ): void => {
+    const source = view ?? latestView;
+    if (source === null) return;
+    if (treasuresOpen && returnTarget === ribbonsShowcase.treasuresBtn) {
+      ribbonsReturnToTreasures = true;
+      treasuresBackdrop.hidden = true;
+    } else {
+      ribbonsReturnToTreasures = false;
+      clearTreasures();
+    }
+    ribbonsShowcase.open(evaluateMeritRibbonsFromJournal(source), returnTarget);
+  };
+
   fieldPrev.addEventListener("click", () => { stepFieldNote(-1); });
   fieldNext.addEventListener("click", () => { stepFieldNote(1); });
   fieldClose.addEventListener("click", closeFieldNote);
@@ -734,15 +795,27 @@ export function createJournalFieldOverlays(options?: {
   treasuresBackdrop.addEventListener("click", (event) => {
     if (event.target === treasuresBackdrop) closeTreasures();
   });
+  ribbonsShowcase.treasuresBtn.addEventListener("click", () => {
+    openRibbons(latestView, ribbonsShowcase.treasuresBtn);
+  });
+  ribbonsShowcase.banner.addEventListener("click", () => {
+    openRibbons(latestView, ribbonsShowcase.banner);
+  });
 
   const closeAll = (): void => {
+    ribbonsReturnToTreasures = false;
     clearFieldNote();
     clearTreasures();
     gemsLedger.clear();
+    ribbonsShowcase.clear();
     lastNotifiedOpen = false;
   };
 
   const dismiss = (): boolean => {
+    if (ribbonsShowcase.isOpen()) {
+      ribbonsShowcase.close();
+      return true;
+    }
     if (gemsLedger.isOpen()) {
       gemsLedger.close();
       return true;
@@ -762,6 +835,8 @@ export function createJournalFieldOverlays(options?: {
     fieldBackdrop,
     treasuresBackdrop,
     gemsOverlay: gemsLedger.overlay,
+    ribbonsOverlay: ribbonsShowcase.overlay,
+    ribbonsBanner: ribbonsShowcase.banner,
     inspect: (item, view) => {
       if (inspectedItem === null) {
         fieldReturnFocusEl =
@@ -801,17 +876,27 @@ export function createJournalFieldOverlays(options?: {
     openGems: (view, returnTarget) => {
       gemsLedger.open(view?.starGems, returnTarget);
     },
+    openRibbons,
     syncFieldNote,
     syncTreasures,
     syncGems: (view) => gemsLedger.sync(view.starGems),
+    syncRibbons,
+    syncAll: (view, ribbonsAnchor) => {
+      syncFieldNote(view);
+      syncTreasures(view);
+      gemsLedger.sync(view.starGems);
+      syncRibbons(view, ribbonsAnchor);
+    },
     stepFieldNote,
     closeFieldNote,
     closeTreasures,
     closeGems: () => gemsLedger.close(),
+    closeRibbons: () => ribbonsShowcase.close(),
     closeAll,
     hasOpen,
     dismiss,
     handleKeydown: (event) => {
+      if (ribbonsShowcase.handleKeydown(event)) return true;
       if (gemsLedger.handleKeydown(event)) return true;
       if (treasuresOpen) {
         if (event.key === "Escape") {

@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 177)
+Last updated: 2026-11-27 (Milestone 178)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -4525,6 +4525,31 @@ trunks keep its two exits.
   backdrop click, `×` close button (44×44 px), `Escape`, `X`, or Gamepad `B`
   restoring focus directly to `.journal-gems` and playing `card-open` /
   `card-close` UI foley via `onOverlayChange`.
+- **Valley Merit Ribbons** (Elevation Track E18B, Milestone 176, Owner-Unlocked
+  §13): pure zero-DOM engine (`src/core/ribbons.ts`) defining 12 full-journey
+  achievements (`MERIT_RIBBON_IDS`: `first-friend`, `party-reunited`,
+  `star-line-explorer`, `gem-scholar`, `master-angler`, `arcade-champion`,
+  `taco-fiesta`, `sanctuary-guardian`, `neighborhood-hearts`,
+  `alpine-stargazer`, `starlight-keeper`, `valley-legend`) across categories
+  `"story" | "explore" | "arcade" | "mastery"` with twin parity evaluators
+  `evaluateMeritRibbons` (core world/state/records) and
+  `evaluateMeritRibbonsFromJournal` (rendered `JournalView` projection, zero
+  save-version changes and zero `view-models.ts` drift). Surfaced via a
+  hand-stitched watercolor showcase modal (`src/ui/journal-ribbons.ts` +
+  `src/ui/journal-ribbons.css`, composed into `createJournalFieldOverlays` in
+  `src/ui/journal-field-note.ts` and mounted in `src/ui/journal.ts`) featuring
+  hand-inked stitched rosette medallions (`createMeritRibbonEmblem` /
+  `meritRibbonEmblemMarkup`, twin notched tails, dashed needlework ring,
+  `heart`/`star`/`gem`/`wave`/`crown` motifs, zero `<text>` SVG nodes), a
+  3-column × 4-row grid with progress pills on locked ribbons and golden
+  `★ 12/12 VALLEY LEGEND!` celebration at 12/12, full `Escape`/`X`/`B`/backdrop/
+  `×` dismiss, reduced-motion and iOS tap-selection hygiene, and two
+  zero-baseline-diff entry points: `.journal-ribbons-btn` (`"★ Ribbons · N/12"`)
+  in the `FIELD TREASURES` modal header and the hand-stitched
+  `.journal-ribbons-banner` (`"★ Valley Merit Ribbons · N/12"`) below
+  `keepsakesGrid` on `STICKERS` (hidden and detached whenever
+  `view.keepsakes === undefined` or `stickersOwned === 0 && earned === 0`),
+  restoring focus directly to the triggering button on dismiss.
 - A chunky four-step sound volume slider sits beside the `♪ on/off` pill and
   fits the heading row at 874x402, including with `♪ off` and 999 coins. At
   narrow widths, the supplies wrap beneath NOTES so every control remains

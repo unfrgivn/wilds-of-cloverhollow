@@ -118,7 +118,9 @@ export function createJournalNavController(host: JournalNavHost): {
   const inspectableSlots = (): HTMLElement[] =>
     [
       ...host.notesPage.querySelectorAll<HTMLElement>("button.journal-gems:not([hidden])"),
-      ...host.stickersPage.querySelectorAll<HTMLElement>(".journal-slot.is-inspectable"),
+      ...host.stickersPage.querySelectorAll<HTMLElement>(
+        ".journal-slot.is-inspectable, button.journal-ribbons-banner:not([hidden])",
+      ),
     ].filter(isElementVisible);
 
   const scrollActivePage = (deltaY: number): boolean => {

@@ -341,7 +341,8 @@ export function createJournal(root: HTMLElement): JournalControl {
 
   book.append(
     label, close, notesPage, stickersPage, mapPage.root, optionsPage.root, tabs,
-    fieldOverlays.fieldBackdrop, fieldOverlays.treasuresBackdrop, fieldOverlays.gemsOverlay,
+    fieldOverlays.fieldBackdrop, fieldOverlays.treasuresBackdrop,
+    fieldOverlays.gemsOverlay, fieldOverlays.ribbonsOverlay,
   );
   root.append(book);
 
@@ -664,9 +665,7 @@ export function createJournal(root: HTMLElement): JournalControl {
           }
         });
       }
-      fieldOverlays.syncFieldNote(view);
-      fieldOverlays.syncTreasures(view);
-      fieldOverlays.syncGems(view);
+      fieldOverlays.syncAll(view, showKeepsakes ? keepsakesGrid : keepsakesAnchor);
       mapPage.render(view, {
         fishOwned,
         fishTotal: fishList.length,

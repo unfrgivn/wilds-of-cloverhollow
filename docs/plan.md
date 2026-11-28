@@ -7677,6 +7677,41 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
 - **Gates:** `just check`, `just build` (every non-vendor JS chunk `<= 370 kB`,
   zero `story-content` chunk), and Chromium/WebKit Playwright e2e verification.
 
+## Milestone 178: Valley Merit Ribbons — 12 Hand-Stitched Watercolor Journal Achievement Ribbons (Elevation Track E18B, §13 Unlock) **Status:** ✅ Completed (2026-11-27)
+- Implements the owner-unlocked **Valley Merit Ribbons** (§13, Elevation Track
+  E18B) as an in-game hand-stitched watercolor achievement showcase inside Fae's
+  Journal — zero `src/core/sim.ts` changes, zero save-version bumps, zero replay
+  hash drift across all 74 recorded sims, and zero visual baseline diffs across
+  all 99 `ui-gallery` and Journal baselines.
+- Pure core merit ribbons engine (`src/core/ribbons.ts`, 334 lines — zero DOM,
+  Pixi, or I/O):
+  - Defined 12 canonical full-journey ribbons (`first-friend`, `party-reunited`,
+    `star-line-explorer`, `gem-scholar`, `master-angler`, `arcade-champion`,
+    `taco-fiesta`, `sanctuary-guardian`, `neighborhood-hearts`,
+    `alpine-stargazer`, `starlight-keeper`, `valley-legend`) across 4 categories
+    (`story`, `explore`, `arcade`, `mastery`).
+  - Exported twin parity evaluators `evaluateMeritRibbons(world, state, records)`
+    and `evaluateMeritRibbonsFromJournal(input)` returning identical progress &
+    unlock states.
+- Hand-stitched watercolor ribbon showcase (`src/ui/journal-ribbons.ts`,
+  `src/ui/journal-ribbons.css`, `src/ui/journal-field-note.ts`,
+  `src/ui/journal.ts`, `src/ui/journal-nav.ts`):
+  - Handcrafted inline SVG stitched rosette medallions with twin notched tails
+    and category motifs (zero `<text>` nodes), colored felt earned cards, dashed
+    locked cards with progress pills, golden `★ 12/12 VALLEY LEGEND!` header &
+    footer, full keyboard/gamepad/mouse/touch focus restoration, reduced-motion
+    guards, and Safari/iOS tap-selection hygiene.
+  - Accessible from both `.journal-ribbons-btn` inside the Field Treasures modal
+    and the hand-stitched `.journal-ribbons-banner` on the scrollable `STICKERS`
+    page while keeping `src/ui/journal.ts` at 677 lines (`< 680`).
+- Evidence: `tests/unit/milestone-178.test.ts`,
+  `tests/e2e/milestone-178.spec.ts` (`@smoke` Chromium + WebKit), and review
+  captures `art/review/m176-merit-ribbons-1280.jpg` and
+  `m176-merit-ribbons-874.jpg` independently verified via `vision`.
+- Gates: `just check` (243 unit files / 1,752 tests, all 74 sims, 23 QA packs,
+  purity, lint), `just build` (`index` `349.15 kB < 500 kB`), 29/29 targeted
+  Chromium & WebKit e2e, and 99/99 Chromium `ui-gallery` tests.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

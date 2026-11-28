@@ -8,6 +8,7 @@ import {
   journalKeepsakes,
   journalProgress,
   journalStarGems,
+  landAtlasSummaries,
   landFieldGuide,
   landStickerProgress,
   levelForXp,
@@ -15,6 +16,7 @@ import {
   mapLandName,
   starGemsFound,
   statsForCommand,
+  storySoFar,
   targetInteractable,
   treasuresSummary,
   valleyCompletion,
@@ -287,6 +289,8 @@ export function buildJournalView(params: JournalViewParams): JournalView {
     busRoutes: open
       ? mapBusRoutes(world.lands, isStorySet)
       : [],
+    storySoFar: open ? storySoFar(world, state) : undefined,
+    atlasPins: open ? landAtlasSummaries(world, state) : [],
     stickersOwned: state.stickers.length,
     stickersTotal: world.stickers.catalogue.length,
     prizesOwned: state.prizes.length,

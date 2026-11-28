@@ -9,7 +9,7 @@ import {
   type JournalFieldNoteFish,
   type JournalFieldNoteSticker,
 } from "./journal-field-note";
-import { createJournalMapPage } from "./journal-map";
+import { createJournalMapPage, type JournalMapView } from "./journal-map";
 import { createJournalNavController, cycleIndex, type JournalNavDirection } from "./journal-nav";
 import {
   createJournalOptionsPage, makeJournalButton, makeSliderButton, syncSlider, wireSlider,
@@ -17,10 +17,9 @@ import {
 } from "./journal-options";
 import { formatArcadeRecordPills, type MinigameRecords } from "../platform/minigame-records";
 import type {
-  BusRoute, CarriedTreat, JournalKeepsake, KeepsakeId, LandProgress, StarGemEntry,
+  AtlasFilter, CarriedTreat, JournalKeepsake, KeepsakeId, StarGemEntry,
 } from "../core/journal";
 import type { LevelStats } from "../core/levels";
-import type { TreasuresSummary } from "../core/treasures";
 
 export {
   bindOptionsCallbacks, defaultOptionsCallbacks, formatJukeboxLabel, journalControlsLines,
@@ -33,7 +32,7 @@ export type JournalSticker = JournalFieldNoteSticker;
 export type JournalPrize = JournalSticker;
 export type JournalFishEntry = JournalFieldNoteFish;
 
-export type JournalView = JournalOptionsView & {
+export type JournalView = JournalOptionsView & JournalMapView & {
   visible: boolean;
   /** Newest first; the game decides the order. */
   notes: string[];
@@ -43,22 +42,11 @@ export type JournalView = JournalOptionsView & {
   arcadeRecords?: MinigameRecords;
   fish?: JournalFishEntry[];
   keepsakes?: JournalKeepsake[];
-  lands: { id: string; name: string; busStop: boolean; x: number; y: number }[];
-  currentLand: string | null;
-  landProgress: Record<string, LandProgress>;
-  landGuides?: Record<string, string>;
-  busRoutes: BusRoute[];
-  stickersOwned: number;
-  stickersTotal: number;
-  prizesOwned: number;
-  prizesTotal: number;
   coins: number;
   tickets: number;
   snacks: number;
   gems?: { found: number; total: number };
   starGems?: StarGemEntry[];
-  valleyComplete?: boolean;
-  treasures?: TreasuresSummary;
   members: {
     id: string;
     name: string;
@@ -242,7 +230,8 @@ export type JournalControl = JournalOptionsHandlers & {
   dismissOverlay: () => boolean;
   stepOverlay: (delta: -1 | 1) => boolean;
   onPageChange: (callback: (page: JournalPage) => void) => void;
-  onMapSelect: (callback: () => void) => void;
+  onMapSelect: (callback: (selected: boolean) => void) => void;
+  onMapFilter: (callback: (filter: AtlasFilter) => void) => void;
   onOverlayChange: (callback: (open: boolean) => void) => void;
   onOverlayStep: (callback: () => void) => void;
   onClose: (callback: () => void) => void;
@@ -312,7 +301,8 @@ export function createJournal(root: HTMLElement): JournalControl {
 
   let latestView: JournalView | null = null;
   let onPageChange: (page: JournalPage) => void = () => undefined;
-  let onMapSelect: () => void = () => undefined;
+  let onMapSelect: (selected: boolean) => void = () => undefined;
+  let onMapFilter: (filter: AtlasFilter) => void = () => undefined;
   let onOverlayChange: (open: boolean) => void = () => undefined;
   let onOverlayStep: () => void = () => undefined;
   let onClose: () => void = () => undefined;
@@ -323,7 +313,8 @@ export function createJournal(root: HTMLElement): JournalControl {
     onStep: () => onOverlayStep(),
   });
   const mapPage = createJournalMapPage(() => fieldOverlays.openTreasures(latestView), {
-    onSelectLand: () => onMapSelect(),
+    onSelectLand: (landId) => onMapSelect(landId !== null),
+    onFilterChange: (filter) => onMapFilter(filter),
   });
   const sliderSteppers = new Map<EventTarget, (direction: -1 | 1) => void>();
   const optionsPage = createJournalOptionsPage({
@@ -412,6 +403,7 @@ export function createJournal(root: HTMLElement): JournalControl {
     stepOverlay: (delta) => fieldOverlays.stepFieldNote(delta),
     onPageChange: (cb) => { onPageChange = cb; },
     onMapSelect: (cb) => { onMapSelect = cb; },
+    onMapFilter: (cb) => { onMapFilter = cb; },
     onOverlayChange: (cb) => { onOverlayChange = cb; },
     onOverlayStep: (cb) => { onOverlayStep = cb; },
     onClose: (cb) => { onClose = cb; },

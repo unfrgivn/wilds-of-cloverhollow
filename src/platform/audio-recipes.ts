@@ -32,14 +32,14 @@ export const soundCueRecipes: Record<SoundCue, AudioRecipe> = {
     { wave: "sine", frequency: 880, offset: 0.045, duration: 0.11, gain: 0.055 },
   ],
   "journal-open": [
-    { wave: "noise", offset: 0, duration: 0.06, gain: 0.016, lowpass: 1800 },
-    { wave: "triangle", frequency: 392, offset: 0, duration: 0.1, gain: 0.09 },
-    { wave: "triangle", frequency: 523, offset: 0.075, duration: 0.14, gain: 0.095 },
+    { wave: "noise", offset: 0, duration: 0.06, gain: 0.016, lowpass: 1800, attack: 0.006 },
+    { wave: "triangle", frequency: 392, offset: 0, duration: 0.1, gain: 0.09, attack: 0.004 },
+    { wave: "triangle", frequency: 523, offset: 0.075, duration: 0.14, gain: 0.095, attack: 0.004 },
   ],
   "journal-close": [
-    { wave: "noise", offset: 0, duration: 0.05, gain: 0.014, lowpass: 1400 },
-    { wave: "triangle", frequency: 523, offset: 0, duration: 0.09, gain: 0.075 },
-    { wave: "triangle", frequency: 330, offset: 0.075, duration: 0.13, gain: 0.075 },
+    { wave: "noise", offset: 0, duration: 0.05, gain: 0.014, lowpass: 1400, attack: 0.006 },
+    { wave: "triangle", frequency: 523, offset: 0, duration: 0.09, gain: 0.075, attack: 0.004 },
+    { wave: "triangle", frequency: 330, offset: 0.075, duration: 0.13, gain: 0.075, attack: 0.004 },
   ],
   "footstep-grass": [
     { wave: "noise", offset: 0, duration: 0.055, gain: 0.02, lowpass: 1350, attack: 0.006 },

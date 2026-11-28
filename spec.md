@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 179)
+Last updated: 2026-11-27 (Milestone 180)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -496,7 +496,19 @@ ios/            Capacitor iOS project (from Milestone 4).
   ~0.3 s to 0.55x gain while gently rolling off highs through a feature-guarded
   warm low-pass `BiquadFilterNode` (`Q = 0.55`, `duckFilterCutoff` ramping
   between `DUCK_FILTER_DUCKED_HZ = 2600` Hz and `DUCK_FILTER_OPEN_HZ = 18000`
-  Hz so character voice prosody stays clear, Milestone 152), resumes
+  Hz so character voice prosody stays clear, Milestone 152), applies adaptive
+  vertical mixing and warm Journal filtering via pure `projectMusicMix`
+  (`src/platform/music-mix.ts`, re-exported from `src/platform/audio.ts`,
+  Milestone 180: engaging `JOURNAL_FILTER_HZ = 1400` Hz / `JOURNAL_DUCK_GAIN =
+  0.46` on music and `AMBIENCE_JOURNAL_FILTER_HZ = 1400` Hz /
+  `AMBIENCE_JOURNAL_GAIN_SCALE = 0.62` on ambience via `AmbiencePlayer.setWarmFilter`
+  whenever the Journal is open outside Jukebox preview; fading in a bar-synced
+  high celesta/music-box counter-voice via `lanternShimmerNote` tuned to
+  `trackScaleMidi(track)` in `[79, 93]` while Fae's blacklight lantern is on in
+  the overworld; and latching a bar-quantized rhythmic percussion/energy lift
+  via `nextBarAdaptiveState` + `battleTensionNotes` + `TENSION_PERCUSSION_BOOST`
+  on Wind-Up or `>= 50%` Calm in mini-boss/finale battles outside `talk`/calm
+  phases, surfaced read-only in `MusicDebugInfo.adaptive`), resumes
   exploration themes on the nearest bar downbeat after battles or shop visits
   via `resumeBarStep` (preserving `stepsPerBar` alignment across 4/4 and 3/4
   waltz scores while `FRESH_START_TRACKS` (`title`, `taco`, `battle`, `boss`,
@@ -590,31 +602,38 @@ ios/            Capacitor iOS project (from Milestone 4).
   (dual-transient mechanical click + soft lowpass lens whirr, ~0.12 s). Pure
   static cue recipe tables (`soundCueRecipes`, `soundCueRecipe`, `AudioSegment`,
   `AudioRecipe`) live in `src/platform/audio-recipes.ts` (Milestone 114), while
-  the 14 shell companion & UI foley recipes (`CompanionAudioEffect`,
+  the 17 shell companion & UI foley recipes (`CompanionAudioEffect`,
   `effectRecipes`, `effectRecipe`) live in modular `src/platform/audio-effects.ts`
-  (Milestone 172, type-only import of `AudioRecipe` from `./audio-recipes`, zero
-  circular runtime dependency) and are re-exported identically from
+  (Milestones 172 & 180, type-only import of `AudioRecipe` from `./audio-recipes`,
+  zero circular runtime dependency) and are re-exported identically from
   `src/platform/audio-recipes.ts` and `src/platform/audio.ts` for
   backwards-compatible unit verification.
-- Tactile storybook UI foley & haptic micro-feedback (Milestone 133,
-  `src/platform/audio-recipes.ts`, `src/platform/audio.ts`,
-  `src/shell/title-flow.ts`, `src/ui/journal-field-note.ts`,
-  `src/ui/journal.ts`, `src/shell/input-shortcuts.ts`, `src/main.ts`): extends
-  `CompanionAudioEffect` / `effectRecipes` with seven gentle (`<= 0.08` gain,
+- Tactile storybook UI foley & haptic micro-feedback (Milestones 133 & 180,
+  `src/platform/audio-recipes.ts`, `src/platform/audio-effects.ts`,
+  `src/platform/audio.ts`, `src/shell/title-flow.ts`,
+  `src/ui/journal-field-note.ts`, `src/ui/journal.ts`,
+  `src/shell/input-shortcuts.ts`, `src/main.ts`): extends
+  `CompanionAudioEffect` / `effectRecipes` with ten gentle (`<= 0.08` gain,
   zero square wave) acoustic recipes: `"title-move"` (soft wooden-marimba
   cursor tick), `"title-start"` (4-note sunlit harp/celesta chord with gentle
   harmonic bloom), `"page-turn"` (feathery lowpass paper-rustle + bookmark tap),
   `"card-open"` (crisp cardstock lift + rising chime), `"card-close"` (soft
   cardstock tuck + settling tone), `"toggle-on"` (cheerful wooden-button click),
-  and `"toggle-off"` (gentle wooden-button release). `AudioController` records
+  `"toggle-off"` (gentle wooden-button release), `"paper-flip"` (dual warm
+  lowpass paper-rustle bursts + wooden crease tap, `<= 0.06` gain),
+  `"sticker-peel"` (filtered adhesive-peel rustle + warm lifting curl,
+  `<= 0.06` gain), and `"atlas-pin"` (wooden push-pin tap resonance + muted
+  map-paper press + brass-pin ring, `<= 0.06` gain). `AudioController` records
   played non-core effects in a rolling 64-entry buffer (`effects()`, cleared via
   `clearEffects()` on harness resets) while keeping `log()` strictly
   `SoundCue[]`. Title transitions map via pure `titleEffectForTransition`
   (adding `"light"` haptic on `"title-start"`), Journal tab flips fire
   `onPageChange` (`"page-turn"` + `"light"` haptic without double-playing
-  `"choice-move"`), painted Valley Map pin clicks and keyboard/gamepad land-pin
-  steps fire `onMapSelect` (`"title-move"` wooden-marimba pin tick + `"light"`
-  haptic, Milestone 169), Field Note / Field Treasures cards fire
+  `"choice-move"`), Valley Atlas pin clicks and keyboard/gamepad land-pin
+  steps fire `onMapSelect` (`"atlas-pin"` when selecting/stepping, `"sticker-peel"`
+  when deselecting a selected pin, + `"light"` haptic, Milestones 169 & 180),
+  Valley Atlas filter toggles fire `onMapFilter` (`"paper-flip"` + `"light"`
+  haptic, Milestone 180), Field Note / Field Treasures cards fire
   `onOverlayChange`
   only on real user open/dismiss flips (`"card-open"` / `"card-close"` +
   `"light"` haptic on open), Battle Field Guide Peek plays `"card-open"` /
@@ -4608,7 +4627,23 @@ trunks keep its two exits.
   iconic land highlights (with expansion highlights `Sanctuary & Taco Truck` for
   `hills` and `Lodge, Summit & Cavern` for `pass`, keeping `bay` as
   `Fishing, Boats & Cottage`, Milestone 165), while keeping the default
-  un-selected `"Here: ..."` line unchanged.
+  un-selected `"Here: ..."` line unchanged. In Milestone 180 (Elevation Track
+  E15), the MAP spread upgrades into the **Smart Interactive Valley Atlas**
+  backed by pure read-only helpers in `src/core/journal.ts` (`storySoFar`,
+  `landAtlasSummaries`, `matchesAtlasFilter`, zero `step()`/`State` edits):
+  a top `"Story So Far"` parchment banner (`.journal-atlas-story`, cleared
+  past `.journal-close`, strictly enforcing section 1.2 secrecy until reveal),
+  a left Atlas rail (`.journal-atlas-rail`) pairing four `>= 44x44 CSS px`
+  die-cut filter/legend buttons (`All`, `Gems`, `Boss`, `Bus`, dimming
+  non-matching pins and non-matching badges and emphasizing bus routes on `Bus`)
+  above a live Quick Pin Inspection Card (`.journal-atlas-inspector`) listing
+  exact remaining land objectives (waiting Chaos Bosses respecting door and
+  `visibleWhile` gates, hidden Star Gems, Star-Line Bus Stop unlocked vs
+  on-foot status, Clubhouse garden progress, and sticker/100% completion), and
+  live die-cut zero-`<text>` SVG pin trays (`.journal-atlas-pin-tray`) directly
+  below each revealed land inside a rounded ink-framed map canvas while keeping
+  `.journal-map-land` exact label text intact and zero truncation or overlap at
+  `1280x720` and `874x402` (including iPhone safe-area insets).
 - The OPTIONS spread (extracted into `src/ui/journal-options.ts` via
   `createJournalOptionsPage`, with `journalControlsLines`, `formatJukeboxLabel`,
   `JournalControlsTools`, `JournalControlsLines`, `JournalInputMode`, and

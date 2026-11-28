@@ -208,6 +208,9 @@ describe("Milestone 114: modular audio-recipes.ts extraction & audio.ts re-expor
     "toggle-on",
     "toggle-off",
     "tool-sparkle",
+    "paper-flip",
+    "sticker-peel",
+    "atlas-pin",
   ];
 
   it("defines valid non-empty recipes for every SoundCue and matches audio.ts re-exports", () => {

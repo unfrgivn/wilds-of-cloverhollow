@@ -26,15 +26,25 @@ import {
   type CompanionAudioEffect,
 } from "./audio-recipes";
 import { createMusicPlayer, type MusicPlayer } from "./music";
+import {
+  AMBIENCE_OPEN_FILTER_HZ,
+  DUCK_FILTER_HZ,
+  NORMAL_DUCK_GAIN,
+  OPEN_FILTER_HZ,
+  projectMusicMix,
+  type MusicAdaptiveState,
+} from "./music-mix";
 import { createPreferenceStore } from "./preference-store";
 import { blipFrequency, dialogueProsody, footstepPitchFactor, trackScaleNotes } from "./voices";
 
 export {
   effectRecipe,
+  projectMusicMix,
   soundCueRecipe,
   type AudioRecipe,
   type AudioSegment,
   type CompanionAudioEffect,
+  type MusicAdaptiveState,
 };
 
 export type SoundLogEntry = { tick: number; cue: SoundCue; played: boolean };
@@ -57,6 +67,22 @@ export type MusicDebugInfo = {
   muted: boolean;
   level: AudioLevel;
   ambienceMuted: boolean;
+  adaptive: {
+    journalWarm: boolean;
+    lanternLayer: boolean;
+    tensionLayer: boolean;
+    filterCutoffHz: number;
+  };
+};
+
+const DEFAULT_ADAPTIVE_STATE: MusicAdaptiveState = {
+  journalWarm: false,
+  lanternLayer: false,
+  tensionLayer: false,
+  filterCutoffHz: OPEN_FILTER_HZ,
+  duckGain: 1,
+  ambienceFilterHz: AMBIENCE_OPEN_FILTER_HZ,
+  ambienceGainScale: 1,
 };
 
 function stateOf(audio: AudioContext | null): AudioState {
@@ -79,7 +105,7 @@ export type AudioController = {
   muted: () => boolean;
   setLevel: (level: AudioLevel) => void;
   level: () => AudioLevel;
-  setSoundtrack: (next: SoundtrackState) => void;
+  setSoundtrack: (next: SoundtrackState, adaptive?: MusicAdaptiveState) => void;
   toggleMusic: () => void;
   musicMuted: () => boolean;
   setMusicLevel: (level: AudioLevel) => void;
@@ -132,6 +158,7 @@ export function createAudio(
     duck: false,
     title: trackTitles.silent,
   };
+  let adaptiveState: MusicAdaptiveState = DEFAULT_ADAPTIVE_STATE;
   const store = createPreferenceStore(preferenceKey);
   let context: AudioContext | null = null;
   let master: GainNode | null = null;
@@ -216,15 +243,31 @@ export function createAudio(
     if (store.isLoaded()) persist();
   };
 
-  const setSoundtrack = (next: SoundtrackState): void => {
+  const setSoundtrack = (next: SoundtrackState, adaptive?: MusicAdaptiveState): void => {
+    const nextAdaptive: MusicAdaptiveState = adaptive ?? {
+      ...DEFAULT_ADAPTIVE_STATE,
+      filterCutoffHz: next.duck ? DUCK_FILTER_HZ : OPEN_FILTER_HZ,
+      duckGain: next.duck ? NORMAL_DUCK_GAIN : 1,
+    };
     if (
       next.track === soundtrack.track &&
       next.ambience === soundtrack.ambience &&
-      next.duck === soundtrack.duck
+      next.duck === soundtrack.duck &&
+      nextAdaptive.journalWarm === adaptiveState.journalWarm &&
+      nextAdaptive.lanternLayer === adaptiveState.lanternLayer &&
+      nextAdaptive.tensionLayer === adaptiveState.tensionLayer
     ) return;
     soundtrack = next;
-    musicPlayer?.setState({ track: next.track, duck: next.duck });
+    adaptiveState = nextAdaptive;
+    musicPlayer?.setState({
+      track: next.track,
+      duck: next.duck,
+      journalWarm: nextAdaptive.journalWarm,
+      lanternLayer: nextAdaptive.lanternLayer,
+      tensionLayer: nextAdaptive.tensionLayer,
+    });
     ambiencePlayer?.setBed(next.ambience);
+    ambiencePlayer?.setWarmFilter(nextAdaptive.journalWarm);
   };
 
   const ensureContext = (): AudioContext | null => {
@@ -263,8 +306,15 @@ export function createAudio(
 
     musicPlayer = createMusicPlayer(context, musicOutput);
     ambiencePlayer = createAmbiencePlayer(context, ambienceOutput);
-    musicPlayer.setState({ track: soundtrack.track, duck: soundtrack.duck });
+    musicPlayer.setState({
+      track: soundtrack.track,
+      duck: soundtrack.duck,
+      journalWarm: adaptiveState.journalWarm,
+      lanternLayer: adaptiveState.lanternLayer,
+      tensionLayer: adaptiveState.tensionLayer,
+    });
     ambiencePlayer.setBed(soundtrack.ambience);
+    ambiencePlayer.setWarmFilter(adaptiveState.journalWarm);
     syncPlayers();
     return context;
   };
@@ -571,6 +621,12 @@ export function createAudio(
       muted: musicMuted,
       level: musicLevel,
       ambienceMuted,
+      adaptive: {
+        journalWarm: adaptiveState.journalWarm,
+        lanternLayer: adaptiveState.lanternLayer,
+        tensionLayer: adaptiveState.tensionLayer,
+        filterCutoffHz: adaptiveState.filterCutoffHz,
+      },
     }),
     log: () => entries.slice(),
     state: () => stateOf(context),

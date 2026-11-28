@@ -37,7 +37,7 @@ import {
   shouldClearRest, stepJukeboxTrack,
 } from "./shell/feedback";
 import { createSaveSession, createSaveStore } from "./shell/save-storage";
-import { createAudio } from "./platform/audio";
+import { createAudio, projectMusicMix } from "./platform/audio";
 import { createHaptics } from "./platform/haptics";
 import { findPettableCompanion, findRestSpot } from "./render/companions";
 import type { AudioLevel } from "./platform/audio-settings";
@@ -183,7 +183,10 @@ async function boot(): Promise<void> {
   let jukeboxTrack: JukeboxTrack | null = null;
   const playPageTurn = (): void => { sound.playEffect("page-turn"); lightHaptic(); };
   journal.onPageChange(playPageTurn);
-  journal.onMapSelect(() => { sound.playEffect("title-move"); lightHaptic(); });
+  journal.onMapSelect((on) => {
+    sound.playEffect(on ? "atlas-pin" : "sticker-peel"); lightHaptic();
+  });
+  journal.onMapFilter(() => { sound.playEffect("paper-flip"); lightHaptic(); });
   journal.onOverlayStep(playPageTurn);
   journal.onOverlayChange((open) => {
     sound.playEffect(open ? "card-open" : "card-close");
@@ -200,11 +203,7 @@ async function boot(): Promise<void> {
   journal.onStepTrack((delta) => {
     if (!state.journalOpen) return;
     const nextTrack = stepJukeboxTrack(
-      content.world,
-      state,
-      jukeboxTrack,
-      delta,
-      titleMode !== null || (qa?.isMenuOpen() ?? false),
+      content.world, state, jukeboxTrack, delta, titleMode !== null || (qa?.isMenuOpen() ?? false),
     );
     if (nextTrack === null) return;
     jukeboxTrack = nextTrack;
@@ -212,8 +211,7 @@ async function boot(): Promise<void> {
   });
   journal.onResetJukebox(() => {
     if (jukeboxTrack === null) return;
-    jukeboxTrack = null;
-    invalidate();
+    jukeboxTrack = null; invalidate();
   });
   journal.onToggleGentleTiming(
     bindToggle(gameSettings.toggleGentleTiming, gameSettings.gentleTiming),
@@ -548,13 +546,14 @@ async function boot(): Promise<void> {
     }
     if (battlePeekOpen && !canBattlePeek(gate)) battlePeekOpen = false;
     if (!state.journalOpen || titleMode !== null || qaMenuOpen) jukeboxTrack = null;
+    const titleOrQaOpen = titleMode !== null || qaMenuOpen;
     const { soundtrack, jukebox } = resolveSoundtrack(
-      content.world,
-      state,
-      jukeboxTrack,
-      titleMode !== null || qaMenuOpen,
+      content.world, state, jukeboxTrack, titleOrQaOpen,
     );
-    sound.setSoundtrack(soundtrack);
+    sound.setSoundtrack(soundtrack, projectMusicMix(content.world, state, {
+      titleOpen: titleOrQaOpen, jukeboxActive: jukeboxTrack !== null,
+      track: soundtrack.track, duck: soundtrack.duck,
+    }));
     devLog?.logMusic(soundtrack);
     const arcadeState = arcadeView(content.world, state, gameSettings.gentleTiming());
     assets.renderOverlays(arcadeState, activeArcadeRecord, inputShortcuts.inputMode());

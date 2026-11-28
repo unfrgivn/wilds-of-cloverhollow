@@ -927,6 +927,122 @@
       "knot": "pet_crab",
       "prompt": "Pet",
       "visibleWhenCalmed": "crab"
+    },
+    {
+      "id": "milo",
+      "point": {
+        "x": 840,
+        "y": 758
+      },
+      "facing": "down",
+      "footprint": [
+        [
+          822,
+          742
+        ],
+        [
+          858,
+          742
+        ],
+        [
+          858,
+          764
+        ],
+        [
+          822,
+          764
+        ]
+      ],
+      "knot": "festival_milo",
+      "prompt": "Talk",
+      "visibleWhile": "milo_revealed"
+    },
+    {
+      "id": "rosie",
+      "point": {
+        "x": 975,
+        "y": 645
+      },
+      "facing": "down",
+      "footprint": [
+        [
+          957,
+          629
+        ],
+        [
+          993,
+          629
+        ],
+        [
+          993,
+          651
+        ],
+        [
+          957,
+          651
+        ]
+      ],
+      "knot": "festival_rosie",
+      "prompt": "Talk",
+      "visibleWhile": "milo_revealed"
+    },
+    {
+      "id": "dad",
+      "point": {
+        "x": 735,
+        "y": 635
+      },
+      "facing": "down",
+      "footprint": [
+        [
+          717,
+          619
+        ],
+        [
+          753,
+          619
+        ],
+        [
+          753,
+          641
+        ],
+        [
+          717,
+          641
+        ]
+      ],
+      "knot": "festival_dad",
+      "prompt": "Talk",
+      "visibleWhile": "milo_revealed"
+    },
+    {
+      "id": "chef",
+      "point": {
+        "x": 1040,
+        "y": 742
+      },
+      "facing": "left",
+      "footprint": [
+        [
+          1022,
+          726
+        ],
+        [
+          1058,
+          726
+        ],
+        [
+          1058,
+          748
+        ],
+        [
+          1022,
+          748
+        ]
+      ],
+      "knot": "festival_chef",
+      "prompt": "Talk",
+      "visibleWhile": "milo_revealed"
     }
   ],
   "spawns": {

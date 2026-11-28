@@ -6939,6 +6939,47 @@ the old trail, the owl, and the clubhouse claim.
   `just ios-smoke` (passed end-to-end on iPhone 17 / iOS 27.0), and
   `just ios-device-build` (unsigned arm64 `Release-iphoneos/App.app` built
   cleanly).
+## Milestone 161: Post-Finale "Sunny Cloverhollow" Epilogue & Sanctuary Celebration Festival **Status:** ✅ Completed (2026-11-27)
+- Turned the post-finale Wildlife Sanctuary (`milo_revealed === true`) into a
+  radiant **Sunny Cloverhollow Sanctuary Celebration Festival** welcoming
+  Milo, Rosie, Dad, and Chef Bea alongside Ranger Fern and all 17 calmed
+  valley critters, with zero `src/core` edits and zero shifts across all 73
+  earlier recorded sims:
+  - **Four Sanctuary Festival Guests (`content/areas/sanctuary.json`)**: added
+    `milo` `(840, 758)`, `rosie` `(975, 645)`, `dad` `(735, 635)`, and `chef`
+    `(1040, 742)` strictly gated behind `visibleWhile: "milo_revealed"` so
+    pre-finale Sanctuary stays 100% untouched, reusing their existing blinking
+    atlases, voices, bust portraits, and exact 53 living NPC profiles.
+  - **Heartfelt Festival Story & Epilogue Echoes (`content/story/main.ink` -> `content/story/main.ink.json`)**:
+    appended 5 `VAR`s (`festival_milo_talked`, `festival_rosie_gift`,
+    `festival_dad_talked`, `festival_chef_talked`, `festival_toast_done`),
+    added `festival_milo`, `festival_rosie` (`+1 snack` Clover Festival
+    Lemonade), `festival_dad` (dynamic `sanctuary_count()` cheer & Chef
+    Mateo's fiesta tacos), `festival_chef` (honey-clover tarts with Maddie's
+    purr), Ranger Fern's ensemble **Sunny Cloverhollow Festival Toast**
+    (`+30 coins`, `+2 snacks`, `# sound: chime-red`, duplicate-free replay),
+    plus post-finale echoes in `sanctuary_picnic`, `mom.again`, `buster`,
+    `club_chest` (celebrating Milo/Rosie homes, Alpine Summit aurora,
+    Starlight Island Seashell Chime, and the Sanctuary Festival), and
+    `journal`.
+  - **Radiant Post-Finale Lighting & Festival Atmosphere (`src/render/time-of-day.ts`, `src/render/atmosphere-shared.ts`, `src/render/atmosphere-outdoor.ts`, `src/render/view.ts`)**:
+    shifts post-finale `sanctuary` to `GOLDEN_MEADOW` and adds 14 deterministic
+    sunlit festival clover-petal & golden-star sparkles (`sanctuaryFestival`)
+    respecting `reducedMotion`.
+  - **Festival Fixture (`content/fixtures/festival.json`, `src/content/load.ts`)**:
+    starts at `sanctuary.entrance` post-finale with all 17 calmed animals and
+    all 4 festival guests ready for instant QA/playtest entry.
+- Evidence: `tests/unit/sunny-epilogue.test.ts`,
+  `tests/unit/festival-replay.test.ts`, recorded run
+  `tests/sim/scripts/new-game/festival.json` (31,877 ticks chaining directly
+  from `golden-kid.json`), real-key `tests/e2e/festival.spec.ts` matching
+  Bun's exact hash at 1280x720 and 874x402, and `vision`-verified
+  `art/review/sanctuary-festival-overlay.jpg` and
+  `art/review/sunny-festival-gameplay.jpg`.
+- Gates: `just check` (223 unit files / 1,633 tests, 74 sims, 23 QA packs,
+  purity, lint), `just build` (all non-vendor chunks `< 400 kB`), and
+  Chromium + WebKit e2e (`festival.spec`, `sanctuary.spec`, `m81-festival.spec`,
+  `milestone-159.spec`, `showcase-polish.spec`).
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.

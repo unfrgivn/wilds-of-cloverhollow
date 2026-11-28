@@ -25,6 +25,7 @@ import {
   pickTint,
   PLAZA_ARCHES,
   PLAZA_STAR_GLOW_TINTS,
+  SANCTUARY_FESTIVAL_TINTS,
   SNOW_TINTS,
   WATER_TINTS,
   wrap,
@@ -203,6 +204,50 @@ export function evaluateOutdoorAtmosphere(
       minAlpha: 0.22,
       maxAlpha: 0.54,
     });
+    if (options?.sanctuaryFestival === true) {
+      // 14 joyful sunlit festival clover-petal & golden-star sparkles drifting over the meadow.
+      const t = options.reducedMotion === true ? 0 : tick;
+      const insetX = width * 0.16;
+      const insetY = height * 0.26;
+      const spanX = Math.max(120, width - insetX * 1.8);
+      const spanY = Math.max(100, height - insetY - 90);
+      for (let i = 0; i < 14; i += 1) {
+        const h0 = hash01(seed + i * 73 + 31);
+        const h1 = hash01(seed + i * 73 + 32);
+        const h2 = hash01(seed + i * 73 + 33);
+        const h3 = hash01(seed + i * 73 + 34);
+        const isPetal = i % 2 === 0;
+        const x = insetX + wrap(
+          h0 * spanX + t * (isPetal ? 0.24 : 0.14) * (0.7 + h2 * 0.6) +
+            Math.sin(t * 0.024 + i * 1.1) * 16,
+          spanX,
+        );
+        const y = insetY + wrap(
+          h1 * spanY + t * (isPetal ? 0.1 : -0.09) * (0.7 + h3 * 0.6) +
+            Math.cos(t * 0.02 + h0 * 6.28) * 10,
+          spanY,
+        );
+        const twinkle =
+          options.reducedMotion === true
+            ? 0.5
+            : 0.5 + 0.5 * Math.sin(t * (0.048 + h3 * 0.036) + i * 1.4);
+        const scale = isPetal ? 0.54 + h2 * 0.28 : 0.56 + h2 * 0.34;
+        out.push({
+          layer: "over",
+          texture: isPetal ? "petal" : "sparkle",
+          blend: isPetal ? "normal" : "add",
+          x,
+          y,
+          scaleX: scale,
+          scaleY: isPetal
+            ? scale * (0.72 + 0.28 * Math.abs(Math.cos(t * 0.035 + h3 * 6.28)))
+            : scale,
+          rotation: isPetal ? t * (0.014 + h3 * 0.016) + h0 * Math.PI * 2 : 0,
+          alpha: clamp01(isPetal ? 0.6 + twinkle * 0.26 : 0.48 + twinkle * 0.38),
+          tint: pickTint(SANCTUARY_FESTIVAL_TINTS, i),
+        });
+      }
+    }
     return out;
   }
 

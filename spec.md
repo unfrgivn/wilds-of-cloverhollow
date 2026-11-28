@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 159)
+Last updated: 2026-11-27 (Milestone 161)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -669,7 +669,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   / `#D6C2FF` acoustic sparkles above the piano and chimes; and
   `artRoomPaletteGlow` in `art-room` when `art_open` and `buster_reward`: 5
   pastel watercolor `#FFA8C5` / `#FFE082` / `#9CE3B4` / `#9AD4FF` sparkles
-  under the studio skylight; all biomes and story-reactive accents respect
+  under the studio skylight; plus Milestone 161 `sanctuaryFestival` in
+  `sanctuary` when `milo_revealed`: 14 sunlit pastel clover-petal and
+  golden-star sparkles drifting gently across the picnic meadow; all biomes
+  and story-reactive accents respect
   `reducedMotion` by holding positions and pulses steady across ticks,
   Milestones 119 and 159), and an `emissive`
   light layer mounted above `lanternLayer` (`emissiveLayer`, boosted smoothly
@@ -694,7 +697,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   during battles or arcade close-ups, and while the lantern is on. `sunrise`
   warms the Morning Wake-Up finale (`state.finale !== null`);
   `enchanted-twilight` washes `mist` and fizzy `enchanted`; `golden-meadow`
-  warms calmed `enchanted` (`forest_fizzy === false`); `golden-hour` bathes outdoor
+  warms calmed `enchanted` (`forest_fizzy === false`) and post-finale
+  `sanctuary` (`milo_revealed === true`); `golden-hour` bathes outdoor
   adventure areas (`plaza`, `park`, `bay`, `island`, `pass`, `summit`, `trail`, `woods`, `hills`,
   `sanctuary`, `field`) once `has_lantern` is set; and `morning` washes `bedroom` and
   `kitchen` before any sticker is earned and before `has_lantern`.
@@ -1656,6 +1660,38 @@ ios/            Capacitor iOS project (from Milestone 4).
   warm alpine sunbeams, NW lily-pond water glints, and golden wildflower pollen
   motes; its soundtrack plays `"hills"` ("Clover Meadow") with `"forest"`
   ambience.
+  - **Post-Finale "Sunny Cloverhollow" Epilogue & Sanctuary Celebration
+    Festival**: once `milo_revealed` is true (never beforehand, keeping Milo
+    100% unnamed before `calmed("hooded-kid")` and `milo_revealed`), four
+    beloved Cloverhollow friends gather in `sanctuary` as `visibleWhile:
+    "milo_revealed"` NPCs (`milo` at `(840, 758)`, knot `festival_milo`;
+    `rosie` at `(975, 645)`, knot `festival_rosie`; `dad` at `(735, 635)`, knot
+    `festival_dad`; `chef` at `(1040, 742)`, knot `festival_chef`), using their
+    existing character atlases, voices, portraits, and 53 living NPC profiles.
+    Five bottom-appended Ink `VAR`s track the celebration
+    (`festival_milo_talked`, `festival_rosie_gift`, `festival_dad_talked`,
+    `festival_chef_talked`, `festival_toast_done`): Milo sketches the crew by
+    the picnic blanket (`chime-yellow`, reacting to `milo_loft_visited` and
+    `sue_joined`/`jordan_joined`); Rosie weaves clover garlands and hands Fae
+    Clover Festival Lemonade (`gift: snack 1`, `chime-green`, reacting to
+    `rosie_cottage_visited`); Dad celebrates Fae's courage and dynamic
+    `sanctuary_count()` plus Chef Mateo's fiesta tacos; Chef Bea serves warm
+    honey-clover tarts with a tart-sampling choice (and Maddie's purr).
+    `ranger_fern` keeps all pre-finale milestone rewards intact and adds a
+    post-finale Sunny Cloverhollow Festival Toast menu (`festival_toast`: sets
+    `festival_toast_done`, ensemble toast with Ranger Fern, Milo, Rosie, Dad,
+    Chef Bea, Sue, Jordan, Maddie, and Fae, awarding the Festival Star Pouch
+    `gift: coins 30`, `gift: snack 2`, `chime-red`; replayable via
+    `festival_toast_replay` without duplicate gifts). Post-finale epilogue
+    echoes enrich `sanctuary_picnic` (Milo sketching Maddie), `mom.again`,
+    `buster`, `club_chest` (celebrating `milo_loft_visited` +
+    `rosie_cottage_visited`, `summit_aurora_read`, `island_shells_solved`, and
+    `festival_toast_done`), and `journal`. Post-finale `sanctuary` shifts
+    `storyTimeOfDay` to `golden-meadow` and enables `sanctuaryFestival`
+    atmosphere sparkles. Its fixture `festival` (`content/fixtures/festival.json`)
+    starts at `sanctuary.entrance` with Maddie, Sue, Jordan, `milo_revealed`,
+    cleared `forest_fizzy`, world-expansion milestones, and all 17 valley
+    animals plus `hooded-kid` calmed.
 - Other Kids' Houses: Sue's Beach Cottage & Jordan's Mountain Cabin:
   - `sue-cottage`, "Sue's Beach Cottage", in the `bay` land, a 1200x800 painted
     isometric cutaway entered from Bubblegum Bay's NW sandy cove (`bay` trigger

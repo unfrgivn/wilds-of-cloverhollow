@@ -32,6 +32,7 @@ export type AtmosphereOptions = {
   cavernChimeShimmer?: boolean;
   musicRoomHarmony?: boolean;
   artRoomPaletteGlow?: boolean;
+  sanctuaryFestival?: boolean;
   reducedMotion?: boolean;
 };
 
@@ -101,6 +102,12 @@ export const MILO_MOTE_TINTS: readonly number[] = [0xfff6d6, 0xffe49e, 0xd4dcff]
 export const ROSIE_MOTE_TINTS: readonly number[] = [0xffd4e4, 0xfff6d8, 0xd4f2dc];
 export const CLUBHOUSE_BLOOM_TINTS: readonly number[] = [0xfff2b2, 0xf9d28c, 0xf7b2c7];
 export const PLAZA_STAR_GLOW_TINTS: readonly number[] = [0xffe89a, 0xb8e8ff];
+export const SANCTUARY_FESTIVAL_TINTS: readonly number[] = [
+  0xffe89a,
+  0xffd0dc,
+  0xb8f0d8,
+  0xfff8dc,
+];
 export const ARCADE_MOTE_TINTS: readonly number[] = [0xffa6da, 0x9cf2eb, 0xf9e29c];
 
 export const CAVERN_CRYSTALS: readonly {

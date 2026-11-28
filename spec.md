@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 240)
+Last updated: 2026-11-28 (Milestone 241)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -1255,7 +1255,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   projections in `src/render/view-projections.ts` (Milestone 167), Pixi
   permanent-sheet preloading, area loading/prefetching, and bounded current +
   previous residency eviction in `AreaAssetManager` (`src/render/view-loader.ts`,
-  Milestone 190), reusable
+  Milestone 190), and the self-contained blacklight lantern dusk tint, additive
+  spotlight, and area glow sprite pool in `LanternGlowLayer`
+  (`src/render/lantern-layer.ts`, composed into `GameView` in Milestone 241 /
+  Track E19X so every `.ts` file in `src/ui/` stays `< 600` lines and every
+  `.ts` file in `src/render/` stays `< 620` lines), reusable
   primitive/geometry JSON validators in
   `src/content/parsers.ts`, Milestone 97, arcade content & calibration parsers
   in `src/content/arcade-parsers.ts` (Milestone 110) and standalone world
@@ -5805,7 +5809,14 @@ trunks keep its two exits.
   golden `aria-pressed="true"` `"★ Home Record"`, pinning/unpinning the active
   track as the Bedroom & Clubhouse Home Record in `"cloverhollow-home-record"`
   with cozy toggle foley and a warm-gold `.journal-album-home-tag` `"★ Home"`
-  badge on the pinned track card, Milestone 227) — and a scrollable 2-column grid of
+  badge on the pinned track card, Milestone 227) — with `:root[data-touch="on"]`
+  Apple HIG / WCAG 2.5.5 `min-height: 44px` touch parity across all 6 Field
+  Treasures header launchers (`.journal-ribbons-btn`, `.journal-weather-btn`,
+  `.journal-hearts-btn`, `.journal-encore-btn`, `.journal-album-btn`,
+  `.journal-postcards-btn`) as well as `.journal-album-filter` and
+  `.journal-album-reset` even in `@media (max-height: 500px)` phone landscape
+  (`874×402`) while leaving non-touch desktop layouts unchanged (Milestone 241 /
+  Track E19X), and a scrollable 2-column grid of
   `>= 44 px` die-cut track cards across both `1280x720` and `874x402` viewports
   showing track number `01`–`35`, colored accent border, bold title, region tag,
   1-line mood note, and golden `"♪ Playing"` badge on the active track. Clicking

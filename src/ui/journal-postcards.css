@@ -353,6 +353,10 @@
   .journal-lightbox-actions { flex-wrap: wrap; }
 }
 
+:root[data-touch="on"] .journal-postcards-btn {
+  min-height: 44px;
+}
+
 :root[data-touch="on"] .journal-lightbox-back,
 :root[data-touch="on"] .journal-lightbox-prev,
 :root[data-touch="on"] .journal-lightbox-next,

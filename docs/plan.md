@@ -10156,6 +10156,33 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
 - Gates: `just check` (305 unit files / 2,153 tests, all 77 sims + all sim
   scripts, 23 QA packs, purity, lint), `just build` (`index` `< 365 kB`),
   20/20 Chromium & WebKit room/album e2e, and 99/99 Chromium `ui-gallery` tests.
+
+## Milestone 241: Universal `>= 44 px` iOS Touch Parity Across All 6 Field Treasures Launchers & Soundtrack Album Toolbar + Lean `src/render/lantern-layer.ts` Split (Elevation Track E19X) **Status:** ✅ Completed (2026-11-28)
+- Universal `>= 44 px` iOS Touch Parity (`src/ui/journal-{ribbons,weather,hearts,encore,jukebox,postcards}.css`):
+  - Adds `:root[data-touch="on"]` `min-height: 44px;` rules (ordered after
+    `@media (max-height: 500px)` so they hold in `874×402` phone landscape while
+    leaving non-touch desktop layouts unchanged) across all 6 Field Treasures
+    header launcher pills (`.journal-ribbons-btn`, `.journal-weather-btn`,
+    `.journal-hearts-btn`, `.journal-encore-btn`, `.journal-album-btn`,
+    `.journal-postcards-btn`) and Soundtrack Album's `.journal-album-filter` and
+    `.journal-album-reset` toolbar pills alongside existing `.journal-album-shuffle`
+    and `.journal-album-home-btn`.
+- Modular `src/render/lantern-layer.ts` Extraction (`src/render/view.ts`
+  `653 -> 566` lines, `src/render/lantern-layer.ts` `139` lines):
+  - Extracts the self-contained blacklight lantern dusk tint, additive spotlight,
+    and area glow sprite layer (`LanternGlowLayer`) into
+    `src/render/lantern-layer.ts` and composes it inside `GameView`
+    (`src/render/view.ts`), keeping every `.ts` file in `src/ui/` `< 600` lines
+    and every `.ts` file in `src/render/` `< 620` lines with zero visual or
+    behavioral diffs.
+- Evidence: `tests/unit/milestone-241.test.ts` and
+  `tests/e2e/milestone-241.spec.ts` (`@smoke`, Chromium & WebKit).
+- Gates: `just check` (all unit files + 77 recorded & 7 headless sims with zero
+  hash shifts, 23 QA packs, purity, lint), `just build` (largest non-vendor
+  production chunk `index` `< 365 kB`, hook leak + runtime story + harness
+  checks green), Chromium & WebKit (`milestone-241`, `240`, `238`, `236`, `228`,
+  `214`), 2/2 Chromium (`lantern`, `0` snapshot diffs), and 12/12 Chromium &
+  WebKit `ui-gallery` `journal` (`0` snapshot diffs).
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

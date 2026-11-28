@@ -470,8 +470,8 @@
   .journal-album-mood { font-size: 8.6px; }
 }
 
+:root[data-touch="on"] .journal-album-btn,
+:root[data-touch="on"] .journal-album-filter,
+:root[data-touch="on"] .journal-album-reset { min-height: 44px; }
 :root[data-touch="on"] .journal-album-shuffle,
-:root[data-touch="on"] .journal-album-home-btn {
-  min-height: 44px;
-  padding: 4px 12px;
-}
+:root[data-touch="on"] .journal-album-home-btn { min-height: 44px; padding: 4px 12px; }

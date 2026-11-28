@@ -498,3 +498,7 @@
     font-size: 9.5px;
   }
 }
+
+:root[data-touch="on"] .journal-ribbons-btn {
+  min-height: 44px;
+}

@@ -1,9 +1,6 @@
+import { Container, Graphics, Text, type Renderer } from "pixi.js";
 import {
-  Assets, Container, Graphics, Sprite, type Spritesheet, Text, type Renderer,
-} from "pixi.js";
-import {
-  activeBlessingEffects, creditEntries, type Area, type NavField, type Point, type State,
-  type World,
+  creditEntries, type Area, type NavField, type Point, type State, type World,
 } from "../core";
 import { weatherForArea } from "../core/weather";
 import type { AreaView } from "./area-view";
@@ -32,14 +29,13 @@ import { NavOverlayController } from "./nav-overlay";
 import { OverworldEffectsController } from "./overworld-effects";
 import type { NavPathSnapshot } from "../shell/nav-steer";
 import type { NpcChatterView } from "../ui/npc-chatter";
-import {
-  areaEntityAtlases, computeGlowTransform, INDOOR_AREAS, type EntityAtlas,
-} from "./overworld-render";
+import { LanternGlowLayer } from "./lantern-layer";
+import { areaEntityAtlases, INDOOR_AREAS, type EntityAtlas } from "./overworld-render";
 import { AreaAssetManager } from "./view-loader";
 import {
-  computeDialogueRenderInfo, computeLanternVisuals, computeNoticeMarkViews,
-  computeNpcChatterScreenAnchor, computePromptScreenView, computeStoryAtmosphereOptions,
-  computeViewportRect, resolveActivePetReaction, resolveActiveRestSpot,
+  computeDialogueRenderInfo, computeNoticeMarkViews, computeNpcChatterScreenAnchor,
+  computePromptScreenView, computeStoryAtmosphereOptions, computeViewportRect,
+  resolveActivePetReaction, resolveActiveRestSpot,
   type GameViewRenderInfo, type NoticeMarkView, type PromptScreenView, type ViewportRect,
 } from "./view-projections";
 
@@ -74,12 +70,8 @@ export class GameView {
   private readonly paperGrain: PaperGrainOverlay;
   private viewportRect: ViewportRect = { x: 0, y: 0, width: 0, height: 0 };
   private photoMode = false;
-  private readonly lanternLayer = new Container();
-  private readonly lanternTint = new Graphics();
-  private readonly lanternWorld = new Container();
-  private readonly lanternSpotlight: Sprite;
+  private readonly lantern: LanternGlowLayer;
   private readonly emissiveLayer = new Container();
-  private readonly glowLayer = new Container();
   private readonly depth = new Container();
   private readonly ambientLayer = new Container();
   private readonly viewportMask = new Graphics();
@@ -94,11 +86,7 @@ export class GameView {
   private staticPaper = 0;
   private staticFadeColor = 0xf8edcf;
   private staticFadeFull = false;
-  private lanternBlend = 0;
-  private lanternTick: number | undefined;
   private readonly assets: AreaAssetManager;
-  private glowSprites: { id: string; sprite: Sprite }[] = [];
-  private drawnGlows: string[] = [];
   private petReaction: { id: string; startTick: number } | null = null;
   private restingSpot: { spot: RestSpot; startTick: number } | null = null;
   private previewDialogueTags: string[] | null = null;
@@ -142,22 +130,12 @@ export class GameView {
     this.microDelights = new MicroDelightsRenderer(this.vfx, this.depth, this.shadowLayer);
     this.npcLife = new NpcLifeController(this.world, this.vfx);
 
-    this.lanternSpotlight = new Sprite(this.vfx.softGlow);
-    this.lanternSpotlight.label = "lantern:spotlight";
-    this.lanternSpotlight.anchor.set(0.5);
-    this.lanternSpotlight.tint = 0xb98eff;
-    this.lanternSpotlight.blendMode = "add";
-    this.lanternSpotlight.width = 540;
-    this.lanternSpotlight.height = 480;
-    this.lanternWorld.addChild(this.lanternSpotlight, this.effects.lanternMoteLayer);
-    this.lanternLayer.label = "lantern";
-    this.lanternLayer.visible = false;
-    this.lanternLayer.addChild(this.lanternTint, this.lanternWorld);
+    this.lantern = new LanternGlowLayer(this.world, this.vfx, this.effects.lanternMoteLayer);
 
     this.assets = new AreaAssetManager(this.world);
     this.viewport.addChild(
-      this.scene, this.effects.timeOfDayLayer, this.lanternLayer,
-      this.emissiveLayer, this.glowLayer,
+      this.scene, this.effects.timeOfDayLayer, this.lantern.lanternLayer,
+      this.emissiveLayer, this.lantern.glowLayer,
     );
     this.viewport.mask = this.viewportMask;
     this.root.addChild(
@@ -195,38 +173,18 @@ export class GameView {
     this.puzzles.clear();
     const next = await this.assets.loadArea(area, this.depth, previous);
     this.areaView = next;
-    for (const entry of this.glowSprites) entry.sprite.destroy();
-    this.glowSprites = area.glows.map((glow) => {
-      const sprite = new Sprite();
-      sprite.label = `glow:${glow.id}`;
-      sprite.anchor.set(0.5);
-      sprite.scale.set(0.5);
-      sprite.visible = false;
-      sprite.blendMode = "add";
-      this.glowLayer.addChild(sprite);
-      return { id: glow.id, sprite };
-    });
+    this.lantern.mountArea(area);
     this.entities.mountAmbient(area);
     this.scene.addChildAt(next.ground, 0);
     this.paperGrain.mountArea(area);
     this.entities.mountNpcs(area);
     this.puzzles.mountArea(area);
-    this.cameraDirector.reset();
-    this.lanternTick = undefined;
     this.staticWidth = 0;
-    this.effects.clearFootsteps();
-    this.effects.clearGrassTufts();
+    this.resetCamera();
     this.effects.clearStarGemGlints();
-    this.effects.clearEmotes();
-    this.restoration.clear();
-    this.microDelights.reset();
-    this.npcLife.clear();
     this.navOverlay.clearArea();
     this.navField = null;
     this.navSnapshot = null;
-    this.previewDialogueTags = null;
-    this.entities.clearPaperFlips();
-    this.clearCompanionActions();
     this.effects.hideClubhouseDisplay();
   }
 
@@ -294,16 +252,21 @@ export class GameView {
   }
   isPhotoMode(): boolean { return this.photoMode; }
 
-  private syncFadeGraphics(width: number, height: number, paper: number, dark: boolean): void {
-    const color = dark ? 0x0f0b18 : paper;
-    if (width === this.staticWidth && height === this.staticHeight &&
-        color === this.staticFadeColor && dark === this.staticFadeFull) return;
+  private fillFade(width: number, height: number, color: number, dark: boolean): void {
     if (dark) this.fade.clear().rect(0, 0, width, height).fill(color);
     else {
       const { x, y, width: viewW, height: viewH } = this.viewportRect;
       this.fade.clear().rect(x, y, viewW, viewH).fill(color);
     }
-    this.staticFadeColor = color; this.staticFadeFull = dark;
+    this.staticFadeColor = color;
+    this.staticFadeFull = dark;
+  }
+
+  private syncFadeGraphics(width: number, height: number, paper: number, dark: boolean): void {
+    const color = dark ? 0x0f0b18 : paper;
+    if (width === this.staticWidth && height === this.staticHeight &&
+        color === this.staticFadeColor && dark === this.staticFadeFull) return;
+    this.fillFade(width, height, color, dark);
   }
 
   private drawStatic(width: number, height: number, paper: number, dark: boolean): void {
@@ -313,19 +276,12 @@ export class GameView {
     this.background.clear().rect(0, 0, width, height).fill(0xf8edcf);
     this.paper.clear().rect(rect.x, rect.y, rect.width, rect.height).fill(paper);
     this.viewportMask.clear().rect(rect.x, rect.y, rect.width, rect.height).fill(0xffffff);
-    this.lanternTint.clear().rect(rect.x, rect.y, rect.width, rect.height).fill(0x140a2e);
-    const fadeColor = dark ? 0x0f0b18 : paper;
-    if (dark) {
-      this.fade.clear().rect(0, 0, width, height).fill(fadeColor);
-    } else {
-      this.fade.clear().rect(rect.x, rect.y, rect.width, rect.height).fill(fadeColor);
-    }
+    this.lantern.drawBackdrop(rect);
+    this.fillFade(width, height, dark ? 0x0f0b18 : paper, dark);
     this.fade.alpha = 0;
     this.staticWidth = width;
     this.staticHeight = height;
     this.staticPaper = paper;
-    this.staticFadeColor = fadeColor;
-    this.staticFadeFull = dark;
   }
 
   render(
@@ -372,10 +328,11 @@ export class GameView {
     this.microDelights.setScenicZoom(requestedScenicZoom < 1 ? frame.zoom : 1);
     const { canInterpolate, alpha, playerPos, zoomScale, zoomOffsetX, zoomOffsetY } = frame;
     const prev = canInterpolate ? previousState : undefined;
-    for (const layer of [this.scene, this.lanternWorld, this.emissiveLayer, this.glowLayer]) {
+    for (const layer of [this.scene, this.emissiveLayer]) {
       layer.scale.set(zoomScale);
       layer.position.set(zoomOffsetX, zoomOffsetY);
     }
+    this.lantern.syncTransform(zoomOffsetX, zoomOffsetY, zoomScale);
     this.atmosphere.over.position.set(frame.parallaxOver.x, frame.parallaxOver.y);
     this.ambientLayer.position.set(frame.parallaxAmbient.x, frame.parallaxAmbient.y);
     const shadowAlpha = indoor ? 0.24 : 0.3;
@@ -411,7 +368,7 @@ export class GameView {
       state, area, playerPos, prev, alpha, activePet, activeRest, npcLife, reducedMotion,
     );
     this.effects.renderTimeOfDay(state, this.viewportRect);
-    this.renderGlows(state, playerPos, paused, reducedMotion);
+    this.lantern.update(state, loaded.area, playerPos, this.effects, paused, reducedMotion);
     this.effects.updateStarGemGlints(state, reducedMotion);
     this.restoration.update(this.world, state, { paused, reducedMotion });
     this.puzzles.update(this.world, area, state, {
@@ -429,7 +386,7 @@ export class GameView {
       weatherInfo.kind === "clear" ? baseAtmos : { ...baseAtmos, weather: weatherInfo.kind };
     this.atmosphere.update(
       area.id, area.width, area.height, state.tick,
-      state.battle === null && state.arcade === null, this.lanternBlend,
+      state.battle === null && state.arcade === null, this.lantern.blend,
       atmosOptions,
     );
     loaded.update(this.world, state.ink, state.player, state.tick, this.entities.figures());
@@ -472,49 +429,6 @@ export class GameView {
     }
     const fade = fadeAlpha(state.transition, this.world.tunables.doorFadeTicks);
     this.fade.alpha = fade;
-  }
-
-  private renderGlows(
-    state: State,
-    playerPos: Point,
-    snapLantern = false,
-    reducedMotion = false,
-  ): void {
-    const area = this.areaView?.area;
-    const sheet = Assets.get<Spritesheet>("glow-sheet");
-    const lantern = computeLanternVisuals(
-      state, playerPos, this.lanternBlend, this.lanternTick, snapLantern, reducedMotion,
-    );
-    this.lanternBlend = lantern.blend;
-    this.lanternTick = state.tick;
-    this.lanternLayer.visible = lantern.showDusk;
-    if (lantern.showDusk) {
-      this.lanternTint.alpha = lantern.tintAlpha;
-      this.lanternSpotlight.position.set(lantern.centerX, lantern.centerY);
-      this.lanternSpotlight.alpha = lantern.spotlightAlpha;
-      this.effects.updateLanternMotes(
-        lantern.centerX, lantern.centerY, state.tick, lantern.blend, reducedMotion,
-      );
-    }
-
-    const glowBonus = activeBlessingEffects(this.world, state).glowVisibilityBonus;
-    const drawn: string[] = [];
-    this.glowSprites.forEach(({ id, sprite }, index) => {
-      const glow = area?.glows.find((item) => item.id === id);
-      const texture = glow === undefined ? undefined : sheet?.textures[glow.frame];
-      sprite.visible = lantern.on && glow !== undefined && texture !== undefined;
-      if (texture !== undefined && glow !== undefined) {
-        sprite.texture = texture;
-        sprite.position.set(glow.point.x, glow.point.y);
-        const transform = computeGlowTransform(
-          glow, state.player, state.tick, index, this.lanternBlend, reducedMotion, glowBonus,
-        );
-        sprite.scale.set(transform.scaleX, transform.scaleY);
-        sprite.alpha = transform.alpha;
-        if (sprite.visible) drawn.push(id);
-      }
-    });
-    this.drawnGlows = drawn;
   }
 
   /** Fae's current feet anchor in CSS pixels, or null before the first render. */
@@ -629,10 +543,7 @@ export class GameView {
       ambient: this.entities.ambient,
       canopies: this.areaView?.canopyAlphas ?? [],
       props: this.areaView?.propInfo ?? [],
-      lantern: {
-        on: state.lantern && state.battle === null,
-        glows: this.drawnGlows.slice(),
-      },
+      lantern: this.lantern.info(state),
       marks: this.noticeMarks(state),
       clubhouseDisplay: this.effects.clubhouseDisplayCount,
       pinnedPostcard: this.effects.pinnedPostcard,

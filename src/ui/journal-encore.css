@@ -366,3 +366,7 @@
   .journal-encore-sub { font-size: 8.2px; }
   .journal-encore-footer { padding: 3px 8px; font-size: 9.2px; }
 }
+
+:root[data-touch="on"] .journal-encore-btn {
+  min-height: 44px;
+}

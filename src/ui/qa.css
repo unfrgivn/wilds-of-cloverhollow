@@ -12,10 +12,13 @@
 /* Dev/harness-only touch trigger shown in live play before a QA pack or Sandbox activates. */
 .qa-touch-trigger { display: none; position: fixed; z-index: 20; top: max(12px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); align-items: center; justify-content: center; padding: 5px 14px; border: 2px solid #6b4937; border-radius: 999px; background: rgb(255 246 219 / 92%); color: #5d3e30; font: inherit; font-size: 13px; font-weight: 800; letter-spacing: 0.04em; box-shadow: 0 3px 0 rgb(107 73 55 / 20%); cursor: pointer; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
 :root[data-touch="on"] .qa-touch-trigger:not([hidden]) { display: inline-flex; }
-:root[data-photo="on"] .qa-touch-trigger,
-:root[data-credits="open"] .qa-touch-trigger,
-:root[data-title="open"] .qa-touch-trigger,
-:root[data-qa-console="open"] .qa-touch-trigger { display: none; }
+:root[data-photo="on"] .qa-touch-trigger:not([hidden]),
+:root[data-credits="open"] .qa-touch-trigger:not([hidden]),
+:root[data-title="open"] .qa-touch-trigger:not([hidden]),
+:root[data-battle="open"] .qa-touch-trigger:not([hidden]),
+:root[data-journal="open"] .qa-touch-trigger:not([hidden]),
+:root[data-arcade="open"] .qa-touch-trigger:not([hidden]),
+:root[data-qa-console="open"] .qa-touch-trigger:not([hidden]) { display: none; }
 
 /* The QA console (spec 11): a dev-only tabbed storybook GUI + command line over the frozen game. */
 .qa-console { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 14px; background: rgb(248 237 207 / 72%); box-sizing: border-box; }

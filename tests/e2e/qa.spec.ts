@@ -444,9 +444,16 @@ test("touch QA trigger opens console during live gameplay on phone", async ({ br
   // Hidden on title screen.
   await expect(page.locator(".qa-touch-trigger")).toBeHidden();
 
-  // Visible in live gameplay before any QA pack activates.
+  // Visible in live gameplay before any QA pack activates, hidden during Journal & battles.
   await resetPaused(page, "new-game");
   const trigger = page.locator(".qa-touch-trigger");
+  await expect(trigger).toBeVisible();
+  await page.locator(".touch-menu").click();
+  await step(page, 1);
+  await expect(page.locator("html")).toHaveAttribute("data-journal", "open");
+  await expect(trigger).toBeHidden();
+  await page.locator(".journal-close").click();
+  await step(page, 1);
   await expect(trigger).toBeVisible();
   await trigger.click();
   await expect(page.locator(".qa-console")).toBeVisible();

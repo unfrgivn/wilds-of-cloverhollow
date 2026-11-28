@@ -7277,6 +7277,31 @@ the old trail, the owl, and the clubhouse claim.
   Chromium & WebKit targeted + UI gallery baseline e2e tests (`0` snapshot
   diffs on all 99 `ui-gallery` baselines).
 
+## Milestone 170: QA Touch Trigger Overlay Specificity Fix & Full Chromium/WebKit Visual Baseline Sync **Status:** ✅ Completed (2026-11-27)
+- Fixes a real phone UI overlap bug where `.qa-touch-trigger` (`QA` pill at top
+  center) stayed visible over battles, the Journal, and minigames on touch
+  viewports (`874×402`, `667×375`) because `:root[data-touch="on"]
+  .qa-touch-trigger:not([hidden])` out-ranked lower-specificity hide selectors,
+  and syncs the `vision`-audited PR `#10`/`#12` Living NPC visual baselines so
+  full Chromium & WebKit e2e returns to 100% green CI — zero `src/core` changes
+  and zero replay hash drift across all 74 sims.
+- QA touch trigger overlay guard (`src/ui/qa.css`, `tests/e2e/qa.spec.ts`):
+  - Added `:not([hidden])` specificity parity and added `data-battle="open"`,
+    `data-journal="open"`, and `data-arcade="open"` alongside `data-photo="on"`,
+    `data-credits="open"`, `data-title="open"`, and `data-qa-console="open"` so
+    `.qa-touch-trigger` hides cleanly over all 7 overlays (instantly restoring 7
+    phone battle baselines pixel-identically with zero snapshot changes!).
+  - Added touch Journal open/close regression checks in `tests/e2e/qa.spec.ts`.
+- Visual baseline sync:
+  - Audited refreshed PR `#12` Living NPC scale/dispersion & free-overworld
+    touch baselines via `vision` (`plaza`, `kit-east-hall-behind`,
+    `encounter-alert`, `journal-options-1280`, `touch-flute-button-874`,
+    `touch-lantern-on-874`, `bunny-following-1280`, `bakery-choice-1280`,
+    `raccoon-waiting`) and synced all 29 Chromium & WebKit snapshots cleanly.
+- Evidence: `tests/unit/milestone-170.test.ts` and updated `tests/e2e/qa.spec.ts`.
+- Gates: `just check`, `just build` (`< 400 kB` every non-vendor chunk), and
+  100/100 Chromium & WebKit e2e tests across all 19 touched/guarded specs.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

@@ -1,0 +1,129 @@
+{
+  "id": "dawn-wakeup",
+  "area": "bedroom",
+  "trigger": {
+    "kind": "area-enter",
+    "area": "bedroom",
+    "forbidsVariable": "awake",
+    "once": true
+  },
+  "steps": [
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "cameraPan",
+          "to": {
+            "x": 590,
+            "y": 330
+          },
+          "ticks": 36,
+          "zoom": 1.07
+        },
+        {
+          "type": "sfx",
+          "cue": "chime-yellow"
+        },
+        {
+          "type": "face",
+          "actor": "fae",
+          "direction": "up"
+        },
+        {
+          "type": "emote",
+          "actor": "fae",
+          "kind": "sparkle",
+          "ticks": 34
+        },
+        {
+          "type": "pose",
+          "actor": "fae",
+          "pose": "hop",
+          "ticks": 18,
+          "effect": "sparkle-burst"
+        }
+      ]
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "moveActor",
+          "actor": "party:0",
+          "to": {
+            "x": 590,
+            "y": 425
+          },
+          "speed": 2.8,
+          "facing": "left"
+        },
+        {
+          "type": "pose",
+          "actor": "party:0",
+          "pose": "hop",
+          "ticks": 18
+        },
+        {
+          "type": "emote",
+          "actor": "party:0",
+          "kind": "note",
+          "ticks": 28
+        },
+        {
+          "type": "sfx",
+          "cue": "chime-green"
+        }
+      ]
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "face",
+          "actor": "fae",
+          "direction": "right"
+        },
+        {
+          "type": "pose",
+          "actor": "fae",
+          "pose": "cheer",
+          "ticks": 22
+        },
+        {
+          "type": "emote",
+          "actor": "fae",
+          "kind": "heart",
+          "ticks": 26
+        },
+        {
+          "type": "emote",
+          "actor": "party:0",
+          "kind": "heart",
+          "ticks": 26
+        }
+      ]
+    },
+    {
+      "type": "setFlag",
+      "flag": "dawn_wakeup_seen",
+      "value": true,
+      "scope": "cutscene"
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "cameraPan",
+          "to": "fae",
+          "ticks": 28,
+          "zoom": 1
+        },
+        {
+          "type": "face",
+          "actor": "fae",
+          "direction": "down"
+        }
+      ]
+    }
+  ]
+}

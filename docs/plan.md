@@ -7480,11 +7480,13 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   `{pause:N}`), and mood-tuned expressive voice blips. Hash-safe, save `v10`.
 
 ### Phase 2: Cutscenes, Tactile Spatial Puzzles & Tactical Battles (`Save v11` Wave)
-- **Track E4 (Deterministic Cutscene & Stage Choreography Engine):** Pure 60 Hz
-  `src/core/cutscene.ts` runner (`moveActor`, `face`, `pose`, `emote`, `wait`,
-  `cameraPan`, `propState`, `sfx`, `sayKnot`, `parallel`) plus 4 choreographed
-  story cutscenes (Dawn Plaza opening + Maddie wake-up, Plaza Purple Hood
-  sighting, Sue Bay intro, Jordan Pass intro).
+- **Track E4 (Deterministic Cutscene & Stage Choreography Engine):** ✅ Completed
+  (Milestone 186, 2026-11-27). Pure 60 Hz `src/core/cutscene.ts` runner
+  (`moveActor`, `face`, `pose`, `emote`, `wait`, `cameraPan`, `propState`,
+  `sfx`, `sayKnot`, `parallel`, `setFlag`, `spawnTempActor`, `despawnTempActor`)
+  with hold-cancel fast-forward, transient save `v10` safety, storybook 24 px
+  cinema letterbox rendering, and 4 choreographed story cutscenes (`dawn-wakeup`,
+  `plaza-hood-sighting`, `sue-bay-intro`, `jordan-pass-intro`).
 - **Track E5 (Real Overworld Tools, Cozy Dash & Spatial Puzzle Engine, Art Wave B):**
   Cozy Dash/Skip; physical overworld Rainbow Lasso (grapple/pull/swing),
   Blacklight Lantern lens (invisible stepping stones, prism beams, hidden
@@ -8080,6 +8082,66 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   `ui-gallery`, `battle-scene`, `battle`, and `battle-depth`.
 - **Gates:** `just check`, `just build` (`< 390 kB` every non-vendor JS chunk),
   and Chromium/WebKit Playwright e2e verification.
+
+## Milestone 186: Deterministic Cutscene & Stage Choreography Engine (Elevation Track E4) **Status:** ✅ Completed (2026-11-27)
+- Introduces a 100% pure, deterministic 60 Hz Cutscene & Stage Choreography
+  Engine (`src/core/cutscene.ts`) plus strict content validation
+  (`src/content/cutscene-parsers.ts`), storybook cinema rendering
+  (`src/render/cutscene-render.ts`), and 4 iconic choreographed story scenes
+  while keeping `SaveData.version = 10` and all 74 existing sims + 23 QA packs
+  bit-identical.
+- **Pure Cutscene Engine (`src/core/cutscene.ts`, `src/core/types.ts`,
+  `src/core/sim.ts`, `src/core/sound.ts`, `src/core/save.ts`, `src/core/party.ts`,
+  `src/core/journal.ts`):**
+  - Declarative JSON scripts supporting `moveActor` (linear `+ - * / Math.sqrt`
+    waypoint motion for `fae`, `party:<index|id>`, `npc:<id>`, and `temp:<id>`),
+    `face`, `pose` (8 expressive poses with optional particle `effect`),
+    `emote` (all 8 emote kinds), `wait`, `cameraPan` (fixed point, `"fae"`, or
+    `"actor:<ref>"` with linear zoom), `sfx` (projected via `soundCues`),
+    `sayKnot` (clean handoff to Ink dialogue with exact-tick resume on close),
+    `parallel` (recursive lockstep child advancement), `setFlag` (`ink` or
+    `cutscene` scope), `spawnTempActor`, `despawnTempActor`, and `propState`.
+  - Deterministic hold-cancel skip (`CUTSCENE_SKIP_HOLD_TICKS = 30`) that
+    fast-forwards remaining steps and pauses safely at any unplayed `sayKnot`
+    recruitment beat; pure `cutsceneView(state)` renderer projection.
+  - Save-safe & hash-safe: optional `state.cutscene` is omitted when inactive
+    and refused by `parseSave`; optional `state.cutscenesSeen` round-trips
+    cleanly at `SaveData.version = 10`; `autosaveNeeded` suppresses mid-cutscene
+    writes and triggers on completion; automatic triggers (`area-enter`,
+    `after-knot`) are opt-in via `StepOptions.cutscenes = true`.
+- **4 Iconic Choreographed Cutscenes (`content/cutscenes/*.json`,
+  `src/content/cutscene-parsers.ts`, `src/content/load.ts`):**
+  - `dawn-wakeup.json`: Bedroom morning focus toward the window, Maddie hopping
+    over beside Fae, and shared cheerful heart emotes.
+  - `plaza-hood-sighting.json`: Fleeting `hooded-kid` temp actor darting past
+    the Plaza fountain, tossing purple fizz sparkles, glancing back with `!`,
+    and vanishing in a `purple-puff` swirl.
+  - `sue-bay-intro.json`: Sue spotting Fae & Maddie from the Bubblegum Bay dock,
+    running over to greet them, handing off cleanly to `sayKnot: "sue"` to join
+    the party, and celebrating together.
+  - `jordan-pass-intro.json`: Jordan hopping in from the Pinecone Pass snowbank
+    with pinecones, handing off to `sayKnot: "jordan"` to join the party, and
+    celebrating together.
+- **Renderer & Shell Integration (`src/render/cutscene-render.ts`,
+  `src/render/camera.ts`, `src/render/view-projections.ts`,
+  `src/render/entity-layer.ts`, `src/render/view.ts`,
+  `src/shell/input-shortcuts.ts`, `src/dev/hook.ts`, `src/main.ts`):**
+  - Renders y-sorted temporary cutscene actors with contact shadows, animated
+    NPC walk/pose overrides, watercolor burst particles, emote bubbles, and
+    opaque 24 px warm paper-edged cinema letterbox bars with a skip-hold meter
+    (respecting Reduced Motion with instant bar snap and zoom locked to `1`),
+    preloading area cutscene sprite atlases inside the existing residency window.
+  - Keeps `src/main.ts` under 950 lines and `src/render/view.ts` under 760
+    lines, with zero dev hook leakage into production builds.
+- **Evidence:** `tests/unit/cutscene.test.ts` (36 real mock-free unit tests),
+  `tools/sim/cutscene-plaza-hood.ts` (headless Bun sim verifying walkable
+  invariants and hash `7814d147`), `tests/e2e/cutscene.spec.ts` (4 Playwright
+  Chromium tests with real keyboard inputs and exact V8/Bun hash parity), and
+  4 `vision`-verified mid-cutscene review JPEGs (`art/review/e4-dawn-wakeup.jpg`,
+  `art/review/e4-plaza-hood-sighting.jpg`, `art/review/e4-sue-bay-intro.jpg`,
+  `art/review/e4-jordan-pass-intro.jpg`).
+- **Gates:** `just check`, `just build` (`< 500 kB` every non-vendor chunk),
+  `bun tools/sim/cutscene-plaza-hood.ts`, and targeted + `@smoke` Chromium e2e.
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.

@@ -1,0 +1,189 @@
+{
+  "id": "plaza-hood-sighting",
+  "area": "plaza",
+  "trigger": {
+    "kind": "after-knot",
+    "area": "plaza",
+    "knot": "notice_board",
+    "requiresVariable": "read_notice",
+    "once": true
+  },
+  "steps": [
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "sfx",
+          "cue": "lantern-on"
+        },
+        {
+          "type": "spawnTempActor",
+          "id": "hooded-kid",
+          "sprite": "hooded-kid",
+          "at": {
+            "x": 640,
+            "y": 420
+          },
+          "facing": "right",
+          "scale": 0.48,
+          "effect": "purple-fizz"
+        }
+      ]
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "cameraPan",
+          "to": {
+            "x": 885,
+            "y": 500
+          },
+          "ticks": 32,
+          "zoom": 1.06
+        },
+        {
+          "type": "moveActor",
+          "actor": "temp:hooded-kid",
+          "to": {
+            "x": 885,
+            "y": 418
+          },
+          "speed": 5.5,
+          "facing": "right"
+        },
+        {
+          "type": "face",
+          "actor": "fae",
+          "direction": "up"
+        },
+        {
+          "type": "face",
+          "actor": "party:0",
+          "direction": "up"
+        }
+      ]
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "pose",
+          "actor": "temp:hooded-kid",
+          "pose": "toss",
+          "ticks": 22,
+          "effect": "purple-fizz"
+        },
+        {
+          "type": "emote",
+          "actor": "temp:hooded-kid",
+          "kind": "sparkle",
+          "ticks": 26
+        },
+        {
+          "type": "sfx",
+          "cue": "lantern-on"
+        }
+      ]
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "moveActor",
+          "actor": "temp:hooded-kid",
+          "to": {
+            "x": 1045,
+            "y": 435
+          },
+          "speed": 5.8,
+          "facing": "right"
+        },
+        {
+          "type": "cameraPan",
+          "to": "actor:temp:hooded-kid",
+          "ticks": 28,
+          "zoom": 1.07
+        },
+        {
+          "type": "emote",
+          "actor": "fae",
+          "kind": "exclaim",
+          "ticks": 30
+        },
+        {
+          "type": "emote",
+          "actor": "party:0",
+          "kind": "question",
+          "ticks": 28
+        }
+      ]
+    },
+    {
+      "type": "face",
+      "actor": "temp:hooded-kid",
+      "direction": "left"
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "pose",
+          "actor": "temp:hooded-kid",
+          "pose": "taunt",
+          "ticks": 26
+        },
+        {
+          "type": "emote",
+          "actor": "temp:hooded-kid",
+          "kind": "exclaim",
+          "ticks": 28
+        },
+        {
+          "type": "sfx",
+          "cue": "flute-blue"
+        }
+      ]
+    },
+    {
+      "type": "moveActor",
+      "actor": "temp:hooded-kid",
+      "to": {
+        "x": 1185,
+        "y": 500
+      },
+      "speed": 7.5,
+      "facing": "right"
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "despawnTempActor",
+          "id": "hooded-kid",
+          "effect": "purple-puff"
+        },
+        {
+          "type": "sfx",
+          "cue": "lantern-off"
+        }
+      ]
+    },
+    {
+      "type": "wait",
+      "ticks": 26
+    },
+    {
+      "type": "setFlag",
+      "flag": "plaza_hood_spotted",
+      "value": true,
+      "scope": "cutscene"
+    },
+    {
+      "type": "cameraPan",
+      "to": "fae",
+      "ticks": 30,
+      "zoom": 1
+    }
+  ]
+}

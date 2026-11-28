@@ -67,48 +67,22 @@ import {
 import { levelUpDelta } from "./levels";
 import { npcLiveFootprint, npcLivePoint } from "./npc-stroll";
 import { openArcade, stepArcade, isArcadeGameId, type ArcadeGameId } from "./arcade";
+import {
+  findTriggeredCutscene, resumeCutsceneAfterDialogue, startCutscene, stepCutscene,
+} from "./cutscene";
+export {
+  CUTSCENE_SKIP_HOLD_TICKS, cutsceneSpriteIds, cutsceneView, findTriggeredCutscene,
+  isCutsceneSeen, startCutscene, stepCutscene,
+} from "./cutscene";
 
 export {
-  BOSS_SET_PIECES,
-  CALM_HOOK,
-  activeBattleActor,
-  addTreat,
-  battleCommands,
-  battleFoe,
-  battleParty,
-  battleTurnRoster,
-  battleView,
-  bossesCalmedCount,
-  calmedFact,
-  closestPointOnPolygon,
-  consumeTreat,
-  distanceToPolygon,
-  faeBox,
-  hiddenFraction,
-  inkFacts,
-  npcVisible,
-  orderPartyContent,
-  orderPartyIds,
-  orderPartyMembers,
-  partyCommand,
-  partyLeader,
-  partySlots,
-  pointInPolygon,
-  presentCritters,
-  purchaseTreat,
-  resolveCollision,
-  resolveMove,
-  revealCharacters,
-  rollWild,
-  startBattle,
-  stepBattle,
-  stepParty,
-  stepWild,
-  syncParty,
-  totalTreatCount,
-  touchingCritter,
-  visibleFollowerSlot,
-  type TextSpeed,
+  BOSS_SET_PIECES, CALM_HOOK, activeBattleActor, addTreat, battleCommands, battleFoe, battleParty,
+  battleTurnRoster, battleView, bossesCalmedCount, calmedFact, closestPointOnPolygon, consumeTreat,
+  distanceToPolygon, faeBox, hiddenFraction, inkFacts, npcVisible, orderPartyContent,
+  orderPartyIds, orderPartyMembers, partyCommand, partyLeader, partySlots, pointInPolygon,
+  presentCritters, purchaseTreat, resolveCollision, resolveMove, revealCharacters, rollWild,
+  startBattle, stepBattle, stepParty, stepWild, syncParty, totalTreatCount, touchingCritter,
+  visibleFollowerSlot, type TextSpeed,
 };
 
 // No `lantern`: it's optional, present only while pressed, so a blank frame,
@@ -209,7 +183,12 @@ export function targetInteractable(
   | Area["glows"][number]
   | { id: string; knot: string; point: Point; prompt: Npc["prompt"] }
   | undefined {
-  if (state.transition !== null || state.dialogue !== null) return undefined;
+  if (
+    state.transition !== null ||
+    state.dialogue !== null ||
+    state.cutscene !== undefined
+  )
+    return undefined;
   const area = world.areas[state.area];
   if (area === undefined) return undefined;
   const facing = {
@@ -285,6 +264,7 @@ export function npcFacing(state: State, npc: Npc): Direction {
 export type StepOptions = {
   gentleTiming?: boolean;
   textSpeed?: TextSpeed;
+  cutscenes?: boolean;
 };
 
 // A line tagged `travel: <area>.<spawn>` sends Fae there when the
@@ -403,6 +383,20 @@ function openTalk(world: World, state: State, input: ActionFrame, knot: string):
 
 export function startDialogue(world: World, state: State, knot: string): State {
   return openTalk(world, state, blankInput(), knot);
+}
+
+function openTalkForCutscene(world: World, state: State, knot: string): State {
+  const result = runInk(world.story, state.ink, { type: "start", knot }, inkFacts(world, state));
+  if (result.line === null && result.choices.length === 0 && result.ended) {
+    return { ...state, ink: result.ink, dialogue: null };
+  }
+  return applyItemTags({
+    ...state,
+    ink: result.ink,
+    dialogue: dialogueState(knot, result),
+    motion: { ...state.motion, moving: false },
+    party: haltedParty(state.party),
+  }, result.line?.tags ?? []);
 }
 
 export const FLUTE_KNOT = "flute";
@@ -605,8 +599,16 @@ function stepTick(
       events: [],
     };
   }
-  if (state.dialogue !== null)
-    return dialogueStep(world, state, input, textSpeed, gentleTiming);
+  if (state.dialogue !== null) {
+    const res = dialogueStep(world, state, input, textSpeed, gentleTiming);
+    if (res.state.dialogue === null && res.state.cutscene?.dialogueWaiting === true) {
+      return { state: resumeCutsceneAfterDialogue(world, res.state), events: res.events };
+    }
+    return res;
+  }
+  if (state.cutscene !== undefined) {
+    return stepCutscene(world, state, input, (w, s, knot) => openTalkForCutscene(w, s, knot));
+  }
   const menuEdge = input.menu && !state.previousInput.menu;
   const cancelEdge = input.cancel && !state.previousInput.cancel;
   const lanternEdge = input.lantern === true && state.previousInput.lantern !== true;
@@ -855,6 +857,13 @@ export function step(
         dialogue: { ...synced.dialogue, revealed: synced.dialogue.text.length },
       }
     : synced;
+  const staged =
+    options?.cutscenes === true && joined.cutscene === undefined
+      ? (() => {
+          const triggered = findTriggeredCutscene(world, state, joined);
+          return triggered === undefined ? joined : startCutscene(world, joined, triggered.id);
+        })()
+      : joined;
   const events = [...result.events];
   const addLevelEvent = (member: string, beforeXp: number, afterXp: number): void => {
     const delta = levelUpDelta(world.levels, beforeXp, afterXp);
@@ -867,12 +876,12 @@ export function step(
         guard: delta.afterStats.guard - delta.beforeStats.guard,
       } });
   };
-  addLevelEvent("fae", state.xp, joined.xp);
-  for (const member of joined.party) {
+  addLevelEvent("fae", state.xp, staged.xp);
+  for (const member of staged.party) {
     const before = state.party.find((item) => item.id === member.id)?.xp;
     if (before !== undefined) addLevelEvent(member.id, before, member.xp);
   }
-  return { state: joined, events };
+  return { state: staged, events };
 }
 
 export function levelUpEvents(world: World, before: State, after: State): Event[] {

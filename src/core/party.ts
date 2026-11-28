@@ -652,7 +652,14 @@ export function syncParty(world: World, state: State): State {
         box: partyContent(world, member.id).box,
       })),
     ];
-    const personPoint = person === undefined ? undefined : npcLivePoint(state, person);
+    const override = person === undefined
+      ? undefined
+      : state.cutscene?.actorOverrides[`npc:${person.id}`];
+    const personPoint = person === undefined
+      ? undefined
+      : override?.x !== undefined && override.y !== undefined
+        ? { x: override.x, y: override.y }
+        : npcLivePoint(state, person);
     const point = critter ?? (personPoint === undefined
       ? undefined
       : { x: personPoint.x, y: personPoint.y }) ??
@@ -674,7 +681,7 @@ export function syncParty(world: World, state: State): State {
         Math.min(98, levelForXp(world.levels, state.xp) - 1))] ?? 0,
       x: point.x,
       y: point.y,
-      facing: state.facing,
+      facing: override?.facing ?? state.facing,
       motion: { distance: 0, moving: false },
       stillTicks: 0,
       trail: [point, leader],

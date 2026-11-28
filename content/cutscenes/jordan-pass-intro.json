@@ -1,0 +1,202 @@
+{
+  "id": "jordan-pass-intro",
+  "area": "pass",
+  "trigger": {
+    "kind": "area-enter",
+    "area": "pass",
+    "forbidsVariable": "jordan_joined",
+    "once": true
+  },
+  "steps": [
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "moveActor",
+          "actor": "fae",
+          "to": {
+            "x": 1065,
+            "y": 985
+          },
+          "speed": 3.6
+        },
+        {
+          "type": "cameraPan",
+          "to": "actor:npc:jordan",
+          "ticks": 34,
+          "zoom": 1.07
+        }
+      ]
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "moveActor",
+          "actor": "fae",
+          "to": {
+            "x": 1095,
+            "y": 895
+          },
+          "speed": 3.6,
+          "facing": "left"
+        },
+        {
+          "type": "moveActor",
+          "actor": "party:maddie",
+          "to": {
+            "x": 1125,
+            "y": 945
+          },
+          "speed": 3.6,
+          "facing": "left"
+        }
+      ]
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "face",
+          "actor": "npc:jordan",
+          "direction": "down"
+        },
+        {
+          "type": "pose",
+          "actor": "npc:jordan",
+          "pose": "hop",
+          "ticks": 20,
+          "effect": "pinecone-burst"
+        },
+        {
+          "type": "emote",
+          "actor": "npc:jordan",
+          "kind": "sparkle",
+          "ticks": 24
+        },
+        {
+          "type": "sfx",
+          "cue": "chime-green"
+        }
+      ]
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "moveActor",
+          "actor": "npc:jordan",
+          "to": {
+            "x": 1065,
+            "y": 765
+          },
+          "speed": 4.5,
+          "facing": "down"
+        },
+        {
+          "type": "cameraPan",
+          "to": {
+            "x": 1020,
+            "y": 830
+          },
+          "ticks": 24,
+          "zoom": 1.07
+        }
+      ]
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "moveActor",
+          "actor": "npc:jordan",
+          "to": {
+            "x": 1030,
+            "y": 785
+          },
+          "speed": 4.2,
+          "facing": "right"
+        },
+        {
+          "type": "emote",
+          "actor": "fae",
+          "kind": "exclaim",
+          "ticks": 22
+        }
+      ]
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "pose",
+          "actor": "npc:jordan",
+          "pose": "toss",
+          "ticks": 20,
+          "effect": "pinecone-burst"
+        },
+        {
+          "type": "sfx",
+          "cue": "battle-beat"
+        },
+        {
+          "type": "emote",
+          "actor": "npc:jordan",
+          "kind": "wave",
+          "ticks": 22
+        }
+      ]
+    },
+    {
+      "type": "sayKnot",
+      "knot": "jordan"
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "sfx",
+          "cue": "sticker"
+        },
+        {
+          "type": "pose",
+          "actor": "fae",
+          "pose": "cheer",
+          "ticks": 26,
+          "effect": "sparkle-burst"
+        },
+        {
+          "type": "emote",
+          "actor": "fae",
+          "kind": "sparkle",
+          "ticks": 30
+        },
+        {
+          "type": "pose",
+          "actor": "party:jordan",
+          "pose": "hop",
+          "ticks": 26,
+          "effect": "pinecone-burst"
+        },
+        {
+          "type": "emote",
+          "actor": "party:jordan",
+          "kind": "heart",
+          "ticks": 30
+        }
+      ]
+    },
+    {
+      "type": "setFlag",
+      "flag": "jordan_pass_intro_seen",
+      "value": true,
+      "scope": "cutscene"
+    },
+    {
+      "type": "cameraPan",
+      "to": "fae",
+      "ticks": 26,
+      "zoom": 1
+    }
+  ]
+}

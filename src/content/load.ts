@@ -186,6 +186,10 @@ import pondPupData from "../../content/party/pond-pup.json";
 import acornSquirrelData from "../../content/party/acorn-squirrel.json";
 import ribbonBunnyData from "../../content/party/ribbon-bunny.json";
 import landsData from "../../content/lands.json";
+import dawnWakeupCutsceneData from "../../content/cutscenes/dawn-wakeup.json";
+import plazaHoodCutsceneData from "../../content/cutscenes/plaza-hood-sighting.json";
+import sueBayCutsceneData from "../../content/cutscenes/sue-bay-intro.json";
+import jordanPassCutsceneData from "../../content/cutscenes/jordan-pass-intro.json";
 import { createInkState, createStoryReader } from "../core/ink";
 import { parsePropCatalogue, propRuleErrors } from "./props";
 import { field } from "./parsers";
@@ -198,8 +202,11 @@ import {
   parseStickers, parseTreats, partyErrors, partyJoinErrors, talkErrors,
 } from "./battle-parsers";
 import { npcScheduleErrors, parseNpcProfiles } from "./npc-parsers";
+import { parseCutscene } from "./cutscene-parsers";
 import { endingContentErrors, parseStoryJson, storyTagErrors, storyTags } from "./story-checks";
-import type { Area, Critter, Fixture, NpcProfile, PartyContent, World } from "../core";
+import type {
+  Area, Critter, CutsceneScript, Fixture, NpcProfile, PartyContent, World,
+} from "../core";
 
 export {
   parseArcade, parseClawCalibration, parseCometCalibration, parseCookCalibration,
@@ -214,6 +221,7 @@ export {
   parseStickers, parseTreats, partyErrors, partyJoinErrors, talkErrors,
 } from "./battle-parsers";
 export { npcScheduleErrors, parseNpcProfiles, parseNpcStroll } from "./npc-parsers";
+export { parseCutscene, type CutsceneValidationContext } from "./cutscene-parsers";
 export { endingContentErrors, parseStoryJson, storyTagErrors, storyTags } from "./story-checks";
 
 export const STORY_ASSET_PATH = "assets/story/main.ink.json";
@@ -546,6 +554,24 @@ export function loadContent(options?: {
   const npcProfiles: Record<string, NpcProfile> = Object.fromEntries(
     parsedProfiles.profiles.map((profile) => [profile.id, profile]),
   );
+  const cutsceneCtx = {
+    areas,
+    characters,
+    party,
+    story,
+    storyVariable: (name: string) => storyVariable(initialInk, name),
+  };
+  const cutsceneFiles: [unknown, string][] = [
+    [dawnWakeupCutsceneData, "dawn-wakeup"],
+    [plazaHoodCutsceneData, "plaza-hood-sighting"],
+    [sueBayCutsceneData, "sue-bay-intro"],
+    [jordanPassCutsceneData, "jordan-pass-intro"],
+  ];
+  const cutscenes: Record<string, CutsceneScript> = {};
+  for (const [data, name] of cutsceneFiles) {
+    const parsed = parseCutscene(data, `content/cutscenes/${name}.json`, cutsceneCtx);
+    cutscenes[parsed.id] = parsed;
+  }
   return {
     world: {
       tunables: parseTunables(tunableData, "content/tunables.json"),
@@ -566,6 +592,7 @@ export function loadContent(options?: {
       npcBanter: parsedProfiles.banter,
       partyBanter: parsedProfiles.partyBanter ?? [],
       toolEvents: parsedProfiles.toolEvents ?? [],
+      cutscenes,
     },
     fixtures,
   };

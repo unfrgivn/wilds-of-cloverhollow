@@ -71,6 +71,7 @@ export function parseSave(json: string, template: State,
       ...(value.version < 8 ? { wild: unnoticed(value.state.wild) } : {}),
     };
     if (saved.battle !== null || saved.arcade !== null || saved.finale !== null) return null;
+    if (saved.cutscene !== undefined && saved.cutscene !== null) return null;
     // Set pieces added by later content start as they would in a new game, so
     // new content never throws a save away.
     const state = record(saved.critters)
@@ -124,12 +125,20 @@ function validOptionalPoint(value: unknown): boolean {
     typeof value.y === "number" && Number.isFinite(value.y);
 }
 
+function validCutscenesSeen(value: unknown): boolean {
+  if (value === undefined) return true;
+  return Array.isArray(value) && value.every(
+    (id) => typeof id === "string" && /^[a-z][a-z0-9-]*$/.test(id),
+  );
+}
+
 function isState(value: unknown, template: State): value is State {
   return sameShape(template, value) && record(value) && Array.isArray(value.wild) &&
     value.wild.every((item) =>
       sameShape(wildShape, item) && record(item) && validOptionalPoint(item.home)) &&
     validCounts(value.treats, 99) &&
-    validCounts(value.caughtFish, 9999);
+    validCounts(value.caughtFish, 9999) &&
+    validCutscenesSeen(value.cutscenesSeen);
 }
 
 export function serializeSave(state: State): string {

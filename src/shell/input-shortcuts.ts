@@ -6,7 +6,7 @@ import type { TitleMode } from "./title-flow";
 
 export type OverlayGateState = Pick<
   State,
-  "dialogue" | "battle" | "arcade" | "journalOpen" | "transition" | "finale"
+  "dialogue" | "battle" | "arcade" | "journalOpen" | "transition" | "finale" | "cutscene"
 >;
 
 export type OverlayGateContext = {
@@ -116,7 +116,8 @@ export function canPhotoMode(ctx: Omit<OverlayGateContext, "photoMode">): boolea
     ctx.state.battle === null &&
     ctx.state.arcade === null &&
     !ctx.state.journalOpen &&
-    ctx.state.finale === null
+    ctx.state.finale === null &&
+    ctx.state.cutscene === undefined
   );
 }
 
@@ -132,7 +133,8 @@ export function canPhotoFromJournal(ctx: Omit<OverlayGateContext, "photoMode">):
     ctx.state.battle === null &&
     ctx.state.arcade === null &&
     ctx.state.transition === null &&
-    ctx.state.finale === null
+    ctx.state.finale === null &&
+    ctx.state.cutscene === undefined
   );
 }
 
@@ -163,7 +165,8 @@ export function canOverworldSteer(ctx: OverlayGateContext): boolean {
     ctx.state.arcade === null &&
     !ctx.state.journalOpen &&
     ctx.state.transition === null &&
-    ctx.state.finale === null
+    ctx.state.finale === null &&
+    ctx.state.cutscene === undefined
   );
 }
 
@@ -194,6 +197,7 @@ export function isOverworldFree(
     ctx.state.arcade === null &&
     !ctx.state.journalOpen &&
     ctx.state.finale !== "credits" &&
+    ctx.state.cutscene === undefined &&
     !hasLevelUpNotice
   );
 }

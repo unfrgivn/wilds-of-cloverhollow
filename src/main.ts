@@ -528,7 +528,7 @@ async function boot(): Promise<void> {
   };
   travelOverlay.onSkip(skipTravel);
   const syncOpenFlag = (
-    name: "arcade" | "qaConsole" | "title" | "credits" | "battle" | "talk" | "journal",
+    name: "arcade" | "qaConsole" | "title" | "credits" | "battle" | "talk" | "journal" | "cutscene",
     open: boolean,
   ): void => {
     if (open) document.documentElement.dataset[name] = "open";
@@ -572,7 +572,7 @@ async function boot(): Promise<void> {
     });
     prompt.render(
       state.battle === null && state.arcade === null && state.finale !== "credits" &&
-        titleMode === null
+        state.cutscene === undefined && titleMode === null
         ? view.promptView(state)
         : { visible: false, label: "", x: 0, y: 0 },
     );
@@ -627,14 +627,12 @@ async function boot(): Promise<void> {
       lastDocumentTitle = nextTitle;
       document.title = nextTitle;
     }
-    if (photoMode || titleMode !== null || activeBattle || state.journalOpen || creditsOpen) {
-      saveToast.hide();
-    }
+    if (photoMode || titleMode !== null || activeBattle ||
+      state.journalOpen || creditsOpen || state.cutscene !== undefined) saveToast.hide();
     credits.render(buildCreditsView(content.world, state, assets));
     devLog?.logTitle(titleMode);
-    syncOpenFlag("title", titleMode !== null);
-    syncOpenFlag("credits", creditsOpen);
-    syncOpenFlag("battle", activeBattle);
+    syncOpenFlag("title", titleMode !== null); syncOpenFlag("credits", creditsOpen);
+    syncOpenFlag("battle", activeBattle); syncOpenFlag("cutscene", state.cutscene !== undefined);
     syncOpenFlag("talk", battle?.talk !== null && battle?.talk !== undefined);
     const checkKind = state.battle?.phase === "check" ? state.battle.check?.kind : undefined;
     if (checkKind !== undefined) document.documentElement.dataset.check = checkKind;
@@ -936,6 +934,7 @@ async function boot(): Promise<void> {
       snapPostcard, minigameRecords: () => minigameRecords.records(),
       navOverlay: (visible) => { const on = view.setNavHeatmap(visible); invalidate(); return on; },
       previewDialogueTags: (tags) => { view.setPreviewDialogueTags(tags); render(); invalidate(); },
+      setCutsceneState: (next) => { state = next; previousState = next; },
       boot: { title: () => titleMode },
     });
   }

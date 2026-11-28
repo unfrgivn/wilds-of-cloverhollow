@@ -2,6 +2,7 @@ import {
   createState,
   serializeSave,
   stableHash,
+  startCutscene,
   type ActionFrame,
   type Fixture,
   type State,
@@ -13,6 +14,7 @@ import type { AudioController } from "../platform/audio";
 import type { GameSettingsController } from "../platform/game-settings";
 import type { MinigameRecords } from "../platform/minigame-records";
 import type { BattleCheckInfo } from "../render/view";
+import type { CutsceneRenderInfo } from "../render/cutscene-render";
 import type { NpcLifeRenderInfo } from "../render/npc-life";
 import type { TimeOfDayPhase } from "../render/time-of-day";
 import { formatSaveBackup, parseSaveBackup } from "../shell/save-backup";
@@ -103,6 +105,7 @@ export type CloverhollowHook = {
       overworldVisible: boolean;
       auraAlpha: number;
     };
+    cutscene: CutsceneRenderInfo | null;
     arcade: ArcadeInfo | null;
   };
   save: {
@@ -116,6 +119,11 @@ export type CloverhollowHook = {
   qa: { active: () => boolean; packs: () => QaPack[] };
   navOverlay?: (visible?: boolean) => boolean;
   previewDialogueTags?: (tags: string[] | null) => void;
+  cutscene?: {
+    play: (id: string) => Promise<boolean>;
+    active: () => string | null;
+    list: () => string[];
+  };
   sound: {
     log: AudioController["log"];
     effects: AudioController["effects"];
@@ -158,6 +166,7 @@ export function installHook(deps: {
   qa: CloverhollowHook["qa"];
   navOverlay?: (visible?: boolean) => boolean;
   previewDialogueTags?: (tags: string[] | null) => void;
+  cutscene?: CloverhollowHook["cutscene"];
   sound: CloverhollowHook["sound"];
   settings: CloverhollowHook["settings"];
 }): void {
@@ -214,6 +223,7 @@ export function installHook(deps: {
     ...(deps.previewDialogueTags !== undefined
       ? { previewDialogueTags: deps.previewDialogueTags }
       : {}),
+    ...(deps.cutscene !== undefined ? { cutscene: deps.cutscene } : {}),
     sound: deps.sound,
     settings: deps.settings,
   };
@@ -251,6 +261,7 @@ export function installShellHook(deps: {
   minigameRecords: () => MinigameRecords;
   navOverlay?: (visible?: boolean) => boolean;
   previewDialogueTags?: (tags: string[] | null) => void;
+  setCutsceneState?: (next: State) => void;
 }): void {
   const invalidateAfter = <Args extends unknown[]>(
     fn: (...args: Args) => void,
@@ -285,6 +296,24 @@ export function installShellHook(deps: {
     ...(deps.navOverlay !== undefined ? { navOverlay: deps.navOverlay } : {}),
     ...(deps.previewDialogueTags !== undefined
       ? { previewDialogueTags: deps.previewDialogueTags }
+      : {}),
+    ...(deps.setCutsceneState !== undefined
+      ? {
+          cutscene: {
+            play: async (id: string) => {
+              if (deps.world.cutscenes[id] === undefined) return false;
+              const next = startCutscene(deps.world, deps.get(), id);
+              if (next.cutscene === undefined) return false;
+              deps.setCutsceneState?.(next);
+              await deps.ensureArea();
+              deps.render();
+              deps.invalidate();
+              return true;
+            },
+            active: () => deps.get().cutscene?.id ?? null,
+            list: () => Object.keys(deps.world.cutscenes).sort(),
+          },
+        }
       : {}),
     save: {
       clear: async () => {

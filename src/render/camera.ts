@@ -165,6 +165,16 @@ export function smoothFollowCamera(
   };
 }
 
+export function cutsceneCameraPoint(focus: Point, view: Size, area: Size): Point {
+  const x = area.width <= view.width
+    ? (area.width - view.width) / 2
+    : clamp(focus.x - view.width / 2, 0, area.width - view.width);
+  const y = area.height <= view.height
+    ? (area.height - view.height) / 2
+    : clamp(focus.y - view.height / 2, 0, area.height - view.height);
+  return { x, y };
+}
+
 export function worldToScreen(
   point: Point,
   camera: Point,
@@ -641,7 +651,31 @@ export class CameraDirector {
       ? resolveDialogueFocus(world, state, playerPos, directive)
       : null;
 
-    if (paused && !hasDirective) {
+    const csCam = overworldClear ? (state.cutscene?.camera ?? null) : null;
+    if (csCam !== null) {
+      const prevCam = previousState?.cutscene?.camera;
+      const canInterpCam = canInterpolate && prevCam !== null && prevCam !== undefined;
+      const camFocus = canInterpCam
+        ? interpolatePoint(prevCam, csCam, alpha)
+        : { x: csCam.x, y: csCam.y };
+      const rawZoom = canInterpCam
+        ? prevCam.zoom + (csCam.zoom - prevCam.zoom) * alpha
+        : csCam.zoom;
+      const targetZoom =
+        reducedMotion || area.id === "harness"
+          ? 1
+          : clampZoomToArea(rawZoom, view, area);
+      this._zoom = targetZoom;
+      this._framing = "directive";
+      const effW = viewWidth / targetZoom;
+      const effH = viewHeight / targetZoom;
+      this._camera = clampCameraToArea(
+        { x: camFocus.x - effW / 2, y: camFocus.y - effH / 2 },
+        view,
+        area,
+        targetZoom,
+      );
+    } else if (paused && !hasDirective) {
       this._zoom = 1;
       this._framing = "follow";
       this._camera = followCamera(this._camera, playerPos, view, area, deadZone);

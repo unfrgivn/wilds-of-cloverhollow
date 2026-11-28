@@ -34,6 +34,33 @@ export function isStorySound(value: string): value is StorySound {
   return storySounds.some((sound) => sound === value);
 }
 
+const allSoundCues: Readonly<Record<SoundCue, true>> = {
+  "dialogue-open": true, "dialogue-advance": true, "dialogue-blip": true, "dialogue-close": true,
+  "choice-move": true, "choice-select": true, "journal-open": true, "journal-close": true,
+  "footstep-grass": true, "footstep-sand": true, "footstep-wood": true, "footstep-snow": true,
+  "footstep-stone": true, "footstep-tile": true, "footstep-carpet": true,
+  door: true, "area-arrive": true, coin: true, item: true, sticker: true,
+  "lantern-on": true, "lantern-off": true, "battle-start": true, "battle-command": true,
+  "battle-together": true, "battle-hit": true, "battle-recover": true, "battle-win": true,
+  "battle-run": true, "battle-rest": true, "battle-faint": true, "battle-beat": true,
+  "level-up": true,
+  "claw-move": true, "claw-drop": true, "claw-grab": true, "claw-miss": true, "prize-won": true,
+  "skee-aim": true, "skee-roll": true, "skee-score": true, "skee-hundred": true,
+  "tickets-won": true,
+  "mole-pop": true, "mole-boop": true, "mole-whiff": true,
+  "comet-move": true, "comet-star": true, "comet-bump": true,
+  "cook-start": true, "cook-frozen": true, "cook-ding": true,
+  "fish-cast": true, "fish-nibble": true, "fish-bite": true, "fish-reel": true, "fish-catch": true,
+  "taco-top": true, "taco-oops": true, "taco-order": true,
+  "chime-red": true, "chime-yellow": true, "chime-green": true, "chime-blue": true, flute: true,
+  "flute-red": true, "flute-yellow": true, "flute-green": true, "flute-blue": true,
+  "lasso-twirl": true,
+};
+
+export function isSoundCue(value: string): value is SoundCue {
+  return Object.hasOwn(allSoundCues, value);
+}
+
 /** Sound is a projection of state changes, never a second game state machine. */
 export function soundCues(
   previous: State,
@@ -194,6 +221,13 @@ export function soundCues(
     ) {
       cues.push("prize-won");
     }
+  }
+  if (
+    next.tick > previous.tick &&
+    next.cutscene !== undefined &&
+    next.cutscene.tick > (previous.cutscene?.tick ?? -1)
+  ) {
+    cues.push(...next.cutscene.tickSfx);
   }
   return cues;
 }

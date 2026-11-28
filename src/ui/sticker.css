@@ -201,6 +201,61 @@
   animation: photo-shutter-pulse 240ms ease-out forwards;
 }
 
+.photo-toast[hidden],
+:root:not([data-photo="on"]) .photo-toast {
+  display: none;
+}
+
+.photo-toast {
+  position: fixed;
+  top: calc(16px + var(--safe-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 84;
+  max-width: calc(100vw - 32px - var(--safe-left) - var(--safe-right));
+  box-sizing: border-box;
+  padding: 7px 16px;
+  border: 2.5px solid #47321f;
+  border-radius: 999px;
+  background: #fbf6e8;
+  box-shadow:
+    inset 0 0 0 2px #fffdf7,
+    0 4px 0 #47321f28,
+    0 6px 12px #47321f24;
+  color: #47321f;
+  font-family: var(--sticker-font);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: 0.015em;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  opacity: 0;
+  transition: opacity 160ms ease-out;
+}
+
+.photo-toast.is-visible {
+  opacity: 1;
+  animation: photo-toast-in 180ms ease-out;
+}
+
+@keyframes photo-toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -6px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
 @keyframes photo-shutter-pulse {
   0% { opacity: 0; }
   22% { opacity: 0.84; }
@@ -412,9 +467,11 @@
   .sticker-portrait.is-talking .sticker-portrait-img,
   .sticker-advance.is-visible,
   .sticker-prompt > span,
-  .notice-mark.is-alert { animation: none; }
+  .notice-mark.is-alert,
+  .photo-toast.is-visible { animation: none; }
   .sticker-choice,
-  .photo-touch-btn { transition: none; }
+  .photo-touch-btn,
+  .photo-toast { transition: none; }
   .photo-touch-btn:active { transform: none; }
   .photo-shutter-flash.is-flashing {
     animation: photo-shutter-pulse-gentle 220ms ease-out forwards;
@@ -435,6 +492,14 @@
 
 :root[data-reduced-motion="on"] .photo-touch-btn:active {
   transform: none;
+}
+
+:root[data-reduced-motion="on"] .photo-toast {
+  transition: none;
+}
+
+:root[data-reduced-motion="on"] .photo-toast.is-visible {
+  animation: none;
 }
 
 :root[data-reduced-motion="on"] .photo-shutter-flash.is-flashing {

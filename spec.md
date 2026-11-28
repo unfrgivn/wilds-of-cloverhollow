@@ -194,8 +194,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   `buildSoundContext`, `resolveArcadeOutcome`, `collectLevelUpNotices`,
   `shouldClearRest`, `isOverworldConfirm`, `stepJukeboxTrack`,
   `resolveSoundtrack`, `createAreaBannerTracker`, `createJournalNotesCache`,
-  `captureAreaPostcard`, `shouldPlayToolEventChime`, `createToolEventChimeSync`,
-  `createNpcChatterSync`) live in `src/shell/feedback.ts`; desktop mouse/pen
+  `captureAreaPostcard`, `deliverAreaPostcard`, `shouldPlayToolEventChime`,
+  `createToolEventChimeSync`, `createNpcChatterSync`) live in `src/shell/feedback.ts`; desktop mouse/pen
   overworld press-and-hold steering and near-player tap detection
   (`computeOverworldSteer`, `isOverworldTap`, `bindOverworldPointerSteer`) live
   in `src/shell/overworld-pointer.ts`; and
@@ -700,8 +700,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   `kitchen` before any sticker is earned and before `has_lantern`.
 - Photo / Showcase mode (Milestone 90), Postcard Camera (Milestone 107),
   Gamepad Parity (Milestone 114), Touch Camera Controls (Milestone 118),
-  Desktop Click-to-Snap / Right-Click-to-Exit (Milestone 151), & Touch Journal
-  Photo Mode Launcher (Milestone 154):
+  Desktop Click-to-Snap / Right-Click-to-Exit (Milestone 151), Touch Journal
+  Photo Mode Launcher (Milestone 154), & Mobile Web Share Delivery + Accessible
+  Photo Toast (Milestone 160):
   pressing `P` (`KeyP`), gamepad Select (standard button 8), or tapping the
   touch-only `Photo Mode` button (`.journal-photo-btn`) inside Journal
   `OPTIONS`'s `CONTROLS` card (shown strictly under `:root[data-touch="on"]`
@@ -734,11 +735,26 @@ ios/            Capacitor iOS project (from Milestone 4).
   frames it inside a warm cream watercolor postcard border (`#fbf6e8` margin,
   `#47321f` hand-inked inner rule, four-leaf clover emblem, region + active
   companion subcaption via `formatPostcardCompanions` / `postcardMetadata` in
-  `src/ui/postcard.ts` and `captureAreaPostcard` in `src/shell/feedback.ts`,
+  `src/ui/postcard.ts` and `captureAreaPostcard` / `deliverAreaPostcard` in
+  `src/shell/feedback.ts`,
   stamping `"with Maddie"`, `"with Maddie & Sue"`, `"with Maddie, Sue & Jordan"`,
   or trimming `> 4` followers to the first 3 plus `"& friends"`, Milestone 136,
   and bottom-right `"<Area> · Wilds of Cloverhollow"` stamp),
-  and downloads `cloverhollow-postcard-<areaId>.png`. Pressing `P` again,
+  and delivers `cloverhollow-postcard-<areaId>.png` via `deliverPostcard`
+  (`src/ui/postcard.ts`, Milestone 160): on touch/iOS (`preferShare` active when
+  `data-touch="on"`), `dataUrlToPngFile` decodes the PNG into a `File`
+  (`image/png`) and opens the native Web Share sheet (`navigator.share` gated by
+  `navigator.canShare`, treating `AbortError` as `"cancelled"` without double
+  downloading, and falling back to `triggerPostcardDownload` on unsupported or
+  non-abort errors); on desktop it downloads immediately. After non-cancelled
+  delivery (`"shared"` or `"downloaded"`), `createPhotoToast` renders a gentle
+  top-center `.photo-toast` storybook pill (`role="status"`, `aria-live="polite"`,
+  `#47321f` ink on `#fbf6e8`, `pointer-events: none`, excluded from Pixi WebGL
+  capture, defensively hidden whenever `:root:not([data-photo="on"])`, with full
+  `@media (prefers-reduced-motion: reduce)` and `:root[data-reduced-motion="on"]`
+  transition/animation suppression) announcing `"Postcard shared · <Area>"` or
+  `"Postcard saved · <Area>"` via `postcardToastMessage` for `1800 ms` and hiding
+  immediately on Photo Mode exit or harness reset. Pressing `P` again,
   `Escape`, gamepad Select/B (button 8 / button 1), right-clicking the canvas on
   desktop (`contextmenu` prevented via `photoModePointerAction`), or opening any
   overlay exits Photo Mode automatically.
@@ -751,7 +767,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   members in `world.party`, `glow-sheet`, `ambient-sheet`, and the battle toy
   atlas — deduplicating party members that also appear in `world.characters`).
   Per-area NPC and critter atlases (`areaEntityAtlases`, extracted with pure
-  stateless overworld render helpers into `src/render/overworld-render.ts` and
+  stateless overworld render helpers into `src/render/overworld-render.ts`, with
+  Pixi-free overworld VFX, lantern, companion emote, backdrop, and Star Gem glint
+  math extracted into `src/render/overworld-vfx-math.ts` and re-exported
+  identically through `src/render/overworld-render.ts`, Milestone 160, and
   re-exported from `src/render/view.ts`, alongside pooled overworld visual
   effects in `OverworldEffectsController` inside `src/render/overworld-effects.ts`
   (Milestone 120), overworld entity sprite pools (player, party followers, NPCs,

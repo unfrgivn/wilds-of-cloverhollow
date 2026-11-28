@@ -74,10 +74,12 @@ const transientAxeErrors = [
 
 function runAxe(axe: string, args: string[]): string {
   for (let attempt = 0; ; attempt += 1) {
-    const result = spawnSync(axe, args, { encoding: "utf8" });
+    const result = spawnSync(axe, args, { encoding: "utf8", timeout: 25_000 });
     if (result.status === 0) return result.stdout;
-    const message = result.stderr || result.stdout;
-    const transient = transientAxeErrors.some((text) => message.includes(text));
+    const timedOut = result.signal === "SIGTERM" || result.error?.message.includes("ETIMEDOUT");
+    const message = result.stderr || result.stdout ||
+      (timedOut ? `axe ${args[0] ?? ""} timed out after 25s` : "axe failed");
+    const transient = timedOut || transientAxeErrors.some((text) => message.includes(text));
     if (attempt >= 7 || !transient) throw new Error(message);
     spawnSync("sleep", ["2"]);
   }

@@ -6896,6 +6896,50 @@ the old trail, the owl, and the clubhouse claim.
   purity, lint), `just build` (all non-vendor chunks `< 390 kB`), and 33/33
   Chromium & WebKit e2e tests.
 
+## Milestone 160: Native iOS / Mobile Postcard Share-Sheet Delivery (`navigator.share`), Post-Snap Accessible Photo Toast & `src/render/overworld-vfx-math.ts` Modular Extraction **Status:** ✅ Completed (2026-11-27)
+- Native iOS / Mobile Web Share API Postcard Delivery (`src/ui/postcard.ts`,
+  `src/shell/feedback.ts`, `src/main.ts`):
+  - Exports `PostcardShareApi`, `PostcardDeliveryResult`, pure
+    `dataUrlToPngFile`, and `deliverPostcard` in `src/ui/postcard.ts` alongside
+    `deliverAreaPostcard` in `src/shell/feedback.ts`.
+  - Threads `preferShare: document.documentElement.dataset.touch === "on"` from
+    `snapPostcard` so touch/iOS players receive the native share sheet with a
+    real `image/png` `File` (respecting `AbortError` as `"cancelled"` without
+    double downloading and falling back cleanly to `triggerPostcardDownload`),
+    while desktop players keep immediate PNG downloads and
+    `snapPostcard({ download: false })` stays completely silent.
+- Accessible Post-Snap Photo Toast (`src/ui/postcard.ts`, `src/ui/sticker.css`,
+  `src/main.ts`):
+  - Exports `createPhotoToast` (`role="status"`, `aria-live="polite"`, `1800 ms`
+    auto-hide) and `postcardToastMessage`, styled as a warm-cream `#fbf6e8` pill
+    with `#47321f` ink anchored at top-center (`top: calc(16px + var(--safe-top))`),
+    excluded from Pixi WebGL captures, defensively hidden outside Photo Mode
+    (`:root:not([data-photo="on"]) .photo-toast`), suppressed under both
+    `@media (prefers-reduced-motion: reduce)` and
+    `:root[data-reduced-motion="on"]`, and hidden immediately on Photo Mode exit
+    or harness reset.
+- `src/render/overworld-vfx-math.ts` Modular Extraction
+  (`src/render/overworld-render.ts` 947 -> 452 lines):
+  - Moves pure overworld VFX, footstep (`spawnFootstepPuffs`,
+    `spawnNpcFootstepPuff`), lantern, companion emote, backdrop, and Star Gem
+    glint constants, types, and functions into Pixi-free
+    `src/render/overworld-vfx-math.ts` and re-exports every symbol identically
+    from `src/render/overworld-render.ts` with zero `src/core` edits and zero
+    pixel or behavioral changes.
+- iOS 27 AXe Smoke Hardening (`tools/ios/smoke.ts`):
+  - Added a `25_000 ms` per-call timeout and `ETIMEDOUT`/`SIGTERM` transient
+    retry to `runAxe` so a momentarily wedged iOS 27 Simulator AXe call retries
+    cleanly instead of hanging indefinitely.
+- Evidence: `tests/unit/milestone-160.test.ts` (8 tests) and real-input
+  `tests/e2e/milestone-160.spec.ts` (`@smoke`, Chromium & WebKit).
+- Gates: `just check` (all 73 sims with zero replay hash shifts, 23 QA packs,
+  purity, lint), `just build` (all non-vendor chunks `< 390 kB`, hook leak +
+  harness checks green), full e2e across Chromium (660 passed) & WebKit
+  (562 passed; 1,222 total passed, 2 skipped, 0 failed, 0 snapshot diffs),
+  `just ios-smoke` (passed end-to-end on iPhone 17 / iOS 27.0), and
+  `just ios-device-build` (unsigned arm64 `Release-iphoneos/App.app` built
+  cleanly).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

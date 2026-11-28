@@ -23,9 +23,10 @@ import type { JukeboxMeta } from "../ui/journal";
 import { createNpcChatter, type NpcChatterView } from "../ui/npc-chatter";
 import {
   composePostcardFrame,
+  deliverPostcard,
   postcardMetadata,
-  triggerPostcardDownload,
   type PostcardCapture,
+  type PostcardDeliveryResult,
 } from "../ui/postcard";
 
 export type ArcadeRecordsStore = Pick<MinigameRecordsController, "submit" | "bestOf">;
@@ -400,12 +401,11 @@ export function createJournalNotesCache(world: World): (state: State) => string[
   };
 }
 
-/** Composes a framed Postcard PNG from a rendered canvas and triggers optional download. */
+/** Composes a framed Postcard PNG from a rendered canvas. */
 export function captureAreaPostcard(
   world: Pick<World, "areas" | "lands">,
   areaId: string,
   sourceCanvas: HTMLCanvasElement,
-  download = true,
   partyNames?: readonly string[],
 ): PostcardCapture | null {
   const area = world.areas[areaId];
@@ -417,7 +417,6 @@ export function captureAreaPostcard(
   const meta = postcardMetadata(areaId, areaName, land?.name ?? "", partyNames);
   const composed = composePostcardFrame(sourceCanvas, meta.caption, meta.subcaption);
   if (composed === null) return null;
-  if (download) triggerPostcardDownload(composed.dataUrl, meta.filename);
   return {
     filename: meta.filename,
     caption: meta.caption,
@@ -425,6 +424,35 @@ export function captureAreaPostcard(
     height: composed.height,
     dataUrl: composed.dataUrl,
   };
+}
+
+/** Composes a framed Postcard PNG and optionally delivers it via share sheet or download. */
+export async function deliverAreaPostcard(
+  world: Pick<World, "areas" | "lands" | "party">,
+  state: Pick<State, "area" | "party">,
+  sourceCanvas: HTMLCanvasElement,
+  options?: {
+    download?: boolean;
+    preferShare?: boolean;
+    partyNames?: readonly string[];
+    onDelivered?: (
+      capture: PostcardCapture,
+      delivery: Exclude<PostcardDeliveryResult, "cancelled">,
+    ) => void;
+  },
+): Promise<PostcardCapture | null> {
+  const partyNames =
+    options?.partyNames ??
+    state.party
+      .map((member) => world.party[member.id]?.name ?? "")
+      .filter((name) => name.length > 0);
+  const capture = captureAreaPostcard(world, state.area, sourceCanvas, partyNames);
+  if (capture === null) return null;
+  if (options?.download !== false) {
+    const delivery = await deliverPostcard(capture, { preferShare: options?.preferShare });
+    if (delivery !== "cancelled") options?.onDelivered?.(capture, delivery);
+  }
+  return capture;
 }
 
 /** True when an interactive NPC tool micro-event freshly activates. */

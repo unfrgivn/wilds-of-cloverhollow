@@ -30,8 +30,8 @@ import {
   createShellAssets, createTacoToppingHandler, FAE_ATLAS,
 } from "./shell/assets";
 import {
-  buildSoundContext, captureAreaPostcard, collectLevelUpNotices, createAreaBannerTracker,
-  createJournalNotesCache, createNpcChatterSync, createToolEventChimeSync, hapticForTick,
+  buildSoundContext, collectLevelUpNotices, createAreaBannerTracker, createJournalNotesCache,
+  createNpcChatterSync, createToolEventChimeSync, deliverAreaPostcard, hapticForTick,
   isOverworldConfirm, petEffectForCompanion, resolveArcadeOutcome, resolveSoundtrack,
   shouldClearRest, stepJukeboxTrack,
 } from "./shell/feedback";
@@ -46,7 +46,10 @@ import type { ArcadeRecordBadge } from "./ui/arcade-popups";
 import { createAreaBanner } from "./ui/area-banner";
 import { createHudHints } from "./ui/hud-hints";
 import { createSaveToast } from "./ui/save-toast";
-import { createPhotoTouchBar, createShutterFlash, type PostcardCapture } from "./ui/postcard";
+import {
+  createPhotoToast, createPhotoTouchBar, createShutterFlash, postcardToastMessage,
+  type PostcardCapture,
+} from "./ui/postcard";
 import {
   canBattlePeek, canOverworldSteer, canPhotoFromJournal, canPhotoMode, createInputShortcuts,
   isBannerEligible, isOverworldFree, type OverlayGateContext,
@@ -147,6 +150,7 @@ async function boot(): Promise<void> {
   const saveToast = createSaveToast(uiRoot);
   const areaBanner = createAreaBanner(uiRoot);
   const shutterFlash = createShutterFlash(uiRoot);
+  const photoToast = createPhotoToast(uiRoot);
   const bannerTracker = createAreaBannerTracker();
   // True while the harness drives ticks synthetically (the hook's `step`).
   let harnessStepping = false;
@@ -371,7 +375,8 @@ async function boot(): Promise<void> {
     photoMode = next;
     document.documentElement.dataset.photo = next ? "on" : "off";
     view.setPhotoMode(next);
-    if (next) { overworldPointer.release(); saveToast.hide(); } else shutterFlash.hide();
+    if (next) { overworldPointer.release(); saveToast.hide(); }
+    else { shutterFlash.hide(); photoToast.hide(); }
     if (changed && !silent && titleMode === null && state.battle === null) {
       sound.playEffect(next ? "toggle-on" : "toggle-off");
       if (next) lightHaptic();
@@ -477,7 +482,7 @@ async function boot(): Promise<void> {
       photoMode = false;
       document.documentElement.dataset.photo = "off";
       view.setPhotoMode(false);
-      shutterFlash.hide();
+      shutterFlash.hide(); photoToast.hide();
     }
     if (battlePeekOpen && !canBattlePeek(gate)) battlePeekOpen = false;
     if (!state.journalOpen || titleMode !== null || qaMenuOpen) jukeboxTrack = null;
@@ -790,11 +795,8 @@ async function boot(): Promise<void> {
     options?: { download?: boolean },
   ): Promise<PostcardCapture | null> => {
     if (!photoMode || !canPhotoMode(overlayContext())) return null;
-    sound.playEffect("camera-shutter");
-    shutterFlash.trigger();
-    lightHaptic();
-    render(1);
-    app.render();
+    sound.playEffect("camera-shutter"); shutterFlash.trigger(); lightHaptic();
+    render(1); app.render();
     const extracted = app.renderer.extract.canvas({
       target: app.stage,
       frame: new Rectangle(0, 0, app.screen.width, app.screen.height),
@@ -802,16 +804,13 @@ async function boot(): Promise<void> {
       clearColor: 0xf8edcf,
     });
     const sourceCanvas = extracted instanceof HTMLCanvasElement ? extracted : app.canvas;
-    const partyNames = state.party
-      .map((member) => content.world.party[member.id]?.name ?? "")
-      .filter((name) => name.length > 0);
-    return captureAreaPostcard(
-      content.world,
-      state.area,
-      sourceCanvas,
-      options?.download !== false,
-      partyNames,
-    );
+    return deliverAreaPostcard(content.world, state, sourceCanvas, {
+      download: options?.download !== false,
+      preferShare: document.documentElement.dataset.touch === "on",
+      onDelivered: (capture, delivery) => {
+        if (photoMode) photoToast.show(postcardToastMessage(delivery, capture.caption));
+      },
+    });
   };
   createPhotoTouchBar(uiRoot, {
     onSnap: () => { void snapPostcard({ download: true }); },

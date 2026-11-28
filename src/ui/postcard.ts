@@ -20,6 +20,16 @@ export type ComposedPostcard = {
   height: number;
 };
 
+export type PostcardShareApi = {
+  canShare?: (data: { files: File[] }) => boolean;
+  share?: (data: { files: File[]; title?: string; text?: string }) => Promise<void>;
+};
+
+export type PostcardDeliveryResult = "shared" | "cancelled" | "downloaded";
+
+const PNG_DATA_URL_PREFIX = "data:image/png;base64,";
+export const PHOTO_TOAST_DURATION_MS = 1800;
+
 function slugAreaId(areaId: string): string {
   const cleaned = areaId
     .trim()
@@ -248,6 +258,122 @@ export function triggerPostcardDownload(dataUrl: string, filename: string): void
   document.body.append(link);
   link.click();
   link.remove();
+}
+
+/** Decodes a PNG base64 data URL into a File for Web Share API delivery, or null if invalid. */
+export function dataUrlToPngFile(dataUrl: string, filename: string): File | null {
+  if (!dataUrl.startsWith(PNG_DATA_URL_PREFIX)) return null;
+  const encoded = dataUrl.slice(PNG_DATA_URL_PREFIX.length).trim();
+  if (encoded.length === 0) return null;
+  let binary: string;
+  try {
+    binary = atob(encoded);
+  } catch {
+    return null;
+  }
+  if (binary.length === 0) return null;
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+  return new File([bytes], filename, { type: "image/png" });
+}
+
+function defaultShareApi(): PostcardShareApi | undefined {
+  if (typeof navigator === "undefined") return undefined;
+  const api: PostcardShareApi = {};
+  if (typeof navigator.canShare === "function") {
+    api.canShare = (data) => navigator.canShare(data);
+  }
+  if (typeof navigator.share === "function") {
+    api.share = (data) => navigator.share(data);
+  }
+  return api;
+}
+
+function isAbortError(error: unknown): boolean {
+  if (error instanceof Error) return error.name === "AbortError";
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "name" in error &&
+    error.name === "AbortError"
+  );
+}
+
+/** Delivers a postcard PNG via Web Share API on touch/iOS, falling back to browser download. */
+export async function deliverPostcard(
+  capture: Pick<PostcardCapture, "dataUrl" | "filename" | "caption">,
+  options?: {
+    preferShare?: boolean;
+    shareApi?: PostcardShareApi;
+    downloadFallback?: (dataUrl: string, filename: string) => void;
+  },
+): Promise<PostcardDeliveryResult> {
+  const downloadFallback = options?.downloadFallback ?? triggerPostcardDownload;
+  if (options?.preferShare === true) {
+    const shareApi = options.shareApi ?? defaultShareApi();
+    const file = dataUrlToPngFile(capture.dataUrl, capture.filename);
+    if (file !== null && typeof shareApi?.share === "function") {
+      try {
+        const canShare =
+          shareApi.canShare === undefined || shareApi.canShare({ files: [file] });
+        if (canShare) {
+          await shareApi.share({
+            files: [file],
+            title: capture.caption,
+            text: "Postcard from Wilds of Cloverhollow",
+          });
+          return "shared";
+        }
+      } catch (error: unknown) {
+        if (isAbortError(error)) return "cancelled";
+      }
+    }
+  }
+  downloadFallback(capture.dataUrl, capture.filename);
+  return "downloaded";
+}
+
+/** Formats the short Photo Mode confirmation pill label after saving or sharing a postcard. */
+export function postcardToastMessage(
+  delivery: Exclude<PostcardDeliveryResult, "cancelled">,
+  caption: string,
+): string {
+  const shortCaption = caption.replace(/\s*·\s*Wilds of Cloverhollow$/i, "").trim();
+  const label = shortCaption.length > 0 ? shortCaption : caption.trim() || "Wilds of Cloverhollow";
+  return delivery === "shared" ? `Postcard shared · ${label}` : `Postcard saved · ${label}`;
+}
+
+/** Gentle non-blocking confirmation pill shown after snapping a Photo Mode postcard. */
+export function createPhotoToast(root: HTMLElement): {
+  show: (text: string) => void;
+  hide: () => void;
+} {
+  const node = element("div", "photo-toast", root);
+  node.setAttribute("role", "status");
+  node.setAttribute("aria-live", "polite");
+  node.hidden = true;
+  let timer = 0;
+
+  const hide = (): void => {
+    window.clearTimeout(timer);
+    timer = 0;
+    node.classList.remove("is-visible");
+    node.hidden = true;
+  };
+
+  const show = (text: string): void => {
+    window.clearTimeout(timer);
+    node.textContent = text;
+    node.hidden = false;
+    node.classList.remove("is-visible");
+    void node.offsetWidth;
+    node.classList.add("is-visible");
+    timer = window.setTimeout(hide, PHOTO_TOAST_DURATION_MS);
+  };
+
+  return { show, hide };
 }
 
 /** Crisp warm-cream shutter flash overlay used when snapping a Photo Mode postcard. */

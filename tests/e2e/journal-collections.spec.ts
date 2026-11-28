@@ -326,7 +326,7 @@ test(
     await expect(fieldNote.locator(".journal-field-name")).toHaveText("Golden Starfish Crown");
     await expect(fieldNote.locator(".journal-field-sub")).toHaveText("Bubblegum Bay · Rare Catch");
     await expect(fieldNote.locator(".journal-field-lands")).toHaveText("Bubblegum Bay Dock");
-    await expect(fieldNote.locator(".journal-field-calms")).toContainText("+20 coins");
+    await expect(fieldNote.locator(".journal-field-calms")).toContainText("+18 coins");
     await expect(fieldNote.locator(".journal-field-specimen")).toHaveClass(/is-rare/);
     await expect(fieldNote.locator(".journal-field-portrait")).toBeVisible();
     await expect(fieldNote.locator(".journal-field-charm")).toBeHidden();

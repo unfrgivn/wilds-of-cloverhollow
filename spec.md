@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 194)
+Last updated: 2026-11-28 (Milestone 195)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -2339,6 +2339,45 @@ ios/            Capacitor iOS project (from Milestone 4).
     and lower right shelves, beanbag 2×2 cuddle arc, crate keepsake row, wall
     planks, timber posts, and left floor perches), each grounded with a
     miniature contact shadow and subtle breathing sparkle aura.
+  - **Bedroom Shelf Plush Display, Clubhouse Decor Swatches, Velvet Plush
+    Pedestals & Visiting Friends (Milestone 195, Elevation Track E9B):**
+    - Pure `src/core/decor.ts` manages optional `state.decor` (omitted when
+      default) for five Clubhouse swatches (`classic` free default plus 4
+      unlockable palettes bought with Coins or Tickets: `sunlit-meadow` 35c/25t,
+      `starlight-cozy` 55c/40t, `bubblegum-beach` 70c/50t, `pinecone-cabin`
+      85c/65t), `Velvet Plush Pedestals` (50c/35t, adding soft gilded velvet
+      cushions under displayed plushes and expanding Fae's Bedroom shelf from 4
+      to 5 slots), Bedroom shelf prize curation (`resolvedBedroomShelfPrizes`,
+      `toggleBedroomShelfPrize`, `resetBedroomShelfPrizes` mapped onto
+      `content/areas/bedroom.json` `shelfAnchors`), and deterministic Visiting
+      Friends in the Clubhouse (`sue`, `jordan`, `milo`, `rosie`, `barnaby`,
+      `fern` via `eligibleClubhouseVisitors`, `activeClubhouseVisitor`,
+      `clubhouseVisitorNpc`, `effectiveAreaNpcs`, `cycleClubhouseVisitor`) with
+      warm hangout knots (`club_visit_*`) at `(360, 505)`.
+    - `evaluateBedroomDisplay` and `evaluateClubhouseDecor`
+      (`src/render/clubhouse-display.ts`) render owned Arcade Plushes & Counter
+      Prizes onto Fae's Bedroom bookshelf (`bedroom:prize:<id>`, loading
+      `clubhouse-prizes` for `bedroom` as well as `clubhouse` in
+      `src/render/view-loader.ts`) and paint the active Clubhouse swatch's
+      isometric watercolor floor rug, upper back-wall pennant garlands, and
+      12 pulsing fairy-light glow halos in `OverworldEffectsController` (drawing
+      nothing extra on `classic` so uncustomized baselines stay pixel-identical).
+    - Interactive hand-drawn storybook Decor Picker (`src/ui/decor-picker.ts`,
+      `src/ui/decor-picker.css`) opens in `clubhouse` or `bedroom` via `KeyB`
+      or diegetic `# open-decor: clubhouse|bedroom` dialogue events emitted by
+      `club_decor` / `bedroom_shelf`, pausing overworld ticks while open and
+      autosaving decor changes cleanly.
+    - **Coin, Ticket & Fish Economy Rebalance (`content/arcade.json`,
+      `content/treats.json`, `content/tunables.json`, `content/story/town/shops.ink`,
+      `content/story/chapters/act2_bay.ink`, `content/story/systems/arcade.ink`):**
+      curbs late-game coin inflation (`taco.coinsPerOrder: 4`, rare repeat fish
+      `11/14/18` coins), introduces 520+ coins / 395+ tickets of worthwhile
+      sinks (Decor Swatches, Velvet Plush Pedestals, 4 Specialty Treat Gift
+      Baskets via `# buy-basket:`, and Mr. Pip's 25-coin -> 15-ticket exchange
+      via `# buy-tickets:`), and enables Bubblegum Bay Fish-to-Ticket (+12t) and
+      Fish-to-Coin (+14c) trade-ins via `EXTERNAL fishCount()` and
+      `# trade-fish:` backed by `state.decor.fishTraded` without ever erasing
+      Catch Book entries in `state.caughtFish` (audited in `tools/sim/balance.ts`).
   - `findPettableCompanion` & `findRestSpot` (`src/render/companions.ts`): on a
     fresh overworld confirm press when no real interactable (`targetInteractable`)
     or overlay is active, Fae can pet Maddie or any active Flute Friend
@@ -5356,7 +5395,23 @@ trunks keep its two exits.
       or golden `"★ 13/13 All Dream Blessings Active!"` with active title chips,
       styled in `src/ui/journal-blessings.css` and built in
       `src/ui/journal-blessings.ts` with full reduced-motion and Safari/iOS
-      tap-selection hygiene).
+      tap-selection hygiene). **Active Keepsake Dream Blessing Effects
+      (Milestone 195, Elevation Track E9B):** `activeBlessingEffects` /
+      `blessingEffectsFromIds` (`src/core/blessings.ts`) wires real passive
+      gameplay bonuses for all 13 keepsakes with zero effect when unowned (so
+      all zero-keepsake early-game sims stay hash-identical): `star-crystal`
+      (+4 demo / +24 input ticks on Echo checks), `star-pin` (+2 arcade tickets
+      on Skee/Mole/Comet rounds), `star-geode` (+5% calm sparkle on landed
+      battle commands & Together!), `moon-feather` (+15% Peekaboo grace),
+      `taco-badge` (+1 coin per Taco Truck order), `clover-wreath` (+1 energy on
+      snacks, treats & Recover), `sea-compass` (+15% fishing bite window +
+      glow/glint boost), `alpine-clover` (+1 steer & spring on Lean checks),
+      `star-whistle` (+8% overworld walk speed), `loft-sketch` (+15% reach &
+      dry-time grace on Trace checks), `aurora-rubbing` (+25% glow/Star Gem
+      visibility & +15% wild notice stealth grace), `shell-shard` (+1 tick
+      harmonic Ring/Charge/Chain window & +4 Flute Friends battle assist calm),
+      and `festival-ribbon` (+1 Clubhouse garden bloom step & +1 jubilee coin on
+      battle calm rewards).
     - **Interactive Scrapbook Specimen Browser** (Milestone 146; pure DOM-free
       `FieldNoteData`, `stickerFieldNote`, `prizeFieldNote`, `prizeFieldNoteData`,
       `fishFieldNote`, `keepsakeFieldNote`, `resolveFieldNote`,
@@ -5444,7 +5499,10 @@ trunks keep its two exits.
   stripped on serialize/parse (Milestone 193).
   Optional `state.encore` (`EncoreRecord`: `{ bosses, trophies }`, omitted when
   empty, validated by `validEncoreRecord` in `src/core/encore.ts` /
-  `src/core/save.ts`, Milestone 191) likewise round-trips at version 10 while
+  `src/core/save.ts`, Milestone 191) and optional `state.decor` (`DecorState`:
+  `{ swatch?, unlockedSwatches?, pedestals?, bedroomSlots?, visitorOffset?,
+  fishTraded? }`, normalized and omitted when default, validated by `validDecor`
+  in `src/core/save.ts`, Milestone 195) likewise round-trip at version 10 while
   keeping existing saves and recorded sims bit-identical.
 - Autosave (the shell, never blocking a frame) when Fae arrives in an area,
   a battle, arcade game, or cutscene ends, a dialogue closes, or the journal

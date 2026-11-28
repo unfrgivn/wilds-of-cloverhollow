@@ -133,6 +133,7 @@ export type InkFacts = {
   stickers?: number;
   treats?: number;
   bossesCalmed?: number;
+  fishCount?: number;
 };
 const newGameFacts: InkFacts = {
   calmed: {},
@@ -148,6 +149,7 @@ const newGameFacts: InkFacts = {
   stickers: 0,
   treats: 0,
   bossesCalmed: 0,
+  fishCount: 0,
 };
 
 // One Story per compiled story: building one from the compiled JSON took
@@ -184,6 +186,7 @@ function runner(storyJson: StoryJson): Runner {
   story.BindExternalFunction("stickers", () => made.facts.stickers ?? 0);
   story.BindExternalFunction("treats", () => made.facts.treats ?? 0);
   story.BindExternalFunction("bossesCalmed", () => made.facts.bossesCalmed ?? 0);
+  story.BindExternalFunction("fishCount", () => made.facts.fishCount ?? 0, true);
   runners.set(storyJson, made);
   return made;
 }

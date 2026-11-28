@@ -1,5 +1,11 @@
 import { readFileSync } from "node:fs";
-import { createState, step } from "../../src/core";
+import {
+  CLUBHOUSE_SWATCH_IDS,
+  createState,
+  plushPedestalPrice,
+  step,
+  swatchPriceFor,
+} from "../../src/core";
 import { levelForXp, statsForCommand } from "../../src/core/levels";
 import { loadContent } from "../../src/content/load";
 import { parseScript } from "../../src/content/script";
@@ -94,3 +100,103 @@ for (const level of [1, 5, 9, 14]) {
     throw new Error(`equal-level calm takes ${commands} commands at level ${level}`);
   console.log(`equal-level level ${level}: ${commands} Soothe commands`);
 }
+
+// Economy Balance Curve audit across Acts 1-4 (Track E9B): verify milestone
+// coin growth, worthwhile permanent + basket sinks >= post-finale festival
+// coins, ordered fish rewards & positive trade-in rates, and balanced basket
+// pricing vs. individual treats.
+const replayCoins = (path: string): number => {
+  const fixture = content.fixtures["new-game"];
+  if (fixture === undefined) throw new Error("missing new-game fixture");
+  let state = createState(content.world, fixture);
+  const script = parseScript(JSON.parse(readFileSync(`tests/sim/scripts/${path}`, "utf8")), path);
+  for (const segment of script) {
+    for (let tick = 0; tick < segment.ticks; tick += 1) {
+      state = step(content.world, state, segment.frame).state;
+    }
+  }
+  return state.coins;
+};
+
+const actCoins = {
+  act1: replayCoins("new-game/chapter-one.json"),
+  act2Bay: replayCoins("new-game/golden-bay.json"),
+  act2Arcade: replayCoins("new-game/golden-arcade.json"),
+  act4Finale: replayCoins("new-game/golden-kid.json"),
+  festival: replayCoins("new-game/festival.json"),
+};
+if (
+  !(actCoins.act1 > 0 &&
+    actCoins.act1 < actCoins.act2Bay &&
+    actCoins.act2Bay < actCoins.act2Arcade &&
+    actCoins.act2Arcade < actCoins.act4Finale &&
+    actCoins.act4Finale < actCoins.festival)
+) {
+  throw new Error(`economy coin progression broke monotonicity: ${JSON.stringify(actCoins)}`);
+}
+
+const swatchCoinSinks = CLUBHOUSE_SWATCH_IDS.reduce(
+  (sum, id) => sum + swatchPriceFor(content.world, id).coins,
+  0,
+);
+const swatchTicketSinks = CLUBHOUSE_SWATCH_IDS.reduce(
+  (sum, id) => sum + swatchPriceFor(content.world, id).tickets,
+  0,
+);
+const pedestal = plushPedestalPrice(content.world);
+const basketCoinSinks = content.world.treatBaskets.reduce((sum, item) => sum + item.price, 0);
+const counterTicketSinks = content.world.arcade.counter.prizes.reduce(
+  (sum, item) => sum + item.price,
+  0,
+);
+const totalCoinSinks = swatchCoinSinks + pedestal.coins + basketCoinSinks;
+const totalTicketSinks = swatchTicketSinks + pedestal.tickets + counterTicketSinks;
+if (totalCoinSinks < actCoins.festival) {
+  throw new Error(
+    `worthwhile coin sinks (${totalCoinSinks}) must cover festival purse (${actCoins.festival})`,
+  );
+}
+if (totalTicketSinks < counterTicketSinks + 150) {
+  throw new Error(`worthwhile ticket sinks (${totalTicketSinks}) too narrow`);
+}
+
+const fishTrade = content.world.arcade.fish.trade;
+if (
+  fishTrade === undefined ||
+  fishTrade.ticketsPerCatch <= 0 ||
+  fishTrade.coinsPerCatch <= 0
+) {
+  throw new Error("fish trade-in rates must be positive");
+}
+const fishCoins = content.world.arcade.fish.catches.map((item) => item.coins);
+for (let index = 1; index < fishCoins.length; index += 1) {
+  const previous = fishCoins[index - 1] ?? 0;
+  const current = fishCoins[index] ?? 0;
+  if (current <= previous) {
+    throw new Error(`fish catch coin curve must strictly rise: ${fishCoins.join(", ")}`);
+  }
+}
+
+const treatById = new Map(content.world.treats.map((item) => [item.id, item]));
+for (const basket of content.world.treatBaskets) {
+  let retailValue = basket.snacks * 5;
+  for (const [treatId, count] of Object.entries(basket.treats)) {
+    const treat = treatById.get(treatId);
+    if (treat === undefined) throw new Error(`basket ${basket.id}: unknown treat ${treatId}`);
+    retailValue += treat.price * count;
+  }
+  if (basket.price <= 0 || basket.price < Math.floor(retailValue * 0.65) ||
+      basket.price > retailValue * 1.15) {
+    throw new Error(
+      `basket ${basket.id} price (${basket.price}) out of balance vs retail (${retailValue})`,
+    );
+  }
+}
+
+console.log(
+  `economy audit: Acts 1-4 coins [${actCoins.act1}, ${actCoins.act2Bay}, ` +
+    `${actCoins.act2Arcade}, ${actCoins.act4Finale}, festival ${actCoins.festival}], ` +
+    `sinks ${totalCoinSinks}c / ${totalTicketSinks}t, ` +
+    `fish trade +${fishTrade.ticketsPerCatch}t/+${fishTrade.coinsPerCatch}c, ` +
+    `${content.world.treatBaskets.length} gift baskets balanced`,
+);

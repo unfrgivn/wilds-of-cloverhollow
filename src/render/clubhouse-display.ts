@@ -1,4 +1,12 @@
-import type { State, World } from "../core";
+import {
+  activeClubhouseSwatch,
+  CLUBHOUSE_SWATCHES,
+  hasPlushPedestals,
+  resolvedBedroomShelfPrizes,
+  type ClubhouseSwatchId,
+  type State,
+  type World,
+} from "../core";
 
 export type ClubhousePrizePlacement = {
   id: string;
@@ -9,6 +17,47 @@ export type ClubhousePrizePlacement = {
   scale: number;
   rotation: number;
 };
+
+export type RoomDisplayPlacement = ClubhousePrizePlacement & {
+  pedestal: boolean;
+};
+
+export type ClubhouseRugMotif = "meadow" | "starlight" | "beach" | "cabin";
+
+export type ClubhouseRugSpec = {
+  center: readonly [number, number];
+  outerPoly: readonly [number, number][];
+  innerPoly: readonly [number, number][];
+  motifStyle: ClubhouseRugMotif;
+  fillTint: number;
+  borderTint: number;
+  accentTint: number;
+  tasselPoints: readonly [number, number, number, number][];
+};
+
+export type ClubhousePennantSpec = {
+  baseA: readonly [number, number];
+  baseB: readonly [number, number];
+  tip: readonly [number, number];
+  tint: number;
+};
+
+export type ClubhouseFairyBulbSpec = {
+  x: number;
+  y: number;
+  tint: number;
+  scale: number;
+  alpha: number;
+};
+
+export type ClubhouseDecorVisuals = {
+  swatch: ClubhouseSwatchId;
+  rug: ClubhouseRugSpec;
+  pennants: ClubhousePennantSpec[];
+  ropeSegments: { x0: number; y0: number; x1: number; y1: number }[];
+  fairyBulbs: ClubhouseFairyBulbSpec[];
+  pedestals: boolean;
+} | null;
 
 export type ClubhouseKeepsakeKey =
   | "keepsakeCrystal"
@@ -333,4 +382,217 @@ export function evaluateSunberryMotes(
       tint: SUNBERRY_SHIMMER_TINT,
     };
   });
+}
+
+function parseHexTint(hex: string): number {
+  const cleaned = hex.startsWith("#") ? hex.slice(1) : hex;
+  const parsed = Number.parseInt(cleaned, 16);
+  return Number.isFinite(parsed) ? parsed & 0xffffff : 0xffffff;
+}
+
+/**
+ * Pure evaluator mapping Fae's selected Bedroom shelf plushes onto `bedroom.shelfAnchors`.
+ * Returns an empty list outside `bedroom` or when no prizes are owned.
+ */
+export function evaluateBedroomDisplay(world: World, state: State): RoomDisplayPlacement[] {
+  if (state.area !== "bedroom") return [];
+  const anchors = world.areas.bedroom?.shelfAnchors;
+  if (anchors === undefined || anchors.length === 0) return [];
+  const prizeIds = resolvedBedroomShelfPrizes(world, state);
+  if (prizeIds.length === 0) return [];
+
+  const byId = new Map(world.arcade.prizes.map((entry) => [entry.id, entry]));
+  const pedestal = hasPlushPedestals(state);
+  const placements: RoomDisplayPlacement[] = [];
+  for (let index = 0; index < prizeIds.length; index += 1) {
+    const id = prizeIds[index];
+    const anchor = anchors[index];
+    if (id === undefined || anchor === undefined) continue;
+    const prize = byId.get(id);
+    if (prize === undefined) continue;
+    placements.push({
+      id: prize.id,
+      frame: prize.frame,
+      x: anchor.x,
+      y: anchor.y,
+      zIndex: anchor.zIndex,
+      scale: anchor.scale,
+      rotation: anchor.rotation,
+      pedestal,
+    });
+  }
+  return placements;
+}
+
+const RUG_CENTER_X = 504;
+const RUG_CENTER_Y = 420;
+const ISO_UX = 0.894;
+const ISO_UY = -0.447;
+const ISO_VX = 0.894;
+const ISO_VY = 0.447;
+
+function buildIsoRect(halfA: number, halfB: number): readonly [number, number][] {
+  const pt = (sa: number, sb: number): [number, number] => [
+    Math.round((RUG_CENTER_X + sa * halfA * ISO_UX + sb * halfB * ISO_VX) * 10) / 10,
+    Math.round((RUG_CENTER_Y + sa * halfA * ISO_UY + sb * halfB * ISO_VY) * 10) / 10,
+  ];
+  return [pt(-1, -1), pt(1, -1), pt(1, 1), pt(-1, 1)];
+}
+
+const RUG_OUTER_POLY: readonly [number, number][] = buildIsoRect(42, 26);
+const RUG_INNER_POLY: readonly [number, number][] = buildIsoRect(32, 19);
+
+const RUG_TASSEL_POINTS: readonly [number, number, number, number][] = (() => {
+  const result: [number, number, number, number][] = [];
+  const count = 5;
+  for (const side of [-1, 1] as const) {
+    for (let i = 0; i < count; i += 1) {
+      const frac = (i / (count - 1)) * 2 - 1;
+      const bOff = frac * 20;
+      const x0 = RUG_CENTER_X + side * 42 * ISO_UX + bOff * ISO_VX;
+      const y0 = RUG_CENTER_Y + side * 42 * ISO_UY + bOff * ISO_VY;
+      const x1 = x0 + side * 6 * ISO_UX;
+      const y1 = y0 + side * 6 * ISO_UY;
+      result.push([
+        Math.round(x0 * 10) / 10,
+        Math.round(y0 * 10) / 10,
+        Math.round(x1 * 10) / 10,
+        Math.round(y1 * 10) / 10,
+      ]);
+    }
+  }
+  return result;
+})();
+
+const SWATCH_MOTIFS: Readonly<Record<Exclude<ClubhouseSwatchId, "classic">, ClubhouseRugMotif>> = {
+  "sunlit-meadow": "meadow",
+  "starlight-cozy": "starlight",
+  "bubblegum-beach": "beach",
+  "pinecone-cabin": "cabin",
+};
+
+type GarlandSpan = {
+  x0: number;
+  y0: number;
+  x1: number;
+  y1: number;
+  sag: number;
+  pennantCount: number;
+  drop: number;
+};
+
+// Back-left wall slopes UP-RIGHT along the high roofline above the drawings; back-right
+// span clears the round window frame and hugs the upper wall above the right-wall shelves.
+const BANNER_SPANS: readonly GarlandSpan[] = [
+  { x0: 292, y0: 206, x1: 534, y1: 92, sag: 8, pennantCount: 7, drop: 12 },
+  { x0: 848, y0: 148, x1: 958, y1: 192, sag: 4, pennantCount: 4, drop: 9 },
+];
+
+const FAIRY_ARCS: readonly { x0: number; y0: number; x1: number; y1: number; sag: number }[] = [
+  { x0: 286, y0: 210, x1: 544, y1: 96, sag: 11 },
+  { x0: 622, y0: 98, x1: 946, y1: 242, sag: 12 },
+];
+
+function sampleArc(
+  x0: number,
+  y0: number,
+  x1: number,
+  y1: number,
+  sag: number,
+  t: number,
+): [number, number] {
+  const x = x0 + (x1 - x0) * t;
+  const y = y0 + (y1 - y0) * t + 4 * sag * t * (1 - t);
+  return [Math.round(x * 10) / 10, Math.round(y * 10) / 10];
+}
+
+/**
+ * Pure evaluator for equipped Clubhouse decor overlays (cozy isometric floor rug,
+ * back-wall pennant banner garland, and twinkling tinted fairy lights).
+ * Returns `null` outside `clubhouse` or on the default `"classic"` swatch so
+ * uncustomized Clubhouse baselines remain pixel-identical.
+ */
+export function evaluateClubhouseDecor(
+  state: State,
+  reducedMotion = false,
+): ClubhouseDecorVisuals {
+  if (state.area !== "clubhouse") return null;
+  const swatch = activeClubhouseSwatch(state);
+  if (swatch === "classic") return null;
+
+  const spec = CLUBHOUSE_SWATCHES[swatch];
+  const fillTint = parseHexTint(spec.palette.rugColor);
+  const borderTint = parseHexTint(spec.palette.rugBorder);
+  const bannerTint = parseHexTint(spec.palette.bannerColor);
+  const lampTint = parseHexTint(spec.palette.lampGlow);
+  const accentTint = bannerTint;
+  const pennantCycle: readonly [number, number, number] = [bannerTint, fillTint, lampTint];
+
+  const pennants: ClubhousePennantSpec[] = [];
+  const ropeSegments: { x0: number; y0: number; x1: number; y1: number }[] = [];
+  let pennantIndex = 0;
+
+  for (const span of BANNER_SPANS) {
+    const steps = span.pennantCount * 2;
+    let prev = sampleArc(span.x0, span.y0, span.x1, span.y1, span.sag, 0);
+    for (let s = 1; s <= steps; s += 1) {
+      const curr = sampleArc(span.x0, span.y0, span.x1, span.y1, span.sag, s / steps);
+      ropeSegments.push({ x0: prev[0], y0: prev[1], x1: curr[0], y1: curr[1] });
+      prev = curr;
+    }
+    for (let i = 0; i < span.pennantCount; i += 1) {
+      const tA = (i + 0.14) / span.pennantCount;
+      const tB = (i + 0.86) / span.pennantCount;
+      const tMid = (tA + tB) * 0.5;
+      const baseA = sampleArc(span.x0, span.y0, span.x1, span.y1, span.sag, tA);
+      const baseB = sampleArc(span.x0, span.y0, span.x1, span.y1, span.sag, tB);
+      const mid = sampleArc(span.x0, span.y0, span.x1, span.y1, span.sag, tMid);
+      pennants.push({
+        baseA,
+        baseB,
+        tip: [mid[0], Math.round((mid[1] + span.drop) * 10) / 10],
+        tint: pennantCycle[pennantIndex % pennantCycle.length] ?? bannerTint,
+      });
+      pennantIndex += 1;
+    }
+  }
+
+  const bulbTints: readonly [number, number, number] = [lampTint, bannerTint, lampTint];
+  const fairyBulbs: ClubhouseFairyBulbSpec[] = [];
+  const t = reducedMotion ? 0 : state.tick;
+  let bulbIndex = 0;
+  for (const arc of FAIRY_ARCS) {
+    const perArc = 6;
+    for (let i = 0; i < perArc; i += 1) {
+      const frac = (i + 0.5) / perArc;
+      const [x, y] = sampleArc(arc.x0, arc.y0, arc.x1, arc.y1, arc.sag, frac);
+      const pulse = reducedMotion ? 0.5 : 0.5 + 0.5 * Math.sin(t * 0.065 + bulbIndex * 1.15);
+      fairyBulbs.push({
+        x,
+        y,
+        tint: bulbTints[bulbIndex % bulbTints.length] ?? lampTint,
+        scale: 0.24 + 0.08 * pulse,
+        alpha: 0.44 + 0.28 * pulse,
+      });
+      bulbIndex += 1;
+    }
+  }
+
+  return {
+    swatch,
+    rug: {
+      center: [RUG_CENTER_X, RUG_CENTER_Y],
+      outerPoly: RUG_OUTER_POLY,
+      innerPoly: RUG_INNER_POLY,
+      motifStyle: SWATCH_MOTIFS[swatch],
+      fillTint,
+      borderTint,
+      accentTint,
+      tasselPoints: RUG_TASSEL_POINTS,
+    },
+    pennants,
+    ropeSegments,
+    fairyBulbs,
+    pedestals: hasPlushPedestals(state),
+  };
 }

@@ -79,6 +79,7 @@ export function storyTagErrors(
   areas: Record<string, Area>,
   prices: Record<string, number> = {},
   treatPrices: Record<string, number> = {},
+  basketPrices?: Record<string, number>,
 ): string[] {
   return tags.flatMap((tag) => {
     if (tag.startsWith("grade:"))
@@ -99,6 +100,23 @@ export function storyTagErrors(
       return price !== undefined && price === Number(match?.[2])
         ? [] : [`invalid buy-treat tag "${tag}" (not a treat at its price)`];
     }
+    if (tag.startsWith("buy-basket:")) {
+      const match = /^buy-basket:\s*([a-z][a-z0-9-]*)\s+([1-9]\d*)$/.exec(tag);
+      if (match === null) return [`invalid buy-basket tag "${tag}"`];
+      if (basketPrices === undefined) return [];
+      const price = basketPrices[match[1] ?? ""];
+      return price !== undefined && price === Number(match[2])
+        ? [] : [`invalid buy-basket tag "${tag}" (not a basket at its price)`];
+    }
+    if (tag.startsWith("trade-fish:"))
+      return /^trade-fish:\s*(tickets|coins)\s+[1-9]\d*$/.test(tag)
+        ? [] : [`invalid trade-fish tag "${tag}"`];
+    if (tag.startsWith("buy-tickets:"))
+      return /^buy-tickets:\s*[1-9]\d*\s+[1-9]\d*$/.test(tag)
+        ? [] : [`invalid buy-tickets tag "${tag}"`];
+    if (tag.startsWith("open-decor:"))
+      return /^open-decor:\s*(clubhouse|bedroom)$/.test(tag)
+        ? [] : [`invalid open-decor tag "${tag}"`];
     if (tag.startsWith("gift:")) {
       if (/^gift:\s*(snack|coins)\s+[1-9]\d*$/.test(tag)) return [];
       const match = /^gift:\s*treat\s+([a-z][a-z0-9-]*)\s+([1-9]\d*)$/.exec(tag);

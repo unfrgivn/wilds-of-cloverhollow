@@ -139,7 +139,7 @@ describe("Chef Mateo's Taco Truck Kitchen (core & layout)", () => {
     expect(oopsState.arcade.mistakes).toBe(1);
     expect(oopsState.arcade.oopsTicks).toBe(world.arcade.taco.oopsTicks);
 
-    // 2. Play a spotless 3/3 shift and verify +20 coins, +2 snacks, taco-order, and prize-won.
+    // 2. Play a spotless 3/3 shift (unblessed) and verify +16 coins, +2 snacks, cues.
     let state = openTaco(31);
     const coinsBefore = state.coins;
     const snacksBefore = state.snacks;
@@ -174,10 +174,10 @@ describe("Chef Mateo's Taco Truck Kitchen (core & layout)", () => {
       expect(state.arcade.served).toBe(3);
       expect(state.arcade.mistakes).toBe(0);
       expect(state.arcade.message).toContain("SPOTLESS TACO SHIFT!");
-      expect(state.arcade.message).toContain("Coins +20");
+      expect(state.arcade.message).toContain("Coins +16");
       expect(state.arcade.message).toContain("Snacks +2");
     }
-    expect(state.coins).toBe(coinsBefore + 20);
+    expect(state.coins).toBe(coinsBefore + 16);
     expect(state.snacks).toBe(snacksBefore + 2);
     expect(cuesSeen).toContain("taco-top");
     expect(cuesSeen).toContain("taco-order");
@@ -209,11 +209,11 @@ describe("Chef Mateo's Taco Truck Kitchen (core & layout)", () => {
     while (state.arcade?.game === "taco" && state.arcade.phase !== "result") {
       state = step(world, state, blankInput()).state;
     }
-    expect(state.coins).toBe(coinsBefore + 5);
+    expect(state.coins).toBe(coinsBefore + 4);
     expect(state.snacks).toBe(snacksBefore);
     if (state.arcade?.game === "taco") {
       expect(state.arcade.message).toContain("1 order(s) complete!");
-      expect(state.arcade.message).toContain("Coins +5");
+      expect(state.arcade.message).toContain("Coins +4");
     }
 
     // Zero orders served -> timeUp line and 0 coins.
@@ -228,6 +228,47 @@ describe("Chef Mateo's Taco Truck Kitchen (core & layout)", () => {
     if (zero.arcade?.game === "taco") {
       expect(zero.arcade.message).toBe(world.arcade.taco.lines.timeUp);
     }
+  });
+
+  it("adds Fiesta Whisk (+1 coin/order) with Golden Taco Badge for 20 spotless & 5 partial",
+    () => {
+    const blessedBase = { ...openTaco(31), stickers: ["taco-chef"] };
+    let state = step(world, blessedBase, confirmFrame).state;
+    state = step(world, state, blankInput()).state;
+    for (let guard = 0; guard < 400 && state.arcade?.game === "taco"; guard += 1) {
+      const g = state.arcade;
+      if (g.phase === "serving") {
+        const next = g.orders[g.orderIndex]?.recipe[g.stepIndex];
+        if (next === undefined) break;
+        state = step(world, state, { ...blankInput(), move: TOPPING_MOVE[next] }).state;
+        state = step(world, state, blankInput()).state;
+      } else if (g.phase === "order-clear") {
+        state = step(world, state, blankInput()).state;
+      } else {
+        break;
+      }
+    }
+    expect(state.coins).toBe(blessedBase.coins + 20);
+    if (state.arcade?.game === "taco") {
+      expect(state.arcade.message).toContain("Coins +20");
+    }
+
+    let partial = { ...openTaco(7), stickers: ["taco-chef"] };
+    const partialBefore = partial.coins;
+    partial = step(world, partial, confirmFrame).state;
+    partial = step(world, partial, blankInput()).state;
+    while (partial.arcade?.game === "taco" && partial.arcade.phase === "serving") {
+      const next = partial.arcade.orders[partial.arcade.orderIndex]?.recipe[
+        partial.arcade.stepIndex
+      ];
+      if (next === undefined) break;
+      partial = step(world, partial, { ...blankInput(), move: TOPPING_MOVE[next] }).state;
+      partial = step(world, partial, blankInput()).state;
+    }
+    while (partial.arcade?.game === "taco" && partial.arcade.phase !== "result") {
+      partial = step(world, partial, blankInput()).state;
+    }
+    expect(partial.coins).toBe(partialBefore + 5);
   });
 
   it("preserves Chef Mateo choice 0 and opens taco on choice 1", () => {

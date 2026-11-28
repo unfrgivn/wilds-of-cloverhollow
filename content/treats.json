@@ -151,5 +151,48 @@
       "useLine": "Fae shares a glowing Golden Sunberry from the clubhouse garden! Warm meadow light swirls!",
       "favouriteLine": "A magical Golden Sunberry! Their woodland favourite! Warm golden light washes the fizz right away!"
     }
+  ],
+  "baskets": [
+    {
+      "id": "market-basket",
+      "name": "Cloverhollow Market Basket",
+      "price": 45,
+      "treats": {
+        "orchard-apple": 2,
+        "fish-cracker": 2
+      },
+      "snacks": 2
+    },
+    {
+      "id": "cafe-basket",
+      "name": "Bon Appetit Trail Basket",
+      "price": 50,
+      "treats": {
+        "maple-brittle": 2,
+        "sea-salt-taffy": 2
+      },
+      "snacks": 3
+    },
+    {
+      "id": "parlor-basket",
+      "name": "Sweet Scoop Party Basket",
+      "price": 55,
+      "treats": {
+        "berry-cone": 2,
+        "cocoa-sundae": 2
+      },
+      "snacks": 2
+    },
+    {
+      "id": "valley-feast",
+      "name": "Golden Valley Feast Basket",
+      "price": 75,
+      "treats": {
+        "sunberry-nectar": 1,
+        "berry-cone": 2,
+        "maple-brittle": 2
+      },
+      "snacks": 2
+    }
   ]
 }

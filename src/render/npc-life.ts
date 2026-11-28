@@ -1,5 +1,6 @@
 import { Container, Sprite } from "pixi.js";
 import {
+  effectiveAreaNpcs,
   evaluateNpcLife,
   npcFacing,
   npcVisible,
@@ -205,7 +206,7 @@ export class NpcLifeController {
 
     if (state.dialogue !== null) {
       const knot = state.dialogue.knot;
-      const talkingNpc = area.npcs.find(
+      const talkingNpc = effectiveAreaNpcs(this.world, state, area).find(
         (item) =>
           item.id !== "bus-stop" &&
           !item.id.startsWith("sanctuary-") &&

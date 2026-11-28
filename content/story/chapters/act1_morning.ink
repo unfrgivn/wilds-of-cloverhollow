@@ -33,6 +33,15 @@ My journal, right under my pillow where it belongs. # speaker: Fae
 Maddie's bed. Still warm, and full of orange fur. # speaker: Fae
 -> DONE
 
+=== bedroom_shelf ===
+My bookshelf! There's a cozy wooden deck right on top for displaying my favorite arcade plushes and prizes. # speaker: Fae
++ [Decorate Bedroom Shelf]
+    Let's pick which cozy plushes perch on the top shelf! # speaker: Fae # open-decor: bedroom
+    -> DONE
++ [Step back]
+    My favorite sunny corner of the room. # speaker: Fae
+    -> DONE
+
 === notice_board ===
 ~ read_notice = true
 CLOVERHOLLOW NEWS: The fountain is fizzing! # speaker: Notice board

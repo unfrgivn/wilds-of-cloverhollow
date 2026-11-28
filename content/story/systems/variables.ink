@@ -41,6 +41,7 @@ EXTERNAL level()
 EXTERNAL stickers()
 EXTERNAL treats()
 EXTERNAL bossesCalmed()
+EXTERNAL fishCount()
 VAR lifeguard_back = false
 
 VAR art_teacher_out = false

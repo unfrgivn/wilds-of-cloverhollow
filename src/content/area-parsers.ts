@@ -1,10 +1,13 @@
 import type {
   Area,
   CharacterContent,
+  DisplayAnchor,
+  EconomyTunables,
   Fixture,
   GroundManifest,
   Spawn,
   SurfaceMap,
+  SwatchPrice,
   Tunables,
   World,
 } from "../core";
@@ -16,6 +19,7 @@ import {
   array,
   direction,
   field,
+  integerIn,
   isFiniteNumber,
   isInteger,
   isPositive,
@@ -30,6 +34,63 @@ import {
 import { parsePropPlacements, placeProps, type PropCatalogue } from "./props";
 import { parseSurfaceMap } from "./surfaces";
 
+function parseSwatchPrice(value: unknown, file: string, label: string): SwatchPrice {
+  field(record(value), file, label);
+  return {
+    coins: integerIn(value, "coins", 1, file, `${label}.coins`),
+    tickets: integerIn(value, "tickets", 1, file, `${label}.tickets`),
+  };
+}
+
+function parseEconomyTunables(value: unknown, file: string): EconomyTunables | undefined {
+  if (value === undefined) return undefined;
+  field(record(value), file, "economy");
+  field(record(value.swatches), file, "economy.swatches");
+  field(record(value.ticketExchange), file, "economy.ticketExchange");
+  const swatches = value.swatches;
+  return {
+    swatches: {
+      "sunlit-meadow": parseSwatchPrice(
+        swatches["sunlit-meadow"],
+        file,
+        "economy.swatches.sunlit-meadow",
+      ),
+      "starlight-cozy": parseSwatchPrice(
+        swatches["starlight-cozy"],
+        file,
+        "economy.swatches.starlight-cozy",
+      ),
+      "bubblegum-beach": parseSwatchPrice(
+        swatches["bubblegum-beach"],
+        file,
+        "economy.swatches.bubblegum-beach",
+      ),
+      "pinecone-cabin": parseSwatchPrice(
+        swatches["pinecone-cabin"],
+        file,
+        "economy.swatches.pinecone-cabin",
+      ),
+    },
+    plushPedestals: parseSwatchPrice(value.plushPedestals, file, "economy.plushPedestals"),
+    ticketExchange: {
+      coinsPerBundle: integerIn(
+        value.ticketExchange,
+        "coinsPerBundle",
+        1,
+        file,
+        "economy.ticketExchange.coinsPerBundle",
+      ),
+      ticketsPerBundle: integerIn(
+        value.ticketExchange,
+        "ticketsPerBundle",
+        1,
+        file,
+        "economy.ticketExchange.ticketsPerBundle",
+      ),
+    },
+  };
+}
+
 export function parseTunables(value: unknown, file: string): Tunables {
   field(record(value), file, "object");
   field(record(value.interact), file, "interact");
@@ -37,6 +98,7 @@ export function parseTunables(value: unknown, file: string): Tunables {
   field(record(value.roam), file, "roam");
   const follow = value.follow;
   const followValue = (name: string): number => number(follow, name, file);
+  const economy = parseEconomyTunables(value.economy, file);
   return {
     walkSpeed: number(value, "walkSpeed", file),
     playerRadius: number(value, "playerRadius", file),
@@ -67,6 +129,7 @@ export function parseTunables(value: unknown, file: string): Tunables {
       noticeTicks: number(value.roam, "noticeTicks", file),
       alertTicks: number(value.roam, "alertTicks", file),
     },
+    ...(economy === undefined ? {} : { economy }),
   };
 }
 
@@ -187,6 +250,23 @@ export function parseArea(value: unknown, file: string, catalogue?: PropCatalogu
     "interactables",
   );
   field(record(value.spawns), file, "spawns");
+  let shelfAnchors: DisplayAnchor[] | undefined;
+  if (value.shelfAnchors !== undefined) {
+    field(array(value.shelfAnchors) && value.shelfAnchors.length > 0, file, "shelfAnchors");
+    shelfAnchors = value.shelfAnchors.map((item, index): DisplayAnchor => {
+      const label = `shelfAnchors[${index}]`;
+      field(record(item), file, label);
+      const scale = number(item, "scale", file, `${label}.scale`);
+      field(scale > 0, file, `${label}.scale`);
+      return {
+        x: number(item, "x", file, `${label}.x`),
+        y: number(item, "y", file, `${label}.y`),
+        zIndex: number(item, "zIndex", file, `${label}.zIndex`),
+        scale,
+        rotation: number(item, "rotation", file, `${label}.rotation`),
+      };
+    });
+  }
   const spawns: Record<string, Spawn> = {};
   for (const [name, raw] of Object.entries(value.spawns)) {
     field(record(raw), file, `spawns.${name}`);
@@ -273,6 +353,7 @@ export function parseArea(value: unknown, file: string, catalogue?: PropCatalogu
     }),
     props: placeProps(parsePropPlacements(value.props, file), catalogue, file),
     atlases: catalogue?.atlases ?? [],
+    ...(shelfAnchors === undefined ? {} : { shelfAnchors }),
     spawns,
     ...(puzzles === undefined ? {} : { puzzles }),
   };

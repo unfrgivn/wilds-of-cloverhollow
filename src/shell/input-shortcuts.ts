@@ -7,7 +7,7 @@ import type { TitleMode } from "./title-flow";
 export type OverlayGateState = Pick<
   State,
   "dialogue" | "battle" | "arcade" | "journalOpen" | "transition" | "finale" | "cutscene"
->;
+> & { area?: string };
 
 export type OverlayGateContext = {
   state: OverlayGateState;
@@ -17,6 +17,7 @@ export type OverlayGateContext = {
   qaBlocked: boolean;
   photoMode: boolean;
   shrineOpen?: boolean;
+  decorPickerOpen?: boolean;
   loading?: boolean;
 };
 
@@ -79,6 +80,13 @@ export type ShortcutEncoreControl = {
   handleKeydown: (event: ShortcutKeyEvent) => boolean;
 };
 
+export type ShortcutDecorControl = {
+  isOpen: () => boolean;
+  openForArea: (area: string) => boolean;
+  close: () => void;
+  handleKeydown: (event: ShortcutKeyEvent) => boolean;
+};
+
 export type InputShortcutsDeps = {
   getContext: () => OverlayGateContext;
   getBattlePeekOpen: () => boolean;
@@ -92,6 +100,7 @@ export type InputShortcutsDeps = {
   swallow: (button: "confirm" | "cancel" | "menu") => void;
   playChoiceMove: () => void;
   invalidate: () => void;
+  decorPicker?: ShortcutDecorControl;
   onToggleMute?: () => void;
   qa?: ShortcutQaControl;
   qaTimer?: ShortcutTimer;
@@ -124,6 +133,7 @@ export function canPhotoMode(ctx: Omit<OverlayGateContext, "photoMode">): boolea
     !ctx.qaConsoleOpen &&
     !ctx.qaBlocked &&
     ctx.shrineOpen !== true &&
+    ctx.decorPickerOpen !== true &&
     ctx.state.dialogue === null &&
     ctx.state.battle === null &&
     ctx.state.arcade === null &&
@@ -141,6 +151,7 @@ export function canPhotoFromJournal(ctx: Omit<OverlayGateContext, "photoMode">):
     !ctx.qaConsoleOpen &&
     !ctx.qaBlocked &&
     ctx.shrineOpen !== true &&
+    ctx.decorPickerOpen !== true &&
     ctx.loading !== true &&
     ctx.state.dialogue === null &&
     ctx.state.battle === null &&
@@ -175,6 +186,7 @@ export function canOverworldSteer(ctx: OverlayGateContext): boolean {
     !ctx.qaBlocked &&
     !ctx.photoMode &&
     ctx.shrineOpen !== true &&
+    ctx.decorPickerOpen !== true &&
     ctx.state.dialogue === null &&
     ctx.state.battle === null &&
     ctx.state.arcade === null &&
@@ -189,7 +201,7 @@ export function canOverworldSteer(ctx: OverlayGateContext): boolean {
 export function isJournalShortcutActive(
   ctx: Pick<
     OverlayGateContext,
-    "state" | "titleMode" | "qaMenuOpen" | "qaConsoleOpen" | "shrineOpen"
+    "state" | "titleMode" | "qaMenuOpen" | "qaConsoleOpen" | "shrineOpen" | "decorPickerOpen"
   >,
 ): boolean {
   return (
@@ -197,7 +209,8 @@ export function isJournalShortcutActive(
     ctx.titleMode === null &&
     !ctx.qaMenuOpen &&
     !ctx.qaConsoleOpen &&
-    ctx.shrineOpen !== true
+    ctx.shrineOpen !== true &&
+    ctx.decorPickerOpen !== true
   );
 }
 
@@ -212,6 +225,7 @@ export function isOverworldFree(
     !ctx.qaConsoleOpen &&
     !ctx.qaBlocked &&
     ctx.shrineOpen !== true &&
+    ctx.decorPickerOpen !== true &&
     ctx.state.dialogue === null &&
     ctx.state.battle === null &&
     ctx.state.arcade === null &&
@@ -293,6 +307,14 @@ export function createInputShortcuts(
       }
       return;
     }
+    if (deps.decorPicker?.isOpen() === true) {
+      if (deps.decorPicker.handleKeydown(event)) {
+        deps.swallow("cancel");
+        deps.clearKeyboardTaps();
+        deps.invalidate();
+      }
+      return;
+    }
     const journalActive = isJournalShortcutActive(ctx);
     if (journalActive && !deps.journal.hasOpenOverlay()) {
       const inSlider = matchesClosest(
@@ -338,6 +360,20 @@ export function createInputShortcuts(
     if (event.code === "KeyM" && deps.onToggleMute !== undefined) {
       event.preventDefault();
       deps.onToggleMute();
+      deps.invalidate();
+      return;
+    }
+    if (
+      event.code === "KeyB" &&
+      deps.decorPicker !== undefined &&
+      isOverworldFree(ctx, false) &&
+      !ctx.photoMode &&
+      ctx.state.transition === null &&
+      ctx.state.area !== undefined &&
+      deps.decorPicker.openForArea(ctx.state.area)
+    ) {
+      event.preventDefault();
+      deps.clearKeyboardTaps();
       deps.invalidate();
       return;
     }
@@ -524,6 +560,12 @@ export function createInputShortcuts(
       return "consume-tick";
     }
     const ctx = deps.getContext();
+    if (deps.decorPicker?.isOpen() === true) {
+      deps.decorPicker.close();
+      deps.swallow("cancel");
+      deps.invalidate();
+      return "consume-tick";
+    }
     if (ctx.state.journalOpen && deps.journal.hasOpenOverlay()) {
       deps.journal.dismissOverlay();
       deps.swallow("cancel");

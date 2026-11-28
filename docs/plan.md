@@ -7516,9 +7516,15 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   Workbench crafting Charm Pins and Tier 2/3 upgrades for Lantern, Lasso, and
   Flute.
 - **Track E9 (Keepsake Dream Blessings, Bedroom/Clubhouse Decor & Economy Rebalance):**
-  Passive Dream Blessings for all 13 Keepsakes; placeable Arcade Plushes,
-  Counter Prizes, and Decor Swatches in Bedroom & Clubhouse + visiting calm
-  friends; full coin/ticket/fish/treat economy rebalance.
+  ✅ Completed (Track E9A Milestone 182, 2026-11-27; Track E9B Milestone 195,
+  2026-11-28) — All 13 Keepsake Dream Blessings cataloged in Journal & wired
+  into live passive gameplay effects (`src/core/blessings.ts`), customizable
+  Bedroom Shelf plush display & 4 Clubhouse Decor Swatches + Velvet Plush
+  Pedestals + 6 rotating Visiting Friends (`src/core/decor.ts`,
+  `src/ui/decor-picker.{ts,css}`, `src/render/clubhouse-display.ts`), and full
+  Coin/Ticket/Fish/Treat economy rebalance with Bubblegum Bay fish trade-ins,
+  4 Specialty Treat Gift Baskets, and Mr. Pip coin-to-ticket exchange (audited
+  in `tools/sim/balance.ts`).
 
 ### Phase 4: Intentional Story, Foreshadowing & Unforgettable Finale
 - **Track E10 (Acts 1 to 3 Narrative Pass & Milo Foreshadowing Arc):** Tighten
@@ -8554,6 +8560,64 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   packs, purity, lint), `just build` (`index` `< 500 kB`), 34/34
   targeted Chromium & WebKit e2e, and 99/99 Chromium `ui-gallery` tests.
 
+## Milestone 195: Active Keepsake Dream Blessings, Bedroom & Clubhouse Decorating, Visiting Friends & Economy Rebalance (Elevation Track E9B) **Status:** ✅ Completed (2026-11-28)
+- Completes Elevation Track E9B on top of E9A (Milestone 182) while keeping
+  `src/core/` 100% pure, Save `v10` backwards-compatible (optional `state.decor`
+  omitted when default), zero new Ink global `VAR`s, and all existing early-game
+  golden replays and QA save packs bit-identical:
+  - **All 13 Active Keepsake Dream Blessings (`src/core/blessings.ts` + core &
+    render wiring):** Preserved E9A's `dreamBlessingBonuses` and catalog intact
+    while adding `ActiveBlessingEffects`, `activeBlessingEffects`,
+    `blessingEffectsFromIds`, `applyBlessingCheckSpec`, `applyCalmSparkleBonus`,
+    `fishBiteTicksWithBlessing`, `effectiveWalkSpeed`, and
+    `effectiveRoamTunables`. Wired passive gameplay bonuses for all 13 keepsakes
+    across `battle.ts`, `sim.ts`, `roam.ts`, `encounter.ts`, `skee.ts`,
+    `mole.ts`, `comet.ts`, `fish.ts`, `taco.ts`, `overworld-vfx-math.ts`, and
+    `view.ts` (zero impact when no keepsakes are owned).
+  - **Bedroom Shelf Plush Display, Clubhouse Decor Swatches & Velvet Pedestals
+    (`src/core/decor.ts`, `src/render/clubhouse-display.ts`,
+    `src/render/overworld-effects.ts`, `src/render/view-loader.ts`,
+    `content/areas/bedroom.json`, `content/areas/clubhouse.json`):** Added 5
+    non-overlapping top-deck `shelfAnchors` on Fae's bedroom bookshelf and
+    diegetic `bedroom_shelf` / `club_decor` interactables (`# open-decor:`).
+    Implemented `classic` default plus 4 unlockable Clubhouse Decor Swatches
+    (`sunlit-meadow` 35c/25t, `starlight-cozy` 55c/40t, `bubblegum-beach`
+    70c/50t, `pinecone-cabin` 85c/65t) rendering an isometric watercolor floor
+    rug, roofline pennant garlands, and 12 pulsing fairy-light bulbs (drawing
+    nothing extra on `classic`), plus `Velvet Plush Pedestals` (50c/35t) adding
+    soft velvet cushions and expanding Bedroom shelf capacity from 4 to 5 slots.
+  - **Visiting Friends in the Clubhouse (`src/core/decor.ts`,
+    `content/story/chapters/act4_forest.ink`, `src/render/entity-layer.ts`,
+    `src/render/overworld-render.ts`, `src/shell/assets.ts`):** Deterministically
+    rotates befriended neighbors (`sue`, `jordan`, `milo`, `rosie`, `barnaby`,
+    `fern`) at `(360, 505)` with full sprite/shadow/facing/portrait support and
+    6 warm `club_visit_*` hangout knots (excluding active party members and
+    keeping `golden-clubhouse`/`golden-kitchen` baselines untouched).
+  - **Interactive Decor Picker (`src/ui/decor-picker.ts`,
+    `src/ui/decor-picker.css`, `src/shell/input-shortcuts.ts`, `src/main.ts`):**
+    Hand-drawn storybook modal accessible via `KeyB` or room interactables in
+    `clubhouse`/`bedroom`, displaying all 4 sections at once on `1280x720`
+    desktop and cleanly scrollable with spacious touch controls on `874x402`
+    phone.
+  - **Full Coin, Ticket & Fish Economy Rebalance (`content/arcade.json`,
+    `content/treats.json`, `content/tunables.json`,
+    `content/story/town/shops.ink`, `content/story/chapters/act2_bay.ink`,
+    `content/story/systems/arcade.ink`, `tools/sim/balance.ts`):** Rebalanced
+    unblessed Taco orders (`coinsPerOrder: 4`, 20 spotless with `taco-badge`)
+    and repeat rare fish payouts (`11/14/18`), added 4 Specialty Treat Gift
+    Baskets (`# buy-basket:`), Bubblegum Bay Fish-to-Ticket (+12t) and
+    Fish-to-Coin (+14c) trade-ins (`EXTERNAL fishCount()`, `# trade-fish:`,
+    Catch Book history preserved via `state.decor.fishTraded`), Mr. Pip's
+    25-coin -> 15-ticket exchange (`# buy-tickets:`), and an automated Acts 1–4
+    Economy Balance Curve audit in `tools/sim/balance.ts` (520c / 395t sinks vs
+    318c festival coins).
+- **Evidence:** `tests/unit/e9b-blessings-decor-economy.test.ts`,
+  `tests/unit/e9b-decor-render-ui.test.ts`, `tools/sim/balance.ts`,
+  `tests/e2e/e9b-decor-economy.spec.ts` (`@smoke` Chromium + WebKit real keys),
+  and `vision`-verified captures in
+  `art/review/e9b-{decor-picker-clubhouse-1280,decor-picker-phone-874,clubhouse-decorated-1280,clubhouse-visitor-dialogue-1280,bedroom-shelf-1280}.jpg`.
+- **Gates:** `just check`, `just build` (`< 500 kB` every non-vendor chunk),
+  and Playwright e2e verification.
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

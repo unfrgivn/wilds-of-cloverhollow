@@ -1,3 +1,4 @@
+import { activeBlessingEffects } from "./blessings";
 import { nextRandom } from "./random";
 import type { ActionFrame, ArcadeOwned, MoleContent, State, World } from "./types";
 
@@ -141,7 +142,8 @@ export function stepMole(
     case "ducking": {
       if (game.mole + 1 < game.order.length) return owned(to("waiting"));
       // The last mole is down: the round pays its tickets.
-      const paid = game.booped * mole.ticketsPerBoop;
+      const bonus = activeBlessingEffects(world, state).arcadeTicketBonus;
+      const paid = game.booped * mole.ticketsPerBoop + bonus;
       const message = mole.lines.result.replace("{booped}", String(game.booped))
         .replace("{moles}", String(game.order.length)).replace("{tickets}", String(paid));
       return {

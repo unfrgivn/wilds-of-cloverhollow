@@ -107,12 +107,17 @@ Ms. Coral smiles and checks the beach. "All clear, kiddos!" # speaker: Ms. Coral
     ~ stamp_bay = true
     A Star-Line Stamp Card from Buster? Stamp! One shiny Bubblegum Bay wave stamp, all yours! # speaker: Bay keeper # sound: chime-blue
 }
-{coins() < 9:
+~ temp ready_fish = fishCount()
+{coins() < 9 and ready_fish == 0:
     Sea-Salt Taffy is 9 coins a bag. Come back whenever your pockets jingle! # speaker: Bay keeper
     -> DONE
 }
 + {coins() >= 9} [Buy Sea-Salt Taffy (9 coins)]
     One pastel bag of chewy Sea-Salt Taffy! Beach and cavern critters adore it! # speaker: Bay keeper # buy-treat: sea-salt-taffy 9
++ {ready_fish > 0} [Trade a bay catch for 12 Arcade Tickets ({ready_fish} ready)]
+    Ooh, what a shiny Bubblegum Bay catch! Here are twelve crisp arcade tickets for your trip back to town! # speaker: Bay keeper # trade-fish: tickets 12 # sound: chime-blue
++ {ready_fish > 0} [Trade a bay catch for 14 Coins ({ready_fish} ready)]
+    A fresh bay treasure! Here are fourteen shiny coins for your purse! # speaker: Bay keeper # trade-fish: coins 14 # sound: chime-yellow
 + [Not now]
     Enjoy the ocean breeze, Fae! Stop by anytime! # speaker: Bay keeper
 - -> DONE

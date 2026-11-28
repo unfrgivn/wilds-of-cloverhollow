@@ -1,6 +1,8 @@
 import type {
   ActionFrame, Area, Direction, Event, Fixture, Mood, Npc, Point, State, World,
 } from "./types";
+import { activeBlessingEffects, effectiveWalkSpeed } from "./blessings";
+import { applyEconomyItemTag, effectiveAreaNpcs } from "./decor";
 import { createInkState, runInk, setInkVariables, storyHasKnot } from "./ink";
 import {
   findLullabyFluteSpot, heartToHeartSpotsInArea, type ActiveHeartSpot,
@@ -168,7 +170,7 @@ export function targetInteractable(
       point: critter.point,
       prompt: critter.kind.calmPrompt,
     }));
-  const people = area.npcs
+  const people = effectiveAreaNpcs(world, state, area)
     .filter((npc) => npcVisible(world, state, npc))
     .map((npc) => {
       const live = npcLivePoint(state, npc);
@@ -209,7 +211,7 @@ function solidArea(
     ? area
     : areaWithoutOverriddenCrossings(world, state, area);
   const scenery = sceneryArea(world, state.ink, base);
-  const npcBlockers = area.npcs
+  const npcBlockers = effectiveAreaNpcs(world, state, area)
     .filter((npc) => npcVisible(world, state, npc))
     .map((npc) => npcLiveFootprint(npc, npcLivePoint(state, npc)));
   return {
@@ -252,6 +254,7 @@ function dialogueState(
   carriedPlay?: { game: ArcadeGameId; price: number },
   carriedPartnerPoint?: Point,
   carriedShrine?: "encore",
+  carriedOpenDecor?: "clubhouse" | "bedroom",
 ): State["dialogue"] {
   const tag = result.line?.tags.find((item) => item.startsWith("travel:"));
   const play = result.line?.tags.map((item) =>
@@ -263,6 +266,14 @@ function dialogueState(
     : carriedShrine;
   const ending = result.line?.tags.includes("ending") || false;
   const credits = result.line?.tags.includes("credits") || false;
+  const decorMatch = result.line?.tags
+    .map((item) => /^open-decor:\s*(clubhouse|bedroom)$/.exec(item.trim()))
+    .find((item) => item !== null);
+  const decorRoom = decorMatch?.[1];
+  const openDecor: "clubhouse" | "bedroom" | undefined =
+    decorRoom === "clubhouse" || decorRoom === "bedroom"
+      ? decorRoom
+      : carriedOpenDecor;
   const game = play?.[1];
   if (game !== undefined && isArcadeGameId(game))
     playValue = { game, price: Number(play?.[2]) };
@@ -284,6 +295,7 @@ function dialogueState(
     ...(shrine === undefined ? {} : { shrine }),
     ...(ending ? { ending: true } : {}),
     ...(credits ? { credits: true } : {}),
+    ...(openDecor === undefined ? {} : { openDecor }),
     ...(carriedPartnerPoint === undefined ? {} : { partnerPoint: carriedPartnerPoint }),
   };
 }
@@ -292,9 +304,9 @@ function dialogueState(
 // Fae a snack; `gift: snack <count>`, `gift: coins <count>`, and
 // `gift: treat <id> <count>` give her snacks, coins, or specialty treats;
 // `feed: snack <count>` gives snacks away (a treat for a friend), never below
-// none; `trade: <prize> <price>` buys a prize at the ticket counter. The
-// loader allows no other item or format.
-function applyItemTags(state: State, tags: string[]): State {
+// none; `trade: <prize> <price>` buys a prize at the ticket counter;
+// `buy-basket:`, `trade-fish:`, and `buy-tickets:` run economy trades.
+function applyItemTags(world: World, state: State, tags: string[]): State {
   let next = state;
   for (const raw of tags) {
     const tag = raw.trim();
@@ -303,6 +315,7 @@ function applyItemTags(state: State, tags: string[]): State {
     const treat = /^buy-treat:\s*([a-z][a-z0-9-]*)\s+(\d+)$/.exec(tag);
     if (treat?.[1] !== undefined && treat[2] !== undefined)
       next = purchaseTreat(next, treat[1], Number(treat[2]));
+    next = applyEconomyItemTag(world, next, tag);
     const gift = /^gift:\s*(snack|coins)\s+(\d+)$/.exec(tag);
     if (gift?.[1] === "snack") next = { ...next, snacks: next.snacks + Number(gift[2]) };
     if (gift?.[1] === "coins") next = { ...next, coins: next.coins + Number(gift[2]) };
@@ -343,16 +356,18 @@ function afterArrival(world: World, state: State): State {
 function openTalk(world: World, state: State, input: ActionFrame, knot: string): State {
   const result = runInk(world.story, state.ink, { type: "start", knot }, inkFacts(world, state));
   const area = world.areas[state.area];
-  const partnerNpc = area?.npcs.find(
-    (npc) => npc.knot === knot && npc.stroll !== undefined && npcVisible(world, state, npc),
-  );
+  const partnerNpc = area === undefined
+    ? undefined
+    : effectiveAreaNpcs(world, state, area).find(
+        (npc) => npc.knot === knot && npc.stroll !== undefined && npcVisible(world, state, npc),
+      );
   const partnerPoint = partnerNpc === undefined
     ? undefined
     : (() => {
         const live = npcLivePoint(state, partnerNpc);
         return { x: live.x, y: live.y };
       })();
-  return applyItemTags({
+  return applyItemTags(world, {
     ...state,
     tick: state.tick + 1,
     ink: result.ink,
@@ -372,7 +387,7 @@ function openTalkForCutscene(world: World, state: State, knot: string): State {
   if (result.line === null && result.choices.length === 0 && result.ended) {
     return { ...state, ink: result.ink, dialogue: null };
   }
-  return applyItemTags({
+  return applyItemTags(world, {
     ...state,
     ink: result.ink,
     dialogue: dialogueState(knot, result),
@@ -444,6 +459,9 @@ function closeDialogue(
       events: [{ type: "open-encore-shrine" }],
     };
   }
+  const events: Event[] = dialogue.openDecor === undefined
+    ? []
+    : [{ type: "open-decor", room: dialogue.openDecor }];
   return { state: {
     ...opened,
     dialogue: null,
@@ -451,7 +469,7 @@ function closeDialogue(
       dialogue.travel === undefined
         ? opened.transition
         : { target: dialogue.travel, phase: "out", elapsed: 0 },
-  }, events: [] };
+  }, events };
 }
 
 /*
@@ -506,8 +524,9 @@ function dialogueStep(
           dialogue.play,
           dialogue.partnerPoint,
           dialogue.shrine,
+          dialogue.openDecor,
         );
-    const advanced = applyItemTags({ ...next, ink: result.ink }, result.line?.tags ?? []);
+    const advanced = applyItemTags(world, { ...next, ink: result.ink }, result.line?.tags ?? []);
     return following === null
       ? closeDialogue(world, advanced, gentleTiming)
       : { state: { ...advanced, dialogue: following }, events: [] };
@@ -536,8 +555,9 @@ function dialogueStep(
           dialogue.play,
           dialogue.partnerPoint,
           dialogue.shrine,
+          dialogue.openDecor,
         );
-    const advanced = applyItemTags({ ...next, ink: result.ink }, result.line?.tags ?? []);
+    const advanced = applyItemTags(world, { ...next, ink: result.ink }, result.line?.tags ?? []);
     return following === null
       ? closeDialogue(world, advanced, gentleTiming)
       : { state: { ...advanced, dialogue: following }, events: [] };
@@ -708,12 +728,14 @@ function stepTick(
   }
   // People who are there are solid, for Fae and for her party alike.
   const solid = solidArea(world, state, area);
+  const speedBonus = activeBlessingEffects(world, state).overworldSpeedBonus;
+  const walkPerTick = effectiveWalkSpeed(world.tunables.walkSpeed, speedBonus) / 60;
   const dashing = input.dash === true;
   const player = resolveOverworldMove(
     state.player,
     input.move,
     dashing,
-    world.tunables.walkSpeed / 60,
+    walkPerTick,
     solid,
     world.tunables.playerRadius,
   );
@@ -829,7 +851,7 @@ function stepTick(
   return {
     state: knock === undefined
       ? resolvedState
-      : applyItemTags(resolvedState, knock.result.line?.tags ?? []),
+      : applyItemTags(world, resolvedState, knock.result.line?.tags ?? []),
     events,
   };
 }

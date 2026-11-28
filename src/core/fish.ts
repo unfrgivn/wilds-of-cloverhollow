@@ -1,3 +1,4 @@
+import { activeBlessingEffects, fishBiteTicksWithBlessing } from "./blessings";
 import { nextRandom } from "./random";
 import type {
   ActionFrame, ArcadeStep, FishCatchSpec, FishContent, FishRarity, State, World,
@@ -274,7 +275,12 @@ export function stepFish(
       return { arcade: { ...game, phaseTicks, nibblePulse }, ...kept };
     }
     case "bite": {
-      const biteWindow = gentleTiming ? fish.biteTicks + GENTLE_BITE_BONUS : fish.biteTicks;
+      const biteWindow = fishBiteTicksWithBlessing(
+        fish.biteTicks,
+        GENTLE_BITE_BONUS,
+        gentleTiming,
+        activeBlessingEffects(world, state).fishBiteGrace,
+      );
       if (press) {
         const spec = catchById(fish, game.fishId);
         return {

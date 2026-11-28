@@ -1,3 +1,4 @@
+import { activeBlessingEffects } from "./blessings";
 import type { ActionFrame, ArcadeOwned, SkeeContent, State, World } from "./types";
 
 // Skee-ball (spec 8.2): five balls, each in two presses. An arrow sweeps back
@@ -129,7 +130,8 @@ export function stepSkee(
           return to("aiming", { aim: -edge, sweep: 1, held: 0 });
         // The last ball is in: the game pays its tickets.
         const score = total(game.throws);
-        const paid = Math.floor(score / skee.pointsPerTicket);
+        const bonus = activeBlessingEffects(world, state).arcadeTicketBonus;
+        const paid = Math.floor(score / skee.pointsPerTicket) + bonus;
         const message = skee.lines.result.replace("{score}", String(score))
           .replace("{tickets}", String(paid));
         return {

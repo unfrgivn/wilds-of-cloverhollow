@@ -27,5 +27,33 @@
     "pauseTicks": 45,
     "noticeTicks": 45,
     "alertTicks": 30
+  },
+  "economy": {
+    "swatches": {
+      "sunlit-meadow": {
+        "coins": 35,
+        "tickets": 25
+      },
+      "starlight-cozy": {
+        "coins": 55,
+        "tickets": 40
+      },
+      "bubblegum-beach": {
+        "coins": 70,
+        "tickets": 50
+      },
+      "pinecone-cabin": {
+        "coins": 85,
+        "tickets": 65
+      }
+    },
+    "plushPedestals": {
+      "coins": 50,
+      "tickets": 35
+    },
+    "ticketExchange": {
+      "coinsPerBundle": 25,
+      "ticketsPerBundle": 15
+    }
   }
 }

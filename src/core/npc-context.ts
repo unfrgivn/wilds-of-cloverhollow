@@ -1,3 +1,4 @@
+import { effectiveAreaNpcs } from "./decor";
 import { starGemsFound } from "./journal";
 import {
   ARRIVAL_GRACE_TICKS,
@@ -585,7 +586,7 @@ export function evaluateNpcLife(
   if (state.area === "harness" || area === undefined) {
     return { situation, npcs: [], party: [], chatter: null, activeToolEventId: null };
   }
-  const visibleNpcs = area.npcs.filter(
+  const visibleNpcs = effectiveAreaNpcs(world, state, area).filter(
     (npc) =>
       npc.id !== "bus-stop" &&
       !npc.id.startsWith("sanctuary-") &&

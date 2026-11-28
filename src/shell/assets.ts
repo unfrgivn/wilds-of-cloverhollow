@@ -1,6 +1,7 @@
 import { Assets, type Spritesheet } from "pixi.js";
 import {
   battleParty,
+  CLUBHOUSE_VISITORS,
   type ArcadeView,
   type Area,
   type ClawView,
@@ -126,7 +127,7 @@ export function createMoleHoleHandler(
 /** Unique critter & NPC atlas JSON paths whose DOM images an area needs warmed. */
 export function areaMediaAtlases(
   world: Pick<World, "critters" | "characters">,
-  area: Pick<Area, "critters" | "recurring" | "npcs">,
+  area: Pick<Area, "critters" | "recurring" | "npcs"> & { id?: string },
 ): string[] {
   const atlases = new Set<string>();
   const areaCritters = new Set([
@@ -142,6 +143,12 @@ export function areaMediaAtlases(
   for (const npc of area.npcs) {
     const character = world.characters[npc.id];
     if (character !== undefined) atlases.add(character.atlas);
+  }
+  if (area.id === "clubhouse") {
+    for (const visitor of CLUBHOUSE_VISITORS) {
+      const character = world.characters[visitor.id];
+      if (character !== undefined) atlases.add(character.atlas);
+    }
   }
   return [...atlases];
 }
@@ -402,10 +409,14 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
   };
 
   const cacheAreaNpcPortraits = (area: Area): void => {
-    for (const npc of area.npcs) {
-      const character = world.characters[npc.id];
+    const ids = area.npcs.map((npc) => npc.id);
+    if (area.id === "clubhouse") {
+      for (const visitor of CLUBHOUSE_VISITORS) ids.push(visitor.id);
+    }
+    for (const id of ids) {
+      const character = world.characters[id];
       if (character === undefined || atlasJsonCache.has(character.atlas)) continue;
-      const sheet = Assets.get<Spritesheet | undefined>(`${npc.id}-sheet`);
+      const sheet = Assets.get<Spritesheet | undefined>(`${id}-sheet`);
       if (sheet !== undefined) atlasJsonCache.set(character.atlas, sheet.data);
     }
   };

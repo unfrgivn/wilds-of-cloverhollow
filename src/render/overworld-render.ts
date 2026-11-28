@@ -1,16 +1,17 @@
-import type {
-  Area,
-  Critter,
-  Direction,
-  Npc,
-  PartyAttention,
-  PartyContent,
-  PartyMember,
-  Point,
-  PresentCritter,
-  State,
-  Tunables,
-  World,
+import {
+  CLUBHOUSE_VISITORS,
+  type Area,
+  type Critter,
+  type Direction,
+  type Npc,
+  type PartyAttention,
+  type PartyContent,
+  type PartyMember,
+  type Point,
+  type PresentCritter,
+  type State,
+  type Tunables,
+  type World,
 } from "../core";
 import { assetUrl } from "../platform/assets";
 import type { AmbientFlyer } from "../content/ambient";
@@ -197,6 +198,13 @@ export function areaEntityAtlases(world: World, area: Area): EntityAtlas[] {
     }
     const character = world.characters[npc.id];
     if (character !== undefined) add(`${npc.id}-sheet`, character.atlas);
+  }
+  if (area.id === "clubhouse") {
+    for (const visitor of CLUBHOUSE_VISITORS) {
+      if (world.party[visitor.id] !== undefined) continue;
+      const character = world.characters[visitor.id];
+      if (character !== undefined) add(`${visitor.id}-sheet`, character.atlas);
+    }
   }
   const critterIds = [
     ...area.critters.map((piece) => piece.id),

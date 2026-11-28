@@ -70,7 +70,7 @@ export class AreaAssetManager {
 
   private areaAtlasesFor(area: Area): EntityAtlas[] {
     const entities = areaEntityAtlases(this.world, area);
-    const base = area.id === "clubhouse"
+    const base = area.id === "clubhouse" || area.id === "bedroom"
       ? [...entities, { alias: CLUBHOUSE_PRIZES_ALIAS, src: assetUrl(this.world.arcade.atlas) }]
       : entities;
     return [...base, ...cutsceneAreaAtlases(this.world, area, base)];

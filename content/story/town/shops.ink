@@ -127,6 +127,12 @@ Whoa, it smells like warm cinnamon! I'll keep it in our clubhouse chest! # speak
     -> DONE
 + {spice_returned and (visited_pass or jordan_joined) and not valley_spice_done} [Ask about the Valley Spice Run]
     -> bea_spice_run
++ {spice_returned and coins() >= 50} [Bon Appetit Trail Basket — 50 coins (2 Brittle, 2 Taffy, 3 Snacks)]
+    A ribbon-tied Bon Appetit Trail Basket packed with brittle, taffy, and three warm trail snacks! # speaker: Chef Bea # buy-basket: cafe-basket 50 # sound: chime-yellow
+    -> DONE
++ {spice_returned and coins() >= 75} [Golden Valley Feast Basket — 75 coins (Sunberry, 2 Cones, 2 Brittle, 2 Snacks)]
+    My grand Golden Valley Feast Basket, tucked with a shimmering Sunberry, cones, brittle, and warm snacks! # speaker: Chef Bea # buy-basket: valley-feast 75 # sound: chime-yellow
+    -> DONE
 + [Just saying hi!]
     Always a treat to see your smiling face, Fae! Come back anytime. # speaker: Chef Bea
     -> DONE
@@ -358,6 +364,9 @@ Need any critter treats or trail snacks for your backpack today? # speaker: Groc
 + {coins() >= 5} [Trail Snack — 5 coins]
     One tidy trail snack wrapped up for the road! Happy exploring, Fae! # speaker: Grocer Pippin # buy: snack 5
     -> DONE
++ {coins() >= 45} [Cloverhollow Market Basket — 45 coins (2 Apples, 2 Crackers, 2 Snacks)]
+    One woven Cloverhollow Market Basket packed with crisp apples, crunchy crackers, and two trail snacks! # speaker: Grocer Pippin # buy-basket: market-basket 45 # sound: chime-green
+    -> DONE
 + [Just browsing!]
     Take your time! The jam shelves smell especially cozy today. # speaker: Grocer Pippin
     -> DONE
@@ -433,6 +442,9 @@ Every first-time visitor gets a complimentary Cloverhollow Dream Sundae made to 
     -> DONE
 + {coins() >= 12} [Cozy Cocoa Sundae — 12 coins (cozy winter & cave friends love it!)]
     One warm Cozy Cocoa Sundae with fluffy marshmallows! Winter and cave friends melt into smiles for this! # speaker: Scooper Penny # buy-treat: cocoa-sundae 12
+    -> DONE
++ {coins() >= 55} [Sweet Scoop Party Basket — 55 coins (2 Berry Cones, 2 Sundaes, 2 Snacks)]
+    One pastel Sweet Scoop Party Basket packed with Berry Swirl Cones, Cozy Cocoa Sundaes, and two sweet snacks! # speaker: Scooper Penny # buy-basket: parlor-basket 55 # sound: chime-blue
     -> DONE
 + [Just admiring the flavors!]
     Keep cool out there, Fae! Our pastel tubs are always ready for a scoop break! # speaker: Scooper Penny

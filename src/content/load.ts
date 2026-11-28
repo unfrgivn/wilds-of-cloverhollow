@@ -201,7 +201,8 @@ import {
 import { parseArcade } from "./arcade-parsers";
 import {
   critterErrors, feelingErrors, parseBattleContent, parseCritter, parseEncoreContent, parseLevels,
-  parsePartyMember, parseStickers, parseTreats, partyErrors, partyJoinErrors, talkErrors,
+  parsePartyMember, parseStickers, parseTreatBaskets, parseTreats, partyErrors, partyJoinErrors,
+  talkErrors,
 } from "./battle-parsers";
 import { npcScheduleErrors, parseNpcProfiles } from "./npc-parsers";
 import { parseCutscene } from "./cutscene-parsers";
@@ -220,7 +221,8 @@ export {
 } from "./area-parsers";
 export {
   critterErrors, feelingErrors, parseBattleContent, parseCritter, parseEncoreContent, parseLevels,
-  parsePartyMember, parseStickers, parseTreats, partyErrors, partyJoinErrors, talkErrors,
+  parsePartyMember, parseStickers, parseTreatBaskets, parseTreats, partyErrors, partyJoinErrors,
+  talkErrors,
 } from "./battle-parsers";
 export { npcScheduleErrors, parseNpcProfiles, parseNpcStroll } from "./npc-parsers";
 export { parseCutscene, type CutsceneValidationContext } from "./cutscene-parsers";
@@ -394,6 +396,7 @@ export function loadContent(options?: {
   }
   const battle = parseBattleContent(battleData, "content/battle.json");
   const treats = parseTreats(treatsData, "content/treats.json", critters);
+  const treatBaskets = parseTreatBaskets(treatsData, "content/treats.json", treats);
   const arcadeGames = parseArcade(arcadeGameData, prizesData);
   const stickers = parseStickers(stickerData, "content/stickers.json");
   const characters = parseCharacters(charactersData, "content/characters.json");
@@ -533,6 +536,7 @@ export function loadContent(options?: {
     areas,
     Object.fromEntries(arcadeGames.counter.prizes.map((item) => [item.prize, item.price])),
     Object.fromEntries(treats.map((item) => [item.id, item.price])),
+    Object.fromEntries(treatBaskets.map((item) => [item.id, item.price])),
   );
   if (tagProblems.length > 0)
     throw new Error(`content/story/main.ink: ${tagProblems.join("; ")}`);
@@ -559,10 +563,8 @@ export function loadContent(options?: {
     storyVariable: (name: string) => storyVariable(initialInk, name),
   };
   const cutsceneFiles: [unknown, string][] = [
-    [dawnWakeupCutsceneData, "dawn-wakeup"],
-    [plazaHoodCutsceneData, "plaza-hood-sighting"],
-    [sueBayCutsceneData, "sue-bay-intro"],
-    [jordanPassCutsceneData, "jordan-pass-intro"],
+    [dawnWakeupCutsceneData, "dawn-wakeup"], [plazaHoodCutsceneData, "plaza-hood-sighting"],
+    [sueBayCutsceneData, "sue-bay-intro"], [jordanPassCutsceneData, "jordan-pass-intro"],
   ];
   const cutscenes: Record<string, CutsceneScript> = {};
   for (const [data, name] of cutsceneFiles) {
@@ -573,7 +575,7 @@ export function loadContent(options?: {
     world: {
       tunables: parseTunables(tunableData, "content/tunables.json"),
       areas, surfaces, lands, story, critters, battle, stickers, characters, party, storyVariable,
-      arcade: arcadeGames, levels, treats, npcProfiles,
+      arcade: arcadeGames, levels, treats, treatBaskets, npcProfiles,
       npcBanter: parsedProfiles.banter,
       partyBanter: parsedProfiles.partyBanter ?? [],
       toolEvents: parsedProfiles.toolEvents ?? [],

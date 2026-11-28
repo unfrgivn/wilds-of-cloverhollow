@@ -1,5 +1,6 @@
 import type { State, Wild } from "./types";
 import { validEncoreRecord } from "./encore";
+import { isClubhouseSwatchId } from "./decor";
 import { levelForXp } from "./levels";
 
 export type SaveData = { version: 10; state: State };
@@ -148,6 +149,57 @@ function validCutscenesSeen(value: unknown): boolean {
   );
 }
 
+const DECOR_KEYS: ReadonlySet<string> = new Set([
+  "swatch",
+  "unlockedSwatches",
+  "pedestals",
+  "bedroomSlots",
+  "visitorOffset",
+  "fishTraded",
+]);
+
+function validDecor(value: unknown): boolean {
+  if (value === undefined) return true;
+  if (!record(value) || Array.isArray(value)) return false;
+  for (const key of Object.keys(value)) {
+    if (!DECOR_KEYS.has(key)) return false;
+  }
+  if (value.swatch !== undefined && !isClubhouseSwatchId(value.swatch)) return false;
+  if (
+    value.unlockedSwatches !== undefined &&
+    (!Array.isArray(value.unlockedSwatches) ||
+      !value.unlockedSwatches.every((item) => isClubhouseSwatchId(item)))
+  )
+    return false;
+  if (value.pedestals !== undefined && typeof value.pedestals !== "boolean") return false;
+  if (
+    value.bedroomSlots !== undefined &&
+    (!Array.isArray(value.bedroomSlots) ||
+      value.bedroomSlots.length > 16 ||
+      !value.bedroomSlots.every(
+        (item) => typeof item === "string" && /^[a-z][a-z0-9-]*$/.test(item),
+      ))
+  )
+    return false;
+  if (
+    value.visitorOffset !== undefined &&
+    (typeof value.visitorOffset !== "number" ||
+      !Number.isInteger(value.visitorOffset) ||
+      value.visitorOffset < 0 ||
+      value.visitorOffset > 9999)
+  )
+    return false;
+  if (
+    value.fishTraded !== undefined &&
+    (typeof value.fishTraded !== "number" ||
+      !Number.isInteger(value.fishTraded) ||
+      value.fishTraded < 0 ||
+      value.fishTraded > 99999)
+  )
+    return false;
+  return true;
+}
+
 function isState(value: unknown, template: State): value is State {
   return sameShape(template, value) && record(value) && Array.isArray(value.wild) &&
     value.wild.every((item) =>
@@ -156,7 +208,8 @@ function isState(value: unknown, template: State): value is State {
     validCounts(value.caughtFish, 9999) &&
     validCutscenesSeen(value.cutscenesSeen) &&
     validEncoreRecord(value.encore) &&
-    validFlags(value.puzzles);
+    validFlags(value.puzzles) &&
+    validDecor(value.decor);
 }
 
 export function serializeSave(state: State): string {

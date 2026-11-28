@@ -16,7 +16,9 @@
 .journal-treasures-btn[hidden],
 .journal-treasures-backdrop[hidden],
 .journal-treasures-stamps[hidden],
-.journal-gems-overlay[hidden] {
+.journal-gems-overlay[hidden],
+.journal-atlas-story[hidden],
+.journal-atlas-inspector-stat[hidden] {
   display: none;
 }
 .journal-members { display: grid; gap: 8px; margin-top: 16px; }
@@ -572,16 +574,280 @@
   inset: 18px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 6px;
+  align-items: stretch;
+  gap: 5px;
   box-sizing: border-box;
-  padding: 12px 24px 10px 18px;
+  padding: 8px 24px 8px 14px;
   background: #fbf6e9;
+}
+.journal-atlas-story {
+  flex: 0 0 auto;
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: calc(100% - 42px);
+  max-width: calc(100% - 42px);
+  box-sizing: border-box;
+  padding: 3px 10px 3px 6px;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: #fffaf2;
+  box-shadow: 0 2px 0 #47321f22;
+  color: var(--sticker-ink);
+}
+.journal-atlas-chapter {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 8px;
+  border: 1.5px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: #ffe794;
+  color: var(--sticker-ink);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .07em;
+  line-height: 1.25;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.journal-atlas-goal {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--sticker-ink);
+  font-size: 11.5px;
+  font-weight: 800;
+  line-height: 1.25;
 }
 .journal-map-stage {
   flex: 1 1 0;
   min-height: 0;
   width: 100%;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 10px;
+}
+.journal-atlas-rail {
+  flex: 0 0 212px;
+  width: 212px;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.journal-atlas-filters {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+.journal-atlas-filter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 4px 6px;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 12px;
+  background: #fffaf2;
+  box-shadow: 0 2px 0 #47321f33;
+  color: var(--sticker-ink);
+  font: 800 11.5px/1.1 var(--sticker-font);
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition: transform 110ms ease-out, background-color 110ms ease-out;
+}
+.journal-atlas-filter:focus-visible {
+  outline: 3px solid #6b9e56;
+  outline-offset: 2px;
+}
+.journal-atlas-filter.is-active {
+  background: #ffe68a;
+  box-shadow: inset 0 0 0 2px #c98f22, 0 2px 0 #47321f33;
+}
+.journal-atlas-filter[data-filter="gems"].is-active {
+  background: #ffe68a;
+  box-shadow: inset 0 0 0 2px #8e5dc7, 0 2px 0 #47321f33;
+}
+.journal-atlas-filter[data-filter="bosses"].is-active {
+  background: #ffe68a;
+  box-shadow: inset 0 0 0 2px #c75b7a, 0 2px 0 #47321f33;
+}
+.journal-atlas-filter[data-filter="bus"].is-active {
+  background: #ffe68a;
+  box-shadow: inset 0 0 0 2px #3f7fc0, 0 2px 0 #47321f33;
+}
+.journal-atlas-filter-icon {
+  display: block;
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+}
+.journal-atlas-filter-label {
+  min-width: 0;
+}
+.journal-atlas-filter-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 17px;
+  padding: 1px 4px;
+  border: 1.5px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: #fbf6e9;
+  color: var(--sticker-ink);
+  font-size: 10px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.journal-atlas-inspector {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-sizing: border-box;
+  padding: 6px 8px 8px;
+  overflow-y: auto;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 14px;
+  background: #fffaf2;
+  box-shadow: 0 2px 0 #47321f22;
+}
+.journal-atlas-inspector-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  row-gap: 3px;
+  column-gap: 5px;
+  min-width: 0;
+  padding-bottom: 4px;
+  border-bottom: 1.5px dashed #47321f44;
+}
+.journal-atlas-eyebrow {
+  order: 1;
+  flex: 0 0 auto;
+  padding: 1px 6px;
+  border: 1.5px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: #fff5d8;
+  color: var(--sticker-ink);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  line-height: 1.2;
+}
+.journal-atlas-eyebrow[data-mode="pin"] {
+  background: #e6f4dc;
+}
+.journal-atlas-eyebrow[data-mode="filter"] {
+  background: #f0e4ff;
+}
+.journal-atlas-inspector-title {
+  order: 3;
+  flex: 1 0 100%;
+  min-width: 0;
+  overflow: visible;
+  white-space: normal;
+  color: var(--sticker-ink);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.18;
+}
+.journal-atlas-inspector-stat {
+  order: 2;
+  flex: 0 0 auto;
+  padding: 1px 5px;
+  border: 1px solid #47321f55;
+  border-radius: 999px;
+  background: #fbf6e9;
+  color: var(--sticker-ink);
+  font-size: 9.5px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.journal-atlas-objectives {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.journal-atlas-objective {
+  position: relative;
+  padding: 2px 6px 2px 15px;
+  border-radius: 8px;
+  background: #fbf6e9;
+  color: var(--sticker-ink);
+  font-size: 10.5px;
+  font-weight: 800;
+  line-height: 1.24;
+}
+.journal-atlas-objective::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 6px;
+  width: 6px;
+  height: 6px;
+  border: 1.2px solid var(--sticker-ink);
+  border-radius: 50%;
+  background: #f2c94c;
+}
+.journal-atlas-objective[data-kind="boss"] {
+  background: #fde2d8;
+}
+.journal-atlas-objective[data-kind="boss"]::before {
+  background: #eb7fa8;
+}
+.journal-atlas-objective[data-kind="gem"] {
+  background: #f0e4ff;
+}
+.journal-atlas-objective[data-kind="gem"]::before {
+  background: #b580e8;
+}
+.journal-atlas-objective[data-kind="bus"] {
+  background: #e4f1fd;
+}
+.journal-atlas-objective[data-kind="bus"]::before {
+  background: #3f7fc0;
+}
+.journal-atlas-objective[data-kind="garden"] {
+  background: #e6f4dc;
+}
+.journal-atlas-objective[data-kind="garden"]::before {
+  background: #72b85c;
+}
+.journal-atlas-objective[data-kind="complete"] {
+  background: #fff5d8;
+}
+.journal-atlas-objective[data-kind="complete"]::before {
+  background: #f2c94c;
+}
+.journal-map-canvas-wrap {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -591,10 +857,15 @@
   width: auto;
   height: 100%;
   max-width: 100%;
+  max-height: 100%;
+  box-sizing: border-box;
   aspect-ratio: 2400 / 1610;
   margin: 0 auto;
   overflow: hidden;
-  background: url("/assets/ui/map/world-map.webp") center / contain no-repeat;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 14px;
+  box-shadow: 0 2px 0 #47321f22;
+  background: #efe6cf url("/assets/ui/map/world-map.webp") center / cover no-repeat;
 }
 .journal-map-routes {
   position: absolute;
@@ -631,6 +902,14 @@
   stroke-width: 24;
   stroke-dasharray: 26 20;
 }
+.journal-map-routes.is-bus-focus .journal-map-route.is-open {
+  stroke-width: 16;
+  stroke-opacity: 1;
+}
+.journal-map-routes.is-bus-focus .journal-map-route-halo.is-open {
+  stroke-width: 28;
+  stroke-opacity: 1;
+}
 .journal-map-labels,
 .journal-map-badges,
 .journal-map-star {
@@ -656,8 +935,9 @@
   border-radius: 999px;
   transform: translate(-50%, -50%);
   color: #47321f;
-  font-size: 13px;
+  font-size: 11.5px;
   font-weight: 800;
+  line-height: 1.2;
   text-shadow: 0 1px #fbf6e9, 1px 0 #fbf6e9, -1px 0 #fbf6e9, 0 -1px #fbf6e9;
   user-select: none;
   -webkit-user-select: none;
@@ -666,6 +946,14 @@
 .journal-map-land.is-revealed {
   cursor: pointer;
 }
+.journal-map-land.is-filter-dim {
+  opacity: 0.34;
+}
+.journal-map-land.is-filter-match {
+  background: #fff5d8ee;
+  box-shadow: 0 0 0 2px #47321f, 0 2px 0 #47321f33;
+  text-shadow: none;
+}
 .journal-map-land.is-revealed:hover,
 .journal-map-land.is-revealed:focus-visible,
 .journal-map-land.is-selected {
@@ -673,14 +961,66 @@
   outline: 2px solid #47321f;
   text-shadow: none;
 }
-.journal-map-complete {
+.journal-map-land[data-land="hills"] {
+  transform: translate(-56%, -20%);
+}
+.journal-map-land[data-land="pass"] {
+  transform: translate(-44%, -68%);
+}
+.journal-atlas-pin-tray {
   position: absolute;
   display: inline-flex;
   align-items: center;
+  gap: 3px;
+  transform: translate(-50%, 13px);
+  pointer-events: none;
+  transition: opacity 110ms ease-out;
+}
+.journal-atlas-pin-tray[data-land="hills"] {
+  transform: translate(-56%, 17px);
+}
+.journal-atlas-pin-tray[data-land="pass"] {
+  transform: translate(-44%, 10px);
+}
+.journal-atlas-pin-tray.is-filter-dim {
+  opacity: 0.25;
+}
+.journal-map[data-atlas-filter="gems"] .journal-atlas-badge:not(.is-gem),
+.journal-map[data-atlas-filter="bosses"] .journal-atlas-badge:not(.is-boss),
+.journal-map[data-atlas-filter="bus"] .journal-atlas-badge {
+  opacity: 0.25;
+}
+.journal-atlas-badge {
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
-  border: 2px solid var(--sticker-ink);
+  width: 17px;
+  height: 17px;
+  box-sizing: border-box;
+  border: 1.5px solid var(--sticker-ink);
+  border-radius: 50%;
+  background: #fffaf2;
+  box-shadow: 0 1px 2px #47321f55;
+}
+.journal-atlas-badge svg {
+  display: block;
+  width: 12px;
+  height: 12px;
+}
+.journal-atlas-badge.is-gem {
+  background: #f0e4ff;
+}
+.journal-atlas-badge.is-boss {
+  background: #fde2d8;
+}
+.journal-map-complete {
+  position: static;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  border: 1.5px solid var(--sticker-ink);
   border-radius: 50%;
   background: #a2ce8f;
   box-shadow: 0 1px 2px #47321f55;
@@ -688,12 +1028,15 @@
   font-size: 11px;
   font-weight: 900;
   line-height: 1;
-  transform: translate(calc(-50% + 52px), calc(-50% - 14px));
+  transform: none;
+}
+.journal-map-complete[data-complete-kind="full"] {
+  background: #ffe794;
 }
 .journal-map-star {
   z-index: 3;
   color: #f2c94c;
-  font-size: 28px;
+  font-size: 24px;
   line-height: 1;
   -webkit-text-stroke: 1.5px #47321f;
   text-shadow: 0 0 3px #fbf6e9, 0 2px 0 #fbf6e9;
@@ -702,11 +1045,15 @@
 }
 .journal-map-stop {
   display: inline-block;
-  width: 12px;
-  height: 18px;
-  margin-right: 3px;
+  width: 11px;
+  height: 16px;
+  margin-right: 4px;
   vertical-align: -3px;
-  filter: drop-shadow(0 1px 1px #47321f88);
+  filter: drop-shadow(0 0 1.5px #fbf6e9) drop-shadow(0 1px 1px #47321f88);
+}
+.journal-map-stop.is-on-foot {
+  opacity: 0.85;
+  filter: grayscale(0.8) contrast(1.05) drop-shadow(0 0 1.5px #fbf6e9);
 }
 .journal-map-stop svg {
   display: block;
@@ -1229,12 +1576,18 @@
   .journal-opt-toggle:hover {
     filter: brightness(1.03);
   }
+  .journal-atlas-filter:not(.is-active):hover {
+    background: #fff5d8;
+    transform: translateY(-1px);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .journal-tab,
   .journal-close,
   .journal-supply.journal-gems,
-  .journal-gems-close {
+  .journal-gems-close,
+  .journal-atlas-filter,
+  .journal-atlas-pin-tray {
     transition: none;
   }
   .journal-tab:not([aria-selected="true"]):hover {
@@ -1242,14 +1595,17 @@
   }
   .journal-close:hover,
   .journal-supply.journal-gems:hover,
-  .journal-gems-close:hover {
+  .journal-gems-close:hover,
+  .journal-atlas-filter:not(.is-active):hover {
     transform: none;
   }
 }
 :root[data-reduced-motion="on"] .journal-tab,
 :root[data-reduced-motion="on"] .journal-close,
 :root[data-reduced-motion="on"] .journal-supply.journal-gems,
-:root[data-reduced-motion="on"] .journal-gems-close {
+:root[data-reduced-motion="on"] .journal-gems-close,
+:root[data-reduced-motion="on"] .journal-atlas-filter,
+:root[data-reduced-motion="on"] .journal-atlas-pin-tray {
   transition: none;
 }
 :root[data-reduced-motion="on"] .journal-tab:not([aria-selected="true"]):hover {
@@ -1257,7 +1613,8 @@
 }
 :root[data-reduced-motion="on"] .journal-close:hover,
 :root[data-reduced-motion="on"] .journal-supply.journal-gems:hover,
-:root[data-reduced-motion="on"] .journal-gems-close:hover {
+:root[data-reduced-motion="on"] .journal-gems-close:hover,
+:root[data-reduced-motion="on"] .journal-atlas-filter:not(.is-active):hover {
   transform: none;
 }
 .journal-book[data-journal-page="map"] .journal-page,
@@ -1592,7 +1949,44 @@
   }
 }
 @media (max-height: 500px) {
-  .journal-map-page { padding: 8px 22px 8px 14px; gap: 4px; }
+  .journal-map-page { padding: 6px 22px 6px 10px; gap: 4px; }
+  .journal-atlas-story {
+    gap: 6px;
+    width: calc(100% - 42px);
+    max-width: calc(100% - 42px);
+    padding: 2px 8px 2px 5px;
+  }
+  .journal-atlas-chapter { padding: 1px 6px; font-size: 9px; }
+  .journal-atlas-goal { font-size: 10.5px; }
+  .journal-map-stage { gap: 8px; }
+  .journal-atlas-rail { flex-basis: 186px; width: 186px; gap: 4px; }
+  .journal-atlas-filters { gap: 4px; }
+  .journal-atlas-filter {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 3px 4px;
+    gap: 3px;
+    border-radius: 10px;
+    font-size: 10.5px;
+  }
+  .journal-atlas-filter-icon { flex-basis: 14px; width: 14px; height: 14px; }
+  .journal-atlas-filter-count { min-width: 15px; padding: 0 3px; font-size: 9.5px; }
+  .journal-atlas-inspector { padding: 4px 6px 6px; gap: 3px; border-radius: 12px; }
+  .journal-atlas-inspector-head { gap: 4px; padding-bottom: 3px; }
+  .journal-atlas-eyebrow { padding: 0 5px; font-size: 8.5px; }
+  .journal-atlas-inspector-title { font-size: 11px; }
+  .journal-atlas-inspector-stat { font-size: 9px; }
+  .journal-atlas-objective { padding: 1px 5px 1px 13px; font-size: 9.5px; line-height: 1.2; }
+  .journal-atlas-objective::before { left: 4px; top: 4.5px; width: 5px; height: 5px; }
+  .journal-map-land { font-size: 9.5px; padding: 1px 3px; }
+  .journal-map-stop { width: 9px; height: 13px; margin-right: 2px; vertical-align: -2px; }
+  .journal-map-star { font-size: 20px; }
+  .journal-atlas-pin-tray { transform: translate(-50%, 11px); gap: 2px; }
+  .journal-atlas-pin-tray[data-land="hills"] { transform: translate(-56%, 15px); }
+  .journal-atlas-pin-tray[data-land="pass"] { transform: translate(-44%, 8px); }
+  .journal-atlas-badge,
+  .journal-map-complete { width: 15px; height: 15px; }
+  .journal-atlas-badge svg { width: 10px; height: 10px; }
   .journal-map-footer { padding: 3px 8px; }
   .journal-map-detail { font-size: 11px; }
   .journal-map-summary { gap: 4px; }

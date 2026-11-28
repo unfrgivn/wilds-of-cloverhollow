@@ -304,6 +304,9 @@ describe("Milestone 172: Modular src/platform/audio-effects.ts Extraction", () =
     "toggle-on",
     "toggle-off",
     "tool-sparkle",
+    "paper-flip",
+    "sticker-peel",
+    "atlas-pin",
   ];
 
   it("re-exports effectRecipes and effectRecipe identically with gentle gains and lean modules",

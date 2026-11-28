@@ -4,6 +4,27 @@ import type { FeelingId, State, World } from "./types";
 
 export type LandProgress = { owned: number; total: number };
 export type BusRoute = { from: string; to: string; open: boolean };
+export type StorySoFar = { chapter: string; goal: string };
+export type AtlasBusStatus = "none" | "unlocked" | "on-foot";
+export type AtlasFilter = "all" | "gems" | "bosses" | "bus";
+export type AtlasBossRef = { id: string; name: string };
+export type AtlasPinSummary = {
+  landId: string;
+  name: string;
+  revealed: boolean;
+  isCurrent: boolean;
+  stickers: LandProgress;
+  gemsFound: number;
+  gemsTotal: number;
+  gemsRemaining: number;
+  activeBosses: AtlasBossRef[];
+  hasUncalmedBoss: boolean;
+  busStop: AtlasBusStatus;
+  gardenNote: string | null;
+  stickersComplete: boolean;
+  landComplete: boolean;
+  objectives: string[];
+};
 export type CritterFieldNote = {
   stickerId: string;
   name: string;
@@ -303,6 +324,231 @@ export function mapBusRoutes(
   if (stops.has("bay") && stops.has("pass"))
     routes.push({ from: "bay", to: "pass", open: bayOpen && passOpen });
   return routes;
+}
+
+/**
+ * Pure reverse-order story progress summary for the Valley Atlas banner.
+ * Reads Ink variables and battle/finale state without running or mutating Ink.
+ */
+export function storySoFar(
+  world: Pick<World, "storyVariable">,
+  state: Pick<State, "area" | "critters" | "finale" | "ink">,
+): StorySoFar {
+  const isSet = (variable: string): boolean => world.storyVariable(state.ink, variable) === true;
+  const calmed = (id: string): boolean => state.critters[id] === "calm";
+  const beat = (chapter: string, goal: string): StorySoFar => ({ chapter, goal });
+
+  if (state.finale !== null || isSet("awake"))
+    return beat("Epilogue", "Good morning! Say hello to Milo by the front door.");
+  if (isSet("festival_toast_done"))
+    return beat("Post-Finale", "The valley is calm! Explore & finish every collection.");
+  if (
+    isSet("milo_revealed") ||
+    calmed("hooded-kid") ||
+    world.storyVariable(state.ink, "forest_fizzy") === false
+  )
+    return beat("Celebration", "Join friends at the Wildlife Sanctuary for the Jubilee!");
+  if (isSet("heard_wish"))
+    return beat("Finale", "Calm the kid in the purple hood under the Ancient Tree.");
+  if (isSet("seal_open"))
+    return beat("Finale", "Enter the Enchanted Forest beyond the parted seal.");
+  if (isSet("found_mist_way"))
+    return beat("Act 3", "Cross the Misty Path with lantern, lasso, and flute.");
+  if (isSet("recess") && isSet("has_flute") && isSet("coach_thanked"))
+    return beat("Act 3", "Bring lantern, lasso, and flute to the Misty Path.");
+  if (isSet("recess"))
+    return beat("Act 3", "Follow the purple hood onto the school playing field.");
+  if (isSet("music_time") && !isSet("has_flute"))
+    return beat("Act 2", "Help Ms. Willow in the music room to earn her flute.");
+  if (isSet("pe_time") && !isSet("coach_thanked"))
+    return beat("Act 2", "Help Coach Ash in the gym to borrow his rainbow lasso.");
+  if (isSet("story_time"))
+    return beat("Act 2", "Join story time in class and follow the purple hood.");
+  if (calmed("arcade-keeper"))
+    return beat("Act 2", "Head back to Cloverhollow School for story time.");
+  if (isSet("clubhouse_claimed"))
+    return beat("Act 2", "Check the plaza arcade — the hooded kid's next stop!");
+  if (isSet("found_old_trail"))
+    return beat("Act 2", "Follow the glowing trail west into Whispering Woods.");
+  if (isSet("has_lantern"))
+    return beat("Act 2", "Shine the blacklight lantern at Pinecone Pass for clues.");
+  if (isSet("visited_pass") || isSet("rode_bus"))
+    return beat("Act 2", "Explore Pinecone Pass and team up with Jordan.");
+  if (isSet("sue_joined"))
+    return beat("Act 2", "Head north to Pinecone Pass via bus or Cliffside Trail.");
+  if (isSet("club_open"))
+    return beat("Act 1", "Follow the east road to Bubblegum Bay and meet Sue.");
+  if (isSet("knows_password"))
+    return beat("Act 1", "Try the password at the tree house in Meadow Park.");
+  if (isSet("hall_pass"))
+    return beat("Act 1", "Follow the purple thread from school to the hooded kid.");
+  if (calmed("fountain-frog"))
+    return beat("Act 1", "Follow the fizz drips to Meadow Park and school.");
+  if (isSet("ate_breakfast") || state.area !== "bedroom")
+    return beat("Act 1", "Investigate the fizzing pink fountain in town plaza.");
+  return beat("Act 1", "Check the fizzing plaza fountain after breakfast.");
+}
+
+/**
+ * Pure per-land live status summaries for the Valley Atlas: stickers, Star Gems,
+ * active uncalmed Chaos Bosses, Star-Line bus stops, clubhouse garden, and objectives.
+ */
+export function landAtlasSummaries(
+  world: Pick<World, "areas" | "critters" | "lands" | "stickers" | "storyVariable">,
+  state: Pick<State, "area" | "critters" | "ink" | "stickers">,
+): AtlasPinSummary[] {
+  const currentLand = world.areas[state.area]?.land ?? null;
+  const isSet = (variable: string): boolean => world.storyVariable(state.ink, variable) === true;
+  const stickerProgress = landStickerProgress(world, state);
+
+  const bossesByLand = new Map<string, AtlasBossRef[]>();
+  const seenBossIds = new Map<string, Set<string>>();
+  for (const area of Object.values(world.areas)) {
+    if (area.land === undefined) continue;
+    if (area.id === "arcade" && !(isSet("clubhouse_claimed") || state.area === "arcade")) {
+      continue;
+    }
+    for (const piece of area.critters) {
+      const critter = world.critters[piece.id];
+      if (critter === undefined) continue;
+      const isBoss = critter.windUp !== null || critter.talk !== null || !critter.canRun;
+      if (!isBoss) continue;
+      if (piece.visibleWhile !== undefined && !isSet(piece.visibleWhile)) continue;
+      if (state.critters[piece.id] === "calm") continue;
+
+      let seen = seenBossIds.get(area.land);
+      if (seen === undefined) {
+        seen = new Set<string>();
+        seenBossIds.set(area.land, seen);
+      }
+      if (seen.has(critter.id)) continue;
+      seen.add(critter.id);
+
+      let list = bossesByLand.get(area.land);
+      if (list === undefined) {
+        list = [];
+        bossesByLand.set(area.land, list);
+      }
+      list.push({
+        id: critter.id,
+        name: critter.id === "hooded-kid" ? "Hooded Kid" : critter.name,
+      });
+    }
+  }
+
+  return world.lands.map((land) => {
+    const name = mapLandName(land, currentLand, isSet);
+    const revealed = name !== "???";
+    const isCurrent = currentLand === land.id;
+    const stickers: LandProgress = stickerProgress[land.id] ?? { owned: 0, total: 0 };
+
+    let gemsFound = 0;
+    let gemsTotal = 0;
+    let gemsRemaining = 0;
+    if (revealed) {
+      const landGems = LAND_GEMS[land.id] ?? [];
+      gemsTotal = landGems.length;
+      for (const variable of landGems) {
+        if (isSet(variable)) gemsFound += 1;
+      }
+      gemsRemaining = Math.max(0, gemsTotal - gemsFound);
+    }
+
+    const activeBosses: AtlasBossRef[] = revealed ? (bossesByLand.get(land.id) ?? []) : [];
+    const hasUncalmedBoss = activeBosses.length > 0;
+
+    let busStop: AtlasBusStatus = "none";
+    if (land.busStop) {
+      if (land.id === "cloverhollow") {
+        busStop = "unlocked";
+      } else if (land.id === "bay") {
+        busStop = isSet("visited_bay") || isSet("sue_joined") ? "unlocked" : "on-foot";
+      } else if (land.id === "pass") {
+        busStop = isSet("visited_pass") || isSet("rode_bus") ? "unlocked" : "on-foot";
+      } else {
+        busStop = "unlocked";
+      }
+    }
+
+    let gardenNote: string | null = null;
+    if (revealed && land.id === "forest") {
+      const rawHarvests = world.storyVariable(state.ink, "sunberry_harvests");
+      const sunberryHarvests =
+        typeof rawHarvests === "number"
+          ? rawHarvests
+          : typeof rawHarvests === "string"
+            ? Number(rawHarvests)
+            : 0;
+      if (isSet("garden_ripe")) {
+        gardenNote = "Garden strawberries ripe!";
+      } else if (Number.isFinite(sunberryHarvests) && sunberryHarvests > 0) {
+        gardenNote = "Sunberries blooming";
+      } else if (isSet("garden_planted")) {
+        gardenNote = "Garden growing";
+      }
+    }
+
+    const stickersComplete = revealed && stickers.total > 0 && stickers.owned >= stickers.total;
+    const landComplete =
+      revealed && stickersComplete && gemsRemaining === 0 && activeBosses.length === 0;
+
+    const objectives: string[] = [];
+    if (revealed) {
+      for (const boss of activeBosses) {
+        objectives.push(`${boss.name} waiting`);
+      }
+      if (gemsRemaining === 1) {
+        objectives.push("1 Star Gem hidden");
+      } else if (gemsRemaining > 1) {
+        objectives.push(`${gemsRemaining} Star Gems hidden`);
+      } else if (gemsTotal > 0) {
+        objectives.push("Star Gems found ✓");
+      }
+      if (busStop === "unlocked") {
+        objectives.push("Bus stop unlocked");
+      } else if (busStop === "on-foot") {
+        objectives.push("Bus stop (visit on foot)");
+      }
+      if (gardenNote !== null) {
+        objectives.push(gardenNote);
+      }
+      if (landComplete) {
+        objectives.push("Calm & 100% complete ★");
+      } else if (stickers.total > 0 && stickers.owned < stickers.total) {
+        const remaining = stickers.total - stickers.owned;
+        objectives.push(`${remaining} sticker${remaining === 1 ? "" : "s"} to find`);
+      } else if (stickersComplete) {
+        objectives.push("All stickers found ✓");
+      }
+    }
+
+    return {
+      landId: land.id,
+      name,
+      revealed,
+      isCurrent,
+      stickers,
+      gemsFound,
+      gemsTotal,
+      gemsRemaining,
+      activeBosses,
+      hasUncalmedBoss,
+      busStop,
+      gardenNote,
+      stickersComplete,
+      landComplete,
+      objectives,
+    };
+  });
+}
+
+/** Tests whether a Valley Atlas land pin matches the currently active Atlas filter. */
+export function matchesAtlasFilter(pin: AtlasPinSummary, filter: AtlasFilter): boolean {
+  if (!pin.revealed) return false;
+  if (filter === "all") return true;
+  if (filter === "gems") return pin.gemsRemaining > 0;
+  if (filter === "bosses") return pin.hasUncalmedBoss;
+  return pin.busStop !== "none";
 }
 
 // Fae's notes, newest first: the `journal` knot's lines for the current story

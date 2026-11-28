@@ -7533,10 +7533,13 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   skippable on tap/Confirm/Cancel/Gamepad and instant in paused harness steps or
   Reduced Motion.
 - **Track E15 (Adaptive Vertical Soundtrack, Foley Polish & Smart Interactive Valley Atlas):**
-  Bar-synced vertical music layers (boss Phase-2 lift, lantern celesta, Journal
-  low-pass filter), organic paper/sticker foley + CC0 footsteps, and upgraded
-  `journal-map.ts` Valley Atlas with quest/gem/garden/boss pins and "Story So
-  Far" header.
+  ✅ Completed (Milestone 180, 2026-11-27) — bar-synced vertical music layers
+  (Journal `1400 Hz` warm low-pass on music & ambience, scale-matched Lantern
+  celesta shimmer, bar-quantized boss Wind-Up / `>= 50%` Calm percussion lift),
+  organic `paper-flip` / `sticker-peel` / `atlas-pin` UI foley, and upgraded
+  `journal-map.ts` Smart Interactive Valley Atlas with `"Story So Far"` banner,
+  live die-cut gem/boss/bus/100% pin badges, `>= 44 px` interactive filters, and
+  Quick Pin Inspector.
 
 ### Phase 6: Mastery, Balance, §13 Unlocks & Ship-Quality Release Pass
 - **Track E16 (Overworld Micro-Delights & Tactile World Props):** Kickable Bay
@@ -7769,6 +7772,66 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   `art/review/e13-park-before-after.jpg`, `art/review/e13-plaza-wipe-mid.jpg`).
 - **Gates:** `just check`, `just build` (every non-vendor JS chunk `< 500 kB`),
   and Chromium/WebKit Playwright e2e verification.
+
+## Milestone 180: Adaptive Vertical Soundtrack, Organic Foley & Smart Interactive Valley Atlas (Elevation Track E15) **Status:** ✅ Completed (2026-11-27)
+- Elevates audio immersion with adaptive vertical soundtrack layers, warm
+  Journal filtering across music and ambience, and organic UI foley, while
+  upgrading the Journal `MAP` page into an interactive Smart Valley Atlas
+  (100% presentation/UI/audio, zero `step()`/`State`/`SaveData` mutations,
+  bit-identical sim hashes, save `v10`).
+- **Adaptive Vertical Soundtrack & Warm Filtering (`src/platform/music-mix.ts`,
+  `src/platform/music.ts`, `src/platform/ambience.ts`, `src/platform/audio.ts`):**
+  - Pure `projectMusicMix`, `hzToMidi`, `trackScaleMidi`, `nextBarAdaptiveState`,
+    `lanternShimmerNote`, and `battleTensionNotes` project live game state to
+    adaptive mix targets with zero DOM, Web Audio, or randomness.
+  - **Journal Warm Filter:** Smoothly engages a `1400 Hz` low-pass filter and
+    subtle gain dip (`0.46x` music, `0.62x` ambience via
+    `AmbiencePlayer.setWarmFilter`) whenever the Journal is open outside Jukebox
+    preview, restoring full `18000 Hz` clarity on close.
+  - **Blacklight Lantern Mystery Layer:** Smoothly fades in a bar-synced high
+    celesta/music-box counter-voice matching `trackScaleMidi(track)` (`G5..A6`,
+    4/4 and 3/4 support) while Fae's lantern is switched on in the overworld,
+    and fades out cleanly when turned off.
+  - **Battle Tension / Phase-2 Lift:** Latches a bar-quantized rhythmic
+    percussion/energy layer (`shaker`/`woodblock` lift + offbeat accents + boss
+    tonic bass pulse) on the next bar boundary when a critter enters Wind-Up or
+    crosses `>= 50%` Calm in mini-boss/finale battles (disengaging cleanly in
+    `talk`, `reward`, `rest`, `soothed`, and `run`).
+  - Exposed read-only `adaptive` state in `MusicDebugInfo` and re-exported
+    `projectMusicMix` from `src/platform/audio.ts`.
+- **Organic Paper/Sticker/Atlas UI Foley (`src/platform/audio-effects.ts`,
+  `src/platform/audio-recipes.ts`, `src/main.ts`):**
+  - Added `"paper-flip"`, `"sticker-peel"`, and `"atlas-pin"` recipes (warm
+    filtered noise bursts + wooden/brass resonance, smooth attacks `>= 0.003`,
+    gentle gains `<= 0.06`, zero square waves), polished `journal-open` /
+    `journal-close` noise attacks, and wired Atlas pin select (`"atlas-pin"`),
+    pin deselect (`"sticker-peel"`), and filter toggle (`"paper-flip"`) + light
+    haptic while keeping `audio-effects.ts` (`165` lines) and `main.ts` (`947`
+    lines) cleanly under line budgets.
+- **Smart Interactive Valley Atlas (`src/core/journal.ts`,
+  `src/shell/view-models.ts`, `src/ui/journal.ts`, `src/ui/journal-map.ts`,
+  `src/ui/journal.css`):**
+  - Added pure read-only `storySoFar`, `landAtlasSummaries`, and
+    `matchesAtlasFilter` in `src/core/journal.ts` (`870` lines `< 960`, strictly
+    honoring `spec.md` §1.2 secrecy, `arcade-door` / `visibleWhile` boss gating,
+    Star-Line unlocked vs on-foot bus status, Star Gem remaining counts,
+    Clubhouse garden status, and 100% land completion).
+  - Upgraded the `MAP` spread with a top `"Story So Far"` banner, a rounded
+    ink-framed map canvas with live die-cut zero-`<text>` SVG pin trays (gem
+    sparkle, waiting boss swirl, calm/100% star, unlocked vs on-foot bus stop
+    signs), a left rail pairing four `>= 44x44 CSS px` interactive filter
+    buttons (`All`, `Gems`, `Boss`, `Bus`) with a live Quick Pin Inspector Card,
+    and full keyboard/gamepad/reduced-motion/Safari hygiene across `1280x720`
+    and `874x402` (including iPhone safe-area insets).
+- **Evidence:** `tests/unit/e15-audio-mix.test.ts` (20 tests),
+  `tests/unit/e15-valley-atlas.test.ts` (16 tests),
+  `tests/e2e/e15-audio-atlas.spec.ts` (`@smoke` Chromium & WebKit), updated
+  `vision`-audited review screenshots (`art/review/e15-atlas-early-1280.jpg`,
+  `art/review/e15-atlas-late-1280.jpg`, `art/review/e15-atlas-phone-874.jpg`) and
+  `vision`-verified MAP visual baselines (`journal-map-1280`, `journal-map-874`,
+  `journal-map-routes-1280` Chromium & WebKit).
+- **Gates:** `just check`, `just build` (`< 500 kB` every non-vendor chunk),
+  and Chromium/WebKit e2e verification.
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.

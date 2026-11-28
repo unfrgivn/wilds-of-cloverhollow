@@ -1,8 +1,14 @@
 import type { AmbienceBed } from "../core";
+import {
+  AMBIENCE_JOURNAL_FILTER_HZ,
+  AMBIENCE_JOURNAL_GAIN_SCALE,
+  AMBIENCE_OPEN_FILTER_HZ,
+} from "./music-mix";
 
 export type AmbiencePlayer = {
   setBed: (bed: AmbienceBed) => void;
   setMix: (next: { active: boolean; gain: number }) => void;
+  setWarmFilter: (warm: boolean) => void;
   sync: () => void;
 };
 
@@ -108,12 +114,24 @@ export function createAmbiencePlayer(
 
   const masterGain = context.createGain();
   masterGain.gain.value = 0;
-  masterGain.connect(destination);
+  const warmGain = context.createGain();
+  warmGain.gain.value = 1;
+  let warmFilter: BiquadFilterNode | null = null;
+  if (typeof context.createBiquadFilter === "function") {
+    warmFilter = context.createBiquadFilter();
+    warmFilter.type = "lowpass";
+    warmFilter.Q.value = 0.55;
+    warmFilter.frequency.value = AMBIENCE_OPEN_FILTER_HZ;
+    masterGain.connect(warmFilter).connect(warmGain).connect(destination);
+  } else {
+    masterGain.connect(warmGain).connect(destination);
+  }
 
   let desiredBed: AmbienceBed = "none";
   let mixActive = false;
   let mixGain = 0;
   let lastMasterTarget = -1;
+  let warmActive = false;
   let activeBed: ActiveBed | null = null;
 
   const canRun = (): boolean =>
@@ -639,6 +657,20 @@ export function createAmbiencePlayer(
       mixActive = next.active;
       mixGain = next.gain;
       sync();
+    },
+    setWarmFilter: (warm) => {
+      if (warm === warmActive) return;
+      warmActive = warm;
+      const now = context.currentTime;
+      if (warmFilter !== null) {
+        rampParam(
+          warmFilter.frequency,
+          warmActive ? AMBIENCE_JOURNAL_FILTER_HZ : AMBIENCE_OPEN_FILTER_HZ,
+          now,
+          0.3,
+        );
+      }
+      rampParam(warmGain.gain, warmActive ? AMBIENCE_JOURNAL_GAIN_SCALE : 1, now, 0.3);
     },
     sync,
   };

@@ -1,8 +1,22 @@
 import type { MusicTrack } from "../core";
+import {
+  battleTensionNotes,
+  JOURNAL_DUCK_GAIN,
+  JOURNAL_FILTER_HZ,
+  lanternShimmerNote,
+  nextBarAdaptiveState,
+  TENSION_PERCUSSION_BOOST,
+} from "./music-mix";
 import { scores, type InstrumentVoice, type PlayableTrack, type Score } from "./scores";
 
 export type MusicPlayer = {
-  setState: (next: { track: MusicTrack; duck: boolean }) => void;
+  setState: (next: {
+    track: MusicTrack;
+    duck: boolean;
+    journalWarm?: boolean;
+    lanternLayer?: boolean;
+    tensionLayer?: boolean;
+  }) => void;
   setMix: (next: { active: boolean; gain: number }) => void;
   isPlaying: () => boolean;
   sync: () => void;
@@ -26,6 +40,9 @@ type CompiledScore = {
 type TrackChannel = {
   gain: GainNode;
   voiceTargets: Readonly<Record<InstrumentVoice, AudioNode>>;
+  lanternGain: GainNode;
+  lanternTarget: AudioNode;
+  tensionGain: GainNode;
   panners: StereoPannerNode[];
 };
 
@@ -216,6 +233,11 @@ export function createMusicPlayer(
   const savedSteps = new Map<PlayableTrack, number>();
   let currentTrack: MusicTrack = "silent";
   let currentDuck = false;
+  let currentJournalWarm = false;
+  let desiredLantern = false;
+  let committedLantern = false;
+  let desiredTension = false;
+  let committedTension = false;
   let mixActive = false;
   let mixGain = 0;
   let lastMasterTarget = -1;
@@ -244,6 +266,22 @@ export function createMusicPlayer(
       return panner;
     };
 
+    const lanternGain = context.createGain();
+    lanternGain.gain.setValueAtTime(committedLantern ? 1 : 0, now);
+    lanternGain.connect(gain);
+    let lanternTarget: AudioNode = lanternGain;
+    if (supportsPan) {
+      const lanternPanner = context.createStereoPanner();
+      lanternPanner.pan.setValueAtTime(0.26, now);
+      lanternPanner.connect(lanternGain);
+      panners.push(lanternPanner);
+      lanternTarget = lanternPanner;
+    }
+
+    const tensionGain = context.createGain();
+    tensionGain.gain.setValueAtTime(committedTension ? 1 : 0, now);
+    tensionGain.connect(gain);
+
     const voiceTargets: Readonly<Record<InstrumentVoice, AudioNode>> = {
       piano: targetFor("piano"),
       celesta: targetFor("celesta"),
@@ -257,7 +295,7 @@ export function createMusicPlayer(
       woodblock: targetFor("woodblock"),
     };
 
-    return { gain, voiceTargets, panners };
+    return { gain, voiceTargets, lanternGain, lanternTarget, tensionGain, panners };
   };
 
   const scheduleVoice = (
@@ -661,6 +699,8 @@ export function createMusicPlayer(
     rampParam(channel.gain.gain, 0, now, CROSSFADE_SEC);
     setTimeout(() => {
       for (const panner of channel.panners) panner.disconnect();
+      channel.lanternGain.disconnect();
+      channel.tensionGain.disconnect();
       channel.gain.disconnect();
     }, Math.ceil((CROSSFADE_SEC + 0.15) * 1000));
   };
@@ -681,6 +721,22 @@ export function createMusicPlayer(
     if (nextStepTime < now - 0.1) nextStepTime = now + 0.03;
     const horizon = now + LOOKAHEAD_SEC;
     while (nextStepTime < horizon) {
+      const stepsPerBar = activeCompiled.score.stepsPerBar;
+      const stepInBar = currentStep % stepsPerBar;
+      const barIndex =
+        Math.floor(currentStep / stepsPerBar) + loopCount * activeCompiled.score.bars;
+
+      const nextLantern = nextBarAdaptiveState(committedLantern, desiredLantern, stepInBar, true);
+      if (nextLantern !== committedLantern) {
+        committedLantern = nextLantern;
+        rampParam(trackChannel.lanternGain.gain, committedLantern ? 1 : 0, nextStepTime, 0.45);
+      }
+      const nextTension = nextBarAdaptiveState(committedTension, desiredTension, stepInBar, false);
+      if (nextTension !== committedTension) {
+        committedTension = nextTension;
+        rampParam(trackChannel.tensionGain.gain, committedTension ? 1 : 0, nextStepTime, 0.25);
+      }
+
       const events = activeCompiled.byStep.get(currentStep);
       if (events !== undefined) {
         for (const note of events) {
@@ -693,7 +749,11 @@ export function createMusicPlayer(
           );
           const noteStart = nextStepTime + dynamics.microDelaySec;
           const noteDuration = note.durationSteps * activeCompiled.stepSeconds;
-          const shapedVelocity = note.velocity * dynamics.gainScale;
+          const tensionScale =
+            committedTension && (note.voice === "shaker" || note.voice === "woodblock")
+              ? TENSION_PERCUSSION_BOOST
+              : 1;
+          const shapedVelocity = note.velocity * dynamics.gainScale * tensionScale;
           scheduleVoice(
             trackChannel.voiceTargets[note.voice],
             { ...note, velocity: shapedVelocity },
@@ -712,6 +772,29 @@ export function createMusicPlayer(
               },
               noteStart + 0.012,
               noteDuration,
+            );
+          }
+        }
+      }
+      if (isPlayableTrack(currentTrack)) {
+        if (committedTension) {
+          for (const extra of battleTensionNotes(currentTrack, stepInBar, stepsPerBar, barIndex)) {
+            scheduleVoice(
+              trackChannel.tensionGain,
+              extra,
+              nextStepTime,
+              extra.durationSteps * activeCompiled.stepSeconds,
+            );
+          }
+        }
+        if (committedLantern) {
+          const shimmer = lanternShimmerNote(currentTrack, stepInBar, stepsPerBar, barIndex);
+          if (shimmer !== null) {
+            scheduleVoice(
+              trackChannel.lanternTarget,
+              shimmer,
+              nextStepTime,
+              shimmer.durationSteps * activeCompiled.stepSeconds,
             );
           }
         }
@@ -743,6 +826,8 @@ export function createMusicPlayer(
     }
     if (trackChannel === null && isPlayableTrack(currentTrack)) {
       activeCompiled = getCompiled(currentTrack);
+      committedLantern = desiredLantern;
+      committedTension = desiredTension;
       trackChannel = createTrackChannel(now, 0.2);
       currentStep = startStepFor(currentTrack, activeCompiled);
       loopCount = 0;
@@ -757,14 +842,36 @@ export function createMusicPlayer(
 
   return {
     setState: (next) => {
-      if (next.duck !== currentDuck) {
+      const nextJournalWarm = next.journalWarm ?? false;
+      if (next.duck !== currentDuck || nextJournalWarm !== currentJournalWarm) {
         currentDuck = next.duck;
+        currentJournalWarm = nextJournalWarm;
         const now = context.currentTime;
-        rampParam(duckGain.gain, currentDuck ? DUCK_GAIN : 1, now, DUCK_RAMP_SEC);
+        const targetDuckGain = currentJournalWarm
+          ? JOURNAL_DUCK_GAIN
+          : currentDuck
+            ? DUCK_GAIN
+            : 1;
+        rampParam(duckGain.gain, targetDuckGain, now, DUCK_RAMP_SEC);
         if (duckFilter !== null) {
-          rampParam(duckFilter.frequency, duckFilterCutoff(currentDuck), now, DUCK_RAMP_SEC);
+          const targetCutoff = currentJournalWarm
+            ? JOURNAL_FILTER_HZ
+            : duckFilterCutoff(currentDuck);
+          rampParam(duckFilter.frequency, targetCutoff, now, DUCK_RAMP_SEC);
         }
       }
+      const nextLantern = next.lanternLayer ?? false;
+      if (desiredLantern && !nextLantern) {
+        desiredLantern = false;
+        committedLantern = false;
+        if (trackChannel !== null) {
+          rampParam(trackChannel.lanternGain.gain, 0, context.currentTime, 0.4);
+        }
+      } else {
+        desiredLantern = nextLantern;
+      }
+      desiredTension = next.tensionLayer ?? false;
+
       if (next.track === currentTrack) {
         sync();
         return;
@@ -784,6 +891,8 @@ export function createMusicPlayer(
       loopCount = 0;
       if (canRun() && activeCompiled !== null) {
         const now = context.currentTime;
+        committedLantern = desiredLantern;
+        committedTension = desiredTension;
         trackChannel = createTrackChannel(now, hadTrack ? CROSSFADE_SEC : 0.2);
         nextStepTime = now + 0.04;
       }

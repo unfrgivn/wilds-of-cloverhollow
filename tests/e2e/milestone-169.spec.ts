@@ -16,7 +16,7 @@ test.describe("Milestone 169: World Map Pin Foley & WCAG 2.4.7 :focus-visible", 
   test.setTimeout(longFlowTimeout);
 
   test(
-    "clicking and stepping Valley Map pins updates Land Guide and plays title-move foley",
+    "clicking and stepping Valley Map pins updates Land Guide and plays atlas-pin foley",
     { tag: "@smoke" },
     async ({ page }) => {
       const errors: string[] = [];
@@ -43,7 +43,7 @@ test.describe("Milestone 169: World Map Pin Foley & WCAG 2.4.7 :focus-visible", 
       await expect(page.locator(".journal-map-tab")).toHaveAttribute("aria-selected", "true");
       await expect(page.locator(".journal-notes-tab")).toHaveAttribute("aria-selected", "false");
 
-      // Click Cloverhollow revealed land pin and verify Land Field Guide footer + title-move foley.
+      // Click Cloverhollow revealed land pin and verify Land Field Guide footer + atlas-pin foley.
       const beforePin = (await recordedEffects(page)).length;
       const cloverPin = page.locator('.journal-map-land.is-revealed[data-land="cloverhollow"]');
       await expect(cloverPin).toBeVisible();
@@ -51,14 +51,14 @@ test.describe("Milestone 169: World Map Pin Foley & WCAG 2.4.7 :focus-visible", 
 
       await expect(cloverPin).toHaveClass(/is-selected/);
       await expect(page.locator(".journal-map-detail")).toContainText("Cloverhollow");
-      expect((await recordedEffects(page)).slice(beforePin)).toContain("title-move");
+      expect((await recordedEffects(page)).slice(beforePin)).toContain("atlas-pin");
 
       // Keyboard-step to the next revealed land pin and verify foley + footer update.
       const beforeStep = (await recordedEffects(page)).length;
       await page.keyboard.press("ArrowDown");
       await step(page, 1);
       await expect(page.locator(".journal-map-detail")).toContainText("Bubblegum Bay");
-      expect((await recordedEffects(page)).slice(beforeStep)).toContain("title-move");
+      expect((await recordedEffects(page)).slice(beforeStep)).toContain("atlas-pin");
 
       expect(errors).toEqual([]);
     },

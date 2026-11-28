@@ -17,7 +17,17 @@
 .battle-grade[hidden],
 .battle-check-tap[hidden],
 .battle-reward[hidden],
-.battle-peek-card[hidden] {
+.battle-peek-card[hidden],
+.battle-calm[hidden],
+.battle-foes[hidden],
+.battle-foe-soothed[hidden],
+.battle-intent-sticker[hidden],
+.battle-intent-art[hidden],
+.battle-phase2-banner[hidden],
+.battle-which-one-star[hidden],
+.battle-which-one-cup-num[hidden],
+.battle-spin-snag-petal[hidden],
+.battle-spin-snag-btn[hidden] {
   display: none;
 }
 
@@ -1988,4 +1998,688 @@
 }
 :root[data-reduced-motion="on"] .battle-peek-card {
   animation: none;
+}
+
+/* Track E7: Multi-critter formation plates, die-cut intent stickers, Boss
+   Phase-2 callout banner, Dual-Friend Combo badges, and 3 v2 check overlays. */
+.battle-foes {
+  position: absolute;
+  top: calc(16px + var(--safe-top));
+  right: calc(76px + var(--safe-right));
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 8px;
+  max-width: min(560px, calc(100vw - 320px));
+  pointer-events: auto;
+}
+.battle-foe-plate {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-sizing: border-box;
+  min-width: 112px;
+  max-width: 176px;
+  min-height: 44px;
+  padding: 6px 10px 7px;
+  border: 4px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 14px;
+  background: #fbf6e8;
+  box-shadow: var(--sticker-shadow);
+  color: var(--sticker-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition: transform 110ms ease-out, box-shadow 110ms ease-out, background-color 110ms ease-out;
+}
+.battle-foe-plate.is-targeted {
+  border-color: #ffe27a;
+  background: #fff9e3;
+  box-shadow: 0 0 0 2.5px #f0b940, 0 5px 0 var(--sticker-ink), 0 8px 14px #47321f24;
+  transform: translateY(-2px);
+}
+.battle-foe-plate.is-soothed {
+  border-style: dashed;
+  background: #eaf5e6;
+  cursor: default;
+  box-shadow: 0 3px 0 #47321f20;
+}
+.battle-foe-plate:focus-visible {
+  outline: 3px solid #6b9e56;
+  outline-offset: 2px;
+}
+.battle-foe-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.battle-foe-name {
+  color: var(--sticker-ink);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.battle-foe-soothed {
+  flex: 0 0 auto;
+  padding: 1px 6px;
+  border: 1.5px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: #a2ce8f;
+  color: var(--sticker-ink);
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+.battle-foe-track {
+  position: relative;
+  width: 100%;
+  height: 12px;
+  overflow: hidden;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 7px;
+  background: var(--sticker-border);
+}
+.battle-foe-fill {
+  width: 100%;
+  height: 100%;
+  background-color: var(--sticker-green);
+  background-image: repeating-linear-gradient(-35deg, #ffffff55 0 4px, transparent 4px 8px);
+  transition: width 180ms ease-out;
+}
+.battle-intent-sticker {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  align-self: flex-start;
+  margin-top: 2px;
+  padding: 2px 7px 2px 4px;
+  border: 2px solid var(--sticker-rim);
+  outline: 1.5px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: #fff3c8;
+  color: var(--sticker-ink);
+  font-size: 10.5px;
+  font-weight: 800;
+  line-height: 1.1;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.battle-intent-sticker[data-intent="puffing-up"] { background: #fde1e8; }
+.battle-intent-sticker[data-intent="calling-cheer"] { background: #e5f6dc; }
+.battle-intent-sticker[data-intent="swirling-scribbles"] { background: #eee2ff; }
+.battle-intent-sticker[data-intent="sharing-fizz"] { background: #fff3c8; }
+.battle-intent-art {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  background-repeat: no-repeat;
+}
+.battle-boss-intent {
+  position: absolute;
+  right: 8px;
+  bottom: -24px;
+  box-shadow: 0 3px 0 #47321f28;
+}
+.battle-phase2-banner {
+  position: absolute;
+  top: calc(28px + var(--safe-top));
+  left: 55%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  max-width: min(360px, calc(100vw - 560px));
+  padding: 4px 12px 5px;
+  border: 4px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 16px;
+  background: #fbf6e8;
+  box-shadow: 0 4px 0 var(--phase2-accent, #6f44a8), var(--sticker-shadow);
+  color: var(--sticker-ink);
+  text-align: center;
+  pointer-events: none;
+  animation: battle-phase2-in 240ms ease-out;
+}
+@keyframes battle-phase2-in {
+  from { opacity: 0; transform: translate(-50%, -8px) scale(0.95); }
+}
+.battle-phase2-crest {
+  padding: 1px 9px;
+  border: 1.5px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: var(--phase2-accent, #6f44a8);
+  color: #fffdf7;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  line-height: 1.25;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.battle-phase2-line {
+  color: var(--sticker-ink);
+  font-size: 11.5px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+@media (max-width: 999px) {
+  .battle-foes {
+    right: calc(74px + var(--safe-right));
+    gap: 5px;
+    max-width: calc(100vw - 290px);
+  }
+  .battle-foe-plate {
+    min-width: 92px;
+    padding: 4px 7px 5px;
+    border-width: 3px;
+  }
+  .battle-foe-name { font-size: 10.5px; }
+  .battle-intent-sticker { font-size: 9.5px; padding: 1px 5px 1px 3px; }
+  .battle-intent-art { width: 16px; height: 16px; }
+  .battle-phase2-banner {
+    top: calc(82px + var(--safe-top));
+    max-width: min(320px, calc(100vw - 200px));
+    padding: 4px 10px;
+    border-width: 3px;
+  }
+  .battle-phase2-crest { font-size: 10px; }
+  .battle-phase2-line { font-size: 10.5px; }
+}
+
+/* Dual-Friend Synergy Combo button styling in the battle command menu. */
+.battle-command.is-combo {
+  border-color: #ffe27a;
+  background: linear-gradient(135deg, #fff5d2 0%, #fde6f2 100%);
+  box-shadow: 0 4px 0 #c99238;
+  padding-right: 14px;
+}
+@media (max-width: 999px) {
+  .battle-command.is-combo {
+    grid-column: 1 / -1;
+  }
+}
+.battle-command.is-combo[aria-selected="true"] {
+  border-color: #fffdf7;
+  background: linear-gradient(135deg, #ffe27a 0%, #f9c8df 100%);
+  box-shadow: 0 5px 0 var(--sticker-ink);
+}
+.battle-command-combo-art {
+  display: block;
+  width: 26px;
+  height: 26px;
+  background-repeat: no-repeat;
+}
+.battle-command-detail.is-combo-cost {
+  display: inline-block;
+  align-self: flex-start;
+  margin-top: 1px;
+  padding: 1px 6px;
+  border: 1.5px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: #ffe27a;
+  color: var(--sticker-ink);
+  font-size: 10.5px;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+/* Check v2 #1: Which-One cup-shuffle board. */
+.battle-which-one {
+  position: fixed;
+  z-index: var(--z-ring);
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px 12px;
+  border: 4px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 22px;
+  background: #fbf6e8f0;
+  box-shadow: var(--sticker-shadow);
+  font-family: var(--sticker-font);
+  pointer-events: auto;
+}
+.battle-which-one-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+.battle-which-one-phase {
+  padding: 2px 10px;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: #ffe58f;
+  color: var(--sticker-ink);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.battle-which-one[data-phase="pick"] .battle-which-one-phase {
+  background: #d8f2d4;
+}
+.battle-which-one-timer {
+  flex: 1 1 auto;
+  height: 7px;
+  overflow: hidden;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: var(--sticker-border);
+}
+.battle-which-one-time-fill {
+  width: 100%;
+  height: 100%;
+  background: #d8cdb8;
+}
+.battle-which-one-timer.is-active .battle-which-one-time-fill {
+  background: #68b99d;
+}
+.battle-which-one-stage {
+  position: relative;
+}
+.battle-which-one-star {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 1;
+}
+.battle-which-one-cup {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  min-height: 64px;
+  padding: 0;
+  border: 3px solid transparent;
+  border-radius: 18px;
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition: transform 90ms ease-out, box-shadow 90ms ease-out;
+}
+.battle-which-one-cup:disabled {
+  cursor: default;
+}
+.battle-which-one-cup.is-cursor {
+  border-color: var(--sticker-rim);
+  outline: 2.5px solid var(--sticker-ink);
+  background: #fff4c488;
+  box-shadow: 0 0 0 4px #f5b82e99, 0 6px 12px #47321f28;
+  transform: translate(-50%, -54%) scale(1.06);
+}
+.battle-which-one-cup:focus-visible {
+  outline: 3px solid #6b9e56;
+  outline-offset: 2px;
+}
+.battle-which-one-cup-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+}
+.battle-which-one-cup-num {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 1px 7px;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: #fbf6e8;
+  color: var(--sticker-ink);
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+/* Check v2 #2: Whack-a-Ticket 5-slot arcade board. */
+.battle-whack {
+  position: fixed;
+  z-index: var(--z-ring);
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 4px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 22px;
+  background: #fbf6e8f2;
+  box-shadow: var(--sticker-shadow);
+  font-family: var(--sticker-font);
+  pointer-events: auto;
+}
+.battle-whack-dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.battle-whack-dot {
+  width: 14px;
+  height: 14px;
+  box-sizing: border-box;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 50%;
+  background: var(--sticker-rim);
+}
+.battle-whack-dot.is-current {
+  background: #ffe58f;
+  box-shadow: 0 0 0 2.5px #f0b94088;
+}
+.battle-whack-dot.is-hit { background: #68b99d; }
+.battle-whack-dot.is-miss { background: #d8d1c5; }
+.battle-whack-board {
+  position: relative;
+}
+.battle-whack-slot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 48px;
+  padding: 2px;
+  border: 3px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 16px;
+  background: #f4ecda;
+  box-shadow: 0 3px 0 var(--sticker-ink);
+  color: var(--sticker-ink);
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition: transform 80ms ease-out, background-color 80ms ease-out;
+}
+.battle-whack-slot.is-active {
+  background: #fff2b8;
+  box-shadow: 0 0 0 3px #f5b82e, 0 4px 0 var(--sticker-ink);
+  transform: translate(-50%, -54%) scale(1.08);
+}
+.battle-whack-slot.is-hit {
+  background: #d8f4df;
+  box-shadow: 0 0 0 3px #68b99d, 0 3px 0 var(--sticker-ink);
+}
+.battle-whack-slot.is-miss {
+  background: #f6d5dc;
+}
+.battle-whack-slot:focus-visible {
+  outline: 3px solid #6b9e56;
+  outline-offset: 2px;
+}
+.battle-whack-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+}
+.battle-whack-key {
+  position: absolute;
+  right: -5px;
+  bottom: -5px;
+  padding: 1px 5px;
+  border: 1.5px solid var(--sticker-ink);
+  border-radius: 6px;
+  background: #fbf6e8;
+  color: var(--sticker-ink);
+  font-size: 10.5px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+:root[data-touch="on"] .battle-whack-key {
+  display: none;
+}
+
+/* Check v2 #3: Spin-Snag circular lasso pad. */
+.battle-spin-snag {
+  position: fixed;
+  z-index: var(--z-ring);
+  font-family: var(--sticker-font);
+  pointer-events: auto;
+}
+.battle-spin-snag-head {
+  position: absolute;
+  left: 50%;
+  top: -42px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border: 3px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: #fbf6e8;
+  box-shadow: var(--sticker-shadow);
+  white-space: nowrap;
+}
+.battle-spin-snag-beads {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.battle-spin-snag-bead {
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid var(--sticker-ink);
+  border-radius: 50%;
+  background: var(--sticker-rim);
+}
+.battle-spin-snag-bead.is-filled {
+  background: #ff8ec4;
+}
+.battle-spin-snag-phase {
+  padding: 1px 7px;
+  border: 1.5px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: #ffe58f;
+  color: var(--sticker-ink);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+}
+.battle-spin-snag[data-phase="snag"] .battle-spin-snag-phase {
+  background: #d8f4df;
+}
+.battle-spin-snag-timer {
+  width: 44px;
+  height: 6px;
+  overflow: hidden;
+  border: 1.5px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: var(--sticker-border);
+}
+.battle-spin-snag-time-fill {
+  width: 100%;
+  height: 100%;
+  background: #d8cdb8;
+}
+.battle-spin-snag-timer.is-active .battle-spin-snag-time-fill {
+  background: #ff8ec4;
+}
+.battle-spin-snag-pad {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  border: 5px solid var(--sticker-rim);
+  outline: 2.5px solid var(--sticker-ink);
+  border-radius: 50%;
+  background: radial-gradient(circle, #fffdf7e8 0%, #fdeaf3e6 70%, #f8d8e8e6 100%);
+  box-shadow: var(--sticker-shadow);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.battle-spin-snag-coil {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 52%;
+  height: 52%;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  transition: transform 90ms ease-out;
+}
+.battle-spin-snag-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.battle-spin-snag-target {
+  fill: none;
+  stroke: #f0b940;
+  stroke-width: 7;
+  stroke-dasharray: 8 6;
+}
+.battle-spin-snag-ring {
+  fill: none;
+  stroke: var(--sticker-ink);
+  stroke-width: 5;
+}
+.battle-spin-snag-petal {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  box-sizing: border-box;
+  border: 3px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 50%;
+  background: #fbf6e8;
+  box-shadow: 0 3px 0 var(--sticker-ink);
+  color: var(--sticker-ink);
+  font: inherit;
+  font-size: 18px;
+  font-weight: 900;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition: transform 80ms ease-out, background-color 80ms ease-out;
+}
+.battle-spin-snag-petal.is-up { left: 50%; top: 8px; transform: translateX(-50%); }
+.battle-spin-snag-petal.is-right { right: 8px; top: 50%; transform: translateY(-50%); }
+.battle-spin-snag-petal.is-down { left: 50%; bottom: 8px; transform: translateX(-50%); }
+.battle-spin-snag-petal.is-left { left: 8px; top: 50%; transform: translateY(-50%); }
+.battle-spin-snag-petal.is-lit {
+  background: #ffd4e8;
+  box-shadow: 0 0 0 3px #ff8ec4, 0 3px 0 var(--sticker-ink);
+}
+.battle-spin-snag-petal.is-snag {
+  opacity: 0.48;
+  pointer-events: none;
+}
+.battle-spin-snag-petal:focus-visible,
+.battle-spin-snag-btn:focus-visible {
+  outline: 3px solid #6b9e56;
+  outline-offset: 2px;
+}
+.battle-spin-snag-btn {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 68px;
+  min-height: 68px;
+  padding: 0 12px;
+  border: 4px solid var(--sticker-rim);
+  outline: 2.5px solid var(--sticker-ink);
+  border-radius: 50%;
+  background: #ffe27a;
+  box-shadow: 0 4px 0 var(--sticker-ink), 0 0 14px #f5b82e88;
+  color: var(--sticker-ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  animation: battle-snag-pulse 640ms ease-in-out infinite;
+}
+@keyframes battle-snag-pulse {
+  50% { transform: translate(-50%, -50%) scale(1.07); }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .battle-foe-plate:not(:disabled):not(.is-targeted):hover {
+    background: #fff9e6;
+    transform: translateY(-1px);
+  }
+  .battle-which-one-cup:not(:disabled):hover,
+  .battle-whack-slot:hover {
+    filter: brightness(1.04);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .battle-foe-plate,
+  .battle-foe-fill,
+  .battle-which-one-cup,
+  .battle-whack-slot,
+  .battle-spin-snag-coil,
+  .battle-spin-snag-petal {
+    transition: none;
+  }
+  .battle-phase2-banner,
+  .battle-spin-snag-btn {
+    animation: none;
+  }
+  .battle-foe-plate:not(:disabled):not(.is-targeted):hover {
+    transform: none;
+  }
+}
+:root[data-reduced-motion="on"] .battle-foe-plate,
+:root[data-reduced-motion="on"] .battle-foe-fill,
+:root[data-reduced-motion="on"] .battle-which-one-cup,
+:root[data-reduced-motion="on"] .battle-whack-slot,
+:root[data-reduced-motion="on"] .battle-spin-snag-coil,
+:root[data-reduced-motion="on"] .battle-spin-snag-petal {
+  transition: none;
+}
+:root[data-reduced-motion="on"] .battle-phase2-banner,
+:root[data-reduced-motion="on"] .battle-spin-snag-btn {
+  animation: none;
+}
+:root[data-reduced-motion="on"] .battle-foe-plate:not(:disabled):not(.is-targeted):hover {
+  transform: none;
 }

@@ -431,6 +431,13 @@ export function parseFixture(value: unknown, file: string): Fixture {
       if (typeof count === "number") parsedCalms[species] = count;
     }
   }
+  const battleFormation = value.battleFormation;
+  field(
+    battleFormation === undefined ||
+      (typeof battleFormation === "string" && battleFormation.trim().length > 0),
+    file,
+    "battleFormation",
+  );
   return {
     area: value.area,
     spawn: value.spawn,
@@ -438,6 +445,7 @@ export function parseFixture(value: unknown, file: string): Fixture {
     ...(party === undefined ? {} : { party }),
     ...(variables === undefined ? {} : { variables: parsedVariables }),
     ...(rawCalms === undefined ? {} : { calms: parsedCalms }),
+    ...(battleFormation === undefined ? {} : { battleFormation }),
   };
 }
 

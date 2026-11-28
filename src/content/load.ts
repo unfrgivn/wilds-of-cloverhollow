@@ -144,6 +144,9 @@ import summitFixtureData from "../../content/fixtures/summit.json";
 import islandFixtureData from "../../content/fixtures/island.json";
 import festivalFixtureData from "../../content/fixtures/festival.json";
 import mistFixtureData from "../../content/fixtures/mist.json";
+import bayDuoFixtureData from "../../content/fixtures/bay-duo.json";
+import woodsDuoFixtureData from "../../content/fixtures/woods-duo.json";
+import arcadeEncoreFixtureData from "../../content/fixtures/arcade-encore.json";
 import tunableData from "../../content/tunables.json";
 import fountainFrogData from "../../content/critters/fountain-frog.json";
 import frogData from "../../content/critters/frog.json";
@@ -456,6 +459,9 @@ export function loadContent(options?: {
     island: loadFixture(islandFixtureData, "island"),
     festival: loadFixture(festivalFixtureData, "festival"),
     mist: loadFixture(mistFixtureData, "mist"),
+    "bay-duo": loadFixture(bayDuoFixtureData, "bay-duo"),
+    "woods-duo": loadFixture(woodsDuoFixtureData, "woods-duo"),
+    "arcade-encore": loadFixture(arcadeEncoreFixtureData, "arcade-encore"),
   };
   for (const [name, fixture] of Object.entries(fixtures))
     for (const id of fixture.party ?? [])
@@ -576,10 +582,8 @@ export function loadContent(options?: {
       tunables: parseTunables(tunableData, "content/tunables.json"),
       areas, surfaces, lands, story, critters, battle, stickers, characters, party, storyVariable,
       arcade: arcadeGames, levels, treats, treatBaskets, npcProfiles,
-      npcBanter: parsedProfiles.banter,
-      partyBanter: parsedProfiles.partyBanter ?? [],
-      toolEvents: parsedProfiles.toolEvents ?? [],
-      cutscenes,
+      npcBanter: parsedProfiles.banter, partyBanter: parsedProfiles.partyBanter ?? [],
+      toolEvents: parsedProfiles.toolEvents ?? [], cutscenes,
       encore: parseEncoreContent(encoreData, "content/encore.json", critters),
     },
     fixtures,

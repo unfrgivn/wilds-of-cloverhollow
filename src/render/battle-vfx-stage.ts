@@ -7,6 +7,11 @@ import type {
 } from "../core";
 import type { MotionPose } from "./motion";
 import type { BattleVfxParticle } from "./battle-vfx";
+export {
+  applyDualComboTheater,
+  DUAL_COMBO_PALETTES,
+  isDualComboActive,
+} from "./battle-vfx-combos";
 
 function clamp01(value: number): number {
   return Math.max(0, Math.min(1, value));

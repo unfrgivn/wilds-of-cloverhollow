@@ -1,5 +1,6 @@
 {
   "toyAtlas": "assets/battle/toys/toys.json",
+  "checksV2Atlas": "assets/battle/battle-checks-v2.json",
   "commands": {
     "soothe": {
       "label": "Soothe",
@@ -64,7 +65,10 @@
     "lean": "Hold left or right to balance!",
     "trace": "Trace the dots before the paint dries!",
     "peekaboo": "Hold confirm while it looks away; freeze when it watches!",
-    "echo": "Listen, then echo the chimes!"
+    "echo": "Listen, then echo the chimes!",
+    "which-one": "Watch the shuffling cups, then pick where it's hiding!",
+    "whack": "Press each popping ticket's direction (confirm for middle)!",
+    "spin-snag": "Circle directions to spin the lasso, then press confirm to snag!"
   },
   "together": {
     "chargeMax": 3,

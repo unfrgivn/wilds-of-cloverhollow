@@ -19,6 +19,7 @@ export function isActionFrame(value: unknown): value is ActionFrame {
     && (value.lasso === undefined || typeof value.lasso === "boolean")
     && (value.dash === undefined || typeof value.dash === "boolean")
     && (value.choose === undefined || typeof value.choose === "number")
+    && (value.target === undefined || typeof value.target === "number")
     && (value.pointer === undefined || pointer(value.pointer))
   );
 }

@@ -14,6 +14,7 @@ import {
   sceneryArea,
   step,
   targetInteractable,
+  whichOneTargetSlot,
   type ActionFrame,
   type CheckState,
   type Direction,
@@ -511,6 +512,40 @@ export function createRecorder(world: World, initial: State): {
         if (state.battle?.phase !== "check" || current?.kind !== "echo") break;
         tick(frame(noteDirs[note]));
         if (state.battle?.phase === "check") tick(frame());
+      }
+    } else if (check.kind === "which-one") {
+      const shuffleEnd = check.spec.showTicks + check.spec.shuffles * check.spec.swapTicks;
+      waitFor(shuffleEnd);
+      const targetSlot = whichOneTargetSlot(check.hidingCup, check.swaps);
+      for (let stepIdx = 0; stepIdx < 3; stepIdx += 1) {
+        const current = live();
+        if (current?.kind !== "which-one" || current.cursor === targetSlot) break;
+        nudge(directions.right);
+      }
+      press();
+    } else if (check.kind === "whack") {
+      const stride = check.spec.stayTicks + check.spec.gapTicks;
+      for (let idx = 0; idx < check.slots.length; idx += 1) {
+        waitFor(idx * stride);
+        const current = live();
+        if (state.battle?.phase !== "check" || current?.kind !== "whack") break;
+        const slot = current.slots[idx];
+        if (slot === "middle") press();
+        else if (slot !== undefined) nudge(directions[slot]);
+      }
+    } else if (check.kind === "spin-snag") {
+      const ringDirs = [directions.up, directions.right, directions.down, directions.left];
+      let dirIdx = 0;
+      for (let current = live(); current?.kind === "spin-snag"; current = live()) {
+        if (current.turns < current.spec.spinsNeeded) {
+          tick(frame(ringDirs[dirIdx % 4]));
+          dirIdx += 1;
+        } else if (current.snagTick >= current.spec.targetTick - 1) {
+          press();
+          break;
+        } else {
+          tick(frame());
+        }
       }
     } else {
       for (const arrival of check.spec.arrivals) {

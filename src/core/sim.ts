@@ -21,8 +21,8 @@ import {
 } from "./roam";
 import {
   CALM_HOOK, activeBattleActor, addTreat, battleCommands, battleTurnRoster, battleView,
-  consumeTreat, purchaseTreat, revealCharacters, startBattle, stepBattle, totalTreatCount,
-  type TextSpeed,
+  consumeTreat, purchaseTreat, revealCharacters, startBattle, startFormationBattle, stepBattle,
+  totalTreatCount, type TextSpeed,
 } from "./battle";
 import { levelUpDelta } from "./levels";
 import { npcLiveFootprint, npcLivePoint } from "./npc-stroll";
@@ -45,8 +45,8 @@ export {
   distanceToPolygon, faeBox, hiddenFraction, inkFacts, npcVisible, orderPartyContent,
   orderPartyIds, orderPartyMembers, partyCommand, partyLeader, partySlots, pointInPolygon,
   presentCritters, purchaseTreat, resolveCollision, resolveMove, revealCharacters, rollWild,
-  startBattle, stepBattle, stepParty, stepWild, syncParty, totalTreatCount, touchingCritter,
-  visibleFollowerSlot, type TextSpeed,
+  startBattle, startFormationBattle, stepBattle, stepParty, stepWild, syncParty, totalTreatCount,
+  touchingCritter, visibleFollowerSlot, type TextSpeed,
 };
 
 // No `lantern`: it's optional, present only while pressed, so a blank frame,
@@ -96,34 +96,18 @@ export function createState(
     }
   }
   const state: State = {
-    tick: 0,
-    area: area.id,
-    player: { x: spawn.x, y: spawn.y },
-    facing: spawn.facing,
-    rng: seed >>> 0,
-    previousInput: blankInput(),
-    motion: { distance: 0, moving: false },
-    transition: null,
-    party: spawnParty(world, ink, area, spawn, ids),
-    xp: 0,
-    ink,
-    dialogue: null,
-    critters,
-    wild: [],
-    calms,
-    stickers,
+    tick: 0, area: area.id, player: { x: spawn.x, y: spawn.y }, facing: spawn.facing,
+    rng: seed >>> 0, previousInput: blankInput(), motion: { distance: 0, moving: false },
+    transition: null, party: spawnParty(world, ink, area, spawn, ids), xp: 0, ink,
+    dialogue: null, critters, wild: [], calms, stickers,
     safeSpot: { area: area.id, spawn: fixture.spawn },
-    battle: null,
-    arcade: null,
-    prizes: [],
-    tickets: 0,
-    journalOpen: false,
-    lantern: false,
-    coins: 0,
-    snacks: 2,
-    finale: null,
+    battle: null, arcade: null, prizes: [], tickets: 0,
+    journalOpen: false, lantern: false, coins: 0, snacks: 2, finale: null,
   };
-  return { ...state, ...rollWild(world, state, area) };
+  const initial: State = { ...state, ...rollWild(world, state, area) };
+  return fixture.battleFormation === undefined
+    ? initial
+    : { ...initial, battle: startFormationBattle(world, initial, fixture.battleFormation) };
 }
 
 // One snack for `price` coins, if Fae can pay (spec 7, a `buy:` line).

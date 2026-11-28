@@ -26,9 +26,10 @@ import { creditsConfirmAllowed } from "./shell/credits-flow";
 import { createAreaLoader } from "./shell/area-loader";
 import { formatDocumentTitle } from "./shell/document-title";
 import {
-  battleCheckOverlay, buildBattleHudView, buildCreditsView, buildDialogueView,
-  buildHudHintsView, buildJournalView, buildRewardStickerView, createMoleHoleHandler,
-  createShellAssets, createTacoToppingHandler, FAE_ATLAS,
+  battleCheckOverlay, bindBattleCheckTouch, buildBattleHudView, buildCommandMenuView,
+  buildCreditsView, buildDialogueView, buildHudHintsView, buildJournalView,
+  buildRewardStickerView, createMoleHoleHandler, createShellAssets, createTacoToppingHandler,
+  keepsBattleArrows,
 } from "./shell/assets";
 import {
   buildSoundContext, collectLevelUpNotices, createAreaBannerTracker, createJournalNotesCache,
@@ -130,10 +131,7 @@ async function boot(): Promise<void> {
   const battleHud = createBattleHud(uiRoot);
   const commandMenu = createCommandMenu(uiRoot);
   const battleCheck = createBattleCheck(uiRoot);
-  const handleConfirmHold = (held: boolean): void => {
-    touch.setButton("confirm", held);
-    if (held) touch.tapButton("confirm");
-  };
+  const handleConfirmHold = bindBattleCheckTouch(battleCheck, touch);
   const feelingBubble = createFeelingBubble(uiRoot);
   const windUpBubbles = createWindUpBubbles(uiRoot);
   const rewardSticker = createRewardSticker(uiRoot);
@@ -182,6 +180,7 @@ async function boot(): Promise<void> {
   let jukeboxTrack: JukeboxTrack | null = null;
   const title = createTitleScreen(uiRoot);
   const credits = createCredits(uiRoot);
+  battleHud.onSelectTarget((index) => touch.tapTarget(index));
   const view = new GameView(content.world, { debugLabel: qaEnabled, renderer: app.renderer });
   const navFollower = createNavPathFollower(content.world);
   const syncNpcChatter = createNpcChatterSync(
@@ -313,8 +312,7 @@ async function boot(): Promise<void> {
         view.setArea(initialArea).then(() => assets.cacheAreaNpcPortraits(initialArea)),
         assets.warmAreaMedia(initialArea),
         assets.warmJournalAssets(state),
-        assets.decodeAtlasImage(FAE_ATLAS),
-        assets.decodeAtlasImage(content.world.battle.toyAtlas),
+        assets.warmBootBattleAtlases(),
       ]);
     }),
   ]);
@@ -567,21 +565,18 @@ async function boot(): Promise<void> {
     const checkKind = state.battle?.phase === "check" ? state.battle.check?.kind : undefined;
     if (checkKind !== undefined) document.documentElement.dataset.check = checkKind;
     else delete document.documentElement.dataset.check;
-    if (checkKind !== "catch" && checkKind !== "lean" && checkKind !== "echo" &&
-        state.arcade?.game !== "mole" && state.arcade?.game !== "comet" &&
-        state.arcade?.game !== "taco" && !overworldPointer.isActive()) touch.releaseArrows();
+    if (!keepsBattleArrows(checkKind) && state.arcade?.game !== "mole" &&
+        state.arcade?.game !== "comet" && state.arcade?.game !== "taco" &&
+        !overworldPointer.isActive()) touch.releaseArrows();
     if (activeBattle && !wasBattleOpen) void assets.warmBattlePortraits(state).then(invalidate);
     wasBattleOpen = activeBattle;
     battleHud.render(buildBattleHudView({
       world: content.world, state, battle, partyCommands, paused,
       canPeek: canBattlePeek(gate), peekOpen: battlePeekOpen,
-      speakerPortrait: assets.speakerPortrait, inputMode: inputShortcuts.inputMode(),
+      speakerPortrait: assets.speakerPortrait, checkV2Art: assets.checkV2Art,
+      inputMode: inputShortcuts.inputMode(),
     }));
-    commandMenu.render({
-      visible: activeBattle && state.battle?.phase === "command" && battle?.talk === null,
-      commands: battle?.commands ?? [], selected: battle?.selected ?? 0,
-      activeActor: battle?.activeActor, treatTray: battle?.treatTray ?? null,
-    });
+    commandMenu.render(buildCommandMenuView(state, battle, assets.checkV2Art));
     const feelingAt = view.battleFeelingAnchor(state, window.innerWidth, window.innerHeight);
     feelingBubble.render(
       battlePeekOpen || battle === null || battle.feelings === null || feelingAt === null
@@ -593,8 +588,12 @@ async function boot(): Promise<void> {
     );
     devLog?.logBattleButtons(activeBattle, state);
     const geometry = view.battleCheckGeometry(state, window.innerWidth, window.innerHeight);
-    touch.setTraceElement(geometry?.kind === "trace" ? geometry.rect : undefined);
-    battleCheck.render(battleCheckOverlay(battle, geometry, assets.toyArt));
+    const traceRect = geometry?.kind === "trace" || geometry?.kind === "spin-snag"
+      ? geometry.rect
+      : undefined;
+    touch.setTraceRect(traceRect);
+    touch.setTraceElement(traceRect);
+    battleCheck.render(battleCheckOverlay(battle, geometry, assets.toyArt, assets.checkV2Art));
     rewardSticker.render(
       buildRewardStickerView(content.world, state, activeBattle, arcadeState, assets),
     );

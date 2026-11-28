@@ -1,5 +1,6 @@
 import {
   CLUBHOUSE_VISITORS,
+  formationPartnersForArea,
   type Area,
   type Critter,
   type Direction,
@@ -209,6 +210,7 @@ export function areaEntityAtlases(world: World, area: Area): EntityAtlas[] {
   const critterIds = [
     ...area.critters.map((piece) => piece.id),
     ...(area.recurring?.dens ?? []).flatMap((den) => den.kinds),
+    ...formationPartnersForArea(area.id).flatMap((formation) => formation.critterIds),
   ];
   for (const id of critterIds) {
     const critter = world.critters[id];

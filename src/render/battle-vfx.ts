@@ -18,7 +18,9 @@ export {
   type SnackTheaterKind,
 } from "./battle-theater";
 export {
+  applyDualComboTheater,
   applyRestFaint,
+  DUAL_COMBO_PALETTES,
   ECHO_CHIME_COLORS,
   echoNoteColor,
   emitEchoChimeVfx,
@@ -27,6 +29,7 @@ export {
   emitRainbowLassoVfx,
   emitSoothedConfettiVfx,
   emitTraceBrushVfx,
+  isDualComboActive,
   isLassoActionActive,
   LASSO_ARC_DURATION,
   LEAN_WIND_TINTS,

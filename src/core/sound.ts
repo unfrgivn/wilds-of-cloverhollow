@@ -142,8 +142,10 @@ export function soundCues(
         if (chime !== undefined) cues.push(chime);
       }
     }
-    const startedTogether = next.battle.command === "together" &&
-      (previous.battle.command !== "together" ||
+    const isTeamMove = (command: string | null): boolean =>
+      command === "together" || (command !== null && command.startsWith("combo:"));
+    const startedTogether = isTeamMove(next.battle.command) &&
+      (previous.battle.command !== next.battle.command ||
         (previous.battle.phase !== "check" && next.battle.phase === "check" &&
           next.battle.check?.side === "critter"));
     if (startedTogether) cues.push("battle-together");
@@ -298,12 +300,13 @@ const echoChimes: readonly SoundCue[] = [
   "chime-red", "chime-yellow", "chime-green", "chime-blue",
 ];
 
-// How many beats, toys, puffs, or peeks a check has cleared so far;
-// other checks none.
+// How many beats, toys, puffs, peeks, whack hits, or lasso turns a check has
+// cleared so far; other checks none.
 function hits(check: CheckState | null): number {
   if (check?.kind === "peekaboo") return check.peeksCleared;
+  if (check?.kind === "spin-snag") return check.turns;
   return check?.kind === "chain" || check?.kind === "catch" ||
-    check?.kind === "lean" || check?.kind === "trace"
+    check?.kind === "lean" || check?.kind === "trace" || check?.kind === "whack"
     ? check.results.filter((result) => result === "hit").length
     : 0;
 }

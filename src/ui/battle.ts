@@ -18,32 +18,25 @@ import {
   type CheckKind,
 } from "./battle-peek";
 
+import {
+  createBossIntentSticker, createFoeFormationHud, createPhase2Banner,
+  type BattleFoePlateItem, type BattleIntentItem, type BossPhase2BannerView,
+} from "./battle-overlays";
+
 export {
-  battlePeekData,
-  checkMechanicLabel,
-  classifyBattlePopup,
-  type BattlePeekData,
-  type BattlePopupKind,
-  type BattlePopupSide,
-  type BattlePopupSnapshot,
-  type BattlePopupSpec,
-  type CheckKind,
+  battlePeekData, checkMechanicLabel, classifyBattlePopup,
+  type BattlePeekData, type BattlePopupKind, type BattlePopupSide,
+  type BattlePopupSnapshot, type BattlePopupSpec, type CheckKind,
 };
 
 export { createBattleCheck, type BattleCheckView, type TimingGrade } from "./battle-checks";
 
 export {
-  battleCommandPreview,
-  createCommandMenu,
-  createFeelingBubble,
-  createRewardSticker,
-  createWindUpBubbles,
-  type BattleCommand,
-  type BattleTreatItem,
-  type CommandMenuView,
-  type FeelingBubbleView,
-  type RewardStickerView,
-  type WindUpView,
+  battleCommandPreview, createBossIntentSticker, createCommandMenu, createFeelingBubble,
+  createFoeFormationHud, createPhase2Banner, createRewardSticker, createWindUpBubbles,
+  type BattleCommand, type BattleFoePlateItem, type BattleIntentItem, type BattleTreatItem,
+  type BossPhase2BannerView, type CommandMenuView, type FeelingBubbleView,
+  type RewardStickerView, type WindUpView,
 } from "./battle-overlays";
 
 export type BattleActionKeys = {
@@ -101,6 +94,9 @@ export type BattleHudView = {
   peekOpen?: boolean;
   peek?: BattlePeekData | null;
   inputMode?: "keyboard" | "gamepad";
+  foes?: readonly BattleFoePlateItem[];
+  bossPhase2?: BossPhase2BannerView;
+  bossIntent?: BattleIntentItem | null;
 };
 
 const leafPath = "M 2 15 C 5 2, 15 1, 22 3 C 20 12, 12 18, 2 15 M 3 14 L 19 4";
@@ -254,6 +250,7 @@ export function createBattleHud(root: HTMLElement): {
   onLasso: (callback: () => void) => void;
   onPeekToggle: (callback: () => void) => void;
   onPeekClose: (callback: () => void) => void;
+  onSelectTarget: (callback: (index: number) => void) => void;
 } {
   let togetherHandler: () => void = () => undefined;
   let fluteHandler: () => void = () => undefined;
@@ -355,6 +352,9 @@ export function createBattleHud(root: HTMLElement): {
     }
   });
   hud.append(energy, portraits, actionsLeft, calm);
+  const foeHud = createFoeFormationHud(hud);
+  const phase2Banner = createPhase2Banner(hud);
+  const bossIntentBadge = createBossIntentSticker(calm);
   hud.hidden = true;
   const peekCard = element("section", "battle-peek-card");
   peekCard.tabIndex = -1;
@@ -460,6 +460,9 @@ export function createBattleHud(root: HTMLElement): {
     onPeekClose: (callback) => {
       peekCloseHandler = callback;
     },
+    onSelectTarget: (callback) => {
+      foeHud.onSelectTarget(callback);
+    },
     render: (view) => {
       hud.hidden = !view.visible;
       const keys = battleActionKeys(view.inputMode ?? "keyboard");
@@ -550,6 +553,14 @@ export function createBattleHud(root: HTMLElement): {
       steadyPill.hidden = !showSteady;
       actionsLeft.hidden =
         !showSparkle && !showTogether && !showFlute && !showSoften && !showLasso && !showSteady;
+      const multiFoe = view.visible && (view.foes?.length ?? 0) > 1;
+      calm.hidden = multiFoe;
+      foeHud.render(multiFoe ? (view.foes ?? []) : []);
+      const activePhase2 = view.visible ? (view.bossPhase2 ?? null) : null;
+      phase2Banner.render(activePhase2);
+      bossIntentBadge.render(
+        view.visible && !multiFoe && activePhase2 !== null ? (view.bossIntent ?? null) : null,
+      );
       setText(calmLabel, view.critterName.toUpperCase());
       const calmFraction = clamp01(view.calm);
       const remainingFraction = battleMeterRemaining(view.calm);

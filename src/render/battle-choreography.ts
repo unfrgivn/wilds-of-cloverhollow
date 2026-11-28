@@ -1,90 +1,29 @@
-import { peekabooStatus, type Battle, type BattleView } from "../core";
+import { isDualComboCommand, peekabooStatus, type Battle, type BattleView } from "../core";
 import { composePose, idleBreathing, NEUTRAL_POSE, type MotionPose } from "./motion";
 import {
-  applyRecoverTheater,
-  applyRestFaint,
-  applySnackTheater,
-  applySoothedAndReward,
-  applyTalkTheater,
-  applyTogetherActive,
-  applyTogetherReady,
-  applyWindUpAndFizzle,
-  clamp01,
-  classifySnackTheater,
-  ECHO_CHIME_COLORS,
-  echoNoteColor,
-  emitEchoChimeVfx,
-  emitLeanWindVfx,
-  emitPeekabooVfx,
-  emitRainbowLassoVfx,
-  emitSoothedConfettiVfx,
-  emitTraceBrushVfx,
-  FIZZ_TINTS,
-  isLassoActionActive,
-  isRecoverTheater,
-  isTalkTheater,
-  LASSO_ARC_DURATION,
-  LEAN_WIND_TINTS,
-  PEEKABOO_DUST_TINT,
-  PEEKABOO_WARNING_TINT,
-  PEEKABOO_WATCH_TINTS,
-  radialBurst,
-  RAINBOW_HEARTS,
-  RAINBOW_LASSO_COLORS,
-  RECOVER_SPARKLE_TINTS,
-  RELIEF_PETALS,
-  SOOTHED_CONFETTI_COLORS,
-  SPARKLE_TINTS,
-  TRACE_BRUSH_COLORS,
-  type BattleStageMood,
-  type BattleVfxAnchor,
-  type BattleVfxBlend,
-  type BattleVfxParticle,
-  type BattleVfxTexture,
-  type BattleVfxTextureKey,
-  type EchoChimeMotion,
-  type EchoColor,
-  type SnackTheaterKind,
-  type TraceBrushMotion,
+  applyDualComboTheater, applyRecoverTheater, applyRestFaint, applySnackTheater,
+  applySoothedAndReward, applyTalkTheater, applyTogetherActive, applyTogetherReady,
+  applyWindUpAndFizzle, clamp01, classifySnackTheater, DUAL_COMBO_PALETTES, ECHO_CHIME_COLORS,
+  echoNoteColor, emitEchoChimeVfx, emitLeanWindVfx, emitPeekabooVfx, emitRainbowLassoVfx,
+  emitSoothedConfettiVfx, emitTraceBrushVfx, FIZZ_TINTS, isDualComboActive, isLassoActionActive,
+  isRecoverTheater, isTalkTheater, LASSO_ARC_DURATION, LEAN_WIND_TINTS, PEEKABOO_DUST_TINT,
+  PEEKABOO_WARNING_TINT, PEEKABOO_WATCH_TINTS, radialBurst, RAINBOW_HEARTS, RAINBOW_LASSO_COLORS,
+  RECOVER_SPARKLE_TINTS, RELIEF_PETALS, SOOTHED_CONFETTI_COLORS, SPARKLE_TINTS, TRACE_BRUSH_COLORS,
+  type BattleStageMood, type BattleVfxAnchor, type BattleVfxBlend, type BattleVfxParticle,
+  type BattleVfxTexture, type BattleVfxTextureKey, type EchoChimeMotion, type EchoColor,
+  type SnackTheaterKind, type TraceBrushMotion,
 } from "./battle-vfx";
 
 export {
-  classifySnackTheater,
-  ECHO_CHIME_COLORS,
-  echoNoteColor,
-  emitEchoChimeVfx,
-  emitLeanWindVfx,
-  emitPeekabooVfx,
-  emitRainbowLassoVfx,
-  emitSoothedConfettiVfx,
-  emitTraceBrushVfx,
-  FIZZ_TINTS,
-  isLassoActionActive,
-  isRecoverTheater,
-  isTalkTheater,
-  LASSO_ARC_DURATION,
-  LEAN_WIND_TINTS,
-  PEEKABOO_DUST_TINT,
-  PEEKABOO_WARNING_TINT,
-  PEEKABOO_WATCH_TINTS,
-  radialBurst,
-  RAINBOW_HEARTS,
-  RAINBOW_LASSO_COLORS,
-  RECOVER_SPARKLE_TINTS,
-  RELIEF_PETALS,
-  SOOTHED_CONFETTI_COLORS,
-  SPARKLE_TINTS,
-  TRACE_BRUSH_COLORS,
-  type BattleStageMood,
-  type BattleVfxAnchor,
-  type BattleVfxBlend,
-  type BattleVfxParticle,
-  type BattleVfxTexture,
-  type BattleVfxTextureKey,
-  type EchoChimeMotion,
-  type EchoColor,
-  type SnackTheaterKind,
-  type TraceBrushMotion,
+  applyDualComboTheater, classifySnackTheater, DUAL_COMBO_PALETTES, ECHO_CHIME_COLORS,
+  echoNoteColor, emitEchoChimeVfx, emitLeanWindVfx, emitPeekabooVfx, emitRainbowLassoVfx,
+  emitSoothedConfettiVfx, emitTraceBrushVfx, FIZZ_TINTS, isDualComboActive, isLassoActionActive,
+  isRecoverTheater, isTalkTheater, LASSO_ARC_DURATION, LEAN_WIND_TINTS, PEEKABOO_DUST_TINT,
+  PEEKABOO_WARNING_TINT, PEEKABOO_WATCH_TINTS, radialBurst, RAINBOW_HEARTS, RAINBOW_LASSO_COLORS,
+  RECOVER_SPARKLE_TINTS, RELIEF_PETALS, SOOTHED_CONFETTI_COLORS, SPARKLE_TINTS, TRACE_BRUSH_COLORS,
+  type BattleStageMood, type BattleVfxAnchor, type BattleVfxBlend, type BattleVfxParticle,
+  type BattleVfxTexture, type BattleVfxTextureKey, type EchoChimeMotion, type EchoColor,
+  type SnackTheaterKind, type TraceBrushMotion,
 };
 
 export type BattleChoreography = {
@@ -120,11 +59,12 @@ export function battleStageMood(battle: Battle, view: BattleView | null): Battle
   if (battle.phase === "rest") return "rest";
   if (battle.phase === "soothed" || battle.phase === "reward") return "soothed";
   if (
-    battle.command === "together" &&
+    (battle.command === "together" || battle.command === "combo:cloverhollow-harmony") &&
     (battle.phase === "check" || (battle.phase === "result" && battle.lastGrade !== null))
   ) {
     return "together-active";
   }
+  if (isDualComboActive(battle)) return "together-ready";
   if (view?.sparkle?.ready === true) return "together-ready";
   if (puffLevel(battle, view) >= 2) return "windup";
   return "calm-normal";
@@ -622,7 +562,8 @@ export function computeBattleChoreography(
       battle.lastGrade !== "miss" &&
       (battle.lastGrade === "great" ||
         battle.answered ||
-        (battle.command === "together" && battle.lastGrade !== null));
+        ((battle.command === "together" || isDualComboCommand(battle.command)) &&
+          battle.lastGrade !== null));
     if (impactful && battle.phaseTicks < 4) {
       hitStop = true;
       critter = {
@@ -709,12 +650,15 @@ export function computeBattleChoreography(
   }
 
   // 10b. Together! Ready on-field telegraph: eager bounce + golden sparkle tether.
-  if (stageMood === "together-ready") {
+  const dualComboActive = isDualComboActive(battle);
+  if (stageMood === "together-ready" && !dualComboActive) {
     fae = applyTogetherReady(tick, partyIds, fae, applyParty, vfx, reducedMotion);
   }
 
-  // 10c. Together! Activation theater: synchronized team wave-hop + golden cascade.
-  if (stageMood === "together-active") {
+  // 10c. Together! / Dual-Friend Synergy Combo activation theater.
+  if (dualComboActive) {
+    fae = applyDualComboTheater(battle, tick, partyIds, fae, applyParty, vfx, reducedMotion);
+  } else if (stageMood === "together-active") {
     fae = applyTogetherActive(battle, tick, partyIds, fae, applyParty, vfx, reducedMotion);
   }
 

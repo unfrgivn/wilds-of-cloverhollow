@@ -7,6 +7,22 @@ import type {
 } from "../core";
 import type { MotionPose } from "./motion";
 import type { BattleVfxParticle } from "./battle-vfx";
+import { RAINBOW_LASSO_COLORS } from "./battle-vfx-checks-v2";
+export {
+  emitSpinSnagVfx,
+  emitWhackVfx,
+  emitWhichOneVfx,
+  RAINBOW_LASSO_COLORS,
+  SPIN_SNAG_COLORS,
+  WHACK_VFX_COLORS,
+  WHICH_ONE_VFX_COLORS,
+  type SpinSnagColors,
+  type SpinSnagMotion,
+  type WhackMotion,
+  type WhackVfxColors,
+  type WhichOneMotion,
+  type WhichOneVfxColors,
+} from "./battle-vfx-checks-v2";
 export {
   applyDualComboTheater,
   DUAL_COMBO_PALETTES,
@@ -18,15 +34,6 @@ function clamp01(value: number): number {
 }
 
 export const LASSO_ARC_DURATION = 32;
-export const RAINBOW_LASSO_COLORS: readonly number[] = [
-  0xff6e93,
-  0xff9e52,
-  0xffd23f,
-  0x76d687,
-  0x6ec3ff,
-  0xa88aff,
-  0xee8ce0,
-];
 
 export type EchoColor = "red" | "yellow" | "green" | "blue";
 

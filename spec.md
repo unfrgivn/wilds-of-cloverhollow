@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 198)
+Last updated: 2026-11-28 (Milestone 199)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -215,9 +215,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   VFX choreography emitters (`isLassoActionActive`, `emitRainbowLassoVfx`,
   `echoNoteColor`, `emitEchoChimeVfx`, `emitSoothedConfettiVfx`,
   `emitLeanWindVfx`, `emitPeekabooVfx`, `emitTraceBrushVfx`) live in Pixi-free
-  `src/render/battle-vfx-stage.ts` (all re-exported identically through
-  `src/render/battle-vfx.ts` and `src/render/battle-choreography.ts`,
-  Milestones 137, 157 & 173). The Pixi battle stage container, sprites, check
+  `src/render/battle-vfx-stage.ts`, and the three Track E7 v2 battle check stage
+  VFX emitters (`WHICH_ONE_VFX_COLORS`, `emitWhichOneVfx`, `WHACK_VFX_COLORS`,
+  `emitWhackVfx`, `SPIN_SNAG_COLORS`, `emitSpinSnagVfx`, sharing
+  `RAINBOW_LASSO_COLORS`) live in Pixi-free `src/render/battle-vfx-checks-v2.ts`
+  (all re-exported identically through `src/render/battle-vfx-stage.ts`,
+  `src/render/battle-vfx.ts`, and `src/render/battle-choreography.ts`,
+  Milestones 137, 157, 173 & 198). The Pixi battle stage container, sprites, check
   geometry, and `renderBattle` orchestration live in `BattleViewController`
   (`src/render/battle-view.ts`, mounted by `GameView` in `src/render/view.ts`),
   delegating blurred backdrop texture caching/invalidation, stage wash scrim,
@@ -294,18 +298,21 @@ ios/            Capacitor iOS project (from Milestone 4).
   safely on unsupported browsers or during synthetic harness steps.
   Projected via `hapticForTick` (`src/shell/feedback.ts`) with strict priority
   `"celebrate"` > `"medium"` > `"light"`:
-  `"celebrate"` on Golden Chef (`goldenCooked`), `soothed` transition, Spatial
+  `"celebrate"` on Golden Chef (`goldenCooked`), `soothed` transition,
+  Dual-Friend Synergy Combo start (`isDualComboCommand`), Boss Phase-2 shift
+  (crossing 50% calm on single-foe or multi-foe mini-bosses), Spatial
   Puzzle solve (`puzzleArea.lastSolved` transition), new Boss Encore Star Trophy
   (`encore.trophies.length` increase), `battle-together`, `prize-won`,
   `fish-catch`, `level-up`, `sticker`, `skee-hundred`, and `taco-order`;
   `"medium"` on `GREAT!` `battle-hit`, `comet-bump`, `lasso-twirl`, `cook-ding`,
-  `taco-oops`, and `battle-faint`; and `"light"` on Prism Mirror rotation
+  `taco-oops`, and `battle-faint`; and `"light"` on `whack` ticket hits,
+  `spin-snag` lasso quarter-turns, Prism Mirror rotation
   (`puzzleArea.mirrors` change), Pressure Plate hold/release
   (`puzzleArea.heldPlates` change), Overworld Rainbow Lasso grapple launch
   (`puzzleArea.lasso.tick === 0`), Harmony Flute chime (`puzzleArea.recentChime`
   change), `battle-recover`, `claw-grab`, `mole-boop`, `taco-top`, `fish-bite`,
   `skee-score`, `comet-star`, `flute`, `lantern-on`, `coin`, `item`, and
-  companion pet (Milestones 122, 142, 165 & 195).
+  companion pet (Milestones 122, 142, 165, 195 & 198).
 
 ### 3.2 Input
 - Devices produce one `ActionFrame` per tick: a `move` vector (x and y in
@@ -4245,14 +4252,14 @@ trunks keep its two exits.
   clicking any chime fires a directional tap via `touch.tapArrow(...)`,
   matching keyboard arrows and gamepad directions. Live choreography bounces
   the critter on each demo note and Fae on each echoed note.
-- Battle stage VFX choreography (Milestone 155, `src/render/battle-vfx.ts`,
-  `src/render/battle-vfx-stage.ts`, `src/render/battle-choreography.ts`,
-  `src/render/battle-view.ts` with `BATTLE_VFX_POOL_SIZE = 80` and `"mistWisp"`
-  in `BattleVfxTexture`): six reduced-motion-aware stage VFX emitters (all
-  holding `rotation: 0` and steady positions across ticks when `reducedMotion`
-  is enabled) join Snack Theater (Milestone 135) and Talk Theater (Milestone
-  136) to complete 8-of-8 battle stage choreography with zero `src/core`
-  changes:
+- Battle stage VFX choreography (Milestones 155 & 198, `src/render/battle-vfx.ts`,
+  `src/render/battle-vfx-stage.ts`, `src/render/battle-vfx-checks-v2.ts`,
+  `src/render/battle-choreography.ts`, `src/render/battle-view.ts` with
+  `BATTLE_VFX_POOL_SIZE = 80` and `"mistWisp"` in `BattleVfxTexture`): nine
+  reduced-motion-aware stage VFX emitters (all holding `rotation: 0` and steady
+  positions across ticks when `reducedMotion` is enabled) join Snack Theater
+  (Milestone 135) and Talk Theater (Milestone 136) to complete 11-of-11 battle
+  check stage choreography with zero `src/core` changes:
   - Rainbow Lasso Arc (`LASSO_ARC_DURATION = 32`, `RAINBOW_LASSO_COLORS`,
     `isLassoActionActive`, `emitRainbowLassoVfx`): during live Rainbow Lasso
     command lines (`phaseTicks < 32`), Fae leans forward while a 7-color pastel
@@ -4296,6 +4303,31 @@ trunks keep its two exits.
     (so prior-turn `"great"` / `answered` state never triggers `hitStop`,
     `stageShake`, critter recoil, or critter heart bursts during `Recover`),
     paired with bespoke `"battle-recover"` audio & `"light"` haptic feedback.
+  - Cup Shuffle Stage VFX (`WHICH_ONE_VFX_COLORS`, `WhichOneMotion`,
+    `emitWhichOneVfx`, Milestone 198): emits a warm golden carnival `softGlow` +
+    3 pastel wonder `sparkle`s over the critter with mischievous bounce during
+    `"show"`, 3 swirling lilac-and-peach `mistWisp` sleight-of-hand ribbons +
+    4 twinkling carnival `sparkle`s across the open corridor above the cups with
+    focused Fae lean (`faeOffsetX: 6`) during `"shuffle"`, and a crisp
+    mint-gold anticipation `energyRing` + 3 orbiting focus `sparkle`s framing
+    Fae during `"pick"` (strict `rotation: 0`, zero sway/bounce, and
+    tick-invariant placement under `reducedMotion`).
+  - Arcade Ticket Whack Stage VFX (`WHACK_VFX_COLORS`, `WhackMotion`,
+    `emitWhackVfx`, Milestone 198): emits a coral-gold carnival hit `sparkle`
+    starburst (4 sparkles + warm `softGlow` pop on `anchor: "between"`) with
+    joyful Fae swing lean on `lastSwing.hit === true`, a soft lavender `puff`
+    whiff on `lastSwing.hit === false`, and 2–4 pastel arcade ticket `sparkle`
+    motes scaling with hit count flanking the corridor (strict `rotation: 0` and
+    zero bounce under `reducedMotion`).
+  - Spin & Snag Lasso Stage VFX (`SPIN_SNAG_COLORS`, `SpinSnagMotion`,
+    `emitSpinSnagVfx`, Milestone 198): emits an orbiting 7-color pastel Rainbow
+    Lasso loop (`RAINBOW_LASSO_COLORS`, 7 `sparkle` beads) + golden `energyRing`
+    halo spinning above Fae (speed & glow scaling with `turns / spinsNeeded`)
+    with playful twirl sway during `"spin"`, transitioning into a sweeping
+    7-color pastel rainbow rope Bézier arc across `anchor: "between"` beneath
+    the snag dial + crisp golden snag `energyRing` and warm `softGlow` framing
+    the target critter during `"snag"` (strict `rotation: 0`, zero sway, and
+    calm steady lasso halo/arc under `reducedMotion`).
 - The kid's reveal plays `milo_calm`, clears `forest_fizzy` through `on_calm`,
   and leaves Milo calm under the tree. The sticker catalogue has 24 slots,
   including Milo, Cozy Bat, Gem Mole, Starry Owl, and Chef Mateo. The front-view NPC art is no longer

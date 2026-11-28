@@ -8751,6 +8751,43 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   runtime story + harness checks green), Chromium & WebKit e2e tests,
   `just ios-device-build` (unsigned arm64 `Release-iphoneos/App.app`), and
   `just ios-smoke` (passed end-to-end on iPhone 17 / iOS 27.0 Simulator).
+
+## Milestone 199: Complete 11-of-11 Battle Stage VFX Choreography (`which-one`, `whack`, `spin-snag`) & E7 Dual-Combo / Phase-2 / Check Haptics **Status:** ✅ Completed (2026-11-28)
+- Completes bespoke reduced-motion-aware stage VFX across all 11 battle check
+  kinds (`which-one` Cup Shuffle, `whack` Ticket Slots, and `spin-snag` Twirl
+  Lasso join the 8 Milestone 158 checks) and adds tactile haptic feedback for
+  Dual-Friend Synergy Combos, Boss Phase-2 transitions, `whack` hits, and
+  `spin-snag` lasso quarter-turns — zero `src/core` changes, zero save-version
+  bumps, zero replay hash drift across all recorded sims + `encore` + `e7-sim` +
+  `e11`, and zero visual baseline diffs.
+- Pure zero-Pixi E7 check VFX module (`src/render/battle-vfx-checks-v2.ts`, 494
+  lines; re-exported via `src/render/battle-vfx-stage.ts`, `battle-vfx.ts`, and
+  `battle-choreography.ts`):
+  - **`emitWhichOneVfx`**: golden carnival `softGlow` + 3 wonder sparkles +
+    playful critter hop on `"show"`, 3 swirling lavender/pink/mint `mistWisp`
+    ribbons + 4 pastel sparkles arcing cleanly above the `SHUFFLING...` card on
+    `"shuffle"`, and mint-gold anticipation `energyRing` + 3 focus sparkles on
+    `"pick"`.
+  - **`emitWhackVfx`**: coral-gold carnival hit `sparkle` starburst + `softGlow`
+    + Fae swing lean on hit, lavender `puff` whiff on miss, and 2–4 streak
+    ticket sparkles.
+  - **`emitSpinSnagVfx`**: orbiting 7-color Rainbow Lasso halo + golden ring
+    above Fae scaling with `turns / spinsNeeded` on `"spin"`, and a full 7-bead
+    rainbow Bézier arc sweeping beneath the `SNAG!` dial into golden target
+    rings on `"snag"`.
+  - Strict `reducedMotion` parity (`rotation: 0`, zero actor bounce/sway,
+    tick-invariant placement) across all 3 emitters.
+- Tactile E7 haptics (`src/shell/feedback.ts`, `src/main.ts`):
+  - Extended `hapticForTick` with `"celebrate"` on Dual-Friend Synergy Combo
+    start and Boss Phase-2 threshold crossings (single & multi-foe), and
+    `"light"` on `whack` ticket hits and `spin-snag` lasso turns.
+- Evidence: `tests/unit/milestone-199.test.ts` (11 tests),
+  `tests/e2e/milestone-199.spec.ts` (`@smoke` Chromium + WebKit), and review
+  captures `art/review/m198-which-one-vfx-1280.jpg` and
+  `m198-spin-snag-vfx-1280.jpg` independently verified via `vision`.
+- Gates: `just check` (269 unit files / 2,020 tests, all sims + `e7-sim` +
+  `encore` + `e11`, 23 QA packs, purity, lint), `just build` (every non-vendor
+  chunk `< 375 kB`), and 29/29 Chromium & WebKit battle e2e tests.
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

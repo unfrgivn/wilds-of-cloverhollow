@@ -1,5 +1,8 @@
 import {
   cookZone,
+  isBossPhase2,
+  isDualComboCommand,
+  isMiniBossId,
   journalNotes,
   jukeboxTracks,
   levelUpLine,
@@ -7,6 +10,8 @@ import {
   targetInteractable,
   trackTitles,
   type ActionFrame,
+  type Battle,
+  type CheckState,
   type Event,
   type JukeboxTrack,
   type SoundCue,
@@ -99,12 +104,77 @@ function recordChanged(
   return false;
 }
 
+function countWhackHits(check: CheckState | null | undefined): number {
+  if (check?.kind !== "whack") return 0;
+  let count = 0;
+  for (const result of check.results) {
+    if (result === "hit") count += 1;
+  }
+  return count;
+}
+
+function foeInBossPhase2(
+  critterId: string,
+  calm: number,
+  calmMax: number,
+  phase: Battle["phase"],
+  talkMode: boolean,
+): boolean {
+  return (
+    isMiniBossId(critterId) &&
+    !talkMode &&
+    calm >= Math.ceil(calmMax * 0.5) &&
+    calm < calmMax &&
+    phase !== "soothed" &&
+    phase !== "reward" &&
+    phase !== "rest" &&
+    phase !== "run"
+  );
+}
+
+function enteredBossPhase2(
+  previous: Battle | null,
+  next: Battle | null,
+  world?: Pick<World, "critters">,
+): boolean {
+  if (previous === null || next === null) return false;
+  if (previous.foes !== undefined && next.foes !== undefined) {
+    return next.foes.some((foe, index) => {
+      const prevFoe = previous.foes?.[index];
+      if (prevFoe === undefined || prevFoe.critterId !== foe.critterId) return false;
+      return (
+        !foeInBossPhase2(
+          prevFoe.critterId,
+          prevFoe.calm,
+          prevFoe.calmMax,
+          previous.phase,
+          previous.talkMode === true,
+        ) &&
+        foeInBossPhase2(
+          foe.critterId,
+          foe.calm,
+          foe.calmMax,
+          next.phase,
+          next.talkMode === true,
+        )
+      );
+    });
+  }
+  if (previous.critterId !== next.critterId || world === undefined) return false;
+  const critter = world.critters[next.critterId];
+  if (critter === undefined) return false;
+  return (
+    !isBossPhase2(critter, previous.calm, previous.phase, previous.talkMode === true) &&
+    isBossPhase2(critter, next.calm, next.phase, next.talkMode === true)
+  );
+}
+
 /** Projects a simulation tick's transitions and sound cues to a tactile haptic kind. */
 export function hapticForTick(
   previous: Pick<State, "battle"> & Partial<Pick<State, "area" | "puzzleArea" | "encore">>,
   next: Pick<State, "battle"> & Partial<Pick<State, "area" | "puzzleArea" | "encore">>,
   cues: readonly SoundCue[],
-  options?: { goldenCooked?: boolean },
+  options?: { goldenCooked?: boolean; world?: Pick<World, "critters"> },
 ): HapticKind | null {
   const sameArea =
     previous.area === undefined || next.area === undefined || previous.area === next.area;
@@ -119,9 +189,18 @@ export function hapticForTick(
   const encoreTrophyEarned =
     (next.encore?.trophies.length ?? 0) > (previous.encore?.trophies.length ?? 0);
   const soothedNow = previous.battle?.phase !== "soothed" && next.battle?.phase === "soothed";
+  const dualComboStarted =
+    isDualComboCommand(next.battle?.command) &&
+    (previous.battle?.command !== next.battle?.command ||
+      (previous.battle?.phase !== "check" &&
+        next.battle?.phase === "check" &&
+        next.battle.check?.side === "critter"));
+  const bossPhase2Started = enteredBossPhase2(previous.battle, next.battle, options?.world);
   if (
     options?.goldenCooked === true ||
     soothedNow ||
+    dualComboStarted ||
+    bossPhase2Started ||
     puzzleSolvedNow ||
     encoreTrophyEarned ||
     cues.some((cue) => CELEBRATE_HAPTIC_CUES.has(cue))
@@ -153,11 +232,18 @@ export function hapticForTick(
     (prevChime === undefined ||
       prevChime.note !== nextChime.note ||
       prevChime.tick !== nextChime.tick);
+  const whackHit = countWhackHits(next.battle?.check) > countWhackHits(previous.battle?.check);
+  const spinSnagTurn =
+    next.battle?.check?.kind === "spin-snag" &&
+    previous.battle?.check?.kind === "spin-snag" &&
+    next.battle.check.turns > previous.battle.check.turns;
   if (
     mirrorRotated ||
     plateChanged ||
     lassoFired ||
     fluteChimed ||
+    whackHit ||
+    spinSnagTurn ||
     cues.some((cue) => LIGHT_HAPTIC_CUES.has(cue))
   ) {
     return "light";

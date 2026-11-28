@@ -753,6 +753,7 @@ async function boot(): Promise<void> {
     if (!harnessStepping) {
       const haptic = hapticForTick(previous, state, cues, {
         goldenCooked: arcadeOutcome.goldenCooked,
+        world: content.world,
       });
       if (haptic !== null) haptics.trigger(haptic);
     }

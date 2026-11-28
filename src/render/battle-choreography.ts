@@ -5,25 +5,31 @@ import {
   applySoothedAndReward, applyTalkTheater, applyTogetherActive, applyTogetherReady,
   applyWindUpAndFizzle, clamp01, classifySnackTheater, DUAL_COMBO_PALETTES, ECHO_CHIME_COLORS,
   echoNoteColor, emitEchoChimeVfx, emitLeanWindVfx, emitPeekabooVfx, emitRainbowLassoVfx,
-  emitSoothedConfettiVfx, emitTraceBrushVfx, FIZZ_TINTS, isDualComboActive, isLassoActionActive,
-  isRecoverTheater, isTalkTheater, LASSO_ARC_DURATION, LEAN_WIND_TINTS, PEEKABOO_DUST_TINT,
-  PEEKABOO_WARNING_TINT, PEEKABOO_WATCH_TINTS, radialBurst, RAINBOW_HEARTS, RAINBOW_LASSO_COLORS,
-  RECOVER_SPARKLE_TINTS, RELIEF_PETALS, SOOTHED_CONFETTI_COLORS, SPARKLE_TINTS, TRACE_BRUSH_COLORS,
+  emitSoothedConfettiVfx, emitSpinSnagVfx, emitTraceBrushVfx, emitWhackVfx, emitWhichOneVfx,
+  FIZZ_TINTS, isDualComboActive, isLassoActionActive, isRecoverTheater, isTalkTheater,
+  LASSO_ARC_DURATION, LEAN_WIND_TINTS, PEEKABOO_DUST_TINT, PEEKABOO_WARNING_TINT,
+  PEEKABOO_WATCH_TINTS, radialBurst, RAINBOW_HEARTS, RAINBOW_LASSO_COLORS,
+  RECOVER_SPARKLE_TINTS, RELIEF_PETALS, SOOTHED_CONFETTI_COLORS, SPARKLE_TINTS,
+  SPIN_SNAG_COLORS, TRACE_BRUSH_COLORS, WHACK_VFX_COLORS, WHICH_ONE_VFX_COLORS,
   type BattleStageMood, type BattleVfxAnchor, type BattleVfxBlend, type BattleVfxParticle,
   type BattleVfxTexture, type BattleVfxTextureKey, type EchoChimeMotion, type EchoColor,
-  type SnackTheaterKind, type TraceBrushMotion,
+  type SnackTheaterKind, type SpinSnagColors, type SpinSnagMotion, type TraceBrushMotion,
+  type WhackMotion, type WhackVfxColors, type WhichOneMotion, type WhichOneVfxColors,
 } from "./battle-vfx";
 
 export {
   applyDualComboTheater, classifySnackTheater, DUAL_COMBO_PALETTES, ECHO_CHIME_COLORS,
   echoNoteColor, emitEchoChimeVfx, emitLeanWindVfx, emitPeekabooVfx, emitRainbowLassoVfx,
-  emitSoothedConfettiVfx, emitTraceBrushVfx, FIZZ_TINTS, isDualComboActive, isLassoActionActive,
-  isRecoverTheater, isTalkTheater, LASSO_ARC_DURATION, LEAN_WIND_TINTS, PEEKABOO_DUST_TINT,
-  PEEKABOO_WARNING_TINT, PEEKABOO_WATCH_TINTS, radialBurst, RAINBOW_HEARTS, RAINBOW_LASSO_COLORS,
-  RECOVER_SPARKLE_TINTS, RELIEF_PETALS, SOOTHED_CONFETTI_COLORS, SPARKLE_TINTS, TRACE_BRUSH_COLORS,
+  emitSoothedConfettiVfx, emitSpinSnagVfx, emitTraceBrushVfx, emitWhackVfx, emitWhichOneVfx,
+  FIZZ_TINTS, isDualComboActive, isLassoActionActive, isRecoverTheater, isTalkTheater,
+  LASSO_ARC_DURATION, LEAN_WIND_TINTS, PEEKABOO_DUST_TINT, PEEKABOO_WARNING_TINT,
+  PEEKABOO_WATCH_TINTS, radialBurst, RAINBOW_HEARTS, RAINBOW_LASSO_COLORS,
+  RECOVER_SPARKLE_TINTS, RELIEF_PETALS, SOOTHED_CONFETTI_COLORS, SPARKLE_TINTS,
+  SPIN_SNAG_COLORS, TRACE_BRUSH_COLORS, WHACK_VFX_COLORS, WHICH_ONE_VFX_COLORS,
   type BattleStageMood, type BattleVfxAnchor, type BattleVfxBlend, type BattleVfxParticle,
   type BattleVfxTexture, type BattleVfxTextureKey, type EchoChimeMotion, type EchoColor,
-  type SnackTheaterKind, type TraceBrushMotion,
+  type SnackTheaterKind, type SpinSnagColors, type SpinSnagMotion, type TraceBrushMotion,
+  type WhackMotion, type WhackVfxColors, type WhichOneMotion, type WhichOneVfxColors,
 };
 
 export type BattleChoreography = {
@@ -516,6 +522,64 @@ export function computeBattleChoreography(
         scaleX: 1,
         scaleY: 1,
         rotation: traceMotion.faeRotation,
+      });
+    }
+  }
+
+  // 8e. Cup Shuffle (which-one) carnival sleight-of-hand VFX & actor choreography.
+  if (battle.phase === "check" && battle.check?.kind === "which-one") {
+    const whichView = view?.check?.kind === "which-one" ? view.check : null;
+    const whichMotion = emitWhichOneVfx(vfx, battle.check, whichView, tick, reducedMotion);
+    if (whichMotion.critterOffsetY !== 0) {
+      critter = composePose(critter, {
+        offsetX: 0,
+        offsetY: whichMotion.critterOffsetY,
+        scaleX: 0.98,
+        scaleY: 1.04,
+        rotation: 0,
+      });
+    }
+    if (whichMotion.faeOffsetX !== 0) {
+      fae = composePose(fae, {
+        offsetX: whichMotion.faeOffsetX,
+        offsetY: 0,
+        scaleX: 1,
+        scaleY: 1,
+        rotation: 0,
+      });
+    }
+  }
+
+  // 8f. Arcade Ticket Whack (whack) starburst hit / lavender whiff & corridor motes.
+  if (battle.phase === "check" && battle.check?.kind === "whack") {
+    const whackView = view?.check?.kind === "whack" ? view.check : null;
+    const whackMotion = emitWhackVfx(vfx, battle.check, whackView, tick, reducedMotion);
+    if (whackMotion.faeOffsetX !== 0 || whackMotion.faeRotation !== 0) {
+      fae = composePose(fae, {
+        offsetX: whackMotion.faeOffsetX,
+        offsetY: 0,
+        scaleX: 1,
+        scaleY: 1,
+        rotation: whackMotion.faeRotation,
+      });
+    }
+  }
+
+  // 8g. Spin & Snag Lasso (spin-snag) orbiting 7-color lasso halo & rainbow throw arc.
+  if (battle.phase === "check" && battle.check?.kind === "spin-snag") {
+    const spinView = view?.check?.kind === "spin-snag" ? view.check : null;
+    const spinMotion = emitSpinSnagVfx(vfx, battle.check, spinView, tick, reducedMotion);
+    if (
+      spinMotion.faeOffsetX !== 0 ||
+      spinMotion.faeOffsetY !== 0 ||
+      spinMotion.faeRotation !== 0
+    ) {
+      fae = composePose(fae, {
+        offsetX: spinMotion.faeOffsetX,
+        offsetY: spinMotion.faeOffsetY,
+        scaleX: 1,
+        scaleY: 1,
+        rotation: spinMotion.faeRotation,
       });
     }
   }

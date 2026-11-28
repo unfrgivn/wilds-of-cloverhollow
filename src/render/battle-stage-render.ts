@@ -1,42 +1,69 @@
 import {
-  Assets,
-  BlurFilter,
-  Container,
-  Graphics,
-  Rectangle,
-  Sprite,
-  Spritesheet,
-  type Renderer,
-  type Texture,
+  Assets, BlurFilter, Container, Graphics, Rectangle, Sprite, Spritesheet,
+  type Renderer, type Texture,
 } from "pixi.js";
 import { battleFoe, type Point, type State, type World } from "../core";
 import type { AreaView } from "./area-view";
 import type { BattleStageMood, BattleVfxParticle } from "./battle-choreography";
+import type { BattleWeatherParticle } from "./battle-weather";
 import {
-  computeBattleStageMoodLayout,
-  evaluateFluteCameo,
-  resolveBattleVfxPosition,
-  resolveFluteCameoIds,
-  type BattleVfxAnchors,
-  type FluteCameoSparkle,
+  computeBattleStageMoodLayout, evaluateFluteCameo, resolveBattleVfxPosition,
+  resolveFluteCameoIds, type BattleVfxAnchors, type FluteCameoSparkle,
 } from "./battle-stage";
 import { computeBackdropTransform } from "./overworld-render";
 import type { VfxTextures } from "./vfx-textures";
 
 const BATTLE_VFX_POOL_SIZE = 80;
+const BATTLE_WEATHER_POOL_SIZE = 32;
 
-export type BattleBackdropBounds = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
+export type BattleBackdropBounds = { x: number; y: number; width: number; height: number };
 
 export function makeShadowSprite(texture: Texture, label: string): Sprite {
   const sprite = new Sprite(texture);
   sprite.label = label;
   sprite.anchor.set(0.5);
   return sprite;
+}
+
+function makeSpritePool(
+  layer: Container, texture: Texture, prefix: string, count: number,
+): Sprite[] {
+  return Array.from({ length: count }, (_, i) => {
+    const sprite = makeShadowSprite(texture, `${prefix}:${i}`);
+    sprite.visible = false;
+    layer.addChild(sprite);
+    return sprite;
+  });
+}
+
+function makeUnderlaySprite(
+  texture: Texture, label: string, alpha: number, tint?: number, blendMode?: "normal" | "screen",
+): Sprite {
+  const sprite = makeShadowSprite(texture, label);
+  if (tint !== undefined) sprite.tint = tint;
+  if (blendMode !== undefined) sprite.blendMode = blendMode;
+  sprite.alpha = alpha;
+  return sprite;
+}
+
+function applyMoodSprite(
+  sprite: Sprite,
+  box: { x: number; y: number; width: number; height: number; tint: number; alpha: number },
+  tint: number,
+  alpha: number,
+): void {
+  sprite.position.set(box.x, box.y);
+  sprite.width = box.width;
+  sprite.height = box.height;
+  sprite.tint = tint;
+  sprite.alpha = alpha;
+}
+
+function hideTail(pool: readonly Sprite[], start: number): void {
+  for (let i = start; i < pool.length; i += 1) {
+    const sprite = pool[i];
+    if (sprite !== undefined) sprite.visible = false;
+  }
 }
 
 /**
@@ -49,6 +76,7 @@ export class BattleStageRenderer {
   readonly wash = new Graphics();
   readonly turnIndicator = new Graphics();
   readonly targetIndicator = new Graphics();
+  readonly weatherLayer = new Container();
   readonly vfxLayer = new Container();
   readonly underlaySprites: readonly Sprite[];
   readonly shadowSprites: readonly Sprite[];
@@ -70,7 +98,8 @@ export class BattleStageRenderer {
   private readonly extraFoeShadows: readonly [Sprite, Sprite];
   private readonly faeShadow: Sprite;
   private readonly partyShadows = new Map<string, Sprite>();
-  private readonly vfxSprites: Sprite[] = [];
+  private readonly weatherSprites: Sprite[];
+  private readonly vfxSprites: Sprite[];
 
   private fluteSeen = false;
   private fluteCameoStartTick: number | undefined;
@@ -81,6 +110,7 @@ export class BattleStageRenderer {
     private readonly vfx: VfxTextures,
     private readonly renderer: Renderer,
   ) {
+    this.weatherLayer.label = "battle:weather";
     this.vfxLayer.label = "battle:vfx";
     this.turnIndicator.label = "battle:turn-indicator";
     this.turnIndicator.visible = false;
@@ -97,45 +127,23 @@ export class BattleStageRenderer {
       .poly([-11, -18, 11, -18, 0, -0.5]).fill({ color: 0xfffdf7 })
       .poly([-8, -16, 8, -16, 0, -3.5]).fill({ color: 0xff8b6b })
       .poly([-4.5, -14.5, 4.5, -14.5, 0, -7]).fill({ color: 0xffe27a });
-    for (let i = 0; i < BATTLE_VFX_POOL_SIZE; i += 1) {
-      const particle = new Sprite(this.vfx.sparkle);
-      particle.label = `battle:vfx:${i}`;
-      particle.anchor.set(0.5);
-      particle.visible = false;
-      this.vfxSprites.push(particle);
-      this.vfxLayer.addChild(particle);
-    }
-
-    this.moodWaveA = new Sprite(this.vfx.mistWisp);
-    this.moodWaveA.label = "battle:mood-wave-a";
-    this.moodWaveA.anchor.set(0.5);
-    this.moodWaveA.tint = 0xfff2cf;
-    this.moodWaveA.alpha = 0.15;
-
-    this.moodWaveB = new Sprite(this.vfx.softGlow);
-    this.moodWaveB.label = "battle:mood-wave-b";
-    this.moodWaveB.anchor.set(0.5);
-    this.moodWaveB.tint = 0xfff2cf;
-    this.moodWaveB.alpha = 0.13;
-
-    this.groundStage = new Sprite(this.vfx.softGlow);
-    this.groundStage.label = "battle:ground-stage";
-    this.groundStage.anchor.set(0.5);
-    this.groundStage.tint = 0xfff3d4;
-    this.groundStage.alpha = 0.26;
-
-    this.spotlight = new Sprite(this.vfx.softGlow);
-    this.spotlight.label = "battle:spotlight";
-    this.spotlight.anchor.set(0.5);
-    this.spotlight.tint = 0xfff8e6;
-    this.spotlight.blendMode = "screen";
-    this.spotlight.alpha = 0.16;
-
-    this.sunburst = new Sprite(this.vfx.sunburst);
-    this.sunburst.label = "battle:sunburst";
-    this.sunburst.anchor.set(0.5);
-    this.sunburst.blendMode = "normal";
-    this.sunburst.alpha = 0.72;
+    this.weatherSprites = makeSpritePool(
+      this.weatherLayer, this.vfx.softGlow, "battle:weather", BATTLE_WEATHER_POOL_SIZE,
+    );
+    this.vfxSprites = makeSpritePool(
+      this.vfxLayer, this.vfx.sparkle, "battle:vfx", BATTLE_VFX_POOL_SIZE,
+    );
+    this.moodWaveA = makeUnderlaySprite(this.vfx.mistWisp, "battle:mood-wave-a", 0.15, 0xfff2cf);
+    this.moodWaveB = makeUnderlaySprite(this.vfx.softGlow, "battle:mood-wave-b", 0.13, 0xfff2cf);
+    this.groundStage = makeUnderlaySprite(
+      this.vfx.softGlow, "battle:ground-stage", 0.26, 0xfff3d4,
+    );
+    this.spotlight = makeUnderlaySprite(
+      this.vfx.softGlow, "battle:spotlight", 0.16, 0xfff8e6, "screen",
+    );
+    this.sunburst = makeUnderlaySprite(
+      this.vfx.sunburst, "battle:sunburst", 0.72, undefined, "normal",
+    );
     this.sunburst.visible = false;
 
     this.critterShadow = makeShadowSprite(this.vfx.contactShadow, "battle:shadow:critter");
@@ -180,14 +188,19 @@ export class BattleStageRenderer {
     this.targetIndicator.visible = false;
     for (const shadow of this.extraFoeShadows) shadow.visible = false;
     this.backdropBounds = null;
-    this.fluteSeen = false;
-    this.fluteCameoStartTick = undefined;
-    this.fluteCameoIds = [];
-    for (const sprite of this.vfxSprites) sprite.visible = false;
+    this.resetFluteCameo();
+    hideTail(this.weatherSprites, 0);
+    hideTail(this.vfxSprites, 0);
     if (this.backdropTexture !== undefined) {
       this.backdropTexture.destroy(true);
       this.backdropTexture = undefined;
     }
+  }
+
+  private resetFluteCameo(): void {
+    this.fluteSeen = false;
+    this.fluteCameoStartTick = undefined;
+    this.fluteCameoIds = [];
   }
 
   /*
@@ -197,13 +210,8 @@ export class BattleStageRenderer {
    * margin keeps the blur's edge fade off-screen.
    */
   renderBackdrop(
-    state: State,
-    areaView: AreaView | undefined,
-    width: number,
-    height: number,
-    viewWidth: number,
-    viewHeight: number,
-    zoom = 1,
+    state: State, areaView: AreaView | undefined, width: number, height: number,
+    viewWidth: number, viewHeight: number, zoom = 1,
   ): void {
     this.wash.visible = true;
     this.backdropSprite.visible = true;
@@ -212,8 +220,7 @@ export class BattleStageRenderer {
     // A battle centres on its critter; the claw machine on Fae, who stands at it.
     const focus = battleFoe(this.world, state)?.point ??
       (state.arcade !== null ? state.player : undefined) ?? {
-        x: area.width / 2,
-        y: area.height / 2,
+        x: area.width / 2, y: area.height / 2,
       };
     const transform = computeBackdropTransform(
       area, focus, width, height, viewWidth, viewHeight, zoom,
@@ -249,15 +256,8 @@ export class BattleStageRenderer {
 
   /** Updates drifting watercolour mood washes, radial spotlight, ground ellipse, and sunburst. */
   renderLighting(
-    mood: BattleStageMood,
-    tick: number,
-    viewWidth: number,
-    viewHeight: number,
-    faeX: number,
-    faeY: number,
-    critterX: number,
-    critterY: number,
-    reducedMotion: boolean,
+    mood: BattleStageMood, tick: number, viewWidth: number, viewHeight: number,
+    faeX: number, faeY: number, critterX: number, critterY: number, reducedMotion: boolean,
     phase2Tint?: { waveA: number; waveB: number; spotlight: number },
   ): void {
     // Drifting watercolour mood washes and radial spotlight kept strictly
@@ -267,27 +267,21 @@ export class BattleStageRenderer {
     );
     const usePhase2 = phase2Tint !== undefined && mood !== "rest" &&
       mood !== "soothed" && mood !== "together-active";
-    this.moodWaveA.position.set(moodLayout.waveA.x, moodLayout.waveA.y);
-    this.moodWaveA.width = moodLayout.waveA.width;
-    this.moodWaveA.height = moodLayout.waveA.height;
-    this.moodWaveA.tint = usePhase2 ? phase2Tint.waveA : moodLayout.waveA.tint;
-    this.moodWaveA.alpha = usePhase2
-      ? Math.max(moodLayout.waveA.alpha, 0.22)
-      : moodLayout.waveA.alpha;
-
-    this.moodWaveB.position.set(moodLayout.waveB.x, moodLayout.waveB.y);
-    this.moodWaveB.width = moodLayout.waveB.width;
-    this.moodWaveB.height = moodLayout.waveB.height;
-    this.moodWaveB.tint = usePhase2 ? phase2Tint.waveB : moodLayout.waveB.tint;
-    this.moodWaveB.alpha = usePhase2
-      ? Math.max(moodLayout.waveB.alpha, 0.19)
-      : moodLayout.waveB.alpha;
-
-    this.spotlight.position.set(moodLayout.spotlight.x, moodLayout.spotlight.y);
-    this.spotlight.width = moodLayout.spotlight.width;
-    this.spotlight.height = moodLayout.spotlight.height;
-    this.spotlight.tint = usePhase2 ? phase2Tint.spotlight : moodLayout.spotlight.tint;
-    this.spotlight.alpha = moodLayout.spotlight.alpha;
+    applyMoodSprite(
+      this.moodWaveA, moodLayout.waveA,
+      usePhase2 ? phase2Tint.waveA : moodLayout.waveA.tint,
+      usePhase2 ? Math.max(moodLayout.waveA.alpha, 0.22) : moodLayout.waveA.alpha,
+    );
+    applyMoodSprite(
+      this.moodWaveB, moodLayout.waveB,
+      usePhase2 ? phase2Tint.waveB : moodLayout.waveB.tint,
+      usePhase2 ? Math.max(moodLayout.waveB.alpha, 0.19) : moodLayout.waveB.alpha,
+    );
+    applyMoodSprite(
+      this.spotlight, moodLayout.spotlight,
+      usePhase2 ? phase2Tint.spotlight : moodLayout.spotlight.tint,
+      moodLayout.spotlight.alpha,
+    );
 
     const stageCenterX = Math.max(
       viewWidth * 0.3,
@@ -362,47 +356,39 @@ export class BattleStageRenderer {
     shadow.alpha = 0.32 * lift;
   }
 
-  updateTurnIndicator(head: Point | undefined, tick: number, reducedMotion: boolean): void {
+  private updateIndicator(
+    indicator: Graphics, head: Point | undefined, tick: number,
+    reducedMotion: boolean, yOffset: number, period: number,
+  ): void {
     if (head === undefined) {
-      this.turnIndicator.visible = false;
+      indicator.visible = false;
       return;
     }
-    const bob = reducedMotion ? 0 : Math.sin(tick / 10) * 5;
-    this.turnIndicator.visible = true;
-    this.turnIndicator.position.set(head.x, head.y + bob);
+    const bob = reducedMotion ? 0 : Math.sin(tick / period) * 5;
+    indicator.visible = true;
+    indicator.position.set(head.x, head.y + yOffset + bob);
+  }
+
+  updateTurnIndicator(head: Point | undefined, tick: number, reducedMotion: boolean): void {
+    this.updateIndicator(this.turnIndicator, head, tick, reducedMotion, 0, 10);
   }
 
   updateTargetIndicator(head: Point | undefined, tick: number, reducedMotion: boolean): void {
-    if (head === undefined) {
-      this.targetIndicator.visible = false;
-      return;
-    }
-    const bob = reducedMotion ? 0 : Math.sin(tick / 8) * 5;
-    this.targetIndicator.visible = true;
-    this.targetIndicator.position.set(head.x, head.y - 8 + bob);
+    this.updateIndicator(this.targetIndicator, head, tick, reducedMotion, -8, 8);
   }
 
   /** Renders Flute Friend on-stage cameo sprites + shadows and returns cameo sparkle particles. */
   renderFluteCameo(
-    state: State,
-    battle: NonNullable<State["battle"]>,
-    faeX: number,
-    faeY: number,
+    state: State, battle: NonNullable<State["battle"]>, faeX: number, faeY: number,
     partySprites: ReadonlyMap<string, Sprite>,
   ): FluteCameoSparkle[] {
     if (this.fluteCameoStartTick !== undefined && state.tick < this.fluteCameoStartTick) {
-      this.fluteSeen = false;
-      this.fluteCameoStartTick = undefined;
-      this.fluteCameoIds = [];
+      this.resetFluteCameo();
     }
-    const showingFluteLine =
-      battle.fluteUsed === true &&
-      battle.phase === "command" &&
+    const showingFluteLine = battle.fluteUsed === true && battle.phase === "command" &&
       battle.message.startsWith("Fae plays her flute!");
     if (battle.fluteUsed !== true) {
-      this.fluteSeen = false;
-      this.fluteCameoStartTick = undefined;
-      this.fluteCameoIds = [];
+      this.resetFluteCameo();
     } else if (!this.fluteSeen || (showingFluteLine && this.fluteCameoIds.length === 0)) {
       this.fluteSeen = true;
       this.fluteCameoIds = resolveFluteCameoIds(this.world, state.ink, battle.message);
@@ -413,13 +399,8 @@ export class BattleStageRenderer {
     const cameoElapsed =
       this.fluteCameoStartTick === undefined ? -1 : state.tick - this.fluteCameoStartTick;
     const cameo = evaluateFluteCameo({
-      ids: this.fluteCameoIds,
-      showingFluteLine,
-      cameoElapsed,
-      tick: state.tick,
-      faeX,
-      faeY,
-      party: this.world.party,
+      ids: this.fluteCameoIds, showingFluteLine, cameoElapsed,
+      tick: state.tick, faeX, faeY, party: this.world.party,
     });
     for (const actor of cameo.actors) {
       const sprite = partySprites.get(actor.id);
@@ -447,6 +428,36 @@ export class BattleStageRenderer {
     return cameo.sparkles;
   }
 
+  private paintPooledSprite(
+    sprite: Sprite, texture: Texture, blend: "normal" | "add", tint: number, alpha: number,
+    scaleX: number, scaleY: number, rotation: number, x: number, y: number,
+  ): void {
+    sprite.visible = true;
+    sprite.texture = texture;
+    sprite.blendMode = blend;
+    sprite.tint = tint;
+    sprite.alpha = alpha;
+    sprite.scale.set(scaleX, scaleY);
+    sprite.rotation = rotation;
+    sprite.position.set(x, y);
+  }
+
+  /** Updates pooled outdoor cozy weather sprites behind combatants (zero allocations). */
+  renderWeather(particles: readonly BattleWeatherParticle[]): void {
+    let slot = 0;
+    for (const p of particles) {
+      const sprite = this.weatherSprites[slot];
+      if (sprite === undefined) break;
+      if (p.alpha <= 0.01) continue;
+      slot += 1;
+      this.paintPooledSprite(
+        sprite, this.vfx[p.texture], p.blend, p.tint, p.alpha, p.scaleX, p.scaleY, p.rotation,
+        p.x, p.y,
+      );
+    }
+    hideTail(this.weatherSprites, slot);
+  }
+
   /** Updates pooled battle VFX sprites from choreography particles and flute cameo sparkles. */
   renderVfx(
     particles: readonly BattleVfxParticle[],
@@ -454,38 +465,26 @@ export class BattleStageRenderer {
     anchors: BattleVfxAnchors,
   ): void {
     let slot = 0;
-    for (const particle of particles) {
-      if (slot >= this.vfxSprites.length) break;
+    for (const p of particles) {
       const sprite = this.vfxSprites[slot];
-      if (sprite === undefined || particle.alpha <= 0.01) continue;
+      if (sprite === undefined) break;
+      if (p.alpha <= 0.01) continue;
       slot += 1;
-      sprite.visible = true;
-      sprite.texture = this.vfx[particle.texture];
-      sprite.blendMode = particle.blend;
-      sprite.tint = particle.tint;
-      sprite.alpha = particle.alpha;
-      sprite.scale.set(particle.scaleX, particle.scaleY);
-      sprite.rotation = particle.rotation;
-      const pos = resolveBattleVfxPosition(particle, anchors);
-      sprite.position.set(pos.x, pos.y);
+      const pos = resolveBattleVfxPosition(p, anchors);
+      this.paintPooledSprite(
+        sprite, this.vfx[p.texture], p.blend, p.tint, p.alpha, p.scaleX, p.scaleY, p.rotation,
+        pos.x, pos.y,
+      );
     }
-    for (const spark of sparkles) {
-      if (slot >= this.vfxSprites.length) break;
+    for (const s of sparkles) {
       const sprite = this.vfxSprites[slot];
       if (sprite === undefined) break;
       slot += 1;
-      sprite.visible = true;
-      sprite.texture = this.vfx.sparkle;
-      sprite.blendMode = "normal";
-      sprite.tint = spark.tint;
-      sprite.alpha = spark.alpha;
-      sprite.scale.set(spark.scale, spark.scale);
-      sprite.rotation = spark.rotation;
-      sprite.position.set(spark.x, spark.y);
+      this.paintPooledSprite(
+        sprite, this.vfx.sparkle, "normal", s.tint, s.alpha, s.scale, s.scale, s.rotation,
+        s.x, s.y,
+      );
     }
-    for (let i = slot; i < this.vfxSprites.length; i += 1) {
-      const sprite = this.vfxSprites[i];
-      if (sprite !== undefined) sprite.visible = false;
-    }
+    hideTail(this.vfxSprites, slot);
   }
 }

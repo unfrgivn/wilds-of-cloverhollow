@@ -9322,6 +9322,35 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   `milestone-215`, `milestone-214`, `milestone-211`, `milestone-160`,
   `milestone-158`, `milestone-199`).
 
+## Milestone 217: Live Dynamic Cozy Weather on the Battle Stage (`src/render/battle-weather.ts`) **Status:** ✅ Completed (2026-11-28)
+- Extends Track E17's Dynamic Cozy Weather seamlessly into outdoor battles so
+  active Rainbow Sunshowers, Snow Flurries, Blossom Breeze Petals, and Twilight
+  Fireflies continue playing softly behind the combatants instead of vanishing
+  when a battle begins, while keeping sheltered indoor battles (`gym`, `arcade`,
+  `school`, `cavern`, etc.) and `"clear"` skies at 0 particles — zero `src/core`
+  changes, zero save-version bumps, zero replay hash drift across all 77 sims,
+  and zero visual baseline diffs.
+- Pure zero-Pixi battle weather evaluator (`src/render/battle-weather.ts`, 245
+  lines):
+  - Exported `evaluateBattleWeather(areaId, width, height, tick, mode,
+    reducedMotion)`: returns 0 particles for `"clear"` or indoor rooms, 28
+    particles for `sunshower` (14 upper-sky 5-band pastel rainbow wash lobes +
+    14 diagonal rain streaks), 18 for `snow-flurry`, 14 for `breeze-petals`, and
+    14 golden-lime `twilight-fireflies` orbs & 4-point sparkles, all enforcing
+    `rotation: 0` and tick-invariant placement under `reducedMotion`.
+- Pooled stage layer & telemetry (`src/render/battle-stage-render.ts`,
+  `src/render/battle-view.ts`, `src/dev/hook.ts`):
+  - Mounted `weatherLayer` (`BATTLE_WEATHER_POOL_SIZE = 32`, zero per-frame
+    allocations) above backdrop/waves and strictly behind shadows/combatants/UI,
+    keeping `battle-stage-render.ts` at 490 lines (`< 500`) and exposing
+    `renderInfo().battle.weather`.
+- Evidence: `tests/unit/milestone-217.test.ts`,
+  `tests/e2e/milestone-217.spec.ts` (`@smoke` Chromium + WebKit), and review
+  captures `art/review/m215-battle-sunshower-1280.jpg` and
+  `m215-battle-fireflies-1280.jpg` independently verified via `vision`.
+- Gates: `just check` (283 unit files / 2,075 tests, all 77 sims + all sim
+  scripts, 23 QA packs, purity, lint), `just build` (`index` `390.47 kB < 500 kB`),
+  and 23/23 Chromium & WebKit battle/weather e2e tests.
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

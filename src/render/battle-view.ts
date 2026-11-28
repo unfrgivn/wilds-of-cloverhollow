@@ -16,6 +16,8 @@ import {
   type State,
   type World,
 } from "../core";
+import type { CozyWeatherKind } from "../core/weather";
+import { getCozyWeatherMode } from "../platform/weather-prefs";
 import type { AreaView } from "./area-view";
 import { selectBattleActorPose } from "./animation";
 import { computeBattleChoreography } from "./battle-choreography";
@@ -34,6 +36,7 @@ import {
   makeShadowSprite,
   type BattleBackdropBounds,
 } from "./battle-stage-render";
+import { evaluateBattleWeather } from "./battle-weather";
 import { NEUTRAL_POSE } from "./motion";
 import { liftShadowScale, warmFlashTint } from "./overworld-render";
 import type { VfxTextures } from "./vfx-textures";
@@ -71,6 +74,7 @@ export type BattleRenderInfo = {
   backdrop: BattleBackdropBounds | null;
   overworldVisible: boolean;
   auraAlpha: number;
+  weather: { kind: CozyWeatherKind; count: number };
 };
 
 export type BattleRenderContext = {
@@ -146,6 +150,7 @@ export class BattleViewController {
   private hasRenderedBattle = false;
   private lastFaePose: string | null = null;
   private lastPartyPoses: Record<string, string> = {};
+  private lastWeather: { kind: CozyWeatherKind; count: number } = { kind: "clear", count: 0 };
 
   constructor(
     private readonly world: World,
@@ -175,6 +180,7 @@ export class BattleViewController {
 
     this.battleLayer.addChild(
       ...this.stage.underlaySprites,
+      this.stage.weatherLayer,
       ...this.stage.shadowSprites,
       this.battleCritterAura,
       this.battleCritter,
@@ -212,6 +218,7 @@ export class BattleViewController {
       this.hasRenderedBattle = false;
       this.lastFaePose = null;
       this.lastPartyPoses = {};
+      this.lastWeather = { kind: "clear", count: 0 };
       this.battleLayer.visible = false;
       this.stage.hide();
       return true;
@@ -233,6 +240,8 @@ export class BattleViewController {
     if (arcade !== null) {
       this.lastFaePose = null;
       this.lastPartyPoses = {};
+      this.lastWeather = { kind: "clear", count: 0 };
+      this.stage.renderWeather([]);
       this.stage.drawWash(width, height, 0.28);
       return false;
     }
@@ -263,6 +272,12 @@ export class BattleViewController {
     } else {
       this.stage.drawWash(width, height, 0.2);
     }
+
+    const weatherFrame = evaluateBattleWeather(
+      state.area, viewWidth, viewHeight, state.tick, getCozyWeatherMode(), reducedMotion,
+    );
+    this.stage.renderWeather(weatherFrame.particles);
+    this.lastWeather = { kind: weatherFrame.kind, count: weatherFrame.particles.length };
 
     const slideOffset = 14 * (1 - introEase);
     const critter = this.world.critters[battle.critterId];
@@ -569,6 +584,9 @@ export class BattleViewController {
       partyPoses: state.battle === null ? {} : { ...this.lastPartyPoses },
       overworldVisible,
       auraAlpha: state.battle === null ? 0 : this.battleCritterAura.alpha,
+      weather: state.battle === null
+        ? { kind: "clear", count: 0 }
+        : { kind: this.lastWeather.kind, count: this.lastWeather.count },
     };
   }
 }

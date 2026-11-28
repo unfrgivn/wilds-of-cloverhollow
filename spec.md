@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 215)
+Last updated: 2026-11-28 (Milestone 217)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -4309,6 +4309,26 @@ trunks keep its two exits.
   and cream die-cut chevron (`battle:turn-indicator`, static under reduced
   motion, hidden outside `command` phase) above their head, and party
   medallions highlight `view.activeActor.id` directly.
+- **Live Dynamic Cozy Weather on the Battle Stage** (Milestone 215,
+  `src/render/battle-weather.ts`, `src/render/battle-stage-render.ts`,
+  `src/render/battle-view.ts`, `src/dev/hook.ts`): carries active outdoor
+  Dynamic Cozy Weather seamlessly onto the Battle Stage via a pure zero-Pixi,
+  zero-DOM evaluator (`evaluateBattleWeather`, reading `weatherForArea` and
+  `getCozyWeatherMode()`) rendered into a dedicated 32-sprite pooled
+  `weatherLayer` (`label = "battle:weather"`) mounted inside `battleLayer`
+  above the blurred backdrop, wash scrim, and lighting underlays and strictly
+  below contact shadows, combatant sprites, indicators, VFX, and HUD. Sheltered
+  indoor battle areas (`gym`, `arcade`, `school`, `cavern`, `lodge`,
+  `art-room`, etc.) and `"clear"` skies always emit `0` particles (preserving
+  0-pixel diffs on all battle baselines). Active outdoor weather renders
+  tastefully behind combatants across the logical stage (`sunshower`: 14
+  upper-sky 5-band pastel watercolor rainbow wash lobes across `x = 0.20..0.80`
+  and `y = 0.14..0.28` + 14 delicate diagonal watercolor rain streaks = 28;
+  `snow-flurry`: 18 drifting frost crystals; `breeze-petals`: 14 floating
+  pastel petals; `twilight-fireflies`: 14 additive warm golden-lime lanterns
+  across `y = 0.22..0.72`). Under Reduced Motion, every particle enforces
+  `rotation: 0` and strict tick-invariant placement and alpha.
+  `renderInfo().battle.weather` exposes read-only `{ kind, count }`.
 - Commands: a two-column grid of sticker buttons on phones (one column from
   1000 px wide), right-aligned above confirm and cancel, clear of the HUD, the
   dialogue box, and the touch buttons. A compact `.battle-turn-header` badge at

@@ -9,6 +9,7 @@ import {
   type TextSpeed,
   type World,
 } from "../core";
+import type { CozyWeatherKind } from "../core/weather";
 import type { InputSource } from "../platform/input";
 import type { AudioController } from "../platform/audio";
 import type { GameSettingsController } from "../platform/game-settings";
@@ -108,6 +109,7 @@ export type CloverhollowHook = {
       backdrop: { x: number; y: number; width: number; height: number } | null;
       overworldVisible: boolean;
       auraAlpha: number;
+      weather: { kind: CozyWeatherKind; count: number };
     };
     cutscene: CutsceneRenderInfo | null;
     arcade: ArcadeInfo | null;

@@ -859,12 +859,14 @@ export function creditsSummary(
 export function autosaveNeeded(previous: State, next: State): boolean {
   if (previous.finale !== null || next.finale !== null) return false;
   if (next.transition !== null) return false;
+  if (next.cutscene !== undefined) return false;
   return (
     previous.area !== next.area ||
     previous.transition?.phase === "in" ||
     (previous.battle !== null && next.battle === null) ||
     (previous.arcade !== null && next.arcade === null) ||
     (previous.dialogue !== null && next.dialogue === null) ||
+    (previous.cutscene !== undefined && next.cutscene === undefined) ||
     (previous.journalOpen && !next.journalOpen)
   );
 }

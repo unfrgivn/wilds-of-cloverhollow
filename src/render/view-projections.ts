@@ -11,8 +11,14 @@ import {
 import type { NpcChatterView } from "../ui/npc-chatter";
 import type { AtmosphereOptions } from "./atmosphere-recipes";
 import type { BattleRenderInfo } from "./battle-view";
-import { interpolatePoint, smoothFollowCamera, worldToScreen } from "./camera";
+import {
+  cutsceneCameraPoint,
+  interpolatePoint,
+  smoothFollowCamera,
+  worldToScreen,
+} from "./camera";
 import type { RestSpot } from "./companions";
+import type { CutsceneRenderInfo } from "./cutscene-render";
 import type {
   AmbientFrameInfo,
   CritterFrameInfo,
@@ -98,6 +104,7 @@ export type GameViewRenderInfo = {
   timeOfDay: TimeOfDayPhase;
   photoMode: boolean;
   battle: BattleRenderInfo;
+  cutscene: CutsceneRenderInfo | null;
 };
 
 /** Computes the letterboxed viewport rectangle inside the canvas. */
@@ -164,23 +171,43 @@ export function computeOverworldCameraFrame(params: {
     state.transition !== null ||
     area.id === "harness";
   const scale = Math.min(width / viewWidth, height / viewHeight);
-  const camera = smoothFollowCamera(
-    previousCamera,
-    playerPos,
-    state.facing,
-    { width: viewWidth, height: viewHeight },
-    area,
-    { x: 80, y: 60 },
-    snapCamera,
-  );
+  const csCam = state.cutscene?.camera;
+  let camera: Point;
+  let cutsceneZoom = 1;
+  if (csCam !== null && csCam !== undefined) {
+    const prevCam = previousState?.cutscene?.camera;
+    const canInterpCam = canInterpolate && prevCam !== null && prevCam !== undefined;
+    const camFocus = canInterpCam
+      ? interpolatePoint(prevCam, csCam, alpha)
+      : { x: csCam.x, y: csCam.y };
+    const camZoom = canInterpCam
+      ? prevCam.zoom + (csCam.zoom - prevCam.zoom) * alpha
+      : csCam.zoom;
+    camera = cutsceneCameraPoint(camFocus, { width: viewWidth, height: viewHeight }, area);
+    cutsceneZoom =
+      area.id === "harness" || reducedMotion
+        ? 1
+        : Math.max(0.85, Math.min(1.35, camZoom));
+  } else {
+    camera = smoothFollowCamera(
+      previousCamera,
+      playerPos,
+      state.facing,
+      { width: viewWidth, height: viewHeight },
+      area,
+      { x: 80, y: 60 },
+      snapCamera,
+    );
+  }
   const letterboxX = (width - viewWidth * scale) / 2;
   const letterboxY = (height - viewHeight * scale) / 2;
   const offsetX = Math.round((letterboxX - camera.x * scale) * resolution) / resolution;
   const offsetY = Math.round((letterboxY - camera.y * scale) * resolution) / resolution;
-  const zoom =
+  const doorZoom =
     area.id === "harness" || reducedMotion
       ? 1
       : transitionZoom(state.transition, doorFadeTicks);
+  const zoom = doorZoom * cutsceneZoom;
   const zoomScale = scale * zoom;
   const centerX = width / 2;
   const centerY = height / 2;
@@ -193,7 +220,7 @@ export function computeOverworldCameraFrame(params: {
 export function isOverworldClear(
   state: Pick<
     State,
-    "battle" | "arcade" | "dialogue" | "transition" | "journalOpen" | "finale"
+    "battle" | "arcade" | "dialogue" | "transition" | "journalOpen" | "finale" | "cutscene"
   >,
 ): boolean {
   return (
@@ -202,7 +229,8 @@ export function isOverworldClear(
     state.dialogue === null &&
     state.transition === null &&
     !state.journalOpen &&
-    state.finale === null
+    state.finale === null &&
+    state.cutscene === undefined
   );
 }
 

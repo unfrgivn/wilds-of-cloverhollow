@@ -1,0 +1,242 @@
+{
+  "id": "sue-bay-intro",
+  "area": "bay",
+  "trigger": {
+    "kind": "area-enter",
+    "area": "bay",
+    "forbidsVariable": "sue_joined",
+    "once": true
+  },
+  "steps": [
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "moveActor",
+          "actor": "fae",
+          "to": {
+            "x": 295,
+            "y": 545
+          },
+          "speed": 3.2,
+          "facing": "right"
+        },
+        {
+          "type": "moveActor",
+          "actor": "party:0",
+          "to": {
+            "x": 235,
+            "y": 570
+          },
+          "speed": 3,
+          "facing": "right"
+        },
+        {
+          "type": "cameraPan",
+          "to": "actor:npc:sue",
+          "ticks": 36,
+          "zoom": 1.06
+        }
+      ]
+    },
+    {
+      "type": "face",
+      "actor": "npc:sue",
+      "direction": "left"
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "pose",
+          "actor": "npc:sue",
+          "pose": "hop",
+          "ticks": 20,
+          "effect": "sparkle-burst"
+        },
+        {
+          "type": "emote",
+          "actor": "npc:sue",
+          "kind": "exclaim",
+          "ticks": 24
+        },
+        {
+          "type": "sfx",
+          "cue": "chime-blue"
+        }
+      ]
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "moveActor",
+          "actor": "npc:sue",
+          "to": {
+            "x": 1230,
+            "y": 355
+          },
+          "speed": 6.5
+        },
+        {
+          "type": "cameraPan",
+          "to": "actor:npc:sue",
+          "ticks": 30,
+          "zoom": 1.04
+        }
+      ]
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "moveActor",
+          "actor": "npc:sue",
+          "to": {
+            "x": 1020,
+            "y": 495
+          },
+          "speed": 6.8
+        },
+        {
+          "type": "cameraPan",
+          "to": "actor:npc:sue",
+          "ticks": 36,
+          "zoom": 1.03
+        }
+      ]
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "moveActor",
+          "actor": "npc:sue",
+          "to": {
+            "x": 820,
+            "y": 550
+          },
+          "speed": 7
+        },
+        {
+          "type": "cameraPan",
+          "to": "actor:npc:sue",
+          "ticks": 30,
+          "zoom": 1.02
+        }
+      ]
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "moveActor",
+          "actor": "npc:sue",
+          "to": {
+            "x": 390,
+            "y": 545
+          },
+          "speed": 7.2,
+          "facing": "left"
+        },
+        {
+          "type": "cameraPan",
+          "to": {
+            "x": 340,
+            "y": 545
+          },
+          "ticks": 60,
+          "zoom": 1.06
+        }
+      ]
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "face",
+          "actor": "npc:sue",
+          "direction": "left"
+        },
+        {
+          "type": "face",
+          "actor": "fae",
+          "direction": "right"
+        }
+      ]
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "emote",
+          "actor": "npc:sue",
+          "kind": "wave",
+          "ticks": 22
+        },
+        {
+          "type": "emote",
+          "actor": "fae",
+          "kind": "heart",
+          "ticks": 22
+        }
+      ]
+    },
+    {
+      "type": "sayKnot",
+      "knot": "sue"
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "sfx",
+          "cue": "sticker"
+        },
+        {
+          "type": "pose",
+          "actor": "fae",
+          "pose": "cheer",
+          "ticks": 26,
+          "effect": "sparkle-burst"
+        },
+        {
+          "type": "emote",
+          "actor": "fae",
+          "kind": "sparkle",
+          "ticks": 30
+        },
+        {
+          "type": "pose",
+          "actor": "party:sue",
+          "pose": "hop",
+          "ticks": 26
+        },
+        {
+          "type": "emote",
+          "actor": "party:sue",
+          "kind": "heart",
+          "ticks": 30
+        },
+        {
+          "type": "emote",
+          "actor": "party:maddie",
+          "kind": "note",
+          "ticks": 28
+        }
+      ]
+    },
+    {
+      "type": "setFlag",
+      "flag": "sue_bay_intro_seen",
+      "value": true,
+      "scope": "cutscene"
+    },
+    {
+      "type": "cameraPan",
+      "to": "fae",
+      "ticks": 26,
+      "zoom": 1
+    }
+  ]
+}

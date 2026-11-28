@@ -22,6 +22,7 @@ import {
   BattleViewController, type BattleCheckGeometry, type BattleCheckInfo,
 } from "./battle-view";
 import { OverworldEntityLayer } from "./entity-layer";
+import { cutsceneAreaAtlases, CutsceneRenderController } from "./cutscene-render";
 import { NpcLifeController, type NpcLifeRenderInfo } from "./npc-life";
 import { NavOverlayController } from "./nav-overlay";
 import { CLUBHOUSE_PRIZES_ALIAS, OverworldEffectsController } from "./overworld-effects";
@@ -61,6 +62,7 @@ export class GameView {
   private readonly restoration: AreaRestorationRenderer;
   private readonly effects: OverworldEffectsController;
   private readonly entities: OverworldEntityLayer;
+  private readonly cutsceneRender: CutsceneRenderController;
   private readonly npcLife: NpcLifeController;
   private readonly navOverlay = new NavOverlayController();
   private navField: NavField | null = null;
@@ -138,6 +140,11 @@ export class GameView {
       ambientLayer: this.ambientLayer,
       emissiveLayer: this.emissiveLayer,
     });
+    this.cutsceneRender = new CutsceneRenderController(this.world, this.vfx, {
+      depth: this.depth,
+      shadowLayer: this.shadowLayer,
+      emissiveLayer: this.emissiveLayer,
+    });
     this.npcLife = new NpcLifeController(this.world, this.vfx);
 
     this.lanternSpotlight = new Sprite(this.vfx.softGlow);
@@ -162,11 +169,8 @@ export class GameView {
       ...Object.keys(CHARACTER_POSE_ATLASES).map((id) => `${id}-poses`),
     ]);
     this.viewport.addChild(
-      this.scene,
-      this.effects.timeOfDayLayer,
-      this.lanternLayer,
-      this.emissiveLayer,
-      this.glowLayer,
+      this.scene, this.effects.timeOfDayLayer, this.lanternLayer,
+      this.emissiveLayer, this.glowLayer,
     );
     this.viewport.mask = this.viewportMask;
     this.root.addChild(
@@ -174,6 +178,7 @@ export class GameView {
       this.paper,
       this.viewport,
       this.viewportMask,
+      this.cutsceneRender.letterboxLayer,
       this.battleView.root,
       this.paperGrain.stageSprite,
       this.fade,
@@ -191,6 +196,7 @@ export class GameView {
       this.restoration.fxLayer,
       this.npcLife.reactionLayer,
       this.effects.emoteLayer,
+      this.cutsceneRender.emoteLayer,
       this.paperGrain.sceneSprite,
       this.navOverlay.debugLayer,
     );
@@ -225,9 +231,10 @@ export class GameView {
 
   private areaAtlasesFor(area: Area): EntityAtlas[] {
     const entities = areaEntityAtlases(this.world, area);
-    return area.id === "clubhouse"
+    const base = area.id === "clubhouse"
       ? [...entities, { alias: CLUBHOUSE_PRIZES_ALIAS, src: assetUrl(this.world.arcade.atlas) }]
       : entities;
+    return [...base, ...cutsceneAreaAtlases(this.world, area, base)];
   }
 
   async setArea(area: Area): Promise<void> {
@@ -237,6 +244,7 @@ export class GameView {
     // a reload from memory, not a white wait on the network.
     previous?.destroy();
     this.entities.clearArea();
+    this.cutsceneRender.clearArea();
     const areaAtlases = this.areaAtlasesFor(area);
     const [next] = await Promise.all([
       AreaView.load(area, this.depth),
@@ -521,6 +529,10 @@ export class GameView {
       state, areaView: loaded, width, height,
       viewWidth: this.viewWidth, viewHeight: this.viewHeight, reducedMotion,
     });
+    this.cutsceneRender.update({
+      state, previousState: prev, alpha, playerPos, shadowAlpha, livingMotion, reducedMotion,
+      viewportRect: this.viewportRect, overworldVisible,
+    });
     this.battleView.root.position.set(frame.battleShake.x, frame.battleShake.y);
     this.viewport.visible = overworldVisible;
     this.scene.visible = overworldVisible;
@@ -538,7 +550,7 @@ export class GameView {
       });
     }
     if (this.label !== undefined) {
-      this.label.visible = !this.photoMode;
+      this.label.visible = !this.photoMode && state.cutscene === undefined;
       this.label.text =
         `Cloverhollow • tick ${state.tick} · ` +
         `${Math.round(state.player.x)},${Math.round(state.player.y)}`;
@@ -710,6 +722,7 @@ export class GameView {
         state, window.innerWidth, window.innerHeight,
         this.viewWidth, this.viewHeight, this.scene.visible,
       ),
+      cutscene: this.cutsceneRender.renderInfo(state),
     };
   }
 }

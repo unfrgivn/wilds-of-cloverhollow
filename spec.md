@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 185)
+Last updated: 2026-11-27 (Milestone 186)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -157,10 +157,33 @@ ios/            Capacitor iOS project (from Milestone 4).
   `src/core/roam.ts` for recurring critter rolling, wandering, sight, touch
   checks, and `inkFacts`, `src/core/battle-view.ts` for pure read-only battle
   view projection, command lists, treat tray items, assist views, and battle
-  scoring helpers, and `src/core/battle.ts` for the turn-based calm-down battle
+  scoring helpers, `src/core/battle.ts` for the turn-based calm-down battle
   state machine and treat inventory mutations, re-exporting all public battle
-  views), all re-exported through `src/core/sim.ts` and `src/core/index.ts`
-  (Milestones 91, 96, 125).
+  views, and `src/core/cutscene.ts` for the pure 60 Hz deterministic cutscene
+  and stage choreography runner), all re-exported through `src/core/sim.ts` and
+  `src/core/index.ts` (Milestones 91, 96, 125 & 186).
+- **Deterministic Cutscene & Stage Choreography Engine** (`src/core/cutscene.ts`,
+  `src/content/cutscene-parsers.ts`, `content/cutscenes/*.json`,
+  `src/render/cutscene-render.ts`, `cutsceneCameraPoint` in `src/render/camera.ts`,
+  Milestone 186 / Track E4): pure 60 Hz declarative JSON choreography engine
+  using `+ - * / Math.sqrt` only (zero trig, DOM, Pixi, timers, `Date`, or
+  `Math.random`). Supports `moveActor`, `face`, `pose` (8 expressive poses with
+  optional burst `effect`), `emote` (all 8 emote kinds), `wait`, `cameraPan`
+  (fixed point, `"fae"`, or `"actor:<ref>"` with smooth linear zoom), `sfx`
+  (projected through `soundCues` via `tickSfx`), `sayKnot` (hands control
+  cleanly to Ink dialogue and resumes on the exact tick dialogue closes),
+  `parallel` (recursive lockstep execution), `setFlag` (`ink` or `cutscene`
+  scope), `spawnTempActor`, `despawnTempActor`, and `propState`. Holding Cancel
+  for `CUTSCENE_SKIP_HOLD_TICKS = 30` ticks deterministically fast-forwards
+  remaining choreography (pausing cleanly at any unplayed `sayKnot` recruitment
+  beat). Automatic triggers (`area-enter` and `after-knot`) are opt-in via
+  `StepOptions.cutscenes = true` (default `false`), preserving bit-identical
+  replays across all 74 existing sims and 23 QA packs. Ships 4 validated
+  story cutscenes (`dawn-wakeup`, `plaza-hood-sighting`, `sue-bay-intro`,
+  `jordan-pass-intro`) rendered with y-sorted temporary actors, animated NPC
+  walk overrides, watercolor burst particles, emote bubbles, and opaque 24 px
+  warm paper-edged cinema letterbox bars (snapping cleanly under Reduced Motion
+  with zoom locked to `1`).
 - Battle stage mood washes, Flute Friend on-stage cameo poses, and battle VFX
   anchor resolution live in `src/render/battle-stage.ts` (Milestone 91), while
   pure battle VFX particle/theater builders (`applyTogetherReady`,
@@ -5104,12 +5127,16 @@ trunks keep its two exits.
   always null in a save, and `parseSave` refuses one where it isn't. The
   battle's own shape can change without a new version (Milestone 40 did).
   Nothing is saved in the morning or the credits either, so `parseSave`
-  refuses a save whose `finale` isn't null (Milestone 56).
+  refuses a save whose `finale` isn't null (Milestone 56). Cutscenes follow the
+  same transient contract (Milestone 186): optional `state.cutscene` is omitted
+  outside active cutscenes and `parseSave` refuses any mid-cutscene save, while
+  optional `state.cutscenesSeen` (kebab-case cutscene IDs, omitted when empty)
+  round-trips cleanly at version 10 without bumping `SaveData.version`.
 - Autosave (the shell, never blocking a frame) when Fae arrives in an area,
-  a battle or arcade game ends, a dialogue closes, or the journal closes. The
-  trigger is a pure function of the previous and next state
-  (`autosaveNeeded`), and it is false while `finale` isn't null: the dream's
-  last save is the ending's snapshot (section 7.4). Fixture resets don't save.
+  a battle, arcade game, or cutscene ends, a dialogue closes, or the journal
+  closes. The trigger is a pure function of the previous and next state
+  (`autosaveNeeded`), and it is false while `finale` isn't null or `cutscene`
+  is active: the dream's last save is the ending's snapshot (section 7.4). Fixture resets don't save.
   In live unpaused gameplay outside QA packs, title, and the harness room, a
   successful autosave displays a compact non-blocking die-cut quill pill
   (`createSaveToast` in `src/ui/save-toast.ts`, `"Saved"`, bottom-right on
@@ -5210,6 +5237,12 @@ trunks keep its two exits.
     null once the game has started.
   - `qa.active()` reports whether a QA pack is loaded, and `qa.packs()` lists
     the dev/harness-only pack metadata.
+  - `cutscene` (optional dev/harness control, Milestone 186): `play(id)` starts
+    a validated cutscene from `world.cutscenes` cleanly in the current state,
+    `active()` returns the running cutscene ID or `null`, and `list()` returns
+    sorted cutscene IDs; `renderInfo().cutscene` reports live `letterboxPx`,
+    `camera`, `tempActors`, `emotes`, `effects`, and `skipProgress` (or `null`
+    when inactive).
   - `save`: `clear()` deletes the slot; `last()` is the tick and hash of the
     latest completed save write; `loaded()` is the tick and hash of the save
     restored at boot, or null for a new game; optional `exportBackup()` formats

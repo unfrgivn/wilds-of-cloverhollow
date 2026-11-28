@@ -1,5 +1,6 @@
 import { Assets, Container, Sprite, Spritesheet, Texture } from "pixi.js";
 import {
+  cutsceneView,
   hiddenFraction,
   npcFacing,
   npcLivePoint,
@@ -21,6 +22,7 @@ import type { Rect } from "./area-view";
 import { makeShadowSprite, placeAura } from "./battle-view";
 import { interpolatePoint } from "./camera";
 import type { RestSpot } from "./companions";
+import { computeCutscenePoseTransform } from "./cutscene-render";
 import {
   composePose,
   idleBreathing,
@@ -323,7 +325,7 @@ export class OverworldEntityLayer {
       activeToolEventId,
       dialogueTags,
     );
-    const faePose = computeFaePose(
+    const baseFaePose = computeFaePose(
       state,
       livingMotion,
       this.world.tunables.walkCycleUnits,
@@ -331,6 +333,14 @@ export class OverworldEntityLayer {
       activeRest,
       activePet,
     );
+    const csFae = cutsceneView(state)?.actorOverrides.fae;
+    const faePose =
+      csFae?.pose !== undefined
+        ? composePose(
+            baseFaePose,
+            computeCutscenePoseTransform(csFae.pose, csFae.poseTicks ?? 0, !livingMotion),
+          )
+        : baseFaePose;
     this.playerFlip = stepPaperFlip(this.playerFlip, facing, state.tick);
     const flipElapsed =
       this.playerFlip.startTick === null
@@ -378,6 +388,7 @@ export class OverworldEntityLayer {
     }
     const partner = dialoguePartner(this.world, state);
     const partyAttentionById = new Map(partyLife.map((entry) => [entry.id, entry.attention]));
+    const csOverrides = cutsceneView(state)?.actorOverrides;
     this.partyFrames = state.party.flatMap((member, index) => {
       const sprite = this.partySprites.get(member.id);
       const content = this.world.party[member.id];
@@ -431,16 +442,40 @@ export class OverworldEntityLayer {
       const texture = this.resolveCharacterTexture(member.id, transform.animation, transform.frame);
       if (texture === undefined)
         throw new Error(`Missing ${member.id} frame ${transform.animation}:${transform.frame}`);
+      const csMember = csOverrides?.[`party:${member.id}`];
+      const csPose =
+        csMember?.pose !== undefined
+          ? computeCutscenePoseTransform(csMember.pose, csMember.poseTicks ?? 0, !livingMotion)
+          : null;
       sprite.texture = texture;
       if (texture.defaultAnchor === undefined)
         throw new Error(`${member.id} anchor missing`);
       sprite.anchor.copyFrom(texture.defaultAnchor);
-      sprite.position.set(transform.x, transform.y);
-      sprite.scale.set(transform.scaleX, transform.scaleY);
-      sprite.rotation = transform.rotation;
+      if (csPose !== null) {
+        sprite.position.set(transform.x + csPose.offsetX, transform.y + csPose.offsetY);
+        sprite.scale.set(transform.scaleX * csPose.scaleX, transform.scaleY * csPose.scaleY);
+        sprite.rotation = transform.rotation + csPose.rotation;
+      } else {
+        sprite.position.set(transform.x, transform.y);
+        sprite.scale.set(transform.scaleX, transform.scaleY);
+        sprite.rotation = transform.rotation;
+      }
       sprite.zIndex = transform.zIndex;
       const shadow = this.partyShadows.get(member.id);
-      if (shadow !== undefined) applyShadow(shadow, transform.shadow);
+      if (shadow !== undefined) {
+        if (csPose !== null) {
+          const lift = liftShadowScale(csPose.offsetY);
+          applyShadow(shadow, {
+            x: transform.shadow.x,
+            y: transform.shadow.y,
+            width: transform.shadow.width * lift,
+            height: transform.shadow.height * lift,
+            alpha: transform.shadow.alpha * lift,
+          });
+        } else {
+          applyShadow(shadow, transform.shadow);
+        }
+      }
       return [{ id: member.id, animation: transform.animation, frame: transform.frame }];
     });
   }
@@ -550,28 +585,47 @@ export class OverworldEntityLayer {
     reducedMotion = false,
   ): void {
     const lifeById = new Map(npcLife.npcs.map((entry) => [entry.id, entry]));
+    const csOverrides = cutsceneView(state)?.actorOverrides;
+    const prevCsOverrides =
+      previousState === undefined ? undefined : cutsceneView(previousState)?.actorOverrides;
     const frames: NpcFrameInfo[] = [];
     for (const [npcIndex, { npc, sprite, shadow }] of this.npcSprites.entries()) {
       sprite.visible = npcVisible(this.world, state, npc);
       if (shadow !== null) shadow.visible = sprite.visible;
       if (!sprite.visible) continue;
+      const csOverride = csOverrides?.[`npc:${npc.id}`];
+      const prevCsOverride = prevCsOverrides?.[`npc:${npc.id}`];
       const currLive = npcLivePoint(state, npc);
       const holdHome = reducedMotion && npc.stroll !== undefined;
-      const livePos: Point = holdHome
-        ? npc.point
-        : npc.stroll !== undefined && previousState !== undefined && alpha < 1
-          ? interpolatePoint(npcLivePoint(previousState, npc), currLive, alpha)
-          : { x: currLive.x, y: currLive.y };
-      const isMoving = !holdHome && currLive.moving;
-      const liveDistance = holdHome ? 0 : currLive.distance;
+      let livePos: Point;
+      if (csOverride?.x !== undefined && csOverride.y !== undefined) {
+        livePos =
+          alpha < 1 && prevCsOverride?.x !== undefined && prevCsOverride.y !== undefined
+            ? interpolatePoint(
+                { x: prevCsOverride.x, y: prevCsOverride.y },
+                { x: csOverride.x, y: csOverride.y },
+                alpha,
+              )
+            : { x: csOverride.x, y: csOverride.y };
+      } else {
+        livePos = holdHome
+          ? npc.point
+          : npc.stroll !== undefined && previousState !== undefined && alpha < 1
+            ? interpolatePoint(npcLivePoint(previousState, npc), currLive, alpha)
+            : { x: currLive.x, y: currLive.y };
+      }
+      const isMoving =
+        csOverride !== undefined ? csOverride.moving === true : !holdHome && currLive.moving;
+      const liveDistance =
+        csOverride !== undefined ? (csOverride.distance ?? 0) : holdHome ? 0 : currLive.distance;
       if (npc.visibleWhenCalmed !== undefined) {
         const critter = this.world.critters[npc.visibleWhenCalmed];
         const sheet = critter === undefined ? undefined : Assets.get<Spritesheet>(critter.atlas);
         const texture = sheet?.textures.calm_idle_01;
         if (critter === undefined || texture === undefined) continue;
-        const facing = npcFacing(state, npc);
+        const facing = csOverride?.facing ?? npcFacing(state, npc);
         const talking = state.dialogue !== null && state.dialogue.knot === npc.knot;
-        const flipX = talking ? state.player.x > livePos.x : npc.facing === "right";
+        const flipX = talking ? state.player.x > livePos.x : facing === "right";
         const scale = critter.overworldHeight / critter.figureHeight;
         const pose = !livingMotion
           ? NEUTRAL_POSE
@@ -593,18 +647,46 @@ export class OverworldEntityLayer {
       const character = this.world.characters[npc.id];
       if (sheet === undefined || character === undefined) continue;
       const entry = lifeById.get(npc.id);
-      const { facing, attentionAge, turnAge, areaTicks } = lifeController.stepPresentation(
+      const lifePresentation = lifeController.stepPresentation(
         npc,
         entry,
         state,
         livingMotion,
       );
-      const { mirror, frameName: name } = resolveNpcTextureFrame(
-        sheet.data.animations,
-        facing,
-        character.idleTicks,
-        state.tick,
-      );
+      const facing = csOverride?.facing ?? lifePresentation.facing;
+      const { attentionAge, turnAge, areaTicks } = lifePresentation;
+      let mirror = false;
+      let name: string | undefined;
+      if (csOverride !== undefined && isMoving) {
+        const animations = sheet.data.animations;
+        const wantedWalk = `walk_${facing}`;
+        const walkMirror =
+          facing === "right" &&
+          animations?.[wantedWalk] === undefined &&
+          animations?.walk_left !== undefined;
+        const walkAnim = walkMirror
+          ? "walk_left"
+          : animations?.[wantedWalk] !== undefined
+            ? wantedWalk
+            : undefined;
+        const walkFrames = walkAnim === undefined ? undefined : animations?.[walkAnim];
+        if (walkFrames !== undefined && walkFrames.length > 0) {
+          const frameIndex =
+            Math.floor(liveDistance / (72 / walkFrames.length)) % walkFrames.length;
+          mirror = walkMirror;
+          name = walkFrames[frameIndex] ?? walkFrames[0];
+        }
+      }
+      if (name === undefined) {
+        const resolved = resolveNpcTextureFrame(
+          sheet.data.animations,
+          facing,
+          character.idleTicks,
+          state.tick,
+        );
+        mirror = resolved.mirror;
+        name = resolved.frameName;
+      }
       const texture = name === undefined ? undefined : sheet.textures[name];
       if (name === undefined || texture === undefined) continue;
       sprite.texture = texture;
@@ -627,7 +709,7 @@ export class OverworldEntityLayer {
                   turnAge,
                 )
               : computeNpcPose(npc.id, npcIndex, state.tick, livingMotion);
-      const pose =
+      const livingPose =
         isMoving &&
         livingMotion &&
         !reducedMotion &&
@@ -645,6 +727,17 @@ export class OverworldEntityLayer {
               ),
             )
           : basePose;
+      const pose =
+        csOverride?.pose !== undefined
+          ? composePose(
+              livingPose,
+              computeCutscenePoseTransform(
+                csOverride.pose,
+                csOverride.poseTicks ?? 0,
+                reducedMotion,
+              ),
+            )
+          : livingPose;
       sprite.scale.set((mirror ? -s : s) * pose.scaleX, s * pose.scaleY);
       sprite.position.set(livePos.x + pose.offsetX, livePos.y + pose.offsetY);
       sprite.rotation = pose.rotation;

@@ -297,6 +297,164 @@ export type GroundManifest = {
     height: number;
   }[];
 };
+export type CutscenePose =
+  | "idle"
+  | "hop"
+  | "cheer"
+  | "shock"
+  | "toss"
+  | "taunt"
+  | "wave"
+  | "sit";
+export type CutsceneEmoteKind =
+  | "exclaim"
+  | "question"
+  | "heart"
+  | "sparkle"
+  | "note"
+  | "wave"
+  | "worry"
+  | "zzz";
+export type CutsceneEffectKind =
+  | "purple-fizz"
+  | "purple-puff"
+  | "sparkle-burst"
+  | "pinecone-burst";
+export type CutsceneCameraTarget = Point | "fae" | `actor:${string}`;
+export type CutsceneStep =
+  | { type: "moveActor"; actor: string; to: Point; speed: number; facing?: Direction }
+  | { type: "face"; actor: string; direction: Direction }
+  | {
+      type: "pose";
+      actor: string;
+      pose: CutscenePose;
+      ticks?: number;
+      effect?: CutsceneEffectKind;
+    }
+  | { type: "emote"; actor: string; kind: CutsceneEmoteKind; ticks: number }
+  | { type: "wait"; ticks: number }
+  | { type: "cameraPan"; to: CutsceneCameraTarget; ticks: number; zoom?: number }
+  | { type: "sfx"; cue: import("./sound").SoundCue }
+  | { type: "sayKnot"; knot: string }
+  | { type: "parallel"; steps: CutsceneStep[] }
+  | { type: "setFlag"; flag: string; value: boolean; scope?: "ink" | "cutscene" }
+  | {
+      type: "spawnTempActor";
+      id: string;
+      sprite: string;
+      at: Point;
+      facing?: Direction;
+      scale?: number;
+      effect?: CutsceneEffectKind;
+    }
+  | { type: "despawnTempActor"; id: string; effect?: CutsceneEffectKind }
+  | { type: "propState"; propId: string; state: string };
+export type CutsceneTrigger =
+  | {
+      kind: "area-enter";
+      area: string;
+      requiresVariable?: string;
+      forbidsVariable?: string;
+      once?: boolean;
+    }
+  | {
+      kind: "after-knot";
+      area: string;
+      knot: string;
+      requiresVariable?: string;
+      forbidsVariable?: string;
+      once?: boolean;
+    }
+  | { kind: "manual" };
+export type CutsceneScript = {
+  id: string;
+  area: string;
+  trigger?: CutsceneTrigger;
+  steps: CutsceneStep[];
+};
+export type CutsceneTempActor = {
+  id: string;
+  sprite: string;
+  x: number;
+  y: number;
+  facing: Direction;
+  scale: number;
+  moving: boolean;
+  distance: number;
+  pose?: CutscenePose;
+  poseTicks?: number;
+};
+export type CutsceneActorOverride = {
+  x?: number;
+  y?: number;
+  facing?: Direction;
+  moving?: boolean;
+  distance?: number;
+  pose?: CutscenePose;
+  poseTicks?: number;
+};
+export type CutsceneEmoteState = {
+  actor: string;
+  kind: CutsceneEmoteKind;
+  elapsed: number;
+  duration: number;
+};
+export type CutsceneEffectState = {
+  kind: CutsceneEffectKind;
+  x: number;
+  y: number;
+  elapsed: number;
+  duration: number;
+};
+export type CutsceneCameraState = {
+  x: number;
+  y: number;
+  zoom: number;
+  fromX?: number;
+  fromY?: number;
+  fromZoom?: number;
+  elapsed?: number;
+  duration?: number;
+};
+export type CutsceneStepProgress =
+  | { kind: "idle" }
+  | { kind: "ticks"; elapsed: number }
+  | { kind: "camera"; elapsed: number; fromX: number; fromY: number; fromZoom: number }
+  | { kind: "move" }
+  | { kind: "dialogue"; opened: boolean }
+  | { kind: "parallel"; children: CutsceneStepProgress[]; done: boolean[] }
+  | { kind: "done" };
+export type CutsceneState = {
+  id: string;
+  tick: number;
+  stepIndex: number;
+  progress: CutsceneStepProgress;
+  camera: { x: number; y: number; zoom: number } | null;
+  tempActors: CutsceneTempActor[];
+  actorOverrides: Record<string, CutsceneActorOverride>;
+  emotes: CutsceneEmoteState[];
+  effects: CutsceneEffectState[];
+  propOverrides: Record<string, string>;
+  flags: Record<string, boolean>;
+  tickSfx: import("./sound").SoundCue[];
+  cancelHoldTicks: number;
+  dialogueWaiting: boolean;
+};
+export type CutsceneView = {
+  id: string;
+  tick: number;
+  stepIndex: number;
+  letterbox: number;
+  camera: { x: number; y: number; zoom: number } | null;
+  tempActors: readonly CutsceneTempActor[];
+  actorOverrides: Readonly<Record<string, CutsceneActorOverride>>;
+  emotes: readonly CutsceneEmoteState[];
+  effects: readonly CutsceneEffectState[];
+  propOverrides: Readonly<Record<string, string>>;
+  skipProgress: number;
+  dialogueActive: boolean;
+};
+
 export type World = {
   tunables: Tunables;
   areas: Record<string, Area>;
@@ -320,6 +478,7 @@ export type World = {
   npcBanter: NpcBanterPair[];
   partyBanter: NpcPartyBanter[];
   toolEvents: NpcToolEvent[];
+  cutscenes: Record<string, CutsceneScript>;
 };
 export type TreatItem = {
   id: string;
@@ -1207,6 +1366,8 @@ export type State = {
   caughtFish?: Record<string, number>;
   finale: "morning" | "credits" | null;
   backLink?: { area: string; direction: Direction };
+  cutscene?: CutsceneState;
+  cutscenesSeen?: string[];
 };
 // What a tick of an arcade game changes: the game itself and what it pays out.
 export type ArcadeOwned = Pick<State, "arcade" | "prizes" | "tickets">;

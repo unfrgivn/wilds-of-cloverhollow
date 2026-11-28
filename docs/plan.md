@@ -7409,6 +7409,35 @@ the old trail, the owl, and the clubhouse claim.
 - Gates: `just check`, `just build` (`< 410 kB` every non-vendor chunk), and
   targeted Chromium & WebKit e2e tests.
 
+## Milestone 174: Modular `src/render/battle-theater.ts` Extraction & Tick-Resilient E2E Repair **Status:** ✅ Completed (2026-11-27)
+- Extracts self-contained Talk, Snack, Recover, and Soothed/Reward battle
+  theater choreography & VFX helpers into Pixi-free
+  `src/render/battle-theater.ts` (zero circular runtime dependency, re-exported
+  identically through `src/render/battle-vfx.ts` and
+  `src/render/battle-choreography.ts`), dropping `src/render/battle-vfx.ts` from
+  `980` lines to `400` lines while keeping every implementation `.ts` file in
+  `src/` cleanly `< 960` lines (excluding `src/core/types.ts`). Zero `src/core`
+  changes and zero replay hash shifts across all 74 recorded sims.
+- Repairs `tests/e2e/milestone-134.spec.ts`, `tests/e2e/milestone-135.spec.ts`,
+  and `tests/e2e/milestone-158.spec.ts` permanently from first principles after
+  PR #14 (`bf8a689c`) shifted battle replay ticks and plaza den spawns:
+  - `milestone-134.spec.ts` & `milestone-158.spec.ts` replace hardcoded replay
+    ticks with a dynamic pure `bunFindReplayTick` helper (`tests/e2e/helpers.ts`
+    + `tools/sim/find-tick.ts`) over `loadContent()` + `createState()` +
+    `step()` + `battleView()` for `golden-woods.json` (Owl Lantern Mood Peek),
+    `golden-flute.json` (Flute Friends & Rainbow Lasso Steady Snag), and
+    `bay.json` (Wind-Gust Lean).
+  - `milestone-135.spec.ts` matches any Fish Cracker-favourite chaos critter
+    (`raccoon`, `pup`, `cat`) spawned in Plaza dens and routes cleanly around
+    the central fountain instead of assuming a single RNG species roll.
+- Syncs verified post-PR #13/#14 WebKit `battle.spec` and Chromium `qa.spec`
+  snapshots (audited via `vision`).
+- Evidence: `tests/unit/milestone-174.test.ts` (export reference identity +
+  line-budget & Pixi-free architecture guards), plus Chromium & WebKit e2e
+  verification of `milestone-134.spec.ts`, `milestone-135.spec.ts`,
+  `milestone-158.spec.ts`, `milestone-172.spec.ts`, `qa.spec.ts`, and
+  `battle.spec.ts`.
+
 ## Elevation Master Roadmap (Owner-approved 2026-11-27)
 Parallel multi-track elevation plan targeting award-winning craft across
 gameplay, puzzles, battles, cutscenes, story, visuals, dialogue, transitions,

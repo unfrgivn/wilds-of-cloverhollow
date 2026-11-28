@@ -575,3 +575,25 @@ export function bunCometLayout(state: string, scale: number): ExpectedComet {
   if (!expectedComet(parsed)) throw new Error(`invalid Comet Cruise layout for ${state}`);
   return parsed;
 }
+
+export type ReplayTickQuery =
+  | "owl-peek"
+  | "flute-command"
+  | "lasso-steady-command"
+  | "lean-check";
+
+export function bunFindReplayTick(
+  scriptPath: string,
+  fixture: string,
+  query: ReplayTickQuery,
+): number {
+  const result = spawnSync("bun", ["tools/sim/find-tick.ts", scriptPath, fixture, query], {
+    encoding: "utf8",
+  });
+  if (result.status !== 0) throw new Error(result.stderr || `find-tick failed for ${query}`);
+  const parsed: unknown = JSON.parse(result.stdout);
+  if (!record(parsed) || typeof parsed.tick !== "number") {
+    throw new Error(`invalid find-tick output: ${result.stdout}`);
+  }
+  return parsed.tick;
+}

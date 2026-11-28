@@ -156,18 +156,20 @@ ios/            Capacitor iOS project (from Milestone 4).
   (Milestones 91, 96, 125).
 - Battle stage mood washes, Flute Friend on-stage cameo poses, and battle VFX
   anchor resolution live in `src/render/battle-stage.ts` (Milestone 91), while
-  pure battle VFX particle/theater builders (`SnackTheaterKind`,
-  `classifySnackTheater`, `isTalkTheater`, `isRecoverTheater`, `radialBurst`,
-  `applyTalkTheater`, `applySnackTheater`, `applyRecoverTheater`,
-  `applyTogetherReady`, `applyTogetherActive`, `applyWindUpAndFizzle`,
-  `applySoothedAndReward`) live in Pixi-free `src/render/battle-vfx.ts` and the
-  six stage VFX choreography emitters
-  (`isLassoActionActive`, `emitRainbowLassoVfx`, `echoNoteColor`,
-  `emitEchoChimeVfx`, `emitSoothedConfettiVfx`, `emitLeanWindVfx`,
-  `emitPeekabooVfx`, `emitTraceBrushVfx`) live in Pixi-free
-  `src/render/battle-vfx-stage.ts` (re-exported identically through
+  pure battle VFX particle/theater builders (`applyTogetherReady`,
+  `applyTogetherActive`, `applyWindUpAndFizzle`) live in Pixi-free
+  `src/render/battle-vfx.ts`, self-contained Talk/Snack/Recover/Soothed theater
+  choreography helpers (`SnackTheaterKind`, `classifySnackTheater`,
+  `isTalkTheater`, `isRecoverTheater`, `RECOVER_SPARKLE_TINTS`, `RAINBOW_HEARTS`,
+  `SPARKLE_TINTS`, `RELIEF_PETALS`, `radialBurst`, `applyTalkTheater`,
+  `applySnackTheater`, `applyRecoverTheater`, `applySoothedAndReward`) live in
+  Pixi-free `src/render/battle-theater.ts` (Milestone 174), and the six stage
+  VFX choreography emitters (`isLassoActionActive`, `emitRainbowLassoVfx`,
+  `echoNoteColor`, `emitEchoChimeVfx`, `emitSoothedConfettiVfx`,
+  `emitLeanWindVfx`, `emitPeekabooVfx`, `emitTraceBrushVfx`) live in Pixi-free
+  `src/render/battle-vfx-stage.ts` (all re-exported identically through
   `src/render/battle-vfx.ts` and `src/render/battle-choreography.ts`,
-  Milestones 137 & 157). The Pixi battle stage container, sprites, check
+  Milestones 137, 157 & 173). The Pixi battle stage container, sprites, check
   geometry, and `renderBattle` orchestration live in `BattleViewController`
   (`src/render/battle-view.ts`, mounted by `GameView` in `src/render/view.ts`),
   delegating blurred backdrop texture caching/invalidation, stage wash scrim,
@@ -3789,9 +3791,9 @@ trunks keep its two exits.
   `battleMoodWaveB`) tinted dynamically by `battleStageMood` (`"calm-normal"`,
   `"windup"`, `"together-ready"`, `"together-active"`, `"soothed"`).
   `computeBattleChoreography` (`src/render/battle-choreography.ts`, paired with
-  pure theater VFX helpers in `src/render/battle-vfx.ts` and
-  `src/render/battle-vfx-stage.ts`, Milestones
-  73, 82, 135, 136, 137, and 155) drives deterministic Paper Mario / EarthBound combat poses,
+  pure theater VFX helpers in `src/render/battle-theater.ts`,
+  `src/render/battle-vfx.ts`, and `src/render/battle-vfx-stage.ts`, Milestones
+  73, 82, 135, 136, 137, 155, 172, and 173) drives deterministic Paper Mario / EarthBound combat poses,
   `stageMood`, `hitStop`, and pooled `battleVfxLayer` particles (`sparkle`,
   `heart`, `energyRing`, `puff`, `petal`, `softGlow`, `mistWisp`, pool size 80): staggered breathing,
   highlighted actor step-forward on command selection, Heart-to-Heart `Talk`

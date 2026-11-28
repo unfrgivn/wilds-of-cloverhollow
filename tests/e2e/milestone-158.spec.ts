@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { peekabooStatus, serializeSave, setInkVariables } from "../../src/core";
 import {
+  bunFindReplayTick,
   longFlowTimeout,
   openHarness,
   playBattleCheck,
@@ -16,9 +17,7 @@ import {
 test.describe.configure({ timeout: longFlowTimeout });
 
 const fluteScript = "tests/sim/scripts/new-game/golden-flute.json";
-const fluteBattleMenuTick = 16049;
 const bayPath = "tests/sim/scripts/bay/bay.json";
-const bayLeanStartTick = 1024;
 
 async function replayTo(page: Page, path: string, targetTick: number): Promise<void> {
   const upTo: ReturnType<typeof recording> = [];
@@ -94,6 +93,7 @@ test(
     await openHarness(page);
 
     // 1. Rainbow Lasso arc (R key during battle command phase).
+    const fluteBattleMenuTick = bunFindReplayTick(fluteScript, "new-game", "lasso-steady-command");
     await resetPaused(page, "new-game");
     await replayTo(page, fluteScript, fluteBattleMenuTick);
     expect((await readBattle(page))?.phase).toBe("command");
@@ -289,12 +289,16 @@ test(
     expect((await readBattle(page))?.lastGrade).toBe("great");
 
     // 5. Wind-Gust Lean (Flappy Bluebird in Bubblegum Bay).
+    const bayLeanStartTick = bunFindReplayTick(bayPath, "bay", "lean-check");
     await resetPaused(page, "bay");
     await replayTo(page, bayPath, bayLeanStartTick);
-    expect((await readBattle(page))?.check?.kind).toBe("lean");
+    const leanBattle = await readBattle(page);
+    expect(leanBattle?.check?.kind).toBe("lean");
+    const expectedSwooshes =
+      leanBattle?.check?.kind === "lean" && leanBattle.check.big ? 4 : 3;
     await step(page, 62);
     await expect(page.locator(".battle-lean-puff").first()).toHaveClass(/is-blowing/);
-    await expect(page.locator(".battle-lean-swoosh:visible")).toHaveCount(3);
+    await expect(page.locator(".battle-lean-swoosh:visible")).toHaveCount(expectedSwooshes);
     await playBattleCheck(page);
     expect((await readBattle(page))?.phase).toBe("burstResult");
 

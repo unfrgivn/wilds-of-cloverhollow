@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import {
+  bunFindReplayTick,
   longFlowTimeout,
   openHarness,
   queueScript,
@@ -83,8 +84,9 @@ test(
     await page.setViewportSize({ width: 1280, height: 720 });
     await openHarness(page);
     await resetPaused(page, "new-game");
-    await replayToTick(page, "tests/sim/scripts/new-game/golden-woods.json", 8791);
-    await step(page, 1);
+    const woodsScript = "tests/sim/scripts/new-game/golden-woods.json";
+    const owlPeekTick = bunFindReplayTick(woodsScript, "new-game", "owl-peek");
+    await replayToTick(page, woodsScript, owlPeekTick);
 
     const before = await readBattle(page);
     expect(before?.critterId).toBe("owl");
@@ -129,7 +131,9 @@ test(
     await page.setViewportSize({ width: 1280, height: 720 });
     await openHarness(page);
     await resetPaused(page, "new-game");
-    await replayToTick(page, "tests/sim/scripts/new-game/cavern.json", 21531);
+    const fluteScript = "tests/sim/scripts/new-game/golden-flute.json";
+    const fluteMenuTick = bunFindReplayTick(fluteScript, "new-game", "flute-command");
+    await replayToTick(page, fluteScript, fluteMenuTick);
 
     const fluteBtn = page.locator(".battle-flute-btn");
     const fluteKey = page.locator(".battle-flute-btn .battle-action-key");

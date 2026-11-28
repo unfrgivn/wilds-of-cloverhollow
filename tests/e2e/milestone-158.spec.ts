@@ -16,9 +16,9 @@ import {
 test.describe.configure({ timeout: longFlowTimeout });
 
 const fluteScript = "tests/sim/scripts/new-game/golden-flute.json";
-const fluteBattleMenuTick = 20438;
+const fluteBattleMenuTick = 16049;
 const bayPath = "tests/sim/scripts/bay/bay.json";
-const bayLeanStartTick = 652;
+const bayLeanStartTick = 1024;
 
 async function replayTo(page: Page, path: string, targetTick: number): Promise<void> {
   const upTo: ReturnType<typeof recording> = [];
@@ -241,8 +241,13 @@ test(
       if (hook === undefined) throw new Error("hook unavailable");
       await hook.reset({ seed: 8, fixture: "hills-calm" });
     });
-    await walk(page, "x", 450);
-    await walk(page, "y", 850);
+    for (let tries = 0; tries < 5 && (await readBattle(page)) === null; tries += 1) {
+      const lamb = (await readState(page)).wild.find((critter) => critter.kind === "lamb");
+      if (lamb === undefined) throw new Error("no lamb spawned in hills");
+      await walk(page, "y", lamb.y);
+      if ((await readBattle(page)) !== null) break;
+      await walk(page, "x", lamb.x);
+    }
     await expect.poll(async () => (await readBattle(page))?.critterId).toBe("lamb");
     for (let i = 0; i < 60; i += 1) {
       const battle = await readBattle(page);
@@ -303,7 +308,25 @@ test(
       await step(page, 2);
     }
     expect((await readState(page)).area).toBe("woods");
+    const runAwayIfIntercepted = async (): Promise<void> => {
+      if ((await readBattle(page)) === null) return;
+      for (let i = 0; i < 60; i += 1) {
+        const battle = await readBattle(page);
+        if (battle === null) return;
+        if (battle.phase === "command") {
+          await page.locator(".battle-command", { hasText: "Run" }).click();
+          await step(page, 2);
+        } else {
+          await tapKey(page, "Enter");
+        }
+      }
+    };
+    await walk(page, "y", 930);
+    await runAwayIfIntercepted();
+    await walk(page, "x", 1400);
+    await runAwayIfIntercepted();
     await walk(page, "y", 820);
+    await runAwayIfIntercepted();
     await walk(page, "x", 1400);
     await expect(page.locator(".sticker-prompt")).toBeVisible();
     await tapKey(page, "Enter");

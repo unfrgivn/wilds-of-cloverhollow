@@ -4796,34 +4796,62 @@ trunks keep its two exits.
 - While dialogue is open, HTML carries `data-dialogue="open"`; movement, doors,
   cancel, and menu are ignored. Confirm reveals the current line, advances it,
   or selects the highlighted choice. Up/down edges wrap the selection.
-- The QA console (Milestone 67), dev and harness builds only: the backtick
-  key or a tap on the QA badge opens it while a QA pack is active, and
-  Backquote or Escape (or its Close button) closes it. While it is open the
-  world is frozen, like the title (no core ticks run), and the root carries
-  `data-qa-console="open"`. Its commands are pure functions
-  (`runConsoleCommand` in the dev module) over the real state, with the
-  console a thin DOM shell: `help`; `xp <fae|member> <n>` and `level
-  <fae|member> <n>` (levels 1 to 99; a level moves XP to its threshold);
-  `coins`, `snacks`, and `tickets` (capped at 999, 99, and 999, the layouts
-  the journal and battle menu were tested at); `treats all|<id>` (adding +1 of
-  every specialty treat or the named treat id, capped at 99); `stickers
-  all|<id>` and `prizes
-  all|<id>` (granting from the catalogues); `fish all|clear` (catching every
-  Bubblegum Bay species or clearing `caughtFish`); `gems all|clear` (setting
-  the closed seven `STAR_GEM_VARIABLES` `gem_park`, `gem_bay`, `gem_trail`,
-  `gem_pass`, `gem_cavern`, `gem_woods`, `gem_hills` to true or false,
-  Milestone 120); `lantern|lasso|flute|map
-  on|off`,
-  which set exactly the four tool story variables `has_lantern`, `has_lasso`,
-  `has_flute`, and `has_map`; and `keepsakes on|off`, which toggles the closed
-  twelve quest-keepsake story variables (`cavern_chime_rung`, `spice_returned`,
-  `gem_reward_all`, `sanctuary_reward_14`, `sue_compass`, `jordan_clover`,
-  `buster_reward`, `milo_loft_visited`, `rosie_cottage_visited`,
-  `summit_aurora_read`, `island_shells_solved`, `festival_toast_done`; an
-  undeclared story variable is an error). `save <name>`
-  keeps the state in a QA-only slot listed in the QA menu; `export` shows the
-  state's save file for a bug report or the library. Nothing the console does
-  autosaves or touches the player's slot.
+- The QA console (Milestone 67, upgraded to a unified tabbed storybook GUI),
+  dev and harness builds only: built lazily on first open so its DOM never sits
+  on the page while unused. Backquote (`` ` ``) toggles it during gameplay
+  (normal or QA mode); holding `Q` (`KeyQ`) for `500 ms` opens it from anywhere
+  (normal gameplay, QA gameplay, title, or `.qa-menu`, ignored in text inputs,
+  while a quick tap of `Q` on the title still opens `.qa-menu`); tapping
+  `.qa-badge` opens it in QA mode; and on touch (`data-touch="on"`), a compact
+  dev/harness-only `.qa-touch-trigger` (`"QA"`) opens it during live gameplay
+  when no QA pack is active (hidden on title, photo mode, QA menu, and while
+  open, and replaced by `.qa-badge` once a pack or `Sandbox` activates).
+  Backquote, Escape, or `Close (Esc)` closes it. Opening via keyboard focuses
+  `.qa-console-input`. While open the world is frozen (no core ticks run), and
+  the root carries `data-qa-console="open"`. Its header shows `"QA console"`,
+  the active mode badge (pack label or `"Live game (edits enter QA)"`), and
+  three tabs (`Cheats`, `Saves`, `Settings`) above an always-visible bottom
+  `.qa-console-log` and `.qa-console-form`:
+  - `Cheats`: Supplies range sliders (`Coins` 0–999, `Snacks` 0–99, `Tickets`
+    0–999), Party Level member selector + slider (1–99 with live `Lv N (XP)`),
+    Tools toggles (`Lantern`, `Lasso`, `Flute`, `Map`), and Collections & Story
+    controls (`Keepsakes`, `Star Gems`, `Fish` toggles; `All Stickers`, `All
+    Prizes`, `+1 All Treats`, `Ripen Garden`). Every GUI state edit routes
+    through `runConsoleCommand` and re-syncs from live `State`.
+  - `Saves`: inline QA slot saver (`data-qa-slot-input` + `Save Slot`), `Export
+    Save` (`[data-qa-export]` in the log), `New Game (Clean Reset)`
+    (`[data-qa-reset]`), and a scrollable list of all QA packs
+    and saved QA slots (`.qa-console-pack`, marking active with
+    `aria-current="true"`), clicking any entry loads it immediately in-game,
+    resets transient overlays, reloads the target area cleanly, and closes the
+    console.
+  - `Settings`: live toggles (`Gentle Timing`, `Key Hints`, `Reduced Motion`,
+    `Mute Audio`, and `Photo Mode` when in the free overworld) plus `Text Speed`
+    segmented buttons (`Cozy`, `Brisk`, `Instant`).
+  - Its commands are pure functions (`runConsoleCommand` in the dev module) over
+    the real state: `help`; `xp <fae|member> <n>` and `level <fae|member> <n>`
+    (levels 1 to 99; a level moves XP to its threshold); `coins`, `snacks`, and
+    `tickets` (capped at 999, 99, and 999, the layouts the journal and battle
+    menu were tested at); `treats all|<id>` (adding +1 of every specialty treat
+    or the named treat id, capped at 99); `stickers all|<id>` and `prizes
+    all|<id>` (granting from the catalogues); `fish all|clear` (catching every
+    Bubblegum Bay species or clearing `caughtFish`); `gems all|clear` (setting
+    the closed seven `STAR_GEM_VARIABLES` `gem_park`, `gem_bay`, `gem_trail`,
+    `gem_pass`, `gem_cavern`, `gem_woods`, `gem_hills` to true or false,
+    Milestone 120); `lantern|lasso|flute|map on|off`, which set exactly the four
+    tool story variables `has_lantern`, `has_lasso`, `has_flute`, and `has_map`;
+    `keepsakes on|off`, which toggles the closed twelve quest-keepsake story
+    variables (`cavern_chime_rung`, `spice_returned`, `gem_reward_all`,
+    `sanctuary_reward_14`, `sue_compass`, `jordan_clover`, `buster_reward`,
+    `milo_loft_visited`, `rosie_cottage_visited`, `summit_aurora_read`,
+    `island_shells_solved`, `festival_toast_done`; an undeclared story variable
+    is an error); and `garden ripe` (ripening the clubhouse garden). `save
+    <name>` keeps the state in a QA-only slot listed in the QA menu and `Saves`
+    tab; `export` shows the state's save file for a bug report or the library;
+    `reset` (and the `New Game (Clean Reset)` button in `Saves`) exits QA mode,
+    clears stale transient runtime state, resets `cloverhollow-save`, reloads
+    the fresh starting area, and closes the console. Nothing else the console
+    does autosaves or touches the player's slot.
 - Deliberately absent: arbitrary flag setting, teleporting, and eval. Fixtures
   and QA save packs are the labeled test-only shortcuts; teleporting, eval, and
   arbitrary flag setting remain absent, and the console's settable story

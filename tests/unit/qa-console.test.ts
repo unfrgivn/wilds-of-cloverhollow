@@ -2,7 +2,13 @@ import { describe, expect, it } from "vitest";
 import { createState, parseSave, serializeSave, type State } from "../../src/core";
 import { inkVariable } from "../../src/core/ink";
 import { loadContent } from "../../src/content/load";
-import { runConsoleCommand, type ConsoleContext } from "../../src/dev/console";
+import {
+  levelForThresholds,
+  readQaCheatSnapshot,
+  runConsoleCommand,
+  thresholdForLevel,
+  type ConsoleContext,
+} from "../../src/dev/console";
 
 const content = loadContent();
 const context: ConsoleContext = {
@@ -32,7 +38,7 @@ describe("QA console commands", () => {
     if (outcome.kind !== "help") throw new Error("expected help");
     for (const word of [
       "help", "xp", "level", "coins", "snacks", "tickets", "treats", "stickers", "prizes",
-      "fish", "lantern", "lasso", "flute", "map", "keepsakes", "save", "export",
+      "fish", "lantern", "lasso", "flute", "map", "keepsakes", "save", "export", "reset",
     ])
       expect(outcome.message, word).toContain(word);
   });
@@ -201,6 +207,7 @@ describe("QA console commands", () => {
     expect(runConsoleCommand(context, start, "save -nope").kind).toBe("error");
     expect(runConsoleCommand(context, start, "save").kind).toBe("error");
     expect(runConsoleCommand(context, start, "export").kind).toBe("export");
+    expect(runConsoleCommand(context, start, "reset")).toEqual({ kind: "reset" });
   });
 
   it("refuses unknown commands and answers any case", () => {
@@ -224,5 +231,54 @@ describe("QA console commands", () => {
     if (restored === null) throw new Error("the console's state would not load");
     expect(restored.coins).toBe(99);
     expect(variable(restored, "has_lasso")).toBe(true);
+  });
+
+  it("computes levels from thresholds and reads live cheat snapshots for the GUI", () => {
+    const start = base();
+    expect(levelForThresholds(context.thresholds, 0)).toBe(1);
+    expect(levelForThresholds(context.thresholds, -25)).toBe(1);
+    expect(levelForThresholds(context.thresholds, context.thresholds[5] ?? 0)).toBe(6);
+    expect(levelForThresholds(context.thresholds, (context.thresholds[5] ?? 0) - 1)).toBe(5);
+    expect(levelForThresholds(context.thresholds, 999_999_999)).toBe(99);
+    expect(thresholdForLevel(context.thresholds, 1)).toBe(context.thresholds[0]);
+    expect(thresholdForLevel(context.thresholds, 6)).toBe(context.thresholds[5]);
+    expect(thresholdForLevel(context.thresholds, 150)).toBe(context.thresholds[98]);
+
+    const partyNames = Object.fromEntries(
+      Object.entries(content.world.party).map(([id, member]) => [id, member.name]),
+    );
+    const initial = readQaCheatSnapshot(context, start, partyNames);
+    expect(initial.coins).toBe(start.coins);
+    expect(initial.members.map((member) => member.id)).toEqual(["fae", "maddie"]);
+    expect(initial.members[0]?.level).toBe(1);
+    expect(initial.tools.lasso).toBe(false);
+    expect(initial.keepsakesOn).toBe(false);
+    expect(initial.gemsAll).toBe(false);
+    expect(initial.fishAll).toBe(false);
+
+    let state = start;
+    for (const cmd of [
+      "coins 321",
+      "snacks 12",
+      "tickets 456",
+      "level fae 8",
+      "lasso on",
+      "keepsakes on",
+      "gems all",
+      "fish all",
+    ]) {
+      const outcome = runConsoleCommand(context, state, cmd);
+      if (outcome.kind !== "applied") throw new Error(`expected applied for ${cmd}`);
+      state = outcome.state;
+    }
+    const updated = readQaCheatSnapshot(context, state, partyNames);
+    expect(updated.coins).toBe(321);
+    expect(updated.snacks).toBe(12);
+    expect(updated.tickets).toBe(456);
+    expect(updated.members[0]?.level).toBe(8);
+    expect(updated.tools.lasso).toBe(true);
+    expect(updated.keepsakesOn).toBe(true);
+    expect(updated.gemsAll).toBe(true);
+    expect(updated.fishAll).toBe(true);
   });
 });

@@ -23,13 +23,14 @@ export type ConsoleOutcome =
   | { kind: "applied"; state: State; message: string }
   | { kind: "save"; name: string }
   | { kind: "export" }
+  | { kind: "reset" }
   | { kind: "help"; message: string }
   | { kind: "error"; message: string };
 
 // The tools Fae carries, and the story variable each sets. A closed set: the
 // console refuses any other story variable (spec 11).
-type ToolName = "lantern" | "lasso" | "flute" | "map";
-const toolVariables: Record<ToolName, string> = {
+export type ToolName = "lantern" | "lasso" | "flute" | "map";
+export const TOOL_VARIABLES: Readonly<Record<ToolName, string>> = {
   lantern: "has_lantern",
   lasso: "has_lasso",
   flute: "has_flute",
@@ -37,7 +38,7 @@ const toolVariables: Record<ToolName, string> = {
 };
 
 // Closed set of quest keepsake story variables for Clubhouse display QA.
-const keepsakeVariables: readonly string[] = [
+export const KEEPSAKE_VARIABLES: readonly string[] = [
   "cavern_chime_rung",
   "spice_returned",
   "gem_reward_all",
@@ -51,6 +52,82 @@ const keepsakeVariables: readonly string[] = [
   "island_shells_solved",
   "festival_toast_done",
 ];
+
+export type QaMemberSummary = {
+  id: string;
+  name: string;
+  xp: number;
+  level: number;
+};
+
+export type QaCheatSnapshot = {
+  coins: number;
+  snacks: number;
+  tickets: number;
+  members: QaMemberSummary[];
+  tools: Record<ToolName, boolean>;
+  keepsakesOn: boolean;
+  gemsAll: boolean;
+  fishAll: boolean;
+};
+
+/** Computes the 1-99 level corresponding to `xp` using the level table's thresholds. */
+export function levelForThresholds(thresholds: readonly number[], xp: number): number {
+  const safe = Math.max(0, Math.floor(xp));
+  let level = 1;
+  for (let index = 1; index < thresholds.length; index += 1) {
+    if ((thresholds[index] ?? Number.MAX_SAFE_INTEGER) > safe) break;
+    level = index + 1;
+  }
+  return Math.min(99, level);
+}
+
+/** Returns the XP threshold for a clamped 1-99 level. */
+export function thresholdForLevel(thresholds: readonly number[], level: number): number {
+  const clamped = Math.max(1, Math.min(99, Math.floor(level)));
+  const index = Math.min(thresholds.length - 1, clamped - 1);
+  return index >= 0 ? (thresholds[index] ?? 0) : 0;
+}
+
+/** Derives the live Cheats-tab values directly from State and ConsoleContext. */
+export function readQaCheatSnapshot(
+  context: ConsoleContext,
+  state: State,
+  partyNames: Readonly<Record<string, string>>,
+): QaCheatSnapshot {
+  const members: QaMemberSummary[] = [
+    {
+      id: "fae",
+      name: "Fae",
+      xp: state.xp,
+      level: levelForThresholds(context.thresholds, state.xp),
+    },
+    ...state.party.map((member) => ({
+      id: member.id,
+      name: partyNames[member.id] ?? member.id,
+      xp: member.xp,
+      level: levelForThresholds(context.thresholds, member.xp),
+    })),
+  ];
+  const flag = (name: string): boolean => inkVariable(context.story, state.ink, name) === true;
+  return {
+    coins: state.coins,
+    snacks: state.snacks,
+    tickets: state.tickets,
+    members,
+    tools: {
+      lantern: flag(TOOL_VARIABLES.lantern),
+      lasso: flag(TOOL_VARIABLES.lasso),
+      flute: flag(TOOL_VARIABLES.flute),
+      map: flag(TOOL_VARIABLES.map),
+    },
+    keepsakesOn: KEEPSAKE_VARIABLES.every(flag),
+    gemsAll: STAR_GEM_VARIABLES.every(flag),
+    fishAll:
+      context.fishIds.length > 0 &&
+      context.fishIds.every((id) => (state.caughtFish?.[id] ?? 0) > 0),
+  };
+}
 
 // The supplies' caps are the layouts the journal and the battle menu were
 // tested at (999 coins beside the ♪ pill, 99 snacks, 999 tickets).
@@ -77,6 +154,7 @@ const CONSOLE_HELP = [
   "garden ripe        ripen the clubhouse garden for Golden Sunberry harvest",
   "save <name>        keep this state in a QA-only slot",
   "export             show this state as a save file",
+  "reset              start a fresh new game (clears stale state & save)",
 ].join("\n");
 
 function parseCount(token: string | undefined): number | null {
@@ -199,7 +277,7 @@ function toolCommand(
   const setting = raw.toLowerCase();
   if (setting !== "on" && setting !== "off")
     return { kind: "error", message: `"${raw}" is not on or off.` };
-  const variable = toolVariables[tool];
+  const variable = TOOL_VARIABLES[tool];
   // A name the story doesn't declare reads as undefined (core/ink): the
   // console refuses anything but the four closed variables.
   if (inkVariable(context.story, state.ink, variable) === undefined)
@@ -224,7 +302,7 @@ function keepsakesCommand(
     return { kind: "error", message: `"${raw}" is not on or off.` };
   const on = setting === "on";
   const updates: Record<string, boolean> = {};
-  for (const variable of keepsakeVariables) {
+  for (const variable of KEEPSAKE_VARIABLES) {
     if (inkVariable(context.story, state.ink, variable) === undefined)
       return { kind: "error", message: `${variable} is not a story variable.` };
     updates[variable] = on;
@@ -375,6 +453,7 @@ export function runConsoleCommand(
     case "garden": return gardenCommand(context, state, args);
     case "save": return saveCommand(args);
     case "export": return { kind: "export" };
+    case "reset": return { kind: "reset" };
     default:
       return { kind: "error", message: `Unknown command "${command}". Type help.` };
   }

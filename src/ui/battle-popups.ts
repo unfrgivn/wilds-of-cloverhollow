@@ -28,6 +28,7 @@ export type BattlePopupSnapshot = {
   lassoUsed?: boolean;
   lanternPeek?: boolean;
   togetherActive?: boolean;
+  recovered?: boolean;
 };
 
 /**
@@ -66,6 +67,10 @@ export function classifyBattlePopup(
   const deltaEnergy = Math.round(next.energy - prev.energy);
   if (deltaEnergy > 0) {
     popups.push({ kind: "energy", text: `+${deltaEnergy} ⚡`, side: "fae" });
+  }
+
+  if (!prev.recovered && next.recovered === true && next.energy <= prev.energy) {
+    popups.push({ kind: "energy", text: "READY! ✦", side: "fae" });
   }
 
   if (!prev.fluteUsed && next.fluteUsed === true) {

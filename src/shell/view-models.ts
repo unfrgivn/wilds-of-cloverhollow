@@ -532,6 +532,7 @@ export function buildBattleHudView(params: BattleHudViewParams): BattleHudView {
             state.battle.command === "together" &&
             state.battle.phase === "check" &&
             state.battle.check?.side === "critter",
+          recovered: state.battle.phase === "result" && state.battle.command === "recover",
         }
       : null;
   const critter = world.critters[state.battle?.critterId ?? ""];

@@ -154,10 +154,11 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Battle stage mood washes, Flute Friend on-stage cameo poses, and battle VFX
   anchor resolution live in `src/render/battle-stage.ts` (Milestone 91), while
   pure battle VFX particle/theater builders (`SnackTheaterKind`,
-  `classifySnackTheater`, `isTalkTheater`, `radialBurst`, `applyTalkTheater`,
-  `applySnackTheater`, `applyTogetherReady`, `applyTogetherActive`,
-  `applyWindUpAndFizzle`, `applySoothedAndReward`) live in Pixi-free
-  `src/render/battle-vfx.ts` and the six stage VFX choreography emitters
+  `classifySnackTheater`, `isTalkTheater`, `isRecoverTheater`, `radialBurst`,
+  `applyTalkTheater`, `applySnackTheater`, `applyRecoverTheater`,
+  `applyTogetherReady`, `applyTogetherActive`, `applyWindUpAndFizzle`,
+  `applySoothedAndReward`) live in Pixi-free `src/render/battle-vfx.ts` and the
+  six stage VFX choreography emitters
   (`isLassoActionActive`, `emitRainbowLassoVfx`, `echoNoteColor`,
   `emitEchoChimeVfx`, `emitSoothedConfettiVfx`, `emitLeanWindVfx`,
   `emitPeekabooVfx`, `emitTraceBrushVfx`) live in Pixi-free
@@ -568,10 +569,14 @@ ios/            Capacitor iOS project (from Milestone 4).
   7-note celebratory RPG arpeggio (C5→D5→E5→G5→A5→C6→E6 over a C4 bass root +
   C7 shimmer, ~0.55 s); and `AudioController.playEffect` adds `"camera-shutter"`
   (dual-transient mechanical click + soft lowpass lens whirr, ~0.12 s). Pure
-  static cue and shell effect recipe tables (`soundCueRecipes`, `effectRecipes`,
-  `soundCueRecipe`, `effectRecipe`, `AudioSegment`, `CompanionAudioEffect`) live
-  in `src/platform/audio-recipes.ts` (Milestone 114) and are re-exported from
-  `src/platform/audio.ts` for backwards-compatible unit verification.
+  static cue recipe tables (`soundCueRecipes`, `soundCueRecipe`, `AudioSegment`,
+  `AudioRecipe`) live in `src/platform/audio-recipes.ts` (Milestone 114), while
+  the 14 shell companion & UI foley recipes (`CompanionAudioEffect`,
+  `effectRecipes`, `effectRecipe`) live in modular `src/platform/audio-effects.ts`
+  (Milestone 172, type-only import of `AudioRecipe` from `./audio-recipes`, zero
+  circular runtime dependency) and are re-exported identically from
+  `src/platform/audio-recipes.ts` and `src/platform/audio.ts` for
+  backwards-compatible unit verification.
 - Tactile storybook UI foley & haptic micro-feedback (Milestone 133,
   `src/platform/audio-recipes.ts`, `src/platform/audio.ts`,
   `src/shell/title-flow.ts`, `src/ui/journal-field-note.ts`,
@@ -3524,7 +3529,11 @@ trunks keep its two exits.
   mint-cream `#dff2cf`, `+N ★` butter-yellow `#ffe896` for `>= 28`, `+N ♥`
   coral-pink `#ffd7e2` for `>= 45` or favourite-treat text), popped wind-up
   bubbles spawn sky-blue `"POP!"` (`#d6eefc`), energy restores spawn peach-mint
-  `+N ⚡` (`#e6f5d5`) over Fae, and live tactical assist transitions spawn
+  `+N ⚡` (`#e6f5d5`) over Fae (and when per-member `Recover` fires at full
+  energy, transitioning `recovered: false -> true` with `next.energy <=
+  prev.energy`, `classifyBattlePopup` spawns `READY! ✦` with `kind: "energy"`
+  over Fae without double-popping when `+1 ⚡` already fired, Milestone 172),
+  and live tactical assist transitions spawn
   WCAG-AAA `#47321f`-ink pills: Flute Friends (`FLUTE! ♪`, `.battle-popup-assist`,
   sky-meadow teal `#c7f0e8`, over Fae), Lasso (`STEADY! ✦`, `.battle-popup-steady`,
   buttercup gold `#ffe484`, over the critter), Lantern Mood Peek (`MOOD PEEK! ✦`,
@@ -3785,7 +3794,14 @@ trunks keep its two exits.
   `"between"`; `"favourite"` / Golden Sunberry: Fae toss lean + bigger critter
   munch bounce + 7 golden/rainbow arcing hearts & sparkles + golden critter
   `softGlow` + 6-heart / 6-sparkle `radialBurst`, collapsing to steady non-
-  bouncing glow/hearts when `reducedMotion` is enabled), live Lean balance
+  bouncing glow/hearts when `reducedMotion` is enabled), per-member `Recover`
+  theater classified by `isRecoverTheater` & applied by `applyRecoverTheater`
+  (Milestone 172: cozy inhale-exhale bob `offsetY: -7 * arc` with subtle
+  squash/stretch on the active recovering character only, a warm clover-meadow
+  `softGlow` `0x9be38a`, and 6 rising clover-green & golden-leaf restorative
+  sparkles `0x9be38a`/`0xc5f0b8`/`0xffe58a` anchored on `"fae"` or `"party"`
+  with `actorId`, collapsing to zero bob and steady upright glow/sparkles under
+  `reducedMotion`), live Lean balance
   tilting, live Catch lane posing with
   caught-toy sparkles, critter burst crouch-and-lunge, 3-tick render-only
   impact hit-stop (`phaseTicks < 4` on `great` / `answered` / `together`

@@ -1,4 +1,4 @@
-import type { Battle } from "../core";
+import type { Battle, BattleView } from "../core";
 import { composePose, idleBreathing, type MotionPose } from "./motion";
 export {
   applyRestFaint,
@@ -70,6 +70,7 @@ export const RAINBOW_HEARTS: readonly number[] = [
 export const SPARKLE_TINTS: readonly number[] = [0xfff099, 0xffe074, 0xd4fcf2, 0xffd2e6];
 export const FIZZ_TINTS: readonly number[] = [0xe6b8ff, 0xffb8d8, 0xd8c4ff];
 export const RELIEF_PETALS: readonly number[] = [0xa8e6cf, 0xfff099, 0xffc8dc, 0xd8b8ff];
+export const RECOVER_SPARKLE_TINTS: readonly number[] = [0x9be38a, 0xc5f0b8, 0xffe58a];
 const SNACK_SPARKLE_TINTS: readonly number[] = [0x9be38a, 0xffe58a];
 const TALK_HEART_TINTS: readonly number[] = [0xffb7cf, 0xffe599, 0xc5e8d5, 0xd8c4ff];
 const FAVOURITE_HEART_TINTS: readonly number[] = [
@@ -92,6 +93,10 @@ export function isTalkTheater(battle: Pick<Battle, "phase" | "talk">): boolean {
     battle.phase !== "soothed" &&
     battle.phase !== "reward"
   );
+}
+
+export function isRecoverTheater(battle: Pick<Battle, "phase" | "command">): boolean {
+  return battle.phase === "result" && battle.command === "recover";
 }
 
 export type SnackTheaterKind = "none" | "snack" | "treat" | "favourite";
@@ -476,6 +481,97 @@ export function applySnackTheater(
     }
   }
   return { fae, critter };
+}
+
+function recoveringActorId(
+  battle: Pick<Battle, "actorIndex">,
+  view: BattleView | null,
+  partyIds: readonly string[],
+): string {
+  if (view !== null) return view.activeActor.id;
+  const roster = ["fae", ...partyIds];
+  const raw = battle.actorIndex ?? 0;
+  const index = ((raw % roster.length) + roster.length) % roster.length;
+  return roster[index] ?? "fae";
+}
+
+export function applyRecoverTheater(
+  battle: Pick<Battle, "actorIndex" | "phaseTicks">,
+  view: BattleView | null,
+  tick: number,
+  partyIds: readonly string[],
+  faeIn: MotionPose,
+  applyParty: (actorId: string | null, delta: MotionPose) => void,
+  vfx: BattleVfxParticle[],
+  reducedMotion = false,
+): MotionPose {
+  let fae = faeIn;
+  const actorId = recoveringActorId(battle, view, partyIds);
+  const target: Pick<BattleVfxParticle, "anchor" | "actorId"> =
+    actorId === "fae" ? { anchor: "fae" } : { anchor: "party", actorId };
+  const u = clamp01(battle.phaseTicks / 24);
+  const arc = Math.sin(u * Math.PI);
+  if (!reducedMotion) {
+    const bob: MotionPose = {
+      offsetX: 0,
+      offsetY: -7 * arc,
+      scaleX: 1 - 0.025 * arc,
+      scaleY: 1 + 0.035 * arc,
+      rotation: 0,
+    };
+    if (actorId === "fae") {
+      fae = composePose(fae, bob);
+    } else {
+      applyParty(actorId, bob);
+    }
+  }
+  const glowPulse = 0.5 + 0.5 * Math.sin(tick * 0.12);
+  vfx.push({
+    texture: "softGlow",
+    blend: "normal",
+    ...target,
+    offsetX: 0,
+    offsetY: -10,
+    scaleX: reducedMotion ? 1.8 : 1.65 + glowPulse * 0.28,
+    scaleY: reducedMotion ? 1.9 : 1.75 + glowPulse * 0.28,
+    rotation: 0,
+    alpha: reducedMotion ? 0.48 : 0.42 + glowPulse * 0.16,
+    tint: 0x9be38a,
+  });
+  for (let i = 0; i < 6; i += 1) {
+    const tint = RECOVER_SPARKLE_TINTS[i % RECOVER_SPARKLE_TINTS.length] ?? 0x9be38a;
+    if (reducedMotion) {
+      vfx.push({
+        texture: "sparkle",
+        blend: "normal",
+        ...target,
+        offsetX: (i - 2.5) * 26,
+        offsetY: -36 - (i % 3) * 20,
+        scaleX: 0.68,
+        scaleY: 0.68,
+        rotation: 0,
+        alpha: 0.88,
+        tint,
+      });
+      continue;
+    }
+    const su = clamp01((battle.phaseTicks + 12 - i * 2) / 42);
+    if (su <= 0 || su >= 1) continue;
+    const scale = (0.62 + (i % 3) * 0.12) * (0.76 + Math.sin(su * Math.PI) * 0.34);
+    vfx.push({
+      texture: "sparkle",
+      blend: "normal",
+      ...target,
+      offsetX: (i - 2.5) * 27 + Math.sin(su * Math.PI * 2 + i) * 9,
+      offsetY: 22 - su * 145 - (i % 2) * 18,
+      scaleX: scale,
+      scaleY: scale,
+      rotation: su * 1.5 + i * 0.5,
+      alpha: 0.96 * Math.sin(su * Math.PI),
+      tint,
+    });
+  }
+  return fae;
 }
 
 export function applyTogetherReady(

@@ -7335,6 +7335,51 @@ the old trail, the owl, and the clubhouse claim.
   purity, lint), `just build` (`< 400 kB` every non-vendor chunk), 35/35
   targeted Chromium & WebKit e2e, and 99/99 Chromium `ui-gallery` tests.
 
+## Milestone 172: Per-Member Battle Recover Theater VFX & Popup, Modular `audio-effects.ts` Extraction & Phone Touch QA Overlay-Hide E2E Guard **Status:** ✅ Completed (2026-11-27)
+- Adds dedicated per-member battle `Recover` stage theater VFX & full-energy
+  die-cut popup feedback, extracts the 14 shell companion & UI foley recipes
+  into modular `src/platform/audio-effects.ts`, and adds an end-to-end phone
+  touch QA trigger overlay-hide guard — zero `src/core` changes and zero replay
+  hash shifts across all 74 recorded sims.
+- Per-member Battle `Recover` theater (`src/render/battle-vfx.ts`,
+  `src/render/battle-choreography.ts`, `src/ui/battle-popups.ts`,
+  `src/shell/view-models.ts`):
+  - Added pure `isRecoverTheater` & `applyRecoverTheater` (re-exported via
+    `src/render/battle-choreography.ts`): applies a cozy refreshed inhale-exhale
+    bob (`offsetY: -7 * arc`, subtle squash/stretch) solely to the active
+    recovering member (`fae` or party member via `applyParty`), anchors a warm
+    clover-meadow `softGlow` (`0x9be38a`) and 6 rising clover-green &
+    golden-leaf restorative sparkles (`0x9be38a`, `0xc5f0b8`, `0xffe58a`)
+    directly on `"fae"` or `"party"` (`actorId`), and collapses to zero bob with
+    steady upright glow & sparkles under `reducedMotion`.
+  - Added `recovered?: boolean` to `BattlePopupSnapshot` (populated in
+    `buildBattleHudView` when `phase === "result" && command === "recover"`);
+    `classifyBattlePopup` spawns `{ kind: "energy", text: "READY! ✦", side:
+    "fae" }` when Recover runs at full energy (`next.energy <= prev.energy`)
+    without double-popping when `+1 ⚡` already fired.
+- Modular `src/platform/audio-effects.ts` extraction (`src/platform/audio-effects.ts`,
+  `src/platform/audio-recipes.ts`):
+  - Extracted `CompanionAudioEffect`, `effectRecipes`, and `effectRecipe` (all
+    14 handcrafted companion & UI foley recipes, `< 220` lines, type-only import
+    of `AudioRecipe` from `./audio-recipes`, zero circular runtime dependency)
+    and re-exported identically from `src/platform/audio-recipes.ts` (`< 740`
+    lines).
+- Phone touch QA overlay-hide e2e guard (`tests/e2e/qa.spec.ts`):
+  - Added `874x402`, `?touch=1` Playwright guard verifying `.qa-touch-trigger`
+    hides over Journal (`data-journal="open"`), Photo Mode (`data-photo="on"`),
+    and Battle (`data-battle="open"`), and reappears cleanly in free overworld
+    play.
+- Evidence: `tests/unit/milestone-172.test.ts` (5 tests),
+  `tests/e2e/milestone-172.spec.ts` (`@smoke`, Chromium & WebKit), updated
+  `tests/e2e/qa.spec.ts`, and review capture
+  `art/review/m172-recover-theater.jpg` verified with `vision`.
+- Gates: `just check` (239 unit files / 1,738 tests, all 74 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (production
+  `index` chunk `332 kB` `< 500 kB`, hook leak + harness checks green),
+  and Chromium + WebKit verification of `milestone-172.spec.ts`, `qa.spec.ts`
+  overlay guard, `party.spec.ts`, `sue.spec.ts`, and `east-road.spec.ts`
+  (`0` snapshot diffs).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

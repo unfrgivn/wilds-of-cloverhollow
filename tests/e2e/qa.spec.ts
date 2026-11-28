@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
-import { openHarness, readState, resetPaused, step } from "./helpers";
+import { openHarness, readBattle, readState, resetPaused, step } from "./helpers";
 
 // Picks a QA pack from the paused title and freezes the game at a
 // deterministic tick, so screenshots over the console hold still.
@@ -553,5 +553,82 @@ test(
     await expect(page.locator(".qa-badge")).toBeHidden();
     expect(await page.evaluate(() => window.__cloverhollow?.qa.active())).toBe(false);
     expect((await readState(page)).coins).toBe(0);
+  },
+);
+
+test(
+  "phone touch QA trigger hides over Journal, Photo Mode, and Battle, then reappears",
+  async ({ browser }) => {
+    const context = await browser.newContext({
+      viewport: { width: 874, height: 402 },
+      hasTouch: true,
+    });
+    const page = await context.newPage();
+    await page.goto("./?touch=1");
+    await page.waitForFunction(() => Boolean(window.__cloverhollow));
+    await resetPaused(page, "plaza");
+
+    const html = page.locator("html");
+    const trigger = page.locator(".qa-touch-trigger");
+    await expect(trigger).toBeVisible();
+
+    // 1. Journal open hides .qa-touch-trigger; closing restores it.
+    await page.locator(".touch-menu").click();
+    await step(page, 1);
+    await expect(html).toHaveAttribute("data-journal", "open");
+    await expect(trigger).toBeHidden();
+    await page.locator(".journal-close").click();
+    await step(page, 1);
+    await expect(html).not.toHaveAttribute("data-journal", "open");
+    await expect(trigger).toBeVisible();
+
+    // 2. Photo Mode hides .qa-touch-trigger; exiting restores it.
+    await page.keyboard.press("p");
+    await step(page, 1);
+    await expect(html).toHaveAttribute("data-photo", "on");
+    await expect(trigger).toBeHidden();
+    await page.keyboard.press("Escape");
+    await step(page, 1);
+    await expect(html).not.toHaveAttribute("data-photo", "on");
+    await expect(trigger).toBeVisible();
+
+    // 3. Battle hides .qa-touch-trigger; running back to overworld restores it.
+    for (const [key, ticks] of [
+      ["ArrowDown", 25],
+      ["ArrowLeft", 15],
+      ["ArrowDown", 50],
+      ["ArrowLeft", 35],
+    ] as const) {
+      await page.keyboard.down(key);
+      await step(page, ticks);
+      await page.keyboard.up(key);
+    }
+    await expect(html).toHaveAttribute("data-battle", "open");
+    await expect(trigger).toBeHidden();
+
+    // Advance intro into command phase, pick Run, and finish the run message.
+    const tap = async (selector: string): Promise<void> => {
+      const bounds = await page.locator(selector).boundingBox();
+      if (bounds === null) throw new Error(`${selector} is not visible`);
+      await page.touchscreen.tap(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
+      await step(page, 2);
+    };
+    for (let guard = 0; guard < 16; guard += 1) {
+      const battle = await readBattle(page);
+      if (battle?.phase === "command" && battle.revealed >= battle.message.length) break;
+      await tap(".touch-confirm");
+    }
+    expect((await readBattle(page))?.phase).toBe("command");
+    await expect(trigger).toBeHidden();
+
+    await tap(".battle-command:has-text('Run')");
+    expect((await readBattle(page))?.phase).toBe("run");
+    for (let guard = 0; guard < 8 && (await readBattle(page)) !== null; guard += 1) {
+      await tap(".touch-confirm");
+    }
+    expect(await readBattle(page)).toBeNull();
+    await expect(html).not.toHaveAttribute("data-battle", "open");
+    await expect(trigger).toBeVisible();
+    await context.close();
   },
 );

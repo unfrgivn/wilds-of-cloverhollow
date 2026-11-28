@@ -1,6 +1,7 @@
 import { peekabooStatus, type Battle, type BattleView } from "../core";
 import { composePose, idleBreathing, NEUTRAL_POSE, type MotionPose } from "./motion";
 import {
+  applyRecoverTheater,
   applyRestFaint,
   applySnackTheater,
   applySoothedAndReward,
@@ -20,6 +21,7 @@ import {
   emitTraceBrushVfx,
   FIZZ_TINTS,
   isLassoActionActive,
+  isRecoverTheater,
   isTalkTheater,
   LASSO_ARC_DURATION,
   LEAN_WIND_TINTS,
@@ -29,6 +31,7 @@ import {
   radialBurst,
   RAINBOW_HEARTS,
   RAINBOW_LASSO_COLORS,
+  RECOVER_SPARKLE_TINTS,
   RELIEF_PETALS,
   SOOTHED_CONFETTI_COLORS,
   SPARKLE_TINTS,
@@ -57,6 +60,7 @@ export {
   emitTraceBrushVfx,
   FIZZ_TINTS,
   isLassoActionActive,
+  isRecoverTheater,
   isTalkTheater,
   LASSO_ARC_DURATION,
   LEAN_WIND_TINTS,
@@ -66,6 +70,7 @@ export {
   radialBurst,
   RAINBOW_HEARTS,
   RAINBOW_LASSO_COLORS,
+  RECOVER_SPARKLE_TINTS,
   RELIEF_PETALS,
   SOOTHED_CONFETTI_COLORS,
   SPARKLE_TINTS,
@@ -414,6 +419,13 @@ export function computeBattleChoreography(
     );
     fae = shared.fae;
     critter = shared.critter;
+  }
+
+  // 6b. Per-member Recover theater: cozy inhale-exhale bob + clover-meadow glow & sparkles.
+  if (isRecoverTheater(battle)) {
+    fae = applyRecoverTheater(
+      battle, view, tick, partyIds, fae, applyParty, vfx, reducedMotion,
+    );
   }
 
   // 7. Fae lean: tilt live with balance + wind-braced squash + sweeping wind-gust ribbons.

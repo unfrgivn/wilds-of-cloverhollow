@@ -1,14 +1,6 @@
-import {
-  Assets,
-  Container,
-  Graphics,
-  Sprite,
-  Spritesheet,
-  type Texture,
-} from "pixi.js";
+import { Container, Graphics, Sprite, type Texture } from "pixi.js";
 import {
   effectiveAreaNpcs,
-  hasPlushPedestals,
   npcLivePoint,
   npcVisible,
   presentCritters,
@@ -19,16 +11,11 @@ import {
   type State,
   type World,
 } from "../core";
-import { makeShadowSprite } from "./battle-view";
 import { interpolatePoint } from "./camera";
 import {
-  evaluateBedroomDisplay,
-  evaluateClubhouseDecor,
-  evaluateClubhouseDisplay,
-  evaluateSunberryMotes,
-  type ClubhouseDecorVisuals,
-  type RoomDisplayPlacement,
-} from "./clubhouse-display";
+  CLUBHOUSE_PRIZES_ALIAS,
+  ClubhouseDisplayRenderer,
+} from "./clubhouse-display-render";
 import type { RestSpot } from "./companions";
 import { evaluateOverworldEmotes } from "./emotes";
 import {
@@ -60,6 +47,8 @@ import type { VfxTextures } from "./vfx-textures";
 
 export {
   classifyFootstepEffect,
+  CLUBHOUSE_PRIZES_ALIAS,
+  ClubhouseDisplayRenderer,
   computeGrassTuftSway,
   FOOTSTEP_POOL_SIZE,
   FOOTSTEP_VFX_STYLES,
@@ -73,7 +62,6 @@ export {
   type GrassTuftPlacement,
 };
 
-export const CLUBHOUSE_PRIZES_ALIAS = "clubhouse-prizes";
 const EMOTE_POOL_SIZE = 24;
 
 type EmoteSpriteItem = {
@@ -96,45 +84,26 @@ export type ViewportRect = {
 
 /**
  * Owns pooled overworld visual effects: living ground reactivity (delegated to
- * `GroundReactivityController`), blacklight lantern motes, prismatic Star Gem
- * glints, Clubhouse Living Display perches, overworld emotes, and time-of-day
- * grading.
+ * `GroundReactivityController`), Clubhouse & Bedroom displays (delegated to
+ * `ClubhouseDisplayRenderer`), blacklight lantern motes, prismatic Star Gem
+ * glints, overworld emotes, and time-of-day grading.
  */
 export class OverworldEffectsController {
   readonly grassLayer: Container;
   readonly footstepLayer: Container;
-  readonly clubhouseRugLayer = new Container();
-  readonly clubhouseBannerLayer = new Container();
+  readonly clubhouseRugLayer: Container;
+  readonly clubhouseBannerLayer: Container;
   readonly lanternMoteLayer = new Container();
   readonly emoteLayer = new Container();
   readonly timeOfDayLayer = new Container();
 
   private readonly ground: GroundReactivityController;
+  private readonly clubhouseDisplay: ClubhouseDisplayRenderer;
   private readonly lanternMotes: Sprite[] = [];
 
   private readonly starGemLayer = new Container();
   private readonly starGemPool: { halo: Sprite; star: Sprite }[] = [];
   private activeStarGemGlints = 0;
-
-  private readonly clubhouseRugGraphics = new Graphics();
-  private readonly clubhouseBannerGraphics = new Graphics();
-  private readonly clubhouseFairyBulbs: Sprite[] = [];
-  private clubhouseDecorSwatch = "";
-  private readonly clubhousePrizePool: {
-    container: Container;
-    shadow: Sprite;
-    pedestal: Graphics;
-    item: Sprite;
-  }[] = [];
-  private readonly clubhouseKeepsakePool: {
-    container: Container;
-    shadow: Sprite;
-    glow: Sprite;
-    item: Sprite;
-    sparkle: Sprite;
-  }[] = [];
-  private readonly clubhouseSunberryPool: Sprite[] = [];
-  private activeClubhouseDisplay = 0;
 
   private readonly emoteSprites: Sprite[] = [];
   private activeDialoguePartner: {
@@ -160,29 +129,16 @@ export class OverworldEffectsController {
   constructor(
     private readonly world: World,
     private readonly vfx: VfxTextures,
-    private readonly depthLayer: Container,
+    depthLayer: Container,
     emissiveLayer: Container,
   ) {
     this.ground = new GroundReactivityController(this.world, this.vfx);
     this.grassLayer = this.ground.grassLayer;
     this.footstepLayer = this.ground.footstepLayer;
 
-    this.clubhouseRugLayer.label = "clubhouse:rug";
-    this.clubhouseRugLayer.visible = false;
-    this.clubhouseRugLayer.addChild(this.clubhouseRugGraphics);
-
-    this.clubhouseBannerLayer.label = "clubhouse:decor-banners";
-    this.clubhouseBannerLayer.visible = false;
-    this.clubhouseBannerLayer.addChild(this.clubhouseBannerGraphics);
-    for (let i = 0; i < 12; i += 1) {
-      const bulb = new Sprite(this.vfx.softGlow);
-      bulb.label = `clubhouse:fairy-bulb:${i}`;
-      bulb.anchor.set(0.5);
-      bulb.blendMode = "add";
-      bulb.visible = false;
-      this.clubhouseFairyBulbs.push(bulb);
-      this.clubhouseBannerLayer.addChild(bulb);
-    }
+    this.clubhouseDisplay = new ClubhouseDisplayRenderer(this.world, this.vfx, depthLayer);
+    this.clubhouseRugLayer = this.clubhouseDisplay.rugLayer;
+    this.clubhouseBannerLayer = this.clubhouseDisplay.bannerLayer;
 
     this.lanternMoteLayer.label = "lantern:motes";
     for (let i = 0; i < LANTERN_MOTE_COUNT; i += 1) {
@@ -234,7 +190,7 @@ export class OverworldEffectsController {
   }
 
   get clubhouseDisplayCount(): number {
-    return this.activeClubhouseDisplay;
+    return this.clubhouseDisplay.displayCount;
   }
 
   clearFootsteps(): void {
@@ -261,16 +217,7 @@ export class OverworldEffectsController {
   }
 
   hideClubhouseDisplay(): void {
-    for (const entry of this.clubhousePrizePool) {
-      entry.container.visible = false;
-      entry.pedestal.visible = false;
-    }
-    for (const entry of this.clubhouseKeepsakePool) entry.container.visible = false;
-    for (const mote of this.clubhouseSunberryPool) mote.visible = false;
-    this.clubhouseRugLayer.visible = false;
-    this.clubhouseBannerLayer.visible = false;
-    for (const bulb of this.clubhouseFairyBulbs) bulb.visible = false;
-    this.activeClubhouseDisplay = 0;
+    this.clubhouseDisplay.hide();
   }
 
   invalidateTimeOfDay(): void {
@@ -359,287 +306,8 @@ export class OverworldEffectsController {
     this.activeStarGemGlints = glints.length;
   }
 
-  private renderPrizePlacements(
-    placements: readonly RoomDisplayPlacement[],
-    labelPrefix: "clubhouse" | "bedroom",
-  ): number {
-    const prizeSheet = Assets.get<Spritesheet | undefined>(CLUBHOUSE_PRIZES_ALIAS);
-    let prizeShown = 0;
-    for (const placement of placements) {
-      const texture = prizeSheet?.textures[placement.frame];
-      if (texture === undefined) continue;
-      let entry = this.clubhousePrizePool[prizeShown];
-      if (entry === undefined) {
-        const container = new Container();
-        const shadow = makeShadowSprite(this.vfx.contactShadow, `shadow:prize:${prizeShown}`);
-        const pedestal = new Graphics();
-        pedestal.label = `pedestal:prize:${prizeShown}`;
-        pedestal
-          .ellipse(0, -0.5, 16.5, 5.8)
-          .fill({ color: 0xd9a84e, alpha: 0.85 })
-          .stroke({ width: 1.1, color: 0x47321f, alpha: 0.65 })
-          .ellipse(0, -1.8, 13.5, 4.4)
-          .fill({ color: 0x994968, alpha: 0.86 })
-          .ellipse(-2.5, -2.8, 6.5, 1.9)
-          .fill({ color: 0xc97b9b, alpha: 0.45 });
-        pedestal.visible = false;
-        const item = new Sprite();
-        container.addChild(shadow, pedestal, item);
-        this.depthLayer.addChild(container);
-        entry = { container, shadow, pedestal, item };
-        this.clubhousePrizePool.push(entry);
-      }
-      entry.container.visible = true;
-      entry.container.label = `${labelPrefix}:prize:${placement.id}`;
-      entry.container.position.set(placement.x, placement.y);
-      entry.container.zIndex = placement.zIndex;
-
-      entry.shadow.position.set(0, -1);
-      entry.shadow.width = 48 * (placement.scale / 0.3);
-      entry.shadow.height = 16 * (placement.scale / 0.3);
-      entry.shadow.alpha = 0.24;
-
-      entry.pedestal.visible = placement.pedestal;
-      if (placement.pedestal) {
-        const pedScale = placement.scale / 0.24;
-        entry.pedestal.scale.set(pedScale);
-      }
-
-      entry.item.texture = texture;
-      if (texture.defaultAnchor !== undefined) {
-        entry.item.anchor.copyFrom(texture.defaultAnchor);
-      } else {
-        entry.item.anchor.set(0.5, 0.9375);
-      }
-      entry.item.position.set(0, placement.pedestal ? -3 : 0);
-      entry.item.scale.set(placement.scale);
-      entry.item.rotation = placement.rotation;
-      prizeShown += 1;
-    }
-    for (let i = prizeShown; i < this.clubhousePrizePool.length; i += 1) {
-      const entry = this.clubhousePrizePool[i];
-      if (entry !== undefined) {
-        entry.container.visible = false;
-        entry.pedestal.visible = false;
-      }
-    }
-    return prizeShown;
-  }
-
-  private drawClubhouseDecorGraphics(decor: NonNullable<ClubhouseDecorVisuals>): void {
-    const { rug, pennants, ropeSegments } = decor;
-    const rg = this.clubhouseRugGraphics;
-    rg.clear();
-    const shadowPoly = rug.outerPoly.map(([x, y]) => ({ x, y: y + 3 }));
-    const outerPts = rug.outerPoly.map(([x, y]) => ({ x, y }));
-    const innerPts = rug.innerPoly.map(([x, y]) => ({ x, y }));
-    rg.poly(shadowPoly, true).fill({ color: 0x47321f, alpha: 0.14 });
-    rg.poly(outerPts, true)
-      .fill({ color: rug.borderTint, alpha: 0.78 })
-      .stroke({ width: 1.5, color: 0x47321f, alpha: 0.48 });
-    rg.poly(innerPts, true)
-      .fill({ color: rug.fillTint, alpha: 0.76 })
-      .stroke({ width: 1.4, color: 0xfff8e6, alpha: 0.55 });
-    for (const [x0, y0, x1, y1] of rug.tasselPoints) {
-      rg.moveTo(x0, y0).lineTo(x1, y1).stroke({
-        width: 2, color: 0xf7ebd2, alpha: 0.78, cap: "round",
-      });
-    }
-    const [cx, cy] = rug.center;
-    if (rug.motifStyle === "meadow") {
-      for (let i = 0; i < 6; i += 1) {
-        const a = (i / 6) * Math.PI * 2;
-        rg.ellipse(cx + Math.cos(a) * 11, cy + Math.sin(a) * 5.5, 5.2, 3)
-          .fill({ color: 0xfff9d4, alpha: 0.92 });
-      }
-      rg.ellipse(cx, cy, 6.5, 3.6).fill({ color: rug.accentTint, alpha: 0.96 });
-    } else if (rug.motifStyle === "starlight") {
-      rg.poly([
-        cx, cy - 11, cx + 6, cy - 2, cx + 22, cy, cx + 6, cy + 2,
-        cx, cy + 11, cx - 6, cy + 2, cx - 22, cy, cx - 6, cy - 2,
-      ], true).fill({ color: rug.accentTint, alpha: 0.92 });
-      rg.circle(cx - 28, cy + 6, 2.2).fill({ color: 0xfff4d6, alpha: 0.85 });
-      rg.circle(cx + 28, cy - 6, 2.2).fill({ color: 0xfff4d6, alpha: 0.85 });
-    } else if (rug.motifStyle === "beach") {
-      for (const offset of [-10, 10]) {
-        rg.moveTo(cx - 32, cy + offset + 12)
-          .lineTo(cx, cy + offset)
-          .lineTo(cx + 32, cy + offset - 12)
-          .stroke({ width: 3, color: 0xfff1e6, alpha: 0.82, cap: "round" });
-      }
-      rg.ellipse(cx, cy, 12, 6).fill({ color: rug.accentTint, alpha: 0.88 });
-    } else {
-      rg.moveTo(cx - 34, cy + 17).lineTo(cx + 34, cy - 17)
-        .stroke({ width: 5, color: rug.borderTint, alpha: 0.42 });
-      rg.moveTo(cx - 24, cy - 12).lineTo(cx + 24, cy + 12)
-        .stroke({ width: 5, color: rug.accentTint, alpha: 0.56 });
-      rg.poly([cx, cy - 8, cx + 16, cy, cx, cy + 8, cx - 16, cy], true)
-        .fill({ color: 0xffdfb5, alpha: 0.85 });
-    }
-
-    const bg = this.clubhouseBannerGraphics;
-    bg.clear();
-    for (const seg of ropeSegments) {
-      bg.moveTo(seg.x0, seg.y0).lineTo(seg.x1, seg.y1).stroke({
-        width: 2, color: 0x6b4c35, alpha: 0.85, cap: "round",
-      });
-    }
-    for (const flag of pennants) {
-      bg.poly([
-        flag.baseA[0], flag.baseA[1],
-        flag.baseB[0], flag.baseB[1],
-        flag.tip[0], flag.tip[1],
-      ], true)
-        .fill({ color: flag.tint, alpha: 0.92 })
-        .stroke({ width: 1.5, color: 0x47321f, alpha: 0.72 });
-      const mx = (flag.baseA[0] + flag.baseB[0] + flag.tip[0]) / 3;
-      const my = (flag.baseA[1] + flag.baseB[1] + flag.tip[1]) / 3;
-      bg.circle(mx, my, 1.8).fill({ color: 0xfffaf0, alpha: 0.78 });
-    }
-  }
-
-  private renderClubhouseDecor(state: State, reducedMotion: boolean): void {
-    const decor = evaluateClubhouseDecor(state, reducedMotion);
-    if (decor === null) {
-      this.clubhouseRugLayer.visible = false;
-      this.clubhouseBannerLayer.visible = false;
-      for (const bulb of this.clubhouseFairyBulbs) bulb.visible = false;
-      return;
-    }
-    if (this.clubhouseDecorSwatch !== decor.swatch) {
-      this.clubhouseDecorSwatch = decor.swatch;
-      this.drawClubhouseDecorGraphics(decor);
-    }
-    this.clubhouseRugLayer.visible = true;
-    this.clubhouseBannerLayer.visible = true;
-    for (let i = 0; i < this.clubhouseFairyBulbs.length; i += 1) {
-      const sprite = this.clubhouseFairyBulbs[i];
-      const spec = decor.fairyBulbs[i];
-      if (sprite === undefined) continue;
-      if (spec === undefined) {
-        sprite.visible = false;
-        continue;
-      }
-      sprite.visible = true;
-      sprite.position.set(spec.x, spec.y);
-      sprite.tint = spec.tint;
-      sprite.scale.set(spec.scale);
-      sprite.alpha = spec.alpha;
-    }
-  }
-
   renderClubhouseDisplay(state: State, area: Area, reducedMotion: boolean): void {
-    const roomVisible =
-      (area.id === "clubhouse" || area.id === "bedroom") &&
-      state.battle === null &&
-      state.arcade === null;
-    if (!roomVisible) {
-      this.hideClubhouseDisplay();
-      return;
-    }
-
-    if (area.id === "bedroom") {
-      this.clubhouseRugLayer.visible = false;
-      this.clubhouseBannerLayer.visible = false;
-      for (const bulb of this.clubhouseFairyBulbs) bulb.visible = false;
-      for (const entry of this.clubhouseKeepsakePool) entry.container.visible = false;
-      for (const mote of this.clubhouseSunberryPool) mote.visible = false;
-      const placements = evaluateBedroomDisplay(this.world, state);
-      this.activeClubhouseDisplay = this.renderPrizePlacements(placements, "bedroom");
-      return;
-    }
-
-    const display = evaluateClubhouseDisplay(this.world, state);
-    const pedestal = hasPlushPedestals(state);
-    const prizeShown = this.renderPrizePlacements(
-      display.prizes.map((placement) => ({ ...placement, pedestal })),
-      "clubhouse",
-    );
-    this.renderClubhouseDecor(state, reducedMotion);
-
-    let keepsakeShown = 0;
-    for (const placement of display.keepsakes) {
-      let entry = this.clubhouseKeepsakePool[keepsakeShown];
-      if (entry === undefined) {
-        const container = new Container();
-        const shadow = makeShadowSprite(
-          this.vfx.contactShadow,
-          `shadow:keepsake:${keepsakeShown}`,
-        );
-        const glow = new Sprite(this.vfx.softGlow);
-        glow.anchor.set(0.5);
-        glow.blendMode = "add";
-        const item = new Sprite();
-        item.anchor.set(0.5, 0.85);
-        const sparkle = new Sprite(this.vfx.sparkle);
-        sparkle.anchor.set(0.5);
-        sparkle.blendMode = "normal";
-        container.addChild(shadow, glow, item, sparkle);
-        this.depthLayer.addChild(container);
-        entry = { container, shadow, glow, item, sparkle };
-        this.clubhouseKeepsakePool.push(entry);
-      }
-      const phase = state.tick * 0.055 + keepsakeShown * 1.4;
-      const pulse = reducedMotion ? 0.5 : 0.5 + 0.5 * Math.sin(phase);
-      entry.container.visible = true;
-      entry.container.label = `clubhouse:keepsake:${placement.id}`;
-      entry.container.position.set(placement.x, placement.y);
-      entry.container.zIndex = placement.zIndex;
-
-      entry.shadow.position.set(0, -1);
-      entry.shadow.width = 26 * placement.scale;
-      entry.shadow.height = 10 * placement.scale;
-      entry.shadow.alpha = 0.22;
-
-      entry.glow.position.set(0, -14 * placement.scale);
-      entry.glow.tint = placement.sparkleTint;
-      entry.glow.scale.set(0.42 * placement.scale * (0.94 + 0.12 * pulse));
-      entry.glow.alpha = 0.18 + 0.1 * pulse;
-
-      entry.item.texture = this.vfx[placement.texture];
-      entry.item.scale.set(placement.scale);
-      entry.item.position.set(0, 0);
-
-      entry.sparkle.position.set(
-        10 * placement.scale + (reducedMotion ? 0 : Math.sin(phase * 0.9) * 3),
-        -24 * placement.scale + (reducedMotion ? 0 : Math.cos(phase * 1.1) * 2.5),
-      );
-      entry.sparkle.tint = placement.sparkleTint;
-      entry.sparkle.scale.set(0.32 + 0.16 * pulse);
-      entry.sparkle.alpha = 0.55 + 0.4 * pulse;
-      keepsakeShown += 1;
-    }
-    for (let i = keepsakeShown; i < this.clubhouseKeepsakePool.length; i += 1) {
-      const entry = this.clubhouseKeepsakePool[i];
-      if (entry !== undefined) entry.container.visible = false;
-    }
-
-    const sunberryMotes = evaluateSunberryMotes(this.world, state, reducedMotion);
-    for (let i = 0; i < sunberryMotes.length; i += 1) {
-      const mote = sunberryMotes[i];
-      if (mote === undefined) continue;
-      let sprite = this.clubhouseSunberryPool[i];
-      if (sprite === undefined) {
-        sprite = new Sprite(this.vfx.sparkle);
-        sprite.anchor.set(0.5);
-        sprite.blendMode = "add";
-        sprite.label = `clubhouse:sunberry:${i}`;
-        this.depthLayer.addChild(sprite);
-        this.clubhouseSunberryPool.push(sprite);
-      }
-      sprite.visible = true;
-      sprite.position.set(mote.x, mote.y);
-      sprite.zIndex = mote.zIndex;
-      sprite.scale.set(mote.scale);
-      sprite.alpha = mote.alpha;
-      sprite.tint = mote.tint;
-    }
-    for (let i = sunberryMotes.length; i < this.clubhouseSunberryPool.length; i += 1) {
-      const sprite = this.clubhouseSunberryPool[i];
-      if (sprite !== undefined) sprite.visible = false;
-    }
-
-    this.activeClubhouseDisplay = prizeShown + keepsakeShown;
+    this.clubhouseDisplay.render(state, area, reducedMotion);
   }
 
   renderEmotes(

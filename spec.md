@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 197)
+Last updated: 2026-11-28 (Milestone 198)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -85,7 +85,7 @@ reference material only.
   `world-content` (`includeDependenciesRecursively: false`, priority 15), and
   `index`/`game` app chunks, keeping every non-vendor production JS chunk under
   350 kB and enforced under 500 kB by `tools/check-dist.ts` via `just build`,
-  Milestones 154, 177 & 195), Bun (package
+  Milestones 154, 177 & 197), Bun (package
   manager and script runner), Node 24 LTS for Node-based tools (`.nvmrc`),
   `just` for tasks. Compiled Ink story JSON lives out of the static JS bundle as
   a runtime-fetched asset at `public/assets/story/main.ink.json` (fetched via
@@ -193,7 +193,15 @@ ios/            Capacitor iOS project (from Milestone 4).
   `src/ui/npc-chatter.css`, `.save-toast` in `src/ui/save-toast.css` and
   `src/ui/sticker.css`, `.hud-hints` in `src/ui/hud-hints.css` and
   `src/ui/sticker.css`, plus `.sticker-prompt` and `.notice-marks` in
-  `src/ui/sticker.css`, Milestone 190).
+  `src/ui/sticker.css`, Milestone 190). Milestone 198 (Track E19A) extends this
+  universal overlay-suppression contract to `html[data-shrine="open"]`,
+  `html[data-decor="open"]`, and `html[data-flute-wheel="open"]` (synced every
+  render via `syncOpenFlag` in `src/shell/shell-bindings.ts` and `src/main.ts`)
+  across `qa.css`, `npc-chatter.css`, `hud-hints.css`, `save-toast.css`, and
+  `sticker.css`, enforces 100% `-webkit-touch-callout: none` parity across every
+  stylesheet in `src/ui/*.css`, and guarantees `min-height: 44px` on
+  `.decor-close-btn`, `.decor-btn`, and `.decor-prize-pill` under
+  `:root[data-touch="on"]` in `src/ui/decor-picker.css`.
 - Battle stage mood washes, Flute Friend on-stage cameo poses, and battle VFX
   anchor resolution live in `src/render/battle-stage.ts` (Milestone 91), while
   pure battle VFX particle/theater builders (`applyTogetherReady`,
@@ -2373,8 +2381,11 @@ ios/            Capacitor iOS project (from Milestone 4).
       `clubhouse-prizes` for `bedroom` as well as `clubhouse` in
       `src/render/view-loader.ts`) and paint the active Clubhouse swatch's
       isometric watercolor floor rug, upper back-wall pennant garlands, and
-      12 pulsing fairy-light glow halos in `OverworldEffectsController` (drawing
-      nothing extra on `classic` so uncustomized baselines stay pixel-identical).
+      12 pulsing fairy-light glow halos via modular `ClubhouseDisplayRenderer`
+      (`src/render/clubhouse-display-render.ts`, composed inside
+      `OverworldEffectsController` in `src/render/overworld-effects.ts`,
+      Milestone 198; drawing nothing extra on `classic` so uncustomized
+      baselines stay pixel-identical).
     - Interactive hand-drawn storybook Decor Picker (`src/ui/decor-picker.ts`,
       `src/ui/decor-picker.css`) opens in `clubhouse` or `bedroom` via `KeyB`
       or diegetic `# open-decor: clubhouse|bedroom` dialogue events emitted by

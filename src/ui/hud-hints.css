@@ -5,7 +5,10 @@
 
 :root[data-touch="on"] .hud-hints,
 :root[data-touch="on"] .hud-battle-hint,
-:root[data-cutscene="open"] .hud-hints {
+:root[data-cutscene="open"] .hud-hints,
+:root[data-shrine="open"] .hud-hints,
+:root[data-decor="open"] .hud-hints,
+:root[data-flute-wheel="open"] .hud-hints {
   display: none;
 }
 
@@ -27,6 +30,8 @@
   font-family: var(--sticker-font);
   pointer-events: none;
   user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .hud-hint[hidden] {
@@ -106,4 +111,6 @@
   pointer-events: auto;
   cursor: pointer;
   user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }

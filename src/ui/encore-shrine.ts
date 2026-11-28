@@ -156,6 +156,7 @@ export function createEncoreShrine(parent: HTMLElement): EncoreShrineOverlay {
   let openState = false;
   let currentParams: EncoreShrineRenderParams | null = null;
   let selectedId = "";
+  let lastRenderKey = "";
   const activeModifiers = new Set<EncoreModifierId>();
   let launchHandler: ((bossId: string, modifiers: EncoreModifierId[]) => void) | null = null;
   let closeHandler: (() => void) | null = null;
@@ -180,6 +181,20 @@ export function createEncoreShrine(parent: HTMLElement): EncoreShrineOverlay {
     if (currentParams === null) return;
     const { view, stickerArt } = currentParams;
     selectedId = pickDefaultBoss(view);
+    const key = [
+      selectedId,
+      orderedModifiers().join(","),
+      view.trophiesEarned,
+      view.starsEarned,
+      ...view.bosses.map(
+        (b) =>
+          `${b.critterId}:${b.unlocked ? 1 : 0}:${b.stars}:${b.trophyEarned ? 1 : 0}:` +
+          `${b.clears}:${b.modifiersCleared.join(".")}:` +
+          `${b.unlocked ? (stickerArt(b.critterId, b.stickerFrame)?.src ?? "") : ""}`,
+      ),
+    ].join("|");
+    if (key === lastRenderKey) return;
+    lastRenderKey = key;
     setText(trophyPill, `Trophies ${view.trophiesEarned}/${view.trophiesTotal}`);
     setAttribute(trophyPill, "data-encore-trophies", String(view.trophiesEarned));
     setText(starsPill, `★ ${view.starsEarned}/${view.starsTotal}`);
@@ -351,6 +366,7 @@ export function createEncoreShrine(parent: HTMLElement): EncoreShrineOverlay {
   const close = (): void => {
     if (!openState) return;
     openState = false;
+    lastRenderKey = "";
     root.hidden = true;
     delete document.documentElement.dataset.encoreShrine;
     closeHandler?.();
@@ -359,6 +375,7 @@ export function createEncoreShrine(parent: HTMLElement): EncoreShrineOverlay {
   const open = (params: EncoreShrineRenderParams): void => {
     currentParams = params;
     openState = true;
+    lastRenderKey = "";
     root.hidden = false;
     document.documentElement.dataset.encoreShrine = "open";
     renderAll();

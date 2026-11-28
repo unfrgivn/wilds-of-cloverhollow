@@ -26,6 +26,8 @@
   text-align: center;
   pointer-events: none;
   user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   transform: translate(-50%, var(--area-banner-y, 0px));
   will-change: transform, opacity;
 }

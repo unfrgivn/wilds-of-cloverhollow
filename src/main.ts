@@ -522,7 +522,8 @@ async function boot(): Promise<void> {
     }
     if (fluteButton !== null) fluteButton.hidden = !hasFlute;
     if (lassoButton !== null) lassoButton.hidden = !hasLasso;
-    fluteWheel.render(buildFluteWheelView(content.world, state));
+    const fluteWheelView = buildFluteWheelView(content.world, state);
+    fluteWheel.render(fluteWheelView);
     const touchActive = document.documentElement.dataset.touch === "on";
     const hasLevelUpNotice = levelUpNotices.length > 0;
     const overworldFree = isOverworldFree(gate, hasLevelUpNotice);
@@ -562,6 +563,9 @@ async function boot(): Promise<void> {
     syncOpenFlag("title", titleMode !== null); syncOpenFlag("credits", creditsOpen);
     syncOpenFlag("battle", activeBattle); syncOpenFlag("cutscene", state.cutscene !== undefined);
     syncOpenFlag("talk", battle?.talk !== null && battle?.talk !== undefined);
+    syncOpenFlag("shrine", encoreShrine?.isOpen() ?? false);
+    syncOpenFlag("decor", decorPicker.isOpen());
+    syncOpenFlag("fluteWheel", fluteWheelView.visible);
     const checkKind = state.battle?.phase === "check" ? state.battle.check?.kind : undefined;
     if (checkKind !== undefined) document.documentElement.dataset.check = checkKind;
     else delete document.documentElement.dataset.check;

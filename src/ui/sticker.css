@@ -111,12 +111,24 @@
   display: none;
 }
 
-/* Choreographed cutscenes (Milestone 189): keep overworld prompts, hints,
-   save toasts, and notice marks cinema-clean beneath the letterbox bars. */
+/* Choreographed cutscenes (Milestone 189) and modal overlays (Milestone 196):
+   keep overworld prompts, hints, save toasts, and notice marks cinema-clean. */
 :root[data-cutscene="open"] .save-toast,
 :root[data-cutscene="open"] .sticker-prompt,
 :root[data-cutscene="open"] .hud-hints,
-:root[data-cutscene="open"] .notice-marks {
+:root[data-cutscene="open"] .notice-marks,
+:root[data-shrine="open"] .save-toast,
+:root[data-shrine="open"] .sticker-prompt,
+:root[data-shrine="open"] .hud-hints,
+:root[data-shrine="open"] .notice-marks,
+:root[data-decor="open"] .save-toast,
+:root[data-decor="open"] .sticker-prompt,
+:root[data-decor="open"] .hud-hints,
+:root[data-decor="open"] .notice-marks,
+:root[data-flute-wheel="open"] .save-toast,
+:root[data-flute-wheel="open"] .sticker-prompt,
+:root[data-flute-wheel="open"] .hud-hints,
+:root[data-flute-wheel="open"] .notice-marks {
   display: none;
 }
 

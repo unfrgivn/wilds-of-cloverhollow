@@ -8714,6 +8714,43 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
 - Gates: `just check` (264 unit files / 1,973 tests, all 74 sims + `encore` +
   `e11`, 23 QA packs, purity, lint), `just build` (every non-vendor JS chunk
   `< 350 kB`), and 25/25 targeted Chromium & WebKit e2e tests.
+
+## Milestone 198: Universal Modal Overlay & 44 px iOS Touch Hygiene, WebKit Encore Click Fix, `clubhouse-display-render.ts` Split & Live iOS 27 Sign-Off (Elevation Track E19A) **Status:** ✅ Completed (2026-11-28)
+- Pure UI overlay, iOS touch-hygiene, render-modularization, and live iOS 27
+  release sign-off pass with zero `src/core/` edits, zero save-version bumps,
+  and bit-identical replay hashes across all recorded and headless sims:
+  - **Universal Modal Root Flags & Defensive Overlay Suppression
+    (`src/shell/shell-bindings.ts`, `src/main.ts`, `src/ui/{qa,npc-chatter,hud-hints,save-toast,sticker}.css`):**
+    Extended `OpenFlagName` with `"shrine" | "decor" | "fluteWheel"`, synced all
+    three flags inside `render()`, and guarded `.qa-touch-trigger`,
+    `.npc-chatter`, `.hud-hints`, `.save-toast`, `.sticker-prompt`, and
+    `.notice-marks` under `:root[data-shrine="open"]`,
+    `:root[data-decor="open"]`, and `:root[data-flute-wheel="open"]`.
+  - **100% iOS Safari Tap-Callout Parity & Touch `>= 44 px` Decor Picker
+    (`src/ui/{arcade-popups,area-banner,hud-hints,save-toast,decor-picker}.css`):**
+    Added `-webkit-touch-callout: none` across the remaining UI stylesheets for
+    100% `src/ui/*.css` coverage and enforced `min-height: 44px` on
+    `.decor-close-btn`, `.decor-btn`, and `.decor-prize-pill` under
+    `:root[data-touch="on"]` even in phone landscape (`max-height: 500px`).
+  - **Modular `ClubhouseDisplayRenderer` Extraction
+    (`src/render/clubhouse-display-render.ts`, `src/render/overworld-effects.ts`):**
+    Extracted Clubhouse & Bedroom prize plushes, velvet pedestals, quest
+    keepsakes, Golden Sunberry motes, watercolor rugs, pennant banners, and
+    fairy lights into `ClubhouseDisplayRenderer` (`315` lines), reducing
+    `src/render/overworld-effects.ts` from `926` lines to `594` lines with zero
+    visual or behavioral changes.
+  - **WebKit Encore Shrine Mid-Click Render Stability (`src/ui/encore-shrine.ts`):**
+    Memoized `renderAll()` via `lastRenderKey` so `pointerdown`-triggered
+    redraws never recreate `.encore-mod-pill` DOM nodes mid-click on WebKit.
+- **Evidence:** `tests/unit/milestone-198.test.ts`, real-input phone touch
+  `tests/e2e/milestone-198.spec.ts` (`@smoke`, Chromium + WebKit), and real iOS
+  27 iPhone 17 Simulator captures `art/review/m198-ios-battle-command.jpg` and
+  `art/review/m198-ios-journal.jpg` verified via `vision`.
+- **Gates:** `just check` (zero replay hash shifts, 23 QA packs, purity, lint),
+  `just build` (every non-vendor production chunk `< 350 kB`, hook leak +
+  runtime story + harness checks green), Chromium & WebKit e2e tests,
+  `just ios-device-build` (unsigned arm64 `Release-iphoneos/App.app`), and
+  `just ios-smoke` (passed end-to-end on iPhone 17 / iOS 27.0 Simulator).
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

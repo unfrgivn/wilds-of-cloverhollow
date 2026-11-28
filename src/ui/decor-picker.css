@@ -510,3 +510,16 @@
     font-size: 11px;
   }
 }
+
+:root[data-touch="on"] .decor-close-btn,
+:root[data-touch="on"] .decor-btn,
+:root[data-touch="on"] .decor-prize-pill {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 6px 12px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+}

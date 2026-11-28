@@ -4,7 +4,10 @@
 :root[data-journal="open"] .save-toast,
 :root[data-title="open"] .save-toast,
 :root[data-credits="open"] .save-toast,
-:root[data-cutscene="open"] .save-toast {
+:root[data-cutscene="open"] .save-toast,
+:root[data-shrine="open"] .save-toast,
+:root[data-decor="open"] .save-toast,
+:root[data-flute-wheel="open"] .save-toast {
   display: none;
 }
 
@@ -31,6 +34,8 @@
   letter-spacing: 0.02em;
   pointer-events: none;
   user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   animation: save-toast-in 180ms ease-out;
 }
 

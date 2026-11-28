@@ -285,7 +285,8 @@ export function bindShellLifecycle(deps: {
 }
 
 export type OpenFlagName =
-  | "arcade" | "qaConsole" | "title" | "credits" | "battle" | "talk" | "journal" | "cutscene";
+  | "arcade" | "qaConsole" | "title" | "credits" | "battle" | "talk" | "journal" | "cutscene"
+  | "shrine" | "decor" | "fluteWheel";
 
 /** Sets or clears a `data-<name>="open"` flag on `document.documentElement`. */
 export function syncOpenFlag(name: OpenFlagName, open: boolean): void {

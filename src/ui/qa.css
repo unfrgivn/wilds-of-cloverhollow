@@ -19,7 +19,10 @@
 :root[data-journal="open"] .qa-touch-trigger:not([hidden]),
 :root[data-arcade="open"] .qa-touch-trigger:not([hidden]),
 :root[data-qa-console="open"] .qa-touch-trigger:not([hidden]),
-:root[data-cutscene="open"] .qa-touch-trigger:not([hidden]) { display: none; }
+:root[data-cutscene="open"] .qa-touch-trigger:not([hidden]),
+:root[data-shrine="open"] .qa-touch-trigger:not([hidden]),
+:root[data-decor="open"] .qa-touch-trigger:not([hidden]),
+:root[data-flute-wheel="open"] .qa-touch-trigger:not([hidden]) { display: none; }
 
 /* The QA console (spec 11): a dev-only tabbed storybook GUI + command line over the frozen game. */
 .qa-console { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 14px; background: rgb(248 237 207 / 72%); box-sizing: border-box; }

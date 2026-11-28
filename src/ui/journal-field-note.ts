@@ -3,22 +3,18 @@ import { element, setAttribute, setText } from "./dom";
 import { feelingMarkup, heartMarkup, icon, keepsakeIcon } from "./icons";
 import { createBlessingPlaque, createTreasuresBlessingsStrip } from "./journal-blessings";
 import {
-  focusRestoreSelector,
-  inspectableShelfIds,
-  prizeFieldNoteData,
-  resolveFieldNote,
-  stepInspectedItem,
-  treasuresSignature,
-  type FieldNoteData,
-  type InspectedJournalItem,
-  type JournalFieldNotePrize,
-  type JournalFieldNoteSource,
+  focusRestoreSelector, inspectableShelfIds, prizeFieldNoteData, resolveFieldNote,
+  stepInspectedItem, treasuresSignature, type FieldNoteData, type InspectedJournalItem,
+  type JournalFieldNotePrize, type JournalFieldNoteSource,
 } from "./journal-field-note-data";
 import { createJournalEncoreCase } from "./journal-encore";
 import { createJournalGemsLedger } from "./journal-gems-ledger";
 import { createJournalHeartsAlbum } from "./journal-hearts";
 import { createJournalJukeboxAlbum } from "./journal-jukebox";
-import { applyModalScrollKey } from "./journal-nav";
+import { applyModalScrollKey, type JournalNavDirection } from "./journal-nav";
+import {
+  activateOverlayButton, scrollOverlayContainer, stepOverlayFocus,
+} from "./journal-overlay-nav";
 import { createJournalRibbonsShowcase } from "./journal-ribbons";
 import { createJournalWeatherAlmanac } from "./journal-weather";
 import { isKeepsakeId } from "../core/blessings";
@@ -27,23 +23,10 @@ import { evaluateMeritRibbonsFromJournal } from "../core/ribbons";
 import type { CozyWeatherMode } from "../core/weather";
 
 export {
-  fieldNoteBlurb,
-  fishFieldNote,
-  focusRestoreSelector,
-  inspectableShelfIds,
-  keepsakeFieldNote,
-  prizeFieldNote,
-  prizeFieldNoteData,
-  resolveFieldNote,
-  stepInspectedItem,
-  stickerFieldNote,
-  treasuresSignature,
-  type FieldNoteData,
-  type InspectedJournalItem,
-  type JournalFieldNoteFish,
-  type JournalFieldNotePrize,
-  type JournalFieldNoteSource,
-  type JournalFieldNoteSticker,
+  fieldNoteBlurb, fishFieldNote, focusRestoreSelector, inspectableShelfIds, keepsakeFieldNote,
+  prizeFieldNote, prizeFieldNoteData, resolveFieldNote, stepInspectedItem, stickerFieldNote,
+  treasuresSignature, type FieldNoteData, type InspectedJournalItem, type JournalFieldNoteFish,
+  type JournalFieldNotePrize, type JournalFieldNoteSource, type JournalFieldNoteSticker,
   type PrizeFieldNoteMeta,
 } from "./journal-field-note-data";
 
@@ -64,6 +47,9 @@ export type JournalFieldOverlays = {
   syncRibbons: (view: JournalFieldNoteSource, anchor?: Element) => void;
   syncAll: (view: JournalFieldNoteSource, ribbonsAnchor?: Element) => void;
   stepFieldNote: (delta: -1 | 1) => boolean;
+  navigateOverlay: (direction: JournalNavDirection) => boolean;
+  activateOverlay: () => boolean;
+  scrollOverlay: (deltaY: number) => boolean;
   closeFieldNote: () => void;
   closeTreasures: () => void;
   closeGems: () => void;
@@ -550,6 +536,9 @@ export function createJournalFieldOverlays(options?: {
   ));
 
   const closeAll = (): void => { clearPeers(); lastNotifiedOpen = false; };
+  const topOverlay = (): HTMLElement | null =>
+    childModals.find((modal) => modal.isOpen())?.overlay ??
+    (treasuresOpen ? treasuresBackdrop : inspectedItem !== null ? fieldBackdrop : null);
   const dismiss = (): boolean => {
     for (const modal of childModals) {
       if (modal.isOpen()) { modal.close(); return true; }
@@ -560,8 +549,7 @@ export function createJournalFieldOverlays(options?: {
   };
 
   return {
-    fieldBackdrop,
-    treasuresBackdrop,
+    fieldBackdrop, treasuresBackdrop,
     gemsOverlay: gemsLedger.overlay,
     ribbonsOverlay: ribbonsShowcase.overlay,
     ribbonsBanner: ribbonsShowcase.banner,
@@ -590,52 +578,52 @@ export function createJournalFieldOverlays(options?: {
       syncVisibility();
     },
     openGems: (view, returnTarget) => { gemsLedger.open(view?.starGems, returnTarget); },
-    openRibbons,
-    syncFieldNote,
-    syncTreasures,
+    openRibbons, syncFieldNote, syncTreasures,
     syncGems: (view) => gemsLedger.sync(view.starGems),
     syncRibbons,
     syncAll: (view, ribbonsAnchor) => {
-      syncFieldNote(view);
-      syncTreasures(view);
-      gemsLedger.sync(view.starGems);
-      syncRibbons(view, ribbonsAnchor);
-      heartsAlbum.sync(view.heartToHearts);
-      encoreCase.sync(view.encoreSummary);
+      syncFieldNote(view); syncTreasures(view);
+      gemsLedger.sync(view.starGems); syncRibbons(view, ribbonsAnchor);
+      heartsAlbum.sync(view.heartToHearts); encoreCase.sync(view.encoreSummary);
       jukeboxAlbum.sync(view);
     },
     stepFieldNote,
-    closeFieldNote,
-    closeTreasures,
+    navigateOverlay: (direction) => {
+      if (inspectedItem !== null && (direction === "left" || direction === "right")) {
+        return stepFieldNote(direction === "right" ? 1 : -1);
+      }
+      const root = topOverlay();
+      return root !== null && stepOverlayFocus(root, direction);
+    },
+    activateOverlay: () => {
+      const root = topOverlay();
+      return root !== null && activateOverlayButton(root);
+    },
+    scrollOverlay: (deltaY) => {
+      const root = topOverlay();
+      return root !== null && scrollOverlayContainer(root, deltaY);
+    },
+    closeFieldNote, closeTreasures,
     closeGems: () => gemsLedger.close(),
     closeRibbons: () => ribbonsShowcase.close(),
-    closeAll,
-    hasOpen,
-    dismiss,
+    closeAll, hasOpen, dismiss,
     handleKeydown: (event) => {
       if (childModals.some((modal) => modal.handleKeydown(event))) return true;
       if (treasuresOpen) {
         if (event.key === "Escape") {
-          event.preventDefault();
-          event.stopPropagation();
-          closeTreasures();
+          event.preventDefault(); event.stopPropagation(); closeTreasures();
         } else if (applyModalScrollKey([treasuresCard], event.key)) {
-          event.preventDefault();
-          event.stopPropagation();
+          event.preventDefault(); event.stopPropagation();
         }
         return true;
       }
       if (inspectedItem !== null) {
         if (event.key === "Escape") {
-          event.preventDefault();
-          event.stopPropagation();
-          closeFieldNote();
+          event.preventDefault(); event.stopPropagation(); closeFieldNote();
         } else if (
-          !fieldBackdrop.hidden &&
-          (event.key === "ArrowLeft" || event.key === "ArrowRight")
+          !fieldBackdrop.hidden && (event.key === "ArrowLeft" || event.key === "ArrowRight")
         ) {
-          event.preventDefault();
-          stepFieldNote(event.key === "ArrowRight" ? 1 : -1);
+          event.preventDefault(); stepFieldNote(event.key === "ArrowRight" ? 1 : -1);
         }
         return true;
       }

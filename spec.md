@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 214)
+Last updated: 2026-11-28 (Milestone 215)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -258,12 +258,17 @@ ios/            Capacitor iOS project (from Milestone 4).
   `buildJournalView`, `buildRewardStickerView`) live in Pixi-free
   `src/shell/view-models.ts` (re-exported identically through
   `src/shell/assets.ts`, Milestone 137); pure gameplay
-  feedback and outcome helpers (`petEffectForCompanion`, `hapticForTick`,
-  `buildSoundContext`, `resolveArcadeOutcome`, `collectLevelUpNotices`,
-  `shouldClearRest`, `isOverworldConfirm`, `stepJukeboxTrack`,
-  `resolveSoundtrack`, `createAreaBannerTracker`, `createJournalNotesCache`,
-  `captureAreaPostcard`, `deliverAreaPostcard`, `shouldPlayToolEventChime`,
-  `createToolEventChimeSync`, `createNpcChatterSync`) live in `src/shell/feedback.ts`; desktop mouse/pen
+  feedback and outcome helpers (`hapticForTick`, `buildSoundContext`,
+  `resolveArcadeOutcome`, `collectLevelUpNotices`, `shouldClearRest`,
+  `stepJukeboxTrack`, `resolveSoundtrack`, `createJournalNotesCache`) live in
+  `src/shell/feedback.ts`, while overworld visual/audio feedback, postcard,
+  arrival banner, chatter, tool-chime, overworld confirm, and ribbon toast
+  helpers (`petEffectForCompanion`, `isOverworldConfirm`,
+  `performOverworldConfirm`, `createAreaBannerTracker`, `captureAreaPostcard`,
+  `deliverAreaPostcard`, `shouldPlayToolEventChime`, `createToolEventChimeSync`,
+  `createNpcChatterSync`, `createRibbonCelebrationSync`) live in
+  `src/shell/overworld-feedback.ts` and are re-exported identically through
+  `src/shell/feedback.ts` (Milestone 215 / Track E19I); desktop mouse/pen
   overworld press-and-hold steering and tap classification
   (`computeOverworldSteer`, `isOverworldTap`, `isOverworldGroundTap`,
   `bindOverworldPointerSteer`) live in `src/shell/overworld-pointer.ts`; and
@@ -5564,6 +5569,22 @@ trunks keep its two exits.
     cycle visible option buttons (`scrollIntoView({ block: "nearest" })`);
     `ArrowLeft` / `ArrowRight` step focused sliders or scrub Music Box tracks;
     `Enter` / `Space` / Gamepad `A` activates the focused control cleanly.
+  - **Journal Modal Overlay Gamepad Navigation & Tab-Flip Isolation** (Milestone
+    214 / Track E19I, `src/ui/journal-overlay-nav.ts`,
+    `src/ui/journal-field-note.ts`, `src/ui/journal.ts`,
+    `src/shell/input-shortcuts.ts`): while any of the 6 Journal modal overlays
+    (Field Treasures, Valley Sky Almanac, Grand 16-Ribbon Merit Tapestry, Star
+    Gem Field Ledger, Party Heart-to-Heart Scrapbook Album, Dream Encore Trophy
+    Case) or a Field Note is open, `[` / `]` / `PageUp` / `PageDown` on keyboard
+    and `LB` / `RB` on gamepad never flip the underlying Journal tab. Gamepad
+    D-Pad / Left Stick drives `journal.navigateOverlay` (stepping Field Notes
+    left/right, cycling visible overlay buttons with primary buttons ordered
+    ahead of `×`, scrolling single-button modal cards by `±72 px`, or stepping
+    focusable Heart/Encore tiles via `stepOverlayFocus`), Gamepad Right Stick
+    drives `journal.scrollOverlay` (`scrollOverlayContainer`), and Gamepad `A`
+    drives `journal.activateOverlay` (`activateOverlayButton`, clicking a
+    focused button or focusing the first primary button without accidentally
+    clicking `×`, while swallowing `confirm` and clearing gamepad taps).
 - **Interactive Field Treasures Card** (`treasuresSummary` in
   `src/core/treasures.ts`, `src/ui/journal-field-note.ts` mounted by
   `src/ui/journal.ts`): summarizes Fae's Star-Line

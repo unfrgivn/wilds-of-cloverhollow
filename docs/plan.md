@@ -9245,6 +9245,40 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
 - Gates: `just check` (281 unit files / 2,067 tests, all 77 sims + all sim
   scripts, 23 QA packs, purity, lint), `just build` (`index` `390.47 kB < 500 kB`),
   34/34 targeted Chromium & WebKit e2e, and 99/99 Chromium `ui-gallery` tests.
+
+## Milestone 215: Full Steam Deck / Gamepad Navigation & Modal Isolation Across All 7 Journal Overlays & `src/shell/overworld-feedback.ts` Modular Split (Elevation Track E19I) **Status:** ✅ Completed (2026-11-28)
+- Full Gamepad Navigation & Tab-Flip Isolation Across All 7 Journal Overlays
+  (`src/ui/journal-overlay-nav.ts`, `src/ui/journal-field-note.ts`,
+  `src/ui/journal.ts`, `src/shell/input-shortcuts.ts`):
+  - Adds `focusableOverlayButtons`, `stepOverlayFocus`, `activateOverlayButton`,
+    and `scrollOverlayContainer` in `src/ui/journal-overlay-nav.ts` and exposes
+    `navigateOverlay`, `activateOverlay`, and `scrollOverlay` through
+    `JournalFieldOverlays` (covering `jukeboxAlbum`, `encoreCase`, `heartsAlbum`,
+    `weatherAlmanac`, `ribbonsShowcase`, `gemsLedger`, `Field Treasures`, and
+    `Field Note`) and `JournalControl`.
+  - Guards keyboard `[`/`]`/`PageUp`/`PageDown` and gamepad `LB`/`RB` page
+    flipping with `!deps.journal.hasOpenOverlay()` so open modals isolate the
+    underlying Journal tab cleanly.
+  - Routes Gamepad Right Stick vertical scrolling, D-Pad / Left Stick navigation
+    (with Field Note left/right stepping preserved), and `A` confirm activation
+    into the topmost open Journal overlay while swallowing `confirm` and
+    clearing gamepad taps.
+- Modular `src/shell/overworld-feedback.ts` Extraction
+  (`src/shell/feedback.ts` `856 -> 467` lines, `src/shell/overworld-feedback.ts`
+  `396` lines):
+  - Extracts overworld confirm, companion pet sound selection, arrival banner
+    tracking, postcard capture/delivery, tool micro-event chime sync, ambient
+    NPC chatter sync, and Merit Ribbon toast celebration sync into
+    `src/shell/overworld-feedback.ts` and re-exports every symbol identically
+    from `src/shell/feedback.ts` with zero behavioral or visual diffs.
+- Evidence: `tests/unit/milestone-215.test.ts` and
+  `tests/e2e/milestone-215.spec.ts` (`@smoke`, Chromium + WebKit).
+- Gates: `just check` (283 unit files / 2,075 tests, all 77 recorded + 7
+  headless sims with zero hash shifts, 23 QA packs, purity, lint), `just build`
+  (largest non-vendor chunk `< 400 kB`, hook leak + runtime story + harness
+  checks green), and Chromium & WebKit e2e tests (`milestone-215`,
+  `milestone-214`, `milestone-124`, `milestone-187`, `milestone-190`,
+  `milestone-204`, `milestone-212`).
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

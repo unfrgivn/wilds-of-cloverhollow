@@ -5,9 +5,7 @@ import {
   coinMarkup, cookieMarkup, gemMarkup, heartMarkup, icon, keepsakeIcon, ticketMarkup,
 } from "./icons";
 import {
-  createJournalFieldOverlays,
-  type JournalFieldNoteFish,
-  type JournalFieldNoteSticker,
+  createJournalFieldOverlays, type JournalFieldNoteFish, type JournalFieldNoteSticker,
 } from "./journal-field-note";
 import { createJournalMapPage, type JournalMapView } from "./journal-map";
 import { createJournalNavController, cycleIndex, type JournalNavDirection } from "./journal-nav";
@@ -230,6 +228,9 @@ export type JournalControl = JournalOptionsHandlers & {
   hasOpenOverlay: () => boolean;
   dismissOverlay: () => boolean;
   stepOverlay: (delta: -1 | 1) => boolean;
+  navigateOverlay: (direction: JournalNavDirection) => boolean;
+  activateOverlay: () => boolean;
+  scrollOverlay: (deltaY: number) => boolean;
   onPageChange: (callback: (page: JournalPage) => void) => void;
   onMapSelect: (callback: (selected: boolean) => void) => void;
   onMapFilter: (callback: (filter: AtlasFilter) => void) => void;
@@ -398,14 +399,16 @@ export function createJournal(root: HTMLElement): JournalControl {
   const fishSlots: Slot[] = [];
   const keepsakeSlots: KeepsakeSlot[] = [];
   return {
-    setPage,
-    stepPage,
+    setPage, stepPage,
     scrollActivePage: nav.scrollActivePage,
     navigateFocus: nav.navigateFocus,
     activateFocused: nav.activateFocused,
-    hasOpenOverlay: () => fieldOverlays.hasOpen(),
-    dismissOverlay: () => fieldOverlays.dismiss(),
-    stepOverlay: (delta) => fieldOverlays.stepFieldNote(delta),
+    hasOpenOverlay: fieldOverlays.hasOpen,
+    dismissOverlay: fieldOverlays.dismiss,
+    stepOverlay: fieldOverlays.stepFieldNote,
+    navigateOverlay: fieldOverlays.navigateOverlay,
+    activateOverlay: fieldOverlays.activateOverlay,
+    scrollOverlay: fieldOverlays.scrollOverlay,
     onPageChange: (cb) => { onPageChange = cb; },
     onMapSelect: (cb) => { onMapSelect = cb; },
     onMapFilter: (cb) => { onMapFilter = cb; },

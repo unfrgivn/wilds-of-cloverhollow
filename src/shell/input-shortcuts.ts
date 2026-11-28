@@ -46,6 +46,9 @@ export type ShortcutJournalControl = {
   hasOpenOverlay: () => boolean;
   dismissOverlay: () => boolean;
   stepOverlay: (delta: -1 | 1) => boolean;
+  navigateOverlay?: (direction: JournalNavDirection) => boolean;
+  activateOverlay?: () => boolean;
+  scrollOverlay?: (deltaY: number) => boolean;
   stepPage: (delta: -1 | 1) => void;
   scrollActivePage: (deltaY: number) => boolean;
   navigateFocus: (direction: JournalNavDirection) => boolean;
@@ -348,7 +351,7 @@ export function createInputShortcuts(
       }
     }
     if (event.repeat) return;
-    if (journalActive) {
+    if (journalActive && !deps.journal.hasOpenOverlay()) {
       if (event.code === "BracketLeft" || event.code === "PageUp") {
         event.preventDefault();
         deps.journal.stepPage(-1);
@@ -551,15 +554,32 @@ export function createInputShortcuts(
       return;
     }
     const journalActive = isJournalShortcutActive(ctx);
-    if (bumperStep !== 0 && journalActive) {
+    const overlayOpen = journalActive && deps.journal.hasOpenOverlay();
+    if (bumperStep !== 0 && journalActive && !overlayOpen) {
       deps.journal.stepPage(bumperStep);
       deps.invalidate();
     }
-    if (journalActive && deps.journal.hasOpenOverlay()) {
-      if (
-        (navStep === "left" || navStep === "right") &&
-        deps.journal.stepOverlay(navStep === "right" ? 1 : -1)
-      ) {
+    if (overlayOpen) {
+      const scrollDelta = computeJournalScrollDelta(deps.gamepad.rightStickY());
+      if (scrollDelta !== 0 && deps.journal.scrollOverlay?.(scrollDelta) === true) {
+        deps.invalidate();
+      }
+      if (navStep !== null) {
+        if (deps.journal.navigateOverlay !== undefined) {
+          if (deps.journal.navigateOverlay(navStep)) {
+            deps.playChoiceMove();
+            deps.invalidate();
+          }
+        } else if (
+          (navStep === "left" || navStep === "right") &&
+          deps.journal.stepOverlay(navStep === "right" ? 1 : -1)
+        ) {
+          deps.invalidate();
+        }
+      }
+      if (journalConfirmEdge && deps.journal.activateOverlay?.() === true) {
+        deps.swallow("confirm");
+        deps.gamepad.clearTaps();
         deps.invalidate();
       }
     } else if (journalActive) {

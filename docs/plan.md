@@ -9181,6 +9181,39 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
 - Gates: `just check` (279 unit files / 2,057 tests, all 77 sims + all sim
   scripts, 23 QA packs, purity, lint), `just build` (`index` `383.26 kB < 500 kB`),
   24/24 Chromium & WebKit e2e, and 99/99 Chromium `ui-gallery` tests.
+
+## Milestone 213: Phone Touch Cinema Hygiene (`cutscene`, `flute-wheel`, `travel-vignette`, `shrine`) & Pixi-Free `src/render/camera-directives.ts` Modular Split (Elevation Track E19H) **Status:** ✅ Completed (2026-11-28)
+- Phone Touch & Travel-Vignette Cinema Hygiene (`src/ui/touch-controls.css`,
+  `src/ui/qa.css`, `src/ui/npc-chatter.css`, `src/ui/ribbon-toast.css`):
+  - Hides `.touch-stick` and `.touch-menu` during `:root[data-cutscene="open"]`
+    while keeping `.touch-confirm` and `.touch-cancel` accessible for dialogue
+    advance and hold-Cancel cutscene skipping.
+  - Hides `.touch-menu` and `.touch-confirm` during
+    `:root[data-flute-wheel="open"]` so only the Harmony Flute Wheel and Cancel
+    button appear on touch viewports.
+  - Hides `.touch-controls` outright under `:root[data-shrine="open"]`.
+  - Adds defensive `:root[data-travel-vignette="open"]` `display: none` guards
+    for `.qa-touch-trigger:not([hidden])` (`qa.css`), `.npc-chatter`
+    (`npc-chatter.css`), and `.ribbon-toast` (`ribbon-toast.css`).
+- Modular Pixi-Free `src/render/camera-directives.ts` Extraction
+  (`src/render/camera.ts` `857 -> 437` lines, `src/render/camera-directives.ts`
+  `391` lines):
+  - Extracts Ink tag extraction/parsing (`extractInkCurrentTags`,
+    `parseCameraTags`), dialogue framing (`resolveDialogueFocus`), zoom/bounds
+    clamping (`clampZoomToArea`, `clampCameraToArea`, `centerCameraOn`),
+    trauma screen-shake (`CameraTraumaState`, `createCameraTraumaState`,
+    `addCameraTrauma`, `stepCameraTrauma`, `detectTraumaImpulse`), and depth
+    parallax (`computeParallaxOffset`) into Pixi-free, DOM-free
+    `src/render/camera-directives.ts` and re-exports every symbol identically
+    from `src/render/camera.ts` with zero behavioral or visual diffs.
+- Evidence: `tests/unit/milestone-213.test.ts` and
+  `tests/e2e/milestone-213.spec.ts` (`@smoke`, Chromium + WebKit).
+- Gates: `just check` (281 unit files / 2,066 tests, all 77 recorded + 7
+  headless sims with zero hash shifts, 23 QA packs, purity, lint), `just build`
+  (largest non-vendor chunk `< 400 kB`, hook leak + runtime story + harness
+  checks green), 27/27 Chromium & WebKit e2e tests (`milestone-213`,
+  `milestone-198`, `milestone-190`, `travel-vignette`, `e1-camera-ground`), and
+  8/8 Chromium e2e tests (`cutscene`, `e5-puzzles-tools-dash`).
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

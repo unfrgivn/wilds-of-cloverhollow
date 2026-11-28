@@ -5,7 +5,8 @@
 :root[data-credits="open"] .ribbon-toast,
 :root[data-shrine="open"] .ribbon-toast,
 :root[data-decor="open"] .ribbon-toast,
-:root[data-flute-wheel="open"] .ribbon-toast {
+:root[data-flute-wheel="open"] .ribbon-toast,
+:root[data-travel-vignette="open"] .ribbon-toast {
   display: none;
 }
 

@@ -159,8 +159,8 @@
    aside: the dialogue reserves room for confirm and cancel only. */
 :root[data-dialogue="open"] :is(.touch-lantern, .touch-flute, .touch-lasso),
 :root[data-battle="open"] :is(.touch-lantern, .touch-flute, .touch-lasso),
-:root[data-cutscene="open"] :is(.touch-lantern, .touch-flute, .touch-lasso, .touch-dash),
-:root[data-flute-wheel="open"] :is(.touch-lantern, .touch-flute, .touch-lasso, .touch-stick),
+:root[data-cutscene="open"] :is(.touch-lantern, .touch-flute, .touch-lasso, .touch-dash, .touch-stick, .touch-menu),
+:root[data-flute-wheel="open"] :is(.touch-lantern, .touch-flute, .touch-lasso, .touch-stick, .touch-menu, .touch-confirm),
 :root[data-photo="on"] :is(.touch-lantern, .touch-flute, .touch-lasso),
 :root[data-credits="open"] :is(.touch-lasso, .touch-dash) {
   display: none;
@@ -235,6 +235,7 @@
   display: none;
 }
 :root[data-title="open"] .touch-controls { display: none; }
+:root[data-shrine="open"] .touch-controls { display: none; }
 .touch-menu svg {
   width: 32px;
   height: 32px;

@@ -8,7 +8,8 @@
 :root[data-cutscene="open"] .npc-chatter,
 :root[data-shrine="open"] .npc-chatter,
 :root[data-decor="open"] .npc-chatter,
-:root[data-flute-wheel="open"] .npc-chatter {
+:root[data-flute-wheel="open"] .npc-chatter,
+:root[data-travel-vignette="open"] .npc-chatter {
   display: none;
 }
 

@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 212)
+Last updated: 2026-11-28 (Milestone 213)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -201,7 +201,17 @@ ios/            Capacitor iOS project (from Milestone 4).
   `sticker.css`, enforces 100% `-webkit-touch-callout: none` parity across every
   stylesheet in `src/ui/*.css`, and guarantees `min-height: 44px` on
   `.decor-close-btn`, `.decor-btn`, and `.decor-prize-pill` under
-  `:root[data-touch="on"]` in `src/ui/decor-picker.css`.
+  `:root[data-touch="on"]` in `src/ui/decor-picker.css`. Milestone 213 (Track
+  E19H) completes phone touch and travel-vignette cinema hygiene:
+  `src/ui/touch-controls.css` hides `.touch-stick` and `.touch-menu` on
+  `:root[data-cutscene="open"]` (retaining `.touch-confirm` and `.touch-cancel`
+  for cutscene dialogue and hold-Cancel skipping), hides `.touch-menu` and
+  `.touch-confirm` on `:root[data-flute-wheel="open"]` so only the Harmony Flute
+  Wheel and Cancel button appear, and hides `.touch-controls` outright on
+  `:root[data-shrine="open"]`; meanwhile `:root[data-travel-vignette="open"]`
+  defensively hides `.qa-touch-trigger:not([hidden])` (`src/ui/qa.css`),
+  `.npc-chatter` (`src/ui/npc-chatter.css`), and `.ribbon-toast`
+  (`src/ui/ribbon-toast.css`).
 - Battle stage mood washes, Flute Friend on-stage cameo poses, and battle VFX
   anchor resolution live in `src/render/battle-stage.ts` (Milestone 91), while
   pure battle VFX particle/theater builders (`applyTogetherReady`,
@@ -794,7 +804,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   false), it applies a subtle facing look-ahead (`±22u` x / `±14u` y) through
   `followCamera` and smoothly damps toward it (`0.14` per frame, snapping within
   `0.15u`), clamped cleanly to area bounds. Presentation-only `CameraDirector`
-  (`src/render/camera.ts`, Milestone 181 / Track E1, Pixi-free, hash-safe) wraps
+  (`src/render/camera.ts`, Milestone 181 / Track E1, Pixi-free, hash-safe;
+  Ink directives, dialogue framing, zoom/bounds clamping, trauma shake, and
+  depth parallax extracted cleanly into Pixi-free
+  `src/render/camera-directives.ts` and re-exported identically from
+  `src/render/camera.ts` in Milestone 213 / Track E19H) wraps
   `smoothFollowCamera` with:
   - Dialogue partner midpoint framing (`resolveDialogueFocus`, 55/45 player-to-partner
     weighting with `+44u` downward camera focus clearance so conversing sprites sit
@@ -956,7 +970,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   watercolor WebP diorama cards (`public/assets/travel/{bus-hills,bus-coast,
   bus-pass,boat-island,lift-summit}.webp`, 42–65 KB each, `art/recipes/travel-vignettes.json`)
   inside a framed die-cut cream postcard (`z-index: 65`, `data-travel-vignette="open"`,
-  hiding gameplay HUD/touch chrome) for `1680 ms` (`200 ms` fade-in, `220 ms`
+  hiding gameplay HUD/touch chrome plus `.qa-touch-trigger`, `.npc-chatter`, and
+  `.ribbon-toast` as of Milestone 213 / Track E19H) for `1680 ms` (`200 ms` fade-in, `220 ms`
   fade-out) with a `"Next stop: <Destination>!"` header, mode chime
   (`title-start` / `card-open` / `tool-sparkle`), and animated origin-to-destination
   progress strip while the target area warms in parallel behind the paper fade.

@@ -18,7 +18,35 @@ export type BattlePeekData = {
   tip: string;
   intentNote?: string | null;
   phase2Note?: string | null;
+  formationPager?: { index: number; total: number } | null;
 };
+
+/**
+ * Steps the active target index in a multi-foe formation by `delta` (`-1` or `1`),
+ * wrapping around and skipping already-soothed critters. Returns `null` when fewer
+ * than two un-soothed foes remain.
+ */
+export function stepMultiFoeTargetIndex(
+  foes: readonly { soothed: boolean }[] | undefined,
+  currentIndex: number,
+  delta: -1 | 1,
+): number | null {
+  if (foes === undefined || foes.length <= 1) return null;
+  let activeCount = 0;
+  for (const foe of foes) {
+    if (!foe.soothed) activeCount += 1;
+  }
+  if (activeCount < 2) return null;
+  const total = foes.length;
+  const origin = ((Math.trunc(currentIndex) % total) + total) % total;
+  for (let step = 1; step < total; step += 1) {
+    const candidate = (((origin + delta * step) % total) + total) % total;
+    if (foes[candidate]?.soothed === false && candidate !== origin) {
+      return candidate;
+    }
+  }
+  return null;
+}
 
 export type BattlePeekOptions = {
   inputMode?: HudInputMode;
@@ -104,13 +132,29 @@ export function battlePeekData(
   if (state.battle === null) return null;
   const foes = state.battle.foes;
   let activeCritterId = state.battle.critterId;
+  let formationPager: { index: number; total: number } | null = null;
   if (foes !== undefined && foes.length > 0) {
-    const chosen = foes[state.battle.targetIndex ?? 0];
-    const targeted =
+    const chosenIndex = state.battle.targetIndex ?? 0;
+    const chosen = foes[chosenIndex];
+    const resolvedIndex =
       chosen !== undefined && !chosen.soothed
-        ? chosen
-        : (foes.find((foe) => !foe.soothed) ?? chosen);
+        ? chosenIndex
+        : foes.findIndex((foe) => !foe.soothed);
+    const targeted = resolvedIndex >= 0 ? foes[resolvedIndex] : chosen;
     if (targeted !== undefined) activeCritterId = targeted.critterId;
+    if (foes.length > 1) {
+      let activeCount = 0;
+      let activePos = 0;
+      for (let index = 0; index < foes.length; index += 1) {
+        const foe = foes[index];
+        if (foe === undefined || foe.soothed) continue;
+        if (index === resolvedIndex) activePos = activeCount;
+        activeCount += 1;
+      }
+      if (activeCount >= 2) {
+        formationPager = { index: activePos + 1, total: activeCount };
+      }
+    }
   }
   const critter = world.critters[activeCritterId];
   if (critter === undefined) return null;
@@ -182,5 +226,6 @@ export function battlePeekData(
     tip: adaptHintForInputMode(peekTip(critter), options?.inputMode ?? "keyboard"),
     intentNote,
     phase2Note,
+    formationPager,
   };
 }

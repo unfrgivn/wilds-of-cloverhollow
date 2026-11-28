@@ -14,6 +14,7 @@ import {
 import {
   battlePeekData,
   checkMechanicLabel,
+  stepMultiFoeTargetIndex,
   type BattlePeekData,
   type BattlePeekOptions,
   type CheckKind,
@@ -25,7 +26,7 @@ import {
 } from "./battle-overlays";
 
 export {
-  battlePeekData, checkMechanicLabel, classifyBattlePopup,
+  battlePeekData, checkMechanicLabel, classifyBattlePopup, stepMultiFoeTargetIndex,
   type BattlePeekData, type BattlePeekOptions, type BattlePopupKind, type BattlePopupSide,
   type BattlePopupSnapshot, type BattlePopupSpec, type CheckKind,
 };
@@ -251,6 +252,7 @@ export function createBattleHud(root: HTMLElement): {
   onLasso: (callback: () => void) => void;
   onPeekToggle: (callback: () => void) => void;
   onPeekClose: (callback: () => void) => void;
+  onPeekStepTarget: (callback: (delta: -1 | 1) => void) => void;
   onSelectTarget: (callback: (index: number) => void) => void;
 } {
   let togetherHandler: () => void = () => undefined;
@@ -425,6 +427,9 @@ export function createBattleHud(root: HTMLElement): {
     },
     onPeekClose: (callback) => {
       peekCard.onClose(callback);
+    },
+    onPeekStepTarget: (callback) => {
+      peekCard.onStepTarget(callback);
     },
     onSelectTarget: (callback) => {
       foeHud.onSelectTarget(callback);

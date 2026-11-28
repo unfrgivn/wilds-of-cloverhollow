@@ -75,6 +75,7 @@ export type InputShortcutsDeps = {
   getContext: () => OverlayGateContext;
   getBattlePeekOpen: () => boolean;
   setBattlePeek: (open: boolean) => void;
+  stepBattleTarget?: (delta: -1 | 1) => boolean;
   setPhotoMode: (open: boolean) => void;
   snapPostcard: () => void;
   onCyclePhotoWeather?: (delta?: -1 | 1) => void;
@@ -185,17 +186,10 @@ export function createInputShortcuts(
     }
     if (event.repeat) return;
     if (journalActive && !deps.journal.hasOpenOverlay()) {
-      if (event.code === "BracketLeft" || event.code === "PageUp") {
-        event.preventDefault();
-        deps.journal.stepPage(-1);
-        deps.invalidate();
-        return;
-      }
-      if (event.code === "BracketRight" || event.code === "PageDown") {
-        event.preventDefault();
-        deps.journal.stepPage(1);
-        deps.invalidate();
-        return;
+      const pageDelta = event.code === "BracketLeft" || event.code === "PageUp" ? -1
+        : event.code === "BracketRight" || event.code === "PageDown" ? 1 : 0;
+      if (pageDelta !== 0) {
+        event.preventDefault(); deps.journal.stepPage(pageDelta); deps.invalidate(); return;
       }
     }
     if (event.code === "KeyM" && deps.onToggleMute !== undefined) {
@@ -229,6 +223,16 @@ export function createInputShortcuts(
       deps.setBattlePeek(false);
       deps.swallow("cancel");
       deps.clearKeyboardTaps();
+      return;
+    }
+    if (
+      deps.getBattlePeekOpen() && canBattlePeek(ctx) &&
+      (event.code === "ArrowLeft" || event.code === "ArrowRight")
+    ) {
+      event.preventDefault(); event.stopPropagation();
+      if (deps.stepBattleTarget?.(event.code === "ArrowRight" ? 1 : -1) === true) {
+        deps.clearKeyboardTaps(); deps.invalidate();
+      }
       return;
     }
     const photoAction = photoKeyAction(event.code);
@@ -346,6 +350,13 @@ export function createInputShortcuts(
       deps.gamepad.clearTaps();
       deps.onCyclePhotoWeather?.(bumperStep);
       return;
+    }
+    if (deps.getBattlePeekOpen() && canBattlePeek(ctx)) {
+      const peekDelta: -1 | 0 | 1 =
+        bumperStep !== 0 ? bumperStep : navStep === "right" ? 1 : navStep === "left" ? -1 : 0;
+      if (peekDelta !== 0) {
+        deps.stepBattleTarget?.(peekDelta); deps.gamepad.clearTaps(); deps.invalidate(); return;
+      }
     }
     if (deps.encoreShrine?.isOpen() === true) {
       if (photoAction === "exit") {

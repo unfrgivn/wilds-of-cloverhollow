@@ -18,6 +18,7 @@
 .battle-check-tap[hidden],
 .battle-reward[hidden],
 .battle-peek-card[hidden],
+.battle-peek-pager[hidden],
 .battle-peek-intent[hidden],
 .battle-peek-phase2[hidden],
 .battle-calm[hidden],
@@ -1865,6 +1866,74 @@
 .battle-peek-fam[data-familiarity="old-friend"] {
   background: #ffe896;
 }
+.battle-peek-pager {
+  flex: 0 0 auto;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: #fffaf2;
+  box-shadow: 0 2px 0 #47321f22;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.battle-peek-step {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  min-height: 28px;
+  box-sizing: border-box;
+  padding: 0 4px;
+  border: 0;
+  background: #f2e8cf;
+  color: var(--sticker-ink);
+  font: inherit;
+  font-size: 17px;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition: transform 90ms ease-out, background-color 90ms ease-out;
+}
+.battle-peek-step:first-child {
+  border-right: 1.5px solid var(--sticker-ink);
+}
+.battle-peek-step:last-child {
+  border-left: 1.5px solid var(--sticker-ink);
+}
+.battle-peek-step:active {
+  background: #f6e4a8;
+}
+.battle-peek-step:focus-visible {
+  background: #f6e4a8;
+  outline: 3px solid #6b9e56;
+  outline-offset: -3px;
+}
+.battle-peek-count {
+  padding: 0 7px;
+  color: var(--sticker-ink);
+  font-size: 11px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+:root[data-touch="on"] .battle-peek-step {
+  min-width: 44px;
+  min-height: 44px;
+}
 .battle-peek-close {
   flex: 0 0 auto;
   display: inline-flex;
@@ -1981,6 +2050,15 @@
     padding: 1px 6px;
     font-size: 10.5px;
   }
+  .battle-peek-step {
+    min-width: 24px;
+    min-height: 24px;
+    font-size: 15px;
+  }
+  .battle-peek-count {
+    padding: 0 5px;
+    font-size: 10px;
+  }
   .battle-peek-close {
     width: 28px;
     height: 28px;
@@ -2004,13 +2082,31 @@
     line-height: 1.2;
   }
 }
+@media (hover: hover) and (pointer: fine) {
+  .battle-peek-step:hover {
+    background: #fff3c4;
+    transform: translateY(-1px);
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .battle-peek-card {
     animation: none;
   }
+  .battle-peek-step {
+    transition: none;
+  }
+  .battle-peek-step:hover {
+    transform: none;
+  }
 }
 :root[data-reduced-motion="on"] .battle-peek-card {
   animation: none;
+}
+:root[data-reduced-motion="on"] .battle-peek-step {
+  transition: none;
+}
+:root[data-reduced-motion="on"] .battle-peek-step:hover {
+  transform: none;
 }
 
 /* Track E7: Multi-critter formation plates, die-cut intent stickers, Boss

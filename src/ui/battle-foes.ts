@@ -209,15 +209,17 @@ export function createBossIntentSticker(calmSection: HTMLElement): {
 }
 
 /**
- * Compact warm-paper Battle Field Guide Peek card (spec 8.1, Milestones 110 & 231).
- * Shows active targeted foe metadata, optional live Next Move intent row, optional
- * Boss Phase-2 badge, feelings/treats, and input-adapted tactical tip.
+ * Compact warm-paper Battle Field Guide Peek card (spec 8.1, Milestones 110, 232 & 233).
+ * Shows active targeted foe metadata, optional multi-foe flipper pager, optional live Next Move
+ * intent row, optional Boss Phase-2 badge, feelings/treats, and input-adapted tactical tip.
  */
 export function createBattlePeekCard(root: HTMLElement): {
   render: (peek: BattlePeekData | null, battleVisible: boolean) => void;
   onClose: (callback: () => void) => void;
+  onStepTarget: (callback: (delta: -1 | 1) => void) => void;
 } {
   let closeHandler: () => void = () => undefined;
+  let stepTargetHandler: (delta: -1 | 1) => void = () => undefined;
   const peekCard = element("section", "battle-peek-card");
   peekCard.tabIndex = -1;
   peekCard.setAttribute("role", "region");
@@ -230,12 +232,28 @@ export function createBattlePeekCard(root: HTMLElement): {
   const peekLevel = element("span", "battle-peek-level");
   const peekFam = element("span", "battle-peek-fam");
   peekTitleRow.append(peekName, peekLevel, peekFam);
+  const peekPager = element("div", "battle-peek-pager");
+  peekPager.setAttribute("role", "group");
+  peekPager.setAttribute("aria-label", "Switch critter target");
+  peekPager.hidden = true;
+  const prevBtn = element("button", "battle-peek-step");
+  prevBtn.type = "button";
+  prevBtn.textContent = "‹";
+  prevBtn.setAttribute("aria-label", "Previous foe");
+  prevBtn.addEventListener("click", () => stepTargetHandler(-1));
+  const countSpan = element("span", "battle-peek-count");
+  const nextBtn = element("button", "battle-peek-step");
+  nextBtn.type = "button";
+  nextBtn.textContent = "›";
+  nextBtn.setAttribute("aria-label", "Next foe");
+  nextBtn.addEventListener("click", () => stepTargetHandler(1));
+  peekPager.append(prevBtn, countSpan, nextBtn);
   const peekClose = element("button", "battle-peek-close");
   peekClose.type = "button";
   peekClose.textContent = "×";
   peekClose.setAttribute("aria-label", "Close critter field guide");
   peekClose.addEventListener("click", () => closeHandler());
-  peekHead.append(peekTitleRow, peekClose);
+  peekHead.append(peekTitleRow, peekPager, peekClose);
 
   const peekMeta = element("div", "battle-peek-meta");
   const peekLand = element("span", "battle-peek-badge is-land");
@@ -284,6 +302,9 @@ export function createBattlePeekCard(root: HTMLElement): {
     onClose: (callback) => {
       closeHandler = callback;
     },
+    onStepTarget: (callback) => {
+      stepTargetHandler = callback;
+    },
     render: (peek, battleVisible) => {
       const nextPeekOpen = peek !== null;
       peekCard.hidden = !nextPeekOpen;
@@ -307,6 +328,7 @@ export function createBattlePeekCard(root: HTMLElement): {
       if (peek === null) return;
       const intentNote = peek.intentNote ?? null;
       const phase2Note = peek.phase2Note ?? null;
+      const pager = peek.formationPager ?? null;
       const sig = [
         peek.critterId,
         peek.name,
@@ -320,6 +342,7 @@ export function createBattlePeekCard(root: HTMLElement): {
         peek.tip,
         intentNote ?? "",
         phase2Note ?? "",
+        pager === null ? "" : `${pager.index}/${pager.total}`,
       ].join("|");
       if (sig === lastPeekSig) return;
       lastPeekSig = sig;
@@ -328,6 +351,8 @@ export function createBattlePeekCard(root: HTMLElement): {
       setText(peekLevel, `Lv ${peek.level}`);
       setText(peekFam, peek.familiarityLabel);
       setAttribute(peekFam, "data-familiarity", peek.familiarity);
+      peekPager.hidden = pager === null;
+      if (pager !== null) setText(countSpan, `${pager.index} / ${pager.total}`);
       setText(peekLand, peek.landName);
       setText(peekCheck, peek.checkLabel);
       peekPhase2.hidden = phase2Note === null;

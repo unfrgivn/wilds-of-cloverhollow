@@ -14,7 +14,7 @@ import { preventPinchZoom } from "./platform/gestures";
 import { createDialogueBox, createNoticeMarks, createPrompt } from "./ui/sticker";
 import {
   createBattleCheck, createBattleHud, createCommandMenu, createFeelingBubble,
-  createRewardSticker, createWindUpBubbles,
+  createRewardSticker, createWindUpBubbles, stepMultiFoeTargetIndex,
 } from "./ui/battle";
 import { createJournal } from "./ui/journal";
 import { createTitleScreen, type TitleChoiceId } from "./ui/title";
@@ -127,14 +127,11 @@ async function boot(): Promise<void> {
   const lassoButton = document.querySelector<HTMLButtonElement>(".touch-lasso");
   const uiRoot = document.createElement("div");
   document.body.append(uiRoot);
-  const dialogueBox = createDialogueBox(uiRoot);
-  const prompt = createPrompt(uiRoot);
-  const noticeMarks = createNoticeMarks(uiRoot);
-  const fluteWheel = createFluteWheel(uiRoot);
+  const dialogueBox = createDialogueBox(uiRoot); const prompt = createPrompt(uiRoot);
+  const noticeMarks = createNoticeMarks(uiRoot); const fluteWheel = createFluteWheel(uiRoot);
   fluteWheel.onNote((index) => touch.tapChoice(index));
   fluteWheel.onClose(() => touch.tapButton("cancel"));
-  const battleHud = createBattleHud(uiRoot);
-  const commandMenu = createCommandMenu(uiRoot);
+  const battleHud = createBattleHud(uiRoot); const commandMenu = createCommandMenu(uiRoot);
   const battleCheck = createBattleCheck(uiRoot);
   const handleConfirmHold = bindBattleCheckTouch(battleCheck, touch);
   const feelingBubble = createFeelingBubble(uiRoot);
@@ -147,8 +144,7 @@ async function boot(): Promise<void> {
   const withInvalidate = <Args extends unknown[]>(
     fn: (...args: Args) => void,
   ): ((...args: Args) => void) => (...args: Args): void => {
-    fn(...args);
-    invalidate();
+    fn(...args); invalidate();
   };
   const syncReducedMotion = (): void => {
     document.documentElement.dataset.reducedMotion = gameSettings.reducedMotion() ? "on" : "off";
@@ -158,21 +154,15 @@ async function boot(): Promise<void> {
   let activeArcadeRecord: ArcadeRecordBadge | null = null;
   let fishStreak = 0;
   syncReducedMotion(); subscribeCozyWeather(invalidate);
-  const hudHints = createHudHints(uiRoot);
-  const saveToast = createSaveToast(uiRoot);
-  const areaBanner = createAreaBanner(uiRoot);
-  const travelOverlay = createTravelOverlay(uiRoot);
-  const shutterFlash = createShutterFlash(uiRoot);
-  const photoToast = createPhotoToast(uiRoot);
+  const hudHints = createHudHints(uiRoot); const saveToast = createSaveToast(uiRoot);
+  const areaBanner = createAreaBanner(uiRoot); const travelOverlay = createTravelOverlay(uiRoot);
+  const shutterFlash = createShutterFlash(uiRoot); const photoToast = createPhotoToast(uiRoot);
   const bannerTracker = createAreaBannerTracker();
   // True while the harness drives ticks synthetically (the hook's `step`).
   let harnessStepping = false;
-  const lightHaptic = (): void => {
-    if (!harnessStepping) haptics.trigger("light");
-  };
+  const lightHaptic = (): void => { if (!harnessStepping) haptics.trigger("light"); };
   const playToggleFeedback = (on: boolean): void => {
-    sound.playEffect(on ? "toggle-on" : "toggle-off");
-    lightHaptic();
+    sound.playEffect(on ? "toggle-on" : "toggle-off"); lightHaptic();
   };
   subscribeHomeRecord((t, user) => { if (user) playToggleFeedback(t !== null); invalidate(); });
   const bindToggle = (toggle: () => void, isOn: () => boolean): (() => void) =>
@@ -185,6 +175,12 @@ async function boot(): Promise<void> {
   const title = createTitleScreen(uiRoot);
   const credits = createCredits(uiRoot);
   battleHud.onSelectTarget((index) => touch.tapTarget(index));
+  const stepBattleTarget = (delta: -1 | 1): boolean => {
+    const next = stepMultiFoeTargetIndex(state.battle?.foes, state.battle?.targetIndex ?? 0, delta);
+    if (next === null) return false;
+    touch.tapTarget(next); return true;
+  };
+  battleHud.onPeekStepTarget((delta) => { stepBattleTarget(delta); invalidate(); });
   const view = new GameView(content.world, { debugLabel: qaEnabled, renderer: app.renderer });
   const navFollower = createNavPathFollower(content.world);
   const syncNpcChatter = createNpcChatterSync(
@@ -433,7 +429,7 @@ async function boot(): Promise<void> {
   });
   const inputShortcuts = createInputShortcuts({
     getContext: overlayContext, getBattlePeekOpen: () => battlePeekOpen,
-    setBattlePeek, setPhotoMode, onCyclePhotoWeather: cyclePhotoWeather,
+    setBattlePeek, stepBattleTarget, setPhotoMode, onCyclePhotoWeather: cyclePhotoWeather,
     snapPostcard: () => { void snapPostcard({ download: true }); },
     journal, encoreShrine: encoreShrine.shortcuts(), decorPicker, gamepad,
     clearKeyboardTaps: () => keyboard.clearTaps(), swallow: (button) => swallowed.add(button),
@@ -664,6 +660,7 @@ async function boot(): Promise<void> {
       confirm: frame.confirm && !swallowed.has("confirm"),
       cancel: frame.cancel && !swallowed.has("cancel"),
       menu: frame.menu && !swallowed.has("menu"),
+      ...(battlePeekOpen ? { flute: false, lasso: false } : {}),
     };
     const confirmEdge = input.confirm && !state.previousInput.confirm;
     let dismissedLevelUp = false;

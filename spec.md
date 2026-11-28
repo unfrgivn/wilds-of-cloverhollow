@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 233)
+Last updated: 2026-11-28 (Milestone 234)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -4290,8 +4290,11 @@ trunks keep its two exits.
     updating `state.encore` (`clears`, `bestStars`, `modifiersCleared`), and
     unlocking each boss's exclusive Clubhouse Encore Trophy on any 1+ Star
     Challenge win (`prize-won` fanfare + `"celebrate"` haptic).
-  - Tactile die-cut Shrine modal (`createEncoreShrine` /
-    `mountEncoreShrineSession`) renders the 3×3 boss sticker grid, Clubhouse
+  - Tactile die-cut Shrine modal (`createEncoreShrine` in
+    `src/ui/encore-shrine.ts`, composing and re-exporting
+    `EncoreShrineSession`, `mountEncoreShrineSession`, and `encoreFooterHint`
+    from `src/ui/encore-shrine-session.ts`, Milestone 234 / Track E19T) renders
+    the 3×3 boss sticker grid, Clubhouse
     Trophy Shelf pips, spotlight preview, 3 Star Challenge toggle pills (3-column
     horizontal layout on phone `<= 520px` height so the `>= 44 px` launch button
     stays 100% visible with zero clipping), full keyboard/gamepad/touch support
@@ -4425,8 +4428,10 @@ trunks keep its two exits.
   Milestone 200 / Track E19B).
 - **Battle Field Guide Peek** (Milestone 110, gamepad parity Milestone 114,
   multi-foe target/intent/Phase-2 & gamepad tip adaptation Milestone 232 /
-  Track E19S, `src/ui/battle-peek.ts`, `src/ui/battle-foes.ts`,
-  `src/ui/battle.ts`, `src/shell/view-models.ts`, `src/main.ts`): during live
+  Track E19S, in-peek multi-foe flipper Milestone 234 / Track E19T,
+  `src/ui/battle-peek.ts`, `src/ui/battle-foes.ts`,
+  `src/ui/battle.ts`, `src/shell/view-models.ts`, `src/shell/input-shortcuts.ts`,
+  `src/main.ts`): during live
   battle `command` phase (outside Talk and QA overlays), pressing `I`, gamepad
   Select (standard button 8), or clicking/tapping the top-right
   foe plate (`.battle-calm`, styled identically at rest so existing battle
@@ -4439,8 +4444,16 @@ trunks keep its two exits.
   element when battle remains active, Milestone 152). In multi-foe formations
   (`state.battle.foes`), `battlePeekData(world, state, options?)` resolves the
   currently targeted un-soothed foe (`state.battle.foes[targetIndex ?? 0]`,
-  falling back to the first un-soothed foe or `state.battle.critterId`) so
-  switching targets updates every card field immediately. It shows critter name,
+  falling back to the first un-soothed foe or `state.battle.critterId`) and
+  attaches `formationPager: { index, total }` whenever at least two un-soothed
+  foes remain (strictly `null` and `.battle-peek-pager[hidden]` on single-foe
+  and 1-remaining-foe battles). Pure DOM-free `stepMultiFoeTargetIndex(foes,
+  currentIndex, delta)` wraps forward/backward across active un-soothed foes so
+  clicking/tapping `.battle-peek-step` (`‹` / `›`, `>= 44×44 px` on
+  `:root[data-touch="on"]`), pressing keyboard `ArrowLeft`/`ArrowRight`, or
+  pressing gamepad `LB`/`RB`/D-Pad Left/Right flips targets live without
+  closing Peek (playing `"atlas-pin"` foley and blocking leaked `flute`/`lasso`
+  inputs while Peek is open). It shows critter name,
   level, familiarity (`New Friend` / `Befriended ✓` / `Old Friend ★` using
   `state.calms[species]` and `world.battle.oldFriends.calms`), region name,
   check mechanic badge (`checkMechanicLabel`, exhaustive over all `CheckSpec["kind"]`

@@ -9892,6 +9892,38 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
 - Gates: `just check` (300 unit files / 2,133 tests, all 77 sims + all sim
   scripts, 23 QA packs, purity, lint), `just build` (`index` `359.84 kB < 360 kB`),
   45/45 Chromium & WebKit e2e, and 99/99 Chromium `ui-gallery` tests.
+
+## Milestone 234: In-Peek Multi-Foe Field Guide Flipper (Mouse/Touch `‹`/`›`, Keyboard `ArrowLeft`/`ArrowRight`, Gamepad `LB`/`RB`/D-Pad) + `encore-shrine-session.ts` Modular Split (Elevation Track E19T) **Status:** ✅ Completed (2026-11-28)
+- Pure Multi-Foe Target Stepper & Peek Formation Pager (`src/ui/battle-peek.ts`):
+  - Exports DOM-free `stepMultiFoeTargetIndex(foes, currentIndex, delta)` wrapping
+    forward/backward across un-soothed foes and returning `null` when fewer than
+    two active foes remain.
+  - Extends `BattlePeekData` with optional `formationPager?: { index, total } | null`,
+    populated only when `>= 2` un-soothed foes remain so single-foe and
+    1-remaining-foe Peek cards stay visually identical.
+- Tactile In-Peek Multi-Foe Flipper & Universal Input Wiring
+  (`src/ui/battle-foes.ts`, `src/ui/battle.ts`, `src/ui/battle.css`,
+  `src/shell/input-shortcuts.ts`, `src/main.ts`):
+  - Adds `.battle-peek-pager` (`‹` / `N / M` / `›`) beside `.battle-peek-close`
+    with `onStepTarget` / `onPeekStepTarget`, `44×44 px` touch hit targets,
+    WCAG `:focus-visible`, pointer-fine hover lift, and full reduced-motion parity.
+  - Intercepts keyboard `ArrowLeft`/`ArrowRight` and gamepad `LB`/`RB`/D-Pad
+    Left/Right while Peek is open to step targets live without closing Peek or
+    leaking `flute`/`lasso` assist activations.
+- Modular `src/ui/encore-shrine-session.ts` extraction (`src/ui/encore-shrine.ts`
+  `684 -> 476` lines, `src/ui/encore-shrine-session.ts` `226` lines):
+  - Extracts `EncoreShrineSession`, `mountEncoreShrineSession`, `encoreFooterHint`,
+    `MODIFIER_SHORT_NAMES`, `starSvg`, and `makeTrophyImg` into
+    `src/ui/encore-shrine-session.ts`, re-exporting public symbols identically
+    from `src/ui/encore-shrine.ts`.
+- Evidence: `tests/unit/milestone-234.test.ts` and
+  `tests/e2e/milestone-234.spec.ts` (`@smoke`, Chromium & WebKit).
+- Gates: `just check` (302 unit files / 2,143 tests, all 77 recorded + 7
+  headless sims with zero hash shifts, 23 QA packs, purity, lint), `just build`
+  (largest non-vendor production chunk `index` `< 365 kB`, hook leak + runtime
+  story + harness checks green), Chromium & WebKit (`milestone-234`,
+  `milestone-233`, `milestone-232`, `milestone-113`, `milestone-115`), and 1/1
+  Chromium (`encore-shrine`).
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

@@ -73,6 +73,13 @@ export function parseSave(json: string, template: State,
     };
     if (saved.battle !== null || saved.arcade !== null || saved.finale !== null) return null;
     if (saved.cutscene !== undefined && saved.cutscene !== null) return null;
+    if (
+      saved.puzzleArea !== undefined &&
+      (!record(saved.puzzleArea) || Array.isArray(saved.puzzleArea))
+    ) {
+      return null;
+    }
+    if ("puzzleArea" in saved) delete saved.puzzleArea;
     // Set pieces added by later content start as they would in a new game, so
     // new content never throws a save away.
     const state = record(saved.critters)
@@ -119,6 +126,14 @@ function validCounts(value: unknown, max: number): boolean {
   );
 }
 
+function validFlags(value: unknown): boolean {
+  if (value === undefined) return true;
+  if (!record(value) || Array.isArray(value)) return false;
+  return Object.entries(value).every(
+    ([id, flag]) => /^[a-z][a-z0-9-]*$/.test(id) && typeof flag === "boolean",
+  );
+}
+
 function validOptionalPoint(value: unknown): boolean {
   if (value === undefined) return true;
   return record(value) && !Array.isArray(value) &&
@@ -140,9 +155,14 @@ function isState(value: unknown, template: State): value is State {
     validCounts(value.treats, 99) &&
     validCounts(value.caughtFish, 9999) &&
     validCutscenesSeen(value.cutscenesSeen) &&
-    validEncoreRecord(value.encore);
+    validEncoreRecord(value.encore) &&
+    validFlags(value.puzzles);
 }
 
 export function serializeSave(state: State): string {
-  return JSON.stringify({ version: 10, state } satisfies SaveData);
+  if (state.puzzleArea === undefined) {
+    return JSON.stringify({ version: 10, state } satisfies SaveData);
+  }
+  const { puzzleArea: _puzzleArea, ...persisted } = state;
+  return JSON.stringify({ version: 10, state: persisted } satisfies SaveData);
 }

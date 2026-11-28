@@ -143,6 +143,7 @@ import rosieCottageFixtureData from "../../content/fixtures/rosie-cottage.json";
 import summitFixtureData from "../../content/fixtures/summit.json";
 import islandFixtureData from "../../content/fixtures/island.json";
 import festivalFixtureData from "../../content/fixtures/festival.json";
+import mistFixtureData from "../../content/fixtures/mist.json";
 import tunableData from "../../content/tunables.json";
 import fountainFrogData from "../../content/critters/fountain-frog.json";
 import frogData from "../../content/critters/frog.json";
@@ -223,6 +224,7 @@ export {
 } from "./battle-parsers";
 export { npcScheduleErrors, parseNpcProfiles, parseNpcStroll } from "./npc-parsers";
 export { parseCutscene, type CutsceneValidationContext } from "./cutscene-parsers";
+export { parseAreaPuzzles } from "./puzzle-parsers";
 export * from "./story-checks";
 
 export const STORY_ASSET_PATH = "assets/story/main.ink.json";
@@ -450,6 +452,7 @@ export function loadContent(options?: {
     summit: loadFixture(summitFixtureData, "summit"),
     island: loadFixture(islandFixtureData, "island"),
     festival: loadFixture(festivalFixtureData, "festival"),
+    mist: loadFixture(mistFixtureData, "mist"),
   };
   for (const [name, fixture] of Object.entries(fixtures))
     for (const id of fixture.party ?? [])
@@ -552,10 +555,7 @@ export function loadContent(options?: {
     parsedProfiles.profiles.map((profile) => [profile.id, profile]),
   );
   const cutsceneCtx = {
-    areas,
-    characters,
-    party,
-    story,
+    areas, characters, party, story,
     storyVariable: (name: string) => storyVariable(initialInk, name),
   };
   const cutsceneFiles: [unknown, string][] = [
@@ -572,20 +572,8 @@ export function loadContent(options?: {
   return {
     world: {
       tunables: parseTunables(tunableData, "content/tunables.json"),
-      areas,
-      surfaces,
-      lands,
-      story,
-      critters,
-      battle,
-      stickers,
-      characters,
-      party,
-      storyVariable,
-      arcade: arcadeGames,
-      levels,
-      treats,
-      npcProfiles,
+      areas, surfaces, lands, story, critters, battle, stickers, characters, party, storyVariable,
+      arcade: arcadeGames, levels, treats, npcProfiles,
       npcBanter: parsedProfiles.banter,
       partyBanter: parsedProfiles.partyBanter ?? [],
       toolEvents: parsedProfiles.toolEvents ?? [],

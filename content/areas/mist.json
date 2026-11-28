@@ -601,5 +601,104 @@
       "y": 570,
       "facing": "left"
     }
+  },
+  "puzzles": {
+    "steppingStones": [
+      {
+        "id": "mist-lantern-stones",
+        "gapPolygon": [
+          [
+            380,
+            505
+          ],
+          [
+            515,
+            505
+          ],
+          [
+            515,
+            655
+          ],
+          [
+            380,
+            655
+          ]
+        ],
+        "overridesCrossing": "mist-band",
+        "stones": [
+          {
+            "x": 415,
+            "y": 575
+          },
+          {
+            "x": 450,
+            "y": 575
+          },
+          {
+            "x": 485,
+            "y": 575
+          }
+        ],
+        "lanternRange": 250,
+        "permanentOnPuzzle": "mist-lantern-ritual"
+      }
+    ],
+    "grapples": [
+      {
+        "id": "mist-gully-post",
+        "kind": "post",
+        "x": 940,
+        "y": 580,
+        "range": 260,
+        "requiresLasso": true
+      }
+    ],
+    "bells": [
+      {
+        "id": "mist-seal-shrine",
+        "style": "shrine",
+        "x": 1275,
+        "y": 525,
+        "sequence": [
+          "up",
+          "right",
+          "left"
+        ],
+        "hintLabel": "Red · Yellow · Blue",
+        "radius": 130
+      }
+    ],
+    "goals": [
+      {
+        "id": "mist-lantern-ritual",
+        "requireSteppingStones": [
+          "mist-lantern-stones"
+        ],
+        "inkVariable": "found_mist_way"
+      },
+      {
+        "id": "mist-lasso-ritual",
+        "requireLevers": [
+          "mist-gully-post"
+        ],
+        "inkVariable": "rope_bridge"
+      },
+      {
+        "id": "mist-flute-ritual",
+        "requireBells": [
+          "mist-seal-shrine"
+        ],
+        "inkVariable": "seal_open"
+      },
+      {
+        "id": "mist-forest-seal",
+        "requirePuzzles": [
+          "mist-lantern-ritual",
+          "mist-lasso-ritual",
+          "mist-flute-ritual"
+        ],
+        "inkVariable": "seal_open"
+      }
+    ]
   }
 }

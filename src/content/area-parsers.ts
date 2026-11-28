@@ -11,6 +11,7 @@ import type {
 import { parseAmbient, setAreaAmbient } from "./ambient";
 import { parseRecurring } from "./battle-parsers";
 import { parseNpcStroll } from "./npc-parsers";
+import { parseAreaPuzzles } from "./puzzle-parsers";
 import {
   array,
   direction,
@@ -193,6 +194,7 @@ export function parseArea(value: unknown, file: string, catalogue?: PropCatalogu
     field(direction(raw.facing), file, `spawns.${name}.facing`);
     spawns[name] = { x: raw.x, y: raw.y, facing: raw.facing };
   }
+  const puzzles = parseAreaPuzzles(value.puzzles, file, crossingIds);
   const area: Area = {
     id: value.id,
     name: value.name,
@@ -272,6 +274,7 @@ export function parseArea(value: unknown, file: string, catalogue?: PropCatalogu
     props: placeProps(parsePropPlacements(value.props, file), catalogue, file),
     atlases: catalogue?.atlases ?? [],
     spawns,
+    ...(puzzles === undefined ? {} : { puzzles }),
   };
   setAreaAmbient(area, parseAmbient(value.ambient, file, value.width, value.height));
   return area;

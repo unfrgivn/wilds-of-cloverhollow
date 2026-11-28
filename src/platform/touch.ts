@@ -38,6 +38,7 @@ export class TouchInput {
   private traceRect: TraceRect | undefined;
   private tracePoint: Point | undefined;
   private traceTap: Point | undefined;
+  private dashOn = false;
 
   frame(): ActionFrame {
     const arrowHeld = this.arrow.x !== 0 || this.arrow.y !== 0;
@@ -53,8 +54,22 @@ export class TouchInput {
       lantern: this.hasButton("lantern"),
       flute: this.hasButton("flute"),
       ...(this.hasButton("lasso") ? { lasso: true } : {}),
+      ...(this.dashOn ? { dash: true } : {}),
       choose: this.choice,
     };
+  }
+
+  toggleDash(): boolean {
+    this.dashOn = !this.dashOn;
+    return this.dashOn;
+  }
+
+  setDash(on: boolean): void {
+    this.dashOn = on;
+  }
+
+  isDashOn(): boolean {
+    return this.dashOn;
   }
 
   private hasButton(button: Button): boolean {

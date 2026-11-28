@@ -110,10 +110,68 @@
   font-size: 26px;
 }
 .touch-flute[hidden] { display: none; }
+.touch-lasso {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-cancel-size);
+  height: var(--touch-cancel-size);
+}
+.touch-lasso[hidden] { display: none; }
+.touch-lasso svg {
+  width: 30px;
+  height: 30px;
+}
+.lasso-icon-loop,
+.lasso-icon-tail {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.lasso-icon-knot {
+  fill: #f5cb5c;
+  stroke: currentColor;
+  stroke-width: 1.8;
+}
+.touch-dash {
+  position: absolute;
+  left: calc(20px + var(--safe-left));
+  bottom: calc(144px + var(--safe-bottom));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-width: 2.5px;
+  background: #fff4d6cc;
+  color: #513b32;
+  font-size: 22px;
+  line-height: 1;
+  touch-action: manipulation;
+}
+.touch-dash.is-on {
+  background: #ffe89a;
+  box-shadow: 0 0 14px #ffe89acc, 0 4px 8px #513b3240;
+}
 /* The tools do nothing in a conversation or a battle (spec 3.2), so they step
    aside: the dialogue reserves room for confirm and cancel only. */
-:root[data-dialogue="open"] :is(.touch-lantern, .touch-flute),
-:root[data-battle="open"] :is(.touch-lantern, .touch-flute) {
+:root[data-dialogue="open"] :is(.touch-lantern, .touch-flute, .touch-lasso),
+:root[data-battle="open"] :is(.touch-lantern, .touch-flute, .touch-lasso),
+:root[data-cutscene="open"] :is(.touch-lantern, .touch-flute, .touch-lasso, .touch-dash),
+:root[data-flute-wheel="open"] :is(.touch-lantern, .touch-flute, .touch-lasso, .touch-stick),
+:root[data-photo="on"] :is(.touch-lantern, .touch-flute, .touch-lasso),
+:root[data-credits="open"] :is(.touch-lasso, .touch-dash) {
+  display: none;
+}
+:root[data-dialogue="open"] .touch-dash,
+:root[data-battle="open"] .touch-dash,
+:root[data-arcade="open"] .touch-dash,
+:root[data-flute-wheel="open"] .touch-dash,
+:root[data-photo="on"] .touch-dash,
+:root[data-check="catch"] .touch-dash,
+:root[data-check="lean"] .touch-dash {
   display: none;
 }
 .touch-lantern.is-on {

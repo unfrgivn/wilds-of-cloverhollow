@@ -451,7 +451,8 @@ export class GroundReactivityController {
   private _lastFootstepKind: FootstepVfxKind | null = null;
   private lastFootstepArea = "";
   private lastFootstepTick: number | undefined;
-  private lastFootstepStride: number | undefined;
+  private lastFootstepDistance: number | undefined;
+  private playerFootstepCount = 0;
   private readonly lastNpcFootstepStride = new Map<string, number>();
 
   constructor(
@@ -502,7 +503,8 @@ export class GroundReactivityController {
     this.activeFootstepCount = 0;
     this._lastFootstepKind = null;
     this.lastFootstepTick = undefined;
-    this.lastFootstepStride = undefined;
+    this.lastFootstepDistance = undefined;
+    this.playerFootstepCount = 0;
     this.lastNpcFootstepStride.clear();
     for (let i = 0; i < FOOTSTEP_POOL_SIZE; i += 1) {
       const slot = this.footstepSlots[i];
@@ -546,6 +548,7 @@ export class GroundReactivityController {
     stride: number,
     tick: number,
     isNpc: boolean,
+    dashing = false,
   ): void {
     const backX = facing === "left" ? 1 : facing === "right" ? -1 : 0;
     const backY = facing === "up" ? 1 : facing === "down" ? -1 : 0;
@@ -555,6 +558,17 @@ export class GroundReactivityController {
     const k = isNpc ? 0.78 : 1;
     const rotA = (stride * 0.7) % (Math.PI * 2);
     const rotB = (stride * 1.3 + 1.1) % (Math.PI * 2);
+
+    if (dashing && !isNpc) {
+      const heelTint =
+        kind === "snow-sparkle" ? 0xdcf4ff : kind === "grass-fleck" ? 0xc8e898 :
+        kind === "water-ripple" ? 0xb8f0f6 : 0xf0dcba;
+      this.writeFootstepSlot(
+        x + backX * 22 + perpX * side * 4, y + backY * 7 + perpY * side * 3,
+        backX * 0.78, backY * 0.34 - 0.36, 0,
+        tick, 0, 18, heelTint, 0.56, 0.24, 0.48, 0.9, rotB, 0.04 * side, "puff", "normal",
+      );
+    }
 
     if (kind === "water-ripple") {
       const rx = x + backX * 16 + perpX * side * 5;
@@ -693,22 +707,33 @@ export class GroundReactivityController {
     ) {
       this.clearFootsteps();
     }
-    const halfStride = this.world.tunables.walkCycleUnits / 2;
-    const stride = Math.floor(state.motion.distance / halfStride);
+    const dashing = state.previousInput.dash === true && state.motion.moving;
+    const stepUnits = dashing
+      ? this.world.tunables.walkCycleUnits / 3.5
+      : this.world.tunables.walkCycleUnits / 2;
     const map = this.world.surfaces[areaId];
+    if (
+      this.lastFootstepDistance === undefined ||
+      state.motion.distance < this.lastFootstepDistance
+    ) {
+      this.lastFootstepDistance = state.motion.distance;
+    }
     if (
       state.motion.moving &&
       this.lastFootstepArea === areaId &&
-      this.lastFootstepTick !== undefined &&
-      this.lastFootstepStride !== undefined
+      this.lastFootstepTick !== undefined
     ) {
       const delta = state.tick - this.lastFootstepTick;
-      if (delta >= 1 && delta <= 5 && stride > this.lastFootstepStride) {
+      const moved = state.motion.distance - this.lastFootstepDistance;
+      if (delta >= 1 && delta <= 5 && moved >= stepUnits) {
+        this.lastFootstepDistance = state.motion.distance;
+        this.playerFootstepCount += 1;
         const surface = map === undefined ? "grass" : surfaceAt(map, state.player);
         const kind = classifyFootstepEffect(surface, areaId, state.player);
         this._lastFootstepKind = kind;
         this.emitFootstepVfx(
-          playerPos.x, playerPos.y, state.facing, surface, kind, stride, state.tick, false,
+          playerPos.x, playerPos.y, state.facing, surface, kind,
+          this.playerFootstepCount, state.tick, false, dashing,
         );
       }
     }
@@ -744,7 +769,6 @@ export class GroundReactivityController {
     }
     this.lastFootstepArea = areaId;
     this.lastFootstepTick = state.tick;
-    this.lastFootstepStride = stride;
 
     let activeCount = 0;
     for (let i = 0; i < FOOTSTEP_POOL_SIZE; i += 1) {

@@ -8,6 +8,7 @@ import type {
   EncoreRecord,
 } from "./encore";
 import type { MoleHole } from "./mole";
+import type { AreaPuzzles, AreaPuzzleState } from "./puzzles";
 import type { TacoTopping } from "./taco";
 
 export type Point = { x: number; y: number };
@@ -21,6 +22,7 @@ export type ActionFrame = {
   lantern?: boolean;
   flute?: boolean;
   lasso?: boolean;
+  dash?: boolean;
   choose?: number;
   pointer?: { x: number; y: number };
 };
@@ -108,6 +110,7 @@ export type Area = {
   // The area's prop atlases (Pixi spritesheet JSON URLs), loaded with it.
   atlases: string[];
   spawns: Record<string, Spawn>;
+  puzzles?: AreaPuzzles;
 };
 // One prop placed in an area (spec 6). Its state is `state` unless one of
 // `rules` applies: the first whose Ink variable is true wins. A painted prop is
@@ -1375,6 +1378,8 @@ export type State = {
   treats?: Record<string, number>;
   caughtFish?: Record<string, number>;
   encore?: EncoreRecord;
+  puzzles?: Record<string, boolean>;
+  puzzleArea?: AreaPuzzleState;
   finale: "morning" | "credits" | null;
   backLink?: { area: string; direction: Direction };
   cutscene?: CutsceneState;

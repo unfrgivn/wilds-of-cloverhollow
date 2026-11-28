@@ -342,6 +342,8 @@ function keysFor(frame: ActionFrame): string[] {
     ...(frame.confirm ? ["z"] : []),
     ...(frame.lantern ? ["l"] : []),
     ...(frame.flute ? ["f"] : []),
+    ...(frame.lasso ? ["r"] : []),
+    ...(frame.dash ? ["ShiftLeft"] : []),
   ];
 }
 

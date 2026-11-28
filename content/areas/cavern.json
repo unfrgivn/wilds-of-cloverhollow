@@ -660,5 +660,48 @@
         }
       ]
     }
-  ]
+  ],
+  "puzzles": {
+    "emitters": [
+      {
+        "id": "cavern-emitter",
+        "x": 580,
+        "y": 875,
+        "direction": "right",
+        "requiresLantern": true,
+        "lanternRange": 180
+      }
+    ],
+    "mirrors": [
+      {
+        "id": "cavern-mirror-1",
+        "x": 720,
+        "y": 875,
+        "orientation": "se"
+      },
+      {
+        "id": "cavern-mirror-2",
+        "x": 720,
+        "y": 750,
+        "orientation": "ne"
+      }
+    ],
+    "receivers": [
+      {
+        "id": "cavern-receiver",
+        "x": 865,
+        "y": 750,
+        "radius": 28
+      }
+    ],
+    "goals": [
+      {
+        "id": "cavern-prism",
+        "requireReceivers": [
+          "cavern-receiver"
+        ],
+        "inkVariable": "cavern_bridge_lit"
+      }
+    ]
+  }
 }

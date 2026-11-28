@@ -605,5 +605,79 @@
       "x": 1069,
       "y": 1068
     }
-  ]
+  ],
+  "puzzles": {
+    "steppingStones": [
+      {
+        "id": "trail-stones",
+        "gapPolygon": [
+          [
+            995,
+            295
+          ],
+          [
+            1070,
+            295
+          ],
+          [
+            1070,
+            365
+          ],
+          [
+            995,
+            365
+          ]
+        ],
+        "stones": [
+          {
+            "x": 1012,
+            "y": 330
+          },
+          {
+            "x": 1035,
+            "y": 330
+          },
+          {
+            "x": 1058,
+            "y": 330
+          }
+        ],
+        "lanternRange": 250,
+        "permanentOnPuzzle": "trail-crossing"
+      }
+    ],
+    "grapples": [
+      {
+        "id": "trail-grapple",
+        "kind": "post",
+        "x": 1115,
+        "y": 330,
+        "range": 280
+      },
+      {
+        "id": "trail-swing",
+        "kind": "swing",
+        "x": 1030,
+        "y": 240,
+        "range": 260,
+        "landA": {
+          "x": 925,
+          "y": 240
+        },
+        "landB": {
+          "x": 1105,
+          "y": 255
+        }
+      }
+    ],
+    "goals": [
+      {
+        "id": "trail-crossing",
+        "requireLevers": [
+          "trail-grapple"
+        ],
+        "rewardCoins": 12
+      }
+    ]
+  }
 }

@@ -38,6 +38,7 @@ function padFrame(pad: StandardGamepad): ActionFrame {
     ...(pressed(pad, 2) ? { lantern: true } : {}),
     ...(pressed(pad, 4) ? { lasso: true } : {}),
     ...(pressed(pad, 5) ? { flute: true } : {}),
+    ...(pressed(pad, 1) || pressed(pad, 7) ? { dash: true } : {}),
   };
 }
 
@@ -54,6 +55,7 @@ export function gamepadFrame(pads: readonly StandardGamepad[]): ActionFrame {
     if (next.lantern) frame.lantern = true;
     if (next.flute) frame.flute = true;
     if (next.lasso) frame.lasso = true;
+    if (next.dash) frame.dash = true;
   }
   return frame;
 }
@@ -76,6 +78,7 @@ export function combineInputFrames(
     ...(keyboard.lantern || touch.lantern || gamepad.lantern ? { lantern: true } : {}),
     ...(keyboard.flute || touch.flute || gamepad.flute ? { flute: true } : {}),
     ...(keyboard.lasso || touch.lasso || gamepad.lasso ? { lasso: true } : {}),
+    ...(keyboard.dash || touch.dash || gamepad.dash ? { dash: true } : {}),
     choose: touch.choose,
     // A finger on a trace (spec 3.2): only touch has one, and only while down.
     ...(touch.pointer === undefined ? {} : { pointer: touch.pointer }),
@@ -93,6 +96,7 @@ export class GamepadLatch {
     if (frame.lantern) this.tapped.lantern = true;
     if (frame.flute) this.tapped.flute = true;
     if (frame.lasso) this.tapped.lasso = true;
+    if (frame.dash) this.tapped.dash = true;
     this.current = frame;
   }
 
@@ -109,6 +113,7 @@ export class GamepadLatch {
       ...(this.current.lantern || this.tapped.lantern ? { lantern: true } : {}),
       ...(this.current.flute || this.tapped.flute ? { flute: true } : {}),
       ...(this.current.lasso || this.tapped.lasso ? { lasso: true } : {}),
+      ...(this.current.dash || this.tapped.dash ? { dash: true } : {}),
     };
     this.clearTaps();
     return result;

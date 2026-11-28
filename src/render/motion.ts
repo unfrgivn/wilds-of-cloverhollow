@@ -43,6 +43,21 @@ export function walkPose(
   return { offsetX: 0, offsetY, scaleX, scaleY, rotation: 0 };
 }
 
+export function dashPose(
+  distance: number,
+  walkCycleUnits: number,
+  facing: Direction,
+): MotionPose {
+  if (walkCycleUnits <= 0) return { ...NEUTRAL_POSE };
+  const phase = (((distance / (walkCycleUnits * 0.85)) % 1) + 1) % 1;
+  const cos4 = Math.cos(phase * Math.PI * 4);
+  const scaleY = 1 + 0.042 * cos4;
+  const scaleX = 1 - 0.032 * cos4;
+  const offsetY = -Math.abs(Math.sin(phase * Math.PI * 2)) * 5.4;
+  const leanSign = facing === "right" ? 1 : facing === "left" ? -1 : 0;
+  return { offsetX: 0, offsetY, scaleX, scaleY, rotation: leanSign * 0.085 };
+}
+
 export function idleBreathing(
   tick: number,
   phaseOffset: number,

@@ -33,3 +33,4 @@ export * from "./npc-context";
 export * from "./cutscene";
 export * from "./heart-to-hearts";
 export * from "./encore";
+export * from "./puzzles";

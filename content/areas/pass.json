@@ -939,5 +939,46 @@
         }
       ]
     }
-  ]
+  ],
+  "puzzles": {
+    "pushables": [
+      {
+        "id": "pass-snowball",
+        "kind": "snowball",
+        "x": 1160,
+        "y": 1005,
+        "radius": 18,
+        "slides": true,
+        "lassoable": true
+      }
+    ],
+    "plates": [
+      {
+        "id": "pass-plate-jordan",
+        "x": 1175,
+        "y": 965,
+        "radius": 26,
+        "companionHold": true,
+        "preferredCompanion": "jordan"
+      },
+      {
+        "id": "pass-plate-snow",
+        "x": 1240,
+        "y": 1005,
+        "radius": 26,
+        "companionHold": true,
+        "preferredCompanion": "sue"
+      }
+    ],
+    "goals": [
+      {
+        "id": "pass-snowball-coop",
+        "requirePlates": [
+          "pass-plate-jordan",
+          "pass-plate-snow"
+        ],
+        "rewardCoins": 15
+      }
+    ]
+  }
 }

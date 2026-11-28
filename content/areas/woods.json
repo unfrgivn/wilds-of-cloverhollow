@@ -726,5 +726,60 @@
         570
       ]
     ]
-  ]
+  ],
+  "puzzles": {
+    "bells": [
+      {
+        "id": "woods-bell",
+        "style": "bell",
+        "x": 340,
+        "y": 780,
+        "sequence": [
+          "up",
+          "down",
+          "right"
+        ],
+        "hintLabel": "Red · Green · Yellow",
+        "radius": 130
+      }
+    ],
+    "bridges": [
+      {
+        "id": "woods-vines",
+        "style": "vine",
+        "opensOn": "woods-vine-harmony",
+        "polygon": [
+          [
+            220,
+            815
+          ],
+          [
+            315,
+            815
+          ],
+          [
+            315,
+            860
+          ],
+          [
+            220,
+            860
+          ]
+        ],
+        "visualPoint": {
+          "x": 268,
+          "y": 838
+        }
+      }
+    ],
+    "goals": [
+      {
+        "id": "woods-vine-harmony",
+        "requireBells": [
+          "woods-bell"
+        ],
+        "rewardCoins": 12
+      }
+    ]
+  }
 }

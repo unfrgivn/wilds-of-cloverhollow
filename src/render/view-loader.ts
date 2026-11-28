@@ -7,6 +7,7 @@ import { cutsceneAreaAtlases } from "./cutscene-render";
 import { CLUBHOUSE_PRIZES_ALIAS } from "./overworld-effects";
 import { areaEntityAtlases, type EntityAtlas } from "./overworld-render";
 import { RESTORATION_ATLAS_ALIAS, RESTORATION_ATLAS_URL } from "./restoration";
+import { PUZZLE_ATLAS_ALIAS, PUZZLE_ATLAS_URL } from "./puzzles-render";
 import { computeAreaEvictions } from "./view-projections";
 
 /** Loads a Pixi spritesheet with mipmap generation enabled for crisp zoom scaling. */
@@ -40,6 +41,7 @@ export class AreaAssetManager {
       "glow-sheet",
       "ambient-sheet",
       RESTORATION_ATLAS_ALIAS,
+      PUZZLE_ATLAS_ALIAS,
       world.battle.toyAtlas,
       ...Object.keys(world.party).map((id) => `${id}-sheet`),
       ...Object.keys(CHARACTER_POSE_ATLASES).map((id) => `${id}-poses`),
@@ -59,6 +61,7 @@ export class AreaAssetManager {
       mipmapSheet("glow-sheet", assetUrl("assets/glows/glows.json")),
       mipmapSheet("ambient-sheet", assetUrl("assets/ambient/ambient.json")),
       mipmapSheet(RESTORATION_ATLAS_ALIAS, assetUrl(RESTORATION_ATLAS_URL)),
+      mipmapSheet(PUZZLE_ATLAS_ALIAS, assetUrl(PUZZLE_ATLAS_URL)),
       // The toys a catch throws are cropped from this sheet by the DOM
       // overlay, which reads their frames here.
       mipmapSheet(this.world.battle.toyAtlas, assetUrl(this.world.battle.toyAtlas)),

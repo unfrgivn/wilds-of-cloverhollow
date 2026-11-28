@@ -424,6 +424,7 @@ function updateFollower(
   leaderBox: Box,
   leaderMoved: boolean,
   ahead: { point: Point; box: Box }[],
+  dashing = false,
 ): PartyMember {
   const tune = world.tunables.follow;
   const trail = member.trail.slice();
@@ -513,9 +514,10 @@ function updateFollower(
     };
   }
   let position = { x: member.x, y: member.y };
+  const baseMultiplier = routeLength > tune.distance + 40 ? tune.catchUp : 1;
   let remaining =
     (world.tunables.walkSpeed / 60) *
-    (routeLength > tune.distance + 40 ? tune.catchUp : 1);
+    (dashing ? Math.max(baseMultiplier, 1.45) : baseMultiplier);
   const targets = route.slice();
   while (remaining > 0 && targets.length > 0) {
     const target = targets[0];
@@ -561,6 +563,22 @@ function updateFollower(
   };
 }
 
+function heldPlateForMember(
+  area: Area,
+  state: State,
+  memberId: string,
+): Point | undefined {
+  const held = state.puzzleArea?.heldPlates;
+  const plates = area.puzzles?.plates;
+  if (held === undefined || plates === undefined) return undefined;
+  for (const [plateId, holderId] of Object.entries(held)) {
+    if (holderId !== memberId) continue;
+    const plate = plates.find((item) => item.id === plateId);
+    if (plate !== undefined) return { x: plate.x, y: plate.y };
+  }
+  return undefined;
+}
+
 // The whole party's tick, in party order: each member follows the one ahead
 // as it stands after its own move this tick. Followers never collide with
 // each other, nor with Fae.
@@ -570,6 +588,7 @@ export function stepParty(
   state: State,
   player: Point,
   playerMoved: boolean,
+  dashing = false,
 ): PartyMember[] {
   const party: PartyMember[] = [];
   let leader = player;
@@ -579,6 +598,29 @@ export function stepParty(
     { point: player, box: faeBox },
   ];
   for (const member of state.party) {
+    const heldPoint = heldPlateForMember(area, state, member.id);
+    if (heldPoint !== undefined) {
+      const dx = player.x - heldPoint.x;
+      const dy = player.y - heldPoint.y;
+      const facing =
+        Math.abs(dx) >= Math.abs(dy)
+          ? dx < 0
+            ? "left"
+            : "right"
+          : dy < 0
+            ? "up"
+            : "down";
+      party.push({
+        ...member,
+        x: heldPoint.x,
+        y: heldPoint.y,
+        facing,
+        stillTicks: member.stillTicks + 1,
+        motion: { ...member.motion, moving: false },
+        trail: [heldPoint],
+      });
+      continue;
+    }
     const content = partyContent(world, member.id);
     const next = updateFollower(
       world,
@@ -589,6 +631,7 @@ export function stepParty(
       leaderBox,
       leaderMoved,
       [...ahead],
+      dashing,
     );
     party.push(next);
     leader = { x: next.x, y: next.y };

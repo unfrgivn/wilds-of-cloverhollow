@@ -17,6 +17,7 @@ export function isActionFrame(value: unknown): value is ActionFrame {
     && (value.lantern === undefined || typeof value.lantern === "boolean")
     && (value.flute === undefined || typeof value.flute === "boolean")
     && (value.lasso === undefined || typeof value.lasso === "boolean")
+    && (value.dash === undefined || typeof value.dash === "boolean")
     && (value.choose === undefined || typeof value.choose === "number")
     && (value.pointer === undefined || pointer(value.pointer))
   );

@@ -24,6 +24,11 @@ const ALL_EFFECTS: readonly CompanionAudioEffect[] = [
   "paper-flip",
   "sticker-peel",
   "atlas-pin",
+  "beach-ball-boop",
+  "pebble-skip",
+  "shop-bell",
+  "arcade-bell",
+  "sanctuary-hop",
 ];
 
 const UI_FOLEY_EFFECTS: readonly CompanionAudioEffect[] = [

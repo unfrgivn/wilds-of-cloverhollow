@@ -211,6 +211,11 @@ describe("Milestone 114: modular audio-recipes.ts extraction & audio.ts re-expor
     "paper-flip",
     "sticker-peel",
     "atlas-pin",
+    "beach-ball-boop",
+    "pebble-skip",
+    "shop-bell",
+    "arcade-bell",
+    "sanctuary-hop",
   ];
 
   it("defines valid non-empty recipes for every SoundCue and matches audio.ts re-exports", () => {

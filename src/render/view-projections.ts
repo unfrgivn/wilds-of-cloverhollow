@@ -27,6 +27,7 @@ import type {
 } from "./entity-layer";
 import { transitionZoom } from "./fade";
 import type { NpcLifeRenderInfo } from "./npc-life";
+import type { MicroDelightsRenderInfo } from "./micro-delights-render";
 import { computeLanternBlend, PET_REACTION_DURATION } from "./overworld-render";
 import type { TimeOfDayPhase } from "./time-of-day";
 
@@ -103,6 +104,7 @@ export type GameViewRenderInfo = {
   resting: string | null;
   timeOfDay: TimeOfDayPhase;
   photoMode: boolean;
+  microDelights: MicroDelightsRenderInfo;
   battle: BattleRenderInfo;
   cutscene: CutsceneRenderInfo | null;
 };
@@ -382,6 +384,7 @@ export function computeNpcChatterScreenAnchor(
   viewHeight: number,
   canvasWidth: number,
   canvasHeight: number,
+  zoom = 1,
 ): NpcChatterView | null {
   if (
     chatter === null ||
@@ -411,6 +414,7 @@ export function computeNpcChatterScreenAnchor(
     viewHeight,
     canvasWidth,
     canvasHeight,
+    zoom,
   );
   return {
     visible: true,

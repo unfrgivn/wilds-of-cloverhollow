@@ -307,6 +307,11 @@ describe("Milestone 172: Modular src/platform/audio-effects.ts Extraction", () =
     "paper-flip",
     "sticker-peel",
     "atlas-pin",
+    "beach-ball-boop",
+    "pebble-skip",
+    "shop-bell",
+    "arcade-bell",
+    "sanctuary-hop",
   ];
 
   it("re-exports effectRecipes and effectRecipe identically with gentle gains and lean modules",

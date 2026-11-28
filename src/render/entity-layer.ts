@@ -33,6 +33,7 @@ import {
   walkPose,
   type PaperFlipState,
 } from "./motion";
+import { sanctuaryCritterHopPose } from "./micro-delights";
 import { isAdultNpc, type NpcLifeController } from "./npc-life";
 import {
   computeCritterShadow,
@@ -583,6 +584,7 @@ export class OverworldEntityLayer {
     previousState?: State,
     alpha = 1,
     reducedMotion = false,
+    sanctuaryHop: { npcId: string; elapsed: number } | null = null,
   ): void {
     const lifeById = new Map(npcLife.npcs.map((entry) => [entry.id, entry]));
     const csOverrides = cutsceneView(state)?.actorOverrides;
@@ -627,9 +629,14 @@ export class OverworldEntityLayer {
         const talking = state.dialogue !== null && state.dialogue.knot === npc.knot;
         const flipX = talking ? state.player.x > livePos.x : facing === "right";
         const scale = critter.overworldHeight / critter.figureHeight;
-        const pose = !livingMotion
+        const idlePose = !livingMotion
           ? NEUTRAL_POSE
           : idleBreathing(state.tick, (npcIndex + 1) * 1.1, 0.012);
+        const hopPose =
+          sanctuaryHop !== null && sanctuaryHop.npcId === npc.id
+            ? sanctuaryCritterHopPose(npc.id, sanctuaryHop.elapsed, reducedMotion)
+            : NEUTRAL_POSE;
+        const pose = composePose(idlePose, hopPose);
         sprite.texture = texture;
         sprite.anchor.set(0.5, 504 / 512);
         sprite.scale.set((flipX ? -scale : scale) * pose.scaleX, scale * pose.scaleY);
@@ -637,8 +644,10 @@ export class OverworldEntityLayer {
         sprite.rotation = pose.rotation;
         sprite.zIndex = livePos.y;
         if (shadow !== null) {
-          applyShadow(shadow, computeCritterShadow(livePos, critter.overworldHeight, 0,
-            shadowAlpha));
+          applyShadow(
+            shadow,
+            computeCritterShadow(livePos, critter.overworldHeight, pose.offsetY, shadowAlpha),
+          );
         }
         frames.push({ id: npc.id, frame: "calm_idle_01", facing });
         continue;

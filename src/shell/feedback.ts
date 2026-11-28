@@ -18,6 +18,11 @@ import type { CompanionAudioEffect, SoundPlayContext } from "../platform/audio";
 import type { HapticKind } from "../platform/haptics";
 import type { MinigameRecordsController } from "../platform/minigame-records";
 import { findPettableCompanion, findRestSpot, type RestSpot } from "../render/companions";
+import {
+  findNearbySanctuaryCritter,
+  findPebbleSkipSpot,
+  type PebbleSkipSpot,
+} from "../render/micro-delights";
 import type { ArcadeRecordBadge } from "../ui/arcade-popups";
 import { areaBannerInfo, type AreaBannerView } from "../ui/area-banner";
 import type { JukeboxMeta } from "../ui/journal";
@@ -568,7 +573,7 @@ export function createNpcChatterSync(
   };
 }
 
-/** Handles overworld Confirm presses when no interactable is targeted: stand, sit, or pet. */
+/** Handles overworld Confirm presses when no interactable is targeted. */
 export function performOverworldConfirm(
   world: World,
   state: State,
@@ -576,6 +581,8 @@ export function performOverworldConfirm(
     isResting: () => boolean;
     setResting: (spot: RestSpot | null, tick: number) => void;
     triggerPet: (id: string, tick: number) => void;
+    triggerPebbleSkip?: (spot: PebbleSkipSpot, tick: number) => void;
+    triggerSanctuaryHop?: (npcId: string, tick: number) => void;
     playEffect: (effect: CompanionAudioEffect) => void;
     lightHaptic: () => void;
   },
@@ -594,6 +601,20 @@ export function performOverworldConfirm(
   if (companion !== null) {
     deps.triggerPet(companion.id, state.tick);
     deps.playEffect(petEffectForCompanion(companion.id));
+    deps.lightHaptic();
+    return;
+  }
+  const skipSpot = findPebbleSkipSpot(world, state);
+  if (skipSpot !== null && deps.triggerPebbleSkip !== undefined) {
+    deps.triggerPebbleSkip(skipSpot, state.tick);
+    deps.playEffect("pebble-skip");
+    deps.lightHaptic();
+    return;
+  }
+  const critter = findNearbySanctuaryCritter(world, state);
+  if (critter !== null && deps.triggerSanctuaryHop !== undefined) {
+    deps.triggerSanctuaryHop(critter.id, state.tick);
+    deps.playEffect("sanctuary-hop");
     deps.lightHaptic();
   }
 }

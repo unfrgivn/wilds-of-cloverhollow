@@ -25,6 +25,10 @@ import {
 } from "./battle-view";
 import { OverworldEntityLayer } from "./entity-layer";
 import { cutsceneAreaAtlases, CutsceneRenderController } from "./cutscene-render";
+import {
+  scenicBenchChatterBubble, scenicBenchZoom, type PebbleSkipSpot,
+} from "./micro-delights";
+import { MicroDelightsRenderer } from "./micro-delights-render";
 import { NpcLifeController, type NpcLifeRenderInfo } from "./npc-life";
 import { NavOverlayController } from "./nav-overlay";
 import { CLUBHOUSE_PRIZES_ALIAS, OverworldEffectsController } from "./overworld-effects";
@@ -65,6 +69,7 @@ export class GameView {
   private readonly effects: OverworldEffectsController;
   private readonly entities: OverworldEntityLayer;
   private readonly cutsceneRender: CutsceneRenderController;
+  private readonly microDelights: MicroDelightsRenderer;
   private readonly npcLife: NpcLifeController;
   private readonly navOverlay = new NavOverlayController();
   private navField: NavField | null = null;
@@ -147,6 +152,7 @@ export class GameView {
       shadowLayer: this.shadowLayer,
       emissiveLayer: this.emissiveLayer,
     });
+    this.microDelights = new MicroDelightsRenderer(this.vfx, this.depth, this.shadowLayer);
     this.npcLife = new NpcLifeController(this.world, this.vfx);
 
     this.lanternSpotlight = new Sprite(this.vfx.softGlow);
@@ -190,6 +196,7 @@ export class GameView {
       this.shadowLayer,
       this.effects.grassLayer,
       this.effects.footstepLayer,
+      this.microDelights.pebbleLayer,
       this.navOverlay.groundLayer,
       this.atmosphere.under,
       this.depth,
@@ -199,6 +206,7 @@ export class GameView {
       this.npcLife.reactionLayer,
       this.effects.emoteLayer,
       this.cutsceneRender.emoteLayer,
+      this.microDelights.hopSparkleLayer,
       this.paperGrain.sceneSprite,
       this.navOverlay.debugLayer,
     );
@@ -280,6 +288,7 @@ export class GameView {
     this.effects.clearStarGemGlints();
     this.effects.clearEmotes();
     this.restoration.clear();
+    this.microDelights.reset();
     this.npcLife.clear();
     this.navOverlay.clearArea();
     this.navField = null;
@@ -339,17 +348,11 @@ export class GameView {
     this.restingSpot = null;
   }
 
-  triggerPet(id: string, tick: number): void {
-    this.petReaction = { id, startTick: tick };
-  }
-
+  triggerPet(id: string, tick: number): void { this.petReaction = { id, startTick: tick }; }
   setResting(spot: RestSpot | null, tick: number): void {
     this.restingSpot = spot === null ? null : { spot, startTick: tick };
   }
-
-  isResting(): boolean {
-    return this.restingSpot !== null;
-  }
+  isResting(): boolean { return this.restingSpot !== null; }
 
   private activePetReaction(state: State): { id: string; elapsed: number } | null {
     const active = resolveActivePetReaction(this.petReaction, state);
@@ -363,42 +366,35 @@ export class GameView {
     return active;
   }
 
-  observeNpcTick(state: State): void {
-    this.npcLife.observeTick(state);
+  observeNpcTick(state: State): void { this.npcLife.observeTick(state); }
+  stepMicroDelights(state: State): { beachBallKicked: boolean } {
+    return this.microDelights.stepOverworldTick(state, isReducedMotionActive());
+  }
+  triggerPebbleSkip(spot: PebbleSkipSpot, tick: number): void {
+    this.microDelights.triggerPebbleSkip(spot, tick, isReducedMotionActive());
+  }
+  triggerSanctuaryHop(npcId: string, tick: number): void {
+    this.microDelights.triggerSanctuaryHop(npcId, tick);
   }
 
   resetCamera(): void {
-    this.cameraDirector.reset();
-    this.previewDialogueTags = null;
-    this.entities.clearPaperFlips();
-    this.effects.clearFootsteps();
-    this.effects.clearGrassTufts();
-    this.effects.clearEmotes();
-    this.restoration.clear();
-    this.npcLife.clear();
-    this.clearCompanionActions();
+    this.cameraDirector.reset(); this.previewDialogueTags = null;
+    this.entities.clearPaperFlips(); this.effects.clearFootsteps();
+    this.effects.clearGrassTufts(); this.effects.clearEmotes();
+    this.restoration.clear(); this.microDelights.reset();
+    this.npcLife.clear(); this.clearCompanionActions();
   }
 
   setPreviewDialogueTags(tags: readonly string[] | null): void {
     this.previewDialogueTags = tags === null ? null : [...tags];
   }
-
-  invalidateBackdrop(): void {
-    this.battleView.invalidateBackdrop();
-  }
-
-  loadedAreaId(): string {
-    return this.areaView?.area.id ?? "";
-  }
-
+  invalidateBackdrop(): void { this.battleView.invalidateBackdrop(); }
+  loadedAreaId(): string { return this.areaView?.area.id ?? ""; }
   setPhotoMode(on: boolean): void {
     this.photoMode = on;
     if (this.label !== undefined) this.label.visible = !on;
   }
-
-  isPhotoMode(): boolean {
-    return this.photoMode;
-  }
+  isPhotoMode(): boolean { return this.photoMode; }
 
   private syncFadeGraphics(width: number, height: number, paper: number, dark: boolean): void {
     const color = dark ? 0x0f0b18 : paper;
@@ -470,12 +466,18 @@ export class GameView {
     const reducedMotion = isReducedMotionActive();
     const previousState = options?.previousState;
     const indoor = INDOOR_AREAS.has(area.id);
+    const activePet = this.activePetReaction(state);
+    const activeRest = this.activeRestSpot(state);
+    const requestedScenicZoom = scenicBenchZoom(
+      activeRest?.spot.id ?? null, activeRest?.elapsed ?? 0, reducedMotion,
+    );
     const frame = this.cameraDirector.step({
       world: this.world, area, state, previousState, width, height,
       viewWidth: this.viewWidth, viewHeight: this.viewHeight, resolution,
       doorFadeTicks: this.world.tunables.doorFadeTicks, paused, reducedMotion,
-      alpha: options?.alpha ?? 1, indoor,
+      alpha: options?.alpha ?? 1, indoor, scenicZoom: requestedScenicZoom,
     });
+    this.microDelights.setScenicZoom(requestedScenicZoom < 1 ? frame.zoom : 1);
     const { canInterpolate, alpha, playerPos, zoomScale, zoomOffsetX, zoomOffsetY } = frame;
     const prev = canInterpolate ? previousState : undefined;
     for (const layer of [this.scene, this.lanternWorld, this.emissiveLayer, this.glowLayer]) {
@@ -486,8 +488,6 @@ export class GameView {
     this.ambientLayer.position.set(frame.parallaxAmbient.x, frame.parallaxAmbient.y);
     const shadowAlpha = indoor ? 0.24 : 0.3;
     const livingMotion = area.id !== "harness" && !reducedMotion;
-    const activePet = this.activePetReaction(state);
-    const activeRest = this.activeRestSpot(state);
     if (state.dialogue === null) this.previewDialogueTags = null;
     const npcLife = this.npcLife.update(state, livingMotion, reducedMotion);
     const flipOn = livingMotion && !paused;
@@ -506,9 +506,12 @@ export class GameView {
     this.entities.renderCritters(
       state, this.areaView !== undefined, shadowAlpha, prev, alpha, livingMotion, reducedMotion,
     );
+    const sanctuaryHop = this.microDelights.activeHopInfo(state);
     this.entities.renderNpcs(
       state, shadowAlpha, livingMotion, npcLife, this.npcLife, prev, alpha, reducedMotion,
+      sanctuaryHop,
     );
+    this.microDelights.render(this.world, state, area.id, shadowAlpha, reducedMotion);
     this.npcLife.renderReactions(state, livingMotion);
     this.effects.renderClubhouseDisplay(state, area, reducedMotion);
     this.entities.renderAmbient(state, area, reducedMotion);
@@ -671,9 +674,21 @@ export class GameView {
     viewportHeight: number,
     suppressNpcId: string | null,
   ): NpcChatterView | null {
-    return computeNpcChatterScreenAnchor(
+    const zoom = this.cameraDirector.zoom;
+    const base = computeNpcChatterScreenAnchor(
       this.world, state, this.npcLife.latest?.chatter ?? null, suppressNpcId,
-      this.cameraDirector.camera, this.viewWidth, this.viewHeight, viewportWidth, viewportHeight,
+      this.cameraDirector.camera, this.viewWidth, this.viewHeight,
+      viewportWidth, viewportHeight, zoom,
+    );
+    if (base !== null) return base;
+    const rest = this.activeRestSpot(state);
+    const bubble = rest === null
+      ? null
+      : scenicBenchChatterBubble(rest.spot.id, rest.elapsed, state);
+    if (bubble === null) return null;
+    return computeNpcChatterScreenAnchor(
+      this.world, state, bubble, suppressNpcId, this.cameraDirector.camera,
+      this.viewWidth, this.viewHeight, viewportWidth, viewportHeight, zoom,
     );
   }
 
@@ -731,6 +746,7 @@ export class GameView {
       resting: this.activeRestSpot(state)?.spot.id ?? null,
       timeOfDay: storyTimeOfDay(this.world, state).phase,
       photoMode: this.photoMode,
+      microDelights: this.microDelights.info(state),
       battle: this.battleView.renderInfo(
         state, window.innerWidth, window.innerHeight,
         this.viewWidth, this.viewHeight, this.scene.visible,

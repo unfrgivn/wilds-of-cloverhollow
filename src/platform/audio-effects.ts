@@ -6,7 +6,8 @@ export type CompanionAudioEffect =
   | "title-move" | "title-start" | "page-turn"
   | "card-open" | "card-close"
   | "toggle-on" | "toggle-off" | "tool-sparkle"
-  | "paper-flip" | "sticker-peel" | "atlas-pin";
+  | "paper-flip" | "sticker-peel" | "atlas-pin"
+  | "beach-ball-boop" | "pebble-skip" | "shop-bell" | "arcade-bell" | "sanctuary-hop";
 
 // Companion petting, cozy resting, and storybook UI foley kept in the platform shell.
 export const effectRecipes: Record<CompanionAudioEffect, AudioRecipe> = {
@@ -155,6 +156,55 @@ export const effectRecipes: Record<CompanionAudioEffect, AudioRecipe> = {
     {
       wave: "sine", frequency: 880, endFrequency: 988, offset: 0.012, duration: 0.085,
       gain: 0.038, attack: 0.003,
+    },
+  ],
+  "beach-ball-boop": [
+    {
+      wave: "sine", frequency: 210, endFrequency: 390, offset: 0, duration: 0.065,
+      gain: 0.072, attack: 0.004,
+    },
+    {
+      wave: "sine", frequency: 390, endFrequency: 260, offset: 0.055, duration: 0.075,
+      gain: 0.058, attack: 0.004,
+    },
+  ],
+  "pebble-skip": [
+    {
+      wave: "sine", frequency: 1180, endFrequency: 1020, offset: 0, duration: 0.07,
+      gain: 0.056, attack: 0.003,
+    },
+    {
+      wave: "sine", frequency: 940, endFrequency: 820, offset: 0.13, duration: 0.075,
+      gain: 0.052, attack: 0.003,
+    },
+    {
+      wave: "sine", frequency: 720, endFrequency: 560, offset: 0.25, duration: 0.09,
+      gain: 0.048, attack: 0.003,
+    },
+    { wave: "noise", offset: 0.25, duration: 0.065, gain: 0.022, lowpass: 1650, attack: 0.006 },
+  ],
+  "shop-bell": [
+    { wave: "triangle", frequency: 1318.5, offset: 0, duration: 0.22, gain: 0.058, attack: 0.004 },
+    { wave: "sine", frequency: 2637, offset: 0.006, duration: 0.16, gain: 0.024, attack: 0.004 },
+    { wave: "sine", frequency: 987.8, offset: 0.11, duration: 0.27, gain: 0.062, attack: 0.005 },
+    {
+      wave: "triangle", frequency: 1975.5, offset: 0.12, duration: 0.2,
+      gain: 0.022, attack: 0.005,
+    },
+  ],
+  "arcade-bell": [
+    { wave: "triangle", frequency: 880, offset: 0, duration: 0.1, gain: 0.058, attack: 0.003 },
+    { wave: "triangle", frequency: 1175, offset: 0.075, duration: 0.11, gain: 0.06, attack: 0.003 },
+    { wave: "sine", frequency: 1568, offset: 0.15, duration: 0.13, gain: 0.054, attack: 0.004 },
+  ],
+  "sanctuary-hop": [
+    {
+      wave: "sine", frequency: 587, endFrequency: 880, offset: 0, duration: 0.11,
+      gain: 0.064, attack: 0.004,
+    },
+    {
+      wave: "triangle", frequency: 784, endFrequency: 1046.5, offset: 0.045, duration: 0.095,
+      gain: 0.036, attack: 0.004,
     },
   ],
 };

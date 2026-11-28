@@ -30,6 +30,7 @@ export type CameraDirectorStepParams = {
   reducedMotion: boolean;
   alpha: number;
   indoor?: boolean;
+  scenicZoom?: number;
 };
 
 export type CameraDirectorFrame = {
@@ -646,6 +647,11 @@ export class CameraDirector {
     const deadZone: Point = { x: 80, y: 60 };
     const overworldClear =
       state.battle === null && state.arcade === null && state.transition === null;
+    const requestedScenicZoom =
+      overworldClear && !reducedMotion && area.id !== "harness" && params.scenicZoom !== undefined
+        ? clampZoomToArea(params.scenicZoom, view, area)
+        : 1;
+    const hasScenicZoom = requestedScenicZoom < 0.9995;
     const hasDirective = directive.focus !== undefined || directive.zoom !== undefined;
     const dialogueFocus = overworldClear
       ? resolveDialogueFocus(world, state, playerPos, directive)
@@ -675,7 +681,7 @@ export class CameraDirector {
         area,
         targetZoom,
       );
-    } else if (paused && !hasDirective) {
+    } else if (paused && !hasDirective && !hasScenicZoom) {
       this._zoom = 1;
       this._framing = "follow";
       this._camera = followCamera(this._camera, playerPos, view, area, deadZone);
@@ -698,9 +704,11 @@ export class CameraDirector {
         this._framing = "follow";
         this._camera = followCamera(this._camera, playerPos, view, area, deadZone);
       }
-    } else if (paused && hasDirective) {
+    } else if (paused && (hasDirective || hasScenicZoom)) {
       const targetZoom =
-        directive.zoom !== undefined ? clampZoomToArea(directive.zoom, view, area) : 1;
+        directive.zoom !== undefined
+          ? clampZoomToArea(directive.zoom, view, area)
+          : requestedScenicZoom;
       this._zoom = targetZoom;
       const effW = viewWidth / targetZoom;
       const effH = viewHeight / targetZoom;
@@ -726,7 +734,7 @@ export class CameraDirector {
       const targetZoom =
         dialogueFocus !== null
           ? clampZoomToArea(directive.zoom ?? DIALOGUE_ZOOM, view, area)
-          : 1;
+          : requestedScenicZoom;
       const prevZoom = this._zoom;
       const snapAll = this._camera === undefined || state.transition !== null;
       if (snapAll || Math.abs(targetZoom - prevZoom) <= 0.0005) {

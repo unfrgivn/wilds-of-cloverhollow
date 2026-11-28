@@ -1,7 +1,7 @@
-import { Application, Rectangle } from "pixi.js";
+import { Application } from "pixi.js";
 import {
   arcadeView, autosaveNeeded, battleView, blankInput, createState, drainTicks, soundCues,
-  stableHash, step, type ActionFrame, type JukeboxTrack, type Point, type State,
+  stableHash, step, type ActionFrame, type JukeboxTrack, type State,
 } from "./core";
 import { loadBrowserContent } from "./content/load";
 import { Keyboard } from "./platform/keyboard";
@@ -32,15 +32,17 @@ import {
 } from "./shell/assets";
 import {
   buildSoundContext, collectLevelUpNotices, createAreaBannerTracker, createJournalNotesCache,
-  createNpcChatterSync, createToolEventChimeSync, deliverAreaPostcard, hapticForTick,
-  isOverworldConfirm, performOverworldConfirm, resolveArcadeOutcome, resolveSoundtrack,
-  shouldClearRest, stepJukeboxTrack,
+  createNpcChatterSync, createToolEventChimeSync, hapticForTick, isOverworldConfirm,
+  performOverworldConfirm, resolveArcadeOutcome, resolveSoundtrack, shouldClearRest,
 } from "./shell/feedback";
 import { createSaveSession, createSaveStore } from "./shell/save-storage";
 import { createAudio, projectMusicMix } from "./platform/audio";
 import { createHaptics } from "./platform/haptics";
 import { findPettableCompanion, findRestSpot } from "./render/companions";
-import type { AudioLevel } from "./platform/audio-settings";
+import {
+  findNearbySanctuaryCritter, findPebbleSkipSpot, findSanctuaryCritterByKnot,
+  shopBellForAreaEntry,
+} from "./render/micro-delights";
 import { createGameSettings } from "./platform/game-settings";
 import { isReducedMotionActive } from "./platform/reduced-motion";
 import { createMinigameRecords } from "./platform/minigame-records";
@@ -49,17 +51,18 @@ import { createAreaBanner } from "./ui/area-banner";
 import { createTravelOverlay } from "./ui/travel-overlay";
 import { createHudHints } from "./ui/hud-hints";
 import { createSaveToast } from "./ui/save-toast";
-import {
-  createPhotoToast, createPhotoTouchBar, createShutterFlash, postcardToastMessage,
-  type PostcardCapture,
-} from "./ui/postcard";
+import { createPhotoToast, createPhotoTouchBar, createShutterFlash } from "./ui/postcard";
 import {
   canBattlePeek, canOverworldSteer, canPhotoFromJournal, canPhotoMode, createInputShortcuts,
   isBannerEligible, isOverworldFree, type OverlayGateContext,
 } from "./shell/input-shortcuts";
 import { bindOverworldPointerSteer } from "./shell/overworld-pointer";
 import { createNavPathFollower, mergeNavSteerInput } from "./shell/nav-steer";
-import { bindWebGlRecovery, renderBootError, shouldFreezeLiveLoop } from "./shell/lifecycle";
+import { renderBootError, shouldFreezeLiveLoop } from "./shell/lifecycle";
+import {
+  bindShellLifecycle, bindShellUiControls, createDocumentTitleSync, createPostcardSnapper,
+  createQaSettingsBindings, syncOpenFlag,
+} from "./shell/shell-bindings";
 import type { QaSession } from "./shell/qa-session";
 
 const app = new Application();
@@ -124,17 +127,6 @@ async function boot(): Promise<void> {
     touch.setButton("confirm", held);
     if (held) touch.tapButton("confirm");
   };
-  battleCheck.onConfirmHold(handleConfirmHold);
-  battleCheck.onDirectionHold((dir) => {
-    touch.setPointerArrow(dir.x === 0 && dir.y === 0 ? null : dir);
-  });
-  const echoArrows: readonly Point[] = [
-    { x: 0, y: -1 }, { x: 1, y: 0 }, { x: 0, y: 1 }, { x: -1, y: 0 },
-  ];
-  battleCheck.onEchoNote((note) => {
-    const direction = echoArrows[note];
-    if (direction !== undefined) touch.tapArrow(direction);
-  });
   const feelingBubble = createFeelingBubble(uiRoot);
   const windUpBubbles = createWindUpBubbles(uiRoot);
   const rewardSticker = createRewardSticker(uiRoot);
@@ -181,60 +173,8 @@ async function boot(): Promise<void> {
     });
   const journal = createJournal(uiRoot);
   let jukeboxTrack: JukeboxTrack | null = null;
-  const playPageTurn = (): void => { sound.playEffect("page-turn"); lightHaptic(); };
-  journal.onPageChange(playPageTurn);
-  journal.onMapSelect((on) => {
-    sound.playEffect(on ? "atlas-pin" : "sticker-peel"); lightHaptic();
-  });
-  journal.onMapFilter(() => { sound.playEffect("paper-flip"); lightHaptic(); });
-  journal.onOverlayStep(playPageTurn);
-  journal.onOverlayChange((open) => {
-    sound.playEffect(open ? "card-open" : "card-close");
-    if (open) lightHaptic();
-  });
-  journal.onToggleAudio(withInvalidate(() => {
-    sound.toggle();
-    if (!sound.muted()) playToggleFeedback(true);
-  }));
-  journal.onSetAudioLevel(withInvalidate((level: AudioLevel) => sound.setLevel(level)));
-  journal.onToggleMusic(bindToggle(sound.toggleMusic, () => !sound.musicMuted()));
-  journal.onSetMusicLevel(withInvalidate((level: AudioLevel) => sound.setMusicLevel(level)));
-  journal.onToggleAmbience(bindToggle(sound.toggleAmbience, () => !sound.ambienceMuted()));
-  journal.onStepTrack((delta) => {
-    if (!state.journalOpen) return;
-    const nextTrack = stepJukeboxTrack(
-      content.world, state, jukeboxTrack, delta, titleMode !== null || (qa?.isMenuOpen() ?? false),
-    );
-    if (nextTrack === null) return;
-    jukeboxTrack = nextTrack;
-    invalidate();
-  });
-  journal.onResetJukebox(() => {
-    if (jukeboxTrack === null) return;
-    jukeboxTrack = null; invalidate();
-  });
-  journal.onToggleGentleTiming(
-    bindToggle(gameSettings.toggleGentleTiming, gameSettings.gentleTiming),
-  );
-  journal.onToggleKeyHints(bindToggle(gameSettings.toggleKeyHints, gameSettings.keyHints));
-  journal.onCycleTextSpeed(
-    bindToggle(gameSettings.cycleTextSpeed, () => gameSettings.textSpeed() !== "cozy"),
-  );
-  journal.onToggleReducedMotion(
-    bindToggle(gameSettings.toggleReducedMotion, gameSettings.reducedMotion),
-  );
   const title = createTitleScreen(uiRoot);
   const credits = createCredits(uiRoot);
-  dialogueBox.onChoose((index) => touch.tapChoice(index));
-  dialogueBox.onAdvance(() => touch.tapButton("confirm"));
-  prompt.onActivate(() => touch.tapButton("confirm"));
-  commandMenu.onChoose((index) => touch.tapChoice(index));
-  rewardSticker.onConfirm(() => touch.tapButton("confirm"));
-  battleHud.onTogether(() => touch.tapButton("cancel"));
-  battleHud.onFlute(() => touch.tapButton("flute"));
-  battleHud.onLasso(() => touch.tapButton("lasso"));
-  journal.onClose(() => touch.tapButton("cancel"));
-  credits.onClose(() => touch.tapButton("confirm"));
   const view = new GameView(content.world, { debugLabel: qaEnabled, renderer: app.renderer });
   const navFollower = createNavPathFollower(content.world);
   const syncNpcChatter = createNpcChatterSync(
@@ -334,33 +274,14 @@ async function boot(): Promise<void> {
       onConsoleApplied: () => { bannerTracker.clear(); invalidate(); },
       onReleasePointer: () => releasePointer(),
       invalidate,
-      settings: {
-        gentleTiming: gameSettings.gentleTiming,
-        toggleGentleTiming: bindToggle(gameSettings.toggleGentleTiming, gameSettings.gentleTiming),
-        keyHints: gameSettings.keyHints,
-        toggleKeyHints: bindToggle(gameSettings.toggleKeyHints, gameSettings.keyHints),
-        reducedMotion: gameSettings.reducedMotion,
-        toggleReducedMotion: bindToggle(
-          gameSettings.toggleReducedMotion, gameSettings.reducedMotion,
-        ),
-        muted: sound.muted,
-        toggleMute: withInvalidate(() => {
-          sound.toggle(); if (!sound.muted()) playToggleFeedback(true);
-        }),
-        textSpeed: gameSettings.textSpeed,
-        setTextSpeed: withInvalidate((speed) => {
-          gameSettings.setTextSpeed(speed); playToggleFeedback(speed !== "cozy");
-        }),
+      settings: createQaSettingsBindings({
+        gameSettings, sound, bindToggle, playToggleFeedback, invalidate,
         photoMode: () => photoMode,
         canPhotoMode: () => canPhotoMode({ ...overlayContext(), qaConsoleOpen: false }),
         setPhotoMode: (on) => setPhotoMode(on),
-        navOverlay: () => view.isNavHeatmapVisible(),
-        toggleNavOverlay: () => {
-          const next = view.setNavHeatmap(!view.isNavHeatmapVisible());
-          playToggleFeedback(next);
-          invalidate();
-        },
-      },
+        isNavOverlayVisible: () => view.isNavHeatmapVisible(),
+        setNavOverlayVisible: (on) => view.setNavHeatmap(on),
+      }),
     });
   if (qa !== null) title.onQa(qa.openMenu);
   const assets = createShellAssets({
@@ -434,18 +355,19 @@ async function boot(): Promise<void> {
     }
     invalidate();
   };
-  battleHud.onPeekToggle(() => setBattlePeek(!battlePeekOpen));
-  battleHud.onPeekClose(() => setBattlePeek(false));
-  hudHints.onAction((action) => {
-    if (action === "interact") touch.tapButton("confirm");
-    else if (action === "journal") touch.tapButton("menu");
-    else if (action === "lantern") touch.tapButton("lantern");
-    else if (action === "flute") touch.tapButton("flute");
-    else if (action === "photo" && canPhotoMode(overlayContext())) setPhotoMode(true);
-    else if (action === "mute") { sound.toggle(); invalidate(); }
-    else if (action === "battle-guide" && canBattlePeek(overlayContext())) {
-      setBattlePeek(!battlePeekOpen);
-    }
+  bindShellUiControls({
+    world: content.world,
+    ui: {
+      journal, touch, battleCheck, dialogueBox, prompt, commandMenu,
+      rewardSticker, battleHud, credits, hudHints,
+    },
+    sound, gameSettings, getState: () => state,
+    getJukeboxTrack: () => jukeboxTrack, setJukeboxTrack: (track) => { jukeboxTrack = track; },
+    isTitleOrQaOpen: () => titleMode !== null || (qa?.isMenuOpen() ?? false),
+    canPhotoMode: () => canPhotoMode(overlayContext()), setPhotoMode: (on) => setPhotoMode(on),
+    canBattlePeek: () => canBattlePeek(overlayContext()),
+    getBattlePeekOpen: () => battlePeekOpen, setBattlePeek,
+    lightHaptic, playToggleFeedback, bindToggle, invalidate, onConfirmHold: handleConfirmHold,
   });
   const overworldPointer = bindOverworldPointerSteer({
     canvas: app.canvas,
@@ -457,7 +379,9 @@ async function boot(): Promise<void> {
       if (
         view.isResting() ||
         findRestSpot(content.world, state) !== null ||
-        findPettableCompanion(content.world, state) !== null
+        findPettableCompanion(content.world, state) !== null ||
+        findPebbleSkipSpot(content.world, state) !== null ||
+        findNearbySanctuaryCritter(content.world, state) !== null
       ) {
         touch.tapButton("confirm");
       }
@@ -527,14 +451,7 @@ async function boot(): Promise<void> {
     sound.playEffect("card-close");
   };
   travelOverlay.onSkip(skipTravel);
-  const syncOpenFlag = (
-    name: "arcade" | "qaConsole" | "title" | "credits" | "battle" | "talk" | "journal" | "cutscene",
-    open: boolean,
-  ): void => {
-    if (open) document.documentElement.dataset[name] = "open";
-    else delete document.documentElement.dataset[name];
-  };
-  let lastDocumentTitle = document.title;
+  const syncDocumentTitle = createDocumentTitleSync(document.title);
   const render = (alpha = 1): void => {
     const gate = overlayContext();
     const qaMenuOpen = gate.qaMenuOpen;
@@ -619,16 +536,15 @@ async function boot(): Promise<void> {
     qa?.render();
     syncOpenFlag("qaConsole", gate.qaConsoleOpen);
     const creditsOpen = state.finale === "credits";
-    const nextTitle = formatDocumentTitle(content.world, state, {
-      titleOpen: titleMode !== null,
-      creditsOpen,
-    });
-    if (nextTitle !== lastDocumentTitle) {
-      lastDocumentTitle = nextTitle;
-      document.title = nextTitle;
+    syncDocumentTitle(formatDocumentTitle(content.world, state, {
+      titleOpen: titleMode !== null, creditsOpen,
+    }));
+    if (
+      photoMode || titleMode !== null || activeBattle ||
+      state.journalOpen || creditsOpen || state.cutscene !== undefined
+    ) {
+      saveToast.hide();
     }
-    if (photoMode || titleMode !== null || activeBattle ||
-      state.journalOpen || creditsOpen || state.cutscene !== undefined) saveToast.hide();
     credits.render(buildCreditsView(content.world, state, assets));
     devLog?.logTitle(titleMode);
     syncOpenFlag("title", titleMode !== null); syncOpenFlag("credits", creditsOpen);
@@ -761,8 +677,26 @@ async function boot(): Promise<void> {
     });
     state = stepped.state;
     view.observeNpcTick(state);
+    if (view.stepMicroDelights(state).beachBallKicked) {
+      sound.playEffect("beach-ball-boop");
+      lightHaptic();
+    }
     if (!paused && !harnessStepping && state.tick !== previous.tick) saveSession.markDirty();
-    if (state.area !== previous.area) navFollower.clear();
+    if (state.area !== previous.area) {
+      navFollower.clear();
+      if (!paused && !harnessStepping) {
+        const bell = shopBellForAreaEntry(previous.area, state.area);
+        if (bell !== null) sound.playEffect(bell);
+      }
+    }
+    if (previous.dialogue !== null && state.dialogue === null && state.area === previous.area) {
+      const critter = findSanctuaryCritterByKnot(content.world, state, previous.dialogue.knot);
+      if (critter !== null) {
+        view.triggerSanctuaryHop(critter.id, state.tick);
+        sound.playEffect("sanctuary-hop");
+        lightHaptic();
+      }
+    }
     previousState = state.area === previous.area ? previous : state;
     const arcadeOutcome = resolveArcadeOutcome(
       content.world, previous, state, gameSettings.gentleTiming(),
@@ -778,6 +712,8 @@ async function boot(): Promise<void> {
         isResting: () => view.isResting(),
         setResting: (spot, tickAt) => view.setResting(spot, tickAt),
         triggerPet: (id, tickAt) => view.triggerPet(id, tickAt),
+        triggerPebbleSkip: (spot, tickAt) => view.triggerPebbleSkip(spot, tickAt),
+        triggerSanctuaryHop: (id, tickAt) => view.triggerSanctuaryHop(id, tickAt),
         playEffect: (effect) => sound.playEffect(effect),
         lightHaptic,
       });
@@ -814,33 +750,15 @@ async function boot(): Promise<void> {
     devLog?.logBattle(state);
     devLog?.afterTick(state);
   };
-  const snapPostcard = async (
-    options?: { download?: boolean },
-  ): Promise<PostcardCapture | null> => {
-    if (!photoMode || !canPhotoMode(overlayContext())) return null;
-    sound.playEffect("camera-shutter"); shutterFlash.trigger(); lightHaptic();
-    render(1); app.render();
-    const extracted = app.renderer.extract.canvas({
-      target: app.stage,
-      frame: new Rectangle(0, 0, app.screen.width, app.screen.height),
-      resolution: app.renderer.resolution,
-      clearColor: 0xf8edcf,
-    });
-    const sourceCanvas = extracted instanceof HTMLCanvasElement ? extracted : app.canvas;
-    return deliverAreaPostcard(content.world, state, sourceCanvas, {
-      download: options?.download !== false,
-      preferShare: document.documentElement.dataset.touch === "on",
-      onDelivered: (capture, delivery) => {
-        if (photoMode) photoToast.show(postcardToastMessage(delivery, capture.caption));
-      },
-    });
-  };
+  const snapPostcard = createPostcardSnapper({
+    app, world: content.world, getState: () => state, isPhotoMode: () => photoMode,
+    canPhotoMode: () => canPhotoMode(overlayContext()), sound, lightHaptic, shutterFlash,
+    photoToast, renderNow: () => render(1),
+  });
   createPhotoTouchBar(uiRoot, {
     onSnap: () => { void snapPostcard({ download: true }); },
     onClose: () => setPhotoMode(false),
   });
-  for (const type of ["resize", "pointerdown", "pointerup"])
-    window.addEventListener(type, invalidate);
   let last = performance.now();
   let accumulator = 0;
   let contextLost = false;
@@ -882,18 +800,17 @@ async function boot(): Promise<void> {
     keyboard.clearAll(); gamepad.clearTaps(); releasePointer();
     touch.releaseArrows(); accumulator = 0; saveSession.flushOnHide();
   };
-  bindWebGlRecovery(app.canvas, {
-    onLost: () => { contextLost = true; suspendLiveInput(); },
-    onRestored: () => {
+  bindShellLifecycle({
+    canvas: app.canvas, invalidate,
+    onSuspend: suspendLiveInput,
+    onResume: () => { last = performance.now(); accumulator = 0; invalidate(); },
+    onContextLost: () => { contextLost = true; suspendLiveInput(); },
+    onContextRestored: () => {
       contextLost = false; last = performance.now();
       view.invalidateBackdrop(); void areaLoader.ensureArea(true); invalidate();
     },
+    onPageHide: saveSession.flushOnHide,
   });
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) suspendLiveInput();
-    else { last = performance.now(); accumulator = 0; invalidate(); }
-  });
-  window.addEventListener("pagehide", saveSession.flushOnHide);
   render();
   inputShortcuts.bind();
   if (qaEnabled) {
@@ -915,7 +832,7 @@ async function boot(): Promise<void> {
         saveSession.setSuppressed(true); saveSession.clearDirty();
         state = next; previousState = state;
         bannerTracker.clear(); saveToast.hide(); saveSession.setSuppressed(false);
-        areaLoader.reset();
+        areaLoader.reset(); view.resetCamera();
         await Promise.all([areaLoader.ensureArea(), assets.warmJournalAssets(state)]);
         resetTransientUi(); qa?.reset(); sound.clearEffects();
         inputShortcuts.resetInputMode(); cancelDown = false;

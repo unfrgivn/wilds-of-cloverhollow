@@ -8183,6 +8183,41 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   purity, lint), `just build` (`index` `389.27 kB < 500 kB`), 12/12 targeted
   Chromium & WebKit e2e, and 99/99 Chromium `ui-gallery` tests.
 
+## Milestone 188: Overworld Micro-Delights & Tactile World Props (Elevation Track E16) + `src/main.ts` Modular Relief **Status:** ✅ Completed (2026-11-27)
+- Implements all five Track E16 tactile overworld micro-delights (100%
+  presentation/audio, zero `src/core` changes, zero replay hash shifts across
+  all 74 sims, and zero Playwright visual baseline diffs) while relieving
+  `src/main.ts` below 880 lines via `src/shell/shell-bindings.ts`:
+  - **Pure Micro-Delights Engine (`src/render/micro-delights.ts`, Pixi-free):**
+    kickable Bubblegum Bay beach ball at `(1465, 946)` (`[1160..1580] x
+    [690..965]` sandbox, sand drag, bounce/spin, Reduced Motion flat roll),
+    3 shoreline pebble-skipping spots (`park-pond-skip`, `bay-surf-skip`,
+    `island-cove-skip`), shop door bell classifier (`cafe`/`market`/`parlor`/
+    `lodge` -> `"shop-bell"`, `arcade` -> `"arcade-bell"`), scenic bench zoom
+    pullback (`1 -> 0.91`) + spoiler-safe warm party chatter across all 6
+    iconic scenic `REST_SPOTS` (`bay-bench`, `park-bench`,
+    `trail-stream-overlook`, `summit-bench`, `island-mat`,
+    `sanctuary-blanket`), and species-distinct 36-tick pet-hop poses across all
+    17 calm Sanctuary critters.
+  - **Bespoke Acoustic Foley (`src/platform/audio-effects.ts`):** added 5
+    gentle (`<= 0.08` gain, zero square wave) recipes (`"beach-ball-boop"`,
+    `"pebble-skip"`, `"shop-bell"`, `"arcade-bell"`, `"sanctuary-hop"`).
+  - **Pixi Renderer & Camera/Entity Integration
+    (`src/render/micro-delights-render.ts`, `src/render/camera.ts`,
+    `src/render/entity-layer.ts`, `src/render/view.ts`,
+    `src/render/view-projections.ts`, `src/shell/feedback.ts`,
+    `src/dev/hook.ts`, `src/shell/shell-bindings.ts`, `src/main.ts`):**
+    painted striped beach ball + lift shadow, concentric water-ring pebble
+    skips + droplets, rising Sanctuary hop hearts/sparkles, clamped scenic
+    pullback camera + bench chatter projection, and `renderInfo().microDelights`.
+- Evidence: `tests/unit/milestone-188.test.ts` (6 tests),
+  `tests/e2e/milestone-188.spec.ts` (`@smoke` Chromium + WebKit, 6/6 passed),
+  and review capture `art/review/m188-beach-ball-bay.jpg` verified with
+  `vision`.
+- Gates: `just check`, `just build` (`< 500 kB` every non-vendor chunk, hook
+  leak + runtime story + harness checks green), and Chromium + WebKit e2e
+  verification.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

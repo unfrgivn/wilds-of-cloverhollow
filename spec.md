@@ -636,12 +636,17 @@ ios/            Capacitor iOS project (from Milestone 4).
   (dual-transient mechanical click + soft lowpass lens whirr, ~0.12 s). Pure
   static cue recipe tables (`soundCueRecipes`, `soundCueRecipe`, `AudioSegment`,
   `AudioRecipe`) live in `src/platform/audio-recipes.ts` (Milestone 114), while
-  the 17 shell companion & UI foley recipes (`CompanionAudioEffect`,
-  `effectRecipes`, `effectRecipe`) live in modular `src/platform/audio-effects.ts`
-  (Milestones 172 & 180, type-only import of `AudioRecipe` from `./audio-recipes`,
-  zero circular runtime dependency) and are re-exported identically from
-  `src/platform/audio-recipes.ts` and `src/platform/audio.ts` for
-  backwards-compatible unit verification.
+  the 22 shell companion, UI & overworld micro-delight foley recipes
+  (`CompanionAudioEffect`, `effectRecipes`, `effectRecipe`) live in modular
+  `src/platform/audio-effects.ts` (Milestones 172, 180 & 184, type-only import
+  of `AudioRecipe` from `./audio-recipes`, zero circular runtime dependency) and
+  are re-exported identically from `src/platform/audio-recipes.ts` and
+  `src/platform/audio.ts` for backwards-compatible unit verification.
+  Milestone 188 (Elevation Track E16) adds five gentle (`<= 0.08` gain, zero
+  square waves, smooth attacks) tactile world foley recipes: `"beach-ball-boop"`
+  (hollow rubber pop), `"pebble-skip"` (3-skip watery plink-plink-plonk + soft
+  splash), `"shop-bell"` (warm brass door chime), `"arcade-bell"` (cheerful
+  vintage parlor chime), and `"sanctuary-hop"` (joyful critter chirp-pop).
 - Tactile storybook UI foley & haptic micro-feedback (Milestones 133 & 180,
   `src/platform/audio-recipes.ts`, `src/platform/audio-effects.ts`,
   `src/platform/audio.ts`, `src/shell/title-flow.ts`,
@@ -2280,8 +2285,47 @@ ios/            Capacitor iOS project (from Milestone 4).
     `atmosphereParticles` (active `BiomeAtmosphere` particle count),
     `footstepPuffs` (active footstep gouache puff count),
     `starGemGlints` (active prismatic Star Gem glint count),
-    `petting` (currently petted companion id or `null`), and `resting` (active
-    rest spot id or `null`).
+    `petting` (currently petted companion id or `null`), `resting` (active
+    rest spot id or `null`), and `microDelights` (`{ beachBall, activeSkips,
+    activeHopNpc, scenicZoom }`, Milestone 188).
+  - Overworld Micro-Delights & Tactile World Props (Milestone 188 / Elevation
+    Track E16, `src/render/micro-delights.ts`,
+    `src/render/micro-delights-render.ts`, `src/shell/shell-bindings.ts`,
+    100% presentation-only, zero `src/core` changes, zero replay hash shifts):
+    1. **Kickable Bubblegum Bay Beach Ball**: rests on sunlit south-east sand at
+       `BEACH_BALL_HOME` `(1465, 946)` (strictly outside both `1280x720` and
+       `874x402` bay arrival viewports, clear of all props and interactables);
+       walking within `34u` launches it away from Fae (`6.4 u/tick`, `zVel 4.2`,
+       14-tick cooldown, `"beach-ball-boop"` + light haptic) with smooth sand
+       drag (`0.935`), vertical bounce & spin (`z = 0` calm roll under Reduced
+       Motion), and soft elastic sandbox reflection inside
+       `[1160..1580] x [690..965]`.
+    2. **Pond & Shore Pebble Skipping**: `PEBBLE_SKIP_SPOTS` (`park-pond-skip`,
+       `bay-surf-skip`, `island-cove-skip`) yield to real interactables, rest
+       spots, and party petting; pressing Confirm projects a flat painted stone
+       across 3–4 parabolic water bounces (`54` ticks) with concentric ripple
+       rings, droplet glints, `"pebble-skip"`, and a calm single ripple under
+       Reduced Motion.
+    3. **Cozy Shop Door Bells**: `shopBellForAreaEntry` plays `"shop-bell"` on
+       live entry (`!paused && !harnessStepping`) into `cafe`, `market`,
+       `parlor`, or `lodge`, and `"arcade-bell"` into `arcade`.
+    4. **Scenic Camera-Pullback Benches with Warm Party Chatter**: resting on
+       any of the 6 iconic scenic `REST_SPOTS` (`bay-bench`, `park-bench`,
+       `trail-stream-overlook`, `summit-bench`, `island-mat`,
+       `sanctuary-blanket`) smoothly eases camera zoom `1 -> 0.91` across ticks
+       `18..48` via `scenicBenchZoom` (clamped by `clampZoomToArea`; `1` under
+       Reduced Motion) and surfaces spoiler-safe warm party chatter (`sue`,
+       `jordan`, `maddie`) across ticks `36..240` via `scenicBenchChatter`.
+    5. **Unique Sanctuary Calm Critter Pet Hops**: `SANCTUARY_HOP_STYLES` and
+       `sanctuaryCritterHopPose` give all 17 calm `sanctuary-*` critters
+       species-distinct 36-tick joyful hop poses + 4 rising heart/sparkle
+       particles and `"sanctuary-hop"` on dialogue close or nearby clear Confirm
+       (neutral under Reduced Motion).
+    6. **`src/shell/shell-bindings.ts`**: modular shell binding helpers
+       (`bindShellUiControls`, `createQaSettingsBindings`,
+       `createPostcardSnapper`, `bindShellLifecycle`, `syncOpenFlag`,
+       `createDocumentTitleSync`) keeping `src/main.ts` cleanly under `880`
+       lines.
   - Living Valley Townspeople & Epilogue Heart (Milestones 108 and 159,
     `content/story/main.ink`): zero-drift late-game and post-completion revisit
     dialogue across twenty-six beloved valley characters — ten townspeople &

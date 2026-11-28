@@ -102,6 +102,9 @@ export function storyTimeOfDay(world: World, state: State): TimeOfDayGrade {
       ? GOLDEN_MEADOW
       : ENCHANTED_TWILIGHT;
   }
+  if (state.area === "sanctuary" && world.storyVariable(state.ink, "milo_revealed") === true) {
+    return GOLDEN_MEADOW;
+  }
   const hasLantern = world.storyVariable(state.ink, "has_lantern") === true;
   if (OUTDOOR_GOLDEN_AREAS.has(state.area) && hasLantern) return GOLDEN_HOUR;
   if (MORNING_HOME_AREAS.has(state.area) && state.stickers.length === 0 && !hasLantern) {

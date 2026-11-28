@@ -608,6 +608,7 @@ export class GameView {
         state.stickers.includes("taco-chef"));
     const plazaStarGlow = areaId === "plaza" && busterReward;
     const passHearthWisps = areaId === "pass" && flag("sanctuary_gift");
+    const sanctuaryFestival = areaId === "sanctuary" && flag("milo_revealed");
     const sunberryHarvests = this.world.storyVariable(state.ink, "sunberry_harvests");
     const sunberryCount =
       typeof sunberryHarvests === "number"
@@ -634,6 +635,7 @@ export class GameView {
       ...(cavernChimeShimmer ? { cavernChimeShimmer: true } : {}),
       ...(musicRoomHarmony ? { musicRoomHarmony: true } : {}),
       ...(artRoomPaletteGlow ? { artRoomPaletteGlow: true } : {}),
+      ...(sanctuaryFestival ? { sanctuaryFestival: true } : {}),
       ...(reducedMotion ? { reducedMotion: true } : {}),
     };
     return Object.keys(options).length === 0 ? undefined : options;

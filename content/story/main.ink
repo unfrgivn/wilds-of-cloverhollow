@@ -90,6 +90,8 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 -> DONE
 
 === journal ===
+{festival_toast_done: We raised a Sunny Cloverhollow Festival Toast at the Wildlife Sanctuary with Milo, Rosie, Dad, Chef Bea, Ranger Fern, Sue, Jordan, and Maddie! # speaker: Fae}
+{milo_revealed and not festival_toast_done: Cloverhollow is sunny again! Friends and calm critters are gathering at the Wildlife Sanctuary for a Celebration Festival! # speaker: Fae}
 {island_shells_solved: I played the four giant pastel seashells in harmony by Starlight Island's tide pool and uncovered a Tide-Pool Pearl Cache! # speaker: Fae}
 {island_visited: I rowed out across Bubblegum Bay to Starlight Island and visited the coral-striped Tide-Pool Lighthouse! # speaker: Fae}
 {summit_aurora_read: Under Jordan's blacklight lantern, ancient aurora runes on Alpine Summit's stone cairn lit up with a valley legend! # speaker: Fae}
@@ -292,6 +294,7 @@ Morning, sleepyhead! Blueberry pancakes are almost ready. # speaker: Mom
 {
 - milo_revealed:
     I'm so proud of you, sweetie! Helping Milo feel seen brought calm right back to the valley. # speaker: Mom
+    Sunny Cloverhollow looks so bright! Dad and Ranger Fern saved you a spot at the Sanctuary Festival! # speaker: Mom
 - sanctuary_reward_14:
     Ranger Fern wove you a Sanctuary Clover Wreath? I'm so proud of my little critter friend! # speaker: Mom
 - gem_reward_all:
@@ -2058,6 +2061,10 @@ The note from under the comics: "NEXT STOP: THE ARCADE. FIZZ THE HIGH SCORES!" #
 {sue_compass: Sue's Sea-Glass Compass from her beach cottage. Its needle always points toward the bay! # speaker: Fae}
 {jordan_clover: Jordan's Pressed Alpine Clover from his grandma's botany book. # speaker: Fae}
 {buster_reward: Buster's Golden Star-Line Whistle! It shines like a tiny bus-stop star. # speaker: Fae}
+{milo_loft_visited and rosie_cottage_visited: A rocket doodle from Milo's Sketch Loft and a pressed clover from Rosie's Flower Cottage! # speaker: Fae}
+{summit_aurora_read: My sketchbook rubbings of the lavender-and-gold Alpine Summit Overlook aurora legend! # speaker: Fae}
+{island_shells_solved: A shimmering pastel shell shard from Starlight Island's four-note Seashell Chime! # speaker: Fae}
+{festival_toast_done: A sunny golden keepsake ribbon from our Cloverhollow Wildlife Sanctuary Celebration Festival! # speaker: Fae}
 Fae closes the lid gently. # speaker: Fae
 -> DONE
 = drawings
@@ -2923,6 +2930,7 @@ VAR sanctuary_picnic_basket = false
     I wove this Sanctuary Clover Wreath for your clubhouse keepsake chest, plus forty coins and two picnic snacks from the ranger pantry! # speaker: Ranger Fern # gift: coins 40 # sound: chime-red
     Every single creature in Cloverhollow knows you're a true friend! # speaker: Ranger Fern # gift: snack 2
     Whoa, it smells like alpine wildflowers! Thank you, Ranger Fern! # speaker: Fae
+    {milo_revealed: -> festival_menu}
     -> DONE
 - count >= 8 and not sanctuary_reward_8:
     ~ sanctuary_reward_8 = true
@@ -2930,12 +2938,14 @@ VAR sanctuary_picnic_basket = false
     Oh, my heart! {count} of 17 valley animals are already visiting our sanctuary meadow! # speaker: Ranger Fern
     Take twenty-five coins and two trail snacks from the ranger pouch, Fae. You've brought so much peace back to these hills! # speaker: Ranger Fern # gift: coins 25 # sound: chime-blue
     Keep soothing shy critters across the valley, and I'll have a handmade keepsake ready when fourteen friends visit! # speaker: Ranger Fern # gift: snack 2
+    {milo_revealed: -> festival_menu}
     -> DONE
 - count >= 3 and not sanctuary_reward_3:
     ~ sanctuary_reward_3 = true
     Look who's dropped by! {count} of 17 valley animals are already napping and playing in the meadow! # speaker: Ranger Fern
     Here's fifteen coins and a berry snack for being so kind to our furry and feathered neighbors! # speaker: Ranger Fern # gift: coins 15 # sound: chime-yellow
     Come say hi again once eight valley friends have found their way here! # speaker: Ranger Fern # gift: snack 1
+    {milo_revealed: -> festival_menu}
     -> DONE
 - count == 17:
     All 17 of 17 valley animals are visiting the Wildlife Sanctuary together! Listen to them chirp, purr, and splash! # speaker: Ranger Fern
@@ -2953,6 +2963,41 @@ VAR sanctuary_picnic_basket = false
 - buster_reward:
     Look at you, an official Star-Line Explorer! Buster tells all the mountain hikers about you! # speaker: Ranger Fern
 }
+{milo_revealed: -> festival_menu}
+-> DONE
+= festival_menu
+Sunny Cloverhollow is shining brighter than ever! Everyone gathered here to celebrate you, Fae! # speaker: Ranger Fern
++ {not festival_toast_done} [Raise a Sunny Cloverhollow Festival Toast!]
+    -> festival_toast
++ {festival_toast_done} [Replay the Sunny Cloverhollow Festival Toast!]
+    -> festival_toast_replay
++ [Enjoy the sunny meadow]
+    Take your time exploring the meadow, Fae! Every critter and friend is glad you're here! # speaker: Ranger Fern
+    -> DONE
+= festival_toast
+~ festival_toast_done = true
+Gather 'round, everyone! Cups of clover lemonade up beneath the alpine sunshine! # speaker: Ranger Fern
+To Fae—for listening when I was tangled in purple fizz, and showing me how fun sharing really is! # speaker: Milo
+To all our calm critters, blooming clover garlands, and brand-new sunny mornings in Cloverhollow! # speaker: Rosie
+To the bravest, kindest kid in the valley—your mom and I couldn't be prouder of you, kiddo! # speaker: Dad
+Cheers from Bon Appetit Cafe! Honey-clover tarts and fiesta tacos for every friend on the blanket! # speaker: Chef Bea
+To sea breezes, Starlight Island, and the best adventure crew on the whole map! # speaker: Sue
+To Alpine Summit auroras, glowing clues, and never running out of marshmallows! # speaker: Jordan
+Mrrrow-purrrr! Maddie lifts one fluffy orange paw right into the middle of the cheers! # speaker: Maddie
+To Sunny Cloverhollow—and every single friend and critter who makes it home! # speaker: Fae # sound: chime-yellow
+And for our guest of honor, here's a gleaming Festival Star Pouch with thirty shiny coins! # speaker: Ranger Fern # gift: coins 30 # sound: chime-red
+Plus two fresh meadow picnic snacks for wherever your next sunny trail leads! # speaker: Ranger Fern # gift: snack 2
+-> DONE
+= festival_toast_replay
+Gather 'round again, everyone! Cups of clover lemonade up beneath the alpine sunshine! # speaker: Ranger Fern
+To Fae—for listening when I was tangled in purple fizz, and showing me how fun sharing really is! # speaker: Milo
+To all our calm critters, blooming clover garlands, and brand-new sunny mornings in Cloverhollow! # speaker: Rosie
+To the bravest, kindest kid in the valley—your mom and I couldn't be prouder of you, kiddo! # speaker: Dad
+Cheers from Bon Appetit Cafe! Honey-clover tarts and fiesta tacos for every friend on the blanket! # speaker: Chef Bea
+To sea breezes, Starlight Island, and the best adventure crew on the whole map! # speaker: Sue
+To Alpine Summit auroras, glowing clues, and never running out of marshmallows! # speaker: Jordan
+Mrrrow-purrrr! Maddie lifts one fluffy orange paw right into the middle of the cheers! # speaker: Maddie
+To Sunny Cloverhollow—and every single friend and critter who makes it home! # speaker: Fae # sound: chime-red
 -> DONE
 
 === sanctuary_board ===
@@ -2993,6 +3038,7 @@ Fae and Maddie hop onto the red-and-cream checkered picnic blanket in the warm a
     ~ sanctuary_picnic_basket = true
     There's a warm honey biscuit tucked inside Ranger Fern's wicker picnic basket with a note: "For kind explorers!" # speaker: Fae # gift: snack 1 # sound: chime-green
 }
+{milo_revealed: Milo hops onto the checkered blanket with his sketchbook, drawing Maddie napping in the sun! # speaker: Milo}
 -> DONE
 
 === sanctuary_barn ===
@@ -3196,21 +3242,25 @@ Tell you what: take this Star-Line Stamp Card! Visit Bubblegum Bay's seaside sta
 Bring me both stamps, and I've got my lucky Golden Star-Line Whistle plus a travel bonus waiting just for you! # speaker: Buster
 {not club_open: We'll stay parked here until your clues point out of town, then just tap the star sign to hop aboard! # speaker: Buster}
 Deal! I'll fill the whole Star-Line Stamp Card! # speaker: Fae
+{milo_revealed: Sunny Cloverhollow is sparkling from Alpine Summit to Starlight Island to the Wildlife Sanctuary! # speaker: Buster}
 -> DONE
 = progress
 {stamp_bay and stamp_pass: -> complete}
 {stamp_bay:
     Ooh, you've got the Bubblegum Bay wave stamp already! One more to go! # speaker: Buster
     Next stop is Pinecone Pass's mountain stand for the crisp pine stamp. Hop on at the star sign whenever the mountain route's open! # speaker: Buster
+    {milo_revealed: Sunny Cloverhollow is sparkling from Alpine Summit to Starlight Island to the Wildlife Sanctuary! # speaker: Buster}
     -> DONE
 }
 {stamp_pass:
     Hey, look at that Pinecone Pass pine stamp! Only one stamp left! # speaker: Buster
     Swing by Bubblegum Bay's seaside stand for the wave stamp, then bring that full card right back to me! # speaker: Buster
+    {milo_revealed: Sunny Cloverhollow is sparkling from Alpine Summit to Starlight Island to the Wildlife Sanctuary! # speaker: Buster}
     -> DONE
 }
 Still got two empty star squares on your Star-Line Stamp Card, kiddo! # speaker: Buster
 {not club_open: Once your town clues open the road out to Bubblegum Bay, tap the star sign right here and we'll roll out to the coast and mountains! # speaker: Buster|Visit Bubblegum Bay's seaside stand for a wave stamp and Pinecone Pass's mountain stand for a pine stamp, then come right back! # speaker: Buster}
+{milo_revealed: Sunny Cloverhollow is sparkling from Alpine Summit to Starlight Island to the Wildlife Sanctuary! # speaker: Buster}
 -> DONE
 = complete
 Whoa-ho! Let me take a peek at that Star-Line Stamp Card! # speaker: Buster
@@ -3224,6 +3274,8 @@ Whoa, a real Golden Star-Line Whistle! Thanks, Buster! # speaker: Fae
 = after
 All aboard anytime, Star-Line Explorer! Keep that Golden Star-Line Whistle shining bright! # speaker: Buster
 {
+- milo_revealed:
+    Sunny Cloverhollow is sparkling from Alpine Summit to Starlight Island to the Wildlife Sanctuary! # speaker: Buster
 - sanctuary_visited:
     Heard Ranger Fern's Sanctuary meadow is full of calm critters! Best detour in the valley! # speaker: Buster
 - sue_cottage_visited and jordan_cabin_visited:
@@ -4975,3 +5027,59 @@ Ooh! Ten moonlit coins shimmer right beside the glowing bluebell runes! # speake
 = again
 The bioluminescent Starlight Beacon Verse shimmers softly across the meadow: "As long as the coral tower shines above the tide pool, every friend on Bubblegum Bay finds a warm harbor!" # speaker: Fae
 -> DONE
+
+// Post-Finale Sunny Cloverhollow Epilogue & Sanctuary Celebration Festival.
+VAR festival_milo_talked = false
+VAR festival_rosie_gift = false
+VAR festival_dad_talked = false
+VAR festival_chef_talked = false
+VAR festival_toast_done = false
+
+=== festival_milo ===
+{festival_milo_talked: -> again}
+~ festival_milo_talked = true
+Hey Fae! Look—I brought my open watercolor sketchbook right up to the checkered picnic blanket! # speaker: Milo # sound: chime-yellow
+I'm drawing Pond Pup, Ribbon Bunny, and your whole crew hanging out in the sunny clover! # speaker: Milo
+{milo_loft_visited: Thanks for dropping by my Sketch Loft too! Seeing my rocket comics on the corkboard felt awesome. # speaker: Milo}
+{sue_joined or jordan_joined: Next time we play Star Racer at the arcade, I'm playing fair and square! # speaker: Milo}
+-> DONE
+= again
+My watercolors look way brighter in alpine sunshine than purple fizz ever did! # speaker: Milo
+{milo_loft_visited: Thanks for dropping by my Sketch Loft too! Any time you want to trade comics, come on over! # speaker: Milo}
+{sue_joined or jordan_joined: Next time we play Star Racer at the arcade, I'm playing fair and square! # speaker: Milo}
+-> DONE
+
+=== festival_rosie ===
+{festival_rosie_gift: -> again}
+~ festival_rosie_gift = true
+Hi Fae! I'm weaving sunlit pressed-clover festival garlands for every critter in the meadow! # speaker: Rosie
+Here—take a cold glass of Clover Festival Lemonade I mixed with fresh meadow mint! # speaker: Rosie # gift: snack 1 # sound: chime-green
+{rosie_cottage_visited: I brought extra pressed blooms from my Flower Cottage so every critter gets a sunny crown! # speaker: Rosie}
+-> DONE
+= again
+Look how happy all the critters look wearing tiny clover garlands in the sunshine! # speaker: Rosie
+{rosie_cottage_visited: Visiting my Flower Cottage gave me the idea for our festival ribbons—thank you, Fae! # speaker: Rosie}
+-> DONE
+
+=== festival_dad ===
+~ temp count = sanctuary_count()
+~ festival_dad_talked = true
+Whoa, look at this sunlit valley view, kiddo! Your courage and kindness brought all of Cloverhollow together! # speaker: Dad
+{count > 0: Look at all {count} calm critters napping in the clover! Not a single fizzy bubble in sight! # speaker: Dad|What a peaceful alpine meadow—not a single fizzy bubble anywhere in sight! # speaker: Dad}
+Chef Mateo even sent up a warm basket of Clover Hills fiesta tacos for the picnic! # speaker: Dad
+-> DONE
+
+=== festival_chef ===
+~ festival_chef_talked = true
+Welcome to the picnic spread, Fae! I baked warm honey-clover tarts fresh beside the basket! # speaker: Chef Bea
+You, Dad, Grandpa Barnaby, and Ranger Fern make the finest valley team I've ever seen! # speaker: Chef Bea
++ [Sample a warm honey-clover festival tart!]
+    Ooh, crisp golden pastry and wildflower honey! Best festival treat in Cloverhollow! # speaker: Fae # sound: chime-yellow
+    Mrrrow-purrrr! Maddie nibbles a tiny golden crust crumb and bumps Fae's knee happily! # speaker: Maddie
+    Haha, a five-star purr from Maddie! Help yourself to another whenever you like! # speaker: Chef Bea
+    -> DONE
++ [Chat about the festival]
+    Every table at Bon Appetit Cafe is buzzing with stories of your Sunny Cloverhollow adventure! # speaker: Chef Bea
+    Go raise a toast with Ranger Fern whenever you're ready, star explorer! # speaker: Chef Bea
+    -> DONE
+

@@ -133,6 +133,7 @@ import miloHouseFixtureData from "../../content/fixtures/milo-house.json";
 import rosieCottageFixtureData from "../../content/fixtures/rosie-cottage.json";
 import summitFixtureData from "../../content/fixtures/summit.json";
 import islandFixtureData from "../../content/fixtures/island.json";
+import festivalFixtureData from "../../content/fixtures/festival.json";
 import tunableData from "../../content/tunables.json";
 import storyData from "../../content/story/main.ink.json";
 import fountainFrogData from "../../content/critters/fountain-frog.json";
@@ -359,6 +360,7 @@ export function loadContent(): {
     "rosie-cottage": loadFixture(rosieCottageFixtureData, "rosie-cottage"),
     summit: loadFixture(summitFixtureData, "summit"),
     island: loadFixture(islandFixtureData, "island"),
+    festival: loadFixture(festivalFixtureData, "festival"),
   };
   for (const [name, fixture] of Object.entries(fixtures))
     for (const id of fixture.party ?? [])

@@ -1,0 +1,43 @@
+{
+  "area": "sanctuary",
+  "spawn": "entrance",
+  "seed": 1,
+  "party": [
+    "maddie",
+    "sue",
+    "jordan"
+  ],
+  "variables": {
+    "milo_revealed": true,
+    "forest_fizzy": false,
+    "sue_joined": true,
+    "jordan_joined": true,
+    "has_lantern": true,
+    "has_flute": true,
+    "has_lasso": true,
+    "milo_loft_visited": true,
+    "rosie_cottage_visited": true,
+    "summit_aurora_read": true,
+    "island_shells_solved": true
+  },
+  "calms": {
+    "fountain-frog": 1,
+    "pup": 1,
+    "cat": 1,
+    "raccoon": 1,
+    "bluebird": 1,
+    "crab": 1,
+    "hamster": 1,
+    "penguin": 1,
+    "bunny": 1,
+    "squirrel": 1,
+    "gull": 1,
+    "owl": 1,
+    "lamb": 1,
+    "hedgehog": 1,
+    "bat": 1,
+    "crystal-mole": 1,
+    "moon-owl": 1,
+    "hooded-kid": 1
+  }
+}

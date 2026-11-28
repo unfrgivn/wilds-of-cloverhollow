@@ -108,7 +108,7 @@ describe("The Wildlife Sanctuary", () => {
     expect(sanctuary.width).toBe(1650);
     expect(sanctuary.height).toBe(1100);
     expect(sanctuary.props).toHaveLength(7);
-    expect(sanctuary.npcs).toHaveLength(18);
+    expect(sanctuary.npcs).toHaveLength(22);
     expect(sanctuary.interactables.map((item) => item.id)).toEqual([
       "sanctuary-board",
       "sanctuary-picnic",

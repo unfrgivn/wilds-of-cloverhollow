@@ -160,6 +160,22 @@ function enteredBossPhase2(
   );
 }
 
+/** True when the player switched the active target foe in a multi-foe battle command phase. */
+export function didSwitchBattleTarget(
+  previous: Pick<State, "battle">,
+  next: Pick<State, "battle">,
+): boolean {
+  const prevBattle = previous.battle;
+  const nextBattle = next.battle;
+  if (prevBattle === null || nextBattle === null) return false;
+  if (prevBattle.phase !== "command" || nextBattle.phase !== "command") return false;
+  if ((nextBattle.foes?.length ?? 0) <= 1) return false;
+  const prevIndex = prevBattle.targetIndex ?? 0;
+  const nextIndex = nextBattle.targetIndex ?? 0;
+  if (prevIndex === nextIndex) return false;
+  return prevBattle.foes?.[prevIndex]?.soothed === nextBattle.foes?.[prevIndex]?.soothed;
+}
+
 /** Projects a simulation tick's transitions and sound cues to a tactile haptic kind. */
 export function hapticForTick(
   previous: Pick<State, "battle"> & Partial<Pick<State, "area" | "puzzleArea" | "encore">>,
@@ -228,6 +244,7 @@ export function hapticForTick(
     next.battle?.check?.kind === "spin-snag" &&
     previous.battle?.check?.kind === "spin-snag" &&
     next.battle.check.turns > previous.battle.check.turns;
+  const targetSwitched = didSwitchBattleTarget(previous, next);
   if (
     mirrorRotated ||
     plateChanged ||
@@ -235,6 +252,7 @@ export function hapticForTick(
     fluteChimed ||
     whackHit ||
     spinSnagTurn ||
+    targetSwitched ||
     cues.some((cue) => LIGHT_HAPTIC_CUES.has(cue))
   ) {
     return "light";

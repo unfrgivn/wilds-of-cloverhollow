@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 222)
+Last updated: 2026-11-28 (Milestone 223)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -168,8 +168,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   `src/core/index.ts` (Milestones 91, 96, 125 & 186).
 - **Deterministic Cutscene & Stage Choreography Engine** (`src/core/cutscene.ts`,
   `src/content/cutscene-parsers.ts`, `content/cutscenes/*.json`,
-  `src/render/cutscene-render.ts`, `cutsceneCameraPoint` in `src/render/camera.ts`,
-  Milestone 186 / Track E4): pure 60 Hz declarative JSON choreography engine
+  `src/render/cutscene-render.ts` with Pixi-free pure cutscene geometry/burst/emote
+  evaluators in `src/render/cutscene-math.ts` re-exported identically through
+  `src/render/cutscene-render.ts` in Milestone 223 / Track E19N, `cutsceneCameraPoint`
+  in `src/render/camera.ts`, Milestone 186 / Track E4): pure 60 Hz declarative JSON choreography engine
   using `+ - * / Math.sqrt` only (zero trig, DOM, Pixi, timers, `Date`, or
   `Math.random`). Supports `moveActor`, `face`, `pose` (8 expressive poses with
   optional burst `effect`), `emote` (all 8 emote kinds), `wait`, `cameraPan`
@@ -279,10 +281,16 @@ ios/            Capacitor iOS project (from Milestone 4).
   `buildJournalView`, `buildRewardStickerView`) live in Pixi-free
   `src/shell/view-models.ts` (re-exported identically through
   `src/shell/assets.ts`, Milestone 137); pure gameplay
-  feedback and outcome helpers (`hapticForTick`, `buildSoundContext`,
-  `resolveArcadeOutcome`, `collectLevelUpNotices`, `shouldClearRest`,
-  `stepJukeboxTrack`, `resolveSoundtrack`, `createJournalNotesCache`) live in
-  `src/shell/feedback.ts`, while overworld visual/audio feedback, postcard,
+  feedback and outcome helpers (`didSwitchBattleTarget`, `hapticForTick`,
+  `buildSoundContext`, `resolveArcadeOutcome`, `collectLevelUpNotices`,
+  `shouldClearRest`, `stepJukeboxTrack`, `resolveSoundtrack`,
+  `createJournalNotesCache`) live in `src/shell/feedback.ts` — including
+  Track E19N multi-foe battle command-phase target-switch tactile feedback
+  (Milestone 223: genuine player target switches detected by
+  `didSwitchBattleTarget` emit `"atlas-pin"` foley and `"light"` haptic across
+  keyboard Left/Right, gamepad, and `.battle-foe-plate` click/tap while staying
+  silent on single-foe battles, non-command phases, unchanged targets, or
+  auto-retarging when the previous foe just became soothed), while overworld visual/audio feedback, postcard,
   arrival banner, chatter, tool-chime, overworld confirm, and ribbon toast
   helpers (`petEffectForCompanion`, `isOverworldConfirm`,
   `performOverworldConfirm`, `createAreaBannerTracker`, `captureAreaPostcard`,
@@ -1097,7 +1105,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   frames it inside a warm cream watercolor postcard border (`#fbf6e8` margin,
   `#47321f` hand-inked inner rule, four-leaf clover emblem, plus a delicate
   hand-inked miniature postal weather cancel stamp beside the clover whenever
-  an active outdoor cozy weather kind is passed to `composePostcardFrame` —
+  an active outdoor cozy weather kind is passed to `composePostcardFrame` (2D
+  canvas watercolor frame and postal/weather stamp drawing isolated in
+  `src/ui/postcard-canvas.ts` and re-exported identically through
+  `src/ui/postcard.ts`, Milestone 223 / Track E19N) —
   rainbow + raindrops for `sunshower`, 6-spoke frost crystal for `snow-flurry`,
   sakura petals + wind curl for `breeze-petals`, crescent moon + firefly stars
   for `twilight-fireflies`, Milestone 220 — region + active
@@ -2516,8 +2527,11 @@ ios/            Capacitor iOS project (from Milestone 4).
       `fern` via `eligibleClubhouseVisitors`, `activeClubhouseVisitor`,
       `clubhouseVisitorNpc`, `effectiveAreaNpcs`, `cycleClubhouseVisitor`) with
       warm hangout knots (`club_visit_*`) at `(360, 505)`.
-    - `evaluateBedroomDisplay` and `evaluateClubhouseDecor`
-      (`src/render/clubhouse-display.ts`) render owned Arcade Plushes & Counter
+    - `evaluateBedroomDisplay` and `evaluateClubhouseDecor` (extracted alongside
+      `ENCORE_TROPHY_PERCH`, `evaluateEncoreTrophySparkles`, `hasSunberryBloom`,
+      and `evaluateSunberryMotes` into Pixi-free, DOM-free
+      `src/render/clubhouse-decor-math.ts` and re-exported identically through
+      `src/render/clubhouse-display.ts`, Milestone 223 / Track E19N) render owned Arcade Plushes & Counter
       Prizes onto Fae's Bedroom bookshelf (`bedroom:prize:<id>`, loading
       `clubhouse-prizes` for `bedroom` as well as `clubhouse` in
       `src/render/view-loader.ts`) and paint the active Clubhouse swatch's

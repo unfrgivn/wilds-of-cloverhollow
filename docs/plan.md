@@ -9519,6 +9519,44 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   chunk `< 400 kB`, hook leak + runtime story + harness checks green), and
   Chromium & WebKit e2e (`milestone-158`, `milestone-199`, `milestone-172`,
   `milestone-221`).
+
+## Milestone 223: Multi-Foe Battle Target-Switch Tactile Foley & Haptic + `cutscene-math.ts`, `postcard-canvas.ts` & `clubhouse-decor-math.ts` Modular Splits (Elevation Track E19N) **Status:** ✅ Completed (2026-11-28)
+- Multi-Foe Battle Target-Switch Tactile Foley & Light Haptic (`src/shell/feedback.ts`):
+  - Exports pure `didSwitchBattleTarget(previous, next)` firing strictly on genuine
+    multi-foe `command`-phase `targetIndex` changes when the previously targeted foe
+    was not just soothed on the same tick.
+  - Emits `"atlas-pin"` foley and `"light"` haptic via `hapticForTick` across
+    keyboard Left/Right, gamepad, and `.battle-foe-plate` clicks/taps with zero
+    `src/core` changes and zero resting visual diffs.
+- Modular Extraction of Pixi-Free `src/render/cutscene-math.ts` (`src/render/cutscene-render.ts`
+  `769 -> 412` lines, `src/render/cutscene-math.ts` `394` lines):
+  - Extracts pure Pixi-free, DOM-free cutscene constants, types, burst particle
+    math, pose transforms, emote anchors, area atlas discovery, and temp-actor
+    frame selection into `src/render/cutscene-math.ts`, re-exporting every public
+    symbol identically from `src/render/cutscene-render.ts`.
+- Modular Extraction of `src/ui/postcard-canvas.ts` (`src/ui/postcard.ts`
+  `748 -> 379` lines, `src/ui/postcard-canvas.ts` `371` lines):
+  - Extracts 2D canvas postcard composition and hand-inked clover/weather postal
+    stamp drawing into `src/ui/postcard-canvas.ts`, re-exporting
+    `composePostcardFrame`, `composePostcard`, and `ComposedPostcard` identically
+    from `src/ui/postcard.ts`.
+- Modular Extraction of Pixi-Free `src/render/clubhouse-decor-math.ts`
+  (`src/render/clubhouse-display.ts` `736 -> 335` lines,
+  `src/render/clubhouse-decor-math.ts` `364` lines):
+  - Extracts pure decorative/glowing Clubhouse & Bedroom layout evaluators
+    (`ENCORE_TROPHY_PERCH`, `evaluateEncoreTrophySparkles`, `hasSunberryBloom`,
+    `evaluateSunberryMotes`, `evaluateBedroomDisplay`, `evaluateClubhouseDecor`)
+    into Pixi-free, DOM-free `src/render/clubhouse-decor-math.ts`, re-exporting
+    every symbol identically from `src/render/clubhouse-display.ts`.
+- Evidence: `tests/unit/milestone-223.test.ts` and `tests/e2e/milestone-223.spec.ts`
+  (`@smoke`, Chromium & WebKit).
+- Gates: `just check` (291 unit files / 2,097 tests, all 77 recorded + 7
+  headless sims with zero hash shifts, 23 QA packs, purity, lint), `just build`
+  (largest non-vendor chunk `392.22 kB < 500 kB`, hook leak + runtime story +
+  harness checks green), 6/6 Chromium & WebKit (`milestone-223`,
+  `milestone-221`, `milestone-212`), and 10/10 Chromium (`e7-multifoe-combos`,
+  `cutscene`, `e9b-decor-economy`).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

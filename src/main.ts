@@ -33,9 +33,9 @@ import {
 } from "./shell/assets";
 import {
   buildSoundContext, collectLevelUpNotices, createAreaBannerTracker, createJournalNotesCache,
-  createNpcChatterSync, createRibbonCelebrationSync, createToolEventChimeSync, hapticForTick,
-  isOverworldConfirm, performOverworldConfirm, resolveArcadeOutcome, resolveSoundtrack,
-  shouldClearRest,
+  createNpcChatterSync, createRibbonCelebrationSync, createToolEventChimeSync,
+  didSwitchBattleTarget, hapticForTick, isOverworldConfirm, performOverworldConfirm,
+  resolveArcadeOutcome, resolveSoundtrack, shouldClearRest,
 } from "./shell/feedback";
 import { createSaveSession, createSaveStore } from "./shell/save-storage";
 import { createAudio, projectMusicMix, resolveSoundtrackWeather } from "./platform/audio";
@@ -753,6 +753,7 @@ async function boot(): Promise<void> {
       const played = sound.play(cue, state.tick, soundContext);
       if (qaEnabled) console.log(`[cloverhollow] sound ${JSON.stringify(played)}`);
     }
+    if (didSwitchBattleTarget(previous, state)) sound.playEffect("atlas-pin");
     if (!harnessStepping) {
       const haptic = hapticForTick(previous, state, cues, {
         goldenCooked: arcadeOutcome.goldenCooked, world: content.world,

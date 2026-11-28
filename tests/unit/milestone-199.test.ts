@@ -517,11 +517,12 @@ describe("Milestone 198: E7 Dual-Combo, Boss Phase-2, Whack & Spin-Snag Haptics"
       foes: [{ ...pipFoeBefore, calm: 92 }, pupFoe],
     });
     expect(hapticForTick({ battle: encoreP1 }, { battle: encoreP2 }, [])).toBe("celebrate");
-    // Switching targetIndex to/from a boss already in Phase 2 must NOT re-trigger celebrate.
+    // Switching targetIndex to/from a boss already in Phase 2 must NOT re-trigger celebrate
+    // (command-phase switches emit the Track E19N light target-switch tap instead).
     expect(hapticForTick({ battle: encoreP2 }, { battle: encoreSwitchedTarget }, [])).toBeNull();
     expect(
       hapticForTick({ battle: encoreSwitchedTarget }, { battle: encoreSwitchedBack }, []),
-    ).toBeNull();
+    ).toBe("light");
   });
 
   it("fires light on whack hits and spin-snag lasso turns without firing on misses", () => {

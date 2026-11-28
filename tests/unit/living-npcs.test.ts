@@ -1258,6 +1258,14 @@ describe("Living NPC presentation craft (voices, portraits, motion, emotes, chat
     const worry = npcLivingPose("cozy", "chaos-worry", 75, 1, 10);
     expect(worry.scaleY).toBeLessThan(1);
     expect(worry.scaleX).toBeGreaterThan(1);
+    for (const tick of [0, 1, 2, 15, 75, 130]) {
+      for (const age of [0, 5, 10, 32]) {
+        const pose = npcLivingPose("cozy", "chaos-worry", tick, 1, age);
+        expect(pose.offsetX).toBe(0);
+        expect(pose.scaleY).toBeLessThan(1);
+        expect(pose.scaleX).toBeGreaterThan(1);
+      }
+    }
     const kidBounce = npcLivingPose("kid-bouncy", "idle", 7, 0, 0);
     expect(kidBounce.offsetY).toBeLessThan(-3);
     const mysticFloat = npcLivingPose("mystic", "idle", 40, 0, 0);
@@ -1302,6 +1310,30 @@ describe("Living NPC presentation craft (voices, portraits, motion, emotes, chat
       "emoteNote",
       "emoteHeart",
     ]);
+
+    const midRange = evaluateOverworldEmotes({
+      areaId: "plaza",
+      tick: 90,
+      player: { x: 910, y: 400 },
+      dialogueOpen: false,
+      roamers: [],
+      calmedCritters: [],
+      nappingMembers: [],
+      npcEmotes,
+    });
+    expect(midRange.map((item) => item.texture)).toEqual(["emoteWorry"]);
+
+    const beyondWorryRange = evaluateOverworldEmotes({
+      areaId: "plaza",
+      tick: 90,
+      player: { x: 1120, y: 400 },
+      dialogueOpen: false,
+      roamers: [],
+      calmedCritters: [],
+      nappingMembers: [],
+      npcEmotes,
+    });
+    expect(beyondWorryRange).toEqual([]);
 
     const far = evaluateOverworldEmotes({
       areaId: "plaza",

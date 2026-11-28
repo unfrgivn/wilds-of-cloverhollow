@@ -331,16 +331,16 @@ describe("Other Kids' Houses: Milo's Sketch Loft & Rosie's Flower Cottage", () =
 
     const miloState = createState(world, fixtures["milo-house"]!);
     const rosieState = createState(world, fixtures["rosie-cottage"]!);
-    for (const [id, state] of [
-      ["milo-house", miloState],
-      ["rosie-cottage", rosieState],
+    for (const [id, state, track, title] of [
+      ["milo-house", miloState, "loft", "Paper Plane Sketchbook"],
+      ["rosie-cottage", rosieState, "bloom", "Rosie's Flower Window"],
     ] as const) {
       expect(INDOOR_AREAS.has(id), id).toBe(true);
       expect(soundtrackFor(world, state, { titleOpen: false }), id).toEqual({
-        track: "home",
+        track,
         ambience: "none",
         duck: false,
-        title: "Cloverhollow Town",
+        title,
       });
       const atmo = evaluateAtmosphere(id, 1200, 800, 90);
       expect(atmo.filter((p) => p.texture === "sunbeam"), id).toHaveLength(2);

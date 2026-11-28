@@ -72,8 +72,8 @@ describe("soundtrackFor", () => {
       market: ["market", "cafe-murmur"],
       parlor: ["parlor", "cafe-murmur"],
       park: ["home", "town-breeze"],
-      "milo-house": ["home", "none"],
-      "rosie-cottage": ["home", "none"],
+      "milo-house": ["loft", "none"],
+      "rosie-cottage": ["bloom", "none"],
       hills: ["hills", "town-breeze"],
       sanctuary: ["sanctuary", "forest"],
       school: ["school", "none"],
@@ -84,11 +84,11 @@ describe("soundtrackFor", () => {
       "art-room": ["school", "none"],
       field: ["school", "town-breeze"],
       bay: ["bay", "ocean"],
-      island: ["bay", "ocean"],
+      island: ["island", "ocean"],
       "sue-cottage": ["cottage", "ocean"],
       trail: ["bay", "ocean"],
       pass: ["pass", "mountain-wind"],
-      summit: ["pass", "mountain-wind"],
+      summit: ["summit", "mountain-wind"],
       lodge: ["lodge", "hearth"],
       "jordan-cabin": ["cabin", "hearth"],
       cavern: ["cavern", "cavern-drips"],
@@ -414,9 +414,9 @@ describe("complete 20-track world audio identity", () => {
     ).toBe(true);
   });
 
-  test("covers all 24 jukebox tracks with titles, multi-voice scores, and harmonic scales", () => {
-    expect(jukeboxTracks).toHaveLength(24);
-    expect(new Set(jukeboxTracks).size).toBe(24);
+  test("covers all 29 jukebox tracks with titles, multi-voice scores, and harmonic scales", () => {
+    expect(jukeboxTracks).toHaveLength(29);
+    expect(new Set(jukeboxTracks).size).toBe(29);
     for (const id of jukeboxTracks) {
       expect(trackTitles[id].trim().length, `${id} title`).toBeGreaterThan(0);
       const score = scores[id];
@@ -437,6 +437,11 @@ describe("complete 20-track world audio identity", () => {
       "parlor",
       "cottage",
       "cabin",
+      "loft",
+      "bloom",
+      "island",
+      "summit",
+      "taco",
     ] as const) {
       expect(scores[id].bars, `${id} bars`).toBeGreaterThanOrEqual(16);
       expect(scores[id].tracks.length, `${id} voices`).toBeGreaterThanOrEqual(4);
@@ -451,19 +456,24 @@ describe("composed scores integrity", () => {
     "cafe",
     "market",
     "parlor",
+    "loft",
+    "bloom",
     "hills",
     "sanctuary",
     "school",
     "bay",
     "fishing",
     "cottage",
+    "island",
     "pass",
     "lodge",
     "cabin",
+    "summit",
     "cavern",
     "woods",
     "clubhouse",
     "arcade",
+    "taco",
     "enchanted",
     "enchanted-calm",
     "battle",

@@ -323,12 +323,12 @@ describe("Starlight Island & Bubblegum Bay Rowboat Crossing", () => {
       if (islandFixture === undefined) throw new Error("island fixture missing");
       const islandState = createState(world, islandFixture);
 
-      // Soundtrack: bay theme + ocean ambience.
+      // Soundtrack: island theme + ocean ambience.
       expect(soundtrackFor(world, islandState, { titleOpen: false })).toEqual({
-        track: "bay",
+        track: "island",
         ambience: "ocean",
         duck: false,
-        title: "Bubblegum Breeze",
+        title: "Starlight Beacon",
       });
 
       // Time-of-day: golden-hour with has_lantern, neutral day without.

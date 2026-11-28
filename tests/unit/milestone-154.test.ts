@@ -66,6 +66,7 @@ describe("Milestone 154: Vite Chunk-Budget Future-Proofing & Check-Dist Gate", (
     expect(routeModule("/repo/src/platform/scores-town.ts")).toBe("audio-scores");
     expect(routeModule("/repo/src/platform/scores-wilds.ts")).toBe("audio-scores");
     expect(routeModule("/repo/src/platform/scores-interiors.ts")).toBe("audio-scores");
+    expect(routeModule("/repo/src/platform/scores-expansion.ts")).toBe("audio-scores");
     expect(routeModule("/repo/content/critters/fountain-frog.json")).toBe("world-content");
     expect(routeModule("/repo/content/npc-profiles.json")).toBe("world-content");
     expect(routeModule("/repo/content/tunables.json")).toBe("world-content");

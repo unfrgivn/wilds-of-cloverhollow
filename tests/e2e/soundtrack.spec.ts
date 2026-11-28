@@ -276,7 +276,8 @@ test(
 );
 
 test(
-  "lodge, clubhouse, sanctuary, and interiors play bespoke themes and Jukebox cycles all 24 tracks",
+  "lodge, clubhouse, sanctuary, interiors, and expansion areas play bespoke themes; " +
+    "Jukebox cycles all 29 tracks",
   { tag: "@smoke" },
   async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
@@ -352,6 +353,50 @@ test(
       playing: true,
     });
 
+    // Milo's Sketch Loft -> Paper Plane Sketchbook + none ambience.
+    await resetPaused(page, "milo-house");
+    await hold(page, "ArrowRight", 8);
+    expect(await readMusic(page)).toMatchObject({
+      track: "loft",
+      ambience: "none",
+      duck: false,
+      title: "Paper Plane Sketchbook",
+      playing: true,
+    });
+
+    // Rosie's Flower Cottage -> Rosie's Flower Window + none ambience.
+    await resetPaused(page, "rosie-cottage");
+    await hold(page, "ArrowRight", 8);
+    expect(await readMusic(page)).toMatchObject({
+      track: "bloom",
+      ambience: "none",
+      duck: false,
+      title: "Rosie's Flower Window",
+      playing: true,
+    });
+
+    // Starlight Island -> Starlight Beacon + ocean ambience.
+    await resetPaused(page, "island");
+    await hold(page, "ArrowRight", 8);
+    expect(await readMusic(page)).toMatchObject({
+      track: "island",
+      ambience: "ocean",
+      duck: false,
+      title: "Starlight Beacon",
+      playing: true,
+    });
+
+    // Alpine Summit Overlook -> Above the Pines + mountain-wind ambience.
+    await resetPaused(page, "summit");
+    await hold(page, "ArrowUp", 8);
+    expect(await readMusic(page)).toMatchObject({
+      track: "summit",
+      ambience: "mountain-wind",
+      duck: false,
+      title: "Above the Pines",
+      playing: true,
+    });
+
     // Wildlife Sanctuary -> Meadow of Friends + forest ambience.
     await resetPaused(page, "sanctuary");
     await hold(page, "ArrowUp", 8);
@@ -363,7 +408,7 @@ test(
       playing: true,
     });
 
-    // Open journal OPTIONS and cycle cleanly through all 24 jukebox tracks back to sanctuary.
+    // Open journal OPTIONS and cycle cleanly through all 29 jukebox tracks back to sanctuary.
     await page.keyboard.press("j");
     await step(page, 2);
     await page.keyboard.press("ArrowRight");
@@ -374,7 +419,7 @@ test(
     const nextBtn = page.locator(".journal-jukebox-next");
     const visited: string[] = [];
     let prevTrack = "sanctuary";
-    for (let i = 0; i < 24; i += 1) {
+    for (let i = 0; i < 29; i += 1) {
       await nextBtn.click();
       await expect.poll(async () => (await readMusic(page)).track).not.toBe(prevTrack);
       const info = await readMusic(page);
@@ -383,11 +428,16 @@ test(
       expect(info.duck).toBe(false);
       await expect(nowPlaying).toHaveText(`♫ ${info.title}`);
     }
-    expect(new Set(visited).size).toBe(24);
+    expect(new Set(visited).size).toBe(29);
     expect(visited).toContain("market");
     expect(visited).toContain("parlor");
+    expect(visited).toContain("loft");
+    expect(visited).toContain("bloom");
     expect(visited).toContain("cottage");
+    expect(visited).toContain("island");
     expect(visited).toContain("cabin");
+    expect(visited).toContain("summit");
+    expect(visited).toContain("taco");
     expect(visited).toContain("sanctuary");
     expect(visited).toContain("lodge");
     expect(visited).toContain("clubhouse");

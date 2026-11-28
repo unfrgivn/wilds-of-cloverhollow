@@ -153,6 +153,13 @@ test(
     }
     expect(readyState.arcade.phase).toBe("ready");
     await expect(page.locator(".taco-stage")).toBeVisible();
+    const tacoMusic = await page.evaluate(() => window.__cloverhollow?.sound.music());
+    expect(tacoMusic).toMatchObject({
+      track: "taco",
+      ambience: "town-breeze",
+      duck: false,
+      title: "Mateo's Fiesta Truck",
+    });
 
     // Click the center of .taco-stage to start the lunch rush (zero keyboard!).
     const stageBox = await page.locator(".taco-stage").boundingBox();

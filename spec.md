@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 161)
+Last updated: 2026-11-27 (Milestone 162)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -412,58 +412,66 @@ ios/            Capacitor iOS project (from Milestone 4).
   ("Watercolor Morning"), `home` ("Cloverhollow Town"), `cafe` ("Cinnamon
   Waltz"), `market` ("Pippin's Basket Waltz", 102 BPM 3/4 G major corner-grocer
   waltz for `market`), `parlor` ("Sweet Scoop Rag", 112 BPM 4/4 Bb major parlor
-  ragtime for `parlor`), `hills` ("Clover Meadow"), `sanctuary` ("Meadow of
-  Friends"), `school` ("Bell & Chalk"), `bay` ("Bubblegum Breeze"), `fishing`
-  ("Docked by the Tide", unducked over `"ocean"` ambience while
-  `state.arcade.game === "fish"` at Bubblegum Bay's dock, ducking only when
-  dialogue opens), `cottage` ("Sea-Glass Sunroom", 88 BPM 4/4 Eb major coastal
-  lullaby for `sue-cottage`), `pass` ("Pinecone Snowfall"), `lodge` ("Hearth &
-  Cocoa"), `cabin` ("Timber & Tea", 92 BPM 3/4 A major alpine folk air for
-  `jordan-cabin`), `cavern` ("Crystal Echoes"), `woods` ("Whispering Canopy"),
-  `clubhouse` ("Our Secret Treehouse"), `arcade` ("Star Racer Tokens"),
-  `enchanted` ("Misty Dream"), `enchanted-calm` ("Ancient Tree's Song", once
-  `forest_fizzy` is false), `battle` ("Fizzy Calm-Down!"), `boss` ("The Purple
-  Hood", for wind-up mini-bosses, Talk battles, or non-runnable battles),
-  `talk` ("Listening Heart", once Talk opens or calm reaches `talkAt`),
-  `morning` ("Waking Up", during the morning and credits finale), and `silent`
-  ("Quiet", for `harness`). `jukeboxTracks` exports all 24 non-silent themes in
-  story/album order (`title`, `home`, `cafe`, `market`, `parlor`, `school`,
-  `bay`, `fishing`, `cottage`, `pass`, `lodge`, `cabin`, `cavern`, `woods`,
-  `clubhouse`, `hills`, `sanctuary`, `arcade`, `enchanted`, `enchanted-calm`,
-  `battle`, `boss`, `talk`, `morning`) for the Journal OPTIONS Music Box
-  (shell-only override, never saved, plays unducked while the journal is open
-  and returns smoothly to the live area theme on close, title, or reset).
-  Ambience beds (`none`, `town-breeze`, `ocean`,
-  `mountain-wind`, `hearth`, `forest`, `enchanted-shimmer`, `arcade-hum`,
-  `cavern-drips`, `cafe-murmur`) match each outdoor area, the café, the lodge,
-  the cavern, and the arcade, and pause in battles. Music ducks smoothly during
-  dialogue, the journal, non-fishing arcade games (and clubhouse microwave
-  cooking), and battle rewards.
+  ragtime for `parlor`), `loft` ("Paper Plane Sketchbook", 96 BPM 4/4 C major /
+  A minor daydream for `milo-house`), `bloom` ("Rosie's Flower Window", 94 BPM
+  3/4 F major pastoral waltz for `rosie-cottage`), `hills` ("Clover Meadow"),
+  `sanctuary` ("Meadow of Friends"), `school` ("Bell & Chalk"), `bay`
+  ("Bubblegum Breeze"), `fishing` ("Docked by the Tide", unducked over
+  `"ocean"` ambience while `state.arcade.game === "fish"` at Bubblegum Bay's
+  dock, ducking only when dialogue opens), `cottage` ("Sea-Glass Sunroom", 88
+  BPM 4/4 Eb major coastal lullaby for `sue-cottage`), `island` ("Starlight
+  Beacon", 86 BPM 4/4 D major / Lydian coastal nocturne for `island`), `pass`
+  ("Pinecone Snowfall"), `lodge` ("Hearth & Cocoa"), `cabin` ("Timber & Tea",
+  92 BPM 3/4 A major alpine folk air for `jordan-cabin`), `summit` ("Above the
+  Pines", 90 BPM 3/4 G major soaring alpine vista waltz for `summit`), `cavern`
+  ("Crystal Echoes"), `woods` ("Whispering Canopy"), `clubhouse` ("Our Secret
+  Treehouse"), `arcade` ("Star Racer Tokens"), `taco` ("Mateo's Fiesta Truck",
+  120 BPM 4/4 A major festive kitchen groove, unducked over `"town-breeze"`
+  ambience while `state.arcade.game === "taco"`, ducking only when dialogue
+  opens), `enchanted` ("Misty Dream"), `enchanted-calm` ("Ancient Tree's Song",
+  once `forest_fizzy` is false), `battle` ("Fizzy Calm-Down!"), `boss` ("The
+  Purple Hood", for wind-up mini-bosses, Talk battles, or non-runnable
+  battles), `talk` ("Listening Heart", once Talk opens or calm reaches
+  `talkAt`), `morning` ("Waking Up", during the morning and credits finale),
+  and `silent` ("Quiet", for `harness`). `jukeboxTracks` exports all 29
+  non-silent themes in story/album order (`title`, `home`, `cafe`, `market`,
+  `parlor`, `loft`, `bloom`, `school`, `bay`, `fishing`, `cottage`, `island`,
+  `pass`, `lodge`, `cabin`, `summit`, `cavern`, `woods`, `clubhouse`, `hills`,
+  `sanctuary`, `arcade`, `taco`, `enchanted`, `enchanted-calm`, `battle`,
+  `boss`, `talk`, `morning`) for the Journal OPTIONS Music Box (shell-only
+  override, never saved, plays unducked while the journal is open and returns
+  smoothly to the live area theme on close, title, or reset). Ambience beds
+  (`none`, `town-breeze`, `ocean`, `mountain-wind`, `hearth`, `forest`,
+  `enchanted-shimmer`, `arcade-hum`, `cavern-drips`, `cafe-murmur`) match each
+  outdoor area, the café, the lodge, the cavern, and the arcade, and pause in
+  battles. Music ducks smoothly during dialogue, the journal, non-fishing /
+  non-taco arcade games (and clubhouse microwave cooking), and battle rewards.
 - `src/platform/audio.ts` creates a single AudioContext first thing at boot,
   before anything awaits, and resumes it at every chance: right away, on each
   key, pointer, or touch, and whenever a cue plays while it isn't running.
-  Its master chain routes SFX, music (`src/platform/music.ts` over the 24
+  Its master chain routes SFX, music (`src/platform/music.ts` over the 29
   multi-voice scores split across `src/platform/scores-helpers.ts`,
-  `src/platform/scores-town.ts`, `src/platform/scores-wilds.ts`, and
-  `src/platform/scores-interiors.ts` and re-exported by `src/platform/scores.ts`,
-  dry plus warm stereo ConvolverNode reverb), and procedural ambience
-  (`src/platform/ambience.ts`) through a shared `DynamicsCompressorNode`. Music
-  arranges its 10 instrument voices across a balanced stereo chamber soundstage
-  (`VOICE_PAN` in `src/platform/music.ts`, within `[-0.4, 0.4]` via
-  feature-guarded per-voice `StereoPannerNode`s cleaned up on track crossfade)
-  and shapes every note with deterministic `phraseDynamics` (a smooth 16-step
-  sinusoidal phrase breath in `[0.92, 1.07]`, subtle `0..8 ms` pluck
-  micro-timing on melodic voices with zero drift on rhythmic anchors, and a
-  whisper-soft `0.16x` celesta octave shimmer on loop-2+ bar 1 and mid-score
-  downbeats for harp/piano notes `<= 76`). Music crossfades (~0.55 s) on track
-  changes, ducks smoothly over ~0.3 s to 0.55x gain while gently rolling off
-  highs through a feature-guarded warm low-pass `BiquadFilterNode` (`Q = 0.55`,
-  `duckFilterCutoff` ramping between `DUCK_FILTER_DUCKED_HZ = 2600` Hz and
-  `DUCK_FILTER_OPEN_HZ = 18000` Hz so character voice prosody stays clear,
-  Milestone 152), resumes exploration themes on the nearest bar downbeat after
-  battles or shop visits via `resumeBarStep` (preserving `stepsPerBar` alignment
-  across 4/4 and 3/4 waltz scores while `FRESH_START_TRACKS` (`title`, `battle`,
-  `boss`, `talk`, and `morning`) always start fresh at step 0, Milestone 152),
+  `src/platform/scores-town.ts`, `src/platform/scores-wilds.ts`,
+  `src/platform/scores-interiors.ts`, and `src/platform/scores-expansion.ts`,
+  re-exported by `src/platform/scores.ts`, dry plus warm stereo ConvolverNode
+  reverb), and procedural ambience (`src/platform/ambience.ts`) through a
+  shared `DynamicsCompressorNode`. Music arranges its 10 instrument voices
+  across a balanced stereo chamber soundstage (`VOICE_PAN` in
+  `src/platform/music.ts`, within `[-0.4, 0.4]` via feature-guarded per-voice
+  `StereoPannerNode`s cleaned up on track crossfade) and shapes every note with
+  deterministic `phraseDynamics` (a smooth 16-step sinusoidal phrase breath in
+  `[0.92, 1.07]`, subtle `0..8 ms` pluck micro-timing on melodic voices with
+  zero drift on rhythmic anchors, and a whisper-soft `0.16x` celesta octave
+  shimmer on loop-2+ bar 1 and mid-score downbeats for harp/piano notes
+  `<= 76`). Music crossfades (~0.55 s) on track changes, ducks smoothly over
+  ~0.3 s to 0.55x gain while gently rolling off highs through a feature-guarded
+  warm low-pass `BiquadFilterNode` (`Q = 0.55`, `duckFilterCutoff` ramping
+  between `DUCK_FILTER_DUCKED_HZ = 2600` Hz and `DUCK_FILTER_OPEN_HZ = 18000`
+  Hz so character voice prosody stays clear, Milestone 152), resumes
+  exploration themes on the nearest bar downbeat after battles or shop visits
+  via `resumeBarStep` (preserving `stepsPerBar` alignment across 4/4 and 3/4
+  waltz scores while `FRESH_START_TRACKS` (`title`, `taco`, `battle`, `boss`,
+  `talk`, and `morning`) always start fresh at step 0, Milestones 152 & 160),
   and pauses cleanly on `visibilitychange` when backgrounded; when returning
   visible on `visibilitychange` or `pageshow` (Milestone 132), pure
   `shouldResumeAudioOnVisible(hidden, state)` (`src/platform/audio.ts`)
@@ -478,7 +486,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   and deterministic `ambiencePan` (`[-0.55, 0.55]`, guarded `StereoPannerNode`s
   disconnected on `onended`), and cleans up all nodes and timers on stop.
   Character-voiced talking blips and key-aligned UI clicks
-  (`src/platform/voices.ts`, Milestones 80, 142 & 152) give every named cast
+  (`src/platform/voices.ts`, Milestones 80, 142, 152 & 160) give every named cast
   member, `"Fizzy "` mini-boss (via optional leading `"fizzy "` prefix stripping
   after exact lookup, plus `"Fizzy Kid"` / `"Kid"` mapped to `MYSTERY_VOICE`),
   fairy, critter archetype, and narrator a distinct warm sine/triangle register
@@ -494,7 +502,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   pitch and `[0.65, 1.25]` gain with bit-identical output when `prosody` is
   omitted or `NEUTRAL_PROSODY`), and pitch `choice-move`, `battle-command`, and
   `choice-select` clicks to the active soundtrack's pentatonic scale (across all
-  24 tracks + `silent`).
+  29 tracks + `silent`).
   Browsers hold the context (`suspended`, or WebKit's `interrupted`) until a
   key, click, or tap; a gamepad press is not a user activation in any browser,
   so a pad-only player on the web hears nothing until one. The iOS app's web
@@ -1764,7 +1772,7 @@ ios/            Capacitor iOS project (from Milestone 4).
     down (`milo_loft_talk`) for a post-finale watercolor hangout. Its fixture
     `milo-house` starts at `door` with Maddie, Sue, Jordan, and the blacklight
     lantern; its atmosphere adds 2 arched-window sunbeams and 10 stardust motes;
-    its soundtrack plays `"home"` ("Cloverhollow Town") with `"none"` ambience.
+    its soundtrack plays `"loft"` ("Paper Plane Sketchbook") with `"none"` ambience.
   - `rosie-cottage`, "Rosie's Flower Cottage", in the `cloverhollow` land, a
     1200x800 painted isometric cutaway entered from Meadow Park's
     north-northwest sunlit meadow gap (`park` trigger `rosie-cottage` at
@@ -1789,8 +1797,8 @@ ios/            Capacitor iOS project (from Milestone 4).
     `rosie_cottage_glow_read`, one-time `gift: coins 10` with `chime-yellow`).
     Its fixture `rosie-cottage` starts at `door` with Maddie, Sue, Jordan, the
     blacklight lantern, and `hall_pass`; its atmosphere adds 2 floral-window
-    sunbeams and 10 pastel petal/sunbeam motes; its soundtrack plays `"home"`
-    ("Cloverhollow Town") with `"none"` ambience.
+    sunbeams and 10 pastel petal/sunbeam motes; its soundtrack plays `"bloom"`
+    ("Rosie's Flower Window") with `"none"` ambience.
 - Alpine Summit Overlook & Rideable Pinecone Pass Ski Lift: `summit`,
   "Alpine Summit Overlook", in the `pass` land, is a 1650x1100 snow-capped
   mountaintop clearing reached by riding Pinecone Pass's ski lift (`ski_lift`
@@ -1819,8 +1827,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   Jordan, `has_lantern`, `has_lasso`, `lodge_open`, and `lodge-keeper` calmed;
   its outdoor atmosphere emits 6 pastel aurora `softGlow` ribbons + 3 `sunbeam`
   curtains (`y = 70..220`), 22 mountain snowflakes, and 6 warming-hut chimney
-  smoke wisps from `(1458, 380)`; its soundtrack plays `"pass"` with
-  `"mountain-wind"` ambience; its rest spot `summit-bench` sits at (1335, 860).
+  smoke wisps from `(1458, 380)`; its soundtrack plays `"summit"` ("Above the
+  Pines") with `"mountain-wind"` ambience; its rest spot `summit-bench` sits at (1335, 860).
 - Starlight Island & Bubblegum Bay Rowboat Crossing: `island`,
   "Starlight Island", in the `bay` land, is a 1650x1100 sunlit coastal islet
   with a coral-striped Tide-Pool Lighthouse reached by rowing from Bubblegum
@@ -1855,7 +1863,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   `sue_joined`, `has_lantern`, and `has_flute`; its outdoor atmosphere emits a
   2-layer emissive golden Lighthouse Beacon Halo at `(1260, 152)`, 14 turquoise
   bay/tide-pool `waterGlint`s, and 10 drifting sea-breeze sparkle motes; its
-  soundtrack plays `"bay"` with `"ocean"` ambience; its rest spot `island-mat`
+  soundtrack plays `"island"` ("Starlight Beacon") with `"ocean"` ambience; its rest spot `island-mat`
   sits at (1150, 796) on the SE woven beach mat.
 - The lifeguard (Milestone 64): once Sue has joined (`sue_joined`), the bay's
   picnic leads on (`bay_picnic.back`): a whistle blasts, and the picnic's
@@ -4105,7 +4113,9 @@ trunks keep its two exits.
   all 3 orders (or timing out) enters `result`, awarding `coinsPerOrder` (5)
   coins per order (+5 spotless bonus for 3/3 with 0 mistakes -> up to 20 coins)
   and 1 snack for 2+ orders or 2 snacks for a spotless 3/3 shift (emitting
-  `prize-won` on spotless shifts alongside standard `coin` / `item` cues).
+  `prize-won` on spotless shifts alongside standard `coin` / `item` cues), while
+  the soundtrack plays `"taco"` ("Mateo's Fiesta Truck", unducked over
+  `"town-breeze"` ambience, fresh-starting at bar 1).
 - The Taco Truck close-up (`src/ui/taco.ts`, laid out by `layoutTaco` in
   `src/ui/taco-layout.ts`, styled in `src/ui/taco.css`, loaded on demand in
   `hills` via `ensureTacoOverlay` in `src/shell/assets.ts`) renders the painted

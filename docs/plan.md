@@ -6981,6 +6981,37 @@ the old trail, the owl, and the clubhouse claim.
   Chromium + WebKit e2e (`festival.spec`, `sanctuary.spec`, `m81-festival.spec`,
   `milestone-159.spec`, `showcase-polish.spec`).
 
+## Milestone 162: Complete 29-Track Expansion World Soundtrack (`island`, `summit`, `taco`, `loft`, `bloom` — `src/platform/scores-expansion.ts`) **Status:** ✅ Completed (2026-11-27)
+- Gives every single expansion destination, friend home, and the 7th playable
+  minigame its own bespoke 16-bar multi-voice stereo chamber score, expanding
+  the Music Box Jukebox from 24 to **29 Original Composed Themes** — zero
+  `src/core` simulation state changes, zero save-version bumps, zero replay
+  hash drift across all 73 sims, and zero visual baseline diffs.
+- Pure soundtrack projection (`src/core/music.ts`, 245 lines):
+  - Added `"loft"` (`"Paper Plane Sketchbook"`, `milo-house`), `"bloom"`
+    (`"Rosie's Flower Window"`, `rosie-cottage`), `"island"` (`"Starlight Beacon"`,
+    `island`, `"ocean"` ambience), `"summit"` (`"Above the Pines"`, `summit`,
+    `"mountain-wind"` ambience), and `"taco"` (`"Mateo's Fiesta Truck"`,
+    `arcade.game === "taco"`, `"town-breeze"` ambience) to `MusicTrack`,
+    `trackTitles`, `jukeboxTracks` (29 tracks), `areaTracks`, and `soundtrackFor`.
+- Five bespoke 16-bar chamber scores (`src/platform/scores-expansion.ts`, 682
+  lines; wired in `src/platform/scores.ts`, bundled cleanly in `audio-scores`
+  `58.22 kB` / `14.16 kB` gzip) & voice scales (`src/platform/voices.ts`) +
+  fresh-start lunch-rush resume (`src/platform/music.ts`):
+  - `loftScore` (96 BPM, 4/4 C major / A minor daydream), `bloomScore` (94 BPM,
+    3/4 F major pastoral waltz), `islandScore` (86 BPM, 4/4 D major / Lydian
+    coastal nocturne), `summitScore` (90 BPM, 3/4 G major alpine vista waltz),
+    and `tacoScore` (120 BPM, 4/4 A major 7-voice fiesta kitchen groove).
+  - Added key-aligned pentatonic scales in `TRACK_SCALES` and added `"taco"` to
+    `FRESH_START_TRACKS` so timed shifts always start crisply on bar 1 while
+    `loft`, `bloom`, `island`, and `summit` resume bar-quantized.
+- Evidence: `tests/unit/milestone-160.test.ts` (5 tests) plus updated
+  `soundtrack`, `lasso-jukebox`, `taco`, `island`, `summit`, `milo-rosie`, and
+  `milestone-{81,111,116,153,154}` suites.
+- Gates: `just check` (222 unit files / 1,632 tests, all 73 sims, 23 QA packs,
+  purity, lint), `just build` (`< 500 kB` app chunk gate passed), and 30/30
+  Chromium & WebKit e2e tests.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

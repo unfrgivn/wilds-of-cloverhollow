@@ -55,19 +55,24 @@ const ALL_PLAYABLE_TRACKS: readonly PlayableTrack[] = [
   "cafe",
   "market",
   "parlor",
+  "loft",
+  "bloom",
   "hills",
   "sanctuary",
   "school",
   "bay",
   "fishing",
   "cottage",
+  "island",
   "pass",
   "lodge",
   "cabin",
+  "summit",
   "cavern",
   "woods",
   "clubhouse",
   "arcade",
+  "taco",
   "enchanted",
   "enchanted-calm",
   "battle",
@@ -78,6 +83,7 @@ const ALL_PLAYABLE_TRACKS: readonly PlayableTrack[] = [
 
 const EXPECTED_FRESH_TRACKS: readonly PlayableTrack[] = [
   "title",
+  "taco",
   "battle",
   "boss",
   "talk",
@@ -97,9 +103,9 @@ function tonalFrequencies(segments: readonly AudioSegment[]): number[] {
 }
 
 describe("Milestone 152: Complete 24-Track World Soundtrack", () => {
-  it("lists 24 unique jukebox tracks in album order with titles, scores, and scales", () => {
-    expect(jukeboxTracks).toHaveLength(24);
-    expect(new Set(jukeboxTracks).size).toBe(24);
+  it("lists 29 unique jukebox tracks in album order with titles, scores, and scales", () => {
+    expect(jukeboxTracks).toHaveLength(29);
+    expect(new Set(jukeboxTracks).size).toBe(29);
 
     expect(jukeboxTracks.indexOf("market")).toBe(jukeboxTracks.indexOf("cafe") + 1);
     expect(jukeboxTracks.indexOf("parlor")).toBe(jukeboxTracks.indexOf("market") + 1);
@@ -123,7 +129,7 @@ describe("Milestone 152: Complete 24-Track World Soundtrack", () => {
         expect(scale[i] ?? 0, `${id} ascending scale`).toBeGreaterThan(scale[i - 1] ?? 0);
       }
     }
-    expect(seenTitles.size).toBe(24);
+    expect(seenTitles.size).toBe(29);
   });
 
   it("gives market, parlor, cottage, and cabin bespoke 16-bar multi-voice chamber scores", () => {
@@ -165,15 +171,16 @@ describe("Milestone 152: Complete 24-Track World Soundtrack", () => {
     }
   });
 
-  it("routes interior shops/homes to bespoke themes and preserves new areas", () => {
+  it("routes interior shops/homes and expansion areas to bespoke themes", () => {
     const cases: readonly (readonly [string, string, string, string])[] = [
       ["market", "market", "Pippin's Basket Waltz", "cafe-murmur"],
       ["parlor", "parlor", "Sweet Scoop Rag", "cafe-murmur"],
       ["sue-cottage", "cottage", "Sea-Glass Sunroom", "ocean"],
       ["jordan-cabin", "cabin", "Timber & Tea", "hearth"],
-      ["milo-house", "home", "Cloverhollow Town", "none"],
-      ["rosie-cottage", "home", "Cloverhollow Town", "none"],
-      ["summit", "pass", "Pinecone Snowfall", "mountain-wind"],
+      ["milo-house", "loft", "Paper Plane Sketchbook", "none"],
+      ["rosie-cottage", "bloom", "Rosie's Flower Window", "none"],
+      ["island", "island", "Starlight Beacon", "ocean"],
+      ["summit", "summit", "Above the Pines", "mountain-wind"],
     ];
     for (const [area, track, title, ambience] of cases) {
       const state: State = { ...baseState, area };
@@ -538,7 +545,7 @@ describe("Milestone 152: Warm Low-Pass Music Ducking & Bar-Quantized Track Resum
     expect(resumeBarStep("cabin", 191, 192, 12)).toBe(180);
 
     const explorationTracks = ALL_PLAYABLE_TRACKS.filter((t) => !FRESH_START_TRACKS.has(t));
-    expect(explorationTracks).toHaveLength(19);
+    expect(explorationTracks).toHaveLength(23);
 
     let sawFourFour = 0;
     let sawThreeFour = 0;

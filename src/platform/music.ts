@@ -57,7 +57,7 @@ const DUCK_FILTER_Q = 0.55;
 export const DUCK_FILTER_OPEN_HZ = 18000;
 export const DUCK_FILTER_DUCKED_HZ = 2600;
 export const FRESH_START_TRACKS: ReadonlySet<PlayableTrack> = new Set([
-  "title", "battle", "boss", "talk", "morning",
+  "title", "taco", "battle", "boss", "talk", "morning",
 ]);
 const PHRASE_SPAN_STEPS = 16;
 const SPARKLE_VELOCITY_SCALE = 0.16;

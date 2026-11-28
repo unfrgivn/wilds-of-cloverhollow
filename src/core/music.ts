@@ -6,19 +6,24 @@ export type MusicTrack =
   | "cafe"
   | "market"
   | "parlor"
+  | "loft"
+  | "bloom"
   | "hills"
   | "sanctuary"
   | "school"
   | "bay"
   | "fishing"
   | "cottage"
+  | "island"
   | "pass"
   | "lodge"
   | "cabin"
+  | "summit"
   | "cavern"
   | "woods"
   | "clubhouse"
   | "arcade"
+  | "taco"
   | "enchanted"
   | "enchanted-calm"
   | "battle"
@@ -35,19 +40,24 @@ export const jukeboxTracks: readonly JukeboxTrack[] = [
   "cafe",
   "market",
   "parlor",
+  "loft",
+  "bloom",
   "school",
   "bay",
   "fishing",
   "cottage",
+  "island",
   "pass",
   "lodge",
   "cabin",
+  "summit",
   "cavern",
   "woods",
   "clubhouse",
   "hills",
   "sanctuary",
   "arcade",
+  "taco",
   "enchanted",
   "enchanted-calm",
   "battle",
@@ -81,19 +91,24 @@ export const trackTitles: Record<MusicTrack, string> = {
   cafe: "Cinnamon Waltz",
   market: "Pippin's Basket Waltz",
   parlor: "Sweet Scoop Rag",
+  loft: "Paper Plane Sketchbook",
+  bloom: "Rosie's Flower Window",
   hills: "Clover Meadow",
   sanctuary: "Meadow of Friends",
   school: "Bell & Chalk",
   bay: "Bubblegum Breeze",
   fishing: "Docked by the Tide",
   cottage: "Sea-Glass Sunroom",
+  island: "Starlight Beacon",
   pass: "Pinecone Snowfall",
   lodge: "Hearth & Cocoa",
   cabin: "Timber & Tea",
+  summit: "Above the Pines",
   cavern: "Crystal Echoes",
   woods: "Whispering Canopy",
   clubhouse: "Our Secret Treehouse",
   arcade: "Star Racer Tokens",
+  taco: "Mateo's Fiesta Truck",
   enchanted: "Misty Dream",
   "enchanted-calm": "Ancient Tree's Song",
   battle: "Fizzy Calm-Down!",
@@ -111,8 +126,8 @@ const areaTracks: Record<string, MusicTrack> = {
   market: "market",
   parlor: "parlor",
   park: "home",
-  "milo-house": "home",
-  "rosie-cottage": "home",
+  "milo-house": "loft",
+  "rosie-cottage": "bloom",
   hills: "hills",
   sanctuary: "sanctuary",
   school: "school",
@@ -123,11 +138,11 @@ const areaTracks: Record<string, MusicTrack> = {
   "art-room": "school",
   field: "school",
   bay: "bay",
-  island: "bay",
+  island: "island",
   "sue-cottage": "cottage",
   trail: "bay",
   pass: "pass",
-  summit: "pass",
+  summit: "summit",
   lodge: "lodge",
   "jordan-cabin": "cabin",
   cavern: "cavern",
@@ -206,6 +221,9 @@ export function soundtrackFor(
   if (state.area === "harness") return makeSoundtrack("silent", "none", false);
   if (state.arcade?.game === "fish") {
     return makeSoundtrack("fishing", "ocean", state.dialogue !== null);
+  }
+  if (state.arcade?.game === "taco") {
+    return makeSoundtrack("taco", "town-breeze", state.dialogue !== null);
   }
   let track: MusicTrack;
   if (state.area === "enchanted") {

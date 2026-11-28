@@ -285,12 +285,12 @@ describe("Alpine Summit Overlook & Rideable Pinecone Pass Ski Lift", () => {
       if (summitFixture === undefined) throw new Error("summit fixture missing");
       const summitState = createState(world, summitFixture);
 
-      // Soundtrack: pass theme + mountain-wind ambience.
+      // Soundtrack: summit theme + mountain-wind ambience.
       expect(soundtrackFor(world, summitState, { titleOpen: false })).toEqual({
-        track: "pass",
+        track: "summit",
         ambience: "mountain-wind",
         duck: false,
-        title: "Pinecone Snowfall",
+        title: "Above the Pines",
       });
 
       // Time-of-day: golden-hour with has_lantern, neutral day without.

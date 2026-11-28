@@ -9463,6 +9463,40 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   checks green), Chromium & WebKit (`milestone-220`, `milestone-219`,
   `e15-audio-atlas`, `milestone-169`, `map`), and 105/105 Chromium
   (`restoration`, `milestone-124`, `ui-gallery` 99/99 with 0 snapshot diffs).
+
+## Milestone 221: Steam Deck / Gamepad Photo Mode Sky Cycler (`LB`/`RB`), Hand-Inked Postcard Postal Weather Stamp & QA Console `weather` Control **Status:** ✅ Completed (2026-11-28)
+- Completes 100% Desktop (`W` / `Shift+W`) + Touch (`.photo-touch-weather`) +
+  Steam Deck/Gamepad (`LB` / `RB`) Photo Mode live sky-cycling parity, stamps a
+  bespoke hand-inked circular postal weather cancel mark onto snapped
+  Cloverhollow Postcards under active Cozy Weather, and adds a dev-only
+  `weather <mode>` QA console command — zero `src/core/sim.ts` changes, zero
+  save-version bumps, zero replay hash drift across all 77 sims, and zero visual
+  baseline diffs across all 99 `ui-gallery` and 4 QA console baselines.
+- Bidirectional Photo Mode sky cycling (`src/core/weather.ts`,
+  `src/shell/input-shortcuts.ts`, `src/shell/shell-bindings.ts`):
+  - Exported pure `stepPhotoWeatherMode(current, delta: -1 | 1)` wrapping
+    cleanly around all 5 outdoor skies (`auto` -> `sunshower` /
+    `twilight-fireflies`).
+  - Wired gamepad `LB` (`-1`) / `RB` (`+1`) in `pollGamepad` strictly while
+    `photoMode && canPhotoMode(ctx)` (isolated from Journal tab flipping) plus
+    keyboard `Shift+W` (`-1`) / `W` (`+1`).
+- Hand-inked Postcard postal weather cancel stamp (`src/ui/postcard.ts`,
+  `src/shell/overworld-feedback.ts`):
+  - Extended `composePostcardFrame(sourceCanvas, caption, subcaption, weather?)`
+    with `drawWeatherStamp(...)` painting circular `#47321f` watercolor cancel
+    emblems for `sunshower` (3-band rainbow + raindrops), `snow-flurry`,
+    `breeze-petals`, and `twilight-fireflies` cleanly beside the four-leaf
+    clover emblem (`clear` / `undefined` unchanged).
+- Dev-only QA console `weather` command (`src/dev/console.ts`):
+  - Added `weather [clear|auto|sunshower|breeze-petals|snow-flurry|twilight-fireflies]`
+    with zero edits to `src/dev/qa.ts`.
+- Evidence: `tests/unit/milestone-221.test.ts`,
+  `tests/e2e/milestone-221.spec.ts` (`@smoke` Chromium + WebKit), and review
+  capture `art/review/m220-postcard-sunshower-stamp.jpg` independently verified
+  via `vision`.
+- Gates: `just check` (288 unit files / 2,090 tests, all 77 sims + all sim
+  scripts, 23 QA packs, purity, lint), `just build` (`index` `391.95 kB < 500 kB`),
+  16/16 Chromium & WebKit e2e, and 99/99 Chromium `ui-gallery` tests.
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

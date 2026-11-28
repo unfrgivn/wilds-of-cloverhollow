@@ -138,7 +138,7 @@ export function captureAreaPostcard(
       ? undefined
       : world.lands.find((entry) => entry.id === area.land);
   const meta = postcardMetadata(areaId, areaName, land?.name ?? "", partyNames, weather);
-  const composed = composePostcardFrame(sourceCanvas, meta.caption, meta.subcaption);
+  const composed = composePostcardFrame(sourceCanvas, meta.caption, meta.subcaption, weather);
   if (composed === null) return null;
   return {
     filename: meta.filename,

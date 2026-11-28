@@ -30,6 +30,7 @@ export const QA_HOLD_MS = 500;
 export type ShortcutKeyEvent = {
   code: string;
   repeat: boolean;
+  shiftKey?: boolean;
   timeStamp?: number;
   target: EventTarget | ShortcutKeyTarget | null;
   preventDefault: () => void;
@@ -98,7 +99,7 @@ export type InputShortcutsDeps = {
   setBattlePeek: (open: boolean) => void;
   setPhotoMode: (open: boolean) => void;
   snapPostcard: () => void;
-  onCyclePhotoWeather?: () => void;
+  onCyclePhotoWeather?: (delta?: -1 | 1) => void;
   journal: ShortcutJournalControl;
   encoreShrine?: ShortcutEncoreControl;
   gamepad: ShortcutGamepadSource;
@@ -427,7 +428,7 @@ export function createInputShortcuts(
     if (photoAction === "weather" && ctx.photoMode && canPhotoMode(ctx)) {
       event.preventDefault();
       deps.clearKeyboardTaps();
-      deps.onCyclePhotoWeather?.();
+      deps.onCyclePhotoWeather?.(event.shiftKey === true ? -1 : 1);
       return;
     }
     if (photoAction === "exit" && ctx.photoMode) {
@@ -566,6 +567,11 @@ export function createInputShortcuts(
         deps.decorPicker?.activateFocused?.();
         deps.invalidate();
       }
+      return;
+    }
+    if (bumperStep !== 0 && ctx.photoMode && canPhotoMode(ctx)) {
+      deps.gamepad.clearTaps();
+      deps.onCyclePhotoWeather?.(bumperStep);
       return;
     }
     const journalActive = isJournalShortcutActive(ctx);

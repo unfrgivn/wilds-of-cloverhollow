@@ -45,7 +45,7 @@ export const COZY_WEATHER_MODES: readonly CozyWeatherMode[] = [
   "twilight-fireflies",
 ];
 
-/** Ordered live sky cycle stepped through by Photo Mode's `W` key and touch sky button. */
+/** Ordered live sky cycle stepped in Photo Mode (`W`/`Shift+W`, `LB`/`RB`, and touch sky). */
 export const PHOTO_WEATHER_CYCLE: readonly CozyWeatherKind[] = [
   "clear",
   "sunshower",
@@ -179,14 +179,28 @@ export function weatherModeLabel(mode: CozyWeatherMode): string {
 }
 
 /**
+ * Steps Photo Mode's live sky cycler forward (`+1`) or backward (`-1`).
+ * Maps `"auto"` cleanly to `"sunshower"` for `+1` and `"twilight-fireflies"`
+ * for `-1`, and wraps cleanly around `PHOTO_WEATHER_CYCLE` in both directions.
+ */
+export function stepPhotoWeatherMode(
+  current: CozyWeatherMode,
+  delta: -1 | 1,
+): CozyWeatherKind {
+  if (current === "auto") return delta > 0 ? "sunshower" : "twilight-fireflies";
+  const index = PHOTO_WEATHER_CYCLE.indexOf(current);
+  const base = index === -1 ? 0 : index;
+  const nextIndex = (base + delta + PHOTO_WEATHER_CYCLE.length) % PHOTO_WEATHER_CYCLE.length;
+  return PHOTO_WEATHER_CYCLE[nextIndex] ?? "clear";
+}
+
+/**
  * Advances Photo Mode's live sky cycler to the next cozy weather kind.
  * Maps `"auto"` directly to `"sunshower"` (first vivid sky) and wraps
  * `"twilight-fireflies"` back around to `"clear"`.
  */
 export function nextPhotoWeatherMode(current: CozyWeatherMode): CozyWeatherKind {
-  if (current === "auto") return "sunshower";
-  const index = PHOTO_WEATHER_CYCLE.indexOf(current);
-  return PHOTO_WEATHER_CYCLE[(index + 1) % PHOTO_WEATHER_CYCLE.length] ?? "clear";
+  return stepPhotoWeatherMode(current, 1);
 }
 
 /** Returns the passive cozy flavor, bonuses, and pastel sky wash for a weather kind. */

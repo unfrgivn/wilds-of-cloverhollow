@@ -1,7 +1,7 @@
 import { Rectangle, type Application } from "pixi.js";
 import type { JukeboxTrack, Point, State, TextSpeed, World } from "../core";
 import {
-  nextPhotoWeatherMode,
+  stepPhotoWeatherMode,
   weatherBiomeForArea,
   weatherForArea,
   weatherLabel,
@@ -248,20 +248,20 @@ export function canCyclePhotoWeather(areaId: string): boolean {
   return weatherBiomeForArea(areaId) !== "indoor";
 }
 
-/** Builds the live Photo Mode sky cycler callback wired to `W` and `.photo-touch-weather`. */
+/** Builds the live Photo Mode sky cycler callback (`W`/`Shift+W`, `LB`/`RB`, touch sky). */
 export function createPhotoWeatherCycler(deps: {
   getArea: () => string;
   sound: AudioController;
   lightHaptic: () => void;
   photoToast: { show: (message: string) => void };
   invalidate: () => void;
-}): () => void {
-  return () => {
+}): (delta?: -1 | 1) => void {
+  return (delta: -1 | 1 = 1) => {
     if (!canCyclePhotoWeather(deps.getArea())) {
       deps.photoToast.show("Indoors · Sheltered & Cozy");
       return;
     }
-    const next = nextPhotoWeatherMode(getCozyWeatherMode());
+    const next = stepPhotoWeatherMode(getCozyWeatherMode(), delta);
     setCozyWeatherMode(next);
     deps.sound.playEffect(next === "clear" ? "toggle-off" : "toggle-on");
     deps.lightHaptic();

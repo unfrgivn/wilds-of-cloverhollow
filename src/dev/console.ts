@@ -2,6 +2,12 @@ import { inkVariable, setInkVariables } from "../core/ink";
 import { STAR_GEM_VARIABLES } from "../core/journal";
 import { addTreat } from "../core/sim";
 import type { State } from "../core/types";
+import {
+  COZY_WEATHER_MODES,
+  isCozyWeatherMode,
+  weatherModeLabel,
+} from "../core/weather";
+import { getCozyWeatherMode, setCozyWeatherMode } from "../platform/weather-prefs";
 
 // The QA console's commands (Milestone 67, spec 11). Pure functions over the
 // real state; the DOM console in qa.ts is a thin shell over them. QA mode
@@ -152,6 +158,7 @@ const CONSOLE_HELP = [
   "map on|off         carry the map",
   "keepsakes on|off   toggle quest keepsakes",
   "garden ripe        ripen the clubhouse garden for Golden Sunberry harvest",
+  "weather [mode]     sky (clear|auto|sunshower|breeze-petals|snow-flurry|twilight-fireflies)",
   "save <name>        keep this state in a QA-only slot",
   "export             show this state as a save file",
   "reset              start a fresh new game (clears stale state & save)",
@@ -414,6 +421,31 @@ function gemsCommand(
   };
 }
 
+function weatherCommand(state: State, args: string[]): ConsoleOutcome {
+  const [raw] = args;
+  if (raw === undefined) {
+    const current = getCozyWeatherMode();
+    return {
+      kind: "applied",
+      state,
+      message: `weather = ${current} (${weatherModeLabel(current)}).`,
+    };
+  }
+  const mode = raw.toLowerCase();
+  if (!isCozyWeatherMode(mode)) {
+    return {
+      kind: "error",
+      message: `Unknown weather "${raw}". Try ${COZY_WEATHER_MODES.join(", ")}.`,
+    };
+  }
+  setCozyWeatherMode(mode);
+  return {
+    kind: "applied",
+    state,
+    message: `weather = ${mode} (${weatherModeLabel(mode)}).`,
+  };
+}
+
 function saveCommand(args: string[]): ConsoleOutcome {
   const [name] = args;
   if (name === undefined || !/^[a-z0-9][a-z0-9-]{0,23}$/.test(name))
@@ -451,6 +483,7 @@ export function runConsoleCommand(
     case "map": return toolCommand(context, state, args, "map");
     case "keepsakes": return keepsakesCommand(context, state, args);
     case "garden": return gardenCommand(context, state, args);
+    case "weather": return weatherCommand(state, args);
     case "save": return saveCommand(args);
     case "export": return { kind: "export" };
     case "reset": return { kind: "reset" };

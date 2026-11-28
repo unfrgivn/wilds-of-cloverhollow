@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 220)
+Last updated: 2026-11-28 (Milestone 221)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -384,7 +384,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   `ActionFrame`, Milestones 115 & 117)
   toggles the Battle Field Guide Peek card during battle `command` phase or
   Photo Mode in the free overworld; while Photo Mode is active, gamepad A
-  (button 0) snaps a framed Postcard (swallowing overworld confirm) and B
+  (button 0) snaps a framed Postcard (swallowing overworld confirm), `LB`/`RB`
+  (buttons 4/5) step outdoor Cozy Weather skies backward/forward via
+  `stepPhotoWeatherMode` without stepping Journal tabs (Milestone 220), and B
   (button 1) exits Photo Mode; while Battle Peek is open, gamepad B dismisses
   only the peek card (swallowing `cancel`). `gamepadHasActivity` detects active
   standard-pad stick movement (`> 0.25`, left or right stick Y) or button
@@ -1054,17 +1056,21 @@ ios/            Capacitor iOS project (from Milestone 4).
   `cameraIcon()` inline SVG with zero `<text>` nodes), and `.photo-touch-close`
   (`aria-label="Exit photo mode"`,
   `×`), completely hidden on desktop and outside Photo Mode and excluded from Pixi
-  `extract.canvas` captures. While Photo Mode is active, pressing `W` (`KeyW`,
-  mapped to `"weather"` by pure `photoKeyAction` in `src/shell/input-shortcuts.ts`
-  strictly while `photoMode === true` so overworld WASD movement is never
-  affected) or tapping `.photo-touch-weather` advances outdoor areas through
-  `PHOTO_WEATHER_CYCLE` (`clear -> sunshower -> breeze-petals -> snow-flurry ->
-  twilight-fireflies -> clear`, mapping `"auto"` to `"sunshower"`) via pure
-  `nextPhotoWeatherMode` (`src/core/weather.ts`), plays `"toggle-on"` /
+  `extract.canvas` captures. While Photo Mode is active, pressing `W` /
+  `Shift+W` (`KeyW`, mapped to `"weather"` by pure `photoKeyAction` in
+  `src/shell/input-shortcuts.ts` strictly while `photoMode === true` so
+  overworld WASD movement is never affected), pressing gamepad `LB`/`RB`
+  (buttons 4/5 in `pollGamepad`, returning cleanly without stepping Journal
+  tabs), or tapping `.photo-touch-weather` steps outdoor areas backward (`-1`)
+  or forward (`+1`) through `PHOTO_WEATHER_CYCLE` (`clear <-> sunshower <->
+  breeze-petals <-> snow-flurry <-> twilight-fireflies`, mapping `"auto"` to
+  `"sunshower"` on `+1` and `"twilight-fireflies"` on `-1`) via pure
+  `stepPhotoWeatherMode` (`src/core/weather.ts`, with `nextPhotoWeatherMode`
+  delegating to `stepPhotoWeatherMode(current, 1)`), plays `"toggle-on"` /
   `"toggle-off"` foley, announces `"Sky · <Label>"` in `.photo-toast` (or
-  `"Indoors · Sheltered & Cozy"` on desktop `W` in sheltered indoor rooms), and
-  immediately updates the live canvas, soundscape, and next snapped postcard
-  (Milestone 218 / Track E17). While Photo Mode
+  `"Indoors · Sheltered & Cozy"` in sheltered indoor rooms), and immediately
+  updates the live canvas, soundscape, and next snapped postcard (Milestones
+  218 & 220 / Track E17). While Photo Mode
   is active, pressing `Enter`, `Space`, gamepad A (button 0), or left-clicking
   the canvas on desktop (via pure `photoModePointerAction` in
   `src/shell/overworld-pointer.ts`, requiring `<= 12 px` drag from `pointerdown`
@@ -1075,7 +1081,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   pulse under Reduced Motion, hidden cleanly on exit or reset), extracts the live
   viewport via Pixi `app.renderer.extract.canvas`,
   frames it inside a warm cream watercolor postcard border (`#fbf6e8` margin,
-  `#47321f` hand-inked inner rule, four-leaf clover emblem, region + active
+  `#47321f` hand-inked inner rule, four-leaf clover emblem, plus a delicate
+  hand-inked miniature postal weather cancel stamp beside the clover whenever
+  an active outdoor cozy weather kind is passed to `composePostcardFrame` —
+  rainbow + raindrops for `sunshower`, 6-spoke frost crystal for `snow-flurry`,
+  sakura petals + wind curl for `breeze-petals`, crescent moon + firefly stars
+  for `twilight-fireflies`, Milestone 220 — region + active
   companion subcaption via `formatPostcardCompanions` / `postcardMetadata` /
   `postcardWeatherLabel` in `src/ui/postcard.ts` and `captureAreaPostcard` /
   `deliverAreaPostcard` in `src/shell/feedback.ts`,
@@ -6152,7 +6163,11 @@ trunks keep its two exits.
     `sanctuary_reward_14`, `sue_compass`, `jordan_clover`, `buster_reward`,
     `milo_loft_visited`, `rosie_cottage_visited`, `summit_aurora_read`,
     `island_shells_solved`, `festival_toast_done`; an undeclared story variable
-    is an error); and `garden ripe` (ripening the clubhouse garden). `save
+    is an error); `garden ripe` (ripening the clubhouse garden); and
+    `weather [clear|auto|sunshower|breeze-petals|snow-flurry|twilight-fireflies]`
+    (inspecting `getCozyWeatherMode()` when called with no argument or updating
+    `setCozyWeatherMode` without altering the GUI QA console layout, Milestone
+    220). `save
     <name>` keeps the state in a QA-only slot listed in the QA menu and `Saves`
     tab; `export` shows the state's save file for a bug report or the library;
     `reset` (and the `New Game (Clean Reset)` button in `Saves`) exits QA mode,

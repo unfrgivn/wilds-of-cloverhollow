@@ -9424,6 +9424,45 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
 - Gates: `just check` (286 unit files / 2,084 tests, all 77 sims + all sim
   scripts, 23 QA packs, purity, lint), `just build` (`index` `391.77 kB < 500 kB`),
   26/26 Chromium & WebKit e2e, and 99/99 Chromium `ui-gallery` tests.
+
+## Milestone 220: Smart Valley Atlas Filter & Pin Keyboard Parity (`Arrow`/`Home`/`End`) & Complete `< 800`-Line Render/UI Modularization (`journal-map-helpers.ts`, `emote-textures.ts`, `restoration-zones.ts`) (Elevation Track E19L) **Status:** ✅ Completed (2026-11-28)
+- Smart Valley Atlas Filter & Pin Keyboard Parity (`src/ui/journal-map.ts`,
+  `src/ui/journal-map-helpers.ts`):
+  - Adds roving keyboard navigation on `.journal-atlas-filters` (`ArrowRight` /
+    `ArrowLeft` with wrap across visible filter pills, `Home` / `End` to first /
+    last filter button, stopping propagation so `input-shortcuts.ts` does not
+    interfere) and `Home` / `End` focus jumping across revealed
+    `.journal-map-land.is-revealed` pins (updating selection,
+    `.journal-map-detail`, and the Quick Pin Inspector seamlessly alongside
+    existing `Enter` / `Space` toggle).
+  - Extracts SVG icon builders, Atlas pin-badge tray builder, and pure pin /
+    filter helpers into `src/ui/journal-map-helpers.ts` (`286` lines) while
+    re-exporting `busStopIcon`, `busRoutePath`, and map view types identically
+    from `src/ui/journal-map.ts` (`800 -> 558` lines).
+- Modular Extraction of `src/render/emote-textures.ts`
+  (`src/render/vfx-textures.ts` `807 -> 501` lines,
+  `src/render/emote-textures.ts` `332` lines):
+  - Extracts all 8 comic-bubble emote canvas builders, `EMOTE_TEXTURE_KEYS`,
+    `EmoteTextureKey`, and `createEmoteTextures` into
+    `src/render/emote-textures.ts` (matching `keepsake-textures.ts`) and
+    composes them inside `createVfxTextures()` in `src/render/vfx-textures.ts`
+    with zero visual pixel diffs.
+- Modular Extraction of Pixi-Free `src/render/restoration-zones.ts`
+  (`src/render/restoration-math.ts` `783 -> 415` lines,
+  `src/render/restoration-zones.ts` `334` lines):
+  - Extracts the pure 9-zone watercolor restoration decal catalog and
+    `isRestorationZoneId` into Pixi-free, DOM-free
+    `src/render/restoration-zones.ts` and re-exports every symbol identically
+    through `src/render/restoration-math.ts`.
+- Evidence: `tests/unit/milestone-220.test.ts` (reference-identical re-exports,
+  Pixi/DOM purity, and global `< 800`-line Render & UI architecture gate) and
+  `tests/e2e/milestone-220.spec.ts` (`@smoke`, Chromium + WebKit).
+- Gates: `just check` (288 unit files / 2,090 tests, all 77 recorded + 7
+  headless sims with zero hash shifts, 23 QA packs, purity, lint), `just build`
+  (largest non-vendor chunk `< 400 kB`, hook leak + runtime story + harness
+  checks green), Chromium & WebKit (`milestone-220`, `milestone-219`,
+  `e15-audio-atlas`, `milestone-169`, `map`), and 105/105 Chromium
+  (`restoration`, `milestone-124`, `ui-gallery` 99/99 with 0 snapshot diffs).
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 219)
+Last updated: 2026-11-28 (Milestone 220)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -856,11 +856,13 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Depth: the area ground layer is always at the back; characters y-sort by
   their feet, and props sort against them column by column by the front edge
   of their footprints (section 6.2).
-- Procedural watercolor VFX kit (`src/render/vfx-textures.ts` composing the thirteen
+- Procedural watercolor VFX kit (`src/render/vfx-textures.ts` composing the eight
+  comic-bubble emote builders from `src/render/emote-textures.ts` and re-exporting
+  `EMOTE_TEXTURE_KEYS` / `EmoteTextureKey` in Milestone 220 / Track E19L, plus the thirteen
   keepsake builders from `src/render/keepsake-textures.ts` and
   `src/render/keepsake-textures-expansion.ts` and re-exporting
   `KeepsakeTextureKey`, Milestones 72–73,
-  84, 88, 93, 95–96, 98, 114, 164): thirty-four small cached offscreen-canvas Pixi
+  84, 88, 93, 95–96, 98, 114, 164, 219): thirty-four small cached offscreen-canvas Pixi
   textures (`contactShadow`, `softGlow`, `sparkle`, `starGemCharm`, `petal`,
   `waterGlint`, `mistWisp`, `sunbeam`, `sunburst`, `paperGrain`, `puff`, `heart`,
   `energyRing`, eight hand-inked 48x48 comic emote bubbles `emoteQuestion`,
@@ -941,6 +943,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   arches, lodge hearth, and café counter glows, plus cool subterranean edge
   framing and crossing shimmer rings in `cavern`); **Live Watercolor
   Chaos-to-Paint Area Restoration** (`src/render/restoration-math.ts`,
+  composing and re-exporting the pure Pixi-free, DOM-free 9-zone decal catalog
+  from `src/render/restoration-zones.ts`, Milestone 220 / Track E19L, alongside
   `src/render/restoration.ts`, wired into `GameView` in `src/render/view.ts`,
   Milestone 179 / Track E13, Art Wave C1): fulfills §1.3 across all 9 signature
   regions (`plaza`, `park`, `bay`, `pass`, `woods`, `school`, `hills`, `cavern`,
@@ -5523,7 +5527,10 @@ trunks keep its two exits.
   on notes; ArrowLeft/ArrowRight and A/D step between pages without stealing
   arrow keys from any focused volume slider.
 - The painted MAP page (extracted cleanly into `src/ui/journal-map.ts` via
-  `createJournalMapPage`, `busRoutePath`, and `busStopIcon`, Milestone 123)
+  `createJournalMapPage`, `busRoutePath`, and `busStopIcon`, Milestone 123,
+  with self-contained SVG icon, pin-badge tray, and Atlas filter helpers
+  extracted into `src/ui/journal-map-helpers.ts` and re-exported identically
+  through `src/ui/journal-map.ts`, Milestone 220 / Track E19L)
   overlays hand-drawn SVG bus routes (`mapBusRoutes` in
   `src/core/journal.ts`, dashed sky-blue with cream halo when open, subtle
   dashed ink when locked) connecting the three bus-stop lands, shows crisp `✓`
@@ -5644,7 +5651,16 @@ trunks keep its two exits.
     `.journal-map-detail` and playing the wooden-marimba `"title-move"` pin-select
     foley + `"light"` haptic via `onSelectLand` / `journal.onMapSelect` (also
     fired when clicking a revealed land pin, Milestone 169), while `ArrowLeft` /
-    `ArrowRight` with no map pin focused keeps tab-flipping compatibility.
+    `ArrowRight` with no map pin focused keeps tab-flipping compatibility. On
+    the Atlas filter toolbar (`.journal-atlas-filters`), `ArrowLeft` /
+    `ArrowRight` step focus across visible `.journal-atlas-filter` buttons with
+    wrap and `Home` / `End` jump to the first / last filter button while
+    stopping propagation so `input-shortcuts.ts` does not fight toolbar focus;
+    on focused revealed land pins (`.journal-map-land.is-revealed`), `Home` /
+    `End` jump focus cleanly to the first / last revealed land pin while
+    updating selection, `.journal-map-detail`, and the Quick Pin Inspector
+    seamlessly alongside existing `Enter` / `Space` toggle (Milestone 220 /
+    Track E19L).
   - `OPTIONS`: `ArrowUp` / `ArrowDown` (skipping focused volume sliders so
     existing ARIA slider adjustment stays intact) and Gamepad D-Pad / Left Stick
     cycle visible option buttons (`scrollIntoView({ block: "nearest" })`);

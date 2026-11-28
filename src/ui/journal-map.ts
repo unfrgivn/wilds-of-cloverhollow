@@ -1,46 +1,29 @@
 import { element, setAttribute, setText, syncAttachedAfter } from "./dom";
 import { cycleIndex, isElementVisible } from "./journal-nav";
 import {
-  matchesAtlasFilter,
-  type AtlasFilter,
-  type AtlasPinSummary,
-  type BusRoute,
-  type LandProgress,
-  type StorySoFar,
-} from "../core/journal";
-import type { TreasuresSummary } from "../core/treasures";
+  ATLAS_FILTER_SPECS,
+  SVG_NAMESPACE,
+  atlasFilterIcon,
+  buildFilterObjectives,
+  busRoutePath,
+  busStopIcon,
+  classifyObjective,
+  createAtlasPinTray,
+  resolveAtlasPins,
+  type FilterButtonSpec,
+  type InspectorObjective,
+  type JournalMapCollectionCounts,
+  type JournalMapLand,
+  type JournalMapView,
+} from "./journal-map-helpers";
+import { matchesAtlasFilter, type AtlasFilter, type AtlasPinSummary } from "../core/journal";
 
-const svgNamespace = "http://www.w3.org/2000/svg";
-
-export type JournalMapLand = {
-  id: string;
-  name: string;
-  busStop: boolean;
-  x: number;
-  y: number;
-};
-
-export type JournalMapView = {
-  lands: readonly JournalMapLand[];
-  currentLand: string | null;
-  landProgress: Readonly<Record<string, LandProgress>>;
-  landGuides?: Readonly<Record<string, string>>;
-  busRoutes: readonly BusRoute[];
-  storySoFar?: StorySoFar;
-  atlasPins?: readonly AtlasPinSummary[];
-  stickersOwned: number;
-  stickersTotal: number;
-  prizesOwned: number;
-  prizesTotal: number;
-  valleyComplete?: boolean;
-  treasures?: TreasuresSummary;
-};
-
-export type JournalMapCollectionCounts = {
-  fishOwned: number;
-  fishTotal: number;
-  keepsakesOwned: number;
-  keepsakesTotal: number;
+export {
+  busRoutePath,
+  busStopIcon,
+  type JournalMapCollectionCounts,
+  type JournalMapLand,
+  type JournalMapView,
 };
 
 export type JournalMapPage = {
@@ -54,212 +37,6 @@ export type JournalMapOptions = {
   onSelectLand?: (landId: string | null) => void;
   onFilterChange?: (filter: AtlasFilter) => void;
 };
-
-type ObjectiveKind = "boss" | "gem" | "bus" | "garden" | "complete" | "sticker";
-
-type InspectorObjective = {
-  kind: ObjectiveKind;
-  text: string;
-};
-
-type FilterButtonSpec = {
-  id: AtlasFilter;
-  label: string;
-  hasCount: boolean;
-  title: string;
-};
-
-const FILTER_SPECS: readonly FilterButtonSpec[] = [
-  { id: "all", label: "All", hasCount: false, title: "All Valley Lands" },
-  { id: "gems", label: "Gems", hasCount: true, title: "Unfound Star Gems" },
-  { id: "bosses", label: "Boss", hasCount: true, title: "Active Chaos Bosses" },
-  { id: "bus", label: "Bus", hasCount: true, title: "Star-Line Bus Stops" },
-];
-
-// The bus line's stop sign, as on the sprite: a gold star on a blue roundel
-// atop a pole.
-export function busStopIcon(): SVGSVGElement {
-  const svg = document.createElementNS(svgNamespace, "svg");
-  svg.setAttribute("viewBox", "0 0 20 30");
-  svg.setAttribute("aria-hidden", "true");
-  svg.innerHTML =
-    '<rect x="9" y="14" width="2" height="15" rx="1" fill="#8a8f98" stroke="#47321f" ' +
-    'stroke-width="0.8"/>' +
-    '<circle cx="10" cy="9" r="8" fill="#3f7fc0" stroke="#47321f" stroke-width="1.2"/>' +
-    '<path d="M10 3.6l1.6 3.3 3.6.5-2.6 2.5.6 3.6L10 11.8l-3.2 1.7.6-3.6-2.6-2.5 3.6-.5z" ' +
-    'fill="#f2c94c" stroke="#47321f" stroke-width="0.5"/>';
-  return svg;
-}
-
-function atlasFilterIcon(filter: AtlasFilter): SVGSVGElement {
-  const svg = document.createElementNS(svgNamespace, "svg");
-  svg.setAttribute("class", "journal-atlas-filter-icon");
-  svg.setAttribute("viewBox", "0 0 18 18");
-  svg.setAttribute("aria-hidden", "true");
-  if (filter === "all") {
-    svg.innerHTML =
-      '<circle cx="9" cy="9" r="7.2" fill="#fffaf2" stroke="#47321f" stroke-width="1.4"/>' +
-      '<path d="M9 3.1l1.7 4.2 4.2 1.7-4.2 1.7L9 14.9l-1.7-4.2L3.1 9l4.2-1.7z" ' +
-      'fill="#f2c94c" stroke="#47321f" stroke-width="1.1" stroke-linejoin="round"/>';
-  } else if (filter === "gems") {
-    svg.innerHTML =
-      '<path d="M9 2.2l5.6 4.4-5.6 9.2-5.6-9.2z" fill="#b580e8" stroke="#47321f" ' +
-      'stroke-width="1.3" stroke-linejoin="round"/>' +
-      '<path d="M9 2.2l2.4 4.4L9 15.8 6.6 6.6z" fill="#e8d4ff" opacity="0.72"/>';
-  } else if (filter === "bosses") {
-    svg.innerHTML =
-      '<path d="M9 2l1.8 3.2 3.6-.8-1.1 3.4 2.9 2.2-3.5 1 .4 3.6-3.1-1.9-3.1 1.9.4-3.6-3.5-1 ' +
-      '2.9-2.2-1.1-3.4 3.6.8z" fill="#eb82a8" stroke="#47321f" stroke-width="1.2" ' +
-      'stroke-linejoin="round"/>' +
-      '<circle cx="9" cy="9.2" r="2.1" fill="#fff5d8" stroke="#47321f" stroke-width="1"/>';
-  } else {
-    svg.innerHTML =
-      '<rect x="8.2" y="10.2" width="1.6" height="6.2" rx="0.8" fill="#8a8f98" stroke="#47321f" ' +
-      'stroke-width="0.7"/>' +
-      '<circle cx="9" cy="6.8" r="5.1" fill="#3f7fc0" stroke="#47321f" stroke-width="1.2"/>' +
-      '<path d="M9 3.6l1 2.1 2.3.3-1.6 1.6.4 2.2L9 8.7l-2.1 1.1.4-2.2-1.6-1.6 2.3-.3z" ' +
-      'fill="#f2c94c"/>';
-  }
-  return svg;
-}
-
-function atlasBadgeIcon(
-  kind: "gem" | "boss" | "complete-full" | "complete-stickers",
-): SVGSVGElement {
-  const svg = document.createElementNS(svgNamespace, "svg");
-  svg.setAttribute("viewBox", "0 0 16 16");
-  svg.setAttribute("aria-hidden", "true");
-  if (kind === "gem") {
-    svg.innerHTML =
-      '<path d="M8 1.8l4.8 3.8L8 14.2 3.2 5.6z" fill="#b580e8" stroke="#47321f" ' +
-      'stroke-width="1.2" stroke-linejoin="round"/>' +
-      '<path d="M8 1.8l2 3.8L8 14.2 6 5.6z" fill="#f3e8ff" opacity="0.78"/>';
-  } else if (kind === "boss") {
-    svg.innerHTML =
-      '<path d="M8 1.8l1.6 2.8 3.1-.7-.9 3 2.5 1.9-3 .9.3 3.1L8 11.2 4.4 12.8l.3-3.1-3-.9 ' +
-      '2.5-1.9-.9-3 3.1.7z" fill="#eb7fa8" stroke="#47321f" stroke-width="1.15" ' +
-      'stroke-linejoin="round"/>' +
-      '<circle cx="8" cy="8.2" r="1.9" fill="#fff5d8" stroke="#47321f" stroke-width="0.9"/>';
-  } else if (kind === "complete-full") {
-    svg.innerHTML =
-      '<path d="M8 1.7l1.9 3.9 4.3.6-3.1 3 .7 4.2L8 11.4l-3.8 2 .7-4.2-3.1-3 4.3-.6z" ' +
-      'fill="#f2c94c" stroke="#47321f" stroke-width="1.2" stroke-linejoin="round"/>';
-  } else {
-    svg.innerHTML =
-      '<path d="M3.2 8.4l3.1 3.1 6.5-6.6" fill="none" stroke="#47321f" stroke-width="2.1" ' +
-      'stroke-linecap="round" stroke-linejoin="round"/>';
-  }
-  return svg;
-}
-
-export function busRoutePath(
-  from: { id: string; x: number; y: number },
-  to: { id: string; x: number; y: number },
-): string {
-  const mx = (from.x + to.x) / 2;
-  const my = (from.y + to.y) / 2;
-  const dx = to.x - from.x;
-  const dy = to.y - from.y;
-  const key = [from.id, to.id].sort().join("-");
-  const bend = key === "bay-cloverhollow" ? 0.16 : key === "cloverhollow-pass" ? -0.32 : 0.14;
-  const cx = Math.round(mx - dy * bend);
-  const cy = Math.round(my + dx * bend);
-  return `M ${from.x} ${from.y} Q ${cx} ${cy} ${to.x} ${to.y}`;
-}
-
-function resolveAtlasPins(view: JournalMapView): Map<string, AtlasPinSummary> {
-  const pins = new Map<string, AtlasPinSummary>();
-  if (view.atlasPins !== undefined && view.atlasPins.length > 0) {
-    for (const pin of view.atlasPins) pins.set(pin.landId, pin);
-    return pins;
-  }
-  const openBusLands = new Set<string>(["cloverhollow"]);
-  for (const route of view.busRoutes) {
-    if (!route.open) continue;
-    openBusLands.add(route.from);
-    openBusLands.add(route.to);
-  }
-  for (const land of view.lands) {
-    const revealed = land.name !== "???";
-    const stickers = view.landProgress[land.id] ?? { owned: 0, total: 0 };
-    const busStop = !land.busStop
-      ? "none"
-      : openBusLands.has(land.id)
-        ? "unlocked"
-        : "on-foot";
-    const stickersComplete = revealed && stickers.total > 0 && stickers.owned >= stickers.total;
-    const objectives: string[] = [];
-    if (revealed) {
-      if (busStop === "unlocked") objectives.push("Bus stop unlocked");
-      else if (busStop === "on-foot") objectives.push("Bus stop (visit on foot)");
-      if (stickersComplete) objectives.push("All stickers found ✓");
-      else if (stickers.total > 0) {
-        const left = stickers.total - stickers.owned;
-        objectives.push(`${left} sticker${left === 1 ? "" : "s"} to find`);
-      }
-    }
-    pins.set(land.id, {
-      landId: land.id,
-      name: land.name,
-      revealed,
-      isCurrent: view.currentLand === land.id,
-      stickers,
-      gemsFound: 0,
-      gemsTotal: 0,
-      gemsRemaining: 0,
-      activeBosses: [],
-      hasUncalmedBoss: false,
-      busStop,
-      gardenNote: null,
-      stickersComplete,
-      landComplete: false,
-      objectives,
-    });
-  }
-  return pins;
-}
-
-function classifyObjective(text: string, pin: AtlasPinSummary): ObjectiveKind {
-  if (text.endsWith(" waiting")) return "boss";
-  if (text.includes("Star Gem")) return "gem";
-  if (text.startsWith("Bus stop")) return "bus";
-  if (pin.gardenNote !== null && text === pin.gardenNote) return "garden";
-  if (text.includes("100% complete") || text.includes("All stickers found")) return "complete";
-  return "sticker";
-}
-
-function buildFilterObjectives(
-  filter: AtlasFilter,
-  matching: readonly AtlasPinSummary[],
-): InspectorObjective[] {
-  if (matching.length === 0) {
-    if (filter === "gems") {
-      return [{ kind: "complete", text: "All revealed Star Gems found ✓" }];
-    }
-    if (filter === "bosses") {
-      return [{ kind: "complete", text: "All revealed lands calm ✓" }];
-    }
-    return [{ kind: "bus", text: "No bus stops revealed yet" }];
-  }
-  return matching.map((pin): InspectorObjective => {
-    if (filter === "gems") {
-      return {
-        kind: "gem",
-        text: `${pin.name} · ${pin.gemsRemaining} ${pin.gemsRemaining === 1 ? "gem" : "gems"}`,
-      };
-    }
-    if (filter === "bosses") {
-      return {
-        kind: "boss",
-        text: `${pin.name} · ${pin.activeBosses.map((boss) => boss.name).join(", ")}`,
-      };
-    }
-    return {
-      kind: "bus",
-      text: `${pin.name} · ${pin.busStop === "unlocked" ? "Unlocked" : "Visit on foot"}`,
-    };
-  });
-}
 
 export function createJournalMapPage(
   onOpenTreasures: () => void,
@@ -287,7 +64,7 @@ export function createJournalMapPage(
     AtlasFilter,
     { button: HTMLButtonElement; count: HTMLSpanElement | null; spec: FilterButtonSpec }
   >();
-  for (const spec of FILTER_SPECS) {
+  for (const spec of ATLAS_FILTER_SPECS) {
     const button = element("button", "journal-atlas-filter");
     button.type = "button";
     setAttribute(button, "data-filter", spec.id);
@@ -305,6 +82,35 @@ export function createJournalMapPage(
     filterGroup.append(button);
     filterButtons.set(spec.id, { button, count, spec });
   }
+  filterGroup.addEventListener("keydown", (event) => {
+    if (
+      event.key !== "ArrowLeft" &&
+      event.key !== "ArrowRight" &&
+      event.key !== "Home" &&
+      event.key !== "End"
+    ) {
+      return;
+    }
+    const buttons = [...filterButtons.values()]
+      .map((entry) => entry.button)
+      .filter(isElementVisible);
+    if (buttons.length === 0) return;
+    const active =
+      event.target instanceof HTMLElement
+        ? event.target.closest<HTMLButtonElement>(".journal-atlas-filter")
+        : null;
+    const currentIndex = active === null ? -1 : buttons.indexOf(active);
+    const target =
+      event.key === "Home"
+        ? buttons[0]
+        : event.key === "End"
+          ? buttons[buttons.length - 1]
+          : buttons[cycleIndex(currentIndex, buttons.length, event.key === "ArrowRight" ? 1 : -1)];
+    if (target === undefined) return;
+    event.preventDefault();
+    event.stopPropagation();
+    target.focus();
+  });
 
   const inspector = element("div", "journal-atlas-inspector");
   inspector.setAttribute("aria-live", "polite");
@@ -319,7 +125,7 @@ export function createJournalMapPage(
 
   const mapCanvasWrap = element("div", "journal-map-canvas-wrap");
   const map = element("div", "journal-map");
-  const mapRoutes = document.createElementNS(svgNamespace, "svg");
+  const mapRoutes = document.createElementNS(SVG_NAMESPACE, "svg");
   mapRoutes.setAttribute("class", "journal-map-routes");
   mapRoutes.setAttribute("viewBox", "0 0 2400 1610");
   mapRoutes.setAttribute("aria-hidden", "true");
@@ -388,21 +194,15 @@ export function createJournalMapPage(
     const filtering = activeFilter !== "all";
     setAttribute(map, "data-atlas-filter", activeFilter);
     mapRoutes.classList.toggle("is-bus-focus", activeFilter === "bus");
-    for (const node of mapLabels.children) {
-      if (!(node instanceof HTMLElement)) continue;
-      const landId = node.getAttribute("data-land");
-      const pin = landId === null ? undefined : latestPins.get(landId);
-      const matches = pin !== undefined && matchesAtlasFilter(pin, activeFilter);
-      node.classList.toggle("is-filter-match", filtering && matches);
-      node.classList.toggle("is-filter-dim", filtering && !matches);
-    }
-    for (const node of mapBadges.children) {
-      if (!(node instanceof HTMLElement)) continue;
-      const landId = node.getAttribute("data-land");
-      const pin = landId === null ? undefined : latestPins.get(landId);
-      const matches = pin !== undefined && matchesAtlasFilter(pin, activeFilter);
-      node.classList.toggle("is-filter-match", filtering && matches);
-      node.classList.toggle("is-filter-dim", filtering && !matches);
+    for (const container of [mapLabels, mapBadges]) {
+      for (const node of container.children) {
+        if (!(node instanceof HTMLElement)) continue;
+        const landId = node.getAttribute("data-land");
+        const pin = landId === null ? undefined : latestPins.get(landId);
+        const matches = pin !== undefined && matchesAtlasFilter(pin, activeFilter);
+        node.classList.toggle("is-filter-match", filtering && matches);
+        node.classList.toggle("is-filter-dim", filtering && !matches);
+      }
     }
   };
 
@@ -421,7 +221,7 @@ export function createJournalMapPage(
     let items: InspectorObjective[] = [];
 
     if (activeFilter !== "all" && activeInspected === undefined) {
-      const spec = FILTER_SPECS.find((item) => item.id === activeFilter);
+      const spec = ATLAS_FILTER_SPECS.find((item) => item.id === activeFilter);
       const allPins = [...latestPins.values()];
       const matching = allPins.filter((pin) => matchesAtlasFilter(pin, activeFilter));
       eyebrow = "FILTER";
@@ -468,6 +268,13 @@ export function createJournalMapPage(
     }
   };
 
+  const stickerSuffix = (view: JournalMapView, landId: string): string => {
+    const progress = view.landProgress[landId];
+    return progress === undefined || progress.total === 0
+      ? ""
+      : ` · ${progress.owned}/${progress.total} stickers`;
+  };
+
   const syncMapDetail = (view: JournalMapView): void => {
     const inspectId = hoveredLandId ?? selectedLandId;
     const inspected = inspectId === null
@@ -481,27 +288,13 @@ export function createJournalMapPage(
       if (mapDetail.hasAttribute("title")) mapDetail.removeAttribute("title");
     } else if (inspected !== undefined) {
       const guide = view.landGuides?.[inspected.id];
-      if (guide !== undefined && guide.length > 0) {
-        const text = `${prefix}${guide}`;
-        setText(mapDetail, text);
-        setAttribute(mapDetail, "title", text);
-      } else {
-        const progress = view.landProgress[inspected.id];
-        const suffix =
-          progress === undefined || progress.total === 0
-            ? ""
-            : ` · ${progress.owned}/${progress.total} stickers`;
-        const text = `${prefix}${inspected.name}${suffix}`;
-        setText(mapDetail, text);
-        setAttribute(mapDetail, "title", text);
-      }
+      const text = guide !== undefined && guide.length > 0
+        ? `${prefix}${guide}`
+        : `${prefix}${inspected.name}${stickerSuffix(view, inspected.id)}`;
+      setText(mapDetail, text);
+      setAttribute(mapDetail, "title", text);
     } else {
-      const progress = view.landProgress[active.id];
-      const suffix =
-        progress === undefined || progress.total === 0
-          ? ""
-          : ` · ${progress.owned}/${progress.total} stickers`;
-      setText(mapDetail, `${prefix}${active.name}${suffix}`);
+      setText(mapDetail, `${prefix}${active.name}${stickerSuffix(view, active.id)}`);
       if (mapDetail.hasAttribute("title")) mapDetail.removeAttribute("title");
     }
     for (const node of mapLabels.children) {
@@ -541,10 +334,24 @@ export function createJournalMapPage(
     }
   };
 
+  const visibleLandPins = (): HTMLElement[] =>
+    [...mapLabels.querySelectorAll<HTMLElement>(".journal-map-land.is-revealed")].filter(
+      isElementVisible,
+    );
+
+  const focusLandPin = (target: HTMLElement, alwaysNotify: boolean): void => {
+    target.focus();
+    const landId = target.matches(".journal-map-land") ? target.getAttribute("data-land") : null;
+    if (landId === null) return;
+    const changed = selectedLandId !== landId;
+    selectedLandId = landId;
+    hoveredLandId = null;
+    if (latestView !== null) syncMapDetail(latestView);
+    if (alwaysNotify || changed) options?.onSelectLand?.(landId);
+  };
+
   const stepLandFocus = (delta: -1 | 1): boolean => {
-    const items: HTMLElement[] = [
-      ...mapLabels.querySelectorAll<HTMLElement>(".journal-map-land.is-revealed"),
-    ].filter(isElementVisible);
+    const items = visibleLandPins();
     if (isElementVisible(mapTreasuresBtn)) items.push(mapTreasuresBtn);
     for (const entry of filterButtons.values()) {
       if (isElementVisible(entry.button)) items.push(entry.button);
@@ -555,17 +362,9 @@ export function createJournalMapPage(
     if (currentIndex === -1 && selectedLandId !== null) {
       currentIndex = items.findIndex((node) => node.getAttribute("data-land") === selectedLandId);
     }
-    const nextIndex = cycleIndex(currentIndex, items.length, delta);
-    const target = items[nextIndex];
+    const target = items[cycleIndex(currentIndex, items.length, delta)];
     if (target === undefined) return false;
-    target.focus();
-    const landId = target.matches(".journal-map-land") ? target.getAttribute("data-land") : null;
-    if (landId !== null) {
-      selectedLandId = landId;
-      hoveredLandId = null;
-      if (latestView !== null) syncMapDetail(latestView);
-      options?.onSelectLand?.(landId);
-    }
+    focusLandPin(target, true);
     return true;
   };
 
@@ -622,7 +421,15 @@ export function createJournalMapPage(
               if (event.key === "Enter" || event.key === " ") {
                 event.preventDefault();
                 toggleSelect();
+                return;
               }
+              if (event.key !== "Home" && event.key !== "End") return;
+              const pins = visibleLandPins();
+              const target = event.key === "Home" ? pins[0] : pins[pins.length - 1];
+              if (target === undefined) return;
+              event.preventDefault();
+              event.stopPropagation();
+              focusLandPin(target, false);
             });
             item.addEventListener("pointerenter", () => {
               hoveredLandId = land.id;
@@ -665,14 +472,14 @@ export function createJournalMapPage(
           const to = landLookup.get(route.to);
           if (from === undefined || to === undefined) continue;
           const d = busRoutePath(from, to);
-          const halo = document.createElementNS(svgNamespace, "path");
+          const halo = document.createElementNS(SVG_NAMESPACE, "path");
           halo.setAttribute(
             "class",
             route.open ? "journal-map-route-halo is-open" : "journal-map-route-halo",
           );
           halo.setAttribute("d", d);
           mapRoutes.append(halo);
-          const line = document.createElementNS(svgNamespace, "path");
+          const line = document.createElementNS(SVG_NAMESPACE, "path");
           line.setAttribute(
             "class",
             route.open ? "journal-map-route is-open" : "journal-map-route",
@@ -703,60 +510,11 @@ export function createJournalMapPage(
         .join("|");
       if (nextBadgeSignature !== badgeSignature) {
         badgeSignature = nextBadgeSignature;
-        mapBadges.replaceChildren();
-        for (const { land, pin, hasGem, hasBoss, hasComplete } of badgedLands) {
-          const tray = element("span", "journal-atlas-pin-tray");
-          setAttribute(tray, "data-land", land.id);
-          tray.style.left = `${(land.x / 2400) * 100}%`;
-          tray.style.top = `${(land.y / 1610) * 100}%`;
-          if (hasGem) {
-            const gemBadge = element("span", "journal-atlas-badge is-gem");
-            setAttribute(gemBadge, "data-badge", "gem");
-            setAttribute(gemBadge, "data-land", land.id);
-            const gemNoun = pin.gemsRemaining === 1 ? "Gem" : "Gems";
-            setAttribute(
-              gemBadge,
-              "aria-label",
-              `${land.name}: ${pin.gemsRemaining} Star ${gemNoun} hidden`,
-            );
-            gemBadge.append(atlasBadgeIcon("gem"));
-            tray.append(gemBadge);
-          }
-          if (hasBoss) {
-            const bossBadge = element("span", "journal-atlas-badge is-boss");
-            setAttribute(bossBadge, "data-badge", "boss");
-            setAttribute(bossBadge, "data-land", land.id);
-            setAttribute(
-              bossBadge,
-              "aria-label",
-              `${land.name}: ${pin.activeBosses.map((boss) => boss.name).join(", ")} waiting`,
-            );
-            bossBadge.append(atlasBadgeIcon("boss"));
-            tray.append(bossBadge);
-          }
-          if (hasComplete) {
-            const completeKind = pin.landComplete ? "full" : "stickers";
-            const completeBadge = element(
-              "span",
-              "journal-atlas-badge is-complete journal-map-complete",
-            );
-            setAttribute(completeBadge, "data-badge", "complete");
-            setAttribute(completeBadge, "data-land", land.id);
-            setAttribute(completeBadge, "data-complete-kind", completeKind);
-            setAttribute(
-              completeBadge,
-              "aria-label",
-              pin.landComplete
-                ? `${land.name} calm and 100% complete`
-                : `${land.name} stickers complete`,
-            );
-            completeBadge.append(
-              atlasBadgeIcon(pin.landComplete ? "complete-full" : "complete-stickers"),
-            );
-            tray.append(completeBadge);
-          }
-          mapBadges.append(tray);
-        }
+        mapBadges.replaceChildren(
+          ...badgedLands.map(({ land, pin, hasGem, hasBoss, hasComplete }) =>
+            createAtlasPinTray(land, pin, { hasGem, hasBoss, hasComplete }),
+          ),
+        );
       }
 
       const showMasterCrest = view.valleyComplete === true;

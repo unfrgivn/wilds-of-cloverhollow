@@ -8982,6 +8982,47 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   scripts, 23 QA packs, purity, lint), `just build` (`index` `375.45 kB < 500 kB`),
   12/12 overworld e2e, 2/2 Chromium & WebKit `ending.spec`, and 99/99 Chromium
   `ui-gallery` tests.
+
+## Milestone 206: Heart-to-Heart Album Keyboard Scroll-Into-View & PageUp/PageDown, Harmony Flute Wheel Modal Focus & Tactile Hover & `voice-catalog.ts` + `entity-critters.ts` Modular Splits (Elevation Track E19E) **Status:** ✅ Completed (2026-11-28)
+- Pure UI accessibility/scrolling polish, Harmony Flute Wheel modal focus
+  management and touch-safe desktop hover, plus two clean modular splits with
+  zero `src/core/` edits, zero save-version bumps, zero visual baseline shifts,
+  and bit-identical replay hashes across all 77+ recorded and headless sims:
+  - **Party Heart-to-Heart Scrapbook Album Keyboard Scroll-Into-View &
+    `PageUp`/`PageDown` (`src/ui/journal-hearts.ts`):** Wires
+    `applyModalScrollKey([grid, card], key)` for `PageDown`/`PageUp` (plus
+    `Home`/`End` top/bottom scroll parity) and calls
+    `target.scrollIntoView?.({ block: "nearest" })` after `Arrow`/`Home`/`End`
+    focus changes so overflowed tiles on compact phone viewports stay visible.
+  - **Harmony Flute Wheel WCAG Modal Focus Restoration & Tactile Hover
+    (`src/ui/flute-wheel.ts`, `src/ui/flute-wheel.css`):** Adds
+    `aria-modal="true"` and `tabIndex = -1`, captures `returnFocusEl` on
+    hidden-to-visible transition, focuses `.flute-wheel` without shifting its
+    resting `3px solid #47321f` ink outline, restores focus on `hide()`, and
+    adds touch-safe `@media (hover: hover) and (pointer: fine)` lift on
+    `.flute-wheel-btn:hover` and `.flute-wheel-close:hover` suppressed under
+    both `@media (prefers-reduced-motion: reduce)` and
+    `:root[data-reduced-motion="on"]`.
+  - **Modular `src/platform/voice-catalog.ts` Split (`src/platform/voices.ts`):**
+    Extracts declarative voice profiles, speaker aliases, critter keyword lists,
+    and `TRACK_SCALES` into `src/platform/voice-catalog.ts` (`553` lines) with
+    type-only imports and zero runtime circularity, reducing
+    `src/platform/voices.ts` from `894` to `357` lines while keeping every
+    public export and acoustic output byte-identical.
+  - **Modular `src/render/entity-critters.ts` Split (`src/render/entity-layer.ts`):**
+    Extracts `OverworldCritterAmbientLayer` (critter bodies/auras/shadows,
+    ambient flyers/shadows/glows, `figures()` rects, and calmed sanctuary
+    critter rendering) into `src/render/entity-critters.ts` (`307` lines),
+    composed inside `OverworldEntityLayer` (`898 -> 545` lines) with zero public
+    API or visual changes.
+- **Evidence:** `tests/unit/milestone-206.test.ts` and real-input Chromium &
+  WebKit `tests/e2e/milestone-206.spec.ts` (`@smoke`).
+- **Gates:** `just check` (277 unit files / 2,053 tests, all 77 recorded + 7
+  headless sims with zero hash shifts, 23 QA packs, purity, lint), `just build`
+  (largest non-vendor chunk `< 390 kB`, hook leak + runtime story + harness
+  checks green), and 31/31 Chromium & WebKit e2e tests (`milestone-206`,
+  `milestone-204`, `milestone-194`, `soundtrack` 12/12, `e5-puzzles-tools-dash`
+  7/7, `living-npcs`).
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

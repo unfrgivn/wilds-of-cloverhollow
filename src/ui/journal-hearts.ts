@@ -1,5 +1,6 @@
 import "./journal-hearts.css";
 import { element, setAttribute, setText } from "./dom";
+import { applyModalScrollKey } from "./journal-nav";
 import {
   heartToHeartMeta, type HeartToHeartEntry, type HeartToHeartSummary,
 } from "../core/heart-to-hearts";
@@ -152,17 +153,14 @@ export function createJournalHeartsAlbum(options?: {
   titleWrap.append(makeSvg("journal-hearts-emblem", HEADER_HEART_MARKUP), title, count);
   const closeBtn = makeButton("journal-hearts-close", "Close Heart-to-Hearts", "×");
   head.append(closeBtn);
-
   const grid = element("div", "journal-hearts-grid", card);
   const footer = element("p", "journal-hearts-footer", card);
   const treasuresBtn = makeButton("journal-hearts-btn", "Open Heart-to-Hearts", "♥ Hearts · 0/6");
   treasuresBtn.hidden = true;
-
   let openState = false;
   let lastSig = "";
   let tiles: HTMLElement[] = [];
   let returnFocusEl: HTMLElement | null = null;
-
   const clear = (): void => {
     returnFocusEl = null;
     if (!openState && overlay.hidden) return;
@@ -187,10 +185,8 @@ export function createJournalHeartsAlbum(options?: {
     treasuresBtn.hidden = false;
     treasuresBtn.classList.toggle("is-complete", complete);
     setText(treasuresBtn, `♥ Hearts · ${summary.completed}/${summary.total}`);
-    setAttribute(
-      treasuresBtn, "aria-label",
-      `Open Heart-to-Hearts, ${summary.completed} of ${summary.total} shared`,
-    );
+    const aria = `Open Heart-to-Hearts, ${summary.completed} of ${summary.total} shared`;
+    setAttribute(treasuresBtn, "aria-label", aria);
     if (!openState) { if (!overlay.hidden) clear(); return; }
     overlay.hidden = false;
     const nextSig = summary.entries
@@ -198,19 +194,13 @@ export function createJournalHeartsAlbum(options?: {
     if (nextSig === lastSig) return;
     lastSig = nextSig;
     count.classList.toggle("is-complete", complete);
-    setText(
-      count,
-      complete ? `♥ ${summary.completed}/${summary.total} ALL HEARTS SHARED!`
-        : `${summary.completed}/${summary.total}`,
-    );
+    setText(count, complete ? `♥ ${summary.completed}/${summary.total} ALL HEARTS SHARED!`
+      : `${summary.completed}/${summary.total}`);
     tiles = summary.entries.map(buildHeartTile);
     grid.replaceChildren(...tiles);
     footer.classList.toggle("is-complete", complete);
-    setText(
-      footer,
-      complete ? "♥ All 6 Heart-to-Hearts Shared — True Cloverhollow Best Friends!"
-        : "Look for floating heart bubbles in the valley to share Heart-to-Hearts!",
-    );
+    setText(footer, complete ? "♥ All 6 Heart-to-Hearts Shared — True Cloverhollow Best Friends!"
+      : "Look for floating heart bubbles in the valley to share Heart-to-Hearts!");
   };
   closeBtn.addEventListener("click", close);
   overlay.addEventListener("click", (event) => { if (event.target === overlay) close(); });
@@ -233,21 +223,30 @@ export function createJournalHeartsAlbum(options?: {
   const handleKeydown = (event: KeyboardEvent): boolean => {
     if (!openState) return false;
     const stop = (): void => { event.preventDefault(); event.stopPropagation(); };
-    if (["Escape", "x", "X", "b", "B"].includes(event.key)) { stop(); close(); return true; }
-    if ((event.key === "Enter" || event.key === " ") && document.activeElement === closeBtn) {
+    const key = event.key;
+    if (["Escape", "x", "X", "b", "B"].includes(key)) { stop(); close(); return true; }
+    if ((key === "Enter" || key === " ") && document.activeElement === closeBtn) {
       stop(); close(); return true;
+    }
+    if (key === "PageDown" || key === "PageUp") {
+      stop(); applyModalScrollKey([grid, card], key); return true;
     }
     const len = tiles.length;
     if (len === 0) return true;
     const idx = tiles.findIndex((tile) => tile === document.activeElement);
-    const key = event.key;
     const next =
       key === "Home" ? 0 : key === "End" ? len - 1
       : key === "ArrowRight" ? (idx === -1 ? 0 : (idx + 1) % len)
       : key === "ArrowLeft" ? (idx === -1 ? len - 1 : (idx - 1 + len) % len)
       : key === "ArrowDown" ? (idx === -1 ? 0 : (idx + 2) % len)
       : key === "ArrowUp" ? (idx === -1 ? len - 1 : (idx - 2 + len) % len) : null;
-    if (next !== null) { stop(); tiles[next]?.focus({ preventScroll: true }); }
+    if (next !== null) {
+      stop();
+      const target = tiles[next];
+      target?.focus({ preventScroll: true });
+      target?.scrollIntoView?.({ block: "nearest" });
+      if (key === "Home" || key === "End") applyModalScrollKey([grid, card], key);
+    }
     return true;
   };
   return {

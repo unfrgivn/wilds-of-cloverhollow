@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 205)
+Last updated: 2026-11-28 (Milestone 206)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -605,7 +605,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   and deterministic `ambiencePan` (`[-0.55, 0.55]`, guarded `StereoPannerNode`s
   disconnected on `onended`), and cleans up all nodes and timers on stop.
   Character-voiced talking blips and key-aligned UI clicks
-  (`src/platform/voices.ts`, Milestones 80, 142, 152 & 160) give every named cast
+  (`src/platform/voices.ts` backed by pure declarative speaker/scale tables in
+  `src/platform/voice-catalog.ts`, Milestones 80, 142, 152, 160 & 205 / Track
+  E19E) give every named cast
   member, `"Fizzy "` mini-boss (via optional leading `"fizzy "` prefix stripping
   after exact lookup, plus `"Fizzy Kid"` / `"Kid"` mapped to `MYSTERY_VOICE`),
   fairy, critter archetype, and narrator a distinct warm sine/triangle register
@@ -1052,7 +1054,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   effects in `OverworldEffectsController` inside `src/render/overworld-effects.ts`
   (Milestone 120), overworld entity sprite pools (player, party followers, NPCs,
   critters, and ambient flyers) in `OverworldEntityLayer` inside
-  `src/render/entity-layer.ts` (Milestone 130), Pixi-free camera/viewport,
+  `src/render/entity-layer.ts` (Milestone 130, composing the pooled critter &
+  ambient flyer controller `OverworldCritterAmbientLayer` extracted into
+  `src/render/entity-critters.ts`, Milestone 206 / Track E19E), Pixi-free
+  camera/viewport,
   eviction, story-atmosphere, prompt, chatter-anchor, notice-mark, and render-info
   projections in `src/render/view-projections.ts` (Milestone 167), Pixi
   permanent-sheet preloading, area loading/prefetching, and bounded current +
@@ -1488,10 +1493,15 @@ ios/            Capacitor iOS project (from Milestone 4).
     - **Harmony Flute Wheel (`flute` / `F` / `RB` / `.touch-flute`):** when
       within `bell.radius` of a `ResonanceBellDef` (preserving `FLUTE_KNOT`
       and Toby's lullaby landmarks everywhere else), opens the opaque die-cut
-      `.flute-wheel` dialog (`data-flute-wheel="open"`), accepting directional
-      edges (`Up` Red / `Right` Yellow / `Down` Green / `Left` Blue) or direct
-      taps (`input.choose` `0..3`) to match 3-note melodies, bloom vine bridges,
-      harmonize seashells, or unseal shrines.
+      `.flute-wheel` dialog (`role="dialog"`, `aria-modal="true"`,
+      `tabIndex="-1"`, `data-flute-wheel="open"`), moving focus into
+      `.flute-wheel` on open and restoring the prior focused element on close,
+      with touch-safe `@media (hover: hover) and (pointer: fine)` button lift
+      suppressed under both `@media (prefers-reduced-motion: reduce)` and
+      `:root[data-reduced-motion="on"]` (Milestone 206 / Track E19E), accepting
+      directional edges (`Up` Red / `Right` Yellow / `Down` Green / `Left` Blue)
+      or direct taps (`input.choose` `0..3`) to match 3-note melodies, bloom
+      vine bridges, harmonize seashells, or unseal shrines.
   - **Pushables, Sliding Snowballs & Companion Hold-Switches:** pushable crates
     and rocks move cleanly clamped to walkable/solid polygons; `slides: true`
     snowballs glide smoothly until hitting a solid or snapping onto an open
@@ -5318,7 +5328,9 @@ trunks keep its two exits.
   with spoiler-free hints, strictly masking `sanctuary-encore` as `"Secret
   Meadow Gathering"` / `"Whole Crew"` without naming Milo until unlocked or
   completed per §1.2), a golden `"♥ 6/6 ALL HEARTS SHARED!"` header & footer
-  celebration at `6/6`, full 2D arrow/Home/End keyboard navigation, M133 paper
+  celebration at `6/6`, full 2D arrow/Home/End keyboard navigation with
+  `scrollIntoView({ block: "nearest" })` plus `PageDown`/`PageUp` vertical
+  scrolling via `applyModalScrollKey` (Milestone 206 / Track E19E), M133 paper
   foley, Reduced Motion and iOS tap-selection parity, and
   backdrop/`×`/`Escape`/`X`/`B` dismiss restoring Field Treasures and focus
   directly to `.journal-hearts-btn`.

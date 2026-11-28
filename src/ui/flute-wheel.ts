@@ -82,7 +82,9 @@ export function createFluteWheel(root: HTMLElement): FluteWheelOverlay {
   const panel = document.createElement("section");
   panel.className = "sticker-ui flute-wheel";
   panel.setAttribute("role", "dialog");
+  panel.setAttribute("aria-modal", "true");
   panel.setAttribute("aria-label", "Harmony Flute");
+  panel.tabIndex = -1;
   panel.hidden = true;
 
   const head = document.createElement("div");
@@ -137,6 +139,7 @@ export function createFluteWheel(root: HTMLElement): FluteWheelOverlay {
   root.append(panel);
 
   let lastKey = "";
+  let returnFocusEl: HTMLElement | null = null;
 
   const syncDataset = (open: boolean): void => {
     if (open) document.documentElement.dataset.fluteWheel = "open";
@@ -144,10 +147,19 @@ export function createFluteWheel(root: HTMLElement): FluteWheelOverlay {
   };
 
   const hide = (): void => {
+    const restoreFocus =
+      returnFocusEl !== null &&
+      returnFocusEl.isConnected &&
+      document.activeElement !== null &&
+      panel.contains(document.activeElement)
+        ? returnFocusEl
+        : null;
+    returnFocusEl = null;
     panel.hidden = true;
     panel.classList.remove("is-matched", "is-wrong");
     syncDataset(false);
     lastKey = "";
+    restoreFocus?.focus({ preventScroll: true });
   };
 
   const render = (view: FluteWheelView): void => {
@@ -157,14 +169,20 @@ export function createFluteWheel(root: HTMLElement): FluteWheelOverlay {
       }
       return;
     }
+    const wasHidden = panel.hidden;
     syncDataset(true);
     const key =
       `${view.bellId}|${view.hintLabel}|${view.sequence.join(",")}|` +
       `${view.entered.join(",")}|${view.status}|${view.lastNote ?? ""}|${view.noteSeq}`;
-    if (key === lastKey && !panel.hidden) return;
+    if (key === lastKey && !wasHidden) return;
     lastKey = key;
 
+    if (wasHidden) {
+      returnFocusEl =
+        document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    }
     panel.hidden = false;
+    if (wasHidden) panel.focus({ preventScroll: true });
     panel.classList.toggle("is-matched", view.status === "matched");
     panel.classList.toggle("is-wrong", view.status === "wrong");
 

@@ -31,6 +31,11 @@
   animation: flute-wheel-in 160ms ease-out;
 }
 
+.flute-wheel:focus,
+.flute-wheel:focus-visible {
+  outline: 3px solid #47321f;
+}
+
 :root[data-flute-wheel="open"] .sticker-prompt {
   display: none;
 }
@@ -82,6 +87,7 @@
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
+  transition: transform 90ms ease-out, background-color 90ms ease-out;
 }
 
 .flute-wheel-close:focus-visible,
@@ -171,6 +177,16 @@
   transition: transform 90ms ease-out, box-shadow 90ms ease-out;
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .flute-wheel-btn:hover {
+    transform: translateY(-2px);
+  }
+  .flute-wheel-close:hover {
+    background: #fff9e6;
+    transform: scale(1.05);
+  }
+}
+
 .flute-wheel-btn:active,
 .flute-wheel-btn.is-last {
   transform: scale(0.95);
@@ -257,16 +273,22 @@
   .flute-wheel,
   .flute-wheel.is-wrong { animation: none; }
   .flute-wheel-orb,
-  .flute-wheel-btn { transition: none; }
+  .flute-wheel-btn,
+  .flute-wheel-close { transition: none; }
   .flute-wheel-orb.is-filled,
+  .flute-wheel-btn:hover,
   .flute-wheel-btn:active,
-  .flute-wheel-btn.is-last { transform: none; }
+  .flute-wheel-btn.is-last,
+  .flute-wheel-close:hover { transform: none; }
 }
 
 :root[data-reduced-motion="on"] .flute-wheel,
 :root[data-reduced-motion="on"] .flute-wheel.is-wrong { animation: none; }
 :root[data-reduced-motion="on"] .flute-wheel-orb,
-:root[data-reduced-motion="on"] .flute-wheel-btn { transition: none; }
+:root[data-reduced-motion="on"] .flute-wheel-btn,
+:root[data-reduced-motion="on"] .flute-wheel-close { transition: none; }
 :root[data-reduced-motion="on"] .flute-wheel-orb.is-filled,
+:root[data-reduced-motion="on"] .flute-wheel-btn:hover,
 :root[data-reduced-motion="on"] .flute-wheel-btn:active,
-:root[data-reduced-motion="on"] .flute-wheel-btn.is-last { transform: none; }
+:root[data-reduced-motion="on"] .flute-wheel-btn.is-last,
+:root[data-reduced-motion="on"] .flute-wheel-close:hover { transform: none; }

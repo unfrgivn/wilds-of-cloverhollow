@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 182)
+Last updated: 2026-11-27 (Milestone 185)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -546,9 +546,15 @@ ios/            Capacitor iOS project (from Milestone 4).
   hushed tone on trailing/leading `...`/`…` whispers, and gentle pitch/gain
   emphasis on uppercase words like `REALLY`/`THAT'S`, clamped to `[0.85, 1.25]`
   pitch and `[0.65, 1.25]` gain with bit-identical output when `prosody` is
-  omitted or `NEUTRAL_PROSODY`), and pitch `choice-move`, `battle-command`, and
-  `choice-select` clicks to the active soundtrack's pentatonic scale (across all
-  31 tracks + `silent`).
+  omitted or `NEUTRAL_PROSODY`), layer expression-tuned mood modulation
+  (`VoiceExpression`, `expressionVoiceModifier`, `applyExpressionProsody`, and
+  optional `expression` in `blipFrequency` / `SoundPlayContext`, Milestone 185:
+  `happy` brighter upbeat alternating intervals, `worried` softer descending
+  inflection, `surprised` crisp upward chirp, `determined` steady warm cadence,
+  bit-identical on `neutral`/omitted, pausing blips cleanly during `{pause:N}`
+  dramatic beats via `buildSoundContext`), and pitch `choice-move`,
+  `battle-command`, and `choice-select` clicks to the active soundtrack's
+  pentatonic scale (across all 31 tracks + `silent`).
   Browsers hold the context (`suspended`, or WebKit's `interrupted`) until a
   key, click, or tap; a gamepad press is not a user activation in any browser,
   so a pad-only player on the web hears nothing until one. The iOS app's web
@@ -2860,19 +2866,44 @@ trunks keep its two exits.
   accent. Every non-sign speaker across all compiled `# speaker:` tags and
   critters (113/113 = 100%, including Plaza sidewalk windows `Baker` -> `chef`,
   `Grocer` -> `pippin`, `Scoops` -> `penny`, and Pinecone Pass `Cocoa seller`
-  -> `pass-keeper`, Milestone 151) also displays a 46 px circular
-  die-cut portrait medallion (`.sticker-portrait`, cropped by
-  `cropPortraitFrame` from cached atlas metadata, shifting the speaker tag right
-  without changing the dialogue box width or text measure). Talking bob motion
-  (`portrait-bob`) is scoped strictly to
+  -> `pass-keeper`, Milestone 151) also displays a circular die-cut portrait
+  medallion (`.sticker-portrait`, Milestone 185 / Elevation Track E3, Art Wave
+  A2): the 10 core cast members (`fae`, `maddie`, `sue`, `jordan`, `milo`,
+  `mom`, `dad`, `barnaby`, `teacher` / Ms. Maple, and `nurse` / Nurse Holly)
+  display bespoke warm-watercolor bust portraits in 5 expressions (`neutral`,
+  `happy`, `worried`, `determined`, `surprised`) packed into a single 2000×1000
+  lossless-alpha WebP atlas (`public/assets/portraits/portraits.{json,webp}`,
+  `PORTRAITS_ATLAS`, 200×200 cells, `cropMode: "bust"` zoomed cleanly to 88%
+  inside the 68 px desktop / 58 px phone medallion with subtle expression ring
+  tints, built deterministically by `tools/art/build-portraits.ts` and logged in
+  `art/recipes/portraits-expressions.json`), while all other NPCs and critters
+  gracefully fall back to `cropPortraitFrame` over their existing character or
+  critter sprite atlas. Ink `# expr: neutral|happy|worried|determined|surprised`
+  tags are extracted purely from serialized `state.ink` (`extractInkCurrentTags`
+  & `extractInkExpression` in `src/shell/view-models.ts`, `parseExpressionTag`
+  in `src/ui/portraits.ts`, zero `src/core` or save-version changes). The
+  `.sticker-dialogue` card renders as tactile hand-inked deckled watercolor
+  paper (`#faf3e1` opaque base with cold-press SVG grain sheen, organic deckled
+  border radii, inset warm-sepia dashed stitching, tucked diamond-pip nameplate
+  ribbon, and a world-anchored inline-SVG `.sticker-tail` speech pointer for
+  `left` / `right` / `center` speakers resolved via
+  `resolveDialogueSpeakerSide`). Inline kinetic storybook markup is parsed and
+  rendered incrementally through pure, zero-`innerHTML` DOM nodes in
+  `src/ui/rich-text.ts` (`{shake}`, `{wave}`, `{pop}`, `{whisper}`,
+  `{color:berry|teal|gold|lavender}`, and `{pause:N}` dramatic reveal beats
+  that pause both reveal cadence and talking bob without altering core dialogue
+  state; all four color accents and `{whisper}` exceed 7.5:1 WCAG AAA contrast
+  on `#faf3e1`, `aria-live` announces stripped plain text, and Reduced Motion
+  disables shake/wave/pop animations while preserving color, bold weight, and
+  italic tint). Talking bob motion (`portrait-bob`) stays scoped strictly to
   `.sticker-portrait.is-talking .sticker-portrait-img` in `src/ui/sticker.css`
   (suppressed under both `@media (prefers-reduced-motion: reduce)` and
   `:root[data-reduced-motion="on"]`) so removing `.is-talking` when a line
-  finishes revealing never restarts `sticker-medallion-pop` on
-  `.sticker-portrait`. Dialogue panels and choice stickers use brief
-  reduced-motion-guarded pop-in motion; dialogue panels and TALK prompts use a
-  low-opacity inset dashed stitch border. Labels use Nunito 800, choices use
-  600, and body copy uses 400 for readable small-size text.
+  finishes revealing or hits a `{pause:N}` beat never restarts
+  `sticker-medallion-pop` on `.sticker-portrait`. Dialogue panels and choice
+  stickers use brief reduced-motion-guarded pop-in motion; dialogue panels and
+  TALK prompts use a low-opacity inset dashed stitch border. Labels use Nunito
+  800, choices use 600, and body copy uses 400 for readable small-size text.
 
 ### 7.2 Title screen layout
 - The title screen (`src/ui/title.ts`, Milestone 97 polish) is the top layer

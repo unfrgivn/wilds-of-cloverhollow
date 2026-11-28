@@ -1,0 +1,80 @@
+{
+  "asset": "portraits-expressions",
+  "track": "E3",
+  "artWave": "A2",
+  "date": "2026-11-27",
+  "status": "owner-review-ready",
+  "summary": "50 hand-painted watercolor bust portraits (10 core cast members x 5 expressions: neutral, happy, worried, determined, surprised) packed into a single 2000x1000 lossless-alpha WebP atlas (200x200 cells, 458 KB, PSNR 42.36 dB).",
+  "model": "gemini-3-pro-image-preview",
+  "aspectRatio": "21:9",
+  "imageSize": "2K",
+  "calls": 11,
+  "callsNote": "10 initial 5-expression strips (1 per cast member) + 1 clean single-ref regen for Grandpa Barnaby to eliminate multi-panel grid bleed.",
+  "expressions": ["neutral", "happy", "worried", "determined", "surprised"],
+  "cast": {
+    "fae": {
+      "key": "#00FF00",
+      "references": ["art/source/fae/fae-model-sheet-v2.png", "public/assets/characters/fae/fae.webp"],
+      "raw": "art/source/portraits/fae-sheet-raw.png"
+    },
+    "maddie": {
+      "key": "#00FF00",
+      "references": ["art/source/maddie/maddie-model-sheet.png", "public/assets/characters/maddie/maddie.webp"],
+      "raw": "art/source/portraits/maddie-sheet-raw.png"
+    },
+    "sue": {
+      "key": "#FF00FF",
+      "references": ["art/source/sue/sue-model-sheet-v2.png", "public/assets/characters/sue/sue.webp"],
+      "raw": "art/source/portraits/sue-sheet-raw.png"
+    },
+    "jordan": {
+      "key": "#FF00FF",
+      "references": ["art/source/jordan/jordan-model-sheet-v1.png", "public/assets/characters/jordan/jordan.webp"],
+      "raw": "art/source/portraits/jordan-sheet-raw.png"
+    },
+    "milo": {
+      "key": "#FF00FF",
+      "references": ["art/source/classmates/milo/model-sheet-raw.png", "public/assets/characters/milo/milo.webp"],
+      "raw": "art/source/portraits/milo-sheet-raw.png"
+    },
+    "mom": {
+      "key": "#FF00FF",
+      "references": ["art/source/mom/mom-model-sheet.png", "public/assets/characters/mom/mom.webp"],
+      "raw": "art/source/portraits/mom-sheet-raw.png"
+    },
+    "dad": {
+      "key": "#00FF00",
+      "references": ["art/source/townspeople/dad/sheet-raw.png", "public/assets/characters/dad/dad.webp"],
+      "raw": "art/source/portraits/dad-sheet-raw.png"
+    },
+    "barnaby": {
+      "key": "#FF00FF",
+      "references": ["art/source/townspeople/barnaby/sheet-raw.png", "public/assets/characters/barnaby/barnaby.webp"],
+      "raw": "art/source/portraits/barnaby-sheet-raw.png"
+    },
+    "teacher": {
+      "key": "#00FF00",
+      "references": ["art/source/staff/teacher/model-sheet-raw.png", "public/assets/characters/teacher/teacher.webp"],
+      "raw": "art/source/portraits/teacher-sheet-raw.png"
+    },
+    "nurse": {
+      "key": "#FF00FF",
+      "references": ["art/source/staff/nurse/model-sheet-raw.png", "public/assets/characters/nurse/nurse.webp"],
+      "raw": "art/source/portraits/nurse-sheet-raw.png"
+    }
+  },
+  "postProcessing": {
+    "key": "Per-character conflict-free chroma key (#00FF00 green for Fae/Maddie/Dad/Ms. Maple; #FF00FF magenta for Sue/Jordan/Milo/Mom/Barnaby/Nurse Holly), 26% fuzz with --holes and --despill none followed by 10px alpha-edge-only despill-edge.ts preserving warm-brown ink contours.",
+    "segmentation": "Minimum-opacity vertical valley detection into 5 panels, largest connected component extraction per panel, uniform chest-up bust framing (max aspect 1.48), uniform per-character scale into 200x200 bottom-anchored cells.",
+    "atlas": "10x5 grid (2000x1000) packed into public/assets/portraits/portraits.json + optimized WebP portraits.webp (q92 -alpha_q 100 -m 6, PSNR 42.36 dB)."
+  },
+  "commands": [
+    "bun tools/art/build-portraits.ts",
+    "bun tools/art/optimize-atlases.ts"
+  ],
+  "review": [
+    "art/review/e3-portraits-cast-a.jpg",
+    "art/review/e3-portraits-cast-b.jpg",
+    "art/review/e3-portraits-medallions.jpg"
+  ]
+}

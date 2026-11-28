@@ -35,7 +35,14 @@ import {
   type MusicAdaptiveState,
 } from "./music-mix";
 import { createPreferenceStore } from "./preference-store";
-import { blipFrequency, dialogueProsody, footstepPitchFactor, trackScaleNotes } from "./voices";
+import {
+  applyExpressionProsody,
+  blipFrequency,
+  dialogueProsody,
+  footstepPitchFactor,
+  trackScaleNotes,
+  type VoiceExpression,
+} from "./voices";
 
 export {
   effectRecipe,
@@ -53,6 +60,8 @@ export type SoundPlayContext = {
   text?: string;
   revealed?: number;
   choiceIndex?: number;
+  expression?: VoiceExpression;
+  inPause?: boolean;
 };
 // WebKit adds "interrupted" (no gesture yet, or the audio session was taken)
 // to the standard states, so the DOM type doesn't cover what it reports.
@@ -374,6 +383,7 @@ export function createAudio(
   };
 
   const dialogueBlipRecipe = (tick: number, info?: SoundPlayContext): Segment[] | null => {
+    if (info?.inPause === true) return null;
     const text = info?.text;
     const revealed = info?.revealed;
     let char: string | undefined;
@@ -384,7 +394,8 @@ export function createAudio(
         ? previous
         : current;
     }
-    const prosody = dialogueProsody(text, revealed);
+    const baseProsody = dialogueProsody(text, revealed);
+    const prosody = applyExpressionProsody(baseProsody, info?.expression);
     const blip = blipFrequency(info?.speaker ?? null, revealed ?? tick, char, prosody);
     if (blip === null) return null;
     const segments: Segment[] = [

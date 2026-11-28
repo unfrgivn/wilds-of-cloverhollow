@@ -42,7 +42,12 @@ import { createCook, type CookInfo } from "../ui/cook";
 import { createFish, type FishInfo } from "../ui/fish";
 import type { HudInputMode } from "../ui/hud-hints";
 import { createMole, type MoleInfo } from "../ui/mole";
-import { cropPortraitFrame, speakerPortraitSource } from "../ui/portraits";
+import {
+  cropPortraitFrame,
+  PORTRAITS_ATLAS,
+  speakerPortraitSource,
+  type PortraitExpression,
+} from "../ui/portraits";
 import { createSkee, type SkeeInfo } from "../ui/skee";
 import { createTaco, type TacoInfo } from "../ui/taco";
 
@@ -218,7 +223,7 @@ export type ShellAssets = {
   atlasFrame: (file: string, frameName: string) => AtlasImage | null;
   stickerArt: (critterId: string, frameName: string) => AtlasImage | null;
   prizeArt: (frameName: string) => AtlasImage | null;
-  speakerPortrait: (speaker: string | null) => AtlasImage | null;
+  speakerPortrait: (speaker: string | null, expression?: PortraitExpression) => AtlasImage | null;
   fishArt: (frameName: string) => AtlasImage | null;
   toyArt: (frameName: string) => AtlasImage | null;
   seedCoreSheets: () => void;
@@ -337,8 +342,9 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
     return critter === undefined ? null : atlasFrame(critter.atlas, frameName);
   };
 
-  const speakerPortrait = (speaker: string | null): AtlasImage | null => {
-    const source = speakerPortraitSource(world, speaker);
+  const resolvePortraitFromSource = (
+    source: ReturnType<typeof speakerPortraitSource>,
+  ): AtlasImage | null => {
     if (source === null) return null;
     const data =
       atlasJsonCache.get(source.atlas) ?? Assets.get<Spritesheet | undefined>(source.atlas)?.data;
@@ -352,6 +358,19 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
     if (data.frames[source.frame] === undefined) return null;
     const image = atlasImage(data, assetUrl(atlasImagePath(source.atlas, data)), source.frame);
     return { ...image, frame: cropPortraitFrame(image.frame, source.cropMode) };
+  };
+
+  const speakerPortrait = (
+    speaker: string | null,
+    expression?: PortraitExpression,
+  ): AtlasImage | null => {
+    const primary = speakerPortraitSource(world, speaker, expression);
+    const resolved = resolvePortraitFromSource(primary);
+    if (resolved !== null) return resolved;
+    if (expression !== undefined && primary?.atlas === PORTRAITS_ATLAS) {
+      return resolvePortraitFromSource(speakerPortraitSource(world, speaker));
+    }
+    return null;
   };
 
   const prizeArt = (frameName: string): AtlasImage | null =>
@@ -395,6 +414,7 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
       ...new Set(Object.values(world.critters).map((critter) => critter.atlas)),
     ];
     await Promise.all([
+      ensureAtlasMeta(PORTRAITS_ATLAS),
       ensureAtlasMeta(world.arcade.atlas),
       ...critterJsonFiles.map((file) => ensureAtlasMeta(file)),
     ]);
@@ -558,7 +578,10 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
   };
 
   const warmAreaMedia = async (area: Area): Promise<void> => {
-    const loads: Promise<unknown>[] = [warmAreaOverlays(area.id)];
+    const loads: Promise<unknown>[] = [
+      warmAreaOverlays(area.id),
+      decodeAtlasImage(PORTRAITS_ATLAS),
+    ];
     for (const atlas of areaMediaAtlases(world, area)) {
       loads.push(decodeAtlasImage(atlas));
     }

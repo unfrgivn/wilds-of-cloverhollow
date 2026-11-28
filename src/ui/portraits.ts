@@ -12,13 +12,115 @@ export type SpeakerAccent =
   | "mystery"
   | "default";
 
-export type PortraitCropMode = "kid" | "adult" | "small" | "critter";
+export type PortraitExpression =
+  | "neutral"
+  | "happy"
+  | "worried"
+  | "determined"
+  | "surprised";
+
+export const PORTRAIT_EXPRESSIONS: readonly PortraitExpression[] = [
+  "neutral",
+  "happy",
+  "worried",
+  "determined",
+  "surprised",
+];
+
+export const PORTRAITS_ATLAS = "assets/portraits/portraits.json";
+
+export const EXPRESSION_CAST_IDS = [
+  "fae",
+  "maddie",
+  "sue",
+  "jordan",
+  "milo",
+  "mom",
+  "dad",
+  "barnaby",
+  "teacher",
+  "nurse",
+] as const;
+
+export type ExpressionCastId = (typeof EXPRESSION_CAST_IDS)[number];
+
+export type PortraitCropMode = "kid" | "adult" | "small" | "critter" | "bust";
 
 export type PortraitSource = {
   atlas: string;
   frame: string;
   cropMode: PortraitCropMode;
 };
+
+export function isPortraitExpression(value: string): value is PortraitExpression {
+  return (
+    value === "neutral" ||
+    value === "happy" ||
+    value === "worried" ||
+    value === "determined" ||
+    value === "surprised"
+  );
+}
+
+/** Extracts an explicit `# expr: <expression>` Ink tag if present and valid. */
+export function parseExpressionTag(tags: readonly string[]): PortraitExpression | null {
+  for (let index = tags.length - 1; index >= 0; index -= 1) {
+    const raw = tags[index];
+    if (raw === undefined) continue;
+    const match = /^expr:\s*([a-z-]+)$/i.exec(raw.trim());
+    const candidate = match?.[1]?.toLowerCase();
+    if (candidate !== undefined && isPortraitExpression(candidate)) {
+      return candidate;
+    }
+  }
+  return null;
+}
+
+/** Resolves the active portrait expression from Ink tags with a safe fallback. */
+export function resolveExpressionTag(
+  tags: readonly string[],
+  fallback: PortraitExpression = "neutral",
+): PortraitExpression {
+  return parseExpressionTag(tags) ?? fallback;
+}
+
+const EXPRESSION_CAST_SPEAKERS: Record<string, ExpressionCastId> = {
+  fae: "fae",
+  maddie: "maddie",
+  sue: "sue",
+  jordan: "jordan",
+  milo: "milo",
+  mom: "mom",
+  dad: "dad",
+  "grandpa barnaby": "barnaby",
+  barnaby: "barnaby",
+  "ms. maple": "teacher",
+  "ms. clover": "teacher",
+  teacher: "teacher",
+  "nurse holly": "nurse",
+  "nurse clover": "nurse",
+  nurse: "nurse",
+  holly: "nurse",
+};
+
+/**
+ * Resolves a speaker to their bespoke Art Wave A2 multi-expression watercolor
+ * bust portrait, or returns `null` for cast members without an expression sheet.
+ */
+export function expressionPortraitSource(
+  speaker: string | null,
+  expression: PortraitExpression = "neutral",
+): PortraitSource | null {
+  if (speaker === null) return null;
+  const key = speaker.trim().toLowerCase();
+  const castId = EXPRESSION_CAST_SPEAKERS[key];
+  if (castId === undefined) return null;
+  return {
+    atlas: PORTRAITS_ATLAS,
+    frame: `${castId}_${expression}`,
+    cropMode: "bust",
+  };
+}
 
 const FAMILY_SPEAKERS = new Set(["mom", "dad", "oliver", "maddie"]);
 const FRIEND_SPEAKERS = new Set([
@@ -315,11 +417,16 @@ const CRITTER_PERSON_MAP: Record<string, string> = {
 export function speakerPortraitSource(
   world: World,
   speaker: string | null,
+  expression?: PortraitExpression,
 ): PortraitSource | null {
   if (speaker === null) return null;
   const key = speaker.trim().toLowerCase();
   if (key.length === 0 || key === "mysterious voice" || key === "???" || SIGN_SPEAKERS.has(key)) {
     return null;
+  }
+  if (expression !== undefined) {
+    const expressive = expressionPortraitSource(speaker, expression);
+    if (expressive !== null) return expressive;
   }
   if (key === "fae") {
     return { atlas: "assets/characters/fae/fae.json", frame: "down_idle_01", cropMode: "kid" };
@@ -370,6 +477,9 @@ function clampRect(
 }
 
 export function cropPortraitFrame(frame: AtlasFrame, mode: PortraitCropMode): AtlasFrame {
+  if (mode === "bust") {
+    return clampRect(frame, frame.w * 0.06, frame.h * 0.04, frame.w * 0.88, frame.h * 0.88);
+  }
   if (mode === "kid") {
     if (frame.w >= 440) {
       return clampRect(frame, frame.w * 0.31, frame.h * 0.33, frame.w * 0.38, frame.h * 0.38);

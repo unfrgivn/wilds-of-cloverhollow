@@ -48,8 +48,12 @@ import {
   type HudInputMode,
 } from "../ui/hud-hints";
 import type { JournalInputMode, JournalView, JukeboxMeta } from "../ui/journal";
-import { speakerAccent } from "../ui/portraits";
-import type { DialogueView } from "../ui/sticker";
+import {
+  resolveExpressionTag,
+  speakerAccent,
+  type PortraitExpression,
+} from "../ui/portraits";
+import type { DialogueView, SpeakerSide } from "../ui/sticker";
 
 export type StickerPrizeArt = {
   stickerArt: (critterId: string, frameName: string) => AtlasImage | null;
@@ -349,13 +353,145 @@ export function buildJournalView(params: JournalViewParams): JournalView {
   };
 }
 
+function isJsonRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+let lastInkTagsInput = "";
+let lastInkTagsOutput: readonly string[] = [];
+
+/**
+ * Purely extracts the active Ink line's `# ...` tags from serialized `state.ink`
+ * JSON without mutating simulation state or instantiating a Story.
+ */
+export function extractInkCurrentTags(inkJson: string | undefined): readonly string[] {
+  if (inkJson === undefined || inkJson.length === 0) return [];
+  if (inkJson === lastInkTagsInput) return lastInkTagsOutput;
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(inkJson);
+  } catch {
+    return [];
+  }
+  if (!isJsonRecord(parsed)) return [];
+  let stream: unknown;
+  const flows = parsed.flows;
+  if (isJsonRecord(flows)) {
+    const flowName =
+      typeof parsed.currentFlowName === "string" && parsed.currentFlowName.length > 0
+        ? parsed.currentFlowName
+        : "DEFAULT_FLOW";
+    const flow = flows[flowName];
+    if (isJsonRecord(flow)) stream = flow.outputStream;
+  }
+  if (!Array.isArray(stream)) stream = parsed.outputStream;
+  if (!Array.isArray(stream)) {
+    lastInkTagsInput = inkJson;
+    lastInkTagsOutput = [];
+    return lastInkTagsOutput;
+  }
+  const tags: string[] = [];
+  for (let index = 0; index < stream.length; index += 1) {
+    if (stream[index] !== "#") continue;
+    let text = "";
+    let cursor = index + 1;
+    while (cursor < stream.length) {
+      const part = stream[cursor];
+      if (part === "/#") break;
+      if (typeof part === "string" && part.startsWith("^")) {
+        text += part.slice(1);
+      }
+      cursor += 1;
+    }
+    const trimmed = text.trim();
+    if (trimmed.length > 0) tags.push(trimmed);
+    index = cursor;
+  }
+  lastInkTagsInput = inkJson;
+  lastInkTagsOutput = tags;
+  return tags;
+}
+
+/** Extracts the active line's `# expr:` portrait expression from serialized Ink state. */
+export function extractInkExpression(inkJson: string | undefined): PortraitExpression {
+  return resolveExpressionTag(extractInkCurrentTags(inkJson));
+}
+
+const PARTY_SPEAKER_IDS: Readonly<Record<string, string>> = {
+  maddie: "maddie",
+  sue: "sue",
+  jordan: "jordan",
+  "pond pup": "pond-pup",
+  "acorn squirrel": "acorn-squirrel",
+  "ribbon bunny": "ribbon-bunny",
+};
+
+/**
+ * Projects a world-anchored speech-tail side (`left` | `right` | `center`) for
+ * the active dialogue speaker without touching camera or core simulation state.
+ */
+export function resolveDialogueSpeakerSide(
+  world: Partial<Pick<World, "areas" | "party">>,
+  state: Partial<Pick<State, "area" | "player" | "facing" | "party" | "dialogue">>,
+  speaker: string | null,
+  inBattle: boolean,
+): SpeakerSide | null {
+  if (speaker === null) return null;
+  const accent = speakerAccent(speaker);
+  if (accent === "default") return null;
+  const key = speaker.trim().toLowerCase();
+  if (inBattle) {
+    return key === "fae" || PARTY_SPEAKER_IDS[key] !== undefined ? "left" : "right";
+  }
+
+  const player = state.player;
+  const dialogue = state.dialogue;
+  const area = state.area !== undefined ? world.areas?.[state.area] : undefined;
+  const npcPartner = area?.npcs.find((npc) => npc.knot === dialogue?.knot)?.point ?? null;
+  const partnerPoint = dialogue?.partnerPoint ?? npcPartner;
+
+  const sideFromDelta = (deltaX: number): SpeakerSide =>
+    deltaX < -16 ? "left" : deltaX > 16 ? "right" : "center";
+
+  const partyId = PARTY_SPEAKER_IDS[key];
+  if (partyId !== undefined && player !== undefined) {
+    const member = state.party?.find((entry) => entry.id === partyId);
+    if (member !== undefined) return sideFromDelta(member.x - player.x);
+  }
+
+  if (key === "fae") {
+    if (player !== undefined && partnerPoint !== null) {
+      return sideFromDelta(player.x - partnerPoint.x);
+    }
+    if (player !== undefined && area !== undefined && area.width > 0) {
+      const ratio = player.x / area.width;
+      if (ratio < 0.4) return "left";
+      if (ratio > 0.56) return "right";
+      return "center";
+    }
+    if (state.facing === "left") return "left";
+    if (state.facing === "right") return "right";
+    return "center";
+  }
+
+  if (player !== undefined && partnerPoint !== null) {
+    return sideFromDelta(partnerPoint.x - player.x);
+  }
+  return "center";
+}
+
 export type DialogueViewParams = {
-  world: Pick<World, "battle">;
-  state: Pick<State, "battle" | "dialogue">;
+  world: Pick<World, "battle"> & Partial<Pick<World, "areas" | "party">>;
+  state: Pick<State, "battle" | "dialogue"> &
+    Partial<Pick<State, "ink" | "area" | "player" | "facing" | "party">>;
   battle: BattleView | null;
   arcadeState: ArcadeView | null;
   levelUpNotice: string | null;
-  speakerPortrait: (speaker: string | null) => AtlasImage | null;
+  speakerPortrait: (
+    speaker: string | null,
+    expression?: PortraitExpression,
+  ) => AtlasImage | null;
+  tags?: readonly string[];
 };
 
 /** Projects active level-up, battle, arcade result, or overworld talk onto DialogueView. */
@@ -374,10 +510,14 @@ export function buildDialogueView(params: DialogueViewParams): DialogueView | nu
   }
   if (activeBattle && battle.talk !== null) {
     const talkView = battleTalkDialogueView(battle.talk);
+    const tags = params.tags ?? extractInkCurrentTags(state.ink);
+    const expression = resolveExpressionTag(tags);
     return {
       ...talkView,
-      portrait: speakerPortrait(talkView.speaker),
+      portrait: speakerPortrait(talkView.speaker, expression),
       accent: speakerAccent(talkView.speaker),
+      expression,
+      speakerSide: resolveDialogueSpeakerSide(world, state, talkView.speaker, true),
     };
   }
   if (activeBattle && battle.message !== "") {
@@ -420,6 +560,8 @@ export function buildDialogueView(params: DialogueViewParams): DialogueView | nu
     };
   }
   if (arcadeState !== null || state.dialogue === null) return null;
+  const tags = params.tags ?? extractInkCurrentTags(state.ink);
+  const expression = resolveExpressionTag(tags);
   return {
     speaker: state.dialogue.speaker,
     text: state.dialogue.text,
@@ -430,8 +572,10 @@ export function buildDialogueView(params: DialogueViewParams): DialogueView | nu
         : [],
     selected: state.dialogue.selected,
     canAdvance: state.dialogue.choices.length === 0,
-    portrait: speakerPortrait(state.dialogue.speaker),
+    portrait: speakerPortrait(state.dialogue.speaker, expression),
     accent: speakerAccent(state.dialogue.speaker),
+    expression,
+    speakerSide: resolveDialogueSpeakerSide(world, state, state.dialogue.speaker, false),
   };
 }
 

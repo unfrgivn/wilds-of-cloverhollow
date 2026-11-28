@@ -19,13 +19,76 @@ export type BlipSynth = {
 };
 
 export type VoiceProsodyMood = "neutral" | "question" | "exclaim" | "whisper";
+export type VoiceExpression = "neutral" | "happy" | "worried" | "determined" | "surprised";
 
 export type VoiceProsody = {
   mood: VoiceProsodyMood;
   pitchScale: number;
   gainScale: number;
   glideScale: number;
+  durationScale?: number;
+  upbeatStep?: boolean;
+  steadyGlide?: boolean;
 };
+
+export type ExpressionVoiceModifier = {
+  pitchScale: number;
+  gainScale: number;
+  glideScale: number;
+  durationScale: number;
+  upbeatStep?: boolean;
+  steadyGlide?: boolean;
+};
+
+const EXPRESSION_VOICE_MODIFIERS: Readonly<Record<VoiceExpression, ExpressionVoiceModifier>> = {
+  neutral: { pitchScale: 1, gainScale: 1, glideScale: 1, durationScale: 1 },
+  happy: {
+    pitchScale: 1.07,
+    gainScale: 1.05,
+    glideScale: 1.05,
+    durationScale: 0.94,
+    upbeatStep: true,
+  },
+  worried: { pitchScale: 0.93, gainScale: 0.84, glideScale: 0.94, durationScale: 1.12 },
+  surprised: { pitchScale: 1.12, gainScale: 1.08, glideScale: 1.13, durationScale: 0.85 },
+  determined: {
+    pitchScale: 0.98,
+    gainScale: 1.08,
+    glideScale: 1,
+    durationScale: 1.04,
+    steadyGlide: true,
+  },
+};
+
+export function expressionVoiceModifier(expression?: VoiceExpression): ExpressionVoiceModifier {
+  return EXPRESSION_VOICE_MODIFIERS[expression ?? "neutral"];
+}
+
+/**
+ * Modulates sentence-aware voice prosody by the speaker's active portrait
+ * expression (`happy`, `worried`, `surprised`, `determined`, or `neutral`).
+ * Returns `prosody` unchanged when expression is omitted or `"neutral"`.
+ */
+export function applyExpressionProsody(
+  prosody: VoiceProsody,
+  expression?: VoiceExpression,
+): VoiceProsody {
+  if (expression === undefined || expression === "neutral") return prosody;
+  const mod = EXPRESSION_VOICE_MODIFIERS[expression];
+  const clamp = (value: number, low: number, high: number): number =>
+    Number(Math.min(high, Math.max(low, value)).toFixed(4));
+  return {
+    mood: prosody.mood,
+    pitchScale: clamp(prosody.pitchScale * mod.pitchScale, 0.82, 1.28),
+    gainScale: clamp(prosody.gainScale * mod.gainScale, 0.62, 1.25),
+    glideScale: mod.steadyGlide === true
+      ? clamp(1 + (prosody.glideScale - 1) * 0.4, 0.86, 1.24)
+      : clamp(prosody.glideScale * mod.glideScale, 0.86, 1.24),
+    durationScale: clamp((prosody.durationScale ?? 1) * mod.durationScale, 0.78, 1.25),
+    ...(mod.upbeatStep === true ? { upbeatStep: true } : {}),
+    ...(mod.steadyGlide === true ? { steadyGlide: true } : {}),
+  };
+}
 
 export const NEUTRAL_PROSODY: VoiceProsody = {
   mood: "neutral",
@@ -713,14 +776,17 @@ export function blipFrequency(
   stepIndex: number,
   char?: string,
   prosody?: VoiceProsody,
+  expression?: VoiceExpression,
 ): BlipSynth | null {
   if (char !== undefined && SILENT_CHAR.test(char)) return null;
   const voice = voiceForSpeaker(speaker);
   const code = char === undefined ? 0 : char.charCodeAt(0);
-  const hash = Math.imul(Math.abs(Math.trunc(stepIndex)) + 1, 7) + Math.imul(code, 13);
+  const step = Math.abs(Math.trunc(stepIndex));
+  const hash = Math.imul(step + 1, 7) + Math.imul(code, 13);
   const index = ((hash % voice.notes.length) + voice.notes.length) % voice.notes.length;
   const baseFrequency = voice.notes[index] ?? voice.notes[0] ?? 440;
-  if (prosody === undefined || prosody === NEUTRAL_PROSODY) {
+  const effective = applyExpressionProsody(prosody ?? NEUTRAL_PROSODY, expression);
+  if (effective === NEUTRAL_PROSODY) {
     return {
       frequency: baseFrequency,
       endFrequency:
@@ -731,17 +797,26 @@ export function blipFrequency(
       harmonic: voice.harmonic,
     };
   }
-  const frequency = Number((baseFrequency * prosody.pitchScale).toFixed(2));
-  const gain = Number((voice.gain * prosody.gainScale).toFixed(4));
-  const hasGlide = voice.glide !== undefined || prosody.glideScale !== 1;
+  const upbeat = effective.upbeatStep === true && step % 2 === 1 ? 1.03 : 1;
+  const frequency = Number((baseFrequency * effective.pitchScale * upbeat).toFixed(2));
+  const gain = Number((voice.gain * effective.gainScale).toFixed(4));
+  const duration =
+    effective.durationScale === undefined
+      ? voice.duration
+      : Number((voice.duration * effective.durationScale).toFixed(4));
+  const baseGlide =
+    effective.steadyGlide === true && voice.glide !== undefined
+      ? 1 + (voice.glide - 1) * 0.45
+      : (voice.glide ?? 1);
+  const hasGlide = voice.glide !== undefined || effective.glideScale !== 1;
   const endFrequency = hasGlide
-    ? Number((frequency * (voice.glide ?? 1) * prosody.glideScale).toFixed(2))
+    ? Number((frequency * baseGlide * effective.glideScale).toFixed(2))
     : undefined;
   return {
     frequency,
     endFrequency,
     wave: voice.wave,
-    duration: voice.duration,
+    duration,
     gain,
     harmonic: voice.harmonic,
   };

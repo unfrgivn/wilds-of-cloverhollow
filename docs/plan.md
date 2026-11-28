@@ -7468,12 +7468,16 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   Maddie `stretch -> groom -> nap` long-idle cycle, and snappy 8-tick
   Paper-Flip horizontal turns (disabled under Reduced Motion & paused harness
   snapshots).
-- **Track E3 (Storybook Dialogue Box, Multi-Expression Portraits & Kinetic Text, Art Wave A):**
-  5-expression portrait sheets (`neutral`, `happy`, `worried`, `determined`,
-  `surprised`) for main cast and school staff; hand-inked deckled-paper dialogue
-  card with speaker-anchored speech tail, `#expr:` swaps, syllable portrait
-  bounce, safe inline kinetic text markup (`{shake}`, `{wave}`, `{pop}`,
-  `{whisper}`, `{color:...}`, `{pause:N}`), and mood-tuned melodic voice cadence.
+- **Track E3 (Storybook Dialogue Box, Multi-Expression Portraits & Kinetic Text, Art Wave A2):**
+  ✅ Completed (Milestone 185, 2026-11-27). 50 hand-painted watercolor bust
+  portraits (10 core cast × 5 expressions: `neutral`, `happy`, `worried`,
+  `determined`, `surprised`) packed into a single 2000×1000 WebP atlas
+  (`public/assets/portraits/portraits.{json,webp}`, 458 KB); hand-inked
+  deckled-paper dialogue card with warm watercolor grain, diamond-pip nameplate
+  ribbon, world-anchored `left`/`right`/`center` speech tail, `# expr:` Ink tag
+  extraction with graceful sprite-crop fallback, pure XSS-safe kinetic text
+  parser (`{shake}`, `{wave}`, `{pop}`, `{whisper}`, `{color:berry|teal|gold|lavender}`,
+  `{pause:N}`), and mood-tuned expressive voice blips. Hash-safe, save `v10`.
 
 ### Phase 2: Cutscenes, Tactile Spatial Puzzles & Tactical Battles (`Save v11` Wave)
 - **Track E4 (Deterministic Cutscene & Stage Choreography Engine):** Pure 60 Hz
@@ -8012,6 +8016,70 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   Resting `sit`, `# pose: party cheer`, live vs paused/Reduced-Motion
   Paper-Flip, and hash parity), `vision`-verified review JPEGs & refreshed
   `battle-reward` / `overworld-frog-calm` baselines, and `docs/review-queue.md`.
+
+## Milestone 185: Storybook Dialogue Box, Multi-Expression Portraits & Kinetic Text (Elevation Track E3, Art Wave A2) **Status:** ✅ Completed (2026-11-27)
+- Upgrades Cloverhollow's dialogue presentation into a tactile *Paper Mario* /
+  *Chicory* / *Night in the Woods* storybook card with 50 bespoke watercolor
+  bust portraits, inline kinetic rich text, world-anchored speech tails, and
+  mood-tuned expressive voice cadence — 100% presentation-only, zero
+  `src/core` changes, Save `v10`, and zero replay hash drift across all 74
+  recorded sims.
+- **Art Wave A2 — Multi-Expression Portrait Atlas (`art/recipes/portraits-expressions.json`,
+  `tools/art/build-portraits.ts`, `public/assets/portraits/portraits.{json,webp}`):**
+  - Generated 5 warm-watercolor bust expressions (`neutral`, `happy`, `worried`,
+    `determined`, `surprised`) for all 10 core cast members (`fae`, `maddie`,
+    `sue`, `jordan`, `milo`, `mom`, `dad`, `barnaby`, `teacher` / Ms. Maple,
+    `nurse` / Nurse Holly) from each character's approved sprite & model sheet
+    (11 Gemini calls total), keyed with conflict-free per-character chroma keys
+    + edge-only despill, segmented via minimum-opacity valleys + largest
+    connected component extraction, packed into a single 2000×1000 WebP atlas
+    (`458 KB`, `q92 -alpha_q 100`, `PSNR 42.36 dB`), and verified **50/50 pass**
+    across `art/review/e3-portraits-{cast-a,cast-b,medallions}.jpg` via `vision`.
+- **Pure Rich-Text Tokenizer & Expression Tag Resolution (`src/ui/rich-text.ts`,
+  `src/ui/portraits.ts`, `src/shell/view-models.ts`, `src/shell/assets.ts`):**
+  - Added 100% pure, XSS-safe (zero `innerHTML`, DOM nodes only)
+    `parseRichText`, `stripRichText`, `resolveRichTextProgress`, and incremental
+    `createRichTextRenderer` supporting `{shake}`, `{wave}`, `{pop}`,
+    `{whisper}`, `{color:berry|teal|gold|lavender}`, and `{pause:N}` (clamped
+    dramatic reveal beats that hold reveal and pause portrait talking bob
+    without touching core simulation state).
+  - Added `PortraitExpression`, `PORTRAITS_ATLAS`, `parseExpressionTag`,
+    `resolveExpressionTag`, `expressionPortraitSource`, and expression-aware
+    `speakerPortraitSource(world, speaker, expression?)` with graceful fallback
+    to existing character/critter sprite crops for all non-core NPCs.
+  - Added memoized pure `extractInkCurrentTags`, `extractInkExpression`, and
+    `resolveDialogueSpeakerSide` (`left` / `right` / `center`) in
+    `src/shell/view-models.ts`, and preloaded/decoded `PORTRAITS_ATLAS` in
+    `src/shell/assets.ts`.
+- **Hand-Inked Deckled Storybook Dialogue Card (`src/ui/sticker.ts`,
+  `src/ui/sticker.css`):**
+  - Upgraded `.sticker-dialogue` with opaque `#faf3e1` warm paper base +
+    cold-press SVG paper grain sheen, subtle deckled border radii, warm-sepia
+    dashed inner stitching, tucked diamond-pip nameplate ribbon, 68 px (desktop)
+    / 58 px (phone) expression-tinted circular portrait medallion, syllable
+    portrait bounce paused during `{pause:N}` beats, seamless inline-SVG
+    `.sticker-tail` (`left` / `center` / `right`), WCAG AAA >= 7.5:1 contrast
+    across all text & ink colors, stripped plain text in `aria-live`, strict
+    874×402 phone touch-button clearance, and full Reduced Motion guards.
+- **Mood-Tuned Expressive Voices (`src/platform/voices.ts`,
+  `src/platform/audio.ts`, `src/shell/feedback.ts`):**
+  - Added `VoiceExpression`, `expressionVoiceModifier`, and
+    `applyExpressionProsody` modulating speaker blips cleanly for `happy`
+    (brighter upbeat alternating intervals), `worried` (softer descending
+    inflection), `surprised` (crisp upward chirp), and `determined` (steady warm
+    cadence), while keeping `neutral`/omitted bit-identical and silencing blips
+    during `{pause:N}` holds.
+- **Evidence:** `tests/unit/e3-dialogue.test.ts` (9 real unit tests covering
+  atlas integrity, `# expr:` parsing & fallback, kinetic rich-text tokens, XSS
+  safety, `{pause:N}` cadence, and mood-tuned voices),
+  `tests/e2e/e3-dialogue.spec.ts` (`@smoke` Chromium + WebKit testing desktop
+  `1280×720` & notched phone `874×402`, all 5 expressions, kinetic markup, WCAG
+  AAA contrast, Reduced Motion, and real-key live gameplay), `vision`-verified
+  review captures (`art/review/e3-dialogue-{desktop-1280,phone-874,expressions}.jpg`),
+  and `vision`-audited dialogue baseline refreshes across `dialogue`,
+  `ui-gallery`, `battle-scene`, `battle`, and `battle-depth`.
+- **Gates:** `just check`, `just build` (`< 390 kB` every non-vendor JS chunk),
+  and Chromium/WebKit Playwright e2e verification.
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.

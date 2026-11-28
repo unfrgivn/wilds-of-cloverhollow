@@ -45,6 +45,15 @@ export const COZY_WEATHER_MODES: readonly CozyWeatherMode[] = [
   "twilight-fireflies",
 ];
 
+/** Ordered live sky cycle stepped through by Photo Mode's `W` key and touch sky button. */
+export const PHOTO_WEATHER_CYCLE: readonly CozyWeatherKind[] = [
+  "clear",
+  "sunshower",
+  "breeze-petals",
+  "snow-flurry",
+  "twilight-fireflies",
+];
+
 const TOWN_AREAS: ReadonlySet<string> = new Set([
   "plaza",
   "park",
@@ -167,6 +176,17 @@ export function weatherLabel(kind: CozyWeatherKind): string {
 /** Returns the cozy player-facing label for a weather preference mode. */
 export function weatherModeLabel(mode: CozyWeatherMode): string {
   return mode === "auto" ? "Auto Cycle" : WEATHER_LABELS[mode];
+}
+
+/**
+ * Advances Photo Mode's live sky cycler to the next cozy weather kind.
+ * Maps `"auto"` directly to `"sunshower"` (first vivid sky) and wraps
+ * `"twilight-fireflies"` back around to `"clear"`.
+ */
+export function nextPhotoWeatherMode(current: CozyWeatherMode): CozyWeatherKind {
+  if (current === "auto") return "sunshower";
+  const index = PHOTO_WEATHER_CYCLE.indexOf(current);
+  return PHOTO_WEATHER_CYCLE[(index + 1) % PHOTO_WEATHER_CYCLE.length] ?? "clear";
 }
 
 /** Returns the passive cozy flavor, bonuses, and pastel sky wash for a weather kind. */

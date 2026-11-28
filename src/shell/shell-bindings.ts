@@ -1,11 +1,17 @@
 import { Rectangle, type Application } from "pixi.js";
 import type { JukeboxTrack, Point, State, TextSpeed, World } from "../core";
-import { weatherForArea, type CozyWeatherKind } from "../core/weather";
+import {
+  nextPhotoWeatherMode,
+  weatherBiomeForArea,
+  weatherForArea,
+  weatherLabel,
+  type CozyWeatherKind,
+} from "../core/weather";
 import type { AudioController } from "../platform/audio";
 import type { AudioLevel } from "../platform/audio-settings";
 import type { GameSettingsController } from "../platform/game-settings";
 import type { TouchInput } from "../platform/touch";
-import { getCozyWeatherMode } from "../platform/weather-prefs";
+import { getCozyWeatherMode, setCozyWeatherMode } from "../platform/weather-prefs";
 import type { HudHintAction } from "../ui/hud-hints";
 import type { JournalControl } from "../ui/journal";
 import { postcardToastMessage, type PostcardCapture } from "../ui/postcard";
@@ -234,6 +240,33 @@ export function createQaSettingsBindings(deps: {
       playToggleFeedback(next);
       invalidate();
     },
+  };
+}
+
+/** Returns true when Photo Mode's live sky cycler can change weather in `areaId`. */
+export function canCyclePhotoWeather(areaId: string): boolean {
+  return weatherBiomeForArea(areaId) !== "indoor";
+}
+
+/** Builds the live Photo Mode sky cycler callback wired to `W` and `.photo-touch-weather`. */
+export function createPhotoWeatherCycler(deps: {
+  getArea: () => string;
+  sound: AudioController;
+  lightHaptic: () => void;
+  photoToast: { show: (message: string) => void };
+  invalidate: () => void;
+}): () => void {
+  return () => {
+    if (!canCyclePhotoWeather(deps.getArea())) {
+      deps.photoToast.show("Indoors · Sheltered & Cozy");
+      return;
+    }
+    const next = nextPhotoWeatherMode(getCozyWeatherMode());
+    setCozyWeatherMode(next);
+    deps.sound.playEffect(next === "clear" ? "toggle-off" : "toggle-on");
+    deps.lightHaptic();
+    deps.photoToast.show(`Sky · ${weatherLabel(next)}`);
+    deps.invalidate();
   };
 }
 

@@ -471,18 +471,57 @@ export function cameraIcon(): SVGSVGElement {
   return icon;
 }
 
+/** Hand-inked inline SVG sky cycler icon shared by Photo Mode touch controls (zero `<text>`). */
+export function weatherSkyIcon(): SVGSVGElement {
+  const icon = svgElement("svg", "photo-touch-sky-icon");
+  icon.setAttribute("viewBox", "0 0 28 28");
+  icon.setAttribute("aria-hidden", "true");
+  const sun = svgElement("circle", "photo-sky-sun", icon);
+  sun.setAttribute("cx", "18.2");
+  sun.setAttribute("cy", "10.2");
+  sun.setAttribute("r", "4.4");
+  const rays = svgElement("path", "photo-sky-rays", icon);
+  rays.setAttribute("d", "M18.2 3.4 V4.9 M23.4 5.4 L22.3 6.5 M24.8 10.2 H23.3");
+  const cloud = svgElement("path", "photo-sky-cloud", icon);
+  cloud.setAttribute(
+    "d",
+    "M7.6 21.4 H19.2 C21.3 21.4 22.9 19.8 22.9 17.8 C22.9 15.9 21.5 14.4 19.6 14.2 " +
+      "C19.1 11.7 16.9 9.9 14.2 9.9 C11.3 9.9 8.9 12.1 8.7 14.9 " +
+      "C6.6 15.2 5.1 16.9 5.1 18.9 C5.1 20.3 6.2 21.4 7.6 21.4 Z",
+  );
+  const sparkle = svgElement("path", "photo-sky-sparkle", icon);
+  sparkle.setAttribute(
+    "d",
+    "M6.8 6.2 L7.6 8.1 L9.5 8.9 L7.6 9.7 L6.8 11.6 L6 9.7 L4.1 8.9 L6 8.1 Z",
+  );
+  return icon;
+}
+
 /**
- * Touch-only Photo Mode camera bar (Milestone 118): warm cream die-cut circular
- * Snap Postcard + Exit buttons shown strictly when both data-touch="on" and
- * data-photo="on" are set on :root, completely excluded from Pixi WebGL capture.
+ * Touch-only Photo Mode camera bar (Milestones 118 & 218): warm cream die-cut
+ * circular Cycle Sky + Snap Postcard + Exit buttons shown strictly when both
+ * data-touch="on" and data-photo="on" are set on :root, completely excluded
+ * from Pixi WebGL capture.
  */
 export function createPhotoTouchBar(
   root: HTMLElement,
-  handlers: { onSnap: () => void; onClose: () => void },
-): { element: HTMLDivElement } {
+  handlers: { onSnap: () => void; onClose: () => void; onCycleWeather?: () => void },
+): {
+  element: HTMLDivElement;
+  onCycleWeather: (handler: () => void) => void;
+  setCanWeather: (can: boolean) => void;
+} {
   const bar = element("div", "photo-touch-bar", root);
   bar.setAttribute("role", "group");
   bar.setAttribute("aria-label", "Photo mode controls");
+
+  let cycleWeatherHandler: () => void = handlers.onCycleWeather ?? (() => undefined);
+  const weather = element("button", "photo-touch-btn photo-touch-weather", bar);
+  weather.type = "button";
+  weather.setAttribute("aria-label", "Cycle Cozy Weather");
+  weather.title = "Cycle sky";
+  weather.append(weatherSkyIcon());
+  weather.addEventListener("click", () => cycleWeatherHandler());
 
   const snap = element("button", "photo-touch-btn photo-touch-snap", bar);
   snap.type = "button";
@@ -496,5 +535,13 @@ export function createPhotoTouchBar(
   close.textContent = "×";
   close.addEventListener("click", () => handlers.onClose());
 
-  return { element: bar };
+  return {
+    element: bar,
+    onCycleWeather: (handler) => {
+      cycleWeatherHandler = handler;
+    },
+    setCanWeather: (can) => {
+      weather.hidden = !can;
+    },
+  };
 }

@@ -98,6 +98,7 @@ export type InputShortcutsDeps = {
   setBattlePeek: (open: boolean) => void;
   setPhotoMode: (open: boolean) => void;
   snapPostcard: () => void;
+  onCyclePhotoWeather?: () => void;
   journal: ShortcutJournalControl;
   encoreShrine?: ShortcutEncoreControl;
   gamepad: ShortcutGamepadSource;
@@ -129,6 +130,17 @@ export type InputShortcutsController = {
   pollGamepad: () => void;
   bind: (target?: ShortcutBindTarget) => void;
 };
+
+export type PhotoKeyAction = "toggle" | "snap" | "weather" | "exit";
+
+/** Maps a keyboard event code to its Photo Mode shortcut action, if any. */
+export function photoKeyAction(code: string): PhotoKeyAction | null {
+  if (code === "KeyP") return "toggle";
+  if (code === "Enter" || code === "Space") return "snap";
+  if (code === "KeyW") return "weather";
+  if (code === "Escape") return "exit";
+  return null;
+}
 
 /** Returns true when Photo Mode can be entered or kept open in the overworld. */
 export function canPhotoMode(ctx: Omit<OverlayGateContext, "photoMode">): boolean {
@@ -398,24 +410,27 @@ export function createInputShortcuts(
       deps.clearKeyboardTaps();
       return;
     }
-    if (event.code === "KeyP") {
+    const photoAction = photoKeyAction(event.code);
+    if (photoAction === "toggle") {
       if (!canPhotoMode(ctx)) return;
       event.preventDefault();
       deps.setPhotoMode(!ctx.photoMode);
       return;
     }
-    if (
-      (event.code === "Enter" || event.code === "Space") &&
-      ctx.photoMode &&
-      canPhotoMode(ctx)
-    ) {
+    if (photoAction === "snap" && ctx.photoMode && canPhotoMode(ctx)) {
       event.preventDefault();
       deps.swallow("confirm");
       deps.clearKeyboardTaps();
       deps.snapPostcard();
       return;
     }
-    if (event.code === "Escape" && ctx.photoMode) {
+    if (photoAction === "weather" && ctx.photoMode && canPhotoMode(ctx)) {
+      event.preventDefault();
+      deps.clearKeyboardTaps();
+      deps.onCyclePhotoWeather?.();
+      return;
+    }
+    if (photoAction === "exit" && ctx.photoMode) {
       event.preventDefault();
       deps.setPhotoMode(false);
     }

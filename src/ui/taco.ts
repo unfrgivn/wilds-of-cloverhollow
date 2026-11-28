@@ -9,6 +9,7 @@ import { applyAtlasCrop, type AtlasImage } from "./atlas";
 import { adaptHintForInputMode } from "./battle-checks-helpers";
 import { element, measure, pixels, place, setStyle, setText, type Box } from "./dom";
 import type { HudInputMode } from "./hud-hints";
+import { createMinigameWeatherLayer } from "./minigame-weather";
 import { bindPointerHold } from "./pointer-hold";
 import { layoutTaco, type TacoLayout } from "./taco-layout";
 import {
@@ -64,6 +65,7 @@ export function createTaco(
 
   const stage = element("div", "taco-stage", overlay);
   stage.style.backgroundImage = `url("${image}")`;
+  const weatherLayer = createMinigameWeatherLayer(stage, "taco");
 
   let lastView: TacoView | null = null;
   const pointerHold = bindPointerHold(
@@ -384,6 +386,7 @@ export function createTaco(
   return {
     render: (view, record = null, inputMode = "keyboard") => {
       overlay.hidden = view === null;
+      weatherLayer.sync("hills", view?.phaseTicks ?? 0, view !== null);
       lastView = view;
       lastRecord = record;
       lastInputMode = inputMode;

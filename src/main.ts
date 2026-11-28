@@ -66,8 +66,8 @@ import { bindOverworldPointerSteer } from "./shell/overworld-pointer";
 import { createNavPathFollower, mergeNavSteerInput } from "./shell/nav-steer";
 import { renderBootError, shouldFreezeLiveLoop } from "./shell/lifecycle";
 import {
-  bindShellLifecycle, bindShellUiControls, createDocumentTitleSync, createPostcardSnapper,
-  createQaSettingsBindings, syncOpenFlag,
+  bindShellLifecycle, bindShellUiControls, canCyclePhotoWeather, createDocumentTitleSync,
+  createPhotoWeatherCycler, createPostcardSnapper, createQaSettingsBindings, syncOpenFlag,
 } from "./shell/shell-bindings";
 import type { QaSession } from "./shell/qa-session";
 
@@ -341,8 +341,7 @@ async function boot(): Promise<void> {
   const setPhotoMode = (on: boolean, silent = false): void => {
     const next = on && canPhotoMode(overlayContext());
     const changed = next !== photoMode;
-    photoMode = next;
-    document.documentElement.dataset.photo = next ? "on" : "off";
+    photoMode = next; document.documentElement.dataset.photo = next ? "on" : "off";
     view.setPhotoMode(next);
     if (next) { releasePointer(); saveToast.hide(); }
     else { shutterFlash.hide(); photoToast.hide(); }
@@ -352,11 +351,12 @@ async function boot(): Promise<void> {
     }
     invalidate();
   };
+  const cyclePhotoWeather = createPhotoWeatherCycler({
+    getArea: () => state.area, sound, lightHaptic, photoToast, invalidate,
+  });
   journal.onEnterPhotoMode(() => {
     if (!state.journalOpen || !canPhotoFromJournal(overlayContext())) return;
-    state = { ...state, journalOpen: false };
-    previousState = state;
-    setPhotoMode(true);
+    state = { ...state, journalOpen: false }; previousState = state; setPhotoMode(true);
   });
   let battlePeekOpen = false;
   const setBattlePeek = (on: boolean): void => {
@@ -431,7 +431,8 @@ async function boot(): Promise<void> {
   });
   const inputShortcuts = createInputShortcuts({
     getContext: overlayContext, getBattlePeekOpen: () => battlePeekOpen,
-    setBattlePeek, setPhotoMode, snapPostcard: () => { void snapPostcard({ download: true }); },
+    setBattlePeek, setPhotoMode, onCyclePhotoWeather: cyclePhotoWeather,
+    snapPostcard: () => { void snapPostcard({ download: true }); },
     journal, encoreShrine: encoreShrine.shortcuts(), decorPicker, gamepad,
     clearKeyboardTaps: () => keyboard.clearTaps(), swallow: (button) => swallowed.add(button),
     playChoiceMove: () => { sound.play("choice-move", state.tick); }, invalidate,
@@ -480,6 +481,7 @@ async function boot(): Promise<void> {
       view.setPhotoMode(false);
       shutterFlash.hide(); photoToast.hide();
     }
+    photoBar.setCanWeather(canCyclePhotoWeather(state.area));
     if (battlePeekOpen && !canBattlePeek(gate)) battlePeekOpen = false;
     if (!state.journalOpen || titleMode !== null || qaMenuOpen) jukeboxTrack = null;
     const titleOrQaOpen = titleMode !== null || qaMenuOpen;
@@ -760,34 +762,28 @@ async function boot(): Promise<void> {
     const liveTick = !paused && !harnessStepping && titleMode === null;
     ribbonSync.observe(state, previous.tick, minigameRecords.records(), liveTick);
     if (!(qa?.isRestricted() ?? false) && autosaveNeeded(previous, state)) void saveSession.save();
-    devLog?.logBattle(state);
-    devLog?.afterTick(state);
+    devLog?.logBattle(state); devLog?.afterTick(state);
   };
   const snapPostcard = createPostcardSnapper({
     app, world: content.world, getState: () => state, isPhotoMode: () => photoMode,
     canPhotoMode: () => canPhotoMode(overlayContext()), sound, lightHaptic, shutterFlash,
     photoToast, renderNow: () => render(1),
   });
-  createPhotoTouchBar(uiRoot, {
+  const photoBar = createPhotoTouchBar(uiRoot, {
     onSnap: () => { void snapPostcard({ download: true }); },
-    onClose: () => setPhotoMode(false),
+    onClose: () => setPhotoMode(false), onCycleWeather: cyclePhotoWeather,
   });
-  let last = performance.now();
-  let accumulator = 0;
-  let contextLost = false;
+  let last = performance.now(); let accumulator = 0; let contextLost = false;
   app.ticker.add(() => {
     inputShortcuts.pollGamepad();
     const pad = areaLoader.isTravelVignetteActive() ? gamepad.frame() : null;
     areaLoader.pollTravelGamepadSkip(pad !== null && (pad.confirm || pad.cancel), skipTravel);
-    const now = performance.now();
-    accumulator += Math.min(now - last, 250);
-    last = now;
+    const now = performance.now(); accumulator += Math.min(now - last, 250); last = now;
     const frozen = shouldFreezeLiveLoop({
       documentHidden: document.hidden, paused, areaLoading: areaLoader.isLoading(), contextLost,
     });
-    if (frozen) {
-      accumulator = 0;
-    } else if (!paused) {
+    if (frozen) accumulator = 0;
+    else if (!paused) {
       const drained = drainTicks(accumulator, 1000 / 60, 5);
       accumulator = drained.remainingMs;
       for (let index = 0; index < drained.ticks; index += 1) {

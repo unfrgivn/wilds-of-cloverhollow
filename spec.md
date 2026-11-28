@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 218)
+Last updated: 2026-11-28 (Milestone 219)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -1038,14 +1038,29 @@ ios/            Capacitor iOS project (from Milestone 4).
   `.hud-hints`, `.area-banner`, `.qa-badge`, `.notice-marks`, and the dev debug
   readout (`view.setPhotoMode`) for unobstructed storybook views. On touch devices
   (`:root[data-touch="on"][data-photo="on"]`), `createPhotoTouchBar`
-  (`src/ui/postcard.ts`, styled in `src/ui/sticker.css`) displays `.photo-touch-bar`
+  (`src/ui/postcard.ts`, styled in `src/ui/sticker.css` and
+  `src/ui/touch-controls.css`) displays `.photo-touch-bar`
   (`role="group"`, `aria-label="Photo mode controls"`) in the bottom-right safe
-  area with two 44×44 px warm cream (`#fbf6e8`) circular `#47321f`-inked buttons:
-  `.photo-touch-snap` (`aria-label="Snap postcard"`, shared exported
-  `cameraIcon()` inline SVG with zero `<text>` nodes) and `.photo-touch-close`
+  area with up to three 44×44 px warm cream (`#fbf6e8`) circular `#47321f`-inked
+  buttons: `.photo-touch-weather` (`aria-label="Cycle Cozy Weather"`,
+  `title="Cycle sky"`, shared exported `weatherSkyIcon()` inline SVG with zero
+  `<text>` nodes, placed neatly left of `.photo-touch-snap` and hidden cleanly
+  via `setCanWeather(false)` in sheltered indoor rooms, Milestone 218 / Track
+  E17), `.photo-touch-snap` (`aria-label="Snap postcard"`, shared exported
+  `cameraIcon()` inline SVG with zero `<text>` nodes), and `.photo-touch-close`
   (`aria-label="Exit photo mode"`,
   `×`), completely hidden on desktop and outside Photo Mode and excluded from Pixi
-  `extract.canvas` captures. While Photo Mode
+  `extract.canvas` captures. While Photo Mode is active, pressing `W` (`KeyW`,
+  mapped to `"weather"` by pure `photoKeyAction` in `src/shell/input-shortcuts.ts`
+  strictly while `photoMode === true` so overworld WASD movement is never
+  affected) or tapping `.photo-touch-weather` advances outdoor areas through
+  `PHOTO_WEATHER_CYCLE` (`clear -> sunshower -> breeze-petals -> snow-flurry ->
+  twilight-fireflies -> clear`, mapping `"auto"` to `"sunshower"`) via pure
+  `nextPhotoWeatherMode` (`src/core/weather.ts`), plays `"toggle-on"` /
+  `"toggle-off"` foley, announces `"Sky · <Label>"` in `.photo-toast` (or
+  `"Indoors · Sheltered & Cozy"` on desktop `W` in sheltered indoor rooms), and
+  immediately updates the live canvas, soundscape, and next snapped postcard
+  (Milestone 218 / Track E17). While Photo Mode
   is active, pressing `Enter`, `Space`, gamepad A (button 0), or left-clicking
   the canvas on desktop (via pure `photoModePointerAction` in
   `src/shell/overworld-pointer.ts`, requiring `<= 12 px` drag from `pointerdown`
@@ -5132,7 +5147,17 @@ trunks keep its two exits.
   accepts `inputMode` (`render(view, record, inputMode)`) and formats via
   `adaptHintForInputMode` so Steam Deck / Gamepad shows `"Press A"` / `"Hold or
   tap A"` live while leaving keyboard/touch copy untouched (Milestone 218 /
-  Track E19K). Its gallery states
+  Track E19K). Both Bubblegum Bay Fishing (`bay`, `variant = "fish"`) and Chef
+  Mateo's Taco Truck Kitchen (`hills`, `variant = "taco"`) mount
+  `createMinigameWeatherLayer` (`src/ui/minigame-weather.{ts,css}`, Milestone
+  219 / Track E17) inside their painted stage frames: hidden completely
+  (`hidden = true`) whenever sky weather resolves to `"clear"` (preserving zero
+  visual baseline drift), and otherwise displaying subtle pointer-events-none
+  watercolor sky accents (`.minigame-weather-fx`, frozen calmly under Reduced
+  Motion) plus a non-overlapping cream die-cut `.minigame-weather-pill`
+  (`data-weather="<kind>"`, `aria-live="polite"`, hand-inked zero-`<text>` SVG
+  emblem + sky label + variant flavor tag such as `"+15% bite charm"` or
+  `"Cozy awning"`). Its gallery states
   (`src/dev/fish-gallery.ts`) are `arcade-fish-aim`, `arcade-fish-reeling`, and
   `arcade-fish-catch`.
 - Chef Mateo's Taco Truck Kitchen (`taco_chef_calm.mateo_shop` in

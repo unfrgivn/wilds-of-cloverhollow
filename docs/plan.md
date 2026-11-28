@@ -9393,6 +9393,37 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   0 snapshot diffs), `just ios-device-build` (unsigned arm64
   `Release-iphoneos/App.app`), and `just ios-smoke` (passed end-to-end on
   iPhone 17 / iOS 27.0 Simulator).
+
+## Milestone 219: Photo Mode Live Sky Cycler (`W` / Touch Sky Pill) & Outdoor Minigame Cozy Weather Continuity (Fishing & Taco Truck) **Status:** ✅ Completed (2026-11-28)
+- Completes 100% end-to-end Dynamic Cozy Weather continuity across overworld,
+  battles, Photo Mode framing, and both outdoor minigames (**Bubblegum Bay
+  Fishing** and **Chef Mateo's Taco Truck**) — zero `src/core/sim.ts` changes,
+  zero save-version bumps, zero replay hash drift across all 77 sims, and zero
+  visual baseline diffs across all 99 `ui-gallery`, `fish.spec`, and `taco.spec`
+  baselines.
+- Photo Mode live sky cycler (`src/core/weather.ts`, `src/shell/input-shortcuts.ts`,
+  `src/shell/shell-bindings.ts`, `src/ui/postcard.ts`, `src/ui/touch-controls.css`,
+  `src/main.ts`):
+  - Exported `PHOTO_WEATHER_CYCLE` and pure `nextPhotoWeatherMode(current)`.
+  - Added `photoKeyAction("KeyW") === "weather"` strictly while in Photo Mode
+    plus a `44×44 px` `.photo-touch-weather` button (`weatherSkyIcon()`, zero
+    `<text>` nodes, hidden cleanly indoors) on `.photo-touch-bar`, announcing
+    `"Sky · <Label>"` in `.photo-toast` with toggle foley & light haptic.
+- Outdoor minigame Cozy Weather continuity (`src/ui/minigame-weather.{ts,css}`,
+  `src/ui/fish.ts`, `src/ui/taco.ts`):
+  - Mounted `.minigame-weather-fx` watercolor accents and die-cut
+    `.minigame-weather-pill` (`Rainbow Sunshower / +15% bite charm` in Fishing,
+    `Twilight Fireflies / Lantern shift` in Taco Truck), strictly hidden when
+    `kind === "clear"` (0 pixel drift), honoring Reduced Motion and Safari/iOS
+    tap-selection hygiene.
+- Evidence: `tests/unit/milestone-219.test.ts`,
+  `tests/e2e/milestone-219.spec.ts` (`@smoke` Chromium + WebKit), and all 3
+  review captures (`art/review/m218-photo-touch-sky-874.jpg`,
+  `m218-fish-sunshower-1280.jpg`, `m218-taco-fireflies-1280.jpg`) independently
+  verified via `vision`.
+- Gates: `just check` (286 unit files / 2,084 tests, all 77 sims + all sim
+  scripts, 23 QA packs, purity, lint), `just build` (`index` `391.77 kB < 500 kB`),
+  26/26 Chromium & WebKit e2e, and 99/99 Chromium `ui-gallery` tests.
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

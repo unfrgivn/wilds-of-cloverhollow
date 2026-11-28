@@ -10,6 +10,7 @@ import { adaptHintForInputMode } from "./battle-checks-helpers";
 import { element, measure, pixels, place, setStyle, setText, type Box } from "./dom";
 import { layoutFish, type FishLayout } from "./fish-layout";
 import type { HudInputMode } from "./hud-hints";
+import { createMinigameWeatherLayer } from "./minigame-weather";
 import { bindPointerHold } from "./pointer-hold";
 import type { FishCalibration, FishPhase, FishView } from "../core";
 
@@ -71,6 +72,7 @@ export function createFish(
 
   const stage = element("div", "fish-stage", overlay);
   stage.style.backgroundImage = `url("${image}")`;
+  const weatherLayer = createMinigameWeatherLayer(stage, "fish");
 
   // Live SVG fishing rig in image coordinates (1600 x 1048).
   const svg = document.createElementNS(SVG_NS, "svg");
@@ -506,6 +508,7 @@ export function createFish(
   return {
     render: (view, record = null, inputMode = "keyboard") => {
       overlay.hidden = view === null;
+      weatherLayer.sync("bay", view?.phaseTicks ?? 0, view !== null);
       lastView = view;
       lastRecord = record;
       lastInputMode = inputMode;

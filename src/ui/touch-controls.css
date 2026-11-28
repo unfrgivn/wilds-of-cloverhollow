@@ -258,17 +258,66 @@
   stroke-width: 1.6;
   stroke-linejoin: round;
 }
+.photo-touch-weather {
+  min-width: 44px;
+  min-height: 44px;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.photo-touch-weather[hidden] {
+  display: none;
+}
+.photo-touch-weather svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+.photo-sky-sun {
+  fill: #ffe175;
+  stroke: #47321f;
+  stroke-width: 1.9;
+}
+.photo-sky-rays {
+  fill: none;
+  stroke: #47321f;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+}
+.photo-sky-cloud {
+  fill: #fffdf7;
+  stroke: #47321f;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+.photo-sky-sparkle {
+  fill: #9fd8ff;
+  stroke: #47321f;
+  stroke-width: 1.1;
+  stroke-linejoin: round;
+}
+:root[data-active-weather]:not([data-active-weather="clear"]) .photo-touch-weather {
+  background: #fff3c4;
+  box-shadow:
+    inset 0 0 0 2px #fffdf7,
+    0 4px 0 #47321f28,
+    0 6px 12px #47321f24;
+}
 @media (prefers-reduced-motion: reduce) {
-  .touch-button {
+  .touch-button,
+  .photo-touch-weather {
     transition: none;
   }
-  .touch-button:active {
+  .touch-button:active,
+  .photo-touch-weather:active {
     transform: none;
   }
 }
-:root[data-reduced-motion="on"] .touch-button {
+:root[data-reduced-motion="on"] .touch-button,
+:root[data-reduced-motion="on"] .photo-touch-weather {
   transition: none;
 }
-:root[data-reduced-motion="on"] .touch-button:active {
+:root[data-reduced-motion="on"] .touch-button:active,
+:root[data-reduced-motion="on"] .photo-touch-weather:active {
   transform: none;
 }

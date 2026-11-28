@@ -501,3 +501,22 @@ export function findRestSpot(world: World, state: State): RestSpot | null {
 
   return bestSpot;
 }
+
+export const MADDIE_STRETCH_START = 120;
+export const MADDIE_GROOM_START = 180;
+export const MADDIE_NAP_START = 240;
+export const MADDIE_IDLE_CYCLE_TICKS = 420;
+
+export type MaddieIdlePhase = "alert" | "stretch" | "groom" | "nap";
+
+/**
+ * Pure deterministic long-idle phase cycle for Maddie: alert below 120 ticks,
+ * then repeating 60-tick stretch, 60-tick groom, and 300-tick nap phases.
+ */
+export function maddieIdlePhase(stillTicks: number): MaddieIdlePhase {
+  if (!Number.isFinite(stillTicks) || stillTicks < MADDIE_STRETCH_START) return "alert";
+  const cycleTick = (Math.floor(stillTicks) - MADDIE_STRETCH_START) % MADDIE_IDLE_CYCLE_TICKS;
+  if (cycleTick < 60) return "stretch";
+  if (cycleTick < 120) return "groom";
+  return "nap";
+}

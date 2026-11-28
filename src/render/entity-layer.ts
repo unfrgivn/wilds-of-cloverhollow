@@ -9,18 +9,28 @@ import {
   type Area,
   type Direction,
   type NpcLifeSnapshot,
+  type PartyLifeEntry,
   type Point,
   type State,
   type World,
 } from "../core";
 import { ambientFor, type AmbientFlyer } from "../content/ambient";
 import { flyerAt } from "./ambient";
-import { dialogueFacing, dialoguePartner, selectFaeAnimation } from "./animation";
+import { dialogueFacing, dialoguePartner, selectFaeOverworldPose } from "./animation";
 import type { Rect } from "./area-view";
 import { makeShadowSprite, placeAura } from "./battle-view";
 import { interpolatePoint } from "./camera";
 import type { RestSpot } from "./companions";
-import { composePose, idleBreathing, NEUTRAL_POSE, npcLivingPose, walkPose } from "./motion";
+import {
+  composePose,
+  idleBreathing,
+  NEUTRAL_POSE,
+  npcLivingPose,
+  paperFlipPose,
+  stepPaperFlip,
+  walkPose,
+  type PaperFlipState,
+} from "./motion";
 import { isAdultNpc, type NpcLifeController } from "./npc-life";
 import {
   computeCritterShadow,
@@ -28,6 +38,7 @@ import {
   computeFlyerVisual,
   computeNpcPose,
   computeNpcShadow,
+  computePartyFollowerFacing,
   computePartyFollowerTransform,
   computeRoamerBobAndFacing,
   liftShadowScale,
@@ -88,6 +99,9 @@ export class OverworldEntityLayer {
   private readonly playerShadow: Sprite;
   private readonly partySprites = new Map<string, Sprite>();
   private readonly partyShadows = new Map<string, Sprite>();
+  private playerFlip: PaperFlipState | undefined;
+  private readonly partyFlips = new Map<string, PaperFlipState>();
+  private currentPaperFlipScaleX = 1;
   private currentAnimation = "idle_down";
   private currentFrame = 0;
   private partyFrames: { id: string; animation: string; frame: number }[] = [];
@@ -134,7 +148,14 @@ export class OverworldEntityLayer {
     }
   }
 
+  clearPaperFlips(): void {
+    this.playerFlip = undefined;
+    this.partyFlips.clear();
+    this.currentPaperFlipScaleX = 1;
+  }
+
   clearArea(): void {
+    this.clearPaperFlips();
     for (const sprite of this.critterSprites) {
       sprite.body.destroy();
       sprite.aura.destroy();
@@ -220,31 +241,67 @@ export class OverworldEntityLayer {
       });
   }
 
-  private setFaeTexture(state: State, facingOverride?: Direction): void {
+  private hasCharacterPoseAnimation(characterId: string, animation: string): boolean {
+    if (!animation.startsWith("pose_")) return true;
+    const poseSheet = Assets.get<Spritesheet | undefined>(`${characterId}-poses`);
+    const frames = poseSheet?.animations[animation];
+    return frames !== undefined && frames.length > 0;
+  }
+
+  private resolveCharacterTexture(
+    characterId: string,
+    animation: string,
+    frame: number,
+  ): Texture | undefined {
+    if (animation.startsWith("pose_")) {
+      const poseSheet = Assets.get<Spritesheet | undefined>(`${characterId}-poses`);
+      const poseTexture = poseSheet?.animations[animation]?.[frame];
+      if (poseTexture !== undefined) return poseTexture;
+      const fallbackSheet = Assets.get<Spritesheet | undefined>(`${characterId}-sheet`);
+      return fallbackSheet?.animations.idle_down?.[0];
+    }
+    const sheet = Assets.get<Spritesheet | undefined>(`${characterId}-sheet`);
+    return sheet?.animations[animation]?.[frame];
+  }
+
+  private setFaeTexture(
+    state: State,
+    activeRest: { spot: RestSpot; elapsed: number } | null,
+    activePet: { id: string; elapsed: number } | null,
+    activeToolEventId: string | null,
+    dialogueTags?: readonly string[],
+  ): Direction {
     const sheet = Assets.get<Spritesheet>("fae-sheet");
-    const facing = dialogueFacing(this.world, state) ?? facingOverride ?? state.facing;
-    const idleName = facing === "right" ? "idle_left" : `idle_${facing}`;
+    const facing = dialogueFacing(this.world, state) ?? activeRest?.spot.facing ?? state.facing;
     const walkName = facing === "right" ? "walk_left" : `walk_${facing}`;
-    const name = state.motion.moving ? walkName : idleName;
-    const frames = sheet.animations[name];
-    if (frames === undefined || frames.length === 0)
-      throw new Error(`Missing Fae animation ${name}`);
-    const selection = selectFaeAnimation(
+    const walkFrames = sheet.animations[walkName];
+    if (walkFrames === undefined || walkFrames.length === 0) {
+      throw new Error(`Missing Fae animation ${walkName}`);
+    }
+    const selection = selectFaeOverworldPose({
+      world: this.world,
+      state,
       facing,
-      state.motion,
-      frames.length,
-      this.world.tunables.walkCycleUnits,
-    );
-    const texture = frames[selection.frame];
-    if (texture === undefined)
-      throw new Error(`Missing Fae frame ${selection.frame}`);
+      walkFrameCount: walkFrames.length,
+      walkCycleUnits: this.world.tunables.walkCycleUnits,
+      activeRest: activeRest !== null,
+      activePet: activePet !== null,
+      activeToolEventId,
+      ...(dialogueTags !== undefined ? { dialogueTags } : {}),
+    });
+    const texture = this.resolveCharacterTexture("fae", selection.animation, selection.frame);
+    if (texture === undefined) {
+      throw new Error(`Missing Fae frame ${selection.animation}:${selection.frame}`);
+    }
     this.player.texture = texture;
-    if (texture.defaultAnchor === undefined)
+    if (texture.defaultAnchor === undefined) {
       throw new Error("Fae anchor missing");
+    }
     this.player.anchor.copyFrom(texture.defaultAnchor);
     this.player.scale.set(selection.mirror ? -0.5 : 0.5, 0.5);
     this.currentAnimation = selection.animation;
     this.currentFrame = selection.frame;
+    return facing;
   }
 
   renderPlayer(
@@ -254,8 +311,18 @@ export class OverworldEntityLayer {
     livingMotion: boolean,
     activeRest: { spot: RestSpot; elapsed: number } | null,
     activePet: { id: string; elapsed: number } | null,
+    paperFlipEnabled = false,
+    interpAlpha = 1,
+    activeToolEventId: string | null = null,
+    dialogueTags?: readonly string[],
   ): void {
-    this.setFaeTexture(state, activeRest?.spot.facing);
+    const facing = this.setFaeTexture(
+      state,
+      activeRest,
+      activePet,
+      activeToolEventId,
+      dialogueTags,
+    );
     const faePose = computeFaePose(
       state,
       livingMotion,
@@ -264,14 +331,22 @@ export class OverworldEntityLayer {
       activeRest,
       activePet,
     );
-    this.player.position.set(playerPos.x + faePose.offsetX, playerPos.y + faePose.offsetY);
+    this.playerFlip = stepPaperFlip(this.playerFlip, facing, state.tick);
+    const flipElapsed =
+      this.playerFlip.startTick === null
+        ? -1
+        : state.tick - this.playerFlip.startTick + (paperFlipEnabled ? interpAlpha : 0);
+    const flipPose = paperFlipPose(flipElapsed, paperFlipEnabled);
+    this.currentPaperFlipScaleX = flipPose.scaleX;
+    const totalPose = composePose(faePose, flipPose);
+    this.player.position.set(playerPos.x + totalPose.offsetX, playerPos.y + totalPose.offsetY);
     this.player.scale.set(
-      this.player.scale.x * faePose.scaleX,
-      this.player.scale.y * faePose.scaleY,
+      this.player.scale.x * totalPose.scaleX,
+      this.player.scale.y * totalPose.scaleY,
     );
-    this.player.rotation = faePose.rotation;
+    this.player.rotation = totalPose.rotation;
     this.player.zIndex = playerPos.y;
-    const faeShadowScale = liftShadowScale(faePose.offsetY);
+    const faeShadowScale = liftShadowScale(totalPose.offsetY);
     this.playerShadow.position.set(playerPos.x, playerPos.y);
     this.playerShadow.width = 46 * faeShadowScale;
     this.playerShadow.height = 18 * faeShadowScale;
@@ -285,6 +360,11 @@ export class OverworldEntityLayer {
     alpha: number,
     livingMotion: boolean,
     activePet: { id: string; elapsed: number } | null,
+    activeRest = false,
+    partyLife: readonly PartyLifeEntry[] = [],
+    paperFlipEnabled = false,
+    interpAlpha = 1,
+    dialogueTags?: readonly string[],
   ): void {
     const inParty = new Set(state.party.map((member) => member.id));
     for (const [id, sprite] of this.partySprites) {
@@ -293,7 +373,11 @@ export class OverworldEntityLayer {
       const shadow = this.partyShadows.get(id);
       if (shadow !== undefined) shadow.visible = present;
     }
+    for (const id of this.partyFlips.keys()) {
+      if (!inParty.has(id)) this.partyFlips.delete(id);
+    }
     const partner = dialoguePartner(this.world, state);
+    const partyAttentionById = new Map(partyLife.map((entry) => [entry.id, entry.attention]));
     this.partyFrames = state.party.flatMap((member, index) => {
       const sprite = this.partySprites.get(member.id);
       const content = this.world.party[member.id];
@@ -303,6 +387,21 @@ export class OverworldEntityLayer {
         ? interpolatePoint(prevMember, member, alpha)
         : member;
       const sheet = Assets.get<Spritesheet>(`${member.id}-sheet`);
+      const memberFacing = computePartyFollowerFacing(
+        member,
+        content,
+        state,
+        partner,
+        this.world.tunables.follow,
+        activePet,
+      );
+      const nextFlip = stepPaperFlip(this.partyFlips.get(member.id), memberFacing, state.tick);
+      this.partyFlips.set(member.id, nextFlip);
+      const flipElapsed =
+        nextFlip.startTick === null
+          ? -1
+          : state.tick - nextFlip.startTick + (paperFlipEnabled ? interpAlpha : 0);
+      const memberFlipPose = paperFlipPose(flipElapsed, paperFlipEnabled);
       const transform = computePartyFollowerTransform(
         member,
         content,
@@ -320,10 +419,18 @@ export class OverworldEntityLayer {
             throw new Error(`Missing ${member.id} animation ${animation}`);
           return frames.length;
         },
+        {
+          activeRest,
+          partyAttention: partyAttentionById.get(member.id) ?? null,
+          ...(dialogueTags !== undefined ? { dialogueTags } : {}),
+          paperFlipPose: memberFlipPose,
+          worldStory: this.world.story,
+          hasAnimation: (animation) => this.hasCharacterPoseAnimation(member.id, animation),
+        },
       );
-      const texture = sheet.animations[transform.animation]?.[transform.frame];
+      const texture = this.resolveCharacterTexture(member.id, transform.animation, transform.frame);
       if (texture === undefined)
-        throw new Error(`Missing ${member.id} frame ${transform.frame}`);
+        throw new Error(`Missing ${member.id} frame ${transform.animation}:${transform.frame}`);
       sprite.texture = texture;
       if (texture.defaultAnchor === undefined)
         throw new Error(`${member.id} anchor missing`);
@@ -618,6 +725,10 @@ export class OverworldEntityLayer {
 
   get frame(): number {
     return this.currentFrame;
+  }
+
+  get paperFlipScaleX(): number {
+    return this.currentPaperFlipScaleX;
   }
 
   partyInfo(state: State): PartyFrameInfo[] {

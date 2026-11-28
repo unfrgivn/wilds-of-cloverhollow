@@ -431,3 +431,62 @@ export function npcLivingPose(
   const pose = npcBaseLivingPose(personality, attention, tick, index, attentionAge);
   return applyTurnSquash(pose, turnAge);
 }
+
+export const PAPER_FLIP_TICKS = 8;
+
+export type HorizontalFacing = "left" | "right";
+
+export type PaperFlipState = {
+  facing: HorizontalFacing | null;
+  startTick: number | null;
+};
+
+export function isHorizontalFacing(facing: Direction): facing is HorizontalFacing {
+  return facing === "left" || facing === "right";
+}
+
+export function stepPaperFlip(
+  previous: PaperFlipState | undefined,
+  facing: Direction,
+  tick: number,
+): PaperFlipState {
+  if (previous === undefined) {
+    return { facing: isHorizontalFacing(facing) ? facing : null, startTick: null };
+  }
+  const activeStart =
+    previous.startTick !== null && tick >= previous.startTick ? previous.startTick : null;
+  if (!isHorizontalFacing(facing)) {
+    return { facing: previous.facing, startTick: activeStart };
+  }
+  if (previous.facing === null) {
+    return { facing, startTick: null };
+  }
+  if (facing !== previous.facing) {
+    return { facing, startTick: tick };
+  }
+  return { facing: previous.facing, startTick: activeStart };
+}
+
+export function paperFlipPose(
+  elapsed: number,
+  enabled = true,
+  duration = PAPER_FLIP_TICKS,
+): MotionPose {
+  if (
+    !enabled ||
+    !Number.isFinite(elapsed) ||
+    duration <= 0 ||
+    elapsed < 0 ||
+    elapsed >= duration
+  ) {
+    return { ...NEUTRAL_POSE };
+  }
+  const progress = elapsed / duration;
+  const card = Math.abs(Math.cos(progress * Math.PI));
+  const settle = progress > 0.7 ? Math.sin(((progress - 0.7) / 0.3) * Math.PI) * 0.08 : 0;
+  const scaleX = 0.16 + 0.84 * card + settle;
+  const arc = Math.sin(progress * Math.PI);
+  const scaleY = 1 + 0.038 * arc;
+  const offsetY = -1.6 * arc;
+  return { offsetX: 0, offsetY, scaleX, scaleY, rotation: 0 };
+}

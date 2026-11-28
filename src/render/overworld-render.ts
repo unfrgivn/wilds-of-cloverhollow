@@ -3,6 +3,7 @@ import type {
   Critter,
   Direction,
   Npc,
+  PartyAttention,
   PartyContent,
   PartyMember,
   Point,
@@ -13,7 +14,7 @@ import type {
 } from "../core";
 import { assetUrl } from "../platform/assets";
 import type { AmbientFlyer } from "../content/ambient";
-import { facingToward } from "./animation";
+import { facingToward, selectPartyOverworldPose } from "./animation";
 import type { RestSpot } from "./companions";
 import {
   companionIdlePose,
@@ -222,10 +223,10 @@ export function computeFaePose(
       : activeRest !== null
         ? {
             offsetX: 0,
-            offsetY: 3,
-            scaleX: 1.04 - Math.sin(activeRest.elapsed * 0.055) * 0.01,
-            scaleY: 0.94 + Math.sin(activeRest.elapsed * 0.055) * 0.015,
-            rotation: Math.sin(activeRest.elapsed * 0.04) * 0.025,
+            offsetY: 2,
+            scaleX: 1 - Math.sin(activeRest.elapsed * 0.055) * 0.008,
+            scaleY: 1 + Math.sin(activeRest.elapsed * 0.055) * 0.012,
+            rotation: Math.sin(activeRest.elapsed * 0.04) * 0.018,
           }
         : idleBreathing(state.tick, 0);
   if (livingMotion && activePet !== null && activePet.elapsed < 22 && !state.motion.moving) {
@@ -250,6 +251,35 @@ export type PartyFollowerTransform = {
   shadow: ShadowTransform;
 };
 
+export type PartyFollowerTransformOptions = {
+  activeRest?: boolean;
+  partyAttention?: PartyAttention | null;
+  dialogueTags?: readonly string[];
+  paperFlipPose?: MotionPose;
+  worldStory?: Record<string, unknown>;
+  hasAnimation?: (animation: string) => boolean;
+};
+
+export function computePartyFollowerFacing(
+  member: PartyMember,
+  content: PartyContent,
+  state: State,
+  partner: Point | null,
+  follow: Tunables["follow"],
+  activePet: { id: string; elapsed: number } | null,
+): Direction {
+  const beingPetted = activePet !== null && activePet.id === member.id;
+  const settled =
+    !content.sits && !member.motion.moving && member.stillTicks >= follow.settleDelayTicks;
+  return beingPetted && !member.motion.moving
+    ? facingToward(member, state.player)
+    : settled
+      ? partner !== null
+        ? facingToward(member, partner)
+        : state.facing
+      : member.facing;
+}
+
 export function computePartyFollowerTransform(
   member: PartyMember,
   content: PartyContent,
@@ -262,24 +292,35 @@ export function computePartyFollowerTransform(
   follow: Tunables["follow"],
   activePet: { id: string; elapsed: number } | null,
   frameCountFor: (animation: string) => number,
+  options?: PartyFollowerTransformOptions,
 ): PartyFollowerTransform {
   const beingPetted = activePet !== null && activePet.id === member.id;
-  const settled = !content.sits && !member.motion.moving &&
-    member.stillTicks >= follow.settleDelayTicks;
-  const facing = beingPetted && !member.motion.moving
-    ? facingToward(member, state.player)
-    : settled
-      ? (partner !== null ? facingToward(member, partner) : state.facing)
-      : member.facing;
+  const facing = computePartyFollowerFacing(member, content, state, partner, follow, activePet);
   const side = facing === "right" ? "left" : facing;
-  const mirror = facing === "right";
+  let mirror = facing === "right";
   const resting = !member.motion.moving &&
     (!content.sits || member.stillTicks >= follow.sitDelayTicks);
-  const animation = resting ? `idle_${side}` : `walk_${side}`;
+  let animation = resting ? `idle_${side}` : `walk_${side}`;
   const frameCount = frameCountFor(animation);
-  const frame = member.motion.moving && frameCount > 0
+  let frame = member.motion.moving && frameCount > 0
     ? Math.floor((member.motion.distance / content.walkCycleUnits) * frameCount) % frameCount
     : 0;
+
+  const expressive = selectPartyOverworldPose({
+    world: { story: options?.worldStory ?? {} },
+    state,
+    member,
+    facing,
+    activeRest: options?.activeRest ?? false,
+    beingPetted,
+    partyAttention: options?.partyAttention ?? null,
+    ...(options?.dialogueTags !== undefined ? { dialogueTags: options.dialogueTags } : {}),
+  });
+  if (expressive !== null && (options?.hasAnimation?.(expressive.animation) ?? true)) {
+    animation = expressive.animation;
+    frame = expressive.frame;
+    mirror = expressive.mirror;
+  }
 
   let pose: MotionPose = NEUTRAL_POSE;
   if (livingMotion) {
@@ -305,6 +346,9 @@ export function computePartyFollowerTransform(
         rotation: Math.sin(e / 3.8) * 0.12 * decay,
       });
     }
+  }
+  if (options?.paperFlipPose !== undefined) {
+    pose = composePose(pose, options.paperFlipPose);
   }
   const baseScale = content.scale ?? 0.5;
   const shadowScale = liftShadowScale(pose.offsetY);

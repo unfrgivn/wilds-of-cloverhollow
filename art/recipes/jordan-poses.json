@@ -1,0 +1,34 @@
+{
+  "asset": "jordan-poses",
+  "status": "generated-validator-passing",
+  "model": "gemini-3-pro-image-preview",
+  "date": "2026-11-27",
+  "generationCalls": 1,
+  "referenceImages": [
+    "art/source/jordan/jordan-model-sheet-v1.png"
+  ],
+  "prompts": {
+    "poses": "Three isolated full-body watercolor chibi Jordan poses on pure magenta #FF00FF matching jordan-model-sheet-v1: cheer, shock, sit. No ground shadow, no text, no floating icons."
+  },
+  "selectedRawSources": [
+    "art/source/jordan/jordan-poses-v1.png"
+  ],
+  "postProcessing": {
+    "build": "bun tools/art/build-poses.ts --only jordan && bun tools/art/optimize-atlases.ts",
+    "extract": "extract-figures.ts connected-component extraction (3 poses)",
+    "key": "#FF00FF border flood plus enclosed holes (--holes, 18% fuzz, edge despill only)",
+    "despill": "despill-edge.ts magenta edge-only despill (band 12 pre-resize and post-resize)",
+    "scalePercent": 22.0,
+    "canvas": "384x384 source px, baseline 375, anchor {x: 0.5, y: 0.9765625}",
+    "atlas": "3 columns x 1 row alpha-WebP companion atlas (public/assets/characters/jordan/jordan-poses.webp + .json)",
+    "review": "art/review/e2-jordan-poses-cream.jpg and art/review/e2-jordan-poses-dark.jpg (with base down_idle_01 in slot 0)"
+  },
+  "validator": {
+    "key": "magenta",
+    "poses": [
+      "cheer",
+      "shock",
+      "sit"
+    ]
+  }
+}

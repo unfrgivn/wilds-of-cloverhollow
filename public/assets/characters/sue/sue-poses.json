@@ -1,0 +1,96 @@
+{
+  "frames": {
+    "pose_cheer_01": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "sourceSize": {
+        "w": 384,
+        "h": 384
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9765625
+      }
+    },
+    "pose_shock_01": {
+      "frame": {
+        "x": 384,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "sourceSize": {
+        "w": 384,
+        "h": 384
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9765625
+      }
+    },
+    "pose_sit_01": {
+      "frame": {
+        "x": 768,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "sourceSize": {
+        "w": 384,
+        "h": 384
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9765625
+      }
+    }
+  },
+  "animations": {
+    "pose_cheer": [
+      "pose_cheer_01"
+    ],
+    "pose_shock": [
+      "pose_shock_01"
+    ],
+    "pose_sit": [
+      "pose_sit_01"
+    ]
+  },
+  "meta": {
+    "image": "sue-poses.webp",
+    "size": {
+      "w": 1152,
+      "h": 384
+    },
+    "scale": "1",
+    "baseline": 375
+  }
+}

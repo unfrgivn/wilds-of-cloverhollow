@@ -1,0 +1,36 @@
+{
+  "asset": "maddie-poses",
+  "status": "generated-validator-passing",
+  "model": "gemini-3-pro-image-preview",
+  "date": "2026-11-27",
+  "generationCalls": 2,
+  "referenceImages": [
+    "art/source/maddie/maddie-model-sheet.png",
+    "art/source/maddie/maddie-idle-sheet.png"
+  ],
+  "prompts": {
+    "poses": "Four isolated full-body compact chibi watercolor Maddie tabby kitten poses facing left on pure green #00FF00 matching maddie-model-sheet and maddie-idle-sheet with blue collar and yellow star tag: groom (paw lick), stretch (classic cat bow stretch), nap (curled orange cinnamon-roll sleep), cheer (compact happy hop). No ground shadow, no text, no floating icons."
+  },
+  "selectedRawSources": [
+    "art/source/maddie/maddie-poses-v2.png"
+  ],
+  "postProcessing": {
+    "build": "bun tools/art/build-poses.ts --only maddie && bun tools/art/optimize-atlases.ts",
+    "extract": "extract-figures.ts connected-component extraction (4 left-facing poses, no flop required)",
+    "key": "#00FF00 border flood plus enclosed holes (--holes, 18% fuzz, edge despill only)",
+    "despill": "despill-edge.ts green edge-only despill (band 12 pre-resize and post-resize)",
+    "scalePercent": 15.4,
+    "canvas": "256x256 source px, baseline 247, anchor {x: 0.5, y: 0.96484375}",
+    "atlas": "4 columns x 1 row alpha-WebP companion atlas (public/assets/characters/maddie/maddie-poses.webp + .json)",
+    "review": "art/review/e2-maddie-poses-cream.jpg and art/review/e2-maddie-poses-dark.jpg (with base down_idle_01 in slot 0)"
+  },
+  "validator": {
+    "key": "green",
+    "poses": [
+      "groom",
+      "stretch",
+      "nap",
+      "cheer"
+    ]
+  }
+}

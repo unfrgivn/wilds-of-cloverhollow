@@ -1148,6 +1148,57 @@ ios/            Capacitor iOS project (from Milestone 4).
   (192x192 units), feet baseline at row 375 (anchor `{x: 0.5, y: 375/384}`),
   animations `walk_down`, `walk_up`, `walk_left` (6 frames each) and
   `idle_down`, `idle_up`, `idle_left` (1 frame each). Right mirrors left.
+- Expressive character pose companion atlases & Paper-Flip motion (Elevation
+  Track E2, Art Wave A1, Milestone 184; 100% presentation-only, hash-safe,
+  save `v10`):
+  - Dedicated alpha-WebP companion pose sheets built deterministically by
+    `tools/art/build-poses.ts` and validated by `tools/art/validate-sprite.ts`
+    (`validator.poses` mode, supporting `.webp` atlases, edge-band-only despill,
+    zero modification to base walk/idle sheets or `fae-faint`):
+    - `public/assets/characters/fae/fae-poses.{json,webp}` (384x384, baseline
+      375, `art/recipes/fae-poses.json`): `pose_cheer`, `pose_shock`,
+      `pose_sit`, `pose_talk` (`pose_talk_01`), `pose_tool_lantern`,
+      `pose_tool_lasso`, `pose_tool_flute`.
+    - `public/assets/characters/maddie/maddie-poses.{json,webp}` (256x256,
+      baseline 247, `art/recipes/maddie-poses.json`): `pose_groom`,
+      `pose_stretch`, `pose_nap`, `pose_cheer`.
+    - `public/assets/characters/sue/sue-poses.{json,webp}` (384x384, baseline
+      375, `art/recipes/sue-poses.json`) and
+      `public/assets/characters/jordan/jordan-poses.{json,webp}` (384x384,
+      baseline 375, `art/recipes/jordan-poses.json`): `pose_cheer`,
+      `pose_shock`, `pose_sit`.
+  - Pure deterministic pose selectors (`src/render/animation.ts`:
+    `CHARACTER_POSE_ATLASES`, `parsePoseTags`, `extractInkOutputTags`,
+    `extractStoryKnotLineTags`, `extractDialogueTags`, `selectFaeOverworldPose`,
+    `selectPartyOverworldPose`, `selectBattleActorPose`):
+    - Active tool use while standing in non-harness areas selects Fae's tool
+      poses (`pose_tool_flute` on flute play / flute micro-events,
+      `pose_tool_lasso` on lasso micro-events / lasso action lines,
+      `pose_tool_lantern` when the blacklight lantern is active or during
+      lantern micro-events); walking always preserves the 6-frame walk cycle.
+    - Ink `# pose: [fae|maddie|sue|jordan|party] cheer|shock|sit|talk` dialogue
+      tags (read from `state.ink`'s `outputStream` with a cached `world.story`
+      knot-line fallback) drive speaker and party pose reactions without
+      mutating `src/core/sim.ts` or saves.
+    - Battle `soothed` and `reward` phases display `pose_cheer` for Fae,
+      Maddie, Sue, and Jordan (`BattleViewController`); companion petting and
+      party `celebrate` attention display `pose_cheer`; Cozy Resting displays
+      `pose_sit` for Fae, Sue, and Jordan; active Fae dialogue reveal displays
+      `pose_talk`.
+  - Pure Maddie long-idle state machine (`src/render/companions.ts`:
+    `maddieIdlePhase`, `MADDIE_STRETCH_START = 120`,
+    `MADDIE_GROOM_START = 180`, `MADDIE_NAP_START = 240`,
+    `MADDIE_IDLE_CYCLE_TICKS = 420`): below 120 still ticks Maddie keeps base
+    `idle_*`; from 120 ticks onward she cycles naturally through `pose_stretch`
+    (60 ticks) -> `pose_groom` (60 ticks) -> `pose_nap` (300 ticks, aligned
+    with `emoteZzz` at 240), waking immediately into `pose_cheer` when petted.
+  - Snappy Paper-Flip horizontal turns (`src/render/motion.ts`:
+    `PAPER_FLIP_TICKS = 8`, `stepPaperFlip`, `paperFlipPose`): when horizontal
+    facing reverses `left <-> right` during live play, applies a crisp 8-tick
+    2D card-flip squash (`scaleX` easing to `0.16` at midpoint with subtle
+    vertical lift and settle overshoot, always strictly positive so mirroring
+    never inverts), strictly disabled under Reduced Motion, in `harness`, and
+    in paused harness snapshots (`scaleX === 1`).
 - Maddie's atlas (`public/assets/characters/maddie/`): 256x256 source-pixel
   frames (128x128 units), feet baseline at row 247 (anchor
   `{x: 0.5, y: 247/256}`), the same six animation names. She stands about 50
@@ -5159,6 +5210,12 @@ trunks keep its two exits.
     null (Milestone 56). `timeOfDay` reports the active `TimeOfDayPhase`, and
     `photoMode` reports whether Photo Mode is active (`settings.photoMode` /
     `settings.setPhotoMode` expose the same flag on the dev hook).
+    `paperFlipScaleX` reports Fae's active Paper-Flip horizontal turn scale
+    (`1` when idle, paused, in `harness`, or under Reduced Motion), and
+    `battle.faePose` / `battle.partyPoses` report the active battle actor pose
+    animation names; the dev/harness hook also exposes optional
+    `previewDialogueTags(tags)` for testing `# pose:` tag rendering during an
+    open dialogue without mutating core state.
 - While dialogue is open, HTML carries `data-dialogue="open"`; movement, doors,
   cancel, and menu are ignored. Confirm reveals the current line, advances it,
   or selects the highlighted choice. Up/down edges wrap the selection.

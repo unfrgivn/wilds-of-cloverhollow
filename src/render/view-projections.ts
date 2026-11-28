@@ -62,6 +62,7 @@ export type GameViewRenderInfo = {
   drawOrder: { label: string; zIndex: number }[];
   animation: string;
   frame: number;
+  paperFlipScaleX: number;
   party: PartyFrameInfo[];
   fade: number;
   cachedAreaTextures: string[];

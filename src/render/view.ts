@@ -5,6 +5,7 @@ import {
   creditEntries, type Area, type NavField, type Point, type State, type World,
 } from "../core";
 import { AreaView } from "./area-view";
+import { CHARACTER_POSE_ATLASES } from "./animation";
 import { CameraDirector, screenToWorld, worldToScreen } from "./camera";
 import { assetUrl } from "../platform/assets";
 import { isReducedMotionActive } from "../platform/reduced-motion";
@@ -109,6 +110,7 @@ export class GameView {
   private drawnGlows: string[] = [];
   private petReaction: { id: string; startTick: number } | null = null;
   private restingSpot: { spot: RestSpot; startTick: number } | null = null;
+  private previewDialogueTags: string[] | null = null;
 
   constructor(
     private readonly world: World,
@@ -157,6 +159,7 @@ export class GameView {
       RESTORATION_ATLAS_ALIAS,
       world.battle.toyAtlas,
       ...Object.keys(world.party).map((id) => `${id}-sheet`),
+      ...Object.keys(CHARACTER_POSE_ATLASES).map((id) => `${id}-poses`),
     ]);
     this.viewport.addChild(
       this.scene,
@@ -207,6 +210,9 @@ export class GameView {
       mipmapSheet("fae-sheet", assetUrl("assets/characters/fae/fae.json")),
       ...Object.entries(this.world.party).map(([id, member]) =>
         mipmapSheet(`${id}-sheet`, assetUrl(member.atlas)),
+      ),
+      ...Object.entries(CHARACTER_POSE_ATLASES).map(([id, atlas]) =>
+        mipmapSheet(`${id}-poses`, assetUrl(atlas)),
       ),
       mipmapSheet("glow-sheet", assetUrl("assets/glows/glows.json")),
       mipmapSheet("ambient-sheet", assetUrl("assets/ambient/ambient.json")),
@@ -268,6 +274,8 @@ export class GameView {
     this.navOverlay.clearArea();
     this.navField = null;
     this.navSnapshot = null;
+    this.previewDialogueTags = null;
+    this.entities.clearPaperFlips();
     this.clearCompanionActions();
     this.effects.hideClubhouseDisplay();
   }
@@ -351,12 +359,18 @@ export class GameView {
 
   resetCamera(): void {
     this.cameraDirector.reset();
+    this.previewDialogueTags = null;
+    this.entities.clearPaperFlips();
     this.effects.clearFootsteps();
     this.effects.clearGrassTufts();
     this.effects.clearEmotes();
     this.restoration.clear();
     this.npcLife.clear();
     this.clearCompanionActions();
+  }
+
+  setPreviewDialogueTags(tags: readonly string[] | null): void {
+    this.previewDialogueTags = tags === null ? null : [...tags];
   }
 
   invalidateBackdrop(): void {
@@ -464,15 +478,24 @@ export class GameView {
     const livingMotion = area.id !== "harness" && !reducedMotion;
     const activePet = this.activePetReaction(state);
     const activeRest = this.activeRestSpot(state);
+    if (state.dialogue === null) this.previewDialogueTags = null;
+    const npcLife = this.npcLife.update(state, livingMotion, reducedMotion);
+    const flipOn = livingMotion && !paused;
+    const tags = state.dialogue === null ? undefined : (this.previewDialogueTags ?? undefined);
     this.shadowLayer.visible = area.id !== "harness";
-    this.entities.renderPlayer(state, playerPos, shadowAlpha, livingMotion, activeRest, activePet);
+    this.entities.renderPlayer(
+      state, playerPos, shadowAlpha, livingMotion, activeRest, activePet,
+      flipOn, alpha, npcLife.activeToolEventId, tags,
+    );
     this.effects.updateGrassTufts(state, area, playerPos, reducedMotion, paused);
     this.effects.updateFootsteps(state, area.id, playerPos, reducedMotion);
-    this.entities.renderParty(state, shadowAlpha, prev, alpha, livingMotion, activePet);
+    this.entities.renderParty(
+      state, shadowAlpha, prev, alpha, livingMotion,
+      activePet, activeRest !== null, npcLife.party, flipOn, alpha, tags,
+    );
     this.entities.renderCritters(
       state, this.areaView !== undefined, shadowAlpha, prev, alpha, livingMotion, reducedMotion,
     );
-    const npcLife = this.npcLife.update(state, livingMotion, reducedMotion);
     this.entities.renderNpcs(
       state, shadowAlpha, livingMotion, npcLife, this.npcLife, prev, alpha, reducedMotion,
     );
@@ -487,9 +510,8 @@ export class GameView {
     this.effects.updateStarGemGlints(state, reducedMotion);
     this.restoration.update(this.world, state, { paused, reducedMotion });
     this.atmosphere.update(
-      area.id, area.width, area.height, state.tick,
-      state.battle === null && state.arcade === null, this.lanternBlend,
-      computeStoryAtmosphereOptions(this.world, state, area.id, reducedMotion),
+      area.id, area.width, area.height, state.tick, state.battle === null && state.arcade === null,
+      this.lanternBlend, computeStoryAtmosphereOptions(this.world, state, area.id, reducedMotion),
     );
     loaded.update(this.world, state.ink, state.player, state.tick, this.entities.figures());
     this.navOverlay.render(
@@ -659,6 +681,7 @@ export class GameView {
         .map((child) => ({ label: child.label, zIndex: child.zIndex })),
       animation: this.entities.animation,
       frame: this.entities.frame,
+      paperFlipScaleX: this.entities.paperFlipScaleX,
       party: this.entities.partyInfo(state),
       fade,
       cachedAreaTextures: [...this.areaTextureUrls].filter((url) => Assets.cache.has(url)),

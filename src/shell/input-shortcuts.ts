@@ -23,12 +23,21 @@ export type ShortcutKeyTarget = {
   closest?: (selector: string) => unknown;
 };
 
+export const QA_HOLD_MS = 500;
+
 export type ShortcutKeyEvent = {
   code: string;
   repeat: boolean;
+  timeStamp?: number;
   target: EventTarget | ShortcutKeyTarget | null;
   preventDefault: () => void;
   stopPropagation: () => void;
+};
+
+export type ShortcutTimer = {
+  now: () => number;
+  set: (callback: () => void, ms: number) => ReturnType<typeof globalThis.setTimeout>;
+  clear: (handle: ReturnType<typeof globalThis.setTimeout>) => void;
 };
 
 export type ShortcutJournalControl = {
@@ -57,7 +66,7 @@ export type ShortcutQaControl = {
   openMenu: () => void;
   isConsoleOpen: () => boolean;
   setConsoleOpen: (open: boolean) => void;
-  openConsole: () => void;
+  openConsole: (options?: { allowFromMenu?: boolean }) => void;
 };
 
 export type InputShortcutsDeps = {
@@ -74,6 +83,14 @@ export type InputShortcutsDeps = {
   invalidate: () => void;
   onToggleMute?: () => void;
   qa?: ShortcutQaControl;
+  qaTimer?: ShortcutTimer;
+};
+
+export type ShortcutBindTarget = {
+  addEventListener: {
+    (type: "keydown" | "keyup", listener: (event: ShortcutKeyEvent) => void): void;
+    (type: "blur", listener: () => void): void;
+  };
 };
 
 export type InputShortcutsController = {
@@ -81,16 +98,11 @@ export type InputShortcutsController = {
   resetInputMode: () => void;
   handleKeydown: (event: ShortcutKeyEvent) => void;
   handleQaKeydown: (event: ShortcutKeyEvent) => void;
+  handleQaKeyup: (event: ShortcutKeyEvent) => void;
+  handleQaBlur: () => void;
   handleCancelEdge: (cancelSwallowed: boolean) => "none" | "swallow" | "consume-tick";
   pollGamepad: () => void;
-  bind: (
-    target?: {
-      addEventListener: (
-        type: "keydown",
-        listener: (event: ShortcutKeyEvent) => void,
-      ) => void;
-    },
-  ) => void;
+  bind: (target?: ShortcutBindTarget) => void;
 };
 
 /** Returns true when Photo Mode can be entered or kept open in the overworld. */
@@ -226,6 +238,18 @@ export function createInputShortcuts(
   deps: InputShortcutsDeps,
 ): InputShortcutsController {
   let lastInputMode: HudInputMode = "keyboard";
+  const timer: ShortcutTimer = deps.qaTimer ?? {
+    now: () => (typeof performance !== "undefined" ? performance.now() : Date.now()),
+    set: (callback, ms) => globalThis.setTimeout(callback, ms),
+    clear: (handle) => globalThis.clearTimeout(handle),
+  };
+  let qHold: { startedAt: number; handle: ReturnType<typeof globalThis.setTimeout> } | null = null;
+  const cancelQHold = (): void => {
+    if (qHold !== null) {
+      timer.clear(qHold.handle);
+      qHold = null;
+    }
+  };
 
   const handleKeydown = (event: ShortcutKeyEvent): void => {
     if (matchesClosest(event.target, "input, textarea")) return;
@@ -323,11 +347,23 @@ export function createInputShortcuts(
     if (qa === undefined) return;
     if (event.code === "KeyQ") {
       if (matchesClosest(event.target, "input, textarea")) return;
+      if (qa.isConsoleOpen()) return;
       event.preventDefault();
+      if (event.repeat) return;
       qa.openMenu();
+      cancelQHold();
+      const startedAt = event.timeStamp ?? timer.now();
+      const handle = timer.set(() => {
+        qHold = null;
+        if (qa.isConsoleOpen()) return;
+        qa.openConsole({ allowFromMenu: true });
+        deps.invalidate();
+      }, QA_HOLD_MS);
+      qHold = { startedAt, handle };
       return;
     }
     if (event.code === "Backquote") {
+      cancelQHold();
       event.preventDefault();
       if (qa.isConsoleOpen()) qa.setConsoleOpen(false);
       else qa.openConsole();
@@ -335,10 +371,26 @@ export function createInputShortcuts(
       return;
     }
     if (event.code === "Escape" && qa.isConsoleOpen()) {
+      cancelQHold();
       event.preventDefault();
       qa.setConsoleOpen(false);
       deps.invalidate();
     }
+  };
+
+  const handleQaKeyup = (event: ShortcutKeyEvent): void => {
+    const qa = deps.qa;
+    if (qa === undefined || event.code !== "KeyQ" || qHold === null) return;
+    const elapsed = (event.timeStamp ?? timer.now()) - qHold.startedAt;
+    cancelQHold();
+    if (elapsed >= QA_HOLD_MS && !qa.isConsoleOpen()) {
+      qa.openConsole({ allowFromMenu: true });
+      deps.invalidate();
+    }
+  };
+
+  const handleQaBlur = (): void => {
+    cancelQHold();
   };
 
   const pollGamepad = (): void => {
@@ -427,12 +479,20 @@ export function createInputShortcuts(
   const bind: InputShortcutsController["bind"] = (target) => {
     if (target !== undefined) {
       target.addEventListener("keydown", handleKeydown);
-      if (deps.qa !== undefined) target.addEventListener("keydown", handleQaKeydown);
+      if (deps.qa !== undefined) {
+        target.addEventListener("keydown", handleQaKeydown);
+        target.addEventListener("keyup", handleQaKeyup);
+        target.addEventListener("blur", handleQaBlur);
+      }
       return;
     }
     if (typeof window === "undefined") return;
     window.addEventListener("keydown", handleKeydown);
-    if (deps.qa !== undefined) window.addEventListener("keydown", handleQaKeydown);
+    if (deps.qa !== undefined) {
+      window.addEventListener("keydown", handleQaKeydown);
+      window.addEventListener("keyup", handleQaKeyup);
+      window.addEventListener("blur", handleQaBlur);
+    }
   };
 
   return {
@@ -442,6 +502,8 @@ export function createInputShortcuts(
     },
     handleKeydown,
     handleQaKeydown,
+    handleQaKeyup,
+    handleQaBlur,
     handleCancelEdge,
     pollGamepad,
     bind,

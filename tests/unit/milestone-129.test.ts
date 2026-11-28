@@ -15,9 +15,12 @@ import {
   isBannerEligible,
   isJournalShortcutActive,
   isOverworldFree,
+  QA_HOLD_MS,
   type OverlayGateContext,
+  type ShortcutBindTarget,
   type ShortcutGamepadSource,
   type ShortcutKeyEvent,
+  type ShortcutTimer,
 } from "../../src/shell/input-shortcuts";
 
 type PointerListenerMap = Record<string, ((event: OverworldPointerEvent) => void)[]>;
@@ -494,5 +497,122 @@ describe("Milestone 129: Overworld Pointer Steering & Input Shortcuts", () => {
     shortcuts.handleQaKeydown(makeKeyEvent("Escape", { target: inputTarget }).event);
     expect(qaConsoleOpen).toBe(false);
     expect(invalidations).toBeGreaterThan(0);
+  });
+
+  it("opens QA console when holding Q for 500ms, cancels on early release or blur", () => {
+    const ctx = makeOverlayContext();
+    let nowMs = 1000;
+    const handleCallbacks = new Map<ReturnType<typeof globalThis.setTimeout>, () => void>();
+    const qaTimer: ShortcutTimer = {
+      now: () => nowMs,
+      set: (callback) => {
+        const handle = globalThis.setTimeout(() => undefined, 60_000);
+        globalThis.clearTimeout(handle);
+        handleCallbacks.set(handle, callback);
+        return handle;
+      },
+      clear: (handle) => {
+        handleCallbacks.delete(handle);
+      },
+    };
+    const fireScheduled = (): void => {
+      const entries = [...handleCallbacks.entries()];
+      handleCallbacks.clear();
+      for (const [, fn] of entries) fn();
+    };
+
+    let qaConsoleOpen = false;
+    let openMenuCalls = 0;
+    let allowFromMenuSeen: boolean | undefined;
+    let invalidations = 0;
+    const gamepad: ShortcutGamepadSource = {
+      poll: () => [],
+      consumeActivity: () => false,
+      consumePhotoAction: () => null,
+      consumeBumperStep: () => 0,
+      consumeNavStep: () => null,
+      consumeConfirmEdge: () => false,
+      rightStickY: () => 0,
+      clearTaps: () => undefined,
+    };
+
+    const shortcuts = createInputShortcuts({
+      getContext: () => ctx,
+      getBattlePeekOpen: () => false,
+      setBattlePeek: () => undefined,
+      setPhotoMode: () => undefined,
+      snapPostcard: () => undefined,
+      journal: {
+        hasOpenOverlay: () => false,
+        dismissOverlay: () => false,
+        stepOverlay: () => false,
+        stepPage: () => undefined,
+        scrollActivePage: () => false,
+        navigateFocus: () => false,
+        activateFocused: () => false,
+      },
+      gamepad,
+      clearKeyboardTaps: () => undefined,
+      swallow: () => undefined,
+      playChoiceMove: () => undefined,
+      invalidate: () => { invalidations += 1; },
+      qaTimer,
+      qa: {
+        openMenu: () => { openMenuCalls += 1; },
+        isConsoleOpen: () => qaConsoleOpen,
+        setConsoleOpen: (open) => { qaConsoleOpen = open; },
+        openConsole: (options) => {
+          qaConsoleOpen = true;
+          allowFromMenuSeen = options?.allowFromMenu;
+        },
+      },
+    });
+
+    // Quick tap (< 500ms) opens menu only and cancels hold timer.
+    shortcuts.handleQaKeydown(makeKeyEvent("KeyQ", { timeStamp: 1000 }).event);
+    expect(openMenuCalls).toBe(1);
+    expect(handleCallbacks.size).toBe(1);
+    shortcuts.handleQaKeyup(makeKeyEvent("KeyQ", { timeStamp: 1200 }).event);
+    expect(handleCallbacks.size).toBe(0);
+    expect(qaConsoleOpen).toBe(false);
+
+    // Hold >= 500ms fires the timer and opens the console even from menu/title.
+    shortcuts.handleQaKeydown(makeKeyEvent("KeyQ", { timeStamp: 2000 }).event);
+    shortcuts.handleQaKeydown(makeKeyEvent("KeyQ", { repeat: true, timeStamp: 2150 }).event);
+    expect(openMenuCalls).toBe(2);
+    expect(handleCallbacks.size).toBe(1);
+    fireScheduled();
+    expect(qaConsoleOpen).toBe(true);
+    expect(allowFromMenuSeen).toBe(true);
+    expect(invalidations).toBe(1);
+
+    // Escape closes; overdue keyup >= 500ms opens even if the timer has not run yet.
+    shortcuts.handleQaKeydown(makeKeyEvent("Escape").event);
+    expect(qaConsoleOpen).toBe(false);
+    allowFromMenuSeen = undefined;
+    shortcuts.handleQaKeydown(makeKeyEvent("KeyQ", { timeStamp: 3000 }).event);
+    shortcuts.handleQaKeyup(makeKeyEvent("KeyQ", { timeStamp: 3000 + QA_HOLD_MS }).event);
+    expect(qaConsoleOpen).toBe(true);
+    expect(allowFromMenuSeen).toBe(true);
+
+    // Window blur cancels a pending hold cleanly.
+    qaConsoleOpen = false;
+    nowMs = 4000;
+    shortcuts.handleQaKeydown(makeKeyEvent("KeyQ", { timeStamp: 4000 }).event);
+    expect(handleCallbacks.size).toBe(1);
+    shortcuts.handleQaBlur();
+    expect(handleCallbacks.size).toBe(0);
+    shortcuts.handleQaKeyup(makeKeyEvent("KeyQ", { timeStamp: 4700 }).event);
+    expect(qaConsoleOpen).toBe(false);
+
+    // bind(target) registers keydown, keyup, and blur listeners.
+    const registered: string[] = [];
+    const target: ShortcutBindTarget = {
+      addEventListener: (type: "keydown" | "keyup" | "blur") => {
+        registered.push(type);
+      },
+    };
+    shortcuts.bind(target);
+    expect(registered).toEqual(["keydown", "keydown", "keyup", "blur"]);
   });
 });

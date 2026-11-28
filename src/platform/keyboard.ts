@@ -56,7 +56,7 @@ export class Keyboard {
       // A focused text field owns the keyboard (the QA console's input, spec
       // 11): game keys neither act nor swallow the typing.
       if (event.target instanceof HTMLElement &&
-          event.target.closest("input, textarea") !== null)
+          event.target.closest("input, textarea, select") !== null)
         return;
       this.held.add(event.code);
       this.tapped.add(event.code);

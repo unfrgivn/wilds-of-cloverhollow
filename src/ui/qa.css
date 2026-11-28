@@ -7,21 +7,101 @@
 .qa-option[aria-selected="true"] { border-color: #7eaa70; background: #e6f0cc; box-shadow: 0 3px 0 #7eaa70; }
 .qa-back { margin: 16px auto 0; display: block; padding: 8px 16px; border: 2px solid #6b4937; border-radius: 14px; background: #fffdf1; color: #5d3e30; font: inherit; }
 .qa-option-note { color: #806554; }
-.qa-badge { position: fixed; z-index: 20; top: max(12px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); padding: 6px 14px; border: 2px solid #6b4937; border-radius: 999px; background: #fff6db; color: #5d3e30; font: inherit; font-weight: 700; cursor: pointer; }
+.qa-badge { position: fixed; z-index: 20; top: max(12px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); padding: 6px 14px; border: 2px solid #6b4937; border-radius: 999px; background: #fff6db; color: #5d3e30; font: inherit; font-weight: 700; cursor: pointer; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
 
-/* The QA console (spec 11): a dev-only command line over the frozen game. */
-.qa-console { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 24px; background: rgb(248 237 207 / 72%); }
+/* Dev/harness-only touch trigger shown in live play before a QA pack or Sandbox activates. */
+.qa-touch-trigger { display: none; position: fixed; z-index: 20; top: max(12px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); align-items: center; justify-content: center; padding: 5px 14px; border: 2px solid #6b4937; border-radius: 999px; background: rgb(255 246 219 / 92%); color: #5d3e30; font: inherit; font-size: 13px; font-weight: 800; letter-spacing: 0.04em; box-shadow: 0 3px 0 rgb(107 73 55 / 20%); cursor: pointer; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+:root[data-touch="on"] .qa-touch-trigger:not([hidden]) { display: inline-flex; }
+:root[data-photo="on"] .qa-touch-trigger,
+:root[data-title="open"] .qa-touch-trigger,
+:root[data-qa-console="open"] .qa-touch-trigger { display: none; }
+
+/* The QA console (spec 11): a dev-only tabbed storybook GUI + command line over the frozen game. */
+.qa-console { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 14px; background: rgb(248 237 207 / 72%); box-sizing: border-box; }
 .qa-console[hidden] { display: none; }
-.qa-console-card { width: min(560px, 92vw); max-height: 88vh; overflow: hidden; display: flex; flex-direction: column; padding: 24px; border: 4px solid #6b4937; border-radius: 28px; background: #fff6db; box-shadow: 0 10px 0 rgb(107 73 55 / 20%); }
-.qa-console-log { min-height: 96px; max-height: min(46vh, 240px); overflow: auto; display: grid; gap: 4px; align-content: start; margin: 0 0 12px; padding: 10px 12px; border: 3px solid #d4a36d; border-radius: 16px; background: #fffdf1; color: #5d3e30; font: 600 14px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.qa-console-card { width: min(700px, 94vw); max-height: 88vh; box-sizing: border-box; overflow: hidden; display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; border: 4px solid #6b4937; border-radius: 26px; background: #fff6db; color: #5d3e30; box-shadow: 0 10px 0 rgb(107 73 55 / 20%); }
+
+.qa-console-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; padding-bottom: 7px; border-bottom: 2px solid #e6cfa9; flex-shrink: 0; }
+.qa-console-title-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
+.qa-console-heading { margin: 0; font-size: clamp(18px, 3vw, 22px); text-align: left; line-height: 1.15; }
+.qa-console-mode { display: inline-flex; align-items: center; padding: 3px 10px; border: 2px solid #d4a36d; border-radius: 999px; background: #fffdf1; color: #806554; font-size: 12px; font-weight: 700; line-height: 1.25; }
+.qa-console-mode.is-qa { border-color: #7eaa70; background: #e6f0cc; color: #34572c; }
+
+.qa-console-tabs { display: inline-flex; gap: 6px; }
+.qa-console-tab { padding: 5px 12px; border: 2px solid #6b4937; border-radius: 12px; background: #fffdf1; color: #5d3e30; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.qa-console-tab[aria-selected="true"] { border-color: #7eaa70; background: #e6f0cc; color: #34572c; box-shadow: 0 2px 0 #7eaa70; }
+
+.qa-console-body { flex: 1 1 auto; min-height: 0; overflow: auto; padding-right: 2px; scrollbar-color: #d4a36d transparent; scrollbar-width: thin; }
+.qa-console-panel[hidden] { display: none; }
+.qa-cheats-panel { display: grid; gap: 7px; }
+.qa-section { display: grid; gap: 5px; padding: 8px 11px; border: 2px solid #e0be8c; border-radius: 15px; background: #fffdf1; }
+.qa-section-title { margin: 0; color: #806554; font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+
+.qa-slider-row { display: grid; grid-template-columns: 58px 1fr 38px; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; }
+.qa-slider-label { color: #5d3e30; }
+.qa-slider { width: 100%; margin: 0; accent-color: #7eaa70; cursor: pointer; }
+.qa-slider-value { color: #5d3e30; font: 700 13px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; text-align: right; }
+
+.qa-level-row { display: grid; grid-template-columns: minmax(96px, 130px) 1fr auto; align-items: center; gap: 10px; }
+.qa-level-value { min-width: 112px; }
+.qa-select { padding: 4px 8px; border: 2px solid #6b4937; border-radius: 10px; background: #fff6db; color: #5d3e30; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+
+.qa-chip-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+.qa-toggle,
+.qa-action,
+.qa-seg-btn { padding: 5px 10px; border: 2px solid #6b4937; border-radius: 11px; background: #fff6db; color: #5d3e30; font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.qa-toggle[aria-pressed="true"],
+.qa-seg-btn[aria-pressed="true"] { border-color: #7eaa70; background: #e6f0cc; color: #34572c; box-shadow: 0 2px 0 #7eaa70; }
+.qa-toggle:disabled,
+.qa-action:disabled { opacity: 0.48; cursor: not-allowed; }
+.qa-action { background: #f8efd7; border-color: #6b4937; }
+.qa-action:hover:not(:disabled) { background: #fff6db; }
+.qa-reset-btn { padding: 5px 10px; border: 2px solid #a84a36; border-radius: 11px; background: #fde6dd; color: #7a2f21; font: inherit; font-size: 12.5px; font-weight: 800; cursor: pointer; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.qa-reset-btn:hover { background: #f8d4c6; }
+
+.qa-saves-panel { display: grid; gap: 8px; }
+.qa-slot-bar { display: flex; flex-wrap: wrap; gap: 6px; }
+.qa-slot-input { flex: 1 1 140px; min-width: 0; padding: 6px 10px; border: 2px solid #6b4937; border-radius: 12px; background: #fffdf1; color: #5d3e30; font: 600 13px/1.3 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.qa-slot-input:focus { outline: 2px solid #7eaa70; outline-offset: 1px; }
+.qa-console-packs { display: grid; gap: 6px; }
+.qa-console-pack { display: grid; gap: 2px; padding: 8px 12px; border: 2px solid #d4a36d; border-radius: 14px; background: #fffdf1; color: #5d3e30; text-align: left; font: inherit; cursor: pointer; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.qa-console-pack[aria-current="true"] { border-color: #7eaa70; background: #e6f0cc; box-shadow: 0 2px 0 #7eaa70; }
+.qa-console-pack-label { font-size: 14px; line-height: 1.25; }
+.qa-console-pack-note { color: #806554; font-size: 12px; line-height: 1.25; }
+
+.qa-settings-panel { display: grid; gap: 10px; padding: 10px 12px; border: 2px solid #e0be8c; border-radius: 15px; background: #fffdf1; }
+.qa-speed-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding-top: 6px; border-top: 1px solid #ead8b8; }
+.qa-segmented { display: inline-flex; gap: 6px; }
+
+.qa-console-footer { display: grid; gap: 7px; flex-shrink: 0; }
+.qa-console-log { min-height: 44px; max-height: min(22vh, 132px); overflow: auto; display: grid; gap: 3px; align-content: start; margin: 0; padding: 7px 10px; border: 2px solid #d4a36d; border-radius: 14px; background: #fffdf1; color: #5d3e30; font: 600 12.5px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; scrollbar-color: #d4a36d transparent; scrollbar-width: thin; }
+.qa-console-log:empty { display: none; }
 .qa-console-log p, .qa-console-log pre { margin: 0; }
 .qa-console-cmd { color: #806554; }
 .qa-console-ok { color: #4c7a43; }
 .qa-console-error { color: #b23b3b; }
 .qa-console-help { white-space: pre-line; }
-.qa-console-save { box-sizing: border-box; max-height: min(30vh, 178px); overflow: auto; padding: 10px 12px; border: 3px solid #d4a36d; border-radius: 16px; background: #fffdf1; color: #5d3e30; font: 600 12px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
-.qa-console-form { display: flex; gap: 10px; }
-.qa-console-input { flex: 1; min-width: 0; padding: 10px 14px; border: 3px solid #6b4937; border-radius: 16px; background: #fffdf1; color: #5d3e30; font: 600 16px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-.qa-console-input:focus { outline: 3px solid #7eaa70; outline-offset: 2px; }
-.qa-console-run { padding: 10px 16px; border: 3px solid #6b4937; border-radius: 16px; background: #e6f0cc; color: #5d3e30; font: inherit; font-weight: 700; cursor: pointer; }
-.qa-console-close { margin: 16px auto 0; display: block; padding: 8px 16px; border: 2px solid #6b4937; border-radius: 14px; background: #fffdf1; color: #5d3e30; font: inherit; }
+.qa-console-save { box-sizing: border-box; max-height: min(17vh, 102px); overflow: auto; padding: 6px 9px; border: 2px solid #d4a36d; border-radius: 11px; background: #fff6db; color: #5d3e30; font: 600 11.5px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; scrollbar-color: #d4a36d transparent; scrollbar-width: thin; }
+
+.qa-console-bar { display: flex; align-items: stretch; gap: 8px; }
+.qa-console-form { flex: 1 1 auto; min-width: 0; display: flex; gap: 6px; }
+.qa-console-input { flex: 1 1 auto; min-width: 0; padding: 7px 11px; border: 2px solid #6b4937; border-radius: 12px; background: #fffdf1; color: #5d3e30; font: 600 14px/1.3 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.qa-console-input:focus { outline: 3px solid #7eaa70; outline-offset: 1px; }
+.qa-console-run { padding: 7px 13px; border: 2px solid #6b4937; border-radius: 12px; background: #e6f0cc; color: #34572c; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.qa-console-close { flex-shrink: 0; padding: 7px 12px; border: 2px solid #6b4937; border-radius: 12px; background: #fffdf1; color: #5d3e30; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+
+@media (max-height: 500px) {
+  .qa-console { padding: 8px; }
+  .qa-console-card { gap: 6px; padding: 10px 12px; border-width: 3px; border-radius: 20px; }
+  .qa-console-header { gap: 6px 8px; padding-bottom: 6px; }
+  .qa-console-heading { font-size: 17px; }
+  .qa-console-mode { padding: 2px 8px; font-size: 11px; }
+  .qa-console-tab { padding: 4px 10px; font-size: 12px; }
+  .qa-section { gap: 4px; padding: 7px 9px; border-radius: 12px; }
+  .qa-cheats-panel { gap: 6px; }
+  .qa-slider-row { font-size: 12px; }
+  .qa-toggle, .qa-action, .qa-seg-btn, .qa-reset-btn { padding: 4px 9px; font-size: 12px; border-radius: 10px; }
+  .qa-console-log { min-height: 36px; max-height: 62px; padding: 5px 8px; font-size: 11.5px; }
+  .qa-console-input { padding: 5px 9px; font-size: 13px; }
+  .qa-console-run, .qa-console-close { padding: 5px 10px; font-size: 12px; }
+}

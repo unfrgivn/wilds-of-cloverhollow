@@ -1,15 +1,27 @@
-import { serializeSave, stableHash, type ActionFrame, type State, type World } from "../core";
+import {
+  serializeSave,
+  stableHash,
+  type ActionFrame,
+  type State,
+  type TextSpeed,
+  type World,
+} from "../core";
 import {
   createQaBadge,
   createQaConsole,
   createQaError,
   createQaMenu,
+  createQaTouchTrigger,
+  ensureSandboxPack,
   loadQaPacks,
   loadQaSlots,
   qaPackFromUrl,
   runConsoleCommand,
   saveQaSlot,
+  shouldShowQaTouchTrigger,
+  type ConsoleContext,
   type PackState,
+  type QaConsoleSnapshot,
   type QaPack,
 } from "../dev/qa";
 import type { ShortcutQaControl } from "./input-shortcuts";
@@ -23,6 +35,22 @@ export type QaBoot = {
   error: string | null;
 };
 
+export type QaSessionSettingsDeps = {
+  gentleTiming: () => boolean;
+  toggleGentleTiming: () => void;
+  keyHints: () => boolean;
+  toggleKeyHints: () => void;
+  reducedMotion: () => boolean;
+  toggleReducedMotion: () => void;
+  muted: () => boolean;
+  toggleMute: () => void;
+  textSpeed: () => TextSpeed;
+  setTextSpeed: (speed: TextSpeed) => void;
+  photoMode: () => boolean;
+  canPhotoMode: () => boolean;
+  setPhotoMode: (on: boolean) => void;
+};
+
 export type QaSessionDeps = {
   uiRoot: HTMLElement;
   world: World;
@@ -33,9 +61,12 @@ export type QaSessionDeps = {
   getTitleMode: () => TitleMode | null;
   setTitleMode: (mode: TitleMode | null) => void;
   onPickPack: () => void;
+  onEnterSandbox: () => void;
+  onResetGame: () => void;
   onConsoleApplied: () => void;
   onReleasePointer: () => void;
   invalidate: () => void;
+  settings: QaSessionSettingsDeps;
 };
 
 export type QaSession = {
@@ -44,8 +75,10 @@ export type QaSession = {
   isActive: () => boolean;
   isBlocked: () => boolean;
   isRestricted: () => boolean;
+  activePack: () => QaPack | null;
   packs: () => QaPack[];
   openMenu: () => void;
+  openConsole: (options?: { source?: "keyboard" | "pointer"; allowFromMenu?: boolean }) => void;
   shortcuts: () => ShortcutQaControl;
   render: () => void;
   stepQaMenu: (frame: ActionFrame, previousFrame: ActionFrame) => boolean;
@@ -67,8 +100,9 @@ export async function loadQaBoot(search: string): Promise<QaBoot> {
 }
 
 /**
- * Manages the dev/harness-only QA save menu, QA console, pack/slot reloading,
- * badge, and menu input stepping. Dynamically imported only outside production.
+ * Manages the dev/harness-only QA save menu, tabbed QA console, pack/slot
+ * reloading, badge, touch trigger, and menu input stepping. Dynamically
+ * imported only outside production.
  */
 export function createQaSession(boot: QaBoot, deps: QaSessionDeps): QaSession {
   let entries: PackState[] = [...boot.packs, ...boot.slots];
@@ -79,10 +113,43 @@ export function createQaSession(boot: QaBoot, deps: QaSessionDeps): QaSession {
   let selected = 0;
   let returnMode: TitleMode = deps.initialReturnMode;
   let consoleOpen = false;
+  let consoleFocusInput = false;
+
+  const consoleContext: ConsoleContext = {
+    story: deps.world.story,
+    stickerIds: deps.world.stickers.catalogue.map((sticker) => sticker.id),
+    prizeIds: deps.world.arcade.prizes.map((prize) => prize.id),
+    treatIds: deps.world.treats.map((treat) => treat.id),
+    fishIds: deps.world.arcade.fish.catches.map((item) => item.id),
+    thresholds: deps.world.levels.thresholds,
+  };
+  const partyNames: Readonly<Record<string, string>> = Object.fromEntries(
+    Object.entries(deps.world.party).map(([id, member]) => [id, member.name]),
+  );
 
   const menu = createQaMenu(deps.uiRoot, entries);
   const badge = createQaBadge(deps.uiRoot);
+  const touchTrigger = createQaTouchTrigger(deps.uiRoot);
   if (boot.error !== null) createQaError(deps.uiRoot, boot.error);
+
+  const snapshot = (): QaConsoleSnapshot => ({
+    open: consoleOpen,
+    focusInput: consoleFocusInput,
+    activePack: activePack?.pack ?? null,
+    entries,
+    state: deps.getState(),
+    context: consoleContext,
+    partyNames,
+    settings: {
+      gentleTiming: deps.settings.gentleTiming(),
+      keyHints: deps.settings.keyHints(),
+      reducedMotion: deps.settings.reducedMotion(),
+      muted: deps.settings.muted(),
+      textSpeed: deps.settings.textSpeed(),
+      photoMode: deps.settings.photoMode(),
+      canPhotoMode: deps.settings.canPhotoMode(),
+    },
+  });
 
   const pickQa = (item: PackState): void => {
     const loaded = deps.parseSave(item.save);
@@ -90,6 +157,7 @@ export function createQaSession(boot: QaBoot, deps: QaSessionDeps): QaSession {
     deps.setState(loaded);
     activePack = item;
     menuOpen = false;
+    consoleOpen = false;
     deps.setTitleMode(null);
     justPicked = true;
     deps.onPickPack();
@@ -103,27 +171,28 @@ export function createQaSession(boot: QaBoot, deps: QaSessionDeps): QaSession {
     deps.onReleasePointer();
   };
 
-  const openConsole = (): void => {
-    if (consoleOpen || activePack === null || deps.getTitleMode() !== null || menuOpen) return;
+  const openConsole = (
+    options: { source?: "keyboard" | "pointer"; allowFromMenu?: boolean } = {},
+  ): void => {
+    if (consoleOpen || blocked) return;
+    const allowFromMenu = options.allowFromMenu === true;
+    if (!allowFromMenu && (deps.getTitleMode() !== null || menuOpen)) return;
+    if (menuOpen) menuOpen = false;
     consoleOpen = true;
+    consoleFocusInput = (options.source ?? "keyboard") === "keyboard";
     deps.onReleasePointer();
+    deps.invalidate();
   };
 
   const consolePanel = createQaConsole(deps.uiRoot, {
+    getSnapshot: snapshot,
     run: (line) => {
-      const outcome = runConsoleCommand(
-        {
-          story: deps.world.story,
-          stickerIds: deps.world.stickers.catalogue.map((sticker) => sticker.id),
-          prizeIds: deps.world.arcade.prizes.map((prize) => prize.id),
-          treatIds: deps.world.treats.map((treat) => treat.id),
-          fishIds: deps.world.arcade.fish.catches.map((item) => item.id),
-          thresholds: deps.world.levels.thresholds,
-        },
-        deps.getState(),
-        line,
-      );
+      const outcome = runConsoleCommand(consoleContext, deps.getState(), line);
       if (outcome.kind === "applied") {
+        const nextPack = ensureSandboxPack(activePack, deps.getState().tick);
+        activePack = nextPack.pack;
+        if (nextPack.enteredSandbox) deps.onEnterSandbox();
+        if (deps.getTitleMode() !== null) deps.setTitleMode(null);
         deps.setState(outcome.state);
         deps.onConsoleApplied();
       }
@@ -136,16 +205,43 @@ export function createQaSession(boot: QaBoot, deps: QaSessionDeps): QaSession {
       await saveQaSlot({ name, tick, hash }, serializeSave(current));
       entries = [...boot.packs, ...(await loadQaSlots())];
       menu.setEntries(entries);
+      deps.invalidate();
       return `Saved QA slot "${name}" (tick ${tick}).`;
     },
     saveFile: () => serializeSave(deps.getState()),
+    loadPack: pickQa,
+    resetGame: () => {
+      activePack = null;
+      menuOpen = false;
+      consoleOpen = false;
+      consoleFocusInput = false;
+      justPicked = false;
+      selected = 0;
+      deps.setTitleMode(null);
+      deps.onResetGame();
+    },
     close: () => {
       consoleOpen = false;
       deps.invalidate();
     },
+    toggleGentleTiming: deps.settings.toggleGentleTiming,
+    toggleKeyHints: deps.settings.toggleKeyHints,
+    toggleReducedMotion: deps.settings.toggleReducedMotion,
+    toggleMute: deps.settings.toggleMute,
+    setTextSpeed: deps.settings.setTextSpeed,
+    togglePhotoMode: () => {
+      if (deps.settings.photoMode()) {
+        deps.settings.setPhotoMode(false);
+      } else if (deps.settings.canPhotoMode()) {
+        consoleOpen = false;
+        deps.settings.setPhotoMode(true);
+      }
+      deps.invalidate();
+    },
   });
 
-  badge.onOpen(openConsole);
+  badge.onOpen(() => openConsole({ source: "pointer" }));
+  touchTrigger.onOpen(() => openConsole({ source: "pointer" }));
   menu.onChoose(pickQa);
   menu.onCancel(() => {
     menuOpen = false;
@@ -187,20 +283,35 @@ export function createQaSession(boot: QaBoot, deps: QaSessionDeps): QaSession {
     isActive: () => activePack !== null,
     isBlocked: () => blocked,
     isRestricted: () => activePack !== null || blocked,
+    activePack: () => activePack?.pack ?? null,
     packs: () => boot.packs.map((item) => item.pack),
     openMenu,
+    openConsole,
     shortcuts: () => ({
       openMenu,
       isConsoleOpen: () => consoleOpen,
       setConsoleOpen: (open) => {
         consoleOpen = open;
       },
-      openConsole,
+      openConsole: (options) => openConsole({
+        source: "keyboard",
+        allowFromMenu: options?.allowFromMenu === true,
+      }),
     }),
     render: () => {
       menu.render(menuOpen, selected);
       badge.render(activePack?.pack ?? null);
-      consolePanel.render(consoleOpen);
+      touchTrigger.render(
+        shouldShowQaTouchTrigger({
+          blocked,
+          hasActivePack: activePack !== null,
+          menuOpen,
+          consoleOpen,
+          titleOpen: deps.getTitleMode() !== null,
+          photoMode: deps.settings.photoMode(),
+        }),
+      );
+      consolePanel.render(snapshot());
     },
     stepQaMenu,
     reset: () => {
@@ -208,6 +319,7 @@ export function createQaSession(boot: QaBoot, deps: QaSessionDeps): QaSession {
       activePack = null;
       justPicked = false;
       consoleOpen = false;
+      consoleFocusInput = false;
     },
   };
 }

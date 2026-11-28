@@ -310,11 +310,43 @@ async function boot(): Promise<void> {
       getTitleMode: () => titleMode,
       setTitleMode: (mode) => { titleMode = mode; },
       onPickPack: () => {
-        saveSession.clearDirty();
+        saveSession.clearDirty(); bannerTracker.clear(); saveToast.hide();
+        jukeboxTrack = null; battlePeekOpen = false; activeArcadeRecord = null;
+        fishStreak = 0; levelUpNotices.length = 0; toolEventChime.reset();
+        setPhotoMode(false, true); overworldPointer.release(); swallowed.add("confirm");
+        areaLoader.reset(); void areaLoader.ensureArea(true);
+        void assets.warmJournalAssets(state); invalidate();
+      },
+      onEnterSandbox: () => { saveSession.clearDirty(); },
+      onResetGame: () => {
+        state = createState(content.world, initialFixture);
+        previousState = state;
+        titleMode = null;
         bannerTracker.clear();
+        toolEventChime.reset();
         saveToast.hide();
+        jukeboxTrack = null;
+        battlePeekOpen = false;
+        activeArcadeRecord = null;
+        fishStreak = 0;
+        levelUpNotices.length = 0;
+        endingSnapshot = null;
+        creditsTicks = 0;
+        lastFinale = null;
+        cancelDown = false;
+        setPhotoMode(false, true);
         overworldPointer.release();
-        swallowed.add("confirm");
+        keyboard.clearTaps();
+        gamepad.clearTaps();
+        touch.releaseArrows();
+        swallowed.clear();
+        saveSession.clearDirty();
+        saveSession.clear();
+        view.invalidateBackdrop();
+        areaLoader.reset();
+        void areaLoader.ensureArea(true);
+        void assets.warmJournalAssets(state);
+        invalidate();
       },
       onConsoleApplied: () => {
         bannerTracker.clear();
@@ -322,6 +354,27 @@ async function boot(): Promise<void> {
       },
       onReleasePointer: () => overworldPointer.release(),
       invalidate,
+      settings: {
+        gentleTiming: gameSettings.gentleTiming,
+        toggleGentleTiming: bindToggle(gameSettings.toggleGentleTiming, gameSettings.gentleTiming),
+        keyHints: gameSettings.keyHints,
+        toggleKeyHints: bindToggle(gameSettings.toggleKeyHints, gameSettings.keyHints),
+        reducedMotion: gameSettings.reducedMotion,
+        toggleReducedMotion: bindToggle(
+          gameSettings.toggleReducedMotion, gameSettings.reducedMotion,
+        ),
+        muted: sound.muted,
+        toggleMute: withInvalidate(() => {
+          sound.toggle(); if (!sound.muted()) playToggleFeedback(true);
+        }),
+        textSpeed: gameSettings.textSpeed,
+        setTextSpeed: withInvalidate((speed) => {
+          gameSettings.setTextSpeed(speed); playToggleFeedback(speed !== "cozy");
+        }),
+        photoMode: () => photoMode,
+        canPhotoMode: () => canPhotoMode({ ...overlayContext(), qaConsoleOpen: false }),
+        setPhotoMode: (on) => setPhotoMode(on),
+      },
     });
   if (qa !== null) title.onQa(qa.openMenu);
   const assets = createShellAssets({

@@ -4,7 +4,12 @@ import { createState, parseSave, stableHash, step } from "../../src/core";
 import { loadContent } from "../../src/content/load";
 import { parseScript } from "../../src/content/script";
 import { qaFlow } from "../../src/shell/qa-flow";
-import { qaPackFromUrl, type PackState } from "../../src/dev/qa";
+import {
+  ensureSandboxPack,
+  qaPackFromUrl,
+  shouldShowQaTouchTrigger,
+  type PackState,
+} from "../../src/dev/qa";
 
 describe("QA menu flow", () => {
   it("wraps, confirms, and cancels without changing the selected pack", () => {
@@ -27,6 +32,49 @@ describe("QA menu flow", () => {
     expect(qaPackFromUrl(packs, "?qa=sample")).toBe(packs[0]);
     expect(() => qaPackFromUrl(packs, "?qa=missing"))
       .toThrow("Known saves: sample");
+  });
+
+  it("enters synthetic Sandbox QA pack on live edits and preserves an active pack", () => {
+    const entered = ensureSandboxPack(null, 420);
+    expect(entered.enteredSandbox).toBe(true);
+    expect(entered.pack.pack).toEqual({
+      id: "sandbox",
+      label: "Sandbox",
+      note: "Live QA sandbox.",
+      fixture: "sandbox",
+      run: "",
+      tick: 420,
+      interim: true,
+      hash: "",
+    });
+    const existing: PackState = {
+      pack: {
+        id: "jordan", label: "Jordan", note: "Note", fixture: "new-game",
+        run: "run.json", tick: 100, interim: false, hash: "abc",
+      },
+      save: "{}",
+    };
+    const kept = ensureSandboxPack(existing, 999);
+    expect(kept.enteredSandbox).toBe(false);
+    expect(kept.pack).toBe(existing);
+  });
+
+  it("gates the touch QA trigger to active live gameplay without overlays or QA packs", () => {
+    const base = {
+      blocked: false,
+      hasActivePack: false,
+      menuOpen: false,
+      consoleOpen: false,
+      titleOpen: false,
+      photoMode: false,
+    };
+    expect(shouldShowQaTouchTrigger(base)).toBe(true);
+    expect(shouldShowQaTouchTrigger({ ...base, hasActivePack: true })).toBe(false);
+    expect(shouldShowQaTouchTrigger({ ...base, titleOpen: true })).toBe(false);
+    expect(shouldShowQaTouchTrigger({ ...base, menuOpen: true })).toBe(false);
+    expect(shouldShowQaTouchTrigger({ ...base, consoleOpen: true })).toBe(false);
+    expect(shouldShowQaTouchTrigger({ ...base, photoMode: true })).toBe(false);
+    expect(shouldShowQaTouchTrigger({ ...base, blocked: true })).toBe(false);
   });
 });
 

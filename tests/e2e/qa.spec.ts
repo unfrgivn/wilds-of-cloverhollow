@@ -263,7 +263,7 @@ test("the console saves QA-only slots the QA menu lists and reloads", async ({ p
   await page.addInitScript(() => {
     localStorage.setItem("CapacitorStorage.cloverhollow-save", "player-save-sentinel");
   });
-  await page.goto("./?qa=jordan");
+  await page.goto("./?qa=breakfast");
   await page.waitForFunction(() => Boolean(window.__cloverhollow));
   await page.keyboard.press("`");
   await expect(page.locator(".qa-console")).toBeVisible();
@@ -327,3 +327,224 @@ test("export shows the save file in the console", async ({ page }, testInfo) => 
   if (testInfo.project.name === "chromium")
     await expect(page).toHaveScreenshot("qa-console-export.png");
 });
+
+test(
+  "hold Q in live gameplay opens GUI console, edits enter Sandbox, and never touch player save",
+  async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("CapacitorStorage.cloverhollow-save", "player-save-sentinel");
+    });
+    await openHarness(page);
+    await resetPaused(page, "new-game");
+    expect(await page.evaluate(() => window.__cloverhollow?.qa.active())).toBe(false);
+    await expect(page.locator(".qa-badge")).toBeHidden();
+    // Lazy DOM: no QA console node exists before first open.
+    await expect(page.locator(".qa-console")).toHaveCount(0);
+
+    // Quick tap of Q during gameplay does not open console or menu.
+    await page.keyboard.press("q");
+    await expect(page.locator(".qa-console")).toHaveCount(0);
+
+    // Holding Q >= 500ms opens the QA console with keyboard focus in live mode.
+    await page.keyboard.down("q");
+    await page.waitForTimeout(560);
+    await page.keyboard.up("q");
+    await expect(page.locator(".qa-console")).toBeVisible();
+    await expect(page.locator(".qa-console-input")).toBeFocused();
+    await expect(page.locator(".qa-console-mode")).toHaveText("Live game (edits enter QA)");
+    expect(await page.evaluate(() => window.__cloverhollow?.qa.active())).toBe(false);
+
+    // Adjusting GUI sliders and toggles mutates live state and activates QA Sandbox.
+    await page.locator('[data-qa-slider="coins"]').fill("250");
+    await expect(page.locator(".qa-console-mode")).toHaveText("Sandbox");
+    expect(await page.evaluate(() => window.__cloverhollow?.qa.active())).toBe(true);
+    await expect(page.locator(".qa-badge")).toContainText("QA · Sandbox");
+
+    await page.locator('[data-qa-slider="snacks"]').fill("15");
+    await page.locator('[data-qa-slider="tickets"]').fill("120");
+    await page.locator('[data-qa-slider="level"]').fill("5");
+    await page.locator('[data-qa-tool="lasso"]').click();
+    await expect(page.locator('[data-qa-tool="lasso"]')).toHaveAttribute("aria-pressed", "true");
+    await page.locator('[data-qa-toggle="keepsakes"]').click();
+    await expect(page.locator('[data-qa-toggle="keepsakes"]'))
+      .toHaveAttribute("aria-pressed", "true");
+    await page.locator('[data-qa-toggle="gems"]').click();
+    await expect(page.locator('[data-qa-toggle="gems"]')).toHaveAttribute("aria-pressed", "true");
+    await page.locator('[data-qa-toggle="fish"]').click();
+    await expect(page.locator('[data-qa-toggle="fish"]')).toHaveAttribute("aria-pressed", "true");
+    await page.locator('[data-qa-action="stickers-all"]').click();
+
+    const state = await readState(page);
+    expect(state.coins).toBe(250);
+    expect(state.snacks).toBe(15);
+    expect(state.tickets).toBe(120);
+    expect(state.xp).toBe(thresholds()[4]);
+    expect(JSON.parse(state.ink).variablesState.has_lasso).toBe(true);
+    expect(state.stickers).toHaveLength(catalogueCount("content/stickers.json", "catalogue"));
+    expect(Object.keys(state.caughtFish ?? {}).length).toBeGreaterThan(0);
+
+    // Player save slot remains untouched.
+    expect(await page.evaluate(() => localStorage.getItem(
+      "CapacitorStorage.cloverhollow-save",
+    ))).toBe("player-save-sentinel");
+  },
+);
+
+test(
+  "Saves tab switches QA packs in-game and saves inline QA slots",
+  async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("CapacitorStorage.cloverhollow-save", "player-save-sentinel");
+    });
+    await pickPaused(page, "Jordan at Pinecone Pass");
+    const firstArea = (await readState(page)).area;
+    await page.keyboard.press("`");
+    await expect(page.locator(".qa-console")).toBeVisible();
+    await page.locator('[data-qa-tab="saves"]').click();
+    await expect(page.locator('[data-qa-panel="saves"]')).toBeVisible();
+
+    // Active pack is marked with aria-current="true".
+    await expect(page.locator('.qa-console-pack[aria-current="true"]'))
+      .toContainText("Jordan at Pinecone Pass");
+
+    // Save an inline slot and verify it appears in the Saves list immediately.
+    await page.locator("[data-qa-slot-input]").fill("inline-slot");
+    await page.locator("[data-qa-slot-save]").click();
+    await expect(page.locator('.qa-console-pack[data-id="slot:inline-slot"]')).toBeVisible();
+
+    // Load a different QA pack in a different area from inside gameplay.
+    const packs = await page.evaluate(() => window.__cloverhollow?.qa.packs() ?? []);
+    const target = packs.find((pack) => pack.id !== "jordan" && pack.id !== "sandbox");
+    if (target === undefined) throw new Error("Missing second QA pack");
+    await page.locator(`.qa-console-pack[data-id="${target.id}"]`).click();
+    await expect(page.locator(".qa-console")).toBeHidden();
+    await expect(page.locator(".qa-badge")).toContainText(target.label);
+    await expect.poll(async () => (await readState(page)).tick, { timeout: 10_000 })
+      .toBe(target.tick);
+    const loadedState = await readState(page);
+    await expect.poll(
+      async () => page.evaluate(() => window.__cloverhollow?.renderInfo().area ?? ""),
+      { timeout: 10_000 },
+    ).toBe(loadedState.area);
+    expect(loadedState.area !== firstArea || loadedState.tick === target.tick).toBe(true);
+    expect(await page.evaluate(() => localStorage.getItem(
+      "CapacitorStorage.cloverhollow-save",
+    ))).toBe("player-save-sentinel");
+  },
+);
+
+test("touch QA trigger opens console during live gameplay on phone", async ({ browser }) => {
+  const context = await browser.newContext({
+    viewport: { width: 874, height: 402 },
+    hasTouch: true,
+  });
+  const page = await context.newPage();
+  await page.goto("./?touch=1");
+  await page.waitForFunction(() => Boolean(window.__cloverhollow));
+  // Hidden on title screen.
+  await expect(page.locator(".qa-touch-trigger")).toBeHidden();
+
+  // Visible in live gameplay before any QA pack activates.
+  await resetPaused(page, "new-game");
+  const trigger = page.locator(".qa-touch-trigger");
+  await expect(trigger).toBeVisible();
+  await trigger.click();
+  await expect(page.locator(".qa-console")).toBeVisible();
+  await expect(page.locator(".qa-console-card")).toBeInViewport();
+  await expect(trigger).toBeHidden();
+
+  // Editing enters Sandbox so .qa-badge replaces .qa-touch-trigger on close.
+  await page.locator('[data-qa-slider="coins"]').fill("77");
+  await page.locator(".qa-console-close").click();
+  await expect(page.locator(".qa-console")).toBeHidden();
+  await expect(page.locator(".qa-badge")).toContainText("QA · Sandbox");
+  await expect(trigger).toBeHidden();
+  await context.close();
+});
+
+test("Settings tab toggles live game settings and Photo Mode", async ({ page }) => {
+  await openHarness(page);
+  await resetPaused(page, "new-game");
+  await page.keyboard.press("`");
+  await expect(page.locator(".qa-console")).toBeVisible();
+  await page.locator('[data-qa-tab="settings"]').click();
+  await expect(page.locator('[data-qa-panel="settings"]')).toBeVisible();
+
+  await page.locator('[data-qa-setting="gentleTiming"]').click();
+  await page.locator('[data-qa-setting="keyHints"]').click();
+  await page.locator('[data-qa-setting="reducedMotion"]').click();
+  await page.locator('[data-qa-setting="muted"]').click();
+  await page.locator('[data-qa-text-speed="instant"]').click();
+
+  const settings = await page.evaluate(() => ({
+    gentleTiming: window.__cloverhollow?.settings.gentleTiming(),
+    keyHints: window.__cloverhollow?.settings.keyHints(),
+    reducedMotion: window.__cloverhollow?.settings.reducedMotion(),
+    muted: window.__cloverhollow?.sound.muted(),
+    textSpeed: window.__cloverhollow?.settings.textSpeed(),
+  }));
+  expect(settings).toEqual({
+    gentleTiming: true,
+    keyHints: true,
+    reducedMotion: true,
+    muted: true,
+    textSpeed: "instant",
+  });
+  await expect(page.locator('[data-qa-text-speed="instant"]'))
+    .toHaveAttribute("aria-pressed", "true");
+
+  // Photo Mode button enters Photo Mode and closes the console when in free overworld.
+  await expect(page.locator('[data-qa-setting="photoMode"]')).toBeEnabled();
+  await page.locator('[data-qa-setting="photoMode"]').click();
+  await expect(page.locator(".qa-console")).toBeHidden();
+  expect(await page.evaluate(() => window.__cloverhollow?.settings.photoMode())).toBe(true);
+});
+
+test(
+  "New Game (Clean Reset) clears QA mode, stale runtime state, and saved player slot",
+  async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("CapacitorStorage.cloverhollow-save", "stale-player-save");
+    });
+    await pickPaused(page, "Jordan at Pinecone Pass");
+    await page.keyboard.press("`");
+    await expect(page.locator(".qa-console")).toBeVisible();
+    await page.locator('[data-qa-slider="coins"]').fill("333");
+    expect((await readState(page)).coins).toBe(333);
+
+    await page.locator('[data-qa-tab="saves"]').click();
+    await expect(page.locator("[data-qa-reset]")).toBeVisible();
+    await page.locator("[data-qa-reset]").click();
+
+    await expect(page.locator(".qa-console")).toBeHidden();
+    await expect(page.locator(".qa-badge")).toBeHidden();
+    expect(await page.evaluate(() => window.__cloverhollow?.qa.active())).toBe(false);
+    await expect.poll(
+      async () => page.evaluate(() => window.__cloverhollow?.renderInfo().area ?? ""),
+      { timeout: 10_000 },
+    ).toBe("bedroom");
+
+    const fresh = await readState(page);
+    expect(fresh.area).toBe("bedroom");
+    expect(fresh.coins).toBe(0);
+    expect(fresh.tick).toBe(0);
+    await expect.poll(
+      async () => page.evaluate(() => localStorage.getItem("CapacitorStorage.cloverhollow-save")),
+      { timeout: 5_000 },
+    ).toBeNull();
+
+    // Typed `reset` command also clears console log, QA mode, and state.
+    await page.keyboard.press("`");
+    await expect(page.locator(".qa-console")).toBeVisible();
+    await page.keyboard.type("coins 88");
+    await page.keyboard.press("Enter");
+    expect((await readState(page)).coins).toBe(88);
+    expect(await page.evaluate(() => window.__cloverhollow?.qa.active())).toBe(true);
+    await page.keyboard.type("reset");
+    await page.keyboard.press("Enter");
+    await expect(page.locator(".qa-console")).toBeHidden();
+    await expect(page.locator(".qa-badge")).toBeHidden();
+    expect(await page.evaluate(() => window.__cloverhollow?.qa.active())).toBe(false);
+    expect((await readState(page)).coins).toBe(0);
+  },
+);

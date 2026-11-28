@@ -28,7 +28,7 @@ function replay(path: string): State {
 describe("the Sunny Cloverhollow Sanctuary Festival recording", () => {
   it("walks from the restored forest to Sanctuary, chats with all 4 guests, and toasts", () => {
     const state = replay("tests/sim/scripts/new-game/festival.json");
-    expect(state.tick).toBe(36645);
+    expect(state.tick).toBe(36709);
     expect(state.area).toBe("sanctuary");
     expect(state.coins).toBe(318);
     expect(state.snacks).toBe(8);

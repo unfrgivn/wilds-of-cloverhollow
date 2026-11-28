@@ -1,0 +1,28 @@
+{
+  "asset": "ending-postcard",
+  "wave": "Elevation Track E12 (Enchanted Forest Climax & Waking-Up Morning Epilogue)",
+  "date": "2026-11-27",
+  "status": "owner-review-ready",
+  "model": "gemini-3-pro-image-preview",
+  "aspectRatio": "16:9",
+  "imageSize": "2K",
+  "generationCalls": "1 total (selected first take: 1795844112915-gemini-3-pro-image-preview-0.png; see art/scratch/generation-log.jsonl in main checkout).",
+  "references": [
+    "art/source/fae/fae-model-sheet-v2.png",
+    "art/source/maddie/maddie-model-sheet.png",
+    "art/source/sue/sue-model-sheet-v2.png",
+    "art/source/jordan/jordan-model-sheet-v1.png",
+    "art/source/classmates/milo-hoodie/idle-down-raw.png",
+    "docs/art/concepts/environments/town_center_plaza.png"
+  ],
+  "postProcessing": {
+    "command": "magick art/scratch/1795844112915-gemini-3-pro-image-preview-0.png -filter Lanczos -resize 960x540^ -gravity center -extent 960x540 -strip -quality 88 -define webp:method=6 public/assets/ending/morning-postcard.webp",
+    "dimensions": "960x540 WebP (16:9 full-bleed)",
+    "footprintBytes": 140432
+  },
+  "output": "public/assets/ending/morning-postcard.webp",
+  "subject": "Warm sunlit watercolor storybook ending postcard showing Sue, Fae, Maddie, Milo (in his purple hoodie with glasses hugging his rocket sketchbook), and Jordan walking together down Cloverhollow's sunlit cobblestone village lane beneath cherry blossom boughs, clover tufts, golden sunbeams, and drifting petals.",
+  "review": [
+    "art/review/e12-ending-postcard.jpg"
+  ]
+}

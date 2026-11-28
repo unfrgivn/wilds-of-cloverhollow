@@ -7531,9 +7531,16 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   Chart, Rosie's Runaway Kite Chain, Toby's Sleepy Lullaby, Chef Bea's Valley
   Spice Run) with validated `# expr:`/`# pose:` tags and `miloSecrecyErrors`.
 - **Track E12 (Enchanted Forest Climax, Waking-Up Morning Epilogue & Consolidated Sim/QA Sync):**
-  Showstopping 3-Tool Seal ritual, clue-powered multi-phase Ancient Tree finale,
-  hood-drop reconciliation, enriched playable waking-up morning + ending
-  postcard, and consolidated sim + QA save sync.
+  ✅ Completed (Milestone 192, 2026-11-28) — Multi-beat 3-Tool Seal Ritual
+  (Lantern runes, Lasso thorny mist-veil, Flute fairy awakening), clue-powered
+  Ancient Tree confrontation (`kid_talk_1..3`), emotional hood-drop
+  reconciliation (`milo_calm`) and golden Ancient Tree bloom with Mom's echoing
+  waking voice, enriched playable waking-up morning (sketchbook/desk, pillow
+  journal, Maddie, Mom, Oliver, and Milo in his real purple hoodie with his
+  rocket sketchbook at the doorway), bespoke illustrated watercolor Ending
+  Postcard (`public/assets/ending/morning-postcard.webp`,
+  `art/recipes/ending-postcard.json`, 2-column Credits spread), and consolidated
+  finale sim + QA save sync.
 
 ### Phase 5: Showstopping Visuals, Transitions & Interactive Audio (Hash-Safe)
 - **Track E13 (Live Watercolor Chaos-to-Paint Area Restoration, Art Wave C):**
@@ -8364,6 +8371,65 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
 - Gates: `just check`, `just build` (`< 500 kB` every non-vendor chunk), and
   Chromium + WebKit e2e verification.
 
+## Milestone 192: Enchanted Forest Climax, Waking-Up Morning Epilogue & Ending Postcard (Elevation Track E12) **Status:** ✅ Completed (2026-11-28)
+- Elevates the finale and waking-up epilogue of *Wilds of Cloverhollow* into an
+  emotional storybook climax while keeping `src/core` 100% pure, Save `v10`
+  unchanged, top-level Ink knot count preserved, and all earlier Chapter 1–3
+  golden replays and QA packs bit-identical:
+  - **3-Tool Seal Ritual & Enchanted Forest Approach
+    (`content/story/chapters/act4_forest.ink`):** Multi-beat ritual across
+    `mist_flowers` (Lantern reveals silver bluebell runes & stepping stones with
+    `# zoom: 1.09`, `# sound: chime-blue`, Jordan & Maddie beats), `gully_bridge`
+    (Lasso parts the thorny mist-veil with `# shake: 0.35`, `# sound: chime-yellow`
+    & `chime-green`, Sue beat), and `mist_seal` (Flute Red-Yellow-Blue-Red weaves
+    lantern runes, rainbow lasso sparks, and music to awaken the glowing fairies
+    and ancient path, with kinetic color markup and strict §1.2 secrecy), plus
+    post-calm golden restoration looks for `mystic_pond` and `ancient_tree`.
+  - **Clue-Powered Ancient Tree Confrontation & Hood-Drop Reconciliation
+    (`content/story/chapters/act4_forest.ink`):** Enriched `kid_talk_1`..`kid_talk_3`
+    referencing Fae's collected clues (missing Art Room purple markers, east-hall
+    marker, Star Racer initials, stump stash, school name tag, and Milo's Sketch
+    Loft rocket margin note; 18 total `# grade:` tags preserved, zero pre-reveal
+    Milo spoilers); deeply heartfelt `milo_calm` hood-drop reconciliation using
+    E3 `# expr:` portraits (`worried`, `happy`, `surprised`), kinetic
+    `{whisper}`/`{wave}`/`{color:gold}`/`{pause:8}`, Fae, Maddie, Sue, and Jordan
+    welcoming Milo back, and `tree_ending` blooming golden-pastel watercolor light
+    as Mom's gentle whispered voice echoes from the waking world.
+  - **Enriched Playable Waking-Up Morning (`act4_forest.ink` + surgical `awake`
+    hooks in `act1_morning.ink`, zero Act 1 lines altered):** Inspecting Fae's
+    `desk` reveals her open watercolor sketchbook echoing her dream adventure,
+    alongside enriched morning beats for `pillow_journal`, `cat_bed` (Maddie at
+    Fae's heels), `mom`, `breakfast`, `fridge`, `oliver`,
+    `front_door_morning_notice`, and `front_door_morning` (Milo waiting in his
+    real purple hoodie hugging his rocket sketchbook, grinning shyly and asking
+    to walk to school together).
+  - **Bespoke Illustrated Ending Postcard (`art/recipes/ending-postcard.json`,
+    `public/assets/ending/morning-postcard.webp`, `src/ui/credits.ts`,
+    `src/ui/credits.css`, `src/shell/view-models.ts`):** Generated a warm sunlit
+    watercolor 16:9 ending postcard (`960x540` WebP, `137 KB`, 1 Gemini call,
+    audited via `vision` in `art/review/e12-ending-postcard.jpg`) depicting Sue,
+    Fae, Maddie, Milo (purple hoodie, glasses, rocket sketchbook), and Jordan
+    walking along Cloverhollow's blossom-lined lane. Upgraded `.credits-screen`
+    into a balanced 2-column desktop storybook spread (non-scrolling at
+    `1280x720` and `1180x820` even with all 6 friends + 24 catalogue stickers)
+    and single-column phone flow (`874x402`) with a framed tilted postcard,
+    inline SVG clover postal stamp (zero `<text>` nodes), decode-gated readiness
+    (`data-stickers="ready"`), and Reduced Motion parity.
+  - **Consolidated Finale Sim & QA Sync:** Recompiled
+    `public/assets/story/main.ink.json` (`bun run ink:check`), re-recorded
+    chained finale scripts (`golden-mist` `31720`, `golden-forest` `32121`,
+    `golden-kid` `32693`, `golden-ending` `32974`, `festival` `36709`), synced
+    `content/qa/saves/{forest,kid}.json` + `saves.json` (`bun run qa:check`),
+    and refreshed `vision`-audited baselines (`ending`, `kid`, `mist`, `forest`,
+    `festival`, `ui-gallery` credits).
+- **Evidence:** `tests/unit/e12-finale.test.ts` (15 zero-mock unit tests covering
+  all 3-tool beats, clue Talk branches, secrecy, reconciliation, waking morning,
+  `<= 112`-char mobile fit, WebP/recipe integrity, and `buildCreditsView`),
+  `tests/e2e/e12-finale.spec.ts` (`@smoke` Chromium + WebKit real-key journey),
+  and `vision`-verified captures in `art/review/e12-{ending-postcard,hood-drop,morning-doorway,credits-postcard-1280,credits-postcard-874}.jpg`.
+- **Gates:** `just check`, `just build` (`< 500 kB` every non-vendor chunk, zero
+  hook leak, runtime story asset verified), and Chromium + WebKit Playwright e2e
+  verification.
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 191)
+Last updated: 2026-11-28 (Milestone 192)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -3116,35 +3116,67 @@ trunks keep its two exits.
   `Boop-a-Mole`, `Comet Cruise`, `Clubhouse Microwave`, `Bubblegum Bay
   Fishing`), and `"<Area Name> · Wilds of Cloverhollow"` in overworld areas.
 
-### 7.4 The wake-up and the credits (Milestone 56)
+### 7.4 The wake-up and the credits (Milestones 56 & 192, Elevation Track E12)
 - `state.finale` is `null` in the dream, `morning` once the ending wakes Fae,
   and `credits` once Milo's last line closes (section 7's finale tags).
+- Approaching the Enchanted Forest (`content/story/chapters/act4_forest.ink`,
+  Milestone 192) stages a multi-beat 3-tool ritual across `mist_flowers`
+  (Lantern reveals silver bluebell runes and stepping stones with `# zoom: 1.09`
+  and `# sound: chime-blue`), `gully_bridge` (Lasso parts the thorny mist-veil
+  with `# shake: 0.35`), and `mist_seal` (Flute plays Red-Yellow-Blue-Red to
+  weave lantern runes, lasso sparks, and melody together and awaken the glowing
+  fairies beyond the arch), preserving `spec.md` §1.2 secrecy (zero mention of
+  `kid` or `Milo` before the final Talk reveal). Under the Ancient Tree,
+  `kid_talk_1`..`kid_talk_3` reference Fae's collected clues (missing Art Room
+  purple markers, hall marker, Star Racer initials, stump stash, school name
+  tag, and Milo's Sketch Loft rocket margin note), followed by `milo_calm`'s
+  hood-drop reconciliation (`# expr: worried|happy|surprised`, kinetic
+  `{whisper}`/`{wave}`/`{color:gold}`/`{pause:8}`, Fae, Maddie, Sue, and Jordan)
+  and golden-pastel Ancient Tree bloom.
 - Milo's talk after the calm-down (`milo_calm.again`, under the restored
-  Ancient Tree) offers [Watch the tree glow], which plays `tree_ending`, and
+  Ancient Tree) offers [Watch the tree glow], which plays `tree_ending`
+  (`milo_calm.epilogue_tree_ending`, blooming golden light as Mom's whispered
+  waking voice echoes through the petals before `# ending`), and
   [Not yet]. Both are sticky (`+`), so after Continue the ending can be
   watched again.
-- The morning is small and playable. Fae and Maddie are alone (no one joins,
-  section 5). Mom wakes her in the bedroom, where she shows only while
-  `awake`; she's in the kitchen too, as in the dream. Talked to again,
-  upstairs or down, Mom sends Fae to Milo (`mom.morning_again`). Downstairs,
-  Milo (`milo-hoodie`, shown only while `awake`) waits in his purple hoodie by
+- The morning is playable and grounded. Fae and Maddie are alone (no one joins,
+  section 5). Mom wakes Fae in the bedroom (`milo_calm.morning_mom`, where Mom
+  shows only while `awake`; she is in the kitchen too, as in the dream). Talked
+  to again, upstairs or down, Mom sends Fae to Milo (`milo_calm.morning_mom_again`).
+  Bedroom and kitchen interactables (`desk`, `pillow_journal`, `cat_bed`,
+  `breakfast`, `fridge`, `oliver`) route cleanly when `awake` to enriched
+  morning epilogue stitches in `act4_forest.ink` (inspecting Fae's desk reveals
+  her open watercolor sketchbook echoing her dream adventure, Maddie purrs at
+  her heels, and Oliver points at the fridge drawings). Downstairs, Milo
+  (`milo-hoodie`, shown only while `awake`) waits in his real purple hoodie by
   the front door. That door needs `dreaming` (section 6), so in the morning it
   plays `front_door_morning_notice` instead of opening; in the dream it still
   leads to the plaza. The lantern and the flute do nothing. Talking to Milo
-  plays `front_door_morning`.
+  plays `front_door_morning` (`milo_calm.epilogue_front_door`), where Milo hugs
+  his rocket sketchbook, grins shyly, asks to walk to school together, and
+  closes on `# credits`.
 - From the wake-up on, nothing is saved: `autosaveNeeded` is false while
   `finale` isn't null (section 10). The `ending-save` event's snapshot is the
   save; the shell writes it and keeps it for the credits.
-- The credits (`src/ui/credits.ts`) are a paper sheet over everything
-  (`--z-credits` and shared `--sticker-*` tokens, with `.die-cut` on entry
-  images and centred desktop layout from 1000 px wide): "THE END", FRIENDS,
-  MET ALONG THE WAY, an optional Journey Summary ribbon (`.credits-summary`,
-  populated from pure `creditsSummary` in `src/core/journal.ts` with compact
-  pills for each non-zero collection category among Stickers, Star Gems, Fish,
-  Keepsakes, and Prizes, hidden when empty; when `valleyCompletion` reaches
-  100% across all five collections, `creditsSummary` prepends a golden
-  `.credits-summary-pill.is-master` pill `"★ 100% Valley Explorer!"`,
-  Milestone 120), and "Thank you for playing!", from `creditEntries` (`src/core/credits.ts`). FRIENDS is each roster member who
+- The credits (`src/ui/credits.ts`, `src/ui/credits.css`, Milestone 192) are a
+  paper sheet over everything (`--z-credits` and shared `--sticker-*` tokens,
+  with `.die-cut` on entry images): a balanced 2-column storybook spread from
+  1000 px wide (left hero/footer column: \"THE END\", the bespoke illustrated
+  16:9 watercolor Ending Postcard `.credits-postcard` rendering
+  `public/assets/ending/morning-postcard.webp` (`960x540`,
+  `art/recipes/ending-postcard.json`, `DEFAULT_ENDING_POSTCARD`, framed with a
+  dashed inner rim, decorative inline SVG four-leaf clover postal stamp with
+  zero `<text>` nodes, and caption `\"Morning walk to school · Cloverhollow\"`,
+  suppressed only if `postcard: null`), an optional Journey Summary ribbon
+  (`.credits-summary`, populated from pure `creditsSummary` in
+  `src/core/journal.ts` with compact pills for each non-zero collection
+  category among Stickers, Star Gems, Fish, Keepsakes, and Prizes, hidden when
+  empty; when `valleyCompletion` reaches 100% across all five collections,
+  `creditsSummary` prepends a golden `.credits-summary-pill.is-master` pill
+  `\"★ 100% Valley Explorer!\"`, Milestone 120), and \"Thank you for playing!\";
+  right cast column: FRIENDS and MET ALONG THE WAY, from `creditEntries`
+  (`src/core/credits.ts`)). Below 1000 px, the sheet stacks cleanly in single
+  column (`hero -> cast -> footer`). FRIENDS is each roster member who
   starts with Fae or whose `befriended` (else `joins`) variable is true, in
   roster order, on the frame `down_idle_01`; small animal party frames
   (`<= 280x280`, via `cropCreditFrame` in `src/shell/view-models.ts`,
@@ -3152,11 +3184,14 @@ trunks keep its two exits.
   to their lower-centre figure so they match Sue, Jordan, and critters in scale.
   MET is each sticker in `state.stickers`, by its name, on its critter's atlas
   at the sticker's frame. Each entry is a small sticker over its name; the
-  stickers show together, once their atlases are decoded (decoded whole, WebKit
-  draws them the same way every time). The names and the thanks are at least
+  stickers and ending postcard show together once their images are decoded
+  (`data-stickers="ready"` waits for both atlases and `postcardImg.decode()` so
+  WebKit draws them identically every time). The names and the thanks are at least
   18 px. At 1180x820 and 1280x720 the largest credits (every friend and the
-  whole catalogue) fit without scrolling; on a phone the sheet scrolls. On
-  touch only the confirm button shows, at least 44 px and clear of the entries.
+  whole catalogue plus the illustrated ending postcard) fit without scrolling;
+  on a phone the sheet scrolls. On touch only the confirm button shows, at least
+  44 px and clear of the entries. Reduced Motion disables `.credits-postcard`'s
+  settle animation.
 - The shell steps the core on every credits tick, and the core holds the
   world still (only the tick, the previous input, and the resting pose
   change), so the ticks and their input stay a replay's.

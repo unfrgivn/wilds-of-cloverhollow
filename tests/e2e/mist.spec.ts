@@ -54,7 +54,8 @@ test("real keys cross the Misty Path and open the seal", async ({ page }) => {
         await take("mist-stones");
       }
     }
-    if (state.area === "mist" && !bridge) {
+    if (state.area === "mist" && !bridge &&
+      (state.dialogue === null || state.dialogue.revealed >= state.dialogue.text.length)) {
       const item = await prop("rope-bridge");
       if (item.state === "across") {
         bridge = true;
@@ -72,7 +73,8 @@ test("real keys cross the Misty Path and open the seal", async ({ page }) => {
       await expect(page.locator(".sticker-choice")).not.toHaveCount(0);
       await take("mist-seal-notes");
     }
-    if (state.area === "mist" && !opened) {
+    if (state.area === "mist" && !opened &&
+      (state.dialogue === null || state.dialogue.revealed >= state.dialogue.text.length)) {
       const item = await prop("seal-open");
       if (item.state === "open" && !item.hidden) {
         opened = true;

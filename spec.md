@@ -183,7 +183,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   `jordan-pass-intro`) rendered with y-sorted temporary actors, animated NPC
   walk overrides, watercolor burst particles, emote bubbles, and opaque 24 px
   warm paper-edged cinema letterbox bars (snapping cleanly under Reduced Motion
-  with zoom locked to `1`).
+  with zoom locked to `1`). While `html[data-cutscene="open"]` is active,
+  defensive `:root[data-cutscene="open"]` CSS guards hide overworld chrome
+  (`.qa-touch-trigger` in `src/ui/qa.css`, `.npc-chatter` in
+  `src/ui/npc-chatter.css`, `.save-toast` in `src/ui/save-toast.css` and
+  `src/ui/sticker.css`, `.hud-hints` in `src/ui/hud-hints.css` and
+  `src/ui/sticker.css`, plus `.sticker-prompt` and `.notice-marks` in
+  `src/ui/sticker.css`, Milestone 190).
 - Battle stage mood washes, Flute Friend on-stage cameo poses, and battle VFX
   anchor resolution live in `src/render/battle-stage.ts` (Milestone 91), while
   pure battle VFX particle/theater builders (`applyTogetherReady`,
@@ -1000,7 +1006,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   critters, and ambient flyers) in `OverworldEntityLayer` inside
   `src/render/entity-layer.ts` (Milestone 130), Pixi-free camera/viewport,
   eviction, story-atmosphere, prompt, chatter-anchor, notice-mark, and render-info
-  projections in `src/render/view-projections.ts` (Milestone 167), reusable
+  projections in `src/render/view-projections.ts` (Milestone 167), Pixi
+  permanent-sheet preloading, area loading/prefetching, and bounded current +
+  previous residency eviction in `AreaAssetManager` (`src/render/view-loader.ts`,
+  Milestone 190), reusable
   primitive/geometry JSON validators in
   `src/content/parsers.ts`, Milestone 97, arcade/minigame content &
   calibration parsers in `src/content/arcade-parsers.ts`, Milestone 110, and
@@ -4879,10 +4888,16 @@ trunks keep its two exits.
   hand-inked `#47321f` inline SVG weather emblems (zero `<text>` nodes), 6
   tactile `>= 44 px` mode selector buttons (`Clear Skies`, `Auto Cycle`,
   `Rainbow Sunshower`, `Blossom Breeze`, `Snow Flurry`, `Twilight Fireflies`)
-  with `aria-pressed` and WCAG `:focus-visible`, a live Sky Effects Card
-  (Fish Forecast, Garden Dew, Valley Mood), reduced-motion and iOS
-  tap-selection hygiene, and clean backdrop/`×`/`Escape`/`X`/`B` dismiss
-  restoring Field Treasures and focus directly to `.journal-weather-btn`.
+  with `aria-pressed` and WCAG `:focus-visible`, a live `aria-live="polite"`
+  Sky Effects Card (Fish Forecast, Garden Dew, Valley Mood), full 2D keyboard
+  navigation across `.journal-weather-grid` while open (`ArrowRight`/`ArrowDown`
+  forward with wrap, `ArrowLeft`/`ArrowUp` backward with wrap, `Home`/`End`
+  first/last), tactile selection foley via `onWeatherSelect` (`"tool-sparkle"`
+  when selecting cozy weather, `"toggle-off"` when returning to Clear skies,
+  paired with `"light"` haptic, firing only on mode change; Milestone 190),
+  reduced-motion and iOS tap-selection hygiene, and clean
+  backdrop/`×`/`Escape`/`X`/`B` dismiss restoring Field Treasures and focus
+  directly to `.journal-weather-btn`.
 - A chunky four-step sound volume slider sits beside the `♪ on/off` pill and
   fits the heading row at 874x402, including with `♪ off` and 999 coins. At
   narrow widths, the supplies wrap beneath NOTES so every control remains
@@ -5174,9 +5189,13 @@ trunks keep its two exits.
       styled in `src/ui/journal-blessings.css` and built in
       `src/ui/journal-blessings.ts` with full reduced-motion and Safari/iOS
       tap-selection hygiene).
-    - **Interactive Scrapbook Specimen Browser** (Milestone 146, pure
-      `inspectableShelfIds` & `stepInspectedItem` in `src/ui/journal-field-note.ts`,
-      wired via `journal.stepOverlay` / `journal.onOverlayStep` and
+    - **Interactive Scrapbook Specimen Browser** (Milestone 146; pure DOM-free
+      `FieldNoteData`, `stickerFieldNote`, `prizeFieldNote`, `prizeFieldNoteData`,
+      `fishFieldNote`, `keepsakeFieldNote`, `resolveFieldNote`,
+      `inspectableShelfIds`, `stepInspectedItem`, `focusRestoreSelector`, and
+      `treasuresSignature` extracted into `src/ui/journal-field-note-data.ts`
+      and re-exported identically from `src/ui/journal-field-note.ts`,
+      Milestone 190; wired via `journal.stepOverlay` / `journal.onOverlayStep` and
       `src/shell/input-shortcuts.ts`): when at least 2 inspectable entries are
       owned on the open card's shelf (`sticker`, `prize`, `fish`, or
       `keepsake`), a compact storybook pager (`.journal-field-pager`: `‹`

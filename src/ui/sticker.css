@@ -111,6 +111,15 @@
   display: none;
 }
 
+/* Choreographed cutscenes (Milestone 189): keep overworld prompts, hints,
+   save toasts, and notice marks cinema-clean beneath the letterbox bars. */
+:root[data-cutscene="open"] .save-toast,
+:root[data-cutscene="open"] .sticker-prompt,
+:root[data-cutscene="open"] .hud-hints,
+:root[data-cutscene="open"] .notice-marks {
+  display: none;
+}
+
 /* Photo / showcase mode (spec 4): hides overworld chrome for unobstructed
    hand-painted storybook views while toggled with P. */
 :root[data-photo="on"] .sticker-prompt,

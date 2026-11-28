@@ -3,7 +3,8 @@
 :root[data-battle="open"] .save-toast,
 :root[data-journal="open"] .save-toast,
 :root[data-title="open"] .save-toast,
-:root[data-credits="open"] .save-toast {
+:root[data-credits="open"] .save-toast,
+:root[data-cutscene="open"] .save-toast {
   display: none;
 }
 

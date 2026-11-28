@@ -106,6 +106,10 @@ export function bindShellUiControls(deps: ShellUiBindingDeps): void {
     sound.playEffect(open ? "card-open" : "card-close");
     if (open) lightHaptic();
   });
+  ui.journal.onWeatherSelect((mode) => {
+    sound.playEffect(mode === "clear" ? "toggle-off" : "tool-sparkle");
+    lightHaptic();
+  });
   ui.journal.onToggleAudio(withInvalidate(() => {
     sound.toggle();
     if (!sound.muted()) playToggleFeedback(true);

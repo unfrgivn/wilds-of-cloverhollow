@@ -19,6 +19,7 @@ import { formatArcadeRecordPills, type MinigameRecords } from "../platform/minig
 import type {
   AtlasFilter, CarriedTreat, JournalKeepsake, KeepsakeId, StarGemEntry,
 } from "../core/journal";
+import type { CozyWeatherMode } from "../core/weather";
 import type { LevelStats } from "../core/levels";
 
 export {
@@ -234,6 +235,7 @@ export type JournalControl = JournalOptionsHandlers & {
   onMapFilter: (callback: (filter: AtlasFilter) => void) => void;
   onOverlayChange: (callback: (open: boolean) => void) => void;
   onOverlayStep: (callback: () => void) => void;
+  onWeatherSelect: (callback: (mode: CozyWeatherMode) => void) => void;
   onClose: (callback: () => void) => void;
 };
 
@@ -305,12 +307,14 @@ export function createJournal(root: HTMLElement): JournalControl {
   let onMapFilter: (filter: AtlasFilter) => void = () => undefined;
   let onOverlayChange: (open: boolean) => void = () => undefined;
   let onOverlayStep: () => void = () => undefined;
+  let onWeatherSelect: (mode: CozyWeatherMode) => void = () => undefined;
   let onClose: () => void = () => undefined;
 
   const fieldOverlays = createJournalFieldOverlays({
     focusRoot: book,
     onVisibilityChange: (open) => onOverlayChange(open),
     onStep: () => onOverlayStep(),
+    onWeatherSelect: (mode) => onWeatherSelect(mode),
   });
   const mapPage = createJournalMapPage(() => fieldOverlays.openTreasures(latestView), {
     onSelectLand: (landId) => onMapSelect(landId !== null),
@@ -406,6 +410,7 @@ export function createJournal(root: HTMLElement): JournalControl {
     onMapFilter: (cb) => { onMapFilter = cb; },
     onOverlayChange: (cb) => { onOverlayChange = cb; },
     onOverlayStep: (cb) => { onOverlayStep = cb; },
+    onWeatherSelect: (cb) => { onWeatherSelect = cb; },
     onClose: (cb) => { onClose = cb; },
     ...optionsPage.handlers,
     render: (view) => {

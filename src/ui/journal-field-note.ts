@@ -1,68 +1,46 @@
-import { applyAtlasCrop, type AtlasImage } from "./atlas";
+import { applyAtlasCrop } from "./atlas";
 import { element, setAttribute, setText } from "./dom";
 import { feelingMarkup, heartMarkup, icon, keepsakeIcon } from "./icons";
 import { createBlessingPlaque, createTreasuresBlessingsStrip } from "./journal-blessings";
+import {
+  focusRestoreSelector,
+  inspectableShelfIds,
+  prizeFieldNoteData,
+  resolveFieldNote,
+  stepInspectedItem,
+  treasuresSignature,
+  type FieldNoteData,
+  type InspectedJournalItem,
+  type JournalFieldNotePrize,
+  type JournalFieldNoteSource,
+} from "./journal-field-note-data";
 import { createJournalGemsLedger } from "./journal-gems-ledger";
 import { createJournalRibbonsShowcase } from "./journal-ribbons";
 import { createJournalWeatherAlmanac } from "./journal-weather";
 import { isKeepsakeId } from "../core/blessings";
-import type { CritterFieldNote, JournalKeepsake, StarGemEntry } from "../core/journal";
 import { evaluateMeritRibbonsFromJournal } from "../core/ribbons";
-import type { TreasuresSummary } from "../core/treasures";
+import type { CozyWeatherMode } from "../core/weather";
 
-export type InspectedJournalItem = {
-  kind: "sticker" | "prize" | "fish" | "keepsake";
-  id: string;
-};
-
-export type PrizeFieldNoteMeta = {
-  origin: string;
-  displayNote: string;
-  blurb: string;
-};
-
-export type JournalFieldNoteSticker = {
-  id: string;
-  name: string;
-  owned: boolean;
-  image: AtlasImage | null;
-  fieldNote?: CritterFieldNote | null;
-};
-
-export type JournalFieldNotePrize = {
-  id: string;
-  name: string;
-  owned: boolean;
-  image: AtlasImage | null;
-};
-
-export type JournalFieldNoteFish = {
-  id: string;
-  name: string;
-  image: AtlasImage | null;
-  owned: boolean;
-  rare: boolean;
-  coins: number;
-  snacks: number;
-  blurb: string;
-};
-
-export type JournalFieldNoteSource = {
-  stickers: readonly JournalFieldNoteSticker[];
-  prizes?: readonly JournalFieldNotePrize[];
-  fish?: readonly JournalFieldNoteFish[];
-  keepsakes?: readonly JournalKeepsake[];
-  starGems?: readonly StarGemEntry[];
-  treasures?: TreasuresSummary;
-  stickersOwned?: number;
-  stickersTotal?: number;
-  prizesOwned?: number;
-  prizesTotal?: number;
-  gems?: { found: number; total: number };
-  valleyComplete?: boolean;
-  members?: readonly { id: string }[];
-  arcadeRecords?: { taco?: number };
-};
+export {
+  fieldNoteBlurb,
+  fishFieldNote,
+  focusRestoreSelector,
+  inspectableShelfIds,
+  keepsakeFieldNote,
+  prizeFieldNote,
+  prizeFieldNoteData,
+  resolveFieldNote,
+  stepInspectedItem,
+  stickerFieldNote,
+  treasuresSignature,
+  type FieldNoteData,
+  type InspectedJournalItem,
+  type JournalFieldNoteFish,
+  type JournalFieldNotePrize,
+  type JournalFieldNoteSource,
+  type JournalFieldNoteSticker,
+  type PrizeFieldNoteMeta,
+} from "./journal-field-note-data";
 
 export type JournalFieldOverlays = {
   fieldBackdrop: HTMLDivElement;
@@ -91,166 +69,69 @@ export type JournalFieldOverlays = {
   handleKeydown: (event: KeyboardEvent) => boolean;
 };
 
-/** CSS selector for the Journal collection slot matching an inspected item. */
-export function focusRestoreSelector(item: InspectedJournalItem | null): string | null {
-  if (item === null) return null;
-  if (item.kind === "sticker") {
-    return `.journal-stickers .journal-slot[data-sticker="${item.id}"]`;
-  }
-  if (item.kind === "prize") {
-    return `.journal-prizes .journal-slot[data-prize="${item.id}"]`;
-  }
-  if (item.kind === "fish") {
-    return `.journal-fish .journal-slot[data-fish="${item.id}"]`;
-  }
-  return `.journal-keepsakes .journal-slot[data-keepsake="${item.id}"]`;
+function makeOverlayButton(className: string, ariaLabel: string, text: string): HTMLButtonElement {
+  const btn = element("button", className);
+  btn.type = "button";
+  btn.setAttribute("aria-label", ariaLabel);
+  btn.textContent = text;
+  return btn;
 }
 
-/** Lists the inspectable owned entry IDs for a given Journal collection shelf in display order. */
-export function inspectableShelfIds(
-  view: JournalFieldNoteSource,
-  kind: InspectedJournalItem["kind"],
-): string[] {
-  if (kind === "sticker") {
-    return view.stickers
-      .filter((s) => s.owned && s.fieldNote !== null && s.fieldNote !== undefined)
-      .map((s) => s.id);
-  }
-  if (kind === "prize") {
-    return (view.prizes ?? [])
-      .filter((p) => p.owned && p.image !== null)
-      .map((p) => p.id);
-  }
-  if (kind === "fish") {
-    return (view.fish ?? []).filter((f) => f.owned).map((f) => f.id);
-  }
-  return (view.keepsakes ?? []).filter((k) => k.owned).map((k) => k.id);
+function makeDialogCard(className: string, ariaLabel: string): HTMLElement {
+  const card = element("article", className);
+  card.tabIndex = -1;
+  card.setAttribute("role", "dialog");
+  card.setAttribute("aria-modal", "true");
+  card.setAttribute("aria-label", ariaLabel);
+  return card;
 }
 
-/** Steps backward or forward with wrap-around across owned entries on the same Journal shelf. */
-export function stepInspectedItem(
-  view: JournalFieldNoteSource,
-  current: InspectedJournalItem,
-  delta: -1 | 1,
-): { next: InspectedJournalItem; index: number; total: number } | null {
-  const ids = inspectableShelfIds(view, current.kind);
-  if (ids.length < 2) return null;
-  const idx = ids.indexOf(current.id);
-  if (idx === -1) return null;
-  const nextIndex = (((idx + delta) % ids.length) + ids.length) % ids.length;
-  const nextId = ids[nextIndex];
-  if (nextId === undefined) return null;
-  return {
-    next: { kind: current.kind, id: nextId },
-    index: nextIndex,
-    total: ids.length,
-  };
+function makeFieldRow(
+  keyText: string,
+  valueNode: HTMLElement,
+  pills = false,
+): { row: HTMLDivElement; key: HTMLSpanElement } {
+  const row = element("div", pills ? "journal-field-row is-pills" : "journal-field-row");
+  const key = element("span", "journal-field-key");
+  key.textContent = keyText;
+  row.append(key, valueNode);
+  return { row, key };
 }
 
-const CLAW_ORIGIN = "Claw Machine · Mr. Pip's Arcade";
-const COUNTER_ORIGIN = "Ticket Counter · Mr. Pip's Arcade";
-const PRIZE_HOME = "Clubhouse Shelf";
-
-const prizeNote = (origin: string, blurb: string): PrizeFieldNoteMeta => ({
-  origin,
-  displayNote: PRIZE_HOME,
-  blurb,
-});
-
-const PRIZE_FIELD_NOTES: Readonly<Record<string, PrizeFieldNoteMeta>> = {
-  "frog-plush": prizeNote(
-    CLAW_ORIGIN,
-    "Squishy moss-green frog with a big stitched grin; Maddie swears it squeaks on rainy nights.",
-  ),
-  "pup-plush": prizeNote(
-    CLAW_ORIGIN,
-    "Floppy-eared puppy with a velvet nose, rescued right from the top of the claw heap.",
-  ),
-  "raccoon-plush": prizeNote(
-    CLAW_ORIGIN,
-    "A delightfully smug bandit in plush form, guarding the clubhouse shelf with tiny paws.",
-  ),
-  "cat-plush": prizeNote(
-    CLAW_ORIGIN,
-    "Soft ginger tabby stitched with a curled tail, always ready for a sunlit afternoon nap.",
-  ),
-  "bunny-plush": prizeNote(
-    CLAW_ORIGIN,
-    "Long pastel ears and a cotton-puff tail that feels like hugging a sunny meadow cloud.",
-  ),
-  "bluebird-plush": prizeNote(
-    CLAW_ORIGIN,
-    "Plump sky-blue songbird with stitched wings that brighten up the whole clubhouse.",
-  ),
-  "hamster-plush": prizeNote(
-    CLAW_ORIGIN,
-    "Round golden cheeks packed tight with stuffing, looking ready to stash a warm snack.",
-  ),
-  "squirrel-plush": prizeNote(
-    CLAW_ORIGIN,
-    "Fluffy chestnut tail curled taller than its head, like a tiny friend from Pinecone Pass.",
-  ),
-  "owl-plush": prizeNote(
-    CLAW_ORIGIN,
-    "Wide starry button eyes watching gently over Fae's clubhouse adventures after dusk.",
-  ),
-  pinwheel: prizeNote(
-    COUNTER_ORIGIN,
-    "Spinning pastel petals that whirl into a rainbow whenever a breeze drifts by.",
-  ),
-  "bouncy-ball": prizeNote(
-    COUNTER_ORIGIN,
-    "Clear speckled bouncy ball with a tiny gold star floating right in the bouncy center.",
-  ),
-  "toy-rocket": prizeNote(
-    COUNTER_ORIGIN,
-    "Tin-painted red-and-cream comet cruiser ready for pretend launches past the marquee.",
-  ),
-  "star-racer-keychain": prizeNote(
-    COUNTER_ORIGIN,
-    "Mr. Pip's legendary 80-ticket champ prize, the very Star Racer charm Milo dreamed about.",
-  ),
-};
-
-const FALLBACK_PRIZE_NOTE = prizeNote(
-  "Mr. Pip's Arcade",
-  "A treasured prize won at Mr. Pip's Arcade and tucked proudly onto the clubhouse shelf.",
-);
-
-/** Returns handcrafted Cloverhollow field-note lore for an Arcade Prize. */
-export function prizeFieldNote(prizeId: string): PrizeFieldNoteMeta {
-  return PRIZE_FIELD_NOTES[prizeId] ?? FALLBACK_PRIZE_NOTE;
+function makeTreasuresSection(titleText: string, bodyClass: string): {
+  section: HTMLElement;
+  count: HTMLSpanElement;
+  body: HTMLDivElement;
+} {
+  const section = element("section", "journal-treasures-section");
+  const head = element("div", "journal-treasures-section-head");
+  element("span", "journal-treasures-section-title", head).textContent = titleText;
+  const count = element("span", "journal-treasures-count", head);
+  const body = element("div", bodyClass, section);
+  section.prepend(head);
+  return { section, count, body };
 }
 
-export function fieldNoteBlurb(note: CritterFieldNote): string {
-  if (note.oldFriend) return "An old friend! Waves happily whenever Fae walks by.";
-  if (note.calms >= 2) return "Brightens up fast for a gentle song and a favorite snack.";
-  if (note.lands.length > 1) return "Loves wandering between sunny spots across the valley.";
-  const firstFeeling = note.feelings[0]?.id;
-  if (firstFeeling === "bored") return "A curious soul who just needed a playful friend.";
-  if (firstFeeling === "hungry") return "Follows its nose straight to warm snacks and treats.";
-  if (firstFeeling === "grumpy") return "A little prickly at first, then soft as moss once calm.";
-  if (firstFeeling === "zoomy") return "Full of bouncy energy until a gentle rhythm settles it.";
-  if (firstFeeling === "curious") return "Watches every sparkle and sound with bright, eager eyes.";
-  return "A cozy valley friend sketched right into Fae's notebook.";
+function makeStampPill(label: string, stamped: boolean): HTMLSpanElement {
+  const pill = element("span", stamped ? "journal-stamp-pill is-stamped" : "journal-stamp-pill");
+  pill.textContent = `${stamped ? "✓" : "○"} ${label}`;
+  return pill;
+}
+
+function activeFocusElement(): HTMLElement | null {
+  return document.activeElement instanceof HTMLElement ? document.activeElement : null;
 }
 
 export function createJournalFieldOverlays(options?: {
   focusRoot?: HTMLElement;
   onVisibilityChange?: (open: boolean) => void;
   onStep?: () => void;
+  onWeatherSelect?: (mode: CozyWeatherMode) => void;
 }): JournalFieldOverlays {
   const fieldBackdrop = element("div", "journal-field-backdrop");
   fieldBackdrop.hidden = true;
-  const fieldCard = element("article", "journal-field-note");
-  fieldCard.tabIndex = -1;
-  fieldCard.setAttribute("role", "dialog");
-  fieldCard.setAttribute("aria-modal", "true");
-  fieldCard.setAttribute("aria-label", "Critter field note");
-  const fieldClose = element("button", "journal-field-close");
-  fieldClose.type = "button";
-  fieldClose.setAttribute("aria-label", "Close field note");
-  fieldClose.textContent = "×";
+  const fieldCard = makeDialogCard("journal-field-note", "Critter field note");
+  const fieldClose = makeOverlayButton("journal-field-close", "Close field note", "×");
   const fieldLeft = element("div", "journal-field-left");
   const fieldSpecimen = element("div", "journal-field-specimen");
   const fieldPortrait = element("div", "journal-field-portrait die-cut");
@@ -264,33 +145,18 @@ export function createJournalFieldOverlays(options?: {
   fieldOldFriend.hidden = true;
   const fieldPager = element("div", "journal-field-pager");
   fieldPager.hidden = true;
-  const fieldPrev = element("button", "journal-field-nav journal-field-prev");
-  fieldPrev.type = "button";
-  fieldPrev.setAttribute("aria-label", "Previous entry");
-  fieldPrev.textContent = "‹";
+  const fieldPrev = makeOverlayButton(
+    "journal-field-nav journal-field-prev", "Previous entry", "‹",
+  );
   const fieldCounter = element("span", "journal-field-counter");
   fieldCounter.setAttribute("aria-live", "polite");
-  const fieldNext = element("button", "journal-field-nav journal-field-next");
-  fieldNext.type = "button";
-  fieldNext.setAttribute("aria-label", "Next entry");
-  fieldNext.textContent = "›";
+  const fieldNext = makeOverlayButton("journal-field-nav journal-field-next", "Next entry", "›");
   fieldPager.append(fieldPrev, fieldCounter, fieldNext);
   fieldLeft.append(fieldSpecimen, fieldOldFriend, fieldPager);
   const fieldBody = element("div", "journal-field-body");
   const fieldName = element("h3", "journal-field-name");
   const fieldSub = element("div", "journal-field-sub");
   const fieldMeta = element("div", "journal-field-meta");
-  const makeFieldRow = (
-    keyText: string,
-    valueNode: HTMLElement,
-    pills = false,
-  ): { row: HTMLDivElement; key: HTMLSpanElement } => {
-    const row = element("div", pills ? "journal-field-row is-pills" : "journal-field-row");
-    const key = element("span", "journal-field-key");
-    key.textContent = keyText;
-    row.append(key, valueNode);
-    return { row, key };
-  };
   const fieldLands = element("span", "journal-field-val journal-field-lands");
   const fieldCalms = element("span", "journal-field-val journal-field-calms");
   const fieldFeelings = element("div", "journal-field-feelings");
@@ -301,10 +167,7 @@ export function createJournalFieldOverlays(options?: {
   const fieldFeelingsRow = makeFieldRow("Feelings", fieldFeelings, true);
   const fieldLovesRow = makeFieldRow("Loves", fieldLoves, true);
   fieldMeta.append(
-    fieldFoundRow.row,
-    fieldDetailRow.row,
-    fieldFeelingsRow.row,
-    fieldLovesRow.row,
+    fieldFoundRow.row, fieldDetailRow.row, fieldFeelingsRow.row, fieldLovesRow.row,
   );
   const blessingPlaque = createBlessingPlaque();
   fieldBody.append(fieldName, fieldSub, fieldMeta, fieldBlurb, blessingPlaque.root);
@@ -313,15 +176,8 @@ export function createJournalFieldOverlays(options?: {
 
   const treasuresBackdrop = element("div", "journal-treasures-backdrop");
   treasuresBackdrop.hidden = true;
-  const treasuresCard = element("article", "journal-treasures-card");
-  treasuresCard.tabIndex = -1;
-  treasuresCard.setAttribute("role", "dialog");
-  treasuresCard.setAttribute("aria-modal", "true");
-  treasuresCard.setAttribute("aria-label", "Field treasures");
-  const treasuresClose = element("button", "journal-treasures-close");
-  treasuresClose.type = "button";
-  treasuresClose.setAttribute("aria-label", "Close field treasures");
-  treasuresClose.textContent = "×";
+  const treasuresCard = makeDialogCard("journal-treasures-card", "Field treasures");
+  const treasuresClose = makeOverlayButton("journal-treasures-close", "Close field treasures", "×");
   const treasuresHead = element("div", "journal-treasures-head");
   const treasuresTitleWrap = element("div", "journal-treasures-title-wrap");
   const treasuresTitle = element("h3", "journal-treasures-title");
@@ -331,33 +187,19 @@ export function createJournalFieldOverlays(options?: {
   const treasuresStamps = element("div", "journal-treasures-stamps");
   treasuresStamps.hidden = true;
   const treasuresBlessings = createTreasuresBlessingsStrip();
-  const keepsakesSection = element("section", "journal-treasures-section");
-  const keepsakesHead = element("div", "journal-treasures-section-head");
-  const treasuresKeepsakesHeading = element("span", "journal-treasures-section-title");
-  treasuresKeepsakesHeading.textContent = "CLUBHOUSE KEEPSAKES";
-  const treasuresKeepsakesCount = element("span", "journal-treasures-count");
-  keepsakesHead.append(treasuresKeepsakesHeading, treasuresKeepsakesCount);
-  const treasuresKeepsakesGrid = element("div", "journal-keepsakes-grid");
-  keepsakesSection.append(keepsakesHead, treasuresKeepsakesGrid);
-  const catchSection = element("section", "journal-treasures-section");
-  const catchHead = element("div", "journal-treasures-section-head");
-  const catchHeading = element("span", "journal-treasures-section-title");
-  catchHeading.textContent = "BUBBLEGUM BAY CATCH BOOK";
-  const catchCount = element("span", "journal-treasures-count");
-  catchHead.append(catchHeading, catchCount);
-  const catchRow = element("div", "journal-catch-row");
-  catchSection.append(catchHead, catchRow);
+  const keepsakesSec = makeTreasuresSection("CLUBHOUSE KEEPSAKES", "journal-keepsakes-grid");
+  const catchSec = makeTreasuresSection("BUBBLEGUM BAY CATCH BOOK", "journal-catch-row");
   treasuresCard.append(
     treasuresHead,
     treasuresStamps,
     treasuresBlessings.root,
-    keepsakesSection,
-    catchSection,
+    keepsakesSec.section,
+    catchSec.section,
   );
   treasuresBackdrop.append(treasuresCard);
 
   let fieldSignature = "";
-  let treasuresSignature = "";
+  let lastTreasuresSignature = "";
   let inspectedItem: InspectedJournalItem | null = null;
   let latestView: JournalFieldNoteSource | null = null;
   let treasuresOpen = false;
@@ -418,6 +260,7 @@ export function createJournalFieldOverlays(options?: {
       weatherReturnToTreasures = false;
     },
     onVisibilityChange: () => syncVisibility(),
+    onSelectMode: options?.onWeatherSelect,
   });
 
   const ribbonsShowcase = createJournalRibbonsShowcase({
@@ -501,32 +344,19 @@ export function createJournalFieldOverlays(options?: {
     treasuresBackdrop.hidden =
       (ribbonsReturnToTreasures && ribbonsShowcase.isOpen()) ||
       (weatherReturnToTreasures && weatherAlmanac.isOpen());
-    const signature = [
-      summary.stamps.started,
-      summary.stamps.bay,
-      summary.stamps.pass,
-      summary.stamps.complete,
-      summary.keepsakes.map((item) => `${item.id}:${item.unlocked}`).join(","),
-      summary.catches.map((item) => `${item.id}:${item.caught}`).join(","),
-    ].join("|");
-    if (signature === treasuresSignature) return;
-    treasuresSignature = signature;
+    const signature = treasuresSignature(summary);
+    if (signature === lastTreasuresSignature) return;
+    lastTreasuresSignature = signature;
 
     treasuresStamps.hidden = !summary.stamps.started;
     if (summary.stamps.started) {
       const stripLabel = element("span", "journal-stamps-label");
       stripLabel.textContent = "STAR-LINE STAMP CARD";
-      const bayPill = element(
-        "span",
-        summary.stamps.bay ? "journal-stamp-pill is-stamped" : "journal-stamp-pill",
-      );
-      bayPill.textContent = `${summary.stamps.bay ? "✓" : "○"} Bay Wave Stamp`;
-      const passPill = element(
-        "span",
-        summary.stamps.pass ? "journal-stamp-pill is-stamped" : "journal-stamp-pill",
-      );
-      passPill.textContent = `${summary.stamps.pass ? "✓" : "○"} Pass Pine Stamp`;
-      const nodes: HTMLElement[] = [stripLabel, bayPill, passPill];
+      const nodes: HTMLElement[] = [
+        stripLabel,
+        makeStampPill("Bay Wave Stamp", summary.stamps.bay),
+        makeStampPill("Pass Pine Stamp", summary.stamps.pass),
+      ];
       if (summary.stamps.complete) {
         const badge = element("span", "journal-stamp-complete");
         badge.textContent = "★ Star-Line Explorer!";
@@ -537,14 +367,14 @@ export function createJournalFieldOverlays(options?: {
       treasuresStamps.replaceChildren();
     }
 
-    setText(treasuresKeepsakesCount, `${summary.unlockedKeepsakes}/${summary.totalKeepsakes}`);
+    setText(keepsakesSec.count, `${summary.unlockedKeepsakes}/${summary.totalKeepsakes}`);
     treasuresBlessings.update(
       summary.keepsakes
         .filter((item) => item.unlocked)
         .map((item) => item.id)
         .filter(isKeepsakeId),
     );
-    treasuresKeepsakesGrid.replaceChildren(
+    keepsakesSec.body.replaceChildren(
       ...summary.keepsakes.map((item) => {
         const card = element(
           "div",
@@ -562,8 +392,8 @@ export function createJournalFieldOverlays(options?: {
       }),
     );
 
-    setText(catchCount, `${summary.caughtFish}/${summary.totalFish}`);
-    catchRow.replaceChildren(
+    setText(catchSec.count, `${summary.caughtFish}/${summary.totalFish}`);
+    catchSec.body.replaceChildren(
       ...summary.catches.map((entry) => {
         const classes = entry.caught
           ? entry.rare
@@ -572,50 +402,60 @@ export function createJournalFieldOverlays(options?: {
           : "journal-catch-pill is-uncaught";
         const pill = element("span", classes);
         setAttribute(pill, "data-fish", entry.id);
-        pill.textContent = entry.caught
-          ? `${entry.rare ? "★ " : ""}${entry.name}`
-          : "???";
+        pill.textContent = entry.caught ? `${entry.rare ? "★ " : ""}${entry.name}` : "???";
         return pill;
       }),
     );
   };
 
-  const renderPrizeNote = (
-    prize: JournalFieldNotePrize,
-    view: JournalFieldNoteSource | null,
-  ): void => {
-    const meta = prizeFieldNote(prize.id);
+  const applyFieldNote = (data: FieldNoteData, view: JournalFieldNoteSource | null): void => {
     fieldBackdrop.hidden = false;
     syncPager(view);
-    const signature = [
-      "prize",
-      prize.id,
-      prize.name,
-      meta.origin,
-      meta.displayNote,
-      meta.blurb,
-      prize.image !== null,
-    ].join("|");
-    if (signature === fieldSignature) return;
-    fieldSignature = signature;
-    setAttribute(fieldCard, "aria-label", "Arcade prize note");
-    setAttribute(fieldCard, "data-field-kind", "prize");
-    fieldSpecimen.classList.toggle("is-rare", false);
-    fieldPortrait.hidden = prize.image === null;
-    fieldCharm.hidden = true;
-    if (prize.image !== null) applyAtlasCrop(fieldPortrait, prize.image);
-    setAttribute(fieldPortrait, "aria-label", prize.name);
-    setText(fieldName, prize.name);
-    setText(fieldSub, "Arcade Prize");
-    fieldOldFriend.hidden = true;
-    setText(fieldFoundRow.key, "Found");
-    setText(fieldLands, meta.origin);
-    setText(fieldDetailRow.key, "Home");
-    setText(fieldCalms, meta.displayNote);
-    fieldFeelingsRow.row.hidden = true;
-    fieldLovesRow.row.hidden = true;
-    setText(fieldBlurb, meta.blurb);
-    blessingPlaque.hide();
+    if (data.signature === fieldSignature) return;
+    fieldSignature = data.signature;
+    setAttribute(fieldCard, "aria-label", data.ariaLabel);
+    setAttribute(fieldCard, "data-field-kind", data.kind);
+    fieldSpecimen.classList.toggle("is-rare", data.rare);
+    fieldPortrait.hidden = data.portraitHidden;
+    if (data.portraitImage !== null) applyAtlasCrop(fieldPortrait, data.portraitImage);
+    if (data.portraitAriaLabel !== null) {
+      setAttribute(fieldPortrait, "aria-label", data.portraitAriaLabel);
+    }
+    fieldCharm.hidden = data.charmId === null;
+    if (data.charmId !== null) {
+      fieldCharm.replaceChildren(keepsakeIcon(data.charmId));
+      setAttribute(fieldCharm, "aria-label", data.name);
+    }
+    setText(fieldName, data.name);
+    setText(fieldSub, data.subtitle);
+    fieldOldFriend.hidden = !data.oldFriend;
+    setText(fieldFoundRow.key, data.foundKey);
+    setText(fieldLands, data.foundValue);
+    setText(fieldDetailRow.key, data.detailKey);
+    setText(fieldCalms, data.detailValue);
+    fieldFeelingsRow.row.hidden = data.feelings === null;
+    fieldLovesRow.row.hidden = data.favouriteTreats === null;
+    if (data.feelings !== null) {
+      fieldFeelings.replaceChildren(
+        ...data.feelings.map((feeling) => {
+          const pill = element("span", "journal-field-feeling");
+          pill.append(icon(feelingMarkup[feeling.id], "journal-field-feeling-icon"), feeling.label);
+          return pill;
+        }),
+      );
+    }
+    if (data.favouriteTreats !== null) {
+      fieldLoves.replaceChildren(
+        ...data.favouriteTreats.map((treat) => {
+          const pill = element("span", "journal-field-love-pill");
+          pill.append(icon(heartMarkup, "journal-field-heart"), treat);
+          return pill;
+        }),
+      );
+    }
+    setText(fieldBlurb, data.blurb);
+    if (data.blessingId !== null) blessingPlaque.update(data.blessingId);
+    else blessingPlaque.hide();
   };
 
   const syncFieldNote = (view: JournalFieldNoteSource): void => {
@@ -625,154 +465,12 @@ export function createJournalFieldOverlays(options?: {
       if (!fieldBackdrop.hidden) fieldBackdrop.hidden = true;
       return;
     }
-    if (inspectedItem.kind === "sticker") {
-      const sticker = view.stickers.find(
-        (candidate) => candidate.id === inspectedItem?.id && candidate.owned &&
-          candidate.fieldNote != null,
-      );
-      const note = sticker?.fieldNote ?? null;
-      if (sticker === undefined || note === null) {
-        clearFieldNote();
-        return;
-      }
-      fieldBackdrop.hidden = false;
-      syncPager(view);
-      const signature = [
-        "sticker",
-        sticker.id,
-        note.level,
-        note.calms,
-        note.oldFriend,
-        note.lands.join(","),
-        note.feelings.map((item) => item.id).join(","),
-        note.favouriteTreats.join(","),
-      ].join("|");
-      if (signature === fieldSignature) return;
-      fieldSignature = signature;
-      setAttribute(fieldCard, "aria-label", "Critter field note");
-      setAttribute(fieldCard, "data-field-kind", "sticker");
-      fieldSpecimen.classList.toggle("is-rare", false);
-      fieldPortrait.hidden = false;
-      fieldCharm.hidden = true;
-      if (sticker.image !== null) applyAtlasCrop(fieldPortrait, sticker.image);
-      setAttribute(fieldPortrait, "aria-label", note.name);
-      setText(fieldName, note.name);
-      setText(fieldSub, `Lv ${note.level} · ${note.chaosName}`);
-      fieldOldFriend.hidden = !note.oldFriend;
-      setText(fieldFoundRow.key, "Found in");
-      setText(fieldLands, note.lands.join(", "));
-      setText(fieldDetailRow.key, "Calmed");
-      setText(fieldCalms, `${note.calms} ${note.calms === 1 ? "time" : "times"}`);
-      fieldFeelingsRow.row.hidden = false;
-      fieldLovesRow.row.hidden = false;
-      fieldFeelings.replaceChildren(
-        ...note.feelings.map((feeling) => {
-          const pill = element("span", "journal-field-feeling");
-          pill.append(icon(feelingMarkup[feeling.id], "journal-field-feeling-icon"), feeling.label);
-          return pill;
-        }),
-      );
-      fieldLoves.replaceChildren(
-        ...note.favouriteTreats.map((treat) => {
-          const pill = element("span", "journal-field-love-pill");
-          pill.append(icon(heartMarkup, "journal-field-heart"), treat);
-          return pill;
-        }),
-      );
-      setText(fieldBlurb, fieldNoteBlurb(note));
-      blessingPlaque.hide();
-      return;
-    }
-    if (inspectedItem.kind === "prize") {
-      const prize = (view.prizes ?? []).find(
-        (candidate) =>
-          candidate.id === inspectedItem?.id && candidate.owned && candidate.image !== null,
-      );
-      if (prize === undefined) {
-        clearFieldNote();
-        return;
-      }
-      renderPrizeNote(prize, view);
-      return;
-    }
-    if (inspectedItem.kind === "fish") {
-      const fish = (view.fish ?? []).find(
-        (candidate) => candidate.id === inspectedItem?.id && candidate.owned,
-      );
-      if (fish === undefined) {
-        clearFieldNote();
-        return;
-      }
-      fieldBackdrop.hidden = false;
-      syncPager(view);
-      const signature = [
-        "fish",
-        fish.id,
-        fish.rare,
-        fish.coins,
-        fish.snacks,
-        fish.blurb,
-        fish.image !== null,
-      ].join("|");
-      if (signature === fieldSignature) return;
-      fieldSignature = signature;
-      setAttribute(fieldCard, "aria-label", "Fish catch note");
-      setAttribute(fieldCard, "data-field-kind", "fish");
-      fieldSpecimen.classList.toggle("is-rare", fish.rare);
-      fieldPortrait.hidden = fish.image === null;
-      fieldCharm.hidden = true;
-      if (fish.image !== null) applyAtlasCrop(fieldPortrait, fish.image);
-      setAttribute(fieldPortrait, "aria-label", fish.name);
-      setText(fieldName, fish.name);
-      setText(fieldSub, fish.rare ? "Bubblegum Bay · Rare Catch" : "Bubblegum Bay · Bay Catch");
-      fieldOldFriend.hidden = true;
-      setText(fieldFoundRow.key, "Found in");
-      setText(fieldLands, "Bubblegum Bay Dock");
-      setText(fieldDetailRow.key, "Reward");
-      const snackBonus = fish.snacks > 0 ? `, +${fish.snacks} snack` : "";
-      setText(fieldCalms, `+${fish.coins} coins${snackBonus}`);
-      fieldFeelingsRow.row.hidden = true;
-      fieldLovesRow.row.hidden = true;
-      setText(fieldBlurb, fish.blurb);
-      blessingPlaque.hide();
-      return;
-    }
-    const keepsake = (view.keepsakes ?? []).find(
-      (candidate) => candidate.id === inspectedItem?.id && candidate.owned,
-    );
-    if (keepsake === undefined) {
+    const data = resolveFieldNote(view, inspectedItem);
+    if (data === null) {
       clearFieldNote();
       return;
     }
-    fieldBackdrop.hidden = false;
-    syncPager(view);
-    const signature = [
-      "keepsake",
-      keepsake.id,
-      keepsake.source,
-      keepsake.displaySpot,
-      keepsake.memory,
-    ].join("|");
-    if (signature === fieldSignature) return;
-    fieldSignature = signature;
-    setAttribute(fieldCard, "aria-label", "Keepsake memory note");
-    setAttribute(fieldCard, "data-field-kind", "keepsake");
-    fieldSpecimen.classList.toggle("is-rare", false);
-    fieldPortrait.hidden = true;
-    fieldCharm.hidden = false;
-    fieldCharm.replaceChildren(keepsakeIcon(keepsake.id));
-    setAttribute(fieldCharm, "aria-label", keepsake.name);
-    setText(fieldName, keepsake.name);
-    setText(fieldSub, "Clubhouse Keepsake");
-    fieldOldFriend.hidden = true;
-    setText(fieldFoundRow.key, "Found in");
-    setText(fieldLands, keepsake.source);
-    setText(fieldDetailRow.key, "Displayed");
-    setText(fieldCalms, keepsake.displaySpot);
-    fieldFeelingsRow.row.hidden = true;
-    fieldLovesRow.row.hidden = true;
-    setText(fieldBlurb, keepsake.memory);
-    blessingPlaque.update(keepsake.id);
+    applyFieldNote(data, view);
   };
 
   const stepFieldNote = (delta: -1 | 1): boolean => {
@@ -861,10 +559,7 @@ export function createJournalFieldOverlays(options?: {
     ribbonsOverlay: ribbonsShowcase.overlay,
     ribbonsBanner: ribbonsShowcase.banner,
     inspect: (item, view) => {
-      if (inspectedItem === null) {
-        fieldReturnFocusEl =
-          document.activeElement instanceof HTMLElement ? document.activeElement : null;
-      }
+      if (inspectedItem === null) fieldReturnFocusEl = activeFocusElement();
       inspectedItem = item;
       if (view !== null) syncFieldNote(view);
       if (!fieldBackdrop.hidden) fieldCard.focus({ preventScroll: true });
@@ -872,33 +567,22 @@ export function createJournalFieldOverlays(options?: {
     },
     openPrize: (prize, view) => {
       if (!prize.owned || prize.image === null) return;
-      if (inspectedItem === null) {
-        fieldReturnFocusEl =
-          document.activeElement instanceof HTMLElement ? document.activeElement : null;
-      }
+      if (inspectedItem === null) fieldReturnFocusEl = activeFocusElement();
       inspectedItem = { kind: "prize", id: prize.id };
-      if (view !== undefined && view !== null) {
-        syncFieldNote(view);
-      } else {
-        renderPrizeNote(prize, null);
-      }
+      if (view !== undefined && view !== null) syncFieldNote(view);
+      else applyFieldNote(prizeFieldNoteData(prize), null);
       if (!fieldBackdrop.hidden) fieldCard.focus({ preventScroll: true });
       syncVisibility();
     },
     openTreasures: (view) => {
       if (view?.treasures?.hasAny !== true) return;
-      if (!treasuresOpen) {
-        treasuresReturnFocusEl =
-          document.activeElement instanceof HTMLElement ? document.activeElement : null;
-      }
+      if (!treasuresOpen) treasuresReturnFocusEl = activeFocusElement();
       treasuresOpen = true;
       syncTreasures(view);
       if (!treasuresBackdrop.hidden) treasuresCard.focus({ preventScroll: true });
       syncVisibility();
     },
-    openGems: (view, returnTarget) => {
-      gemsLedger.open(view?.starGems, returnTarget);
-    },
+    openGems: (view, returnTarget) => { gemsLedger.open(view?.starGems, returnTarget); },
     openRibbons,
     syncFieldNote,
     syncTreasures,

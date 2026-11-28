@@ -105,10 +105,7 @@ function isFocusable(node: HTMLElement | null): node is HTMLElement {
   return node !== null && node.isConnected && node.closest("[hidden]") === null;
 }
 
-function makeEffectRow(
-  parent: Element,
-  keyLabel: string,
-): HTMLSpanElement {
+function makeEffectRow(parent: Element, keyLabel: string): HTMLSpanElement {
   const row = element("div", "journal-weather-effect-row", parent);
   element("span", "journal-weather-effect-key", row).textContent = keyLabel;
   return element("span", "journal-weather-effect-val", row);
@@ -127,14 +124,15 @@ export function createJournalWeatherAlmanac(options?: {
   onBeforeOpen?: () => void;
   onVisibilityChange?: (open: boolean) => void;
   onClose?: () => void;
+  onSelectMode?: (mode: CozyWeatherMode) => void;
 }): JournalWeatherAlmanac {
   const overlay = element("div", "journal-weather-overlay");
   overlay.hidden = true;
   const card = element("article", "journal-weather-card", overlay);
   card.tabIndex = -1;
-  card.setAttribute("role", "dialog");
-  card.setAttribute("aria-modal", "true");
-  card.setAttribute("aria-label", "Valley Sky Almanac");
+  setAttribute(card, "role", "dialog");
+  setAttribute(card, "aria-modal", "true");
+  setAttribute(card, "aria-label", "Valley Sky Almanac");
 
   const head = element("div", "journal-weather-head", card);
   const titleWrap = element("div", "journal-weather-title-wrap", head);
@@ -146,10 +144,9 @@ export function createJournalWeatherAlmanac(options?: {
   head.append(closeBtn);
 
   const grid = element("div", "journal-weather-grid", card);
-  grid.setAttribute("role", "group");
-  grid.setAttribute("aria-label", "Valley sky mode");
-  const modeButtons = new Map<CozyWeatherMode, HTMLButtonElement>();
-  for (const mode of COZY_WEATHER_MODES) {
+  setAttribute(grid, "role", "group");
+  setAttribute(grid, "aria-label", "Valley sky mode");
+  const modeButtons = COZY_WEATHER_MODES.map((mode): [CozyWeatherMode, HTMLButtonElement] => {
     const btn = makeButton("journal-weather-option");
     setAttribute(btn, "data-weather-mode", mode);
     setAttribute(btn, "aria-pressed", "false");
@@ -157,35 +154,35 @@ export function createJournalWeatherAlmanac(options?: {
     element("span", "journal-weather-option-label", copy).textContent = weatherModeLabel(mode);
     element("span", "journal-weather-option-sub", copy).textContent = MODE_META[mode].sub;
     btn.append(createWeatherEmblem(mode, "journal-weather-option-svg"), copy);
-    btn.addEventListener("click", () => setCozyWeatherMode(mode));
-    modeButtons.set(mode, btn);
+    btn.addEventListener("click", () => {
+      if (getCozyWeatherMode() === mode) return;
+      setCozyWeatherMode(mode);
+      options?.onSelectMode?.(mode);
+    });
     grid.append(btn);
-  }
+    return [mode, btn];
+  });
 
   const effectsCard = element("section", "journal-weather-effects", card);
-  effectsCard.setAttribute("aria-live", "polite");
+  setAttribute(effectsCard, "aria-live", "polite");
   const effectsHead = element("div", "journal-weather-effects-head", effectsCard);
   const effectsEyebrow = element("span", "journal-weather-effects-eyebrow", effectsHead);
-  element("span", "journal-weather-effects-note", effectsHead).textContent =
-    "Indoors stays sheltered & cozy";
+  const noteEl = element("span", "journal-weather-effects-note", effectsHead);
+  noteEl.textContent = "Indoors stays sheltered & cozy";
   const fishVal = makeEffectRow(effectsCard, "Fish Forecast");
   const gardenVal = makeEffectRow(effectsCard, "Garden Dew");
   const moodVal = makeEffectRow(effectsCard, "Valley Mood");
-
   const treasuresBtn = makeButton(
     "journal-weather-btn", "Open Valley Sky Almanac", "☀ Sky Almanac",
   );
 
   let openState = false;
   let returnFocusEl: HTMLElement | null = null;
-
   const sync = (): void => {
     const active = getCozyWeatherMode();
     setText(activePill, weatherModeLabel(active));
     setAttribute(card, "data-weather-mode", active);
-    for (const [mode, btn] of modeButtons) {
-      setAttribute(btn, "aria-pressed", String(mode === active));
-    }
+    for (const [m, b] of modeButtons) setAttribute(b, "aria-pressed", String(m === active));
     effectsCard.style.borderLeftColor = MODE_META[active].accent;
     if (active === "auto") {
       setText(effectsEyebrow, "SKY FORECAST · AUTO BIOME CYCLE");
@@ -197,22 +194,17 @@ export function createJournalWeatherAlmanac(options?: {
     const fx = weatherEffects(active);
     setText(effectsEyebrow, `SKY FORECAST · ${weatherModeLabel(active).toUpperCase()}`);
     setText(fishVal, fx.fishFlavor);
-    setText(
-      gardenVal,
-      fx.gardenDewBonus > 0
-        ? `+${fx.gardenDewBonus} Clubhouse Garden Dew bonus during sunshowers!`
-        : "Steady cozy growth (sunshowers bring +1 extra garden dew).",
-    );
+    setText(gardenVal, fx.gardenDewBonus > 0
+      ? `+${fx.gardenDewBonus} Clubhouse Garden Dew bonus during sunshowers!`
+      : "Steady cozy growth (sunshowers bring +1 extra garden dew).");
     setText(moodVal, fx.moodNote);
   };
-
   const clear = (): void => {
     returnFocusEl = null;
     if (!openState && overlay.hidden) return;
     openState = false;
     overlay.hidden = true;
   };
-
   const close = (): void => {
     if (!openState && overlay.hidden) return;
     const target = returnFocusEl;
@@ -221,12 +213,10 @@ export function createJournalWeatherAlmanac(options?: {
     options?.onVisibilityChange?.(false);
     if (isFocusable(target)) target.focus({ preventScroll: true });
   };
-
   closeBtn.addEventListener("click", close);
   overlay.addEventListener("click", (event) => { if (event.target === overlay) close(); });
   subscribeCozyWeather(sync);
   sync();
-
   const open = (returnTarget?: HTMLElement | null): void => {
     const wasOpen = openState;
     options?.onBeforeOpen?.();
@@ -242,15 +232,24 @@ export function createJournalWeatherAlmanac(options?: {
   };
   const handleKeydown = (event: KeyboardEvent): boolean => {
     if (!openState) return false;
-    if (["Escape", "x", "X", "b", "B"].includes(event.key)) {
-      event.preventDefault();
-      event.stopPropagation();
-      close();
+    const stop = (): void => { event.preventDefault(); event.stopPropagation(); };
+    if (["Escape", "x", "X", "b", "B"].includes(event.key)) { stop(); close(); return true; }
+    if ((event.key === "Enter" || event.key === " ") &&
+      document.activeElement instanceof HTMLButtonElement && card.contains(document.activeElement)
+    ) { stop(); document.activeElement.click(); return true; }
+    const fwd = event.key === "ArrowRight" || event.key === "ArrowDown";
+    const back = event.key === "ArrowLeft" || event.key === "ArrowUp";
+    if (fwd || back || event.key === "Home" || event.key === "End") {
+      stop();
+      const idx = modeButtons.findIndex(([, btn]) => btn === document.activeElement);
+      const len = modeButtons.length;
+      const next = event.key === "Home" ? 0 : event.key === "End" ? len - 1
+        : idx === -1 ? (fwd ? 0 : len - 1) : (idx + (fwd ? 1 : -1) + len) % len;
+      modeButtons[next]?.[1].focus({ preventScroll: true });
     }
     return true;
   };
   return {
-    overlay, treasuresBtn, open, sync, close, clear,
-    isOpen: () => openState, handleKeydown,
+    overlay, treasuresBtn, open, sync, close, clear, isOpen: () => openState, handleKeydown,
   };
 }

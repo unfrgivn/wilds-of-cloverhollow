@@ -8276,6 +8276,35 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
 - Gates: `just check`, `just build`, and Playwright e2e (`--workers=2`) verified
   clean after rebasing onto `origin/main`.
 
+## Milestone 190: Universal `data-cutscene="open"` Overlay Hygiene, Valley Sky Almanac Tactile Foley & Keyboard Navigation, and `journal-field-note-data.ts` + `view-loader.ts` Modular Relief **Status:** ✅ Completed (2026-11-28)
+- Defensive `:root[data-cutscene="open"]` cinema-clean overlay suppression across
+  `src/ui/qa.css` (`.qa-touch-trigger`), `src/ui/npc-chatter.css`
+  (`.npc-chatter`), `src/ui/save-toast.css` (`.save-toast`),
+  `src/ui/hud-hints.css` (`.hud-hints`), and `src/ui/sticker.css`
+  (`.save-toast`, `.sticker-prompt`, `.hud-hints`, `.notice-marks`).
+- Valley Sky Almanac tactile foley & keyboard/Steam Deck parity
+  (`src/ui/journal-weather.ts`, `src/ui/journal-field-note.ts`,
+  `src/ui/journal.ts`, `src/shell/shell-bindings.ts`): `aria-live="polite"` on
+  `.journal-weather-effects`, 2D arrow-key (`ArrowRight`/`ArrowDown` forward
+  wrap, `ArrowLeft`/`ArrowUp` backward wrap, `Home`/`End` first/last) focus
+  navigation across `.journal-weather-grid` while open, and `onWeatherSelect`
+  wiring playing `"tool-sparkle"` for cozy weather or `"toggle-off"` for Clear
+  skies with a `"light"` haptic only when changing modes.
+- Modular relief (zero `src/core` changes, zero replay shifts, zero visual
+  baseline diffs):
+  - Extracted pure DOM-free specimen field-note data, lore maps, browsing, and
+    focus-restore helpers into `src/ui/journal-field-note-data.ts`, re-exported
+    identically from `src/ui/journal-field-note.ts` (`950 -> 634` lines).
+  - Extracted Pixi permanent-sheet preloading, area loading/prefetching, and
+    bounded current + previous residency eviction into `AreaAssetManager`
+    (`src/render/view-loader.ts`), relieving `src/render/view.ts` (`757 -> 658`
+    lines).
+- Evidence: `tests/unit/milestone-190.test.ts` and
+  `tests/e2e/milestone-190.spec.ts` (`@smoke`, Chromium + WebKit, 4/4 passed).
+- Gates: `just check`, `just build` (all non-vendor chunks `< 500 kB`, hook
+  leak + runtime story + harness checks green), and Chromium + WebKit e2e
+  verification.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

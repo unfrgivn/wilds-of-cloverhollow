@@ -1,48 +1,44 @@
 import {
-  Assets, Container, Graphics, Sprite, Spritesheet, Text, type Renderer,
+  Assets, Container, Graphics, Sprite, type Spritesheet, Text, type Renderer,
 } from "pixi.js";
 import {
   creditEntries, type Area, type NavField, type Point, type State, type World,
 } from "../core";
 import { weatherForArea } from "../core/weather";
-import { AreaView } from "./area-view";
-import { CHARACTER_POSE_ATLASES } from "./animation";
+import type { AreaView } from "./area-view";
 import { CameraDirector, screenToWorld, worldToScreen } from "./camera";
-import { assetUrl } from "../platform/assets";
 import { isReducedMotionActive } from "../platform/reduced-motion";
 import { getCozyWeatherMode } from "../platform/weather-prefs";
 import { fadeAlpha } from "./fade";
 import { PaperGrainOverlay, syncPresentationTelemetry } from "./paper-grain";
 import { createVfxTextures, type VfxTextures } from "./vfx-textures";
 import { BiomeAtmosphere } from "./atmosphere";
-import {
-  AreaRestorationRenderer, RESTORATION_ATLAS_ALIAS, RESTORATION_ATLAS_URL,
-} from "./restoration";
+import { AreaRestorationRenderer } from "./restoration";
 import type { RestSpot } from "./companions";
 import { storyTimeOfDay } from "./time-of-day";
 import {
   BattleViewController, type BattleCheckGeometry, type BattleCheckInfo,
 } from "./battle-view";
 import { OverworldEntityLayer } from "./entity-layer";
-import { cutsceneAreaAtlases, CutsceneRenderController } from "./cutscene-render";
+import { CutsceneRenderController } from "./cutscene-render";
 import {
   scenicBenchChatterBubble, scenicBenchZoom, type PebbleSkipSpot,
 } from "./micro-delights";
 import { MicroDelightsRenderer } from "./micro-delights-render";
 import { NpcLifeController, type NpcLifeRenderInfo } from "./npc-life";
 import { NavOverlayController } from "./nav-overlay";
-import { CLUBHOUSE_PRIZES_ALIAS, OverworldEffectsController } from "./overworld-effects";
+import { OverworldEffectsController } from "./overworld-effects";
 import type { NavPathSnapshot } from "../shell/nav-steer";
 import type { NpcChatterView } from "../ui/npc-chatter";
 import {
   areaEntityAtlases, computeGlowTransform, INDOOR_AREAS, type EntityAtlas,
 } from "./overworld-render";
+import { AreaAssetManager } from "./view-loader";
 import {
-  computeAreaEvictions, computeDialogueRenderInfo, computeLanternVisuals,
-  computeNoticeMarkViews, computeNpcChatterScreenAnchor,
-  computePromptScreenView, computeStoryAtmosphereOptions, computeViewportRect,
-  resolveActivePetReaction, resolveActiveRestSpot, type GameViewRenderInfo,
-  type NoticeMarkView, type PromptScreenView, type ViewportRect,
+  computeDialogueRenderInfo, computeLanternVisuals, computeNoticeMarkViews,
+  computeNpcChatterScreenAnchor, computePromptScreenView, computeStoryAtmosphereOptions,
+  computeViewportRect, resolveActivePetReaction, resolveActiveRestSpot,
+  type GameViewRenderInfo, type NoticeMarkView, type PromptScreenView, type ViewportRect,
 } from "./view-projections";
 
 export {
@@ -51,14 +47,6 @@ export {
 };
 
 export type RenderOptions = { paused?: boolean; alpha?: number; previousState?: State };
-
-function mipmapSheet(alias: string, src: string): Promise<Spritesheet> {
-  return Assets.load<Spritesheet>({
-    alias,
-    src,
-    data: { textureOptions: { autoGenerateMipmaps: true } },
-  });
-}
 
 export class GameView {
   readonly root = new Container();
@@ -105,16 +93,7 @@ export class GameView {
   private staticFadeFull = false;
   private lanternBlend = 0;
   private lanternTick: number | undefined;
-  private readonly areaTextureUrls = new Set<string>();
-  // The URLs of the area one crossing back, kept resident so the way back
-  // through a door is a cache hit (the area two crossings back unloads).
-  private residentUrls: readonly string[] = [];
-  // Per-area NPC and critter atlas aliases kept on the same current + previous
-  // residency window, separate from `areaTextureUrls` so `cachedAreaTextures`
-  // reports only the area's ground tiles and prop atlases.
-  private currentEntityAliases: readonly string[] = [];
-  private residentEntityAliases: readonly string[] = [];
-  private readonly permanentAliases: ReadonlySet<string>;
+  private readonly assets: AreaAssetManager;
   private glowSprites: { id: string; sprite: Sprite }[] = [];
   private drawnGlows: string[] = [];
   private petReaction: { id: string; startTick: number } | null = null;
@@ -167,15 +146,7 @@ export class GameView {
     this.lanternLayer.visible = false;
     this.lanternLayer.addChild(this.lanternTint, this.lanternWorld);
 
-    this.permanentAliases = new Set([
-      "fae-sheet",
-      "glow-sheet",
-      "ambient-sheet",
-      RESTORATION_ATLAS_ALIAS,
-      world.battle.toyAtlas,
-      ...Object.keys(world.party).map((id) => `${id}-sheet`),
-      ...Object.keys(CHARACTER_POSE_ATLASES).map((id) => `${id}-poses`),
-    ]);
+    this.assets = new AreaAssetManager(this.world);
     this.viewport.addChild(
       this.scene, this.effects.timeOfDayLayer, this.lanternLayer,
       this.emissiveLayer, this.glowLayer,
@@ -218,52 +189,18 @@ export class GameView {
       this.label.position.set(20, 20);
       this.root.addChild(this.label);
     }
-    this.ready = this.loadCharacter();
-  }
-
-  private async loadCharacter(): Promise<void> {
-    await Promise.all([
-      mipmapSheet("fae-sheet", assetUrl("assets/characters/fae/fae.json")),
-      ...Object.entries(this.world.party).map(([id, member]) =>
-        mipmapSheet(`${id}-sheet`, assetUrl(member.atlas)),
-      ),
-      ...Object.entries(CHARACTER_POSE_ATLASES).map(([id, atlas]) =>
-        mipmapSheet(`${id}-poses`, assetUrl(atlas)),
-      ),
-      mipmapSheet("glow-sheet", assetUrl("assets/glows/glows.json")),
-      mipmapSheet("ambient-sheet", assetUrl("assets/ambient/ambient.json")),
-      mipmapSheet(RESTORATION_ATLAS_ALIAS, assetUrl(RESTORATION_ATLAS_URL)),
-      // The toys a catch throws are cropped from this sheet by the DOM
-      // overlay, which reads their frames here.
-      mipmapSheet(this.world.battle.toyAtlas, assetUrl(this.world.battle.toyAtlas)),
-    ]);
-  }
-
-  private areaAtlasesFor(area: Area): EntityAtlas[] {
-    const entities = areaEntityAtlases(this.world, area);
-    const base = area.id === "clubhouse"
-      ? [...entities, { alias: CLUBHOUSE_PRIZES_ALIAS, src: assetUrl(this.world.arcade.atlas) }]
-      : entities;
-    return [...base, ...cutsceneAreaAtlases(this.world, area, base)];
+    this.ready = this.assets.loadPermanentSheets();
   }
 
   async setArea(area: Area): Promise<void> {
     const previous = this.areaView;
-    const previousEntities = this.currentEntityAliases;
     // The old sprites go; the old textures stay cached, so the door back is
     // a reload from memory, not a white wait on the network.
     previous?.destroy();
     this.entities.clearArea();
     this.cutsceneRender.clearArea();
-    const areaAtlases = this.areaAtlasesFor(area);
-    const [next] = await Promise.all([
-      AreaView.load(area, this.depth),
-      ...areaAtlases.map((entry) => mipmapSheet(entry.alias, entry.src)),
-    ]);
+    const next = await this.assets.loadArea(area, this.depth, previous);
     this.areaView = next;
-    const nextEntities = areaAtlases.map((entry) => entry.alias);
-    this.currentEntityAliases = nextEntities;
-    await this.evict(previous, next, previousEntities, nextEntities);
     for (const entry of this.glowSprites) entry.sprite.destroy();
     this.glowSprites = area.glows.map((glow) => {
       const sprite = new Sprite();
@@ -276,7 +213,6 @@ export class GameView {
       return { id: glow.id, sprite };
     });
     this.entities.mountAmbient(area);
-    for (const url of next.textureUrls) this.areaTextureUrls.add(url);
     this.scene.addChildAt(next.ground, 0);
     this.paperGrain.mountArea(area);
     this.entities.mountNpcs(area);
@@ -299,43 +235,8 @@ export class GameView {
     this.effects.hideClubhouseDisplay();
   }
 
-  // Unloads what a crossing displaced: everything resident that is neither
-  // the new area's art nor the one just left's. The area just left then
-  // becomes the resident one, so at most a current + previous pair of areas
-  // ever stays in the cache (spec 4, texture budget).
-  private async evict(
-    previous: AreaView | undefined,
-    next: AreaView,
-    previousEntities: readonly string[],
-    nextEntities: readonly string[],
-  ): Promise<void> {
-    const { evictedUrls, unloadKeys } = computeAreaEvictions({
-      residentUrls: this.residentUrls,
-      previousUrls: previous?.textureUrls ?? [],
-      nextUrls: next.textureUrls,
-      residentEntityAliases: this.residentEntityAliases,
-      previousEntities,
-      nextEntities,
-      permanentAliases: this.permanentAliases,
-    });
-    for (const url of evictedUrls) this.areaTextureUrls.delete(url);
-    this.residentUrls = previous?.textureUrls ?? [];
-    this.residentEntityAliases = previousEntities;
-    if (unloadKeys.length > 0)
-      await Promise.all(unloadKeys.map((key) => Assets.unload(key)));
-  }
-
-  // Warms an area's art without touching the shown one. The warmed URLs join
-  // `areaTextureUrls` so the harness sees them cached; a failed prefetch says
-  // nothing the arrival's own load won't say louder.
   prefetch(area: Area): void {
-    const areaAtlases = this.areaAtlasesFor(area);
-    void Promise.all([
-      AreaView.prefetch(area).then((urls) => {
-        for (const url of urls) this.areaTextureUrls.add(url);
-      }),
-      ...areaAtlases.map((entry) => mipmapSheet(entry.alias, entry.src)),
-    ]).catch(() => {});
+    this.assets.prefetch(area);
   }
 
   resize(width: number, height: number): void {
@@ -724,7 +625,7 @@ export class GameView {
       paperFlipScaleX: this.entities.paperFlipScaleX,
       party: this.entities.partyInfo(state),
       fade,
-      cachedAreaTextures: [...this.areaTextureUrls].filter((url) => Assets.cache.has(url)),
+      cachedAreaTextures: this.assets.cachedAreaTextures(),
       prompt: this.promptView(state),
       dialogue: computeDialogueRenderInfo(state),
       critters: this.entities.critters,

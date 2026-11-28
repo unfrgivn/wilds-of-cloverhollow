@@ -4,7 +4,8 @@
 :root[data-journal="open"] .npc-chatter,
 :root[data-title="open"] .npc-chatter,
 :root[data-credits="open"] .npc-chatter,
-:root[data-arcade="open"] .npc-chatter {
+:root[data-arcade="open"] .npc-chatter,
+:root[data-cutscene="open"] .npc-chatter {
   display: none;
 }
 

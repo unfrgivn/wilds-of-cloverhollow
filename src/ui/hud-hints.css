@@ -4,7 +4,8 @@
 }
 
 :root[data-touch="on"] .hud-hints,
-:root[data-touch="on"] .hud-battle-hint {
+:root[data-touch="on"] .hud-battle-hint,
+:root[data-cutscene="open"] .hud-hints {
   display: none;
 }
 

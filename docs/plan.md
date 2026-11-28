@@ -7409,6 +7409,116 @@ the old trail, the owl, and the clubhouse claim.
 - Gates: `just check`, `just build` (`< 410 kB` every non-vendor chunk), and
   targeted Chromium & WebKit e2e tests.
 
+## Elevation Master Roadmap (Owner-approved 2026-11-27)
+Parallel multi-track elevation plan targeting award-winning craft across
+gameplay, puzzles, battles, cutscenes, story, visuals, dialogue, transitions,
+audio, and progression. Tracks run in parallel worktrees and always land via
+PRs rebased onto `origin/main` and squash-merged. Each PR claims the next open
+Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
+
+### Phase 0: Narrative Infrastructure
+- **Track E0 (Ink Modularization & Runtime Story Asset Pipeline):** Add a disk
+  `fileHandler` to `tools/ink/compile.ts` for Ink `INCLUDE`, split `main.ink`
+  into modular chapter/party/town/system `.ink` files, and serve compiled
+  `main.ink.json` from `public/assets/story/main.ink.json` (fetched at boot in
+  browser, loaded from disk in Bun/Vitest/sim). Hash-safe, save `v10`.
+
+### Phase 1: Living Canvas, Expressive Sprites & Storybook Dialogue (Hash-Safe)
+- **Track E1 (Camera Director & Living Ground Reactivity):** Dialogue partner
+  framing + `#cam:`/`#zoom:` Ink tags, reduced-motion-safe trauma screen-shake,
+  foreground depth parallax, surface-aware footstep puffs, bending grass/puddle
+  ripples, and unified cold-press watercolor paper grain overlay.
+- **Track E2 (Expressive Sprite Action Poses & Paper-Flip Motion, Art Wave A):**
+  Expressive pose strips (`sit`, `cheer`, `shock`, `tool_lantern`, `tool_lasso`,
+  `tool_flute`, `talk`, `dash_lean`) for Fae, Maddie, Sue, Jordan, and core
+  cast; deterministic pose selector + Maddie groom/stretch/nap idle states;
+  snappy Paper Mario-style 2D card-flip turns.
+- **Track E3 (Storybook Dialogue Box, Multi-Expression Portraits & Kinetic Text, Art Wave A):**
+  5-expression portrait sheets (`neutral`, `happy`, `worried`, `determined`,
+  `surprised`) for main cast and school staff; hand-inked deckled-paper dialogue
+  card with speaker-anchored speech tail, `#expr:` swaps, syllable portrait
+  bounce, safe inline kinetic text markup (`{shake}`, `{wave}`, `{pop}`,
+  `{whisper}`, `{color:...}`, `{pause:N}`), and mood-tuned melodic voice cadence.
+
+### Phase 2: Cutscenes, Tactile Spatial Puzzles & Tactical Battles (`Save v11` Wave)
+- **Track E4 (Deterministic Cutscene & Stage Choreography Engine):** Pure 60 Hz
+  `src/core/cutscene.ts` runner (`moveActor`, `face`, `pose`, `emote`, `wait`,
+  `cameraPan`, `propState`, `sfx`, `sayKnot`, `parallel`) plus 4 choreographed
+  story cutscenes (Dawn Plaza opening + Maddie wake-up, Plaza Purple Hood
+  sighting, Sue Bay intro, Jordan Pass intro).
+- **Track E5 (Real Overworld Tools, Cozy Dash & Spatial Puzzle Engine, Art Wave B):**
+  Cozy Dash/Skip; physical overworld Rainbow Lasso (grapple/pull/swing),
+  Blacklight Lantern lens (invisible stepping stones, prism beams, hidden
+  trails), and 3-note Harmony Flute wheel; `src/core/puzzles.ts` (pushable
+  crates/snowballs, companion-weighted pressure plates, prism mirrors,
+  resonance bells); retrofit 7 signature areas (School Gym/Hallway, Cliffside
+  Trail, Crystal Cavern, Whispering Woods, Pinecone Pass, Starlight Island,
+  Enchanted Forest 3-Tool Seal).
+- **Track E6 (Overworld First-Strikes, Cozy Statuses & Backpack Charm Pins, Art Wave B, Save v11 Lock):**
+  Lasso/Lantern/Flute overworld first-strikes; cozy battle statuses (`Sleepy`,
+  `Tangled`, `Bubbled`, `Giddy`, `Distracted`); 14 equippable watercolor Charm
+  Pins (`content/badges.json`) with Pin Point (PP) budget in Journal; single
+  consolidated `SaveData.version = 11` migration with clean `upgrades[10]`.
+- **Track E7 (Multi-Critter Formations, Multi-Phase Boss AI, Dual Combos & New Checks, Art Wave B):**
+  1-to-3 critter encounters with targeting and AoE skills; telegraphed enemy
+  intent and 50% Calm Phase-2 mini-boss/boss shifts; bespoke Dual-Friend
+  Synergy Combos; 3 new battle checks from `docs/battle-ideas.md` (`Which One?`
+  cup shuffle, `Whack` ticket slots, `Spin & Snag` lasso).
+
+### Phase 3: Clubhouse Inventor Hub & Meaningful Economy
+- **Track E8 (Clubhouse Magical Garden & Fae's Inventor Workbench, Art Wave B):**
+  Deterministic `src/core/garden.ts` (4 biome seeds growing by battles calmed /
+  chapters progressed, zero `Date` timers) + custom magical snacks; Inventor
+  Workbench crafting Charm Pins and Tier 2/3 upgrades for Lantern, Lasso, and
+  Flute.
+- **Track E9 (Keepsake Dream Blessings, Bedroom/Clubhouse Decor & Economy Rebalance):**
+  Passive Dream Blessings for all 13 Keepsakes; placeable Arcade Plushes,
+  Counter Prizes, and Decor Swatches in Bedroom & Clubhouse + visiting calm
+  friends; full coin/ticket/fish/treat economy rebalance.
+
+### Phase 4: Intentional Story, Foreshadowing & Unforgettable Finale
+- **Track E10 (Acts 1 to 3 Narrative Pass & Milo Foreshadowing Arc):** Tighten
+  Acts 1 to 3 writing; add 5 choreographed Milo foreshadowing cutscenes
+  (strictly obeying `spec.md` §1.2 secrecy rule) and empathetic pre-battle
+  stress vignettes for every mini-boss.
+- **Track E11 (Party Heart-to-Hearts & Interactive Multi-Step Town Quests):**
+  6 optional Heart-to-Heart scenes (including Fae's journal / baby Oliver
+  backstory from `NOTES.md`, Sue, Jordan, and Clubhouse trio) unlocking
+  Friendship Charm Pins + 4 tool-driven Living NPC quests.
+- **Track E12 (Enchanted Forest Climax, Waking-Up Morning Epilogue & Consolidated Sim/QA Sync):**
+  Showstopping 3-Tool Seal ritual, clue-powered multi-phase Ancient Tree finale,
+  hood-drop reconciliation, enriched playable waking-up morning + ending
+  postcard, and consolidated sim + QA save sync.
+
+### Phase 5: Showstopping Visuals, Transitions & Interactive Audio (Hash-Safe)
+- **Track E13 (Live Watercolor Chaos-to-Paint Area Restoration, Art Wave C):**
+  Crumpled-paper / purple-scribble chaos overlays that peel away with a
+  real-time watercolor wash-bloom wipe into flowers and sunlight when chaos is
+  calmed.
+- **Track E14 (Illustrated Storybook Travel Vignettes, Art Wave C):** 5 painted
+  animated travel cards (Star-Line Bus hills/coast/pass, Rowboat to Island, Ski
+  Lift to Summit), skippable on tap and instant in paused harness steps.
+- **Track E15 (Adaptive Vertical Soundtrack, Foley Polish & Smart Interactive Valley Atlas):**
+  Bar-synced vertical music layers (boss Phase-2 lift, lantern celesta, Journal
+  low-pass filter), organic paper/sticker foley + CC0 footsteps, and upgraded
+  `journal-map.ts` Valley Atlas with quest/gem/garden/boss pins and "Story So
+  Far" header.
+
+### Phase 6: Mastery, Balance, §13 Unlocks & Ship-Quality Release Pass
+- **Track E16 (Overworld Micro-Delights & Tactile World Props):** Kickable Bay
+  beach balls, pond pebble skipping, shop bells, scenic camera-pullback benches
+  with party chatter, unique Sanctuary critter pet hops.
+- **Track E17 (Dynamic Cozy Weather, §13 Unlock):** Gentle biome weather cycles
+  (sunshowers + rainbows, soft snow flurries, twilight fireflies) with subtle
+  critter/fish/garden interactions.
+- **Track E18 (Cozy Replay Shrine / Boss Encore & Valley Merit Ribbons, §13 Unlocks):**
+  Post-finale Sanctuary Dream Memory Shrine with remixed Star Challenges and
+  Clubhouse trophies + hand-stitched Journal Merit Ribbons page.
+- **Track E19 (Full-Game Balance, Accessibility, Memory Diet & iOS Device Sign-Off):**
+  End-to-end balance tuning (`tools/sim/balance.ts`), Gentle Timing / Reduced
+  Motion / 44 px touch audit, `< 500 kB` chunk audit, full Chromium/WebKit e2e,
+  and `just ios-smoke` release pass.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

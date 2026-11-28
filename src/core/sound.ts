@@ -1,4 +1,4 @@
-import type { CheckState, State, World } from "./types";
+import type { CheckState, Direction, State, World } from "./types";
 import { levelForXp } from "./levels";
 import { surfaceAt } from "./surfaces";
 
@@ -232,7 +232,59 @@ export function soundCues(
   ) {
     cues.push(...next.cutscene.tickSfx);
   }
+  if (previous.area === next.area) {
+    const prevPuzzle = previous.puzzleArea;
+    const nextPuzzle = next.puzzleArea;
+    if (
+      nextPuzzle?.lasso !== undefined &&
+      nextPuzzle.lasso.tick === 0 &&
+      (prevPuzzle?.lasso === undefined || prevPuzzle.lasso.tick !== 0)
+    ) {
+      cues.push("lasso-twirl");
+    }
+    const nextChime = nextPuzzle?.recentChime;
+    const prevChime = prevPuzzle?.recentChime;
+    if (
+      nextChime !== undefined &&
+      (prevChime?.tick !== nextChime.tick || prevChime.note !== nextChime.note)
+    ) {
+      cues.push(fluteChimeCue(nextChime.note));
+    }
+    const mirrorChanged = recordDiffers(prevPuzzle?.mirrors, nextPuzzle?.mirrors);
+    const holdChanged = recordDiffers(prevPuzzle?.heldPlates, nextPuzzle?.heldPlates);
+    if (mirrorChanged || holdChanged) {
+      cues.push("choice-select");
+    }
+    const nextSolved = nextPuzzle?.lastSolved;
+    const prevSolved = prevPuzzle?.lastSolved;
+    if (
+      nextSolved !== undefined &&
+      (prevSolved?.id !== nextSolved.id || prevSolved.tick !== nextSolved.tick)
+    ) {
+      cues.push(cues.includes("sticker") ? "chime-yellow" : "sticker");
+    }
+  }
   return cues;
+}
+
+function fluteChimeCue(note: Direction): SoundCue {
+  if (note === "up") return "flute-red";
+  if (note === "right") return "flute-yellow";
+  if (note === "down") return "flute-green";
+  return "flute-blue";
+}
+
+function recordDiffers(
+  before: Record<string, string> | undefined,
+  after: Record<string, string> | undefined,
+): boolean {
+  if (before === after) return false;
+  const a = before ?? {};
+  const b = after ?? {};
+  const keysA = Object.keys(a);
+  const keysB = Object.keys(b);
+  if (keysA.length !== keysB.length) return true;
+  return keysA.some((key) => a[key] !== b[key]);
 }
 
 function treatCount(treats: State["treats"]): number {

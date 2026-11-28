@@ -17,6 +17,7 @@ import type { BattleCheckInfo } from "../render/view";
 import type { CutsceneRenderInfo } from "../render/cutscene-render";
 import type { MicroDelightsRenderInfo } from "../render/micro-delights-render";
 import type { NpcLifeRenderInfo } from "../render/npc-life";
+import type { PuzzleRenderInfo } from "../render/puzzles-render";
 import type { TimeOfDayPhase } from "../render/time-of-day";
 import { formatSaveBackup, parseSaveBackup } from "../shell/save-backup";
 import type { SaveStore } from "../shell/save-storage";
@@ -92,6 +93,7 @@ export type CloverhollowHook = {
     timeOfDay: TimeOfDayPhase;
     photoMode: boolean;
     microDelights: MicroDelightsRenderInfo;
+    puzzles: PuzzleRenderInfo;
     battle: {
       phase: string | null;
       check: BattleCheckInfo | null;

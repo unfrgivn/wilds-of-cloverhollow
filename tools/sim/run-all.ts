@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
+  areaWithoutOverriddenCrossings,
   createState,
   distanceToPolygon,
   pointInPolygon,
@@ -32,7 +33,11 @@ for (const folder of readdirSync(root, { withFileTypes: true })) {
         const room = content.world.areas[state.area];
         if (room === undefined) throw new Error(`${name}: unknown area ${state.area}`);
         // Props' current footprints are solid like blockers (spec 6.2).
-        const area = sceneryArea(content.world, state.ink, room);
+        const area = sceneryArea(
+          content.world,
+          state.ink,
+          areaWithoutOverriddenCrossings(content.world, state, room),
+        );
         if (
           !pointInPolygon(state.player, area.walkable) ||
           distanceToPolygon(state.player, area.walkable) < radius - epsilon

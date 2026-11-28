@@ -7488,13 +7488,16 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   cinema letterbox rendering, and 4 choreographed story cutscenes (`dawn-wakeup`,
   `plaza-hood-sighting`, `sue-bay-intro`, `jordan-pass-intro`).
 - **Track E5 (Real Overworld Tools, Cozy Dash & Spatial Puzzle Engine, Art Wave B):**
-  Cozy Dash/Skip; physical overworld Rainbow Lasso (grapple/pull/swing),
-  Blacklight Lantern lens (invisible stepping stones, prism beams, hidden
-  trails), and 3-note Harmony Flute wheel; `src/core/puzzles.ts` (pushable
-  crates/snowballs, companion-weighted pressure plates, prism mirrors,
-  resonance bells); retrofit 7 signature areas (School Gym/Hallway, Cliffside
-  Trail, Crystal Cavern, Whispering Woods, Pinecone Pass, Starlight Island,
-  Enchanted Forest 3-Tool Seal).
+  ✅ Completed (Milestone 193, 2026-11-28) — Stamina-free 1.45× Cozy Dash/Skip
+  (`Shift` / gamepad B or R2 / `.touch-dash` toggle + brisk surface dust puffs &
+  skip-lean); physical overworld Rainbow Lasso (grapple swing/lever/mirror/crate
+  yank + 5-band rainbow arc), Blacklight Lantern lens (invisible stepping stones
+  & axis-aligned prism beams), and die-cut 3-note Harmony Flute Wheel; pure
+  60 Hz `src/core/puzzles.ts` + `src/core/puzzles-queries.ts`, strict
+  `src/content/puzzle-parsers.ts`, Art Wave B1 12-prop alpha-WebP atlas
+  (`public/assets/puzzles/puzzles.{webp,json}`, 123 KB, PSNR 43.86 dB), and 7
+  retrofitted signature areas (`gym`, `trail`, `cavern`, `woods`, `pass`,
+  `island`, `mist`), preserving Save `v10` and all 74 existing sim hashes.
 - **Track E6 (Overworld First-Strikes, Cozy Statuses & Backpack Charm Pins, Art Wave B, Save v11 Lock):**
   Lasso/Lantern/Flute overworld first-strikes; cozy battle statuses (`Sleepy`,
   `Tangled`, `Bubbled`, `Giddy`, `Distracted`); 14 equippable watercolor Charm
@@ -8430,6 +8433,87 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
 - **Gates:** `just check`, `just build` (`< 500 kB` every non-vendor chunk, zero
   hook leak, runtime story asset verified), and Chromium + WebKit Playwright e2e
   verification.
+
+## Milestone 193: Real Overworld Tools, Cozy Dash & Spatial Puzzle Engine (Elevation Track E5, Art Wave B1) **Status:** ✅ Completed (2026-11-28)
+- Transforms overworld exploration into tactile spatial adventure with Cozy
+  Dash, physical overworld Rainbow Lasso, Blacklight Lantern stepping stones &
+  prism beams, 3-note Harmony Flute Wheel, pushable crates/sliding snowballs,
+  companion-held pressure plates, and Art Wave B1 watercolor puzzle props across
+  7 signature areas — while keeping Save `v10` and all 74 prior recorded sims
+  100% bit-identical:
+  - **Cozy Dash / Skip (`src/core/puzzles-queries.ts`, `src/core/sim.ts`,
+    `src/platform/{keyboard,gamepad,touch}.ts`, `src/ui/touch-controls.{ts,css}`,
+    `src/render/{motion,overworld-render,ground-reactivity}.ts`):**
+    - Optional `dash?: boolean` on `ActionFrame` (omitted when false so
+      `blankInput()` and existing sim hashes stay byte-identical), bound to
+      `ShiftLeft`/`ShiftRight`, Gamepad B/R2, and a subtle `46×46 px`
+      `.touch-dash` toggle above the virtual stick (plus `.touch-lasso` once
+      `has_lasso` is true, both respecting `data-cutscene="open"` and modal
+      hiding).
+    - Moves at `1.45×` `walkSpeed` via two crisp half-step `resolveMove` passes
+      for clean corner-sliding and zero wall/trigger tunneling, paired with
+      render-only `dashPose` skip-lean and brisk surface-aware footstep dust
+      puffs (`walkCycleUnits / 3.5` in the existing 32-slot pool).
+  - **Pure Spatial Puzzle Engine & Overworld Tools (`src/core/puzzles.ts`,
+    `src/core/puzzles-queries.ts`, `src/content/puzzle-parsers.ts`,
+    `src/core/{types,sim,save,party,sound,index}.ts`):**
+    - Deterministic 60 Hz engine (zero DOM/Pixi/trig) supporting pushable
+      crates/rocks, sliding snowballs with plate snapping, weighted &
+      companion-hold pressure plates (`Hold` / `Call Back` stationing Jordan or
+      an active party member), Rainbow Lasso (`swing`, `post`/`lever`, mirror
+      rotation, crate/snowball yank, open-air arc), Blacklight Lantern
+      invisible stepping stones (`overridesCrossing` + lantern-off safety nudge)
+      & axis-aligned 8-bounce crystal prism ray-tracing (`tracePrismBeams`),
+      and 3-note Harmony Flute Wheel (`fluteWheel`, preserving `FLUTE_KNOT` and
+      Toby's lullabies away from resonance bells).
+    - Persists solved flags cleanly in optional `state.puzzles?: Record<string, boolean>`
+      (omitted when empty, validated at Save `v10`), strips transient
+      `state.puzzleArea` on save/transition, and mirrors solved crossings into
+      existing Ink variables (`cavern_bridge_lit`, `island_shells_solved`,
+      `found_mist_way`, `rope_bridge`, `seal_open`).
+  - **Art Wave B1 — Painted Puzzle Prop Kit (`art/recipes/puzzle-props.json`,
+    `public/assets/puzzles/puzzles.{webp,json}`, `src/render/puzzles-render.ts`,
+    `src/ui/flute-wheel.{ts,css}`):**
+    - Generated 12 hand-painted `256×256` watercolor puzzle props in 4 Gemini
+      calls (`push-rock`, `push-crate`, `push-snowball`, `pressure-plate-up`,
+      `pressure-plate-down`, `sun-crystal-off`, `sun-crystal-on`,
+      `prism-mirror`, `resonance-bell`, `grapple-post`, `vine-bridge`,
+      `stepping-stone`), packed into a permanent `1024×768` alpha-WebP atlas
+      (`123 KB`, PSNR `43.86 dB`, 0 border-alpha leaks), verified 12/12 on
+      cream and dark review sheets (`art/review/puzzle-props-{cream,dark}.jpg`)
+      via `vision`.
+    - Mounted `PuzzleRenderer` (`src/render/puzzles-render.ts`) in `GameView`
+      with y-sorted props, directional rotating mirror visuals, luminous
+      violet-cyan prism beams, 5-band pastel rainbow lasso arc, glowing
+      stepping stones, floating bell melody dots, solve sparkle bursts, and an
+      opaque die-cut cream Harmony Flute Wheel dialog (`src/ui/flute-wheel.{ts,css}`).
+  - **7 Signature Areas Retrofitted (`content/areas/{gym,trail,cavern,woods,pass,island,mist}.json`):**
+    - `gym` (pushable crate + pressure plate + lasso lever), `trail`
+      (lantern stepping stones + grapple post + grapple swing), `cavern`
+      (blacklight prism beam mirror puzzle -> `cavern_bridge_lit`), `woods`
+      (3-note flute resonance bell blooming vine bridge), `pass` (sliding
+      snowball + co-op double pressure plate with Jordan), `island` (3-note
+      seashell flute harmony -> `island_shells_solved`), and `mist`
+      (interactive 3-tool Enchanted Forest Seal ritual: Lantern stepping stones
+      + Lasso grapple bridge + Flute seal shrine -> `found_mist_way`,
+      `rope_bridge`, `seal_open`).
+- Evidence: `tests/unit/puzzles.test.ts` (17 real-state core tests) &
+  `tests/unit/puzzles-ui.test.ts` (input/touch/flute-wheel/pose/prompt tests);
+  3 new deterministic sim scripts (`cavern/cavern-prism.json`,
+  `mist/mist-3tool-seal.json`, `island/island-flute-harmony.json` via
+  `tools/sim/record-e5-puzzles.ts`, `content/fixtures/mist.json`); real-key
+  Chromium + WebKit Playwright e2e `tests/e2e/e5-puzzles-tools-dash.spec.ts`
+  (`@smoke`, verifying Bun == Browser hashes for Cavern prism, Mist 3-tool
+  seal, and Island harmony, plus Shift/touch dash & Pass snowball co-op);
+  `vision`-verified art & gameplay review JPEGs (`art/review/puzzle-props-{cream,dark}.jpg`,
+  `art/review/e5-cavern-prism-before-after.jpg`,
+  `art/review/e5-mist-3tool-seal-before-after.jpg`,
+  `art/review/e5-pass-snowball-coop.jpg`), logged in `docs/review-queue.md`.
+- Gates: `just check` (261 test files, 1,942 unit tests, 77 sim scripts, 23 QA
+  packs, ink/purity/lint/typecheck), `just build` (all non-vendor chunks
+  `< 446 kB`, hook leak + runtime story + harness checks green), and Chromium +
+  WebKit Playwright e2e verification.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

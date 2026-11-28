@@ -1,0 +1,54 @@
+{
+  "asset": "puzzle-props",
+  "date": "2026-11-27",
+  "summary": "Art Wave B1 — 12 hand-painted 256x256 watercolor spatial puzzle props (push-rock, push-crate, push-snowball, pressure-plate-up/down, sun-crystal-off/on, prism-mirror, resonance-bell, grapple-post, vine-bridge, stepping-stone) packed into a 1024x768 alpha-WebP atlas (`public/assets/puzzles/puzzles.webp`, 123 KB, q92, alpha_q 100, PSNR 43.86 dB).",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 4,
+  "rejectedCalls": 0,
+  "references": [
+    "docs/art/concepts/props/park_props.png",
+    "docs/art/concepts/props/tools_lasso_flute_journal.png",
+    "docs/art/concepts/props/blacklight_lantern.png",
+    "docs/art/concepts/environments/meadow_park_environment.png"
+  ],
+  "selectedRawSources": [
+    "art/source/puzzles/sheet-a-raw.png",
+    "art/source/puzzles/sheet-b-raw.png",
+    "art/source/puzzles/sheet-c-raw.png",
+    "art/source/puzzles/sheet-patch-raw.png"
+  ],
+  "prompts": {
+    "sheetA": "2x2 grid of four isolated 3/4 overhead watercolor-and-ink game puzzle props on flat pure magenta #FF00FF matching Cloverhollow warm-brown ink (#5B3530) and pastel watercolor style (zero magenta inside): push-rock (mossy boulder), push-crate (honey-oak plank crate with brass star rivets), push-snowball (fluffy packed mountain snowball), vine-bridge (braided woody vines with sage clovers and butter-yellow flowers).",
+    "sheetB": "2x2 grid of four isolated 3/4 overhead watercolor-and-ink game puzzle props on flat pure green #00FF00 matching Cloverhollow warm-brown ink (#5B3530): sun-crystal-off (dormant slate-lavender crystal spire on two-tier stone pedestal), sun-crystal-on (replaced by zero-halo patch), prism-mirror (round wooden turntable base with brass-framed octagonal reflective crystal mirror), stepping-stone (pale cream-lavender stone engraved with glowing violet four-leaf clover rune).",
+    "sheetC": "2x2 grid of four isolated 3/4 overhead watercolor-and-ink game puzzle props on flat pure green #00FF00 matching Cloverhollow warm-brown ink (#5B3530): pressure-plate-up (replaced by matching-clover patch), pressure-plate-down (recessed square terracotta-and-cream stone plate with butter-gold glowing clover), resonance-bell (curved cedar crook hanging coral, butter-yellow, and sky-blue chime bells), grapple-post (rope-bound carved cedar anchor post with golden star finial).",
+    "sheetPatch": "Side-by-side 16:9 regeneration on flat pure green #00FF00 using sun-crystal-off and pressure-plate-down as references: sun-crystal-on with luminous golden/lavender interior facets and zero outer glow bleeding onto chroma green, and pressure-plate-up in raised beveled state with matching unlit carved three-leaf clover emblem."
+  },
+  "processing": [
+    "Crop sheet-a quadrants (1024x1024 each) for push-rock, push-crate, push-snowball, and vine-bridge; key #FF00FF with tools/art/key-alpha.ts (--fuzz 22%..24%, --holes on vine-bridge, --despill none) and tools/art/despill-edge.ts --key magenta --band 3.",
+    "Crop sheet-b quadrants for sun-crystal-off, prism-mirror, stepping-stone and sheet-c quadrants for pressure-plate-down, resonance-bell, grapple-post; crop sheet-patch-raw.png along measured green gutter x=1204 (gutter 1094..1313) for sun-crystal-on (left) and pressure-plate-up (right).",
+    "Key #00FF00 with tools/art/key-alpha.ts (--fuzz 20%..22%, --holes on resonance-bell, --despill none) and tools/art/despill-edge.ts --key green --band 3.",
+    "Trim each frame, fit preserving aspect ratio inside 216..236 px, center on 256x256 PNG32 canvas, verify 0 non-zero alpha pixels on the 4 px outer border of all 12 frames, montage 4x3 (1024x768), and encode with cwebp -q 92 -alpha_q 100 -m 6 (verified PSNR 43.86 dB >= 42 dB)."
+  ],
+  "outputs": [
+    "public/assets/puzzles/puzzles.webp",
+    "public/assets/puzzles/puzzles.json"
+  ],
+  "frames": [
+    "push-rock",
+    "push-crate",
+    "push-snowball",
+    "pressure-plate-up",
+    "pressure-plate-down",
+    "sun-crystal-off",
+    "sun-crystal-on",
+    "prism-mirror",
+    "resonance-bell",
+    "grapple-post",
+    "vine-bridge",
+    "stepping-stone"
+  ],
+  "review": [
+    "art/review/puzzle-props-cream.jpg",
+    "art/review/puzzle-props-dark.jpg"
+  ]
+}

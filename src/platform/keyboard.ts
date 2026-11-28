@@ -39,6 +39,7 @@ export function keyboardFrame(pressed: ReadonlySet<string>): ActionFrame {
     lantern: has("KeyL"),
     flute: has("KeyF"),
     ...(has("KeyR") ? { lasso: true } : {}),
+    ...(has("ShiftLeft") || has("ShiftRight") ? { dash: true } : {}),
   };
 }
 

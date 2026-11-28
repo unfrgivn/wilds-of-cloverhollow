@@ -9,11 +9,35 @@ const BUTTONS = [
   ["menu", "☰"],
   ["lantern", "✦"],
   ["flute", "♪"],
+  ["lasso", "◎"],
 ] as const;
 type Button = (typeof BUTTONS)[number][0];
 // One of a check's arrow stickers: its class suffix, glyph, name, and the
 // stick direction it holds.
 type Arrow = { side: string; label: string; name: string; direction: Point };
+
+function lassoIcon(): SVGSVGElement {
+  const namespace = "http://www.w3.org/2000/svg";
+  const icon = document.createElementNS(namespace, "svg");
+  icon.setAttribute("viewBox", "0 0 32 32");
+  icon.setAttribute("aria-hidden", "true");
+  const loop = document.createElementNS(namespace, "ellipse");
+  loop.setAttribute("class", "lasso-icon-loop");
+  loop.setAttribute("cx", "16");
+  loop.setAttribute("cy", "12.5");
+  loop.setAttribute("rx", "9.5");
+  loop.setAttribute("ry", "6.2");
+  const tail = document.createElementNS(namespace, "path");
+  tail.setAttribute("class", "lasso-icon-tail");
+  tail.setAttribute("d", "M16 18.7 C16 23 12 24.5 9.5 27");
+  const knot = document.createElementNS(namespace, "circle");
+  knot.setAttribute("class", "lasso-icon-knot");
+  knot.setAttribute("cx", "16");
+  knot.setAttribute("cy", "18.7");
+  knot.setAttribute("r", "2.1");
+  icon.append(loop, tail, knot);
+  return icon;
+}
 
 // The concept's JOURNAL sticker: an open book with a quill.
 function journalIcon(): SVGSVGElement {
@@ -49,6 +73,18 @@ export function mountTouchControls(): TouchInput {
   const stick = document.createElement("div");
   stick.className = "touch-stick";
   root.append(stick);
+  const dash = document.createElement("button");
+  dash.className = "touch-button touch-dash";
+  dash.type = "button";
+  dash.textContent = "»";
+  dash.setAttribute("aria-label", "Dash toggle");
+  dash.setAttribute("aria-pressed", "false");
+  dash.addEventListener("click", () => {
+    const on = input.toggleDash();
+    dash.classList.toggle("is-on", on);
+    dash.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+  root.append(dash);
   const trace = document.createElement("div");
   trace.className = "touch-trace";
   trace.hidden = true;
@@ -77,6 +113,10 @@ export function mountTouchControls(): TouchInput {
       element.textContent = label;
       element.hidden = true;
       element.setAttribute("aria-label", "flute");
+    } else if (button === "lasso") {
+      element.hidden = true;
+      element.setAttribute("aria-label", "lasso");
+      element.append(lassoIcon());
     } else {
       element.textContent = label;
     }

@@ -19,6 +19,7 @@ import type { RestSpot } from "./companions";
 import {
   companionIdlePose,
   composePose,
+  dashPose,
   fairyHover,
   idleBreathing,
   NEUTRAL_POSE,
@@ -216,10 +217,13 @@ export function computeFaePose(
   activeRest: { spot: RestSpot; elapsed: number } | null,
   activePet: { id: string; elapsed: number } | null,
 ): MotionPose {
+  const dashing = state.previousInput.dash === true && state.motion.moving;
   let pose: MotionPose = !livingMotion
     ? NEUTRAL_POSE
     : state.motion.moving
-      ? walkPose(state.motion.distance, walkCycleUnits, true)
+      ? dashing
+        ? dashPose(state.motion.distance, walkCycleUnits, state.facing)
+        : walkPose(state.motion.distance, walkCycleUnits, true)
       : activeRest !== null
         ? {
             offsetX: 0,

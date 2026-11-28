@@ -1,72 +1,25 @@
 import type {
-  ActionFrame,
-  Area,
-  Direction,
-  Event,
-  Fixture,
-  Mood,
-  Npc,
-  Point,
-  State,
-  World,
+  ActionFrame, Area, Direction, Event, Fixture, Mood, Npc, Point, State, World,
 } from "./types";
 import { createInkState, runInk, setInkVariables, storyHasKnot } from "./ink";
 import {
-  findLullabyFluteSpot,
-  heartToHeartSpotsInArea,
-  type ActiveHeartSpot,
+  findLullabyFluteSpot, heartToHeartSpotsInArea, type ActiveHeartSpot,
 } from "./heart-to-hearts";
 import { sceneryArea } from "./props";
 import {
-  closestPointOnPolygon,
-  distanceToPolygon,
-  pointInPolygon,
-  resolveCollision,
-  resolveMove,
+  closestPointOnPolygon, distanceToPolygon, pointInPolygon, resolveCollision, resolveMove,
 } from "./geometry";
 import {
-  BOSS_SET_PIECES,
-  battleParty,
-  bossesCalmedCount,
-  calmedFact,
-  faeBox,
-  haltedParty,
-  hiddenFraction,
-  npcVisible,
-  orderPartyContent,
-  orderPartyIds,
-  orderPartyMembers,
-  partyCommand,
-  partyLeader,
-  partySlots,
-  restingParty,
-  spawnParty,
-  stepParty,
-  syncParty,
-  visibleFollowerSlot,
+  BOSS_SET_PIECES, battleParty, bossesCalmedCount, calmedFact, faeBox, haltedParty,
+  hiddenFraction, npcVisible, orderPartyContent, orderPartyIds, orderPartyMembers, partyCommand,
+  partyLeader, partySlots, restingParty, spawnParty, stepParty, syncParty, visibleFollowerSlot,
 } from "./party";
 import {
-  battleFoe,
-  inkFacts,
-  presentCritters,
-  rollWild,
-  sendHome,
-  stepWild,
-  touchingCritter,
+  battleFoe, inkFacts, presentCritters, rollWild, sendHome, stepWild, touchingCritter,
 } from "./roam";
 import {
-  CALM_HOOK,
-  activeBattleActor,
-  addTreat,
-  battleCommands,
-  battleTurnRoster,
-  battleView,
-  consumeTreat,
-  purchaseTreat,
-  revealCharacters,
-  startBattle,
-  stepBattle,
-  totalTreatCount,
+  CALM_HOOK, activeBattleActor, addTreat, battleCommands, battleTurnRoster, battleView,
+  consumeTreat, purchaseTreat, revealCharacters, startBattle, stepBattle, totalTreatCount,
   type TextSpeed,
 } from "./battle";
 import { levelUpDelta } from "./levels";
@@ -79,6 +32,10 @@ export {
   CUTSCENE_SKIP_HOLD_TICKS, cutsceneSpriteIds, cutsceneView, findTriggeredCutscene,
   isCutsceneSeen, startCutscene, stepCutscene,
 } from "./cutscene";
+import {
+  areaWithoutOverriddenCrossings, clearPuzzleArea, puzzleSolidPolygons, resolveOverworldMove,
+  stepPuzzleIntercept, stepPuzzles, tryPuzzleConfirm,
+} from "./puzzles";
 
 export {
   BOSS_SET_PIECES, CALM_HOOK, activeBattleActor, addTreat, battleCommands, battleFoe, battleParty,
@@ -242,15 +199,27 @@ export function targetInteractable(
     .sort((a, b) => a.length - b.length)[0]?.item;
 }
 
-function solidArea(world: World, state: State, area: Area): Area {
-  const scenery = sceneryArea(world, state.ink, area);
+function solidArea(
+  world: World,
+  state: State,
+  area: Area,
+  excludePushableId?: string,
+): Area {
+  const base = area.puzzles === undefined
+    ? area
+    : areaWithoutOverriddenCrossings(world, state, area);
+  const scenery = sceneryArea(world, state.ink, base);
+  const npcBlockers = area.npcs
+    .filter((npc) => npcVisible(world, state, npc))
+    .map((npc) => npcLiveFootprint(npc, npcLivePoint(state, npc)));
   return {
     ...scenery,
     blockers: [
       ...scenery.blockers,
-      ...area.npcs
-        .filter((npc) => npcVisible(world, state, npc))
-        .map((npc) => npcLiveFootprint(npc, npcLivePoint(state, npc))),
+      ...npcBlockers,
+      ...(area.puzzles === undefined
+        ? []
+        : puzzleSolidPolygons(world, state, area, excludePushableId)),
     ],
   };
 }
@@ -632,7 +601,6 @@ function stepTick(
   }
   const menuEdge = input.menu && !state.previousInput.menu;
   const cancelEdge = input.cancel && !state.previousInput.cancel;
-  const lanternEdge = input.lantern === true && state.previousInput.lantern !== true;
   const fluteEdge = input.flute === true && state.previousInput.flute !== true;
   if (state.journalOpen) {
     return {
@@ -647,20 +615,16 @@ function stepTick(
       events: [],
     };
   }
-  if (lanternEdge && state.finale === null && state.transition === null) {
-    const hasLantern = world.storyVariable(state.ink, "has_lantern") === true;
-    if (hasLantern) return {
-      state: {
-        ...state,
-        tick: state.tick + 1,
-        lantern: !state.lantern,
-        previousInput: { ...input },
-      },
-      events: [],
-    };
-  }
-  // The flute plays its own knot: a musical lullaby landmark when nearby on
-  // Toby's quest, otherwise a friend called or sent home (spec 5).
+  const intercepted = stepPuzzleIntercept(
+    world,
+    area,
+    (targetState, excludeId) => solidArea(world, targetState, area, excludeId),
+    state,
+    input,
+  );
+  if (intercepted !== undefined) return { state: intercepted, events: [] };
+  // The flute plays a lullaby landmark or calls/sends home a friend when away
+  // from a resonance bell (spec 5).
   if (fluteEdge && state.finale === null && state.transition === null &&
       world.storyVariable(state.ink, "has_flute") === true) {
     const lullaby = findLullabyFluteSpot(world, state);
@@ -692,7 +656,7 @@ function stepTick(
       if (targetArea === undefined) throw new Error("Unknown transition area");
       const spawn = targetArea.spawns[transition.target.spawn];
       if (spawn === undefined) throw new Error("Unknown transition spawn");
-      const arrived: State = {
+      const arrived: State = clearPuzzleArea({
         ...state,
         tick: state.tick + 1,
         area: targetArea.id,
@@ -715,7 +679,7 @@ function stepTick(
         ),
         safeSpot: { area: targetArea.id, spawn: transition.target.spawn },
         backLink: held === undefined ? undefined : { area: state.area, direction: held },
-      };
+      });
       // Every arrival rolls the area's critters fresh (a rest arrives too).
       const revealed = afterArrival(world, arrived);
       return { state: { ...revealed, ...rollWild(world, revealed, targetArea) }, events: [] };
@@ -739,20 +703,17 @@ function stepTick(
     const target = targetInteractable(world, state);
     if (target !== undefined && target.knot !== undefined)
       return { state: openTalk(world, state, input, target.knot), events: [] };
+    const puzzleConfirm = tryPuzzleConfirm(world, area, state, input);
+    if (puzzleConfirm !== undefined) return { state: puzzleConfirm, events: [] };
   }
-  const length = Math.sqrt(
-    input.move.x * input.move.x + input.move.y * input.move.y,
-  );
-  const scale = length > 1 ? 1 / length : 1;
-  const speed = world.tunables.walkSpeed / 60;
   // People who are there are solid, for Fae and for her party alike.
   const solid = solidArea(world, state, area);
-  const player = resolveMove(
+  const dashing = input.dash === true;
+  const player = resolveOverworldMove(
     state.player,
-    {
-      x: state.player.x + input.move.x * scale * speed,
-      y: state.player.y + input.move.y * scale * speed,
-    },
+    input.move,
+    dashing,
+    world.tunables.walkSpeed / 60,
     solid,
     world.tunables.playerRadius,
   );
@@ -829,7 +790,7 @@ function stepTick(
   }
   const party =
     trigger === undefined
-      ? stepParty(world, solid, state, player, displacement > 0.0001)
+      ? stepParty(world, solid, state, player, displacement > 0.0001, dashing)
       : haltedParty(state.party);
   const nextState: State = {
       ...state,
@@ -855,10 +816,20 @@ function stepTick(
       rng: moved.rng,
       backLink,
     };
+  const resolvedState =
+    trigger === undefined && (area.puzzles !== undefined || nextState.puzzleArea !== undefined)
+      ? stepPuzzles(
+          world,
+          area,
+          (excludeId) => solidArea(world, nextState, area, excludeId),
+          nextState,
+          input,
+        )
+      : nextState;
   return {
     state: knock === undefined
-      ? nextState
-      : applyItemTags(nextState, knock.result.line?.tags ?? []),
+      ? resolvedState
+      : applyItemTags(resolvedState, knock.result.line?.tags ?? []),
     events,
   };
 }
@@ -890,23 +861,7 @@ export function step(
           return triggered === undefined ? joined : startCutscene(world, joined, triggered.id);
         })()
       : joined;
-  const events = [...result.events];
-  const addLevelEvent = (member: string, beforeXp: number, afterXp: number): void => {
-    const delta = levelUpDelta(world.levels, beforeXp, afterXp);
-    if (delta.levels === 0) return;
-    events.push({ type: "level-up", member, from: delta.before, to: delta.after,
-      deltas: {
-        power: delta.afterStats.power - delta.beforeStats.power,
-        magic: delta.afterStats.magic - delta.beforeStats.magic,
-        life: delta.afterStats.life - delta.beforeStats.life,
-        guard: delta.afterStats.guard - delta.beforeStats.guard,
-      } });
-  };
-  addLevelEvent("fae", state.xp, staged.xp);
-  for (const member of staged.party) {
-    const before = state.party.find((item) => item.id === member.id)?.xp;
-    if (before !== undefined) addLevelEvent(member.id, before, member.xp);
-  }
+  const events = [...result.events, ...levelUpEvents(world, state, staged)];
   return { state: staged, events };
 }
 

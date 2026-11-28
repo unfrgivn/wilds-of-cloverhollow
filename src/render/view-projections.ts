@@ -1,5 +1,6 @@
 import {
   targetInteractable,
+  targetPuzzleAction,
   wildMarks,
   type Area,
   type CreditEntry,
@@ -29,6 +30,7 @@ import { transitionZoom } from "./fade";
 import type { NpcLifeRenderInfo } from "./npc-life";
 import type { MicroDelightsRenderInfo } from "./micro-delights-render";
 import { computeLanternBlend, PET_REACTION_DURATION } from "./overworld-render";
+import type { PuzzleRenderInfo } from "./puzzles-render";
 import type { TimeOfDayPhase } from "./time-of-day";
 
 export type ViewportRect = {
@@ -106,6 +108,7 @@ export type GameViewRenderInfo = {
   timeOfDay: TimeOfDayPhase;
   photoMode: boolean;
   microDelights: MicroDelightsRenderInfo;
+  puzzles: PuzzleRenderInfo;
   battle: BattleRenderInfo;
   cutscene: CutsceneRenderInfo | null;
 };
@@ -351,7 +354,9 @@ export function computePromptScreenView(
   canvasWidth: number,
   canvasHeight: number,
 ): PromptScreenView {
-  const target = targetInteractable(world, state);
+  const interactable = targetInteractable(world, state);
+  const puzzle = interactable === undefined ? targetPuzzleAction(world, state) : undefined;
+  const target = interactable ?? puzzle;
   if (target === undefined || camera === undefined) {
     return { visible: false, label: "", x: 0, y: 0 };
   }

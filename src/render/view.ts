@@ -14,6 +14,7 @@ import { PaperGrainOverlay, syncPresentationTelemetry } from "./paper-grain";
 import { createVfxTextures, type VfxTextures } from "./vfx-textures";
 import { BiomeAtmosphere } from "./atmosphere";
 import { AreaRestorationRenderer } from "./restoration";
+import { PuzzleRenderer } from "./puzzles-render";
 import type { RestSpot } from "./companions";
 import { storyTimeOfDay } from "./time-of-day";
 import {
@@ -54,6 +55,7 @@ export class GameView {
   private readonly vfx: VfxTextures;
   private readonly atmosphere: BiomeAtmosphere;
   private readonly restoration: AreaRestorationRenderer;
+  private readonly puzzles: PuzzleRenderer;
   private readonly effects: OverworldEffectsController;
   private readonly entities: OverworldEntityLayer;
   private readonly cutsceneRender: CutsceneRenderController;
@@ -120,6 +122,10 @@ export class GameView {
 
     this.shadowLayer.label = "shadows";
     this.depth.sortableChildren = true;
+    this.puzzles = new PuzzleRenderer(this.vfx, {
+      depth: this.depth,
+      shadowLayer: this.shadowLayer,
+    });
     this.entities = new OverworldEntityLayer(this.world, this.vfx, {
       depth: this.depth,
       shadowLayer: this.shadowLayer,
@@ -164,6 +170,7 @@ export class GameView {
     );
     this.scene.addChild(
       this.restoration.groundLayer,
+      this.puzzles.groundLayer,
       this.shadowLayer,
       this.effects.grassLayer,
       this.effects.footstepLayer,
@@ -174,6 +181,7 @@ export class GameView {
       this.ambientLayer,
       this.atmosphere.over,
       this.restoration.fxLayer,
+      this.puzzles.fxLayer,
       this.npcLife.reactionLayer,
       this.effects.emoteLayer,
       this.cutsceneRender.emoteLayer,
@@ -199,6 +207,7 @@ export class GameView {
     previous?.destroy();
     this.entities.clearArea();
     this.cutsceneRender.clearArea();
+    this.puzzles.clear();
     const next = await this.assets.loadArea(area, this.depth, previous);
     this.areaView = next;
     for (const entry of this.glowSprites) entry.sprite.destroy();
@@ -216,6 +225,7 @@ export class GameView {
     this.scene.addChildAt(next.ground, 0);
     this.paperGrain.mountArea(area);
     this.entities.mountNpcs(area);
+    this.puzzles.mountArea(area);
     this.cameraDirector.reset();
     this.lanternTick = undefined;
     this.staticWidth = 0;
@@ -419,6 +429,9 @@ export class GameView {
     this.renderGlows(state, playerPos, paused, reducedMotion);
     this.effects.updateStarGemGlints(state, reducedMotion);
     this.restoration.update(this.world, state, { paused, reducedMotion });
+    this.puzzles.update(this.world, area, state, {
+      prev, alpha, paused, reducedMotion, shadowAlpha,
+    });
     const baseAtmos = computeStoryAtmosphereOptions(this.world, state, area.id, reducedMotion);
     const weatherInfo = weatherForArea(area.id, state.tick, getCozyWeatherMode());
     if (
@@ -644,6 +657,7 @@ export class GameView {
       timeOfDay: storyTimeOfDay(this.world, state).phase,
       photoMode: this.photoMode,
       microDelights: this.microDelights.info(state),
+      puzzles: this.puzzles.renderInfo(this.world, state),
       battle: this.battleView.renderInfo(
         state, window.innerWidth, window.innerHeight,
         this.viewWidth, this.viewHeight, this.scene.visible,

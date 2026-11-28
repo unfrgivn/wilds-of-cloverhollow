@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 192)
+Last updated: 2026-11-28 (Milestone 193)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -293,11 +293,19 @@ ios/            Capacitor iOS project (from Milestone 4).
 ### 3.2 Input
 - Devices produce one `ActionFrame` per tick: a `move` vector (x and y in
   -1..1) plus booleans `confirm`, `cancel`, and `menu`, and optional
-  `lantern`, `flute`, and `lasso`, each present only while pressed (like a
+  `lantern`, `flute`, `lasso`, and `dash` (Milestone 193 / Track E5), each
+  present only while pressed/active (like a
   touch `choose`): a blank
   frame, a recorded one, and a real key's frame then have the same shape, so a
   save's last input matches a new game's (section 10), and older recordings
-  and their hashes stand. A trace check may additionally carry
+  and their hashes stand. Cozy Dash (`dash: true`, stamina-free ~1.45x
+  skip-run with two-half-step `resolveMove` corner-sliding and brisk surface
+  dust puffs) binds to `ShiftLeft`/`ShiftRight` on keyboard, B (button 1) or
+  R2 (button 7) on standard gamepads, and a subtle `.touch-dash` toggle pill
+  (`46×46 px`, `aria-pressed`) above the resting virtual stick on touch
+  devices; `.touch-lasso` appears beside `.touch-flute` once `has_lasso` is
+  true (both hidden during dialogue, battle, arcade, cutscene, flute-wheel,
+  journal, title, credits, and photo overlays). A trace check may additionally carry
   `pointer: { x, y }`, integer coordinates from 0 through 1000 in the trace
   square, only while a finger is down; `blankInput()` has no pointer. Only
   touch supplies it, and the device merge (`combineInputFrames`) passes it on
@@ -1406,6 +1414,63 @@ ios/            Capacitor iOS project (from Milestone 4).
   overlay over the area painting.
 - `content/tunables.json`: `walkSpeed` (240 units per second), `playerRadius`
   (14), and `walkCycleUnits` (126).
+- **Spatial Puzzle Engine & Real Overworld Tools** (Milestone 193 / Elevation
+  Track E5, Art Wave B1; pure core in `src/core/puzzles.ts` &
+  `src/core/puzzles-queries.ts`, strict validator `src/content/puzzle-parsers.ts`,
+  Pixi renderer `src/render/puzzles-render.ts`, Harmony Flute Wheel dialog
+  `src/ui/flute-wheel.{ts,css}`, permanent 12-frame `1024×768` alpha-WebP
+  prop kit `public/assets/puzzles/puzzles.{webp,json}`, `123 KB`, PSNR
+  `43.86 dB`, `art/recipes/puzzle-props.json`):
+  - **Cozy Dash / Skip (`DASH_SPEED_MULTIPLIER = 1.45`):** holding `Shift`,
+    gamepad B/R2, or toggling `.touch-dash` moves Fae at `1.45×` walk speed
+    through two half-step `resolveMove` passes for crisp corner-sliding and
+    zero wall/trigger tunneling, paired with render-only `dashPose` skip-lean
+    (`src/render/motion.ts`) and brisk surface-aware dust/snow/sand/grass/ripple
+    puffs (`src/render/ground-reactivity.ts`, suppressed in Reduced Motion and
+    `harness`).
+  - **Physical Overworld Tools:**
+    - **Rainbow Lasso (`lasso` / `R` / `LB` / `.touch-lasso`):** fires a visible
+      5-band pastel rainbow arc in Fae's facing direction (forgiving corridor,
+      up to `260u`) to smoothly swing across gaps on `swing` grapple posts
+      (16 ticks, moving party along), yank `post`/`lever` switches from afar,
+      rotate `prism-mirror`s 90° clockwise, yank `lassoable` crates/rocks/snowballs
+      toward Fae, or twirl playfully in open air (`miss`, 12 ticks).
+    - **Blacklight Lantern Lens (`lantern` / `L` / `X`):** illuminates invisible
+      `steppingStones` (making their `gapPolygon` / `overridesCrossing` walkable
+      ONLY while lit within `lanternRange` or once permanently solved, safely
+      nudging Fae out if switched off inside an unlit gap) and energizes
+      `emitters` within `lanternRange` to trace pure axis-aligned crystal beams
+      (`tracePrismBeams`, zero trig, up to 8 bounces across rotatable
+      `ne`/`se`/`sw`/`nw` `mirrors`, blocked by pushables/walls) into `receivers`.
+    - **Harmony Flute Wheel (`flute` / `F` / `RB` / `.touch-flute`):** when
+      within `bell.radius` of a `ResonanceBellDef` (preserving `FLUTE_KNOT`
+      and Toby's lullaby landmarks everywhere else), opens the opaque die-cut
+      `.flute-wheel` dialog (`data-flute-wheel="open"`), accepting directional
+      edges (`Up` Red / `Right` Yellow / `Down` Green / `Left` Blue) or direct
+      taps (`input.choose` `0..3`) to match 3-note melodies, bloom vine bridges,
+      harmonize seashells, or unseal shrines.
+  - **Pushables, Sliding Snowballs & Companion Hold-Switches:** pushable crates
+    and rocks move cleanly clamped to walkable/solid polygons; `slides: true`
+    snowballs glide smoothly until hitting a solid or snapping onto an open
+    pressure plate; `companionHold: true` pressure plates allow Fae to press
+    Confirm (`Hold` / `Call Back`) to station a party companion (preferring
+    `preferredCompanion`, e.g., Jordan) on the plate while remaining companions
+    follow Fae.
+  - **Seven Retrofitted Signature Areas** (all existing golden-path Ink flows
+    and all 74 prior sim scripts remain 100% compatible and bit-identical):
+    `gym` (`gym-crate` + `gym-plate` + `gym-lever` -> `gym-supply-puzzle`),
+    `trail` (`trail-stones` + `trail-grapple` + `trail-swing` -> `trail-crossing`),
+    `cavern` (blacklight prism beam puzzle `cavern-emitter` -> 2 rotating mirrors
+    -> `cavern-receiver` mirroring `cavern_bridge_lit`), `woods` (`woods-bell`
+    3-note flute harmony blooming `woods-vines` -> `woods-vine-harmony`),
+    `pass` (`pass-snowball` sliding snowball + co-op double pressure plates
+    `pass-plate-jordan` & `pass-plate-snow` -> `pass-snowball-coop`),
+    `island` (`island-seashell-bell` 3-note seashell flute harmony mirroring
+    `island_shells_solved`), and `mist` (interactive 3-tool Enchanted Forest
+    Seal ritual: Lantern `mist-lantern-stones` -> `found_mist_way`, Lasso
+    `mist-gully-post` -> `rope_bridge`, Flute `mist-seal-shrine` -> `seal_open`
+    + `mist-forest-seal`). `renderInfo().puzzles` exposes read-only
+    `{ solved, activeBeams, fluteWheelOpen, lassoActive, dashing }`.
 - Transitions: entering a trigger fades out, loads the target area, places the
   player at the named spawn facing the given direction, and fades in. The
   target's art is prefetched as the fade-out begins and its tiles and prop
@@ -5344,6 +5409,11 @@ trunks keep its two exits.
   outside active cutscenes and `parseSave` refuses any mid-cutscene save, while
   optional `state.cutscenesSeen` (kebab-case cutscene IDs, omitted when empty)
   round-trips cleanly at version 10 without bumping `SaveData.version`.
+  Optional `state.puzzles` (`Record<string, boolean>`, kebab-case puzzle IDs,
+  omitted when empty) persists solved spatial puzzles cleanly at version 10
+  while transient `state.puzzleArea` (live room crate/mirror/lasso/flute-wheel
+  state) is omitted until interaction, cleared on area transitions, and
+  stripped on serialize/parse (Milestone 193).
   Optional `state.encore` (`EncoreRecord`: `{ bosses, trophies }`, omitted when
   empty, validated by `validEncoreRecord` in `src/core/encore.ts` /
   `src/core/save.ts`, Milestone 191) likewise round-trips at version 10 while

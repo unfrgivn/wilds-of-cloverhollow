@@ -1,0 +1,272 @@
+.flute-wheel[hidden] {
+  display: none;
+}
+
+.flute-wheel {
+  position: fixed;
+  left: 50%;
+  bottom: calc(28px + var(--safe-bottom));
+  z-index: 42;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-width: 262px;
+  max-width: calc(100vw - 32px - var(--safe-left) - var(--safe-right));
+  box-sizing: border-box;
+  padding: 16px 20px 18px;
+  border: 6px solid #fffdf7;
+  border-radius: 22px 26px 20px 24px;
+  outline: 3px solid #47321f;
+  background: #fbf5e4;
+  box-shadow: 0 10px 26px rgba(71, 50, 31, 0.34), inset 0 0 0 2px #d8c7a3;
+  color: #47321f;
+  font-family: var(--sticker-font);
+  pointer-events: auto;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  animation: flute-wheel-in 160ms ease-out;
+}
+
+:root[data-flute-wheel="open"] .sticker-prompt {
+  display: none;
+}
+
+:root[data-cutscene="open"] .flute-wheel {
+  display: none;
+}
+
+.flute-wheel.is-matched {
+  background: #fdf6d6;
+  box-shadow: 0 0 22px #ffe484aa, var(--sticker-shadow);
+}
+
+.flute-wheel.is-wrong {
+  background: #fdeae8;
+  animation: flute-wheel-shake 240ms ease-in-out;
+}
+
+.flute-wheel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+.flute-wheel-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.flute-wheel-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 2.5px solid var(--sticker-ink);
+  border-radius: 50%;
+  background: var(--sticker-rim);
+  color: var(--sticker-ink);
+  cursor: pointer;
+  font: 900 18px/1 var(--sticker-font);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.flute-wheel-close:focus-visible,
+.flute-wheel-btn:focus-visible {
+  outline: 3px solid #6b9e56;
+  outline-offset: 2px;
+}
+
+.flute-wheel-clue {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: #fffdf6;
+  border: 2px dashed #47321f55;
+}
+
+.flute-wheel-clue-dot {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 50%;
+  background: var(--note-color, #fffdf7);
+}
+
+.flute-wheel-orbs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.flute-wheel-orb {
+  width: 22px;
+  height: 22px;
+  border: 2.5px solid var(--sticker-ink);
+  border-radius: 50%;
+  background: #ebe2cc;
+  box-shadow: inset 0 2px 0 #ffffff88;
+  transition: transform 110ms ease-out, background-color 110ms ease-out;
+}
+
+.flute-wheel-orb.is-filled {
+  background: var(--note-color, #ffe484);
+  transform: scale(1.1);
+}
+
+.flute-wheel.is-matched .flute-wheel-orb {
+  background: #ffd95e;
+  box-shadow: 0 0 10px #ffe484;
+}
+
+.flute-wheel.is-wrong .flute-wheel-orb {
+  background: #f27474;
+}
+
+.flute-wheel-compass {
+  display: grid;
+  grid-template-columns: repeat(3, 52px);
+  grid-template-rows: repeat(3, 52px);
+  gap: 6px;
+  place-items: center;
+}
+
+.flute-wheel-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border: 3px solid var(--sticker-ink);
+  border-radius: 50%;
+  background: var(--note-color, var(--sticker-rim));
+  box-shadow: inset 0 0 0 2px #fffdf7aa, 0 3px 0 #47321f33;
+  color: var(--sticker-ink);
+  cursor: pointer;
+  font-family: var(--sticker-font);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition: transform 90ms ease-out, box-shadow 90ms ease-out;
+}
+
+.flute-wheel-btn:active,
+.flute-wheel-btn.is-last {
+  transform: scale(0.95);
+  box-shadow: inset 0 0 0 2px #fffdf7dd, 0 0 12px var(--note-color, #ffe484);
+}
+
+.flute-wheel-btn[data-note="up"] {
+  grid-column: 2;
+  grid-row: 1;
+  --note-color: #f27474;
+}
+
+.flute-wheel-btn[data-note="right"] {
+  grid-column: 3;
+  grid-row: 2;
+  --note-color: #f5cb5c;
+}
+
+.flute-wheel-btn[data-note="down"] {
+  grid-column: 2;
+  grid-row: 3;
+  --note-color: #6bc78b;
+}
+
+.flute-wheel-btn[data-note="left"] {
+  grid-column: 1;
+  grid-row: 2;
+  --note-color: #6cb5f5;
+}
+
+.flute-wheel-center {
+  grid-column: 2;
+  grid-row: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid #47321f44;
+  background: #fffdf6;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.flute-wheel-glyph {
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1;
+  color: #3a2314;
+}
+
+.flute-wheel-name {
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  color: #3a2314;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.flute-wheel-clue-dot[data-note="up"],
+.flute-wheel-orb[data-note="up"] { --note-color: #f27474; }
+.flute-wheel-clue-dot[data-note="right"],
+.flute-wheel-orb[data-note="right"] { --note-color: #f5cb5c; }
+.flute-wheel-clue-dot[data-note="down"],
+.flute-wheel-orb[data-note="down"] { --note-color: #6bc78b; }
+.flute-wheel-clue-dot[data-note="left"],
+.flute-wheel-orb[data-note="left"] { --note-color: #6cb5f5; }
+
+@keyframes flute-wheel-in {
+  from { opacity: 1; transform: translate(-50%, 6px) scale(0.96); }
+  to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+
+@keyframes flute-wheel-shake {
+  0%, 100% { transform: translateX(-50%); }
+  25% { transform: translateX(calc(-50% - 6px)); }
+  50% { transform: translateX(calc(-50% + 6px)); }
+  75% { transform: translateX(calc(-50% - 4px)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flute-wheel,
+  .flute-wheel.is-wrong { animation: none; }
+  .flute-wheel-orb,
+  .flute-wheel-btn { transition: none; }
+  .flute-wheel-orb.is-filled,
+  .flute-wheel-btn:active,
+  .flute-wheel-btn.is-last { transform: none; }
+}
+
+:root[data-reduced-motion="on"] .flute-wheel,
+:root[data-reduced-motion="on"] .flute-wheel.is-wrong { animation: none; }
+:root[data-reduced-motion="on"] .flute-wheel-orb,
+:root[data-reduced-motion="on"] .flute-wheel-btn { transition: none; }
+:root[data-reduced-motion="on"] .flute-wheel-orb.is-filled,
+:root[data-reduced-motion="on"] .flute-wheel-btn:active,
+:root[data-reduced-motion="on"] .flute-wheel-btn.is-last { transform: none; }

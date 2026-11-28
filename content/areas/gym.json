@@ -290,5 +290,47 @@
       "x": 938,
       "y": 808
     }
-  ]
+  ],
+  "puzzles": {
+    "pushables": [
+      {
+        "id": "gym-crate",
+        "kind": "crate",
+        "x": 970,
+        "y": 640,
+        "radius": 20,
+        "lassoable": true
+      }
+    ],
+    "plates": [
+      {
+        "id": "gym-plate",
+        "x": 910,
+        "y": 640,
+        "radius": 28
+      }
+    ],
+    "grapples": [
+      {
+        "id": "gym-lever",
+        "kind": "lever",
+        "x": 610,
+        "y": 400,
+        "range": 260,
+        "requiresLasso": true
+      }
+    ],
+    "goals": [
+      {
+        "id": "gym-supply-puzzle",
+        "requirePlates": [
+          "gym-plate"
+        ],
+        "requireLevers": [
+          "gym-lever"
+        ],
+        "rewardCoins": 10
+      }
+    ]
+  }
 }

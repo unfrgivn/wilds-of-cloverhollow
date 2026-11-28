@@ -52,6 +52,7 @@ import { createTravelOverlay } from "./ui/travel-overlay";
 import { mountEncoreShrineSession, type EncoreShrineSession } from "./ui/encore-shrine";
 import { createHudHints } from "./ui/hud-hints";
 import { createSaveToast } from "./ui/save-toast";
+import { buildFluteWheelView, createFluteWheel } from "./ui/flute-wheel";
 import { createPhotoToast, createPhotoTouchBar, createShutterFlash } from "./ui/postcard";
 import {
   canBattlePeek, canOverworldSteer, canPhotoFromJournal, canPhotoMode, createInputShortcuts,
@@ -116,11 +117,15 @@ async function boot(): Promise<void> {
   const touch = mountTouchControls();
   const lanternButton = document.querySelector<HTMLButtonElement>(".touch-lantern");
   const fluteButton = document.querySelector<HTMLButtonElement>(".touch-flute");
+  const lassoButton = document.querySelector<HTMLButtonElement>(".touch-lasso");
   const uiRoot = document.createElement("div");
   document.body.append(uiRoot);
   const dialogueBox = createDialogueBox(uiRoot);
   const prompt = createPrompt(uiRoot);
   const noticeMarks = createNoticeMarks(uiRoot);
+  const fluteWheel = createFluteWheel(uiRoot);
+  fluteWheel.onNote((index) => touch.tapChoice(index));
+  fluteWheel.onClose(() => touch.tapButton("cancel"));
   const battleHud = createBattleHud(uiRoot);
   const commandMenu = createCommandMenu(uiRoot);
   const battleCheck = createBattleCheck(uiRoot);
@@ -507,6 +512,8 @@ async function boot(): Promise<void> {
       lanternButton.classList.toggle("is-on", state.lantern);
     }
     if (fluteButton !== null) fluteButton.hidden = !hasFlute;
+    if (lassoButton !== null) lassoButton.hidden = !hasLasso;
+    fluteWheel.render(buildFluteWheelView(content.world, state));
     const touchActive = document.documentElement.dataset.touch === "on";
     const hasLevelUpNotice = levelUpNotices.length > 0;
     const overworldFree = isOverworldFree(gate, hasLevelUpNotice);

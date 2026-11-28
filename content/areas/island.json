@@ -462,5 +462,32 @@
       "x": 1429,
       "y": 722
     }
-  ]
+  ],
+  "puzzles": {
+    "bells": [
+      {
+        "id": "island-seashell-bell",
+        "style": "seashell",
+        "x": 470,
+        "y": 505,
+        "sequence": [
+          "up",
+          "right",
+          "left"
+        ],
+        "hintLabel": "Red · Yellow · Blue",
+        "radius": 135
+      }
+    ],
+    "goals": [
+      {
+        "id": "island-seashell-harmony",
+        "requireBells": [
+          "island-seashell-bell"
+        ],
+        "inkVariable": "island_shells_solved",
+        "rewardCoins": 20
+      }
+    ]
+  }
 }

@@ -131,9 +131,16 @@ export function bindShellUiControls(deps: ShellUiBindingDeps): void {
     deps.setJukeboxTrack(nextTrack);
     invalidate();
   });
+  ui.journal.onSelectJukeboxTrack((track) => {
+    if (!deps.getState().journalOpen || deps.isTitleOrQaOpen()) return;
+    deps.setJukeboxTrack(track);
+    playToggleFeedback(true);
+    invalidate();
+  });
   ui.journal.onResetJukebox(() => {
     if (deps.getJukeboxTrack() === null) return;
     deps.setJukeboxTrack(null);
+    playToggleFeedback(false);
     invalidate();
   });
   ui.journal.onToggleGentleTiming(

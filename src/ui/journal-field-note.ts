@@ -17,10 +17,12 @@ import {
 import { createJournalEncoreCase } from "./journal-encore";
 import { createJournalGemsLedger } from "./journal-gems-ledger";
 import { createJournalHeartsAlbum } from "./journal-hearts";
+import { createJournalJukeboxAlbum } from "./journal-jukebox";
 import { applyModalScrollKey } from "./journal-nav";
 import { createJournalRibbonsShowcase } from "./journal-ribbons";
 import { createJournalWeatherAlmanac } from "./journal-weather";
 import { isKeepsakeId } from "../core/blessings";
+import type { JukeboxTrack } from "../core/music";
 import { evaluateMeritRibbonsFromJournal } from "../core/ribbons";
 import type { CozyWeatherMode } from "../core/weather";
 
@@ -74,18 +76,13 @@ export type JournalFieldOverlays = {
 
 function makeOverlayButton(className: string, ariaLabel: string, text: string): HTMLButtonElement {
   const btn = element("button", className);
-  btn.type = "button";
-  btn.setAttribute("aria-label", ariaLabel);
-  btn.textContent = text;
+  btn.type = "button"; btn.setAttribute("aria-label", ariaLabel); btn.textContent = text;
   return btn;
 }
-
 function makeDialogCard(className: string, ariaLabel: string): HTMLElement {
   const card = element("article", className);
-  card.tabIndex = -1;
-  card.setAttribute("role", "dialog");
-  card.setAttribute("aria-modal", "true");
-  card.setAttribute("aria-label", ariaLabel);
+  card.tabIndex = -1; card.setAttribute("role", "dialog");
+  card.setAttribute("aria-modal", "true"); card.setAttribute("aria-label", ariaLabel);
   return card;
 }
 
@@ -130,6 +127,8 @@ export function createJournalFieldOverlays(options?: {
   onVisibilityChange?: (open: boolean) => void;
   onStep?: () => void;
   onWeatherSelect?: (mode: CozyWeatherMode) => void;
+  onSelectTrack?: (track: JukeboxTrack) => void;
+  onResetTrack?: () => void;
 }): JournalFieldOverlays {
   const fieldBackdrop = element("div", "journal-field-backdrop");
   fieldBackdrop.hidden = true;
@@ -248,9 +247,10 @@ export function createJournalFieldOverlays(options?: {
     treasuresBackdrop.hidden = true;
   };
 
-  type TreasuresPeer = "weather" | "ribbons" | "hearts" | "encore";
+  const PEER_KEYS = ["jukebox", "encore", "hearts", "weather", "ribbons"] as const;
+  type TreasuresPeer = (typeof PEER_KEYS)[number];
   const returnToTreasures: Record<TreasuresPeer, boolean> = {
-    weather: false, ribbons: false, hearts: false, encore: false,
+    weather: false, ribbons: false, hearts: false, encore: false, jukebox: false,
   };
   const attachOverlay = (overlay: HTMLElement): void => {
     const host = options?.focusRoot ?? treasuresBackdrop.parentElement;
@@ -260,7 +260,7 @@ export function createJournalFieldOverlays(options?: {
     clearFieldNote();
     if (keep === "gems" || keep === undefined) clearTreasures();
     if (keep !== "gems") gemsLedger.clear();
-    for (const key of ["ribbons", "weather", "hearts", "encore"] as const) {
+    for (const key of PEER_KEYS) {
       if (keep === key) continue;
       returnToTreasures[key] = false;
       peerModals[key].clear();
@@ -275,27 +275,32 @@ export function createJournalFieldOverlays(options?: {
     onVisibilityChange: () => syncVisibility(),
   });
   const weatherAlmanac = createJournalWeatherAlmanac({
-    ...peerHooks("weather"),
-    onSelectMode: options?.onWeatherSelect,
+    ...peerHooks("weather"), onSelectMode: options?.onWeatherSelect,
   });
   const ribbonsShowcase = createJournalRibbonsShowcase(peerHooks("ribbons"));
   const heartsAlbum = createJournalHeartsAlbum(peerHooks("hearts"));
   const encoreCase = createJournalEncoreCase(peerHooks("encore"));
+  const jukeboxAlbum = createJournalJukeboxAlbum({
+    ...peerHooks("jukebox"),
+    onSelectTrack: options?.onSelectTrack, onResetTrack: options?.onResetTrack,
+  });
   const peerModals = {
-    weather: weatherAlmanac, ribbons: ribbonsShowcase, hearts: heartsAlbum, encore: encoreCase,
+    weather: weatherAlmanac, ribbons: ribbonsShowcase, hearts: heartsAlbum,
+    encore: encoreCase, jukebox: jukeboxAlbum,
   };
   treasuresTitleWrap.append(
     ribbonsShowcase.treasuresBtn, weatherAlmanac.treasuresBtn,
-    heartsAlbum.treasuresBtn, encoreCase.treasuresBtn,
+    heartsAlbum.treasuresBtn, encoreCase.treasuresBtn, jukeboxAlbum.treasuresBtn,
   );
   const gemsLedger = createJournalGemsLedger({
     onBeforeOpen: () => clearPeers("gems"),
     onVisibilityChange: () => syncVisibility(),
   });
+  const childModals = [
+    jukeboxAlbum, encoreCase, heartsAlbum, weatherAlmanac, ribbonsShowcase, gemsLedger,
+  ] as const;
   const hasOpen = (): boolean =>
-    treasuresOpen || inspectedItem !== null || gemsLedger.isOpen() ||
-    ribbonsShowcase.isOpen() || weatherAlmanac.isOpen() || heartsAlbum.isOpen() ||
-    encoreCase.isOpen();
+    treasuresOpen || inspectedItem !== null || childModals.some((modal) => modal.isOpen());
 
   const syncVisibility = (): void => {
     const nowOpen = hasOpen();
@@ -341,11 +346,9 @@ export function createJournalFieldOverlays(options?: {
       if (!treasuresBackdrop.hidden) clearTreasures();
       return;
     }
-    treasuresBackdrop.hidden =
-      (returnToTreasures.ribbons && ribbonsShowcase.isOpen()) ||
-      (returnToTreasures.weather && weatherAlmanac.isOpen()) ||
-      (returnToTreasures.hearts && heartsAlbum.isOpen()) ||
-      (returnToTreasures.encore && encoreCase.isOpen());
+    treasuresBackdrop.hidden = PEER_KEYS.some(
+      (key) => returnToTreasures[key] && peerModals[key].isOpen(),
+    );
     const signature = treasuresSignature(summary);
     if (signature === lastTreasuresSignature) return;
     lastTreasuresSignature = signature;
@@ -511,19 +514,19 @@ export function createJournalFieldOverlays(options?: {
   fieldPrev.addEventListener("click", () => { stepFieldNote(-1); });
   fieldNext.addEventListener("click", () => { stepFieldNote(1); });
   fieldClose.addEventListener("click", closeFieldNote);
-  fieldBackdrop.addEventListener("click", (event) => {
-    if (event.target === fieldBackdrop) closeFieldNote();
+  fieldBackdrop.addEventListener("click", (e) => {
+    if (e.target === fieldBackdrop) closeFieldNote();
   });
   treasuresClose.addEventListener("click", closeTreasures);
-  treasuresBackdrop.addEventListener("click", (event) => {
-    if (event.target === treasuresBackdrop) closeTreasures();
+  treasuresBackdrop.addEventListener("click", (e) => {
+    if (e.target === treasuresBackdrop) closeTreasures();
   });
-  ribbonsShowcase.treasuresBtn.addEventListener("click", () => {
-    openRibbons(latestView, ribbonsShowcase.treasuresBtn);
-  });
-  ribbonsShowcase.banner.addEventListener("click", () => {
-    openRibbons(latestView, ribbonsShowcase.banner);
-  });
+  ribbonsShowcase.treasuresBtn.addEventListener("click", () =>
+    openRibbons(latestView, ribbonsShowcase.treasuresBtn),
+  );
+  ribbonsShowcase.banner.addEventListener("click", () =>
+    openRibbons(latestView, ribbonsShowcase.banner),
+  );
   const openFromTreasures = (key: TreasuresPeer, overlay: HTMLElement, launch: () => void) => {
     attachOverlay(overlay);
     returnToTreasures[key] = treasuresOpen;
@@ -541,18 +544,16 @@ export function createJournalFieldOverlays(options?: {
     "encore", encoreCase.overlay,
     () => encoreCase.open(latestView?.encoreSummary, encoreCase.treasuresBtn),
   ));
+  jukeboxAlbum.treasuresBtn.addEventListener("click", () => openFromTreasures(
+    "jukebox", jukeboxAlbum.overlay,
+    () => jukeboxAlbum.open(latestView, jukeboxAlbum.treasuresBtn),
+  ));
 
-  const closeAll = (): void => {
-    clearPeers();
-    lastNotifiedOpen = false;
-  };
-
+  const closeAll = (): void => { clearPeers(); lastNotifiedOpen = false; };
   const dismiss = (): boolean => {
-    if (encoreCase.isOpen()) { encoreCase.close(); return true; }
-    if (heartsAlbum.isOpen()) { heartsAlbum.close(); return true; }
-    if (weatherAlmanac.isOpen()) { weatherAlmanac.close(); return true; }
-    if (ribbonsShowcase.isOpen()) { ribbonsShowcase.close(); return true; }
-    if (gemsLedger.isOpen()) { gemsLedger.close(); return true; }
+    for (const modal of childModals) {
+      if (modal.isOpen()) { modal.close(); return true; }
+    }
     if (treasuresOpen) { closeTreasures(); return true; }
     if (inspectedItem !== null) { closeFieldNote(); return true; }
     return false;
@@ -601,6 +602,7 @@ export function createJournalFieldOverlays(options?: {
       syncRibbons(view, ribbonsAnchor);
       heartsAlbum.sync(view.heartToHearts);
       encoreCase.sync(view.encoreSummary);
+      jukeboxAlbum.sync(view);
     },
     stepFieldNote,
     closeFieldNote,
@@ -611,11 +613,7 @@ export function createJournalFieldOverlays(options?: {
     hasOpen,
     dismiss,
     handleKeydown: (event) => {
-      if (encoreCase.handleKeydown(event)) return true;
-      if (heartsAlbum.handleKeydown(event)) return true;
-      if (weatherAlmanac.handleKeydown(event)) return true;
-      if (ribbonsShowcase.handleKeydown(event)) return true;
-      if (gemsLedger.handleKeydown(event)) return true;
+      if (childModals.some((modal) => modal.handleKeydown(event))) return true;
       if (treasuresOpen) {
         if (event.key === "Escape") {
           event.preventDefault();

@@ -1,6 +1,7 @@
 import { element, setAttribute, setText } from "./dom";
 import { cameraIcon } from "./postcard";
 import { AUDIO_LEVELS, type AudioLevel } from "../platform/audio-settings";
+import type { JukeboxTrack } from "../core/music";
 import type { TextSpeed } from "../core/sim";
 
 export type JukeboxMeta = {
@@ -50,6 +51,7 @@ export type JournalOptionsCallbacks = {
   onSetMusicLevel: (level: AudioLevel) => void;
   onToggleAmbience: () => void;
   onStepTrack: (delta: -1 | 1) => void;
+  onSelectJukeboxTrack: (track: JukeboxTrack) => void;
   onResetJukebox: () => void;
   onToggleGentleTiming: () => void;
   onToggleKeyHints: () => void;
@@ -65,6 +67,7 @@ export type JournalOptionsHandlers = {
   onSetMusicLevel: (callback: (level: AudioLevel) => void) => void;
   onToggleAmbience: (callback: () => void) => void;
   onStepTrack: (callback: (delta: -1 | 1) => void) => void;
+  onSelectJukeboxTrack: (callback: (track: JukeboxTrack) => void) => void;
   onResetJukebox: (callback: () => void) => void;
   onToggleGentleTiming: (callback: () => void) => void;
   onToggleKeyHints: (callback: () => void) => void;
@@ -83,6 +86,7 @@ export function defaultOptionsCallbacks(): JournalOptionsCallbacks {
     onSetMusicLevel: noop,
     onToggleAmbience: noop,
     onStepTrack: noop,
+    onSelectJukeboxTrack: noop,
     onResetJukebox: noop,
     onToggleGentleTiming: noop,
     onToggleKeyHints: noop,
@@ -103,6 +107,7 @@ export function bindOptionsCallbacks(
     onSetMusicLevel: (cb) => { callbacks.onSetMusicLevel = cb; },
     onToggleAmbience: (cb) => { callbacks.onToggleAmbience = cb; },
     onStepTrack: (cb) => { callbacks.onStepTrack = cb; },
+    onSelectJukeboxTrack: (cb) => { callbacks.onSelectJukeboxTrack = cb; },
     onResetJukebox: (cb) => { callbacks.onResetJukebox = cb; },
     onToggleGentleTiming: (cb) => { callbacks.onToggleGentleTiming = cb; },
     onToggleKeyHints: (cb) => { callbacks.onToggleKeyHints = cb; },
@@ -121,6 +126,8 @@ export type JournalOptionsPage = {
   toggleAudio: () => void;
   setAudioLevel: (level: AudioLevel) => void;
   stepTrack: (delta: -1 | 1) => void;
+  selectTrack: (track: JukeboxTrack) => void;
+  resetJukebox: () => void;
   render: (view: JournalOptionsView) => void;
 };
 
@@ -422,6 +429,8 @@ export function createJournalOptionsPage(options: {
       callbacks.onSetAudioLevel(next);
     },
     stepTrack: (delta) => callbacks.onStepTrack(delta),
+    selectTrack: (track) => callbacks.onSelectJukeboxTrack(track),
+    resetJukebox: () => callbacks.onResetJukebox(),
     render: (view) => {
       setText(nowPlaying, `♫ ${view.nowPlaying}`);
       jukeboxBrowsing = view.jukebox?.active === true;

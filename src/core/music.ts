@@ -38,6 +38,18 @@ export type MusicTrack =
 
 export type JukeboxTrack = Exclude<MusicTrack, "silent">;
 
+export type TrackCategory = "town" | "interiors" | "wilds" | "festive" | "story";
+
+export type TrackAlbumMeta = {
+  track: JukeboxTrack;
+  number: number;
+  title: string;
+  region: string;
+  category: TrackCategory;
+  mood: string;
+  accent: string;
+};
+
 export const jukeboxTracks: readonly JukeboxTrack[] = [
   "title",
   "home",
@@ -129,6 +141,97 @@ export const trackTitles: Record<MusicTrack, string> = {
   morning: "Waking Up",
   silent: "Quiet",
 };
+
+type TrackLinerNote = Omit<TrackAlbumMeta, "track" | "number" | "title">;
+
+const note = (
+  region: string,
+  category: TrackCategory,
+  mood: string,
+  accent: string,
+): TrackLinerNote => ({ region, category, mood, accent });
+
+const TRACK_ALBUM_NOTES: Readonly<Record<JukeboxTrack, TrackLinerNote>> = {
+  title: note("Title Screen", "town", "Sunbeams & paper-cut opening overture", "#e6b85c"),
+  home: note("Cloverhollow", "town", "Warm village stroll through sunny plazas", "#7ab874"),
+  cafe: note("Bon Appétit Café", "interiors", "Buttery 3/4 waltz of scones & cocoa", "#d48a62"),
+  market: note("Pippin's Market", "interiors", "Jaunty grocer waltz by berry baskets", "#de7d63"),
+  parlor: note(
+    "Sweet Scoop Parlor", "interiors", "Bouncy parlor ragtime & waffle cones", "#e88db0",
+  ),
+  loft: note("Milo's Loft", "interiors", "Daydreaming doodles & paper gliders", "#7d9fd6"),
+  bloom: note(
+    "Rosie's Cottage", "interiors", "Sunlit flowerbeds & sweet pastoral bloom", "#e592b0",
+  ),
+  school: note("Cloverhollow School", "town", "Crisp morning bells, chalk & recess joy", "#d99a52"),
+  bay: note("Bubblegum Bay", "wilds", "Sparkling boardwalk waves & pastel skies", "#5cb4cf"),
+  fishing: note("Bay Fishing Dock", "wilds", "Easygoing bobber sway & tide catches", "#4ea4bf"),
+  cottage: note(
+    "Sue's Cottage", "interiors", "Lulling sea-glass chime by the sunroom", "#64b5c9",
+  ),
+  island: note("Starlight Island", "wilds", "Dreamy lighthouse nocturne across water", "#6a88cf"),
+  pass: note("Pinecone Pass", "wilds", "Crisp alpine air & fluttering snowflakes", "#7bb3de"),
+  lodge: note(
+    "Alpine Lodge", "interiors", "Crackling hearth warmth after snowy trails", "#cf7c52",
+  ),
+  cabin: note("Jordan's Cabin", "interiors", "Cedar mountain folk air & steeped tea", "#b88856"),
+  summit: note("Alpine Summit", "wilds", "Soaring mountaintop waltz over the valley", "#6d9ed4"),
+  cavern: note("Crystal Cavern", "wilds", "Glinting amethyst chimes below the pass", "#9b7cd4"),
+  woods: note("Whispering Woods", "wilds", "Dappled mossy trails & rustling pines", "#5b9e76"),
+  clubhouse: note(
+    "Fae's Clubhouse", "town", "Cozy loft hideout of keepsakes & plushies", "#c78f54",
+  ),
+  hills: note("Clover Hills", "town", "Rolling emerald hillsides & drifting seeds", "#85bf6e"),
+  road: note("East Road", "town", "Breezy country lane linking town to woods", "#c9a653"),
+  sanctuary: note(
+    "Wildlife Sanctuary", "town", "Peaceful clearing where calmed friends rest", "#6fb58a",
+  ),
+  festival: note(
+    "Sanctuary Festival", "festive", "Sunlit ensemble jubilee across the valley", "#e3a93b",
+  ),
+  arcade: note(
+    "Mr. Pip's Arcade", "festive", "Playful prize-counter bounce & star tokens", "#e07b6c",
+  ),
+  taco: note(
+    "Clover Hills Truck", "festive", "Zesty kitchen groove & lunch-rush cheer", "#e38f3d",
+  ),
+  enchanted: note(
+    "Enchanted Forest", "wilds", "Swirling silver mist & deep-woods mystery", "#8c7cc9",
+  ),
+  "enchanted-calm": note(
+    "Restored Forest", "festive", "Golden bloom & serene harmony reborn", "#72ba8e",
+  ),
+  battle: note("Critter Battle", "story", "Peppy chamber rhythm for soothing critters", "#e37c68"),
+  boss: note("Mini-Boss", "story", "Spirited showdown with a mysterious rival", "#8d68c7"),
+  encore: note("Boss Encore", "story", "Heroic sunlit remix at the Dream Shrine", "#d9a032"),
+  talk: note("Heartfelt Talk", "story", "Tender pause when a friend opens their heart", "#d984a2"),
+  hearts: note("Heart-to-Heart", "story", "Intimate 3/4 waltz shared with friends", "#e07b9b"),
+  morning: note("Finale & Credits", "story", "Golden sunrise glow after a cozy dream", "#e6b34e"),
+};
+
+/** Exhaustive 33-track soundtrack album catalog ordered identically to `jukeboxTracks`. */
+export const JUKEBOX_ALBUM: readonly TrackAlbumMeta[] = jukeboxTracks.map((track, index) => ({
+  track,
+  number: index + 1,
+  title: trackTitles[track],
+  ...TRACK_ALBUM_NOTES[track],
+}));
+
+const ALBUM_BY_TRACK = new Map<JukeboxTrack, TrackAlbumMeta>(
+  JUKEBOX_ALBUM.map((entry) => [entry.track, entry]),
+);
+
+/** Returns the album liner-notes metadata entry for any playable Jukebox track. */
+export function trackAlbumEntry(track: JukeboxTrack): TrackAlbumMeta {
+  const entry = ALBUM_BY_TRACK.get(track);
+  if (entry !== undefined) return entry;
+  return {
+    track,
+    number: jukeboxTracks.indexOf(track) + 1,
+    title: trackTitles[track],
+    ...TRACK_ALBUM_NOTES[track],
+  };
+}
 
 const areaTracks: Record<string, MusicTrack> = {
   bedroom: "home",

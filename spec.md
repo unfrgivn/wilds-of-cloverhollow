@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 213)
+Last updated: 2026-11-28 (Milestone 214)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -550,7 +550,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   `pass`, `lodge`, `cabin`, `summit`, `cavern`, `woods`, `clubhouse`, `hills`,
   `road`, `sanctuary`, `festival`, `arcade`, `taco`, `enchanted`,
   `enchanted-calm`, `battle`, `boss`, `encore`, `talk`, `hearts`, `morning`) for the
-  Journal OPTIONS Music Box (shell-only
+  Journal OPTIONS Music Box and the interactive **Soundtrack Album** modal
+  (`JUKEBOX_ALBUM` / `trackAlbumEntry` / `TrackCategory` / `TrackAlbumMeta` in
+  `src/core/music.ts`, Milestone 213 — exhaustive 33-track liner-notes registry
+  with track numbers `1..33`, region tags, 5 categories `town` / `interiors` /
+  `wilds` / `festive` / `story`, warm 1-line mood notes, and accent hues; shell-only
   override, never saved, plays unducked while the journal is open and returns
   smoothly to the live area theme on close, title, or reset). Ambience beds
   (`none`, `town-breeze`, `ocean`, `mountain-wind`, `hearth`, `forest`,
@@ -5398,6 +5402,30 @@ trunks keep its two exits.
   foley, Reduced Motion and iOS tap-selection parity, and
   backdrop/`×`/`Escape`/`X`/`B` dismiss restoring Field Treasures and focus
   directly to `.journal-hearts-btn`.
+- **Interactive 33-Track Soundtrack Album & Direct Music Box Player**
+  (Milestone 213): hand-inked storybook Soundtrack Album modal
+  (`src/ui/journal-jukebox.ts` + `src/ui/journal-jukebox.css`, composed into
+  `createJournalFieldOverlays` in `src/ui/journal-field-note.ts` and wired to
+  `onSelectJukeboxTrack` / `onResetJukebox` through `src/ui/journal-options.ts`,
+  `src/ui/journal.ts`, and `src/shell/shell-bindings.ts`, backed by pure
+  `JUKEBOX_ALBUM` & `trackAlbumEntry` in `src/core/music.ts`) launched from the
+  lilac-cream `.journal-album-btn` (`"♫ OST · 33"`) pill in the `FIELD TREASURES`
+  modal header (leaving all 99 `ui-gallery` and 12 `soundtrack.spec` baselines
+  pixel-identical). Renders a hand-inked `#47321f` inline SVG music-box emblem
+  (zero `<text>` nodes), `"SOUNDTRACK ALBUM"` heading, live `aria-live="polite"`
+  count/now-playing pill (`"33 Themes"` / golden `"♪ Playing: <Title>"`),
+  conditional `"Area Theme"` reset button (`.journal-album-reset`, shown while
+  Jukebox override is active), circular 44×44 `×` close button, 6 category
+  filter pills (`All · 33`, `Town`, `Homes & Shops`, `Wilds`, `Festive`,
+  `Story & Battle` with `aria-pressed`), and a scrollable 2-column grid of
+  `>= 44 px` die-cut track cards across both `1280x720` and `874x402` viewports
+  showing track number `01`–`33`, colored accent border, bold title, region tag,
+  1-line mood note, and golden `"♪ Playing"` badge on the active track. Clicking
+  any track plays it live unducked through the real Web Audio Music Box
+  synthesizer with subtle toggle foley, full 2D arrow/`PageUp`/`PageDown`/`Home`/`End`
+  keyboard navigation with `scrollIntoView({ block: "nearest" })`, Reduced Motion
+  and Safari/iOS tap-selection parity, and backdrop/`×`/`Escape`/`X`/`B` dismiss
+  restoring Field Treasures and focus directly to `.journal-album-btn`.
 - A chunky four-step sound volume slider sits beside the `♪ on/off` pill and
   fits the heading row at 874x402, including with `♪ off` and 999 coins. At
   narrow widths, the supplies wrap beneath NOTES so every control remains

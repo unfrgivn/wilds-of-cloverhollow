@@ -310,20 +310,21 @@ export function createJournal(root: HTMLElement): JournalControl {
   let onWeatherSelect: (mode: CozyWeatherMode) => void = () => undefined;
   let onClose: () => void = () => undefined;
 
+  const sliderSteppers = new Map<EventTarget, (direction: -1 | 1) => void>();
+  const optionsPage = createJournalOptionsPage({
+    sliderSteppers,
+    onMirrorAudioLevel: (next) => syncSlider(volume.button, volume.value, next),
+  });
   const fieldOverlays = createJournalFieldOverlays({
     focusRoot: book,
     onVisibilityChange: (open) => onOverlayChange(open),
     onStep: () => onOverlayStep(),
     onWeatherSelect: (mode) => onWeatherSelect(mode),
+    onSelectTrack: optionsPage.selectTrack, onResetTrack: optionsPage.resetJukebox,
   });
   const mapPage = createJournalMapPage(() => fieldOverlays.openTreasures(latestView), {
     onSelectLand: (landId) => onMapSelect(landId !== null),
     onFilterChange: (filter) => onMapFilter(filter),
-  });
-  const sliderSteppers = new Map<EventTarget, (direction: -1 | 1) => void>();
-  const optionsPage = createJournalOptionsPage({
-    sliderSteppers,
-    onMirrorAudioLevel: (next) => syncSlider(volume.button, volume.value, next),
   });
 
   const tabs = element("div", "journal-tabs");

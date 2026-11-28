@@ -9214,6 +9214,37 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   checks green), 27/27 Chromium & WebKit e2e tests (`milestone-213`,
   `milestone-198`, `milestone-190`, `travel-vignette`, `e1-camera-ground`), and
   8/8 Chromium e2e tests (`cutscene`, `e5-puzzles-tools-dash`).
+
+## Milestone 214: Interactive 33-Track Cloverhollow Soundtrack Album & Direct Music Box Jukebox Player (`src/ui/journal-jukebox.ts`) **Status:** ✅ Completed (2026-11-28)
+- Gives Fae's Journal a dedicated storybook **Soundtrack Album** showcasing all
+  **33 Original Composed Stereo Chamber Themes** with category filter pills,
+  region tags, mood liner notes, 1-click live Web Audio Music Box playback, and
+  an `Area Theme` reset button — zero `src/core/sim.ts` changes, zero
+  save-version bumps, zero replay hash drift across all 77 sims, and zero visual
+  baseline diffs across all 99 `ui-gallery` and 12 `soundtrack.spec` baselines.
+- Pure 33-track album liner-notes registry (`src/core/music.ts`, 384 lines):
+  - Exported `TrackCategory` (`town`, `interiors`, `wilds`, `festive`, `story`),
+    `TrackAlbumMeta`, `JUKEBOX_ALBUM` (numbered `1..33`, exhaustive over
+    `JukeboxTrack`), and `trackAlbumEntry(track)`.
+- Interactive Soundtrack Album modal (`src/ui/journal-jukebox.{ts,css}`,
+  `src/ui/journal-field-note{,-data}.ts`, `src/ui/journal-options.ts`,
+  `src/ui/journal.ts`, `src/shell/shell-bindings.ts`):
+  - Hand-inked music-box & eighth-note inline SVGs (zero `<text>` nodes), 6
+    category filter pills (`All · 33`, `Town`, `Homes & Shops`, `Wilds`,
+    `Festive`, `Story & Battle`), scrollable 2-column track grid at `1280×720`
+    and `874×402`, live golden `♪ Playing` highlight, 2D keyboard/gamepad
+    navigation, `Escape`/`X`/`B`/backdrop/`×` dismiss restoring Field Treasures
+    & focus to `.journal-album-btn`, Reduced Motion parity, and iOS tap hygiene.
+  - Wired `onSelectJukeboxTrack(track)` cleanly into `shell-bindings.ts` for
+    instant unducked direct playback while keeping `src/ui/journal.ts` at 675
+    lines (`< 680`) and `src/main.ts` untouched.
+- Evidence: `tests/unit/milestone-214.test.ts`,
+  `tests/e2e/milestone-214.spec.ts` (`@smoke` Chromium + WebKit), and review
+  captures `art/review/m213-ost-album-1280.jpg` and
+  `m213-ost-album-874.jpg` independently verified via `vision`.
+- Gates: `just check` (281 unit files / 2,067 tests, all 77 sims + all sim
+  scripts, 23 QA packs, purity, lint), `just build` (`index` `390.47 kB < 500 kB`),
+  34/34 targeted Chromium & WebKit e2e, and 99/99 Chromium `ui-gallery` tests.
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

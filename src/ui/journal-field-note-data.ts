@@ -1,4 +1,5 @@
 import type { AtlasImage } from "./atlas";
+import type { JukeboxMeta } from "./journal-options";
 import type { JournalEncoreSummary } from "../core/encore";
 import type { HeartToHeartSummary } from "../core/heart-to-hearts";
 import type {
@@ -67,6 +68,8 @@ export type JournalFieldNoteSource = {
   valleyComplete?: boolean;
   members?: readonly { id: string }[];
   arcadeRecords?: { taco?: number };
+  nowPlaying?: string;
+  jukebox?: JukeboxMeta;
 };
 
 export type FieldNoteData = {

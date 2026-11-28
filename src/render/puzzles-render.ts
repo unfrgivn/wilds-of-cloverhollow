@@ -1,13 +1,16 @@
-import { Assets, Container, Graphics, Sprite, type Spritesheet, type Texture } from "pixi.js";
+import { Assets, Container, Graphics, Sprite, type Spritesheet } from "pixi.js";
 import {
   isPressurePlateActive, isPuzzleSolved, isSteppingStoneGroupLit, mirrorOrientation,
-  pushablePosition, tracePrismBeams, type Area, type Direction, type GrapplePostDef,
-  type Point, type Polygon, type PressurePlateDef, type PrismEmitterDef, type PrismMirrorDef,
-  type PrismOrientation, type PrismReceiverDef, type PushableDef, type ResonanceBellDef,
-  type State, type SteppingStoneGroupDef, type VineBridgeDef, type World,
+  pushablePosition, tracePrismBeams, type Area, type GrapplePostDef, type PressurePlateDef,
+  type PrismEmitterDef, type PrismMirrorDef, type PrismReceiverDef, type PushableDef,
+  type ResonanceBellDef, type State, type SteppingStoneGroupDef, type VineBridgeDef, type World,
 } from "../core";
 import { makeShadowSprite } from "./battle-view";
 import { interpolatePoint } from "./camera";
+import {
+  BEAM_GLOW_POOL_SIZE, createFxSprite, drawPuzzleFx, placeShadow, polygonCenter, pushableFrame,
+  SOLVE_SPARKLE_COUNT,
+} from "./puzzles-render-fx";
 import type { VfxTextures } from "./vfx-textures";
 
 export const PUZZLE_ATLAS_ALIAS = "puzzle-props-sheet";
@@ -21,58 +24,6 @@ export type PuzzleRenderInfo = {
 export type PuzzleUpdateOptions = {
   prev?: State; alpha: number; paused: boolean; reducedMotion: boolean; shadowAlpha: number;
 };
-
-const BEAM_GLOW_POOL_SIZE = 20;
-const SOLVE_SPARKLE_COUNT = 14;
-const SOLVE_BURST_TICKS = 36;
-const LASSO_RAINBOW: readonly number[] = [0xf48fb1, 0xffcc80, 0xfff59d, 0xa5d6a7, 0x90caf9];
-const SPARKLE_TINTS: readonly number[] = [0xffe885, 0xf7b2d9, 0xa8e6cf, 0xb8d8ff, 0xfff6cc];
-const NOTE_COLORS: Readonly<Record<Direction, number>> = {
-  up: 0xf27474, right: 0xf5cb5c, down: 0x6bc78b, left: 0x6cb5f5,
-};
-
-function polygonCenter(polygon: Polygon): Point {
-  if (polygon.length === 0) return { x: 0, y: 0 };
-  let sx = 0;
-  let sy = 0;
-  for (const pt of polygon) { sx += pt[0]; sy += pt[1]; }
-  return { x: sx / polygon.length, y: sy / polygon.length };
-}
-
-function pushableFrame(kind: PushableDef["kind"]): string {
-  return kind === "rock" ? "push-rock" : kind === "snowball" ? "push-snowball" : "push-crate";
-}
-
-function mirrorArms(orientation: PrismOrientation): [Point, Point] {
-  if (orientation === "ne") return [{ x: 0, y: -1 }, { x: 1, y: 0 }];
-  if (orientation === "se") return [{ x: 0, y: 1 }, { x: 1, y: 0 }];
-  if (orientation === "sw") return [{ x: 0, y: 1 }, { x: -1, y: 0 }];
-  return [{ x: 0, y: -1 }, { x: -1, y: 0 }];
-}
-
-function goalAnchor(area: Area, state: State, goalId: string): Point {
-  const puzzles = area.puzzles;
-  const goal = puzzles?.goals?.find((item) => item.id === goalId);
-  if (puzzles === undefined || goal === undefined) return state.player;
-  const bell = puzzles.bells?.find((item) => item.id === goal.requireBells?.[0]);
-  if (bell !== undefined) return { x: bell.x, y: bell.y - 34 };
-  const recv = puzzles.receivers?.find((item) => item.id === goal.requireReceivers?.[0]);
-  if (recv !== undefined) return { x: recv.x, y: recv.y - 24 };
-  const post = puzzles.grapples?.find((item) => item.id === goal.requireLevers?.[0]);
-  if (post !== undefined) return { x: post.x, y: post.y - 26 };
-  const plate = puzzles.plates?.find((item) => item.id === goal.requirePlates?.[0]);
-  if (plate !== undefined) return { x: plate.x, y: plate.y - 12 };
-  return { x: state.player.x, y: state.player.y - 28 };
-}
-
-function placeShadow(
-  shadow: Sprite, x: number, y: number, width: number, height: number, alpha: number,
-): void {
-  shadow.position.set(x, y + 1);
-  shadow.width = width;
-  shadow.height = height;
-  shadow.alpha = alpha;
-}
 
 type PlateEntry = { def: PressurePlateDef; sprite: Sprite; glow: Sprite; holdRing: Sprite };
 type StoneEntry = { group: SteppingStoneGroupDef; sprites: { sprite: Sprite; glow: Sprite }[] };
@@ -124,25 +75,15 @@ export class PuzzleRenderer {
     this.fxLayer.addChild(this.beamGraphics, this.lassoGraphics);
 
     for (let i = 0; i < BEAM_GLOW_POOL_SIZE; i += 1) {
-      const glow = this.makeFxSprite(this.vfx.softGlow, `puzzle:beam-glow:${i}`);
+      const glow = createFxSprite(this.vfx.softGlow, `puzzle:beam-glow:${i}`);
       this.beamGlowPool.push(glow);
       this.fxLayer.addChild(glow);
     }
     for (let i = 0; i < SOLVE_SPARKLE_COUNT; i += 1) {
-      const sp = this.makeFxSprite(this.vfx.sparkle, `puzzle:solve-sparkle:${i}`);
+      const sp = createFxSprite(this.vfx.sparkle, `puzzle:solve-sparkle:${i}`);
       this.solveSparklePool.push(sp);
       this.fxLayer.addChild(sp);
     }
-  }
-
-  private makeFxSprite(texture: Texture, label: string, tint = 0xffffff): Sprite {
-    const sprite = new Sprite(texture);
-    sprite.label = label;
-    sprite.anchor.set(0.5);
-    sprite.blendMode = "add";
-    sprite.tint = tint;
-    sprite.visible = false;
-    return sprite;
   }
 
   private track(sprite: Sprite): Sprite {
@@ -191,11 +132,12 @@ export class PuzzleRenderer {
     if (puzzles === undefined) return;
 
     for (const def of puzzles.plates ?? []) {
-      const glow = this.track(this.makeFxSprite(this.vfx.softGlow, `puzzle:plate-glow:${def.id}`,
-        0xffe484));
+      const glow = this.track(
+        createFxSprite(this.vfx.softGlow, `puzzle:plate-glow:${def.id}`, 0xffe484),
+      );
       glow.position.set(def.x, def.y);
       const holdRing = this.track(
-        this.makeFxSprite(this.vfx.energyRing, `puzzle:plate-hold:${def.id}`, 0xf4a8d8),
+        createFxSprite(this.vfx.energyRing, `puzzle:plate-hold:${def.id}`, 0xf4a8d8),
       );
       holdRing.position.set(def.x, def.y);
       const sprite = this.track(new Sprite());
@@ -210,7 +152,7 @@ export class PuzzleRenderer {
     for (const group of puzzles.steppingStones ?? []) {
       const sprites = group.stones.map((pt, index) => {
         const glow = this.track(
-          this.makeFxSprite(this.vfx.softGlow, `puzzle:stone-glow:${group.id}:${index}`, 0xc9a0ff),
+          createFxSprite(this.vfx.softGlow, `puzzle:stone-glow:${group.id}:${index}`, 0xc9a0ff),
         );
         glow.position.set(pt.x, pt.y);
         const sprite = this.track(new Sprite());
@@ -228,7 +170,7 @@ export class PuzzleRenderer {
     for (const def of puzzles.bridges ?? []) {
       const point = def.visualPoint ?? polygonCenter(def.polygon);
       const glow = this.track(
-        this.makeFxSprite(this.vfx.softGlow, `puzzle:bridge-glow:${def.id}`, 0xffe999),
+        createFxSprite(this.vfx.softGlow, `puzzle:bridge-glow:${def.id}`, 0xffe999),
       );
       glow.position.set(point.x, point.y);
       const sprite = this.track(new Sprite());
@@ -258,7 +200,7 @@ export class PuzzleRenderer {
     for (const def of puzzles.grapples ?? []) {
       const pair = this.addDepthProp(`puzzle:grapple:${def.id}`, def.id, def.x, def.y, 0.28, 0.86);
       const glint = this.track(
-        this.makeFxSprite(this.vfx.sparkle, `puzzle:grapple-glint:${def.id}`, 0xffe888),
+        createFxSprite(this.vfx.sparkle, `puzzle:grapple-glint:${def.id}`, 0xffe888),
       );
       this.fxLayer.addChild(glint);
       this.grapples.push({ def, ...pair, glint });
@@ -310,7 +252,19 @@ export class PuzzleRenderer {
         : { segments: [], energizedReceivers: [], activeEmitters: [] };
     this.updateDepthEntities(area, state, sheet, prev, alpha, shadowAlpha, reducedMotion, pulse,
       beams);
-    this.updateFx(world, area, state, beams, pulse, paused, reducedMotion);
+    this.fxLayer.visible = drawPuzzleFx(
+      {
+        beamGraphics: this.beamGraphics,
+        lassoGraphics: this.lassoGraphics,
+        beamGlowPool: this.beamGlowPool,
+        solveSparklePool: this.solveSparklePool,
+        crystals: this.crystals,
+        mirrors: this.mirrors,
+        bells: this.bells,
+        grappleCount: this.grapples.length,
+      },
+      world, area, state, beams, pulse, paused, reducedMotion,
+    );
   }
 
   private updateGround(
@@ -471,192 +425,6 @@ export class PuzzleRenderer {
       sprite.texture = bellTex;
       placeShadow(shadow, def.x, def.y, 44, 17, shadowAlpha);
     }
-  }
-
-  private updateFx(
-    world: World,
-    area: Area,
-    state: State,
-    beams: {
-      segments: { from: Point; to: Point }[];
-      activeEmitters: string[];
-      energizedReceivers: string[];
-    },
-    pulse: number,
-    paused: boolean,
-    reducedMotion: boolean,
-  ): void {
-    this.beamGraphics.clear();
-    this.lassoGraphics.clear();
-    let glowUsed = 0;
-    const placeGlow = (x: number, y: number, scale: number, tint: number, alphaVal: number) => {
-      const sprite = this.beamGlowPool[glowUsed];
-      if (sprite === undefined) return;
-      glowUsed += 1;
-      sprite.visible = true;
-      sprite.position.set(x, y);
-      sprite.scale.set(scale);
-      sprite.tint = tint;
-      sprite.alpha = alphaVal;
-    };
-
-    for (const seg of beams.segments) {
-      const x1 = seg.from.x;
-      const y1 = seg.from.y - 24;
-      const x2 = seg.to.x;
-      const y2 = seg.to.y - 24;
-      this.beamGraphics
-        .moveTo(x1, y1).lineTo(x2, y2)
-        .stroke({ width: 12, color: 0xb98eff, alpha: 0.55, cap: "round" })
-        .moveTo(x1, y1).lineTo(x2, y2)
-        .stroke({ width: 4, color: 0xeefcff, alpha: 0.92, cap: "round" });
-      placeGlow(x2, y2, 0.56 + 0.1 * pulse, 0xd4b6ff, 0.55 + 0.15 * pulse);
-    }
-
-    for (const { kind, def } of this.crystals) {
-      const lit =
-        kind === "emitter"
-          ? beams.activeEmitters.includes(def.id)
-          : beams.energizedReceivers.includes(def.id);
-      if (lit) {
-        placeGlow(
-          def.x, def.y - 24, 0.85 + 0.14 * pulse,
-          kind === "emitter" ? 0xd8a8ff : 0xffe694, 0.45 + 0.2 * pulse,
-        );
-      }
-    }
-
-    for (const { def } of this.mirrors) {
-      const [a, b] = mirrorArms(mirrorOrientation(area, state, def));
-      const cx = def.x;
-      const cy = def.y - 26;
-      const len = 18;
-      this.beamGraphics
-        .moveTo(cx + a.x * len, cy + a.y * len).lineTo(cx, cy)
-        .lineTo(cx + b.x * len, cy + b.y * len)
-        .stroke({ width: 5, color: 0xffe28a, alpha: 0.88, cap: "round", join: "round" })
-        .moveTo(cx + a.x * len, cy + a.y * len).lineTo(cx, cy)
-        .lineTo(cx + b.x * len, cy + b.y * len)
-        .stroke({ width: 2.2, color: 0xc2f7ff, alpha: 0.96, cap: "round", join: "round" })
-        .circle(cx + a.x * len, cy + a.y * len, 3.2).fill({ color: 0xeefcff, alpha: 0.95 })
-        .circle(cx + b.x * len, cy + b.y * len, 3.2).fill({ color: 0xeefcff, alpha: 0.95 });
-    }
-
-    const solvedBells = state.puzzleArea?.solvedBells ?? [];
-    for (const { def } of this.bells) {
-      const bellSolved =
-        solvedBells.includes(def.id) ||
-        (area.puzzles?.goals ?? []).some(
-          (g) => (g.requireBells ?? []).includes(def.id) && isPuzzleSolved(world, state, g.id),
-        );
-      const startX = def.x - ((def.sequence.length - 1) * 14) * 0.5;
-      for (let i = 0; i < def.sequence.length; i += 1) {
-        const note = def.sequence[i];
-        if (note === undefined) continue;
-        const bob = reducedMotion ? 0 : Math.sin(state.tick * 0.08 + i * 1.1) * 2.4;
-        const dotX = startX + i * 14;
-        const dotY = def.y - 68 + bob;
-        this.beamGraphics
-          .circle(dotX, dotY, 5.4).fill({ color: 0x47321f, alpha: bellSolved ? 0.55 : 0.85 })
-          .circle(dotX, dotY, 4.0).fill({
-            color: bellSolved ? 0xffe58a : NOTE_COLORS[note],
-            alpha: bellSolved ? 0.68 + 0.2 * pulse : 0.96,
-          });
-      }
-    }
-
-    for (let i = glowUsed; i < this.beamGlowPool.length; i += 1) {
-      const sprite = this.beamGlowPool[i];
-      if (sprite !== undefined) sprite.visible = false;
-    }
-
-    const lasso = state.puzzleArea?.lasso;
-    if (lasso !== undefined) this.drawLassoArc(lasso, state.player, state.tick, reducedMotion);
-
-    const sparkleActive = this.updateSolveSparkles(area, state, paused, reducedMotion);
-    this.fxLayer.visible =
-      beams.segments.length > 0 ||
-      this.mirrors.length > 0 ||
-      this.bells.length > 0 ||
-      this.grapples.length > 0 ||
-      glowUsed > 0 ||
-      lasso !== undefined ||
-      sparkleActive;
-  }
-
-  private updateSolveSparkles(
-    area: Area,
-    state: State,
-    paused: boolean,
-    reducedMotion: boolean,
-  ): boolean {
-    const solved = state.puzzleArea?.lastSolved;
-    const age = solved === undefined ? -1 : state.tick - solved.tick;
-    if (solved === undefined || reducedMotion || paused || age < 0 || age >= SOLVE_BURST_TICKS) {
-      for (const sp of this.solveSparklePool) sp.visible = false;
-      return false;
-    }
-    const u = age / SOLVE_BURST_TICKS;
-    const center = goalAnchor(area, state, solved.id);
-    for (let i = 0; i < this.solveSparklePool.length; i += 1) {
-      const sp = this.solveSparklePool[i];
-      if (sp === undefined) continue;
-      const angle = (i / SOLVE_SPARKLE_COUNT) * Math.PI * 2 + u * 0.85;
-      const radius = 14 + u * (54 + (i % 3) * 14);
-      sp.visible = true;
-      sp.position.set(
-        center.x + Math.cos(angle) * radius,
-        center.y + Math.sin(angle) * radius * 0.72 - u * 16,
-      );
-      sp.scale.set((0.46 + (i % 3) * 0.14) * (1 - u * 0.45));
-      sp.rotation = angle + u * 2.2;
-      sp.tint = SPARKLE_TINTS[i % SPARKLE_TINTS.length] ?? 0xffe885;
-      sp.alpha = Math.sin(u * Math.PI) * 0.95;
-    }
-    return true;
-  }
-
-  private drawLassoArc(
-    lasso: NonNullable<NonNullable<State["puzzleArea"]>["lasso"]>,
-    player: Point,
-    tick: number,
-    reducedMotion: boolean,
-  ): void {
-    const progress = Math.min(1, (lasso.tick + 1) / Math.max(1, lasso.duration));
-    const reach =
-      lasso.kind === "swing"
-        ? 1
-        : progress < 0.38
-          ? 0.48 + (progress / 0.38) * 0.52
-          : 1 - ((progress - 0.38) / 0.62) * 0.18;
-    const fromX = lasso.kind === "swing" ? player.x : lasso.from.x;
-    const fromY = (lasso.kind === "swing" ? player.y : lasso.from.y) - 24;
-    const tipX = fromX + (lasso.to.x - fromX) * reach;
-    const tipY = fromY + (lasso.to.y - 22 - fromY) * reach;
-    const ctrlX = (fromX + tipX) * 0.5;
-    const ctrlY = (fromY + tipY) * 0.5 - 32 * Math.sin(Math.min(1, progress * 1.15) * Math.PI);
-
-    this.lassoGraphics
-      .moveTo(fromX, fromY)
-      .quadraticCurveTo(ctrlX, ctrlY, tipX, tipY)
-      .stroke({ width: 15, color: 0x47321f, alpha: 0.38, cap: "round" });
-
-    for (let b = 0; b < LASSO_RAINBOW.length; b += 1) {
-      const offset = (b - 2) * 2.2;
-      this.lassoGraphics
-        .moveTo(fromX, fromY + offset)
-        .quadraticCurveTo(ctrlX, ctrlY + offset, tipX, tipY + offset)
-        .stroke({ width: 3.2, color: LASSO_RAINBOW[b] ?? 0xfff59d, alpha: 0.96, cap: "round" });
-    }
-
-    const spin = reducedMotion ? 0 : tick * 0.45;
-    const rx = 12 + Math.cos(spin) * 2.5;
-    const ry = 7 + Math.sin(spin) * 1.6;
-    this.lassoGraphics
-      .ellipse(tipX, tipY, rx, ry)
-      .stroke({ width: 3.4, color: 0xf5cb5c, alpha: 0.95 })
-      .ellipse(tipX, tipY, rx * 0.84, ry * 0.84)
-      .stroke({ width: 1.6, color: 0xfff8dc, alpha: 0.95 });
   }
 
   renderInfo(world: World, state: State): PuzzleRenderInfo {

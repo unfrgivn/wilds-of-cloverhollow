@@ -302,20 +302,26 @@ export function createJournalJukeboxAlbum(options?: JournalJukeboxOptions): Jour
     const stop = (): void => { event.preventDefault(); event.stopPropagation(); };
     const key = event.key;
     if (["Escape", "x", "X", "b", "B"].includes(key)) { stop(); close(); return true; }
+    if ((key === "s" || key === "S") && !event.ctrlKey && !event.metaKey && !event.altKey) {
+      stop(); shuffleBtn.click(); return true;
+    }
     if ((key === "Enter" || key === " ") &&
       document.activeElement instanceof HTMLButtonElement && card.contains(document.activeElement)
     ) { stop(); document.activeElement.click(); return true; }
     if (key === "PageDown" || key === "PageUp") {
       stop(); applyModalScrollKey([grid, card], key); return true;
     }
-    const barBtns = [...filterBtns.map((item) => item.btn), shuffleBtn, homeRecordBtn];
+    const barBtns = [...filterBtns.map((item) => item.btn), shuffleBtn, homeRecordBtn]
+      .filter((btn) => !btn.disabled && !btn.hidden);
     const barIdx = barBtns.findIndex((btn) => btn === document.activeElement);
-    if (barIdx !== -1 && (key === "ArrowLeft" || key === "ArrowRight")) {
+    if (barIdx !== -1 && (
+      key === "ArrowLeft" || key === "ArrowRight" || key === "Home" || key === "End"
+    )) {
       stop();
       const len = barBtns.length;
-      barBtns[(barIdx + (key === "ArrowRight" ? 1 : -1) + len) % len]?.focus({
-        preventScroll: true,
-      });
+      const targetIdx = key === "Home" ? 0 : key === "End" ? len - 1
+        : (barIdx + (key === "ArrowRight" ? 1 : -1) + len) % len;
+      barBtns[targetIdx]?.focus({ preventScroll: true });
       return true;
     }
     const visible = trackRefs.filter((ref) => !ref.btn.hidden);

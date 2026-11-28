@@ -17,7 +17,7 @@ export const chunkGroups: ChunkGroup[] = [
     test: new RegExp(
       "/src/platform/(" +
         "scores(-[a-z]+)?|audio-(recipes|cue-recipes|effects|playback|settings)|" +
-        "voice(s|-catalog)|music-(synth|mix)|(weather-)?ambience" +
+        "voice(s|-catalog)|music-(synth|mix)|(weather-)?ambience|home-record-prefs" +
         ")\\.ts",
     ),
     priority: 18,
@@ -31,7 +31,7 @@ export const chunkGroups: ChunkGroup[] = [
   },
   {
     name: "render-engine",
-    test: /\/src\/render\/|\/src\/platform\/reduced-motion\.ts/,
+    test: /\/src\/render\/|\/src\/platform\/(reduced-motion|weather-prefs)\.ts/,
     priority: 16,
     includeDependenciesRecursively: false,
   },

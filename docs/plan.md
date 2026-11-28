@@ -9758,6 +9758,48 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   story + harness checks green), Chromium & WebKit (`milestone-229`,
   `milestone-228`, `milestone-126`, `ending`, `sound`, `soundtrack`), and 6/6
   Chromium `ui-gallery` `credits` (`0` visual diffs).
+
+## Milestone 230: Soundtrack Album Toolbar Focus Fix & `S` Shuffle Shortcut + `puzzles-render-fx.ts` & `area-connection-checks.ts` Modular Splits + `< 360 kB` `index` Chunk Parity (Elevation Track E19R) **Status:** ✅ Completed (2026-11-28)
+- Soundtrack Album Toolbar Focus Fix & Instant `S` Shuffle Shortcut
+  (`src/ui/journal-jukebox.ts`):
+  - Filters `barBtns` to enabled, visible buttons (`!btn.disabled && !btn.hidden`)
+    so pressing `ArrowRight`/`ArrowLeft` never drops focus onto a disabled
+    `Home Record` button.
+  - Handles `Home` (`0`) and `End` (`len - 1`) inside the album toolbar cleanly
+    with `stop()` and `focus({ preventScroll: true })`.
+  - Adds instant `S` / `s` Shuffle shortcut while the album is open, stopping
+    event propagation and clicking `shuffleBtn` without closing the album or
+    moving Fae.
+- Production `< 360 kB` `index` Chunk Parity (`vite.config.ts`):
+  - Routes `src/platform/home-record-prefs.ts` into `audio-scores` alongside
+    `audio-settings` and `weather-ambience`, and routes
+    `src/platform/weather-prefs.ts` into `render-engine` alongside
+    `reduced-motion.ts`, returning `dist/assets/index-*.js` strictly `< 360 kB`
+    (`359.59 kB`).
+- Modular `src/render/puzzles-render-fx.ts` extraction
+  (`src/render/puzzles-render.ts` `688 -> < 460` lines,
+  `src/render/puzzles-render-fx.ts` `< 320` lines):
+  - Extracts self-contained puzzle visual effect drawing helpers & pure
+    geometry/palette utilities (`LASSO_RAINBOW`, `SPARKLE_TINTS`, `NOTE_COLORS`,
+    `polygonCenter`, `pushableFrame`, `mirrorArms`, `goalAnchor`,
+    `drawPrismBeams`, `drawLassoArc`, `drawFluteResonance`, `drawSolveBurst`,
+    `drawPuzzleFx`, `PuzzleFxDrawContext`) with zero visual diffs and identical
+    `PuzzleRenderer` public API.
+- Modular `src/content/area-connection-checks.ts` extraction
+  (`src/content/area-checks.ts` `642 -> < 420` lines,
+  `src/content/area-connection-checks.ts` `< 280` lines):
+  - Extracts multi-area graph & navigation quality checks (`areaConnectionErrors`
+    and `navigationQualityErrors` plus exclusive helpers) cleanly into
+    `src/content/area-connection-checks.ts` and re-exports them identically
+    from `src/content/area-checks.ts`.
+- Evidence: `tests/unit/milestone-230.test.ts` and
+  `tests/e2e/milestone-230.spec.ts` (`@smoke`, Chromium & WebKit).
+- Gates: `just check` (298 unit files / 2,124 tests, all 77 recorded + 7
+  headless sims with zero hash shifts, 23 QA packs, purity, lint), `just build`
+  (largest non-vendor production chunk `index` `359.59 kB < 360 kB`, hook leak
+  + runtime story + harness checks green), 6/6 Chromium & WebKit
+  (`milestone-230`, `milestone-228`, `milestone-214`), and 4/4 Chromium
+  (`e5-puzzles-tools-dash`).
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

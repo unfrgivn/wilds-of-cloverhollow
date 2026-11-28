@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 229)
+Last updated: 2026-11-28 (Milestone 230)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -79,16 +79,17 @@ reference material only.
   priority 19), `audio-scores` (`scores*.ts`, `audio-recipes.ts`,
   `audio-cue-recipes.ts`, `audio-effects.ts`, `audio-playback.ts`,
   `audio-settings.ts`, `voices.ts`, `voice-catalog.ts`, `music-synth.ts`,
-  `music-mix.ts`, `ambience.ts`, `weather-ambience.ts`,
+  `music-mix.ts`, `ambience.ts`, `weather-ambience.ts`, `home-record-prefs.ts`,
   `includeDependenciesRecursively: false`, priority 18),
   `ui-overlays` (`src/ui/*`, `includeDependenciesRecursively: false`, priority
   17), `render-engine` (`includeDependenciesRecursively: false`, including
-  `src/platform/reduced-motion.ts` so `render-engine` never forms a circular
-  chunk dependency with the `index`/`game` entry chunk, priority 16),
+  `src/platform/reduced-motion.ts` and `src/platform/weather-prefs.ts` so
+  `render-engine` never forms a circular chunk dependency with the
+  `index`/`game` entry chunk, priority 16),
   `world-content` (`includeDependenciesRecursively: false`, priority 15), and
   `index`/`game` app chunks, keeping every non-vendor production JS chunk under
   360 kB and enforced under 500 kB by `tools/check-dist.ts` via `just build`,
-  Milestones 154, 177, 197 & 228 / Track E19Q), Bun (package
+  Milestones 154, 177, 197, 229 & 230 / Track E19R), Bun (package
   manager and script runner), Node 24 LTS for Node-based tools (`.nvmrc`),
   `just` for tasks. Compiled Ink story JSON lives out of the static JS bundle as
   a runtime-fetched asset at `public/assets/story/main.ink.json` (fetched via
@@ -1597,8 +1598,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   10-unit signed clearance field (`NavField`, zero trig) powers clearance-
   weighted A* with line-of-sight string-pulling (`findPath`), medial-axis
   gradient queries (`gradientAt`), and navigation auditing
-  (`auditAreaNavigation`, `navigationQualityErrors` in
-  `src/content/area-checks.ts`). Crisp ground clicks/taps outside the
+  (`auditAreaNavigation`, `navigationQualityErrors` extracted into
+  `src/content/area-connection-checks.ts` and re-exported identically from
+  `src/content/area-checks.ts`, Milestone 230 / Track E19R). Crisp ground clicks/taps outside the
   near-player pet/rest radius (`isOverworldGroundTap` + `onTapGround` in
   `src/shell/overworld-pointer.ts`, guarding against accidental click-to-walk
   when hold-steering already walked Fae `> 20` px/units during the press,
@@ -1614,7 +1616,9 @@ ios/            Capacitor iOS project (from Milestone 4).
 - **Spatial Puzzle Engine & Real Overworld Tools** (Milestone 193 / Elevation
   Track E5, Art Wave B1; pure core in `src/core/puzzles.ts` &
   `src/core/puzzles-queries.ts`, strict validator `src/content/puzzle-parsers.ts`,
-  Pixi renderer `src/render/puzzles-render.ts`, Harmony Flute Wheel dialog
+  Pixi renderer `src/render/puzzles-render.ts` with modular puzzle FX &
+  geometry helpers extracted into `src/render/puzzles-render-fx.ts` (Milestone
+  230 / Track E19R), Harmony Flute Wheel dialog
   `src/ui/flute-wheel.{ts,css}`, permanent 12-frame `1024×768` alpha-WebP
   prop kit `public/assets/puzzles/puzzles.{webp,json}`, `123 KB`, PSNR
   `43.86 dB`, `art/recipes/puzzle-props.json`):
@@ -2938,7 +2942,9 @@ trunks keep its two exits.
 - `presentCritters(world, state)` lists every critter out in Fae's area, set
   pieces first, each with a `key` (a set piece's id, or `wild:<den>`) used
   for its Talk target (`critter:<key>`) and its render labels and info.
-- Authoring checks (`src/content/area-checks.ts`): a den must be on the
+- Authoring checks (`areaConnectionErrors` extracted into
+  `src/content/area-connection-checks.ts` and re-exported identically from
+  `src/content/area-checks.ts`, Milestone 230 / Track E19R): a den must be on the
   floor; farther from every spawn than sight plus its kinds' touch radius,
   so Fae never arrives in a critter's sight; clear of every door by its
   radius plus that touch; and mostly in view (of 48 sample spots on rings
@@ -5617,7 +5623,7 @@ trunks keep its two exits.
   backdrop/`×`/`Escape`/`X`/`B` dismiss restoring Field Treasures and focus
   directly to `.journal-hearts-btn`.
 - **Interactive 35-Track Soundtrack Album & Direct Music Box Player**
-  (Milestones 213, 225 & 227): hand-inked storybook Soundtrack Album modal
+  (Milestones 213, 225, 228 & 230 / Track E19R): hand-inked storybook Soundtrack Album modal
   (`src/ui/journal-jukebox.ts` + `src/ui/journal-jukebox.css`, composed into
   `createJournalFieldOverlays` in `src/ui/journal-field-note.ts` and wired to
   `onSelectJukeboxTrack` / `onResetJukebox` through `src/ui/journal-options.ts`,
@@ -5650,7 +5656,12 @@ trunks keep its two exits.
   auto-scrolls the active visible track button into view via
   `scrollIntoView({ block: "nearest" })` (Milestone 216 / Track E19J), alongside
   full 2D arrow/`PageUp`/`PageDown`/`Home`/`End`
-  keyboard navigation with `scrollIntoView({ block: "nearest" })`, Reduced Motion
+  keyboard navigation with `scrollIntoView({ block: "nearest" })` (toolbar
+  navigation filters strictly to enabled visible buttons so `ArrowRight` /
+  `ArrowLeft` / `Home` / `End` never drop focus onto a disabled `Home Record`
+  button, and pressing `S` while the album is open triggers instant category-aware
+  `↻ Shuffle` live without closing the album or moving Fae, Milestone 230 /
+  Track E19R), Reduced Motion
   and Safari/iOS tap-selection parity, and backdrop/`×`/`Escape`/`X`/`B` dismiss
   restoring Field Treasures and focus directly to `.journal-album-btn`.
 - A chunky four-step sound volume slider sits beside the `♪ on/off` pill and

@@ -54,10 +54,10 @@ describe("Milestone 116: Journal Arcade Records Strip", () => {
   });
 });
 
-describe("Milestone 116: Keyboard-Accessible 31-Track Music Box Jukebox", () => {
+describe("Milestone 116: Keyboard-Accessible 32-Track Music Box Jukebox", () => {
   it("formats accessible track labels for live area themes and active jukebox browsing", () => {
     const fishingIndex = jukeboxTracks.indexOf("fishing");
-    expect(jukeboxTracks).toHaveLength(31);
+    expect(jukeboxTracks).toHaveLength(32);
     expect(fishingIndex).toBe(9);
     expect(trackTitles.fishing).toBe("Docked by the Tide");
 
@@ -68,7 +68,7 @@ describe("Milestone 116: Keyboard-Accessible 31-Track Music Box Jukebox", () => 
         total: jukeboxTracks.length,
       }),
     ).toBe(
-      "Track 10 of 31: Docked by the Tide — press Left or Right to browse, " +
+      "Track 10 of 32: Docked by the Tide — press Left or Right to browse, " +
         "Enter to return to area theme",
     );
 

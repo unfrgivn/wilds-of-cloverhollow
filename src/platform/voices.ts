@@ -866,6 +866,7 @@ const TRACK_SCALES: Record<MusicTrack, readonly number[]> = {
   festival: D_MAJOR,
   pass: EB_MAJOR,
   cottage: EB_MAJOR_WARM,
+  hearts: EB_MAJOR_WARM,
   cavern: D_DORIAN,
   woods: A_DORIAN,
   hills: A_MAJOR,

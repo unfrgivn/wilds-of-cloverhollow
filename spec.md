@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 193)
+Last updated: 2026-11-28 (Milestone 194)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -501,14 +501,18 @@ ios/            Capacitor iOS project (from Milestone 4).
   once `forest_fizzy` is false), `battle` ("Fizzy Calm-Down!"), `boss` ("The
   Purple Hood", for wind-up mini-bosses, Talk battles, or non-runnable
   battles), `talk` ("Listening Heart", once Talk opens or calm reaches
-  `talkAt`), `morning` ("Waking Up", during the morning and credits finale),
-  and `silent` ("Quiet", for `harness`). `jukeboxTracks` exports all 31
+  `talkAt`), `hearts` ("Warm Hearth Hearts", 84 BPM 3/4 E-flat major 16-bar
+  5-voice chamber waltz across `harp`, `piano`, `flute`, `celesta`, and `pad`,
+  softly ducked over the area's active ambience bed whenever a Party
+  Heart-to-Heart `h2h_*` dialogue knot is active outside battles/arcade,
+  Milestone 191), `morning` ("Waking Up", during the morning and credits
+  finale), and `silent` ("Quiet", for `harness`). `jukeboxTracks` exports all 32
   non-silent themes in story/album order (`title`, `home`, `cafe`, `market`,
   `parlor`, `loft`, `bloom`, `school`, `bay`, `fishing`, `cottage`, `island`,
   `pass`, `lodge`, `cabin`, `summit`, `cavern`, `woods`, `clubhouse`, `hills`,
   `road`, `sanctuary`, `festival`, `arcade`, `taco`, `enchanted`,
-  `enchanted-calm`, `battle`, `boss`, `talk`, `morning`) for the Journal OPTIONS
-  Music Box (shell-only
+  `enchanted-calm`, `battle`, `boss`, `talk`, `hearts`, `morning`) for the
+  Journal OPTIONS Music Box (shell-only
   override, never saved, plays unducked while the journal is open and returns
   smoothly to the live area theme on close, title, or reset). Ambience beds
   (`none`, `town-breeze`, `ocean`, `mountain-wind`, `hearth`, `forest`,
@@ -520,7 +524,7 @@ ios/            Capacitor iOS project (from Milestone 4).
 - `src/platform/audio.ts` creates a single AudioContext first thing at boot,
   before anything awaits, and resumes it at every chance: right away, on each
   key, pointer, or touch, and whenever a cue plays while it isn't running.
-  Its master chain routes SFX, music (`src/platform/music.ts` over the 30
+  Its master chain routes SFX, music (`src/platform/music.ts` over the 32
   multi-voice scores split across `src/platform/scores-helpers.ts`,
   `src/platform/scores-town.ts`, `src/platform/scores-wilds.ts`,
   `src/platform/scores-interiors.ts`, and `src/platform/scores-expansion.ts`,
@@ -554,7 +558,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   exploration themes on the nearest bar downbeat after battles or shop visits
   via `resumeBarStep` (preserving `stepsPerBar` alignment across 4/4 and 3/4
   waltz scores while `FRESH_START_TRACKS` (`title`, `taco`, `battle`, `boss`,
-  `talk`, and `morning`) always start fresh at step 0, Milestones 152 & 160),
+  `talk`, `hearts`, and `morning`) always start fresh at step 0, Milestones
+  152, 160 & 191),
   and pauses cleanly on `visibilitychange` when backgrounded; when returning
   visible on `visibilitychange` or `pageshow` (Milestone 132), pure
   `shouldResumeAudioOnVisible(hidden, state)` (`src/platform/audio.ts`)
@@ -591,7 +596,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   bit-identical on `neutral`/omitted, pausing blips cleanly during `{pause:N}`
   dramatic beats via `buildSoundContext`), and pitch `choice-move`,
   `battle-command`, and `choice-select` clicks to the active soundtrack's
-  pentatonic scale (across all 31 tracks + `silent`).
+  pentatonic scale (across all 32 tracks + `silent`, with `hearts` tuned to
+  `EB_MAJOR_WARM`).
   Browsers hold the context (`suspended`, or WebKit's `interrupted`) until a
   key, click, or tap; a gamepad press is not a user activation in any browser,
   so a pad-only player on the web hears nothing until one. The iOS app's web
@@ -5038,6 +5044,28 @@ trunks keep its two exits.
   reduced-motion and iOS tap-selection hygiene, and clean
   backdrop/`×`/`Escape`/`X`/`B` dismiss restoring Field Treasures and focus
   directly to `.journal-weather-btn`.
+- **Party Heart-to-Heart Scrapbook Album** (Milestone 191): hand-inked
+  storybook scrapbook modal (`src/ui/journal-hearts.ts` +
+  `src/ui/journal-hearts.css`, composed into `createJournalFieldOverlays` in
+  `src/ui/journal-field-note.ts`, backed by pure `heartToHeartSummary` and
+  `heartToHeartMeta` in `src/core/heart-to-hearts.ts` projected via
+  `buildJournalView` in `src/shell/view-models.ts`) launched from the compact
+  warm-rose `.journal-hearts-btn` (`"♥ Hearts · N/6"`) beside
+  `.journal-ribbons-btn` and `.journal-weather-btn` in the `FIELD TREASURES`
+  modal header (hidden when `heartToHearts` is omitted so all `ui-gallery` and
+  Journal baselines stay pixel-identical). Renders hand-inked `#47321f` inline
+  SVG heart-ribbon and state medallions (zero `<text>` nodes) across a balanced
+  2-column × 3-row grid at both `1280x720` and `874x402` (`is-done` warm
+  rose-cream cards with colored accent stripes, location pills, memory notes,
+  and golden `✦` keepsake pins; `is-ready` sunny blush cards with `"Ready to
+  Visit!"` and `"Visit: <location>"` badges; `is-locked` dashed parchment cards
+  with spoiler-free hints, strictly masking `sanctuary-encore` as `"Secret
+  Meadow Gathering"` / `"Whole Crew"` without naming Milo until unlocked or
+  completed per §1.2), a golden `"♥ 6/6 ALL HEARTS SHARED!"` header & footer
+  celebration at `6/6`, full 2D arrow/Home/End keyboard navigation, M133 paper
+  foley, Reduced Motion and iOS tap-selection parity, and
+  backdrop/`×`/`Escape`/`X`/`B` dismiss restoring Field Treasures and focus
+  directly to `.journal-hearts-btn`.
 - A chunky four-step sound volume slider sits beside the `♪ on/off` pill and
   fits the heading row at 874x402, including with `♪ off` and 999 coins. At
   narrow widths, the supplies wrap beneath NOTES so every control remains

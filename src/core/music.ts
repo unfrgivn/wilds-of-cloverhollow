@@ -31,6 +31,7 @@ export type MusicTrack =
   | "battle"
   | "boss"
   | "talk"
+  | "hearts"
   | "morning"
   | "silent";
 
@@ -67,6 +68,7 @@ export const jukeboxTracks: readonly JukeboxTrack[] = [
   "battle",
   "boss",
   "talk",
+  "hearts",
   "morning",
 ];
 
@@ -120,6 +122,7 @@ export const trackTitles: Record<MusicTrack, string> = {
   battle: "Fizzy Calm-Down!",
   boss: "The Purple Hood",
   talk: "Listening Heart",
+  hearts: "Warm Hearth Hearts",
   morning: "Waking Up",
   silent: "Quiet",
 };
@@ -241,6 +244,10 @@ export function soundtrackFor(
   if (state.arcade?.game === "taco") {
     return makeSoundtrack("taco", "town-breeze", state.dialogue !== null);
   }
+  const ambience: AmbienceBed = areaAmbience[state.area] ?? "none";
+  if (state.arcade === null && state.dialogue !== null && state.dialogue.knot.startsWith("h2h_")) {
+    return makeSoundtrack("hearts", ambience, true);
+  }
   let track: MusicTrack;
   if (state.area === "enchanted") {
     track = world.storyVariable(state.ink, "forest_fizzy") === false
@@ -259,7 +266,6 @@ export function soundtrackFor(
       track = (land !== undefined ? landTracks[land] : undefined) ?? "home";
     }
   }
-  const ambience: AmbienceBed = areaAmbience[state.area] ?? "none";
   const duck = state.dialogue !== null || state.journalOpen || state.arcade !== null;
   return makeSoundtrack(track, ambience, duck);
 }

@@ -8514,6 +8514,46 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   `< 446 kB`, hook leak + runtime story + harness checks green), and Chromium +
   WebKit Playwright e2e verification.
 
+## Milestone 194: Party Heart-to-Heart Scrapbook Album in Fae's Journal & 32nd Original Soundtrack Theme `"Warm Hearth Hearts"` **Status:** ✅ Completed (2026-11-28)
+- Gives PR `#25`'s 6 Party Heart-to-Hearts their own tender 32nd original
+  soundtrack waltz (`"hearts"` — `"Warm Hearth Hearts"`) and a dedicated
+  hand-inked **Heart-to-Heart Scrapbook Album** inside Fae's Journal so players
+  can track every unlocked hangout location, completed memory, and Friendship
+  Pin — zero `src/core/sim.ts` changes, zero save-version bumps, zero replay
+  hash drift across all 74 recorded sims + `e11-heart-to-hearts`, and zero
+  visual baseline diffs across all 99 `ui-gallery` baselines.
+- 32nd Original Soundtrack Theme `"hearts"` (`"Warm Hearth Hearts"`)
+  (`src/core/music.ts`, `src/platform/scores-interiors.ts`,
+  `src/platform/scores.ts`, `src/platform/voices.ts`, `src/platform/music.ts`):
+  - Composed `heartsScore` (84 BPM, 3/4, 16-bar E-flat major 5-voice acoustic
+    waltz: `harp`, `piano`, `flute`, `celesta`, `pad`), expanded `jukeboxTracks`
+    to **32 composed themes**, routed `soundtrackFor(...)` cleanly whenever
+    `state.dialogue.knot.startsWith("h2h_")` (preserving area ambience), added
+    `hearts: EB_MAJOR_WARM` in `TRACK_SCALES`, and added `"hearts"` to
+    `FRESH_START_TRACKS`.
+- Pure Heart-to-Heart Scrapbook metadata (`src/core/heart-to-hearts.ts`,
+  `src/shell/view-models.ts`):
+  - Added `heartToHeartMeta(id, revealed)` covering all 6 `HeartToHeartId`s with
+    exact Friendship Pin labels, memory notes, hangout locations, and strict
+    `spec.md` §1.2 spoiler masking for locked `sanctuary-encore` (`"Whole Crew"`,
+    `"Secret Meadow Gathering"`, zero Milo mentions pre-reveal).
+- Party Heart-to-Heart Scrapbook Album (`src/ui/journal-hearts.ts`,
+  `src/ui/journal-hearts.css`, `src/ui/journal-field-note.ts`,
+  `src/ui/journal-field-note-data.ts`):
+  - Hand-inked inline SVG heart medallions (zero `<text>` nodes), balanced 2×3
+    grid with `is-done`, `is-ready` (`Ready to Visit!`), and `is-locked` cards,
+    golden `♥ 6/6 ALL HEARTS SHARED!` header & footer, 2D keyboard navigation,
+    `Escape`/`X`/`B`/backdrop/`×` dismiss restoring Field Treasures & focus to
+    `.journal-hearts-btn`, M133 paper foley, Reduced Motion parity, and iOS
+    tap-selection hygiene.
+- Evidence: `tests/unit/milestone-194.test.ts`,
+  `tests/e2e/milestone-194.spec.ts` (`@smoke` Chromium + WebKit), and review
+  captures `art/review/m191-hearts-album-1280.jpg` and
+  `m191-hearts-album-874.jpg` independently verified via `vision`.
+- Gates: `just check` (259 unit files / 1,920 tests, all 74 sims + `e11`, 23 QA
+  packs, purity, lint), `just build` (`index` `< 500 kB`), 34/34
+  targeted Chromium & WebKit e2e, and 99/99 Chromium `ui-gallery` tests.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

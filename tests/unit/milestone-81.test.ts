@@ -88,6 +88,7 @@ describe("Milestone 81: character-voiced talking blips & key-aligned UI scales",
       "battle",
       "boss",
       "talk",
+      "hearts",
       "morning",
       "silent",
     ];

@@ -48,6 +48,15 @@ export type HeartToHeartSummary = {
   entries: readonly HeartToHeartEntry[];
 };
 
+export type HeartToHeartMeta = {
+  participantsLabel: string;
+  locationLabel: string;
+  accent: string;
+  unlockHint: string;
+  memoryNote: string;
+  pinLabel: string;
+};
+
 export type LullabyFluteSpot = {
   id: string;
   area: string;
@@ -206,6 +215,80 @@ export function heartToHeartSummary(
     total: entries.length,
     entries,
   };
+}
+
+const HEART_TO_HEART_META: Readonly<Record<HeartToHeartId, HeartToHeartMeta>> = {
+  "fae-maddie": {
+    participantsLabel: "Fae & Maddie",
+    locationLabel: "Fae's Bedroom",
+    accent: "#e58963",
+    unlockHint: "Eat breakfast, claim the Clubhouse, or calm the Fountain Frog.",
+    memoryNote:
+      "Remembered Mom & Dad's rainy-night journal gift and kitten Maddie's pawprint on page one.",
+    pinLabel: "Pawprint Co-Captain Pin",
+  },
+  "fae-sue": {
+    participantsLabel: "Fae & Sue",
+    locationLabel: "Bubblegum Bay",
+    accent: "#58b5cc",
+    unlockHint: "Team up with Sue and calm a critter at Bubblegum Bay.",
+    memoryNote:
+      "Swapped tide-jitter stories on the pier and admired Sue's storm-smoothed sea-glass compass.",
+    pinLabel: "Sea-Glass Compass Pin",
+  },
+  "fae-jordan": {
+    participantsLabel: "Fae & Jordan",
+    locationLabel: "Pinecone Pass",
+    accent: "#6aa876",
+    unlockHint: "Team up with Jordan and earn the Lantern or calm the Hiker Hamster.",
+    memoryNote:
+      "Paused in the pine snow so Jordan could set down his heavy guide pack and take a breather.",
+    pinLabel: "Snowy Overlook Pin",
+  },
+  "sue-jordan": {
+    participantsLabel: "Fae, Sue, Jordan & Maddie",
+    locationLabel: "Bon Appetit Café",
+    accent: "#df9a4c",
+    unlockHint: "Recruit both Sue and Jordan into Fae's adventure crew.",
+    memoryNote:
+      "Settled the hot cocoa vs. sea-salt taffy debate with the Coast-Meets-Mountain Snack Treaty.",
+    pinLabel: "Snack Treaty Pin",
+  },
+  "clubhouse-trio": {
+    participantsLabel: "Fae, Sue, Jordan & Maddie",
+    locationLabel: "Clubhouse",
+    accent: "#b57bd6",
+    unlockHint: "Claim the Whispering Woods Clubhouse with Sue and Jordan on the team.",
+    memoryNote:
+      "Shared lantern-lit snacks on the clubhouse rug as Cloverhollow's found family.",
+    pinLabel: "Found-Family Rug Pin",
+  },
+  "sanctuary-encore": {
+    participantsLabel: "Whole Crew",
+    locationLabel: "Wildlife Sanctuary",
+    accent: "#e27b9e",
+    unlockHint: "Calm the Enchanted Forest to gather everyone at the Wildlife Sanctuary.",
+    memoryNote:
+      "Laughed together in the sunlit clover over every wild dream-adventure memory.",
+    pinLabel: "Sunlit Clover Encore Pin",
+  },
+};
+
+const SANCTUARY_ENCORE_REVEALED: HeartToHeartMeta = {
+  ...HEART_TO_HEART_META["sanctuary-encore"],
+  participantsLabel: "Fae, Maddie, Sue, Jordan & Milo",
+  memoryNote:
+    "Laughed with Maddie, Sue, Jordan, and Milo in the sunlit clover over the whole wild dream.",
+};
+
+/**
+ * Pure storybook scrapbook metadata for each Party Heart-to-Heart.
+ * Strictly obeys spec §1.2 secrecy: `sanctuary-encore` never names Milo unless
+ * `revealed` is explicitly true (only after unlock/completion).
+ */
+export function heartToHeartMeta(id: HeartToHeartId, revealed = false): HeartToHeartMeta {
+  if (id === "sanctuary-encore" && revealed) return SANCTUARY_ENCORE_REVEALED;
+  return HEART_TO_HEART_META[id];
 }
 
 /**

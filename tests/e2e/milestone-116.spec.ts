@@ -264,7 +264,7 @@ test.describe("Milestone 116: Journal Arcade Shelf, Keyboard Jukebox & Key Hints
       await expect(nowPlaying).toHaveAttribute("data-browsing", "true");
       await expect(nowPlaying).toHaveAttribute(
         "aria-label",
-        /Track 4 of 31: Pippin's Basket Waltz/,
+        /Track 4 of 32: Pippin's Basket Waltz/,
       );
       expect((await readMusic(page)).duck).toBe(false);
 
@@ -272,7 +272,7 @@ test.describe("Milestone 116: Journal Arcade Shelf, Keyboard Jukebox & Key Hints
       await page.keyboard.press("ArrowLeft");
       await expect.poll(async () => (await readMusic(page)).track).toBe("cafe");
       await expect(nowPlaying).toHaveText("♫ Cinnamon Waltz");
-      await expect(nowPlaying).toHaveAttribute("aria-label", /Track 3 of 31: Cinnamon Waltz/);
+      await expect(nowPlaying).toHaveAttribute("aria-label", /Track 3 of 32: Cinnamon Waltz/);
 
       // Click .journal-now-playing to reset smoothly back to live area theme.
       await nowPlaying.click();

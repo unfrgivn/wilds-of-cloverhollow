@@ -1,4 +1,5 @@
 import type { AtlasImage } from "./atlas";
+import type { HeartToHeartSummary } from "../core/heart-to-hearts";
 import type {
   CritterFieldNote,
   JournalKeepsake,
@@ -51,6 +52,7 @@ export type JournalFieldNoteSource = {
   keepsakes?: readonly JournalKeepsake[];
   starGems?: readonly StarGemEntry[];
   treasures?: TreasuresSummary;
+  heartToHearts?: HeartToHeartSummary;
   stickersOwned?: number;
   stickersTotal?: number;
   prizesOwned?: number;

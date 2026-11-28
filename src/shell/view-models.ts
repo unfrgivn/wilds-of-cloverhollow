@@ -4,6 +4,7 @@ import {
   creditEntries,
   creditsSummary,
   critterFieldNote,
+  heartToHeartSummary,
   journalFish,
   journalKeepsakes,
   journalProgress,
@@ -22,6 +23,7 @@ import {
   valleyCompletion,
   type ArcadeView,
   type BattleView,
+  type HeartToHeartSummary,
   type Point,
   type State,
   type TextSpeed,
@@ -224,7 +226,9 @@ export type JournalViewParams = {
 };
 
 /** Builds the complete DOM JournalView from core state, map centres, and atlas resolvers. */
-export function buildJournalView(params: JournalViewParams): JournalView {
+export function buildJournalView(
+  params: JournalViewParams,
+): JournalView & { heartToHearts?: HeartToHeartSummary } {
   const { world, state, mapCentres, art } = params;
   const open = state.journalOpen;
   const isStorySet = (variable: string): boolean =>
@@ -317,6 +321,7 @@ export function buildJournalView(params: JournalViewParams): JournalView {
     textSpeed: params.textSpeed,
     reducedMotion: params.reducedMotion,
     treasures: open ? treasuresSummary(world, state) : undefined,
+    heartToHearts: open ? heartToHeartSummary(world, state) : undefined,
     hasLantern: params.hasLantern,
     hasFlute: params.hasFlute,
     hasLasso: params.hasLasso,

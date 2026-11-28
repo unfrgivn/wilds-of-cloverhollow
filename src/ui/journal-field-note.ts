@@ -15,6 +15,7 @@ import {
   type JournalFieldNoteSource,
 } from "./journal-field-note-data";
 import { createJournalGemsLedger } from "./journal-gems-ledger";
+import { createJournalHeartsAlbum } from "./journal-hearts";
 import { createJournalRibbonsShowcase } from "./journal-ribbons";
 import { createJournalWeatherAlmanac } from "./journal-weather";
 import { isKeepsakeId } from "../core/blessings";
@@ -247,55 +248,57 @@ export function createJournalFieldOverlays(options?: {
 
   let ribbonsReturnToTreasures = false;
   let weatherReturnToTreasures = false;
-
+  let heartsReturnToTreasures = false;
+  const attachOverlay = (overlay: HTMLElement): void => {
+    const host = options?.focusRoot ?? treasuresBackdrop.parentElement;
+    if (host !== null && overlay.parentElement !== host) host.append(overlay);
+  };
+  const restoreTreasures = (wasFromTreasures: boolean): void => {
+    if (wasFromTreasures && treasuresOpen) treasuresBackdrop.hidden = false;
+  };
+  const clearPeers = (keep?: "weather" | "ribbons" | "hearts" | "gems"): void => {
+    clearFieldNote();
+    if (keep === "gems" || keep === undefined) clearTreasures();
+    if (keep !== "gems") gemsLedger.clear();
+    if (keep !== "ribbons") { ribbonsReturnToTreasures = false; ribbonsShowcase.clear(); }
+    if (keep !== "weather") { weatherReturnToTreasures = false; weatherAlmanac.clear(); }
+    if (keep !== "hearts") { heartsReturnToTreasures = false; heartsAlbum.clear(); }
+  };
   const weatherAlmanac = createJournalWeatherAlmanac({
-    onBeforeOpen: () => {
-      clearFieldNote();
-      gemsLedger.clear();
-      ribbonsReturnToTreasures = false;
-      ribbonsShowcase.clear();
-    },
+    onBeforeOpen: () => clearPeers("weather"),
     onClose: () => {
-      if (weatherReturnToTreasures && treasuresOpen) treasuresBackdrop.hidden = false;
+      restoreTreasures(weatherReturnToTreasures);
       weatherReturnToTreasures = false;
     },
     onVisibilityChange: () => syncVisibility(),
     onSelectMode: options?.onWeatherSelect,
   });
-
   const ribbonsShowcase = createJournalRibbonsShowcase({
-    onBeforeOpen: () => {
-      clearFieldNote();
-      gemsLedger.clear();
-      weatherReturnToTreasures = false;
-      weatherAlmanac.clear();
-    },
+    onBeforeOpen: () => clearPeers("ribbons"),
     onClose: () => {
-      if (ribbonsReturnToTreasures && treasuresOpen) treasuresBackdrop.hidden = false;
+      restoreTreasures(ribbonsReturnToTreasures);
       ribbonsReturnToTreasures = false;
     },
     onVisibilityChange: () => syncVisibility(),
   });
-  treasuresTitleWrap.append(ribbonsShowcase.treasuresBtn, weatherAlmanac.treasuresBtn);
-
+  const heartsAlbum = createJournalHeartsAlbum({
+    onBeforeOpen: () => clearPeers("hearts"),
+    onClose: () => {
+      restoreTreasures(heartsReturnToTreasures);
+      heartsReturnToTreasures = false;
+    },
+    onVisibilityChange: () => syncVisibility(),
+  });
+  treasuresTitleWrap.append(
+    ribbonsShowcase.treasuresBtn, weatherAlmanac.treasuresBtn, heartsAlbum.treasuresBtn,
+  );
   const gemsLedger = createJournalGemsLedger({
-    onBeforeOpen: () => {
-      clearFieldNote();
-      clearTreasures();
-      ribbonsReturnToTreasures = false;
-      weatherReturnToTreasures = false;
-      ribbonsShowcase.clear();
-      weatherAlmanac.clear();
-    },
+    onBeforeOpen: () => clearPeers("gems"),
     onVisibilityChange: () => syncVisibility(),
   });
-
   const hasOpen = (): boolean =>
-    treasuresOpen ||
-    inspectedItem !== null ||
-    gemsLedger.isOpen() ||
-    ribbonsShowcase.isOpen() ||
-    weatherAlmanac.isOpen();
+    treasuresOpen || inspectedItem !== null || gemsLedger.isOpen() ||
+    ribbonsShowcase.isOpen() || weatherAlmanac.isOpen() || heartsAlbum.isOpen();
 
   const syncVisibility = (): void => {
     const nowOpen = hasOpen();
@@ -343,7 +346,8 @@ export function createJournalFieldOverlays(options?: {
     }
     treasuresBackdrop.hidden =
       (ribbonsReturnToTreasures && ribbonsShowcase.isOpen()) ||
-      (weatherReturnToTreasures && weatherAlmanac.isOpen());
+      (weatherReturnToTreasures && weatherAlmanac.isOpen()) ||
+      (heartsReturnToTreasures && heartsAlbum.isOpen());
     const signature = treasuresSignature(summary);
     if (signature === lastTreasuresSignature) return;
     lastTreasuresSignature = signature;
@@ -523,27 +527,25 @@ export function createJournalFieldOverlays(options?: {
     openRibbons(latestView, ribbonsShowcase.banner);
   });
   weatherAlmanac.treasuresBtn.addEventListener("click", () => {
-    const host = options?.focusRoot ?? treasuresBackdrop.parentElement;
-    if (host !== null && weatherAlmanac.overlay.parentElement !== host) {
-      host.append(weatherAlmanac.overlay);
-    }
+    attachOverlay(weatherAlmanac.overlay);
     weatherReturnToTreasures = treasuresOpen;
     if (treasuresOpen) treasuresBackdrop.hidden = true;
     weatherAlmanac.open(weatherAlmanac.treasuresBtn);
   });
+  heartsAlbum.treasuresBtn.addEventListener("click", () => {
+    attachOverlay(heartsAlbum.overlay);
+    heartsReturnToTreasures = treasuresOpen;
+    if (treasuresOpen) treasuresBackdrop.hidden = true;
+    heartsAlbum.open(latestView?.heartToHearts, heartsAlbum.treasuresBtn);
+  });
 
   const closeAll = (): void => {
-    ribbonsReturnToTreasures = false;
-    weatherReturnToTreasures = false;
-    clearFieldNote();
-    clearTreasures();
-    gemsLedger.clear();
-    ribbonsShowcase.clear();
-    weatherAlmanac.clear();
+    clearPeers();
     lastNotifiedOpen = false;
   };
 
   const dismiss = (): boolean => {
+    if (heartsAlbum.isOpen()) { heartsAlbum.close(); return true; }
     if (weatherAlmanac.isOpen()) { weatherAlmanac.close(); return true; }
     if (ribbonsShowcase.isOpen()) { ribbonsShowcase.close(); return true; }
     if (gemsLedger.isOpen()) { gemsLedger.close(); return true; }
@@ -593,6 +595,7 @@ export function createJournalFieldOverlays(options?: {
       syncTreasures(view);
       gemsLedger.sync(view.starGems);
       syncRibbons(view, ribbonsAnchor);
+      heartsAlbum.sync(view.heartToHearts);
     },
     stepFieldNote,
     closeFieldNote,
@@ -603,6 +606,7 @@ export function createJournalFieldOverlays(options?: {
     hasOpen,
     dismiss,
     handleKeydown: (event) => {
+      if (heartsAlbum.handleKeydown(event)) return true;
       if (weatherAlmanac.handleKeydown(event)) return true;
       if (ribbonsShowcase.handleKeydown(event)) return true;
       if (gemsLedger.handleKeydown(event)) return true;

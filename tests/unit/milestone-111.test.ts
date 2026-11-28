@@ -298,7 +298,7 @@ describe("Milestone 111: Enriched Title Continue summary", () => {
 });
 
 describe("Milestone 111: Modular scores.ts split", () => {
-  it("exposes all 31 tracks across town, wilds, interior, and expansion scores", () => {
+  it("exposes all 32 tracks across town, wilds, interior, and expansion scores", () => {
     const expectedTracks: readonly PlayableTrack[] = [
       "title",
       "home",
@@ -330,12 +330,13 @@ describe("Milestone 111: Modular scores.ts split", () => {
       "battle",
       "boss",
       "talk",
+      "hearts",
       "morning",
     ];
     expect(Object.keys(scores)).toEqual(expectedTracks);
     expect(Object.keys(townScores)).toHaveLength(10);
     expect(Object.keys(wildsScores)).toHaveLength(10);
-    expect(Object.keys(interiorScores)).toHaveLength(4);
+    expect(Object.keys(interiorScores)).toHaveLength(5);
     expect(Object.keys(expansionScores)).toHaveLength(7);
     for (const trackId of expectedTracks) {
       const score = scores[trackId];

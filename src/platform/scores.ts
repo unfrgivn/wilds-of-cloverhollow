@@ -42,5 +42,6 @@ export const scores: Record<PlayableTrack, Score> = {
   battle: wildsScores.battle,
   boss: wildsScores.boss,
   talk: townScores.talk,
+  hearts: interiorScores.hearts,
   morning: townScores.morning,
 };

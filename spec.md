@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 228)
+Last updated: 2026-11-28 (Milestone 229)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -76,16 +76,19 @@ reference material only.
 - Tooling: Vite 8 / Rolldown (dev server and production/harness builds with
   `build.rolldownOptions.output.codeSplitting` into `vendor-pixi`, `vendor-ink`,
   `area-content`, `critter-content` (`content/critters/*` & `content/fixtures/*`,
-  priority 19), `audio-scores` (`scores*.ts`, `audio-recipes.ts`, `voices.ts`,
-  `ambience.ts`, `includeDependenciesRecursively: false`, priority 18),
+  priority 19), `audio-scores` (`scores*.ts`, `audio-recipes.ts`,
+  `audio-cue-recipes.ts`, `audio-effects.ts`, `audio-playback.ts`,
+  `audio-settings.ts`, `voices.ts`, `voice-catalog.ts`, `music-synth.ts`,
+  `music-mix.ts`, `ambience.ts`, `weather-ambience.ts`,
+  `includeDependenciesRecursively: false`, priority 18),
   `ui-overlays` (`src/ui/*`, `includeDependenciesRecursively: false`, priority
   17), `render-engine` (`includeDependenciesRecursively: false`, including
   `src/platform/reduced-motion.ts` so `render-engine` never forms a circular
   chunk dependency with the `index`/`game` entry chunk, priority 16),
   `world-content` (`includeDependenciesRecursively: false`, priority 15), and
   `index`/`game` app chunks, keeping every non-vendor production JS chunk under
-  350 kB and enforced under 500 kB by `tools/check-dist.ts` via `just build`,
-  Milestones 154, 177 & 197), Bun (package
+  360 kB and enforced under 500 kB by `tools/check-dist.ts` via `just build`,
+  Milestones 154, 177, 197 & 228 / Track E19Q), Bun (package
   manager and script runner), Node 24 LTS for Node-based tools (`.nvmrc`),
   `just` for tasks. Compiled Ink story JSON lives out of the static JS bundle as
   a runtime-fetched asset at `public/assets/story/main.ink.json` (fetched via
@@ -302,9 +305,15 @@ ios/            Capacitor iOS project (from Milestone 4).
   (`computeOverworldSteer`, `isOverworldTap`, `isOverworldGroundTap`,
   `bindOverworldPointerSteer`) live in `src/shell/overworld-pointer.ts`; and
   shell keyboard/gamepad overlay & journal shortcut orchestration
-  (`canPhotoMode`, `canPhotoFromJournal`, `canBattlePeek`, `canOverworldSteer`,
+  (`createInputShortcuts`) lives in `src/shell/input-shortcuts.ts` while its
+  pure zero-DOM overlay-gate types and classifiers (`QA_HOLD_MS`,
+  `OverlayGateState`, `OverlayGateContext`, `ShortcutKeyTarget`,
+  `ShortcutKeyEvent`, `PhotoKeyAction`, `photoKeyAction`, `canPhotoMode`,
+  `canPhotoFromJournal`, `canBattlePeek`, `canOverworldSteer`,
   `isJournalShortcutActive`, `isOverworldFree`, `isBannerEligible`,
-  `createInputShortcuts`) lives in `src/shell/input-shortcuts.ts`; dynamic
+  `matchesClosest`) live in modular `src/shell/overlay-gates.ts` and are
+  re-exported identically from `src/shell/input-shortcuts.ts` (Milestone 229 /
+  Track E19Q); dynamic
   browser tab title formatting (`formatDocumentTitle`) lives in
   `src/shell/document-title.ts`, serialized area loading and door-fade target
   prefetching (`createAreaLoader`) live in `src/shell/area-loader.ts`, and
@@ -615,7 +624,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   cozy battle-faint rest (`battle.phase === "rest"`, Milestone 165).
 - `src/platform/audio.ts` creates a single AudioContext first thing at boot,
   before anything awaits, and resumes it at every chance: right away, on each
-  key, pointer, or touch, and whenever a cue plays while it isn't running.
+  key, pointer, or touch, and whenever a cue plays while it isn't running. Its
+  Web Audio output graph, noise/reverb buffer builders, gain-enveloped
+  segment/recipe schedulers, voice blip and ambient chatter synthesis helpers,
+  and scale/footstep pitch helpers live in modular
+  `src/platform/audio-playback.ts` (Milestone 229 / Track E19Q).
   Its master chain routes SFX, music (`src/platform/music.ts` over the 35
   multi-voice scores split across `src/platform/scores-helpers.ts`,
   `src/platform/scores-town.ts`, `src/platform/scores-wilds.ts`,
@@ -3537,7 +3550,14 @@ trunks keep its two exits.
   change), so the ticks and their input stay a replay's.
 - A confirm counts after a 12-tick beat (`CREDITS_BEAT_TICKS`,
   `creditsConfirmAllowed`), so a press still down from Milo's last line can't
-  skip the credits. Clicking or tapping `.credits-screen` (`createCredits`
+  skip the credits. `.credits-screen` declares `role="dialog"`,
+  `aria-modal="true"`, `aria-label="Credits"`, and `tabindex="-1"`, moves
+  keyboard/VoiceOver focus onto itself on the hidden -> visible transition
+  (`focus({ preventScroll: true })`, with `.credits-screen:focus` /
+  `:focus-visible { outline: none; }` so the full-viewport spread shows zero
+  focus-ring bleed), and routes `Escape`, `Enter`, or Space (`" "`) keydowns
+  through the same `onClose` callback and beat guard (Milestone 229 / Track
+  E19Q). Clicking or tapping `.credits-screen` (`createCredits`
   `onClose`, Milestone 126; with `:root[data-credits="open"] .touch-controls`
   set to `pointer-events: none` so touch taps reach the sheet while
   `.touch-buttons` keeps `pointer-events: auto`) emits a `confirm` tap through

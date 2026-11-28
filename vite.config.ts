@@ -14,7 +14,12 @@ export const chunkGroups: ChunkGroup[] = [
   { name: "critter-content", test: /\/content\/(critters|fixtures)\//, priority: 19 },
   {
     name: "audio-scores",
-    test: /\/src\/platform\/(scores(-[a-z]+)?|audio-recipes|voices|ambience)\.ts/,
+    test: new RegExp(
+      "/src/platform/(" +
+        "scores(-[a-z]+)?|audio-(recipes|cue-recipes|effects|playback|settings)|" +
+        "voice(s|-catalog)|music-(synth|mix)|(weather-)?ambience" +
+        ")\\.ts",
+    ),
     priority: 18,
     includeDependenciesRecursively: false,
   },

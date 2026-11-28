@@ -9713,6 +9713,51 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   scripts, 23 QA packs, purity, lint), `just build` (`index` `393.98 kB < 500 kB`),
   28/28 Chromium & WebKit soundtrack/album e2e, and 99/99 Chromium `ui-gallery`
   tests.
+
+## Milestone 229: Production `index` Chunk Diet (`< 365 kB` via Audio Module Routing), Ending Credits WCAG Dialog & Keyboard Focus, & `overlay-gates.ts` + `audio-playback.ts` Modular Splits (Elevation Track E19Q) **Status:** ✅ Completed (2026-11-28)
+- Production `index` Chunk Diet (`vite.config.ts`):
+  - Expands `audio-scores` (`priority: 18`,
+    `includeDependenciesRecursively: false`) to route `audio-cue-recipes.ts`,
+    `audio-effects.ts`, `audio-playback.ts`, `audio-settings.ts`,
+    `voice-catalog.ts`, `music-synth.ts`, `music-mix.ts`, and
+    `weather-ambience.ts` alongside `scores*.ts`, `audio-recipes.ts`,
+    `voices.ts`, and `ambience.ts`, keeping every non-vendor production JS
+    chunk cleanly `< 365 kB`.
+- Ending Credits Postcard WCAG Dialog & Focus Management (`src/ui/credits.ts`,
+  `src/ui/credits.css`):
+  - Sets `role="dialog"`, `aria-modal="true"`, `aria-label="Credits"`, and
+    `tabindex="-1"` on `.credits-screen`, moves focus onto `.credits-screen`
+    (`focus({ preventScroll: true })`) on hidden -> visible transitions, routes
+    `Escape`, `Enter`, and `" "` keydowns through `onClose` (respecting the
+    existing `CREDITS_BEAT_TICKS` grace guard), and suppresses full-viewport
+    focus-ring bleed via `.credits-screen:focus, .credits-screen:focus-visible
+    { outline: none; }`.
+- Modular `src/shell/overlay-gates.ts` extraction
+  (`src/shell/input-shortcuts.ts` `693 -> 498` lines,
+  `src/shell/overlay-gates.ts` `187` lines):
+  - Extracts all pure zero-DOM overlay-gate types, constants, and classifiers
+    (`QA_HOLD_MS`, `OverlayGateState`, `OverlayGateContext`,
+    `ShortcutKeyTarget`, `ShortcutKeyEvent`, `PhotoKeyAction`,
+    `photoKeyAction`, `canPhotoMode`, `canPhotoFromJournal`, `canBattlePeek`,
+    `canOverworldSteer`, `isJournalShortcutActive`, `isOverworldFree`,
+    `isBannerEligible`, `matchesClosest`) into `src/shell/overlay-gates.ts` and
+    re-exports every symbol identically from `src/shell/input-shortcuts.ts`.
+- Modular `src/platform/audio-playback.ts` extraction
+  (`src/platform/audio.ts` `659 -> 428` lines,
+  `src/platform/audio-playback.ts` `272` lines):
+  - Extracts Web Audio output-graph setup, noise/reverb buffer generators,
+    gain-enveloped segment & recipe scheduling, voice blip & ambient chatter
+    synthesis, and scale/footstep pitch helpers into
+    `src/platform/audio-playback.ts` while keeping `createAudio` and every
+    public export of `src/platform/audio.ts` identical.
+- Evidence: `tests/unit/milestone-229.test.ts` and
+  `tests/e2e/milestone-229.spec.ts` (`@smoke`, Chromium & WebKit).
+- Gates: `just check` (297 unit files / 2,123 tests, all 77 recorded + 7
+  headless sims with zero hash shifts, 23 QA packs, purity, lint), `just build`
+  (largest non-vendor production chunk `index` `< 365 kB`, hook leak + runtime
+  story + harness checks green), Chromium & WebKit (`milestone-229`,
+  `milestone-228`, `milestone-126`, `ending`, `sound`, `soundtrack`), and 6/6
+  Chromium `ui-gallery` `credits` (`0` visual diffs).
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

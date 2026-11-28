@@ -1,41 +1,19 @@
-import type { State } from "../core";
 import type { GamepadInput } from "../platform/gamepad";
 import type { HudInputMode } from "../ui/hud-hints";
 import { computeJournalScrollDelta, type JournalNavDirection } from "../ui/journal-nav";
-import type { TitleMode } from "./title-flow";
+import {
+  QA_HOLD_MS,
+  canBattlePeek,
+  canPhotoMode,
+  isJournalShortcutActive,
+  isOverworldFree,
+  matchesClosest,
+  photoKeyAction,
+  type OverlayGateContext,
+  type ShortcutKeyEvent,
+} from "./overlay-gates";
 
-export type OverlayGateState = Pick<
-  State,
-  "dialogue" | "battle" | "arcade" | "journalOpen" | "transition" | "finale" | "cutscene"
-> & { area?: string };
-
-export type OverlayGateContext = {
-  state: OverlayGateState;
-  titleMode: TitleMode | null;
-  qaMenuOpen: boolean;
-  qaConsoleOpen: boolean;
-  qaBlocked: boolean;
-  photoMode: boolean;
-  shrineOpen?: boolean;
-  decorPickerOpen?: boolean;
-  loading?: boolean;
-};
-
-export type ShortcutKeyTarget = {
-  closest?: (selector: string) => unknown;
-};
-
-export const QA_HOLD_MS = 500;
-
-export type ShortcutKeyEvent = {
-  code: string;
-  repeat: boolean;
-  shiftKey?: boolean;
-  timeStamp?: number;
-  target: EventTarget | ShortcutKeyTarget | null;
-  preventDefault: () => void;
-  stopPropagation: () => void;
-};
+export * from "./overlay-gates";
 
 export type ShortcutTimer = {
   now: () => number;
@@ -131,164 +109,6 @@ export type InputShortcutsController = {
   pollGamepad: () => void;
   bind: (target?: ShortcutBindTarget) => void;
 };
-
-export type PhotoKeyAction = "toggle" | "snap" | "weather" | "exit";
-
-/** Maps a keyboard event code to its Photo Mode shortcut action, if any. */
-export function photoKeyAction(code: string): PhotoKeyAction | null {
-  if (code === "KeyP") return "toggle";
-  if (code === "Enter" || code === "Space") return "snap";
-  if (code === "KeyW") return "weather";
-  if (code === "Escape") return "exit";
-  return null;
-}
-
-/** Returns true when Photo Mode can be entered or kept open in the overworld. */
-export function canPhotoMode(ctx: Omit<OverlayGateContext, "photoMode">): boolean {
-  return (
-    ctx.titleMode === null &&
-    !ctx.qaMenuOpen &&
-    !ctx.qaConsoleOpen &&
-    !ctx.qaBlocked &&
-    ctx.shrineOpen !== true &&
-    ctx.decorPickerOpen !== true &&
-    ctx.state.dialogue === null &&
-    ctx.state.battle === null &&
-    ctx.state.arcade === null &&
-    !ctx.state.journalOpen &&
-    ctx.state.finale === null &&
-    ctx.state.cutscene === undefined
-  );
-}
-
-/** Returns true when Photo Mode can be launched from Journal OPTIONS in the free overworld. */
-export function canPhotoFromJournal(ctx: Omit<OverlayGateContext, "photoMode">): boolean {
-  return (
-    ctx.titleMode === null &&
-    !ctx.qaMenuOpen &&
-    !ctx.qaConsoleOpen &&
-    !ctx.qaBlocked &&
-    ctx.shrineOpen !== true &&
-    ctx.decorPickerOpen !== true &&
-    ctx.loading !== true &&
-    ctx.state.dialogue === null &&
-    ctx.state.battle === null &&
-    ctx.state.arcade === null &&
-    ctx.state.transition === null &&
-    ctx.state.finale === null &&
-    ctx.state.cutscene === undefined
-  );
-}
-
-/** Returns true when the Battle Field Guide Peek card may toggle during battle command phase. */
-export function canBattlePeek(ctx: Omit<OverlayGateContext, "photoMode">): boolean {
-  return (
-    ctx.titleMode === null &&
-    !ctx.qaMenuOpen &&
-    !ctx.qaConsoleOpen &&
-    !ctx.qaBlocked &&
-    ctx.shrineOpen !== true &&
-    !ctx.state.journalOpen &&
-    ctx.state.battle !== null &&
-    ctx.state.battle.phase === "command" &&
-    (ctx.state.battle.talk === undefined || ctx.state.battle.talk === null)
-  );
-}
-
-/** Returns true when desktop mouse/pen press-and-hold overworld steering is permitted. */
-export function canOverworldSteer(ctx: OverlayGateContext): boolean {
-  return (
-    ctx.titleMode === null &&
-    !ctx.qaMenuOpen &&
-    !ctx.qaConsoleOpen &&
-    !ctx.qaBlocked &&
-    !ctx.photoMode &&
-    ctx.shrineOpen !== true &&
-    ctx.decorPickerOpen !== true &&
-    ctx.state.dialogue === null &&
-    ctx.state.battle === null &&
-    ctx.state.arcade === null &&
-    !ctx.state.journalOpen &&
-    ctx.state.transition === null &&
-    ctx.state.finale === null &&
-    ctx.state.cutscene === undefined
-  );
-}
-
-/** Returns true when journal keyboard/gamepad navigation and page-flip shortcuts are active. */
-export function isJournalShortcutActive(
-  ctx: Pick<
-    OverlayGateContext,
-    "state" | "titleMode" | "qaMenuOpen" | "qaConsoleOpen" | "shrineOpen" | "decorPickerOpen"
-  >,
-): boolean {
-  return (
-    ctx.state.journalOpen &&
-    ctx.titleMode === null &&
-    !ctx.qaMenuOpen &&
-    !ctx.qaConsoleOpen &&
-    ctx.shrineOpen !== true &&
-    ctx.decorPickerOpen !== true
-  );
-}
-
-/** Returns true when the overworld HUD hints ribbon can treat Fae as free-roaming. */
-export function isOverworldFree(
-  ctx: Omit<OverlayGateContext, "photoMode">,
-  hasLevelUpNotice: boolean,
-): boolean {
-  return (
-    ctx.titleMode === null &&
-    !ctx.qaMenuOpen &&
-    !ctx.qaConsoleOpen &&
-    !ctx.qaBlocked &&
-    ctx.shrineOpen !== true &&
-    ctx.decorPickerOpen !== true &&
-    ctx.state.dialogue === null &&
-    ctx.state.battle === null &&
-    ctx.state.arcade === null &&
-    !ctx.state.journalOpen &&
-    ctx.state.finale !== "credits" &&
-    ctx.state.cutscene === undefined &&
-    !hasLevelUpNotice
-  );
-}
-
-/** Returns true when area-arrival banners may be displayed over the viewport. */
-export function isBannerEligible(
-  ctx: Pick<
-    OverlayGateContext,
-    "titleMode" | "qaMenuOpen" | "qaConsoleOpen" | "qaBlocked" | "shrineOpen"
-  >,
-  hasLevelUpNotice: boolean,
-): boolean {
-  return (
-    ctx.titleMode === null &&
-    !ctx.qaMenuOpen &&
-    !ctx.qaConsoleOpen &&
-    !ctx.qaBlocked &&
-    ctx.shrineOpen !== true &&
-    !hasLevelUpNotice
-  );
-}
-
-function matchesClosest(
-  target: ShortcutKeyEvent["target"],
-  selector: string,
-): boolean {
-  if (target === null) return false;
-  if (typeof HTMLElement !== "undefined") {
-    return target instanceof HTMLElement && target.closest(selector) !== null;
-  }
-  if (
-    typeof target === "object" &&
-    "closest" in target &&
-    typeof target.closest === "function"
-  ) {
-    return target.closest(selector) !== null;
-  }
-  return false;
-}
 
 /**
  * Orchestrates shell keyboard shortcuts, optional QA shortcuts, and per-frame
@@ -495,6 +315,10 @@ export function createInputShortcuts(
       deps.invalidate();
     }
     const ctx = deps.getContext();
+    const swallowPad = (button: "confirm" | "cancel"): void => {
+      deps.swallow(button);
+      deps.gamepad.clearTaps();
+    };
     const photoAction = deps.gamepad.consumePhotoAction();
     if (photoAction === "toggle") {
       if (canBattlePeek(ctx)) {
@@ -503,18 +327,15 @@ export function createInputShortcuts(
         deps.setPhotoMode(!ctx.photoMode);
       }
     } else if (photoAction === "snap" && ctx.photoMode && canPhotoMode(ctx)) {
-      deps.swallow("confirm");
-      deps.gamepad.clearTaps();
+      swallowPad("confirm");
       deps.snapPostcard();
     } else if (photoAction === "exit") {
       if (ctx.photoMode) {
         deps.setPhotoMode(false);
-        deps.swallow("cancel");
-        deps.gamepad.clearTaps();
+        swallowPad("cancel");
       } else if (deps.getBattlePeekOpen()) {
         deps.setBattlePeek(false);
-        deps.swallow("cancel");
-        deps.gamepad.clearTaps();
+        swallowPad("cancel");
       }
     }
 
@@ -529,8 +350,7 @@ export function createInputShortcuts(
     if (deps.encoreShrine?.isOpen() === true) {
       if (photoAction === "exit") {
         deps.encoreShrine.close();
-        deps.swallow("cancel");
-        deps.gamepad.clearTaps();
+        swallowPad("cancel");
         deps.invalidate();
         return;
       }
@@ -545,8 +365,7 @@ export function createInputShortcuts(
         deps.invalidate();
       }
       if (journalConfirmEdge) {
-        deps.swallow("confirm");
-        deps.gamepad.clearTaps();
+        swallowPad("confirm");
         deps.encoreShrine.activateLaunch();
         deps.invalidate();
       }
@@ -555,8 +374,7 @@ export function createInputShortcuts(
     if (ctx.decorPickerOpen === true || deps.decorPicker?.isOpen() === true) {
       if (photoAction === "exit") {
         deps.decorPicker?.close();
-        deps.swallow("cancel");
-        deps.gamepad.clearTaps();
+        swallowPad("cancel");
         deps.invalidate();
         return;
       }
@@ -567,16 +385,10 @@ export function createInputShortcuts(
         deps.invalidate();
       }
       if (journalConfirmEdge) {
-        deps.swallow("confirm");
-        deps.gamepad.clearTaps();
+        swallowPad("confirm");
         deps.decorPicker?.activateFocused?.();
         deps.invalidate();
       }
-      return;
-    }
-    if (bumperStep !== 0 && ctx.photoMode && canPhotoMode(ctx)) {
-      deps.gamepad.clearTaps();
-      deps.onCyclePhotoWeather?.(bumperStep);
       return;
     }
     const journalActive = isJournalShortcutActive(ctx);
@@ -659,21 +471,14 @@ export function createInputShortcuts(
   };
 
   const bind: InputShortcutsController["bind"] = (target) => {
-    if (target !== undefined) {
-      target.addEventListener("keydown", handleKeydown);
-      if (deps.qa !== undefined) {
-        target.addEventListener("keydown", handleQaKeydown);
-        target.addEventListener("keyup", handleQaKeyup);
-        target.addEventListener("blur", handleQaBlur);
-      }
-      return;
-    }
-    if (typeof window === "undefined") return;
-    window.addEventListener("keydown", handleKeydown);
+    const host: ShortcutBindTarget | undefined =
+      target ?? (typeof window === "undefined" ? undefined : window);
+    if (host === undefined) return;
+    host.addEventListener("keydown", handleKeydown);
     if (deps.qa !== undefined) {
-      window.addEventListener("keydown", handleQaKeydown);
-      window.addEventListener("keyup", handleQaKeyup);
-      window.addEventListener("blur", handleQaBlur);
+      host.addEventListener("keydown", handleQaKeydown);
+      host.addEventListener("keyup", handleQaKeyup);
+      host.addEventListener("blur", handleQaBlur);
     }
   };
 

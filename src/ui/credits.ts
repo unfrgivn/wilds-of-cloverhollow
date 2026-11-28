@@ -67,9 +67,20 @@ export function createCredits(root: HTMLElement): {
   let closeHandler: () => void = () => undefined;
   const screen = document.createElement("section");
   screen.className = "credits-screen";
+  screen.setAttribute("role", "dialog");
+  screen.setAttribute("aria-modal", "true");
   screen.setAttribute("aria-label", "Credits");
+  screen.tabIndex = -1;
+  screen.hidden = true;
   screen.addEventListener("click", () => {
     if (!screen.hidden) closeHandler();
+  });
+  screen.addEventListener("keydown", (event) => {
+    if (screen.hidden || event.repeat) return;
+    if (event.key === "Escape" || event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      closeHandler();
+    }
   });
 
   const hero = document.createElement("div");
@@ -131,11 +142,15 @@ export function createCredits(root: HTMLElement): {
       closeHandler = callback;
     },
     render: (view) => {
+      const wasHidden = screen.hidden;
       screen.hidden = !view.visible;
       if (!view.visible) {
         shown = "";
         atlases = [];
         return;
+      }
+      if (wasHidden && document.activeElement !== screen) {
+        screen.focus({ preventScroll: true });
       }
       const summary = view.summary ?? [];
       const postcard = view.postcard === undefined ? DEFAULT_ENDING_POSTCARD : view.postcard;

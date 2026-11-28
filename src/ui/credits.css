@@ -20,6 +20,8 @@
   -webkit-user-select: none;
   -webkit-touch-callout: none;
 }
+.credits-screen:focus,
+.credits-screen:focus-visible { outline: none; }
 .credits-screen[hidden],
 .credits-screen h2[hidden],
 .credits-summary[hidden],

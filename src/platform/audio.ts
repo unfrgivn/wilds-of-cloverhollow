@@ -17,10 +17,18 @@ import {
 } from "./audio-settings";
 import { createAmbiencePlayer, type AmbiencePlayer } from "./ambience";
 import {
+  ambientChatterSegments,
+  createAudioOutputGraph,
+  createNoiseBuffer,
+  extractBlipChar,
+  resolveCueRecipe,
+  scheduleRecipe,
+  voiceBlipSegments,
+} from "./audio-playback";
+import {
   effectRecipe,
   effectRecipes,
   soundCueRecipe,
-  soundCueRecipes,
   type AudioRecipe,
   type AudioSegment,
   type CompanionAudioEffect,
@@ -39,8 +47,6 @@ import {
   applyExpressionProsody,
   blipFrequency,
   dialogueProsody,
-  footstepPitchFactor,
-  trackScaleNotes,
   type VoiceExpression,
 } from "./voices";
 import { resolveSoundtrackWeather, type ActiveWeatherKind } from "./weather-ambience";
@@ -130,26 +136,7 @@ export type AudioController = {
   state: () => AudioState;
 };
 
-type Segment = AudioSegment;
-type Recipe = AudioRecipe;
-
 const preferenceKey = "cloverhollow-audio";
-
-function createReverbImpulse(audio: AudioContext): AudioBuffer {
-  const length = Math.max(1, Math.floor(audio.sampleRate * 1.0));
-  const buffer = audio.createBuffer(2, length, audio.sampleRate);
-  for (let ch = 0; ch < 2; ch += 1) {
-    const data = buffer.getChannelData(ch);
-    let lp = 0;
-    for (let i = 0; i < length; i += 1) {
-      const decay = Math.pow(1 - i / length, 2.6);
-      const white = (Math.random() * 2 - 1) * decay;
-      lp = lp * 0.72 + white * 0.28;
-      data[i] = lp;
-    }
-  }
-  return buffer;
-}
 
 // The context is made at boot and resumed at every chance: browsers keep it
 // suspended until a key, click, or tap (a gamepad press never counts), while
@@ -182,10 +169,7 @@ export function createAudio(
 
   // One shared quarter second of white noise; segments are shorter and just play its head.
   const noiseBuffer = (audio: AudioContext): AudioBuffer => {
-    if (noise !== null) return noise;
-    noise = audio.createBuffer(1, Math.floor(audio.sampleRate / 4), audio.sampleRate);
-    const data = noise.getChannelData(0);
-    for (let index = 0; index < data.length; index += 1) data[index] = Math.random() * 2 - 1;
+    noise ??= createNoiseBuffer(audio);
     return noise;
   };
   const entries: SoundLogEntry[] = [];
@@ -208,20 +192,13 @@ export function createAudio(
 
   const persist = (): void => {
     void store.save(
-      writeAudioPreferences({
-        muted,
-        level,
-        musicMuted,
-        musicLevel,
-        ambienceMuted,
-      }),
+      writeAudioPreferences({ muted, level, musicMuted, musicLevel, ambienceMuted }),
     );
   };
 
-  const toggle = (): void => {
-    muted = !muted;
+  const commitPref = (update: () => void): void => {
     store.markDirty();
-    syncPlayers();
+    update();
     if (store.isLoaded()) persist();
   };
 
@@ -230,31 +207,24 @@ export function createAudio(
     if (master !== null) master.gain.value = gainForAudioLevel(level);
   };
 
-  const setLevel = (next: AudioLevel): void => {
-    store.markDirty();
-    applyLevel(next);
-    if (store.isLoaded()) persist();
-  };
+  const toggle = (): void => commitPref(() => { muted = !muted; syncPlayers(); });
+  const setLevel = (next: AudioLevel): void => commitPref(() => applyLevel(next));
+  const toggleMusic = (): void => commitPref(() => { musicMuted = !musicMuted; syncPlayers(); });
+  const setMusicLevel = (next: AudioLevel): void =>
+    commitPref(() => { musicLevel = next; syncPlayers(); });
+  const toggleAmbience = (): void =>
+    commitPref(() => { ambienceMuted = !ambienceMuted; syncPlayers(); });
 
-  const toggleMusic = (): void => {
-    musicMuted = !musicMuted;
-    store.markDirty();
-    syncPlayers();
-    if (store.isLoaded()) persist();
-  };
-
-  const setMusicLevel = (next: AudioLevel): void => {
-    musicLevel = next;
-    store.markDirty();
-    syncPlayers();
-    if (store.isLoaded()) persist();
-  };
-
-  const toggleAmbience = (): void => {
-    ambienceMuted = !ambienceMuted;
-    store.markDirty();
-    syncPlayers();
-    if (store.isLoaded()) persist();
+  const syncSoundtrackPlayers = (): void => {
+    musicPlayer?.setState({
+      track: soundtrack.track,
+      duck: soundtrack.duck,
+      journalWarm: adaptiveState.journalWarm,
+      lanternLayer: adaptiveState.lanternLayer,
+      tensionLayer: adaptiveState.tensionLayer,
+    });
+    ambiencePlayer?.setBed(soundtrack.ambience);
+    ambiencePlayer?.setWarmFilter(adaptiveState.journalWarm);
   };
 
   const setSoundtrack = (next: SoundtrackState, adaptive?: MusicAdaptiveState): void => {
@@ -273,15 +243,7 @@ export function createAudio(
     ) return;
     soundtrack = next;
     adaptiveState = nextAdaptive;
-    musicPlayer?.setState({
-      track: next.track,
-      duck: next.duck,
-      journalWarm: nextAdaptive.journalWarm,
-      lanternLayer: nextAdaptive.lanternLayer,
-      tensionLayer: nextAdaptive.tensionLayer,
-    });
-    ambiencePlayer?.setBed(next.ambience);
-    ambiencePlayer?.setWarmFilter(nextAdaptive.journalWarm);
+    syncSoundtrackPlayers();
   };
 
   const setWeather = (next: ActiveWeatherKind): void => {
@@ -295,47 +257,13 @@ export function createAudio(
     const Constructor = globalThis.AudioContext;
     if (Constructor === undefined) return null;
     context = new Constructor();
-    const compressor = context.createDynamicsCompressor();
-    compressor.threshold.value = -14;
-    compressor.knee.value = 18;
-    compressor.ratio.value = 3;
-    compressor.attack.value = 0.01;
-    compressor.release.value = 0.15;
-    compressor.connect(context.destination);
+    const graph = createAudioOutputGraph(context, gainForAudioLevel(level));
+    master = graph.master;
 
-    master = context.createGain();
-    master.gain.value = gainForAudioLevel(level);
-    master.connect(compressor);
-
-    const musicOutput = context.createGain();
-    musicOutput.gain.value = 1;
-    const musicDry = context.createGain();
-    musicDry.gain.value = 0.85;
-    musicOutput.connect(musicDry).connect(compressor);
-    if (typeof context.createConvolver === "function") {
-      const convolver = context.createConvolver();
-      convolver.buffer = createReverbImpulse(context);
-      const musicWet = context.createGain();
-      musicWet.gain.value = 0.22;
-      musicOutput.connect(convolver).connect(musicWet).connect(compressor);
-    }
-
-    const ambienceOutput = context.createGain();
-    ambienceOutput.gain.value = 1;
-    ambienceOutput.connect(compressor);
-
-    musicPlayer = createMusicPlayer(context, musicOutput);
-    ambiencePlayer = createAmbiencePlayer(context, ambienceOutput);
-    musicPlayer.setState({
-      track: soundtrack.track,
-      duck: soundtrack.duck,
-      journalWarm: adaptiveState.journalWarm,
-      lanternLayer: adaptiveState.lanternLayer,
-      tensionLayer: adaptiveState.tensionLayer,
-    });
-    ambiencePlayer.setBed(soundtrack.ambience);
+    musicPlayer = createMusicPlayer(context, graph.musicOutput);
+    ambiencePlayer = createAmbiencePlayer(context, graph.ambienceOutput);
+    syncSoundtrackPlayers();
     ambiencePlayer.setWeather(currentWeather);
-    ambiencePlayer.setWarmFilter(adaptiveState.journalWarm);
     syncPlayers();
     return context;
   };
@@ -350,160 +278,26 @@ export function createAudio(
     }
   };
 
-  const playSegment = (audio: AudioContext, segment: Segment, start: number): void => {
-    if (master === null) return;
-    const gain = audio.createGain();
-    const end = start + segment.duration;
-    const attack = Math.min(segment.attack ?? 0.006, segment.duration * 0.4);
-    gain.gain.setValueAtTime(0.001, start);
-    if (segment.attack !== undefined) {
-      gain.gain.linearRampToValueAtTime(segment.gain, start + attack);
-    } else {
-      gain.gain.exponentialRampToValueAtTime(segment.gain, start + attack);
-    }
-    gain.gain.exponentialRampToValueAtTime(0.001, end);
-    if (segment.wave === "noise") {
-      const source = audio.createBufferSource();
-      source.buffer = noiseBuffer(audio);
-      const filter = audio.createBiquadFilter();
-      filter.type = "lowpass";
-      filter.frequency.value = segment.lowpass;
-      source.connect(filter).connect(gain).connect(master);
-      source.start(start);
-      source.stop(end);
-      return;
-    }
-    const oscillator = audio.createOscillator();
-    oscillator.type = segment.wave;
-    // Square blips get a hair of pitch wobble so text doesn't sound like a dial tone.
-    const jitter = segment.wave === "square" ? (Math.random() - 0.5) * 18 : 0;
-    oscillator.frequency.setValueAtTime(segment.frequency + jitter, start);
-    if (segment.endFrequency !== undefined)
-      oscillator.frequency.linearRampToValueAtTime(segment.endFrequency, end);
-    if (segment.vibrato !== undefined) {
-      const vibrato = audio.createOscillator();
-      const depth = audio.createGain();
-      vibrato.frequency.value = segment.vibrato.rate;
-      depth.gain.value = segment.vibrato.depth;
-      vibrato.connect(depth).connect(oscillator.frequency);
-      vibrato.start(start);
-      vibrato.stop(end);
-    }
-    oscillator.connect(gain).connect(master);
-    oscillator.start(start);
-    oscillator.stop(end);
-  };
-
-  const dialogueBlipRecipe = (tick: number, info?: SoundPlayContext): Segment[] | null => {
+  const dialogueBlipRecipe = (tick: number, info?: SoundPlayContext): AudioSegment[] | null => {
     if (info?.inPause === true) return null;
     const text = info?.text;
     const revealed = info?.revealed;
-    let char: string | undefined;
-    if (text !== undefined && revealed !== undefined && revealed > 0) {
-      const current = text[revealed - 1];
-      const previous = revealed >= 2 ? text[revealed - 2] : undefined;
-      char = current !== undefined && /^[\s.,!?;:\u2014\u2013-]$/.test(current)
-        ? previous
-        : current;
-    }
-    const baseProsody = dialogueProsody(text, revealed);
-    const prosody = applyExpressionProsody(baseProsody, info?.expression);
+    const char = extractBlipChar(text, revealed);
+    const prosody = applyExpressionProsody(dialogueProsody(text, revealed), info?.expression);
     const blip = blipFrequency(info?.speaker ?? null, revealed ?? tick, char, prosody);
-    if (blip === null) return null;
-    const segments: Segment[] = [
-      {
-        wave: blip.wave,
-        frequency: blip.frequency,
-        endFrequency: blip.endFrequency,
-        offset: 0,
-        duration: blip.duration,
-        gain: blip.gain,
-        attack: 0.002,
-      },
-    ];
-    if (blip.harmonic !== undefined) {
-      segments.push({
-        wave: "sine",
-        frequency: blip.frequency * blip.harmonic,
-        endFrequency:
-          blip.endFrequency === undefined ? undefined : blip.endFrequency * blip.harmonic,
-        offset: 0,
-        duration: blip.duration * 0.85,
-        gain: blip.gain * 0.28,
-        attack: 0.002,
-      });
-    }
-    return segments;
+    return blip === null ? null : voiceBlipSegments(blip, blip.duration, blip.gain, 0.002, 0.28);
   };
-
-  const scaleChoiceRecipe = (
-    cue: "choice-move" | "battle-command" | "choice-select",
-    tick: number,
-    info?: SoundPlayContext,
-  ): Segment[] => {
-    const scale = trackScaleNotes(soundtrack.track);
-    if (cue === "choice-select") {
-      const root = scale[0] ?? 523.25;
-      const fifth = scale[3] ?? 783.99;
-      return [
-        { wave: "triangle", frequency: root, offset: 0, duration: 0.095, gain: 0.1 },
-        { wave: "sine", frequency: fifth, offset: 0.045, duration: 0.115, gain: 0.075 },
-      ];
-    }
-    const raw = info?.choiceIndex ?? tick;
-    const index = ((Math.trunc(raw) % scale.length) + scale.length) % scale.length;
-    const note = scale[index] ?? 523.25;
-    const isCommand = cue === "battle-command";
-    return [
-      {
-        wave: "triangle",
-        frequency: note,
-        offset: 0,
-        duration: isCommand ? 0.09 : 0.072,
-        gain: isCommand ? 0.082 : 0.074,
-        attack: 0.003,
-      },
-      {
-        wave: "sine",
-        frequency: note * 2,
-        offset: 0,
-        duration: isCommand ? 0.055 : 0.045,
-        gain: 0.022,
-        attack: 0.003,
-      },
-    ];
-  };
-
-  const scaleRecipePitch = (recipe: Recipe, factor: number): Segment[] =>
-    recipe.map((segment) =>
-      segment.wave === "noise"
-        ? { ...segment, lowpass: segment.lowpass * factor }
-        : {
-            ...segment,
-            frequency: segment.frequency * factor,
-            endFrequency:
-              segment.endFrequency === undefined ? undefined : segment.endFrequency * factor,
-          },
-    );
 
   const playRecipe = (cue: SoundCue, tick: number, info?: SoundPlayContext): boolean => {
     if (muted) return false;
     unlock();
     const audio = context;
     if (audio === null || master === null || stateOf(audio) !== "running") return false;
-    let recipe: Recipe | null;
-    if (cue === "dialogue-blip") {
-      recipe = dialogueBlipRecipe(tick, info);
-    } else if (cue === "choice-move" || cue === "battle-command" || cue === "choice-select") {
-      recipe = scaleChoiceRecipe(cue, tick, info);
-    } else if (cue.startsWith("footstep-")) {
-      recipe = scaleRecipePitch(soundCueRecipes[cue], footstepPitchFactor(tick));
-    } else {
-      recipe = soundCueRecipes[cue];
-    }
+    const recipe: AudioRecipe | null = cue === "dialogue-blip"
+      ? dialogueBlipRecipe(tick, info)
+      : resolveCueRecipe(cue, soundtrack.track, tick, info?.choiceIndex);
     if (recipe === null) return true;
-    const now = audio.currentTime;
-    recipe.forEach((segment) => playSegment(audio, segment, now + segment.offset));
+    scheduleRecipe(audio, master, noiseBuffer, recipe);
     return true;
   };
 
@@ -512,8 +306,7 @@ export function createAudio(
     unlock();
     const audio = context;
     if (audio === null || master === null || stateOf(audio) !== "running") return;
-    const now = audio.currentTime;
-    effectRecipes[effect].forEach((segment) => playSegment(audio, segment, now + segment.offset));
+    scheduleRecipe(audio, master, noiseBuffer, effectRecipes[effect]);
     playedEffects.push(effect);
     if (playedEffects.length > 64) playedEffects.shift();
   };
@@ -578,32 +371,8 @@ export function createAudio(
     if (muted || !pageVisible()) return;
     const audio = context;
     if (audio === null || master === null || stateOf(audio) !== "running") return;
-    const blip = blipFrequency(speaker, speaker.length, speaker[0]);
-    if (blip === null) return;
-    const now = audio.currentTime;
-    const duration = 0.038;
-    const gain = blip.gain * 0.32;
-    playSegment(audio, {
-      wave: blip.wave,
-      frequency: blip.frequency,
-      endFrequency: blip.endFrequency,
-      offset: 0,
-      duration,
-      gain,
-      attack: 0.004,
-    }, now);
-    if (blip.harmonic !== undefined) {
-      playSegment(audio, {
-        wave: "sine",
-        frequency: blip.frequency * blip.harmonic,
-        endFrequency:
-          blip.endFrequency === undefined ? undefined : blip.endFrequency * blip.harmonic,
-        offset: 0,
-        duration: duration * 0.85,
-        gain: gain * 0.25,
-        attack: 0.004,
-      }, now);
-    }
+    const segments = ambientChatterSegments(speaker);
+    if (segments !== null) scheduleRecipe(audio, master, noiseBuffer, segments);
   };
 
   return {

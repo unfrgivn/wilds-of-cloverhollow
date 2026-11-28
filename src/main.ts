@@ -39,6 +39,7 @@ import {
 } from "./shell/feedback";
 import { createSaveSession, createSaveStore } from "./shell/save-storage";
 import { createAudio, projectMusicMix, resolveSoundtrackWeather } from "./platform/audio";
+import { getHomeRecordTrack, subscribeHomeRecord } from "./platform/home-record-prefs";
 import { getCozyWeatherMode, subscribeCozyWeather } from "./platform/weather-prefs";
 import { createHaptics } from "./platform/haptics";
 import { findPettableCompanion, findRestSpot } from "./render/companions";
@@ -173,6 +174,7 @@ async function boot(): Promise<void> {
     sound.playEffect(on ? "toggle-on" : "toggle-off");
     lightHaptic();
   };
+  subscribeHomeRecord((t, user) => { if (user) playToggleFeedback(t !== null); invalidate(); });
   const bindToggle = (toggle: () => void, isOn: () => boolean): (() => void) =>
     withInvalidate(() => {
       toggle();
@@ -486,7 +488,7 @@ async function boot(): Promise<void> {
     if (!state.journalOpen || titleMode !== null || qaMenuOpen) jukeboxTrack = null;
     const titleOrQaOpen = titleMode !== null || qaMenuOpen;
     const { soundtrack, jukebox } = resolveSoundtrack(
-      content.world, state, jukeboxTrack, titleOrQaOpen,
+      content.world, state, jukeboxTrack, titleOrQaOpen, getHomeRecordTrack(),
     );
     sound.setSoundtrack(soundtrack, projectMusicMix(content.world, state, {
       titleOpen: titleOrQaOpen, jukeboxActive: jukeboxTrack !== null,

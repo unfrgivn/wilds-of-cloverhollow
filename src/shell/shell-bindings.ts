@@ -11,6 +11,7 @@ import type { AudioController } from "../platform/audio";
 import type { AudioLevel } from "../platform/audio-settings";
 import type { GameSettingsController } from "../platform/game-settings";
 import type { TouchInput } from "../platform/touch";
+import { getHomeRecordTrack } from "../platform/home-record-prefs";
 import { getCozyWeatherMode, setCozyWeatherMode } from "../platform/weather-prefs";
 import type { HudHintAction } from "../ui/hud-hints";
 import type { JournalControl } from "../ui/journal";
@@ -136,6 +137,7 @@ export function bindShellUiControls(deps: ShellUiBindingDeps): void {
     if (!current.journalOpen) return;
     const nextTrack = stepJukeboxTrack(
       deps.world, current, deps.getJukeboxTrack(), delta, deps.isTitleOrQaOpen(),
+      getHomeRecordTrack(),
     );
     if (nextTrack === null) return;
     deps.setJukeboxTrack(nextTrack);

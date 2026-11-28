@@ -18,6 +18,7 @@ import {
   type State,
   type World,
 } from "../core";
+import { applyHomeRecord } from "../core/music";
 import type { SoundPlayContext } from "../platform/audio";
 import type { HapticKind } from "../platform/haptics";
 import type { MinigameRecordsController } from "../platform/minigame-records";
@@ -423,8 +424,11 @@ export function stepJukeboxTrack(
   current: JukeboxTrack | null,
   delta: -1 | 1,
   titleOpen: boolean,
+  homeRecord: JukeboxTrack | null = null,
 ): JukeboxTrack | null {
-  const baseTrack = current ?? soundtrackFor(world, state, { titleOpen }).track;
+  const projected = soundtrackFor(world, state, { titleOpen });
+  const baseTrack =
+    current ?? (titleOpen ? projected : applyHomeRecord(state, projected, homeRecord)).track;
   const currentIndex = baseTrack === "silent" ? -1 : jukeboxTracks.indexOf(baseTrack);
   const startIndex = currentIndex >= 0 ? currentIndex : delta > 0 ? -1 : 0;
   const nextIndex = (startIndex + delta + jukeboxTracks.length) % jukeboxTracks.length;
@@ -437,8 +441,10 @@ export function resolveSoundtrack(
   state: State,
   jukeboxTrack: JukeboxTrack | null,
   titleOpen: boolean,
+  homeRecord: JukeboxTrack | null = null,
 ): { soundtrack: SoundtrackState; jukebox: JukeboxMeta } {
-  const base = soundtrackFor(world, state, { titleOpen });
+  const projected = soundtrackFor(world, state, { titleOpen });
+  const base = titleOpen ? projected : applyHomeRecord(state, projected, homeRecord);
   const soundtrack: SoundtrackState =
     jukeboxTrack !== null
       ? { ...base, track: jukeboxTrack, duck: false, title: trackTitles[jukeboxTrack] }

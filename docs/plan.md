@@ -9684,6 +9684,35 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   checks green), 14/14 Chromium & WebKit (`milestone-227`, `title`), 115/115
   Chromium (`title-gallery` 16/16 + `ui-gallery` 99/99 with 0 visual diffs), and
   66/66 Chromium (`shows exactly its parts`).
+
+## Milestone 228: Clubhouse & Bedroom Home Record Player (`cloverhollow-home-record`) & Soundtrack Album Shuffle **Status:** ✅ Completed (2026-11-28)
+- Turns Fae's 35-Track Soundtrack Album into a living Bedroom & Clubhouse Home
+  Record player with deterministic category-aware `↻ Shuffle` and persistent
+  `★ Home Record` pinning — zero `src/core/sim.ts` changes, zero save-version
+  bumps, zero replay hash drift across all 77 sims, and zero visual baseline
+  diffs across all 99 `ui-gallery` and 12 `soundtrack` baselines.
+- Pure Home Record & deterministic Shuffle helpers (`src/core/music.ts`,
+  `src/platform/home-record-prefs.ts`):
+  - Exported `HOME_RECORD_AREAS` (`bedroom`, `clubhouse`), `isJukeboxTrack`,
+    `applyHomeRecord(state, base, homeRecord)` (yielding automatically to
+    battles, Clubhouse Microwave, Waking-Up finale, and `h2h_*` Heart-to-Hearts),
+    and zero-`Math.random()` `pickShuffleTrack(candidates, current, seed)`.
+  - Added resilient `createPreferenceStore("cloverhollow-home-record")` wrapper
+    defaulting to `null` with strict `isJukeboxTrack` validation.
+- Soundtrack Album Shuffle & Home Record UI (`src/ui/journal-jukebox.{ts,css}`,
+  `src/shell/{feedback,shell-bindings}.ts`, `src/main.ts`):
+  - Added right-aligned `↻ Shuffle` and `☆/★ Home Record` pills (`>= 44 px` on
+    touch, Reduced Motion & iOS tap hygiene, full keyboard/gamepad nav) plus
+    warm-gold `★ Home` badge on the pinned track card, with toggle foley & live
+    music switching on pin/unpin.
+- Evidence: `tests/unit/milestone-228.test.ts`,
+  `tests/e2e/milestone-228.spec.ts` (`@smoke` Chromium + WebKit), and review
+  capture `art/review/m227-home-record-album-1280.jpg` independently verified
+  via `vision`.
+- Gates: `just check` (295 unit files / 2,114 tests, all 77 sims + all sim
+  scripts, 23 QA packs, purity, lint), `just build` (`index` `393.98 kB < 500 kB`),
+  28/28 Chromium & WebKit soundtrack/album e2e, and 99/99 Chromium `ui-gallery`
+  tests.
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

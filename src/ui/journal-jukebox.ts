@@ -3,9 +3,12 @@ import { element, setAttribute, setText } from "./dom";
 import { applyModalScrollKey } from "./journal-nav";
 import type { JukeboxMeta } from "./journal-options";
 import {
-  JUKEBOX_ALBUM, jukeboxTracks, trackAlbumEntry,
+  JUKEBOX_ALBUM, jukeboxTracks, pickShuffleTrack, trackAlbumEntry,
   type JukeboxTrack, type TrackAlbumMeta, type TrackCategory,
 } from "../core/music";
+import {
+  getHomeRecordTrack, setHomeRecordTrack, subscribeHomeRecord,
+} from "../platform/home-record-prefs";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -14,7 +17,7 @@ export type JournalJukeboxSnapshot = { nowPlaying?: string; jukebox?: JukeboxMet
 export type JournalJukeboxOptions = {
   onBeforeOpen?: () => void; onVisibilityChange?: (open: boolean) => void; onClose?: () => void;
   onSelectTrack?: (track: JukeboxTrack) => void; onResetTrack?: () => void;
-  onFilterChange?: () => void;
+  onFilterChange?: () => void; onHomeRecordChange?: (track: JukeboxTrack | null) => void;
 };
 export type JournalJukeboxAlbum = {
   overlay: HTMLDivElement; treasuresBtn: HTMLButtonElement;
@@ -85,7 +88,12 @@ function resolveActiveTrack(snapshot: JournalJukeboxSnapshot): JukeboxTrack | nu
   return JUKEBOX_ALBUM.find((entry) => entry.title === snapshot.nowPlaying)?.track ?? null;
 }
 
-type TrackCardRef = { meta: TrackAlbumMeta; btn: HTMLButtonElement; playingPill: HTMLSpanElement };
+type TrackCardRef = {
+  meta: TrackAlbumMeta;
+  btn: HTMLButtonElement;
+  playingPill: HTMLSpanElement;
+  homeTag: HTMLSpanElement;
+};
 
 function buildTrackCard(
   meta: TrackAlbumMeta,
@@ -110,10 +118,13 @@ function buildTrackCard(
   const playingPill = element("span", "journal-album-playing", badges);
   playingPill.textContent = "♪ Playing";
   playingPill.hidden = true;
+  const homeTag = element("span", "journal-album-home-tag", badges);
+  homeTag.textContent = "★ Home";
+  homeTag.hidden = true;
   element("span", "journal-album-region", badges).textContent = meta.region;
   element("span", "journal-album-mood", copy).textContent = meta.mood;
   btn.addEventListener("click", () => onSelect(meta.track));
-  return { meta, btn, playingPill };
+  return { meta, btn, playingPill, homeTag };
 }
 
 /** Creates the interactive 35-track Storybook Soundtrack Album modal for Fae's Journal. */
@@ -152,6 +163,17 @@ export function createJournalJukeboxAlbum(options?: JournalJukeboxOptions): Jour
     filterBar.append(btn);
     return { id: def.id, btn };
   });
+  const toolsWrap = element("div", "journal-album-tools", filterBar);
+  const shuffleBtn = makeButton(
+    "journal-album-shuffle", "Shuffle a track from this category", "↻ Shuffle",
+  );
+  const homeRecordBtn = makeButton(
+    "journal-album-home-btn",
+    "Pin or unpin current track as Bedroom and Clubhouse record",
+    "☆ Home Record",
+  );
+  setAttribute(homeRecordBtn, "aria-pressed", "false");
+  toolsWrap.append(shuffleBtn, homeRecordBtn);
 
   const grid = element("div", "journal-album-grid", card);
   const trackRefs = JUKEBOX_ALBUM.map((meta) =>
@@ -168,6 +190,8 @@ export function createJournalJukeboxAlbum(options?: JournalJukeboxOptions): Jour
   let lastSig = "";
   let activeFilter: AlbumFilter = "all";
   let activeTrack: JukeboxTrack | null = null;
+  let shuffleStep = 0;
+  let latestSnapshot: JournalJukeboxSnapshot = {};
   let returnFocusEl: HTMLElement | null = null;
 
   const applyFilter = (next: AlbumFilter, notify = true): void => {
@@ -181,6 +205,25 @@ export function createJournalJukeboxAlbum(options?: JournalJukeboxOptions): Jour
   };
   for (const item of filterBtns) item.btn.addEventListener("click", () => applyFilter(item.id));
   resetBtn.addEventListener("click", () => { options?.onResetTrack?.(); });
+  shuffleBtn.addEventListener("click", () => {
+    const visibleTracks = trackRefs
+      .filter((ref) => !ref.btn.hidden)
+      .map((ref) => ref.meta.track);
+    const picked = pickShuffleTrack(visibleTracks, activeTrack, shuffleStep);
+    shuffleStep += 1;
+    if (picked === null) return;
+    options?.onSelectTrack?.(picked);
+    const pickedRef = trackRefs.find((ref) => ref.meta.track === picked);
+    pickedRef?.btn.scrollIntoView?.({ block: "nearest" });
+  });
+  homeRecordBtn.addEventListener("click", () => {
+    if (activeTrack === null) return;
+    const isPinned = getHomeRecordTrack() === activeTrack;
+    const next: JukeboxTrack | null = isPinned ? null : activeTrack;
+    setHomeRecordTrack(next);
+    options?.onHomeRecordChange?.(next);
+    if (openState) sync(latestSnapshot);
+  });
 
   const clear = (): void => {
     returnFocusEl = null;
@@ -195,28 +238,43 @@ export function createJournalJukeboxAlbum(options?: JournalJukeboxOptions): Jour
     if (isFocusable(target)) target.focus({ preventScroll: true });
   };
   const sync = (snapshot: JournalJukeboxSnapshot): void => {
+    latestSnapshot = snapshot;
     if (!openState) { if (!overlay.hidden) clear(); return; }
     overlay.hidden = false;
     activeTrack = resolveActiveTrack(snapshot);
+    const homeTrack = getHomeRecordTrack();
     const jukeboxActive = snapshot.jukebox?.active === true;
     const titleText = activeTrack !== null
       ? trackAlbumEntry(activeTrack).title : (snapshot.nowPlaying ?? "");
-    const nextSig = `${activeTrack ?? "none"}|${jukeboxActive ? 1 : 0}|${titleText}`;
+    const nextSig =
+      `${activeTrack ?? "none"}|${homeTrack ?? "none"}|${jukeboxActive ? 1 : 0}|${titleText}`;
     if (nextSig === lastSig) return;
     lastSig = nextSig;
     setAttribute(card, "data-jukebox-active", String(jukeboxActive));
+    setAttribute(card, "data-home-record", homeTrack ?? "");
     countPill.classList.toggle("is-active", jukeboxActive);
     setText(countPill, jukeboxActive && titleText !== ""
       ? `♪ Playing: ${titleText}` : `${JUKEBOX_ALBUM.length} Themes`);
     resetBtn.hidden = !jukeboxActive;
     if (!jukeboxActive && document.activeElement === resetBtn) card.focus({ preventScroll: true });
+    const homePinned = activeTrack !== null && homeTrack === activeTrack;
+    homeRecordBtn.disabled = activeTrack === null;
+    homeRecordBtn.classList.toggle("is-pinned", homePinned);
+    setAttribute(homeRecordBtn, "aria-pressed", String(homePinned));
+    setText(homeRecordBtn, homePinned ? "★ Home Record" : "☆ Home Record");
     for (const ref of trackRefs) {
       const playing = ref.meta.track === activeTrack;
+      const isHome = ref.meta.track === homeTrack;
       ref.btn.classList.toggle("is-playing", playing);
+      ref.btn.classList.toggle("is-home-record", isHome);
       setAttribute(ref.btn, "aria-pressed", String(playing));
       ref.playingPill.hidden = !playing;
+      ref.homeTag.hidden = !isHome;
     }
   };
+  subscribeHomeRecord(() => {
+    if (openState) sync(latestSnapshot);
+  });
   closeBtn.addEventListener("click", close);
   overlay.addEventListener("click", (event) => { if (event.target === overlay) close(); });
 
@@ -250,11 +308,12 @@ export function createJournalJukeboxAlbum(options?: JournalJukeboxOptions): Jour
     if (key === "PageDown" || key === "PageUp") {
       stop(); applyModalScrollKey([grid, card], key); return true;
     }
-    const filterIdx = filterBtns.findIndex((item) => item.btn === document.activeElement);
-    if (filterIdx !== -1 && (key === "ArrowLeft" || key === "ArrowRight")) {
+    const barBtns = [...filterBtns.map((item) => item.btn), shuffleBtn, homeRecordBtn];
+    const barIdx = barBtns.findIndex((btn) => btn === document.activeElement);
+    if (barIdx !== -1 && (key === "ArrowLeft" || key === "ArrowRight")) {
       stop();
-      const len = filterBtns.length;
-      filterBtns[(filterIdx + (key === "ArrowRight" ? 1 : -1) + len) % len]?.btn.focus({
+      const len = barBtns.length;
+      barBtns[(barIdx + (key === "ArrowRight" ? 1 : -1) + len) % len]?.focus({
         preventScroll: true,
       });
       return true;

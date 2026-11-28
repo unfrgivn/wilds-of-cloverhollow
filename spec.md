@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 227)
+Last updated: 2026-11-28 (Milestone 228)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -598,7 +598,15 @@ ios/            Capacitor iOS project (from Milestone 4).
   with track numbers `1..35`, region tags, 5 categories `town` / `interiors` /
   `wilds` / `festive` / `story`, warm 1-line mood notes, and accent hues; shell-only
   override, never saved, plays unducked while the journal is open and returns
-  smoothly to the live area theme on close, title, or reset). Ambience beds
+  smoothly to the live area theme on close, title, or reset). In addition,
+  players can pin any of the 35 themes as their custom **Bedroom & Clubhouse Home
+  Record** (`HOME_RECORD_AREAS`, `isJukeboxTrack`, `applyHomeRecord`, and
+  deterministic zero-`Math.random()` `pickShuffleTrack` in `src/core/music.ts`,
+  persisted cleanly via `src/platform/home-record-prefs.ts` under
+  `"cloverhollow-home-record"`, default `null`, applied in `resolveSoundtrack` /
+  `stepJukeboxTrack` outside title/QA/Jukebox overrides while yielding to
+  battles, Clubhouse Microwave/`arcade`, Waking-Up morning/credits `finale`, and
+  `h2h_*` Heart-to-Hearts, Milestone 227). Ambience beds
   (`none`, `town-breeze`, `ocean`, `mountain-wind`, `hearth`, `forest`,
   `enchanted-shimmer`, `arcade-hum`, `cavern-drips`, `cafe-murmur`) match each
   outdoor area, the café, the lodge, the cavern, and the arcade, and pause in
@@ -5589,7 +5597,7 @@ trunks keep its two exits.
   backdrop/`×`/`Escape`/`X`/`B` dismiss restoring Field Treasures and focus
   directly to `.journal-hearts-btn`.
 - **Interactive 35-Track Soundtrack Album & Direct Music Box Player**
-  (Milestones 213 & 225): hand-inked storybook Soundtrack Album modal
+  (Milestones 213, 225 & 227): hand-inked storybook Soundtrack Album modal
   (`src/ui/journal-jukebox.ts` + `src/ui/journal-jukebox.css`, composed into
   `createJournalFieldOverlays` in `src/ui/journal-field-note.ts` and wired to
   `onSelectJukeboxTrack` / `onResetJukebox` through `src/ui/journal-options.ts`,
@@ -5603,7 +5611,14 @@ trunks keep its two exits.
   conditional `"Area Theme"` reset button (`.journal-album-reset`, shown while
   Jukebox override is active), circular 44×44 `×` close button, 6 category
   filter pills (`All · 35`, `Town`, `Homes & Shops`, `Wilds`, `Festive`,
-  `Story & Battle` with `aria-pressed`), and a scrollable 2-column grid of
+  `Story & Battle` with `aria-pressed`) paired with two tactile `>= 44 px`-on-touch
+  action pills — **`.journal-album-shuffle`** (`"↻ Shuffle"`, deterministically
+  picking a non-repeating surprise track from the active category filter via
+  `pickShuffleTrack`) and **`.journal-album-home-btn`** (`"☆ Home Record"` /
+  golden `aria-pressed="true"` `"★ Home Record"`, pinning/unpinning the active
+  track as the Bedroom & Clubhouse Home Record in `"cloverhollow-home-record"`
+  with cozy toggle foley and a warm-gold `.journal-album-home-tag` `"★ Home"`
+  badge on the pinned track card, Milestone 227) — and a scrollable 2-column grid of
   `>= 44 px` die-cut track cards across both `1280x720` and `874x402` viewports
   showing track number `01`–`35`, colored accent border, bold title, region tag,
   1-line mood note, and golden `"♪ Playing"` badge on the active track. Clicking

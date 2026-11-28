@@ -2,7 +2,8 @@
 .journal-album-btn[hidden],
 .journal-album-reset[hidden],
 .journal-album-track[hidden],
-.journal-album-playing[hidden] {
+.journal-album-playing[hidden],
+.journal-album-home-tag[hidden] {
   display: none;
 }
 
@@ -30,6 +31,8 @@
 .journal-album-btn:focus-visible,
 .journal-album-reset:focus-visible,
 .journal-album-filter:focus-visible,
+.journal-album-shuffle:focus-visible,
+.journal-album-home-btn:focus-visible,
 .journal-album-track:focus-visible,
 .journal-jukebox-close:focus-visible {
   outline: 3px solid #6b9e56;
@@ -192,7 +195,9 @@
   flex: 0 0 auto;
 }
 
-.journal-album-filter {
+.journal-album-filter,
+.journal-album-shuffle,
+.journal-album-home-btn {
   display: inline-flex;
   align-items: center;
   min-height: 30px;
@@ -216,6 +221,30 @@
   background: linear-gradient(180deg, #fff5be 0%, #f7d96c 100%);
   box-shadow: inset 0 0 0 1.5px #fffaf0, 0 1.5px 0 #47321f33;
 }
+
+.journal-album-tools {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.journal-album-shuffle,
+.journal-album-home-btn {
+  padding: 3px 10px;
+  box-shadow: inset 0 0 0 1.5px #fffdf7, 0 1.5px 0 #47321f28;
+}
+
+.journal-album-shuffle { background: linear-gradient(180deg, #fffdf8 0%, #e7ddf8 100%); }
+.journal-album-home-btn { background: linear-gradient(180deg, #fffdf8 0%, #f5ebd4 100%); }
+
+.journal-album-home-btn[aria-pressed="true"] {
+  background: linear-gradient(180deg, #fff5be 0%, #f5cd52 100%);
+  box-shadow: inset 0 0 0 1.5px #c98f22, 0 1.5px 0 #47321f33;
+}
+
+.journal-album-home-btn:disabled { opacity: 0.55; cursor: default; }
 
 .journal-album-grid {
   display: grid;
@@ -312,15 +341,16 @@
 .journal-album-badges {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   flex: 0 0 auto;
 }
 
 .journal-album-playing,
+.journal-album-home-tag,
 .journal-album-region {
   display: inline-flex;
   align-items: center;
-  padding: 1px 6px;
+  padding: 1px 5px;
   border-radius: 999px;
   font-size: 8.8px;
   font-weight: 900;
@@ -332,6 +362,19 @@
   border: 1.5px solid var(--sticker-ink);
   background: #ffe375;
   color: var(--sticker-ink);
+}
+
+.journal-album-home-tag {
+  border: 1.5px solid #a86a12;
+  background: linear-gradient(180deg, #fff6c8 0%, #f8d66b 100%);
+  color: var(--sticker-ink);
+}
+
+.journal-album-track.is-playing.is-home-record .journal-album-playing,
+.journal-album-track.is-playing.is-home-record .journal-album-home-tag,
+.journal-album-track.is-playing.is-home-record .journal-album-region {
+  padding: 1px 4px;
+  font-size: 8.2px;
 }
 
 .journal-album-region {
@@ -355,6 +398,9 @@
   .journal-album-btn:hover { background: linear-gradient(180deg, #fffdf9 0%, #dfc9f5 100%); transform: translateY(-1px); }
   .journal-album-reset:hover { background: linear-gradient(180deg, #fffdf9 0%, #c8e5f5 100%); transform: translateY(-1px); }
   .journal-album-filter:hover { background: #fff3d2; transform: translateY(-1px); }
+  .journal-album-shuffle:hover { background: linear-gradient(180deg, #fffdf9 0%, #dac7f5 100%); transform: translateY(-1px); }
+  .journal-album-home-btn:hover { background: linear-gradient(180deg, #fffdf9 0%, #f7e3ae 100%); transform: translateY(-1px); }
+  .journal-album-home-btn[aria-pressed="true"]:hover { background: linear-gradient(180deg, #fff8cc 0%, #f3c13d 100%); }
   .journal-album-track:hover { background: linear-gradient(180deg, #fffef9 0%, #f8e9be 100%); transform: translateY(-1px); }
   .journal-album-track.is-playing:hover { background: linear-gradient(180deg, #fffde8 0%, #f9db75 100%); }
   .journal-jukebox-close:hover { background: #fff9e6; transform: scale(1.05); }
@@ -364,11 +410,15 @@
   .journal-album-btn,
   .journal-album-reset,
   .journal-album-filter,
+  .journal-album-shuffle,
+  .journal-album-home-btn,
   .journal-album-track,
   .journal-jukebox-close { transition: none; }
   .journal-album-btn:hover,
   .journal-album-reset:hover,
   .journal-album-filter:hover,
+  .journal-album-shuffle:hover,
+  .journal-album-home-btn:hover,
   .journal-album-track:hover,
   .journal-jukebox-close:hover { transform: none; }
   .journal-jukebox-head,
@@ -379,12 +429,16 @@
 :root[data-reduced-motion="on"] .journal-album-btn,
 :root[data-reduced-motion="on"] .journal-album-reset,
 :root[data-reduced-motion="on"] .journal-album-filter,
+:root[data-reduced-motion="on"] .journal-album-shuffle,
+:root[data-reduced-motion="on"] .journal-album-home-btn,
 :root[data-reduced-motion="on"] .journal-album-track,
 :root[data-reduced-motion="on"] .journal-jukebox-close { transition: none; }
 
 :root[data-reduced-motion="on"] .journal-album-btn:hover,
 :root[data-reduced-motion="on"] .journal-album-reset:hover,
 :root[data-reduced-motion="on"] .journal-album-filter:hover,
+:root[data-reduced-motion="on"] .journal-album-shuffle:hover,
+:root[data-reduced-motion="on"] .journal-album-home-btn:hover,
 :root[data-reduced-motion="on"] .journal-album-track:hover,
 :root[data-reduced-motion="on"] .journal-jukebox-close:hover { transform: none; }
 
@@ -400,14 +454,24 @@
   .journal-jukebox-title { font-size: 13px; }
   .journal-jukebox-count { max-width: 195px; padding: 1px 8px; font-size: 9.8px; }
   .journal-album-reset { min-height: 28px; padding: 2px 9px; font-size: 9.8px; }
-  .journal-album-filters { gap: 4px; }
-  .journal-album-filter { min-height: 26px; padding: 2px 8px; font-size: 9.8px; }
+  .journal-album-filters,
+  .journal-album-tools { gap: 4px; }
+  .journal-album-filter,
+  .journal-album-shuffle,
+  .journal-album-home-btn { min-height: 26px; padding: 2px 8px; font-size: 9.8px; }
   .journal-album-grid { gap: 5px; }
   .journal-album-track { gap: 6px; min-height: 44px; padding: 4px 7px; }
   .journal-album-num { flex-basis: 22px; width: 22px; height: 22px; font-size: 9.5px; }
   .journal-album-copy { gap: 1.5px; }
   .journal-album-name { font-size: 10.2px; }
   .journal-album-playing,
+  .journal-album-home-tag,
   .journal-album-region { padding: 0 5px; font-size: 8px; }
   .journal-album-mood { font-size: 8.6px; }
+}
+
+:root[data-touch="on"] .journal-album-shuffle,
+:root[data-touch="on"] .journal-album-home-btn {
+  min-height: 44px;
+  padding: 4px 12px;
 }

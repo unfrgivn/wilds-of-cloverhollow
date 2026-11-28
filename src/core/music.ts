@@ -90,6 +90,60 @@ export const jukeboxTracks: readonly JukeboxTrack[] = [
   "morning",
 ];
 
+const JUKEBOX_TRACK_SET: ReadonlySet<string> = new Set<string>(jukeboxTracks);
+
+/** Areas where the player's pinned Home Record plays in place of the default room theme. */
+export const HOME_RECORD_AREAS: ReadonlySet<string> = new Set(["bedroom", "clubhouse"]);
+
+/** Type guard verifying an arbitrary runtime value is one of the 35 playable Jukebox tracks. */
+export function isJukeboxTrack(value: unknown): value is JukeboxTrack {
+  return typeof value === "string" && JUKEBOX_TRACK_SET.has(value);
+}
+
+/**
+ * Overrides the active room soundtrack in Bedroom & Clubhouse with the player's pinned
+ * Home Record while yielding cleanly to battles, minigames, finale scenes, and Heart-to-Hearts.
+ */
+export function applyHomeRecord(
+  state: Pick<State, "area" | "battle" | "arcade" | "finale" | "dialogue">,
+  base: SoundtrackState,
+  homeRecord: JukeboxTrack | null,
+): SoundtrackState {
+  if (
+    homeRecord === null ||
+    !HOME_RECORD_AREAS.has(state.area) ||
+    state.battle !== null ||
+    state.arcade !== null ||
+    state.finale !== null ||
+    state.dialogue?.knot.startsWith("h2h_") === true
+  ) {
+    return base;
+  }
+  return { ...base, track: homeRecord, title: trackTitles[homeRecord] };
+}
+
+/**
+ * Deterministically picks a surprise track from `candidates` using an unsigned integer hash on
+ * `seed`, excluding `current` whenever more than one candidate is available.
+ */
+export function pickShuffleTrack(
+  candidates: readonly JukeboxTrack[],
+  current: JukeboxTrack | null,
+  seed: number,
+): JukeboxTrack | null {
+  if (candidates.length === 0) return null;
+  const pool =
+    candidates.length > 1 && current !== null
+      ? candidates.filter((track) => track !== current)
+      : candidates;
+  if (pool.length === 0) return candidates[0] ?? null;
+  let hash = (Math.trunc(seed) ^ 0x9e3779b9) >>> 0;
+  hash = Math.imul(hash ^ (hash >>> 16), 0x85ebca6b) >>> 0;
+  hash = Math.imul(hash ^ (hash >>> 13), 0xc2b2ae35) >>> 0;
+  hash = (hash ^ (hash >>> 16)) >>> 0;
+  return pool[hash % pool.length] ?? null;
+}
+
 export type AmbienceBed =
   | "none"
   | "town-breeze"

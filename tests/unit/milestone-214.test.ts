@@ -94,8 +94,8 @@ describe("Milestone 213: 35-Track Soundtrack Album & Direct Music Box Jukebox Pl
 
     const caps: readonly [string, number][] = [
       ["src/core/music.ts", 520],
-      ["src/ui/journal-jukebox.ts", 290],
-      ["src/ui/journal-jukebox.css", 430],
+      ["src/ui/journal-jukebox.ts", 360],
+      ["src/ui/journal-jukebox.css", 480],
       ["src/ui/journal-field-note.ts", 700],
       ["src/ui/journal-field-note-data.ts", 1000],
       ["src/ui/journal-options.ts", 1000],

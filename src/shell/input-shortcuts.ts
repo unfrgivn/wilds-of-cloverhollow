@@ -84,6 +84,8 @@ export type ShortcutDecorControl = {
   isOpen: () => boolean;
   openForArea: (area: string) => boolean;
   close: () => void;
+  stepFocus?: (delta: -1 | 1) => void;
+  activateFocused?: () => void;
   handleKeydown: (event: ShortcutKeyEvent) => boolean;
 };
 
@@ -309,7 +311,10 @@ export function createInputShortcuts(
     }
     if (deps.decorPicker?.isOpen() === true) {
       if (deps.decorPicker.handleKeydown(event)) {
-        deps.swallow("cancel");
+        if (!deps.decorPicker.isOpen()) {
+          deps.swallow("confirm");
+          deps.swallow("cancel");
+        }
         deps.clearKeyboardTaps();
         deps.invalidate();
       }
@@ -519,6 +524,28 @@ export function createInputShortcuts(
         deps.swallow("confirm");
         deps.gamepad.clearTaps();
         deps.encoreShrine.activateLaunch();
+        deps.invalidate();
+      }
+      return;
+    }
+    if (ctx.decorPickerOpen === true || deps.decorPicker?.isOpen() === true) {
+      if (photoAction === "exit") {
+        deps.decorPicker?.close();
+        deps.swallow("cancel");
+        deps.gamepad.clearTaps();
+        deps.invalidate();
+        return;
+      }
+      if (navStep !== null) {
+        const delta: -1 | 1 = navStep === "left" || navStep === "up" ? -1 : 1;
+        deps.decorPicker?.stepFocus?.(delta);
+        deps.playChoiceMove();
+        deps.invalidate();
+      }
+      if (journalConfirmEdge) {
+        deps.swallow("confirm");
+        deps.gamepad.clearTaps();
+        deps.decorPicker?.activateFocused?.();
         deps.invalidate();
       }
       return;

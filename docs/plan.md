@@ -8860,6 +8860,41 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
 - Gates: `just check` (271 unit files / 2,027 tests, all 77 sims + `e7` +
   `encore` + `e11`, 23 QA packs, purity, lint), `just build` (every non-vendor
   chunk `< 375 kB`), and 18/18 Chromium & WebKit e2e tests.
+
+## Milestone 202: Room Decor Picker Full Keyboard/Gamepad Navigation & Focus Restoration, Adaptive Travel Vignette & Encore Shrine Gamepad/Touch Hints & `ground-reactivity-math.ts` Modular Split (Elevation Track E19C) **Status:** ✅ Completed (2026-11-28)
+- Pure UI accessibility/gamepad parity and Pixi-free render modularity pass
+  with zero `src/core/` edits, zero save-version bumps, and bit-identical
+  replay hashes across all 77+ recorded and headless sims:
+  - **Room Decor Picker Keyboard/Gamepad Navigation, Focus Restoration &
+    `aria-live` (`src/ui/decor-picker.ts`, `src/ui/decor-picker.css`,
+    `src/shell/input-shortcuts.ts`):** Makes `.decor-picker-modal` focusable
+    (`tabIndex = -1`, preserving its `2.5px` ink outline on focus), captures
+    and restores focus on open/close, adds a visually hidden `role="status"`
+    `aria-live="polite"` `.decor-picker-status` live region, upgrades
+    `handleKeydown` with wrap-around `Arrow`/`WASD`/`Home`/`End` stepping and
+    `Enter`/`Space`/`KeyZ` activation, exposes `stepFocus` and
+    `activateFocused`, and wires Gamepad D-Pad/Stick + `A` + `B` in
+    `src/shell/input-shortcuts.ts`.
+  - **Adaptive Travel Vignette & Dream Memory Shrine Gamepad/Touch Hints
+    (`src/ui/travel-overlay.ts`, `src/ui/encore-shrine.ts`, `src/main.ts`):**
+    Exports pure `travelSkipButtonLabel` (`"Skip"` / `"Skip · A"` /
+    `"Skip · Z"`) and `encoreFooterHint` (touch / gamepad / keyboard) and
+    threads `inputMode` and `touchActive` from `src/main.ts` cleanly with zero
+    DOM churn.
+  - **Pixi-Free `src/render/ground-reactivity-math.ts` Split
+    (`src/render/ground-reactivity.ts`):** Extracts all pure constants, types,
+    shore checks, footstep emission math, and grass-tuft sway/sampling helpers
+    into Pixi-free `src/render/ground-reactivity-math.ts` (`431` lines),
+    re-exporting every public symbol identically from `ground-reactivity.ts`
+    (`917 -> 473` lines).
+- **Evidence:** `tests/unit/milestone-202.test.ts` and real-input Chromium &
+  WebKit `tests/e2e/milestone-202.spec.ts` (`@smoke`).
+- **Gates:** `just check` (273 unit files / 2,038 tests, all 77+ recorded &
+  headless sims with zero hash shifts, 23 QA packs, purity, lint), `just build`
+  (largest non-vendor chunk `< 380 kB`, hook leak + runtime story + harness
+  checks green), and 25/25 Chromium & WebKit e2e tests (`milestone-202`,
+  `e9b-decor-economy`, `encore-shrine`, `travel-vignette`, `milestone-198`,
+  `milestone-200`).
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 201)
+Last updated: 2026-11-28 (Milestone 202)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -948,7 +948,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   `X`, `Escape`), or pressing a fresh Gamepad A/B edge skips the scenic hold
   immediately (swallowing confirm/cancel so arrival never re-triggers the travel
   interactable and playing `"card-close"` while still awaiting any in-flight
-  `setArea`). Paused harness synthetic stepping (`harnessStepping` / `paused`),
+  `setArea`), and `travelSkipButtonLabel` (`src/ui/travel-overlay.ts`, Milestone
+  201 / Track E19C) adapts the skip pill cleanly across touch (`"Skip"`),
+  gamepad (`"Skip · A"`), and keyboard (`"Skip · Z"`). Paused harness synthetic
+  stepping (`harnessStepping` / `paused`),
   Reduced Motion (`isReducedMotionActive()`), walking doors, same-area hops, and
   dark battle-rest fades bypass vignettes instantaneously with zero added delay,
   preserving 100% deterministic `src/core` hashes and Save `v10` compatibility.
@@ -1096,8 +1099,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   below 180 ticks), continuous hover bob and banking tilt on `fairy-*` NPCs
   (`fairyHover`, with grounded altitude-scaled shadows), and playful startle
   jumps, snappy hops, and forward lean on roaming critters (`roamerHop`).
-  **Living Ground Reactivity** (`src/render/ground-reactivity.ts`, mounted and
-  re-exported through `src/render/overworld-effects.ts`, Milestones 119 & 181 /
+  **Living Ground Reactivity** (`src/render/ground-reactivity.ts`, with its
+  Pixi-free math, shore-polygon, footstep-emitter, and grass-sampling helpers
+  extracted cleanly into `src/render/ground-reactivity-math.ts` in Milestone
+  201 / Track E19C and re-exported identically through `ground-reactivity.ts`
+  and `src/render/overworld-effects.ts`, Milestones 119 & 181 /
   Track E1, presentation-only, zero per-frame allocations): in non-harness
   areas advancing `1..5` ticks per render, each half-stride writes into a
   pre-allocated 32-slot circular footstep pool (`FOOTSTEP_POOL_SIZE = 32`)
@@ -2397,7 +2403,14 @@ ios/            Capacitor iOS project (from Milestone 4).
       `src/ui/decor-picker.css`) opens in `clubhouse` or `bedroom` via `KeyB`
       or diegetic `# open-decor: clubhouse|bedroom` dialogue events emitted by
       `club_decor` / `bedroom_shelf`, pausing overworld ticks while open and
-      autosaving decor changes cleanly.
+      autosaving decor changes cleanly. Milestone 202 (Track E19C) adds full
+      keyboard & gamepad navigation (`Arrow`/`WASD`/`Home`/`End` focus stepping
+      via `stepFocus`, `Enter`/`Space`/`KeyZ` & Gamepad `A` activation via
+      `activateFocused`, `Escape`/`KeyX`/`KeyB` & Gamepad `B` close wired in
+      `src/shell/input-shortcuts.ts`), focusable `.decor-picker-modal`
+      (`tabIndex = -1`) with focus restoration on close, and a visually hidden
+      `role="status" aria-live="polite"` `.decor-picker-status` live region for
+      swatch/pedestal/shelf/visitor announcements.
     - **Coin, Ticket & Fish Economy Rebalance (`content/arcade.json`,
       `content/treats.json`, `content/tunables.json`, `content/story/town/shops.ink`,
       `content/story/chapters/act2_bay.ink`, `content/story/systems/arcade.ink`):**
@@ -4038,7 +4051,10 @@ trunks keep its two exits.
     `mountEncoreShrineSession`) renders the 3×3 boss sticker grid, Clubhouse
     Trophy Shelf pips, spotlight preview, 3 Star Challenge toggle pills (3-column
     horizontal layout on phone `<= 520px` height so the `>= 44 px` launch button
-    stays 100% visible with zero clipping), full keyboard/gamepad/touch support,
+    stays 100% visible with zero clipping), full keyboard/gamepad/touch support
+    with live adaptive `.encore-foot-hint` copy (`encoreFooterHint` in
+    `src/ui/encore-shrine.ts`, Milestone 202 / Track E19C: touch tap copy,
+    gamepad `D-Pad`/`L/R`/`A`/`B` copy, and keyboard `Arrows/WASD` copy),
     on-demand boss atlas loading (`GameView.ensureCritterAtlas`), and a floating
     `.encore-battle-banner` during active Encore rematches.
 

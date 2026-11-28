@@ -1,6 +1,7 @@
 import "./encore-shrine.css";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
 import { element, setAttribute, setText } from "./dom";
+import type { HudInputMode } from "./hud-hints";
 import { assetUrl } from "../platform/assets";
 import {
   buildEncoreShrineView,
@@ -19,9 +20,27 @@ import type { ShortcutEncoreControl, ShortcutKeyEvent } from "../shell/input-sho
 const SVG_NS = "http://www.w3.org/2000/svg";
 const TROPHY_IMG_URL = "assets/props/encore-shrine/star-trophy.webp";
 
+/** Adapts the Dream Memory Shrine footer hint for touch, gamepad, and keyboard input. */
+export function encoreFooterHint(
+  inputMode: HudInputMode = "keyboard",
+  touchActive = false,
+): string {
+  if (touchActive) {
+    return "Tap a memory · Tap Star Challenges · Tap Begin Encore";
+  }
+  if (inputMode === "gamepad") {
+    return "D-Pad pick a memory · L/R toggle Star Challenges · A launch · B close";
+  }
+  return (
+    "Arrows/WASD pick a memory · 1/2/3 toggle Star Challenges · Enter/Z launch · Esc close"
+  );
+}
+
 export type EncoreShrineRenderParams = {
   view: EncoreShrineView;
   stickerArt: (critterId: string, frameName: string) => AtlasImage | null;
+  inputMode?: HudInputMode;
+  touchActive?: boolean;
 };
 
 export type EncoreBattleBannerView = {
@@ -146,8 +165,7 @@ export function createEncoreShrine(parent: HTMLElement): EncoreShrineOverlay {
   launchBtn.textContent = "Replay Calm-Down!";
 
   const footHint = element("p", "encore-foot-hint", card);
-  footHint.textContent =
-    "Arrows/WASD pick a memory · 1/2/3 toggle Star Challenges · Enter/Z launch · Esc close";
+  footHint.textContent = encoreFooterHint();
 
   const battleBanner = element("div", "sticker-ui encore-battle-banner", parent);
   battleBanner.hidden = true;
@@ -372,19 +390,30 @@ export function createEncoreShrine(parent: HTMLElement): EncoreShrineOverlay {
     closeHandler?.();
   };
 
+  const syncFooterHint = (params: EncoreShrineRenderParams): void => {
+    setText(
+      footHint,
+      encoreFooterHint(params.inputMode ?? "keyboard", params.touchActive ?? false),
+    );
+  };
+
   const open = (params: EncoreShrineRenderParams): void => {
     currentParams = params;
     openState = true;
     lastRenderKey = "";
     root.hidden = false;
     document.documentElement.dataset.encoreShrine = "open";
+    syncFooterHint(params);
     renderAll();
     card.focus({ preventScroll: true });
   };
 
   const sync = (params: EncoreShrineRenderParams): void => {
     currentParams = params;
-    if (openState) renderAll();
+    if (openState) {
+      syncFooterHint(params);
+      renderAll();
+    }
   };
 
   const renderBattleBanner = (banner: EncoreBattleBannerView): void => {
@@ -497,7 +526,7 @@ export type EncoreShrineSession = {
   isOpen: () => boolean;
   open: () => void;
   closeSilent: () => void;
-  render: (state: State) => void;
+  render: (state: State, inputMode?: HudInputMode, touchActive?: boolean) => void;
   shortcuts: () => ShortcutEncoreControl;
 };
 
@@ -523,6 +552,8 @@ export function mountEncoreShrineSession(deps: {
   const shrine = createEncoreShrine(deps.uiRoot);
   let launching = false;
   let silentClose = false;
+  let lastInputMode: HudInputMode = "keyboard";
+  let lastTouchActive = false;
 
   shrine.onSelect(() => {
     deps.playCue("choice-move", deps.getState().tick);
@@ -582,7 +613,12 @@ export function mountEncoreShrineSession(deps: {
     if (!view.unlocked) return;
     deps.releasePointer();
     deps.clearTaps();
-    shrine.open({ view, stickerArt: deps.stickerArt });
+    shrine.open({
+      view,
+      stickerArt: deps.stickerArt,
+      inputMode: lastInputMode,
+      touchActive: lastTouchActive,
+    });
     deps.playEffect("card-open");
     deps.lightHaptic();
     deps.invalidate();
@@ -592,6 +628,8 @@ export function mountEncoreShrineSession(deps: {
         shrine.sync({
           view: buildEncoreShrineView(deps.world, deps.getState()),
           stickerArt: deps.stickerArt,
+          inputMode: lastInputMode,
+          touchActive: lastTouchActive,
         });
         deps.invalidate();
       }
@@ -605,11 +643,19 @@ export function mountEncoreShrineSession(deps: {
     silentClose = false;
   };
 
-  const render = (state: State): void => {
+  const render = (
+    state: State,
+    inputMode: HudInputMode = "keyboard",
+    touchActive = false,
+  ): void => {
+    lastInputMode = inputMode;
+    lastTouchActive = touchActive;
     if (shrine.isOpen()) {
       shrine.sync({
         view: buildEncoreShrineView(deps.world, state),
         stickerArt: deps.stickerArt,
+        inputMode,
+        touchActive,
       });
     }
     const encore = state.battle?.encore;

@@ -1,6 +1,7 @@
 import "./travel-overlay.css";
 import type { TravelMode, TravelVignetteSpec } from "../render/travel-vignette";
 import { element, setAttribute, setStyle, setText, svgElement } from "./dom";
+import type { HudInputMode } from "./hud-hints";
 
 export type TravelOverlayView = {
   visible: boolean;
@@ -11,7 +12,18 @@ export type TravelOverlayView = {
   bobY: number;
   tiltDeg: number;
   touchActive?: boolean;
+  inputMode?: HudInputMode;
 };
+
+/** Adapts the Travel Vignette skip button label for touch, gamepad, and keyboard input. */
+export function travelSkipButtonLabel(options: {
+  touchActive?: boolean;
+  inputMode?: HudInputMode;
+}): string {
+  if (options.touchActive === true) return "Skip";
+  if (options.inputMode === "gamepad") return "Skip · A";
+  return "Skip · Z";
+}
 
 export type TravelOverlayController = {
   preload: (assetUrl: string) => void;
@@ -238,7 +250,7 @@ export function createTravelOverlay(root: HTMLElement): TravelOverlayController 
     setText(caption, spec.caption);
     setText(originLabel, spec.originLabel);
     setText(destLabel, spec.destinationLabel);
-    setText(skipButton, view.touchActive === true ? "Skip" : "Skip · Z");
+    setText(skipButton, travelSkipButtonLabel(view));
 
     const pct = Math.min(100, Math.max(0, view.progressPct));
     const pctValue = `${pct.toFixed(2)}%`;

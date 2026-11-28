@@ -458,6 +458,7 @@ async function boot(): Promise<void> {
       onStart: (spec) => { sound.playEffect(spec.chime); lightHaptic(); },
       render: (v) => travelOverlay.render({
         ...v, touchActive: document.documentElement.dataset.touch === "on",
+        inputMode: inputShortcuts.inputMode(),
       }),
     },
   });
@@ -554,7 +555,7 @@ async function boot(): Promise<void> {
     if (photoMode || titleMode !== null || activeBattle || state.journalOpen || creditsOpen ||
       state.cutscene !== undefined || (encoreShrine?.isOpen() ?? false) || decorPicker.isOpen()
     ) saveToast.hide();
-    encoreShrine?.render(state);
+    encoreShrine?.render(state, inputMode, touchActive);
     decorPicker.render(!titleOrQaOpen && !gate.qaConsoleOpen && !gate.qaBlocked &&
       state.cutscene === undefined && !(encoreShrine?.isOpen() ?? false));
     credits.render(buildCreditsView(content.world, state, assets));

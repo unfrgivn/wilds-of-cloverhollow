@@ -42,6 +42,8 @@ export type DecorPickerController = {
   close: (silent?: boolean) => void;
   isOpen: () => boolean;
   render: (canStayOpen?: boolean) => void;
+  stepFocus: (delta: -1 | 1) => void;
+  activateFocused: () => void;
   handleKeydown: (event: ShortcutKeyEvent) => boolean;
 };
 
@@ -99,11 +101,17 @@ export function createDecorPicker(
   backdrop.setAttribute("aria-labelledby", "decor-picker-title");
 
   const modal = el("div", "decor-picker-modal");
-  backdrop.append(modal);
+  modal.tabIndex = -1;
+  const statusEl = el("div", "decor-picker-status");
+  statusEl.setAttribute("role", "status");
+  statusEl.setAttribute("aria-live", "polite");
+  backdrop.append(modal, statusEl);
   root.append(backdrop);
 
   let activeRoom: DecorPickerRoom | null = null;
   let lastRenderedKey = "";
+  let returnFocusEl: HTMLElement | null = null;
+  let restoreButtonAfterRender = false;
 
   const syncDocumentFlag = (open: boolean): void => {
     if (typeof document === "undefined") return;
@@ -111,21 +119,77 @@ export function createDecorPicker(
     else delete document.documentElement.dataset.decor;
   };
 
-  const applyAndRefresh = (next: State, cue: DecorPickerFeedback): void => {
+  const announce = (message: string): void => {
+    statusEl.textContent = message;
+  };
+
+  const enabledButtons = (): HTMLButtonElement[] =>
+    Array.from(modal.querySelectorAll("button")).filter((btn) => !btn.disabled && !btn.hidden);
+
+  const findFocusedButton = (): HTMLButtonElement | null => {
+    if (typeof document === "undefined") return null;
+    const active = document.activeElement;
+    if (
+      active instanceof HTMLButtonElement &&
+      modal.contains(active) &&
+      !active.disabled &&
+      !active.hidden
+    ) {
+      return active;
+    }
+    return null;
+  };
+
+  const focusButton = (button: HTMLButtonElement): void => {
+    button.focus({ preventScroll: true });
+    if (typeof button.scrollIntoView === "function") {
+      button.scrollIntoView({ block: "nearest", inline: "nearest" });
+    }
+  };
+
+  const buttonIdentity = (button: HTMLButtonElement): string | null => {
+    if (button.dataset.decorClose !== undefined) return "[data-decor-close]";
+    if (button.dataset.swatchEquip !== undefined) {
+      return `[data-swatch-equip="${button.dataset.swatchEquip}"]`;
+    }
+    if (button.dataset.swatchBuyCoins !== undefined) {
+      return `[data-swatch-buy-coins="${button.dataset.swatchBuyCoins}"]`;
+    }
+    if (button.dataset.swatchBuyTickets !== undefined) {
+      return `[data-swatch-buy-tickets="${button.dataset.swatchBuyTickets}"]`;
+    }
+    if (button.dataset.pedestalBuyCoins !== undefined) return "[data-pedestal-buy-coins]";
+    if (button.dataset.pedestalBuyTickets !== undefined) return "[data-pedestal-buy-tickets]";
+    if (button.dataset.shelfReset !== undefined) return "[data-shelf-reset]";
+    if (button.dataset.shelfPrize !== undefined) {
+      return `[data-shelf-prize="${button.dataset.shelfPrize}"]`;
+    }
+    if (button.dataset.cycleVisitor !== undefined) return "[data-cycle-visitor]";
+    return null;
+  };
+
+  const applyAndRefresh = (next: State, cue: DecorPickerFeedback, message?: string): void => {
     deps.applyState(next);
     deps.onFeedback?.(cue);
+    if (message !== undefined) announce(message);
     render(true);
   };
 
   const close = (silent = false): void => {
     if (activeRoom === null) return;
+    const focusTarget = returnFocusEl;
+    returnFocusEl = null;
     activeRoom = null;
     lastRenderedKey = "";
+    statusEl.textContent = "";
     backdrop.hidden = true;
     delete backdrop.dataset.decorPicker;
     delete backdrop.dataset.decorRoom;
     syncDocumentFlag(false);
     if (!silent) {
+      if (focusTarget !== null && focusTarget.isConnected) {
+        focusTarget.focus({ preventScroll: true });
+      }
       deps.onFeedback?.("close");
       deps.onClose?.();
     }
@@ -210,7 +274,7 @@ export function createDecorPicker(
         equipBtn.addEventListener("click", () => {
           const current = deps.getState();
           const next = equipClubhouseSwatch(current, id);
-          if (next !== current) applyAndRefresh(next, "equip");
+          if (next !== current) applyAndRefresh(next, "equip", `${spec.name} equipped.`);
         });
         actions.append(equipBtn);
       } else {
@@ -251,7 +315,7 @@ export function createDecorPicker(
       const unlocked = unlockClubhouseSwatch(deps.world, current, id, currency);
       if (unlocked === current) return;
       const equipped = equipClubhouseSwatch(unlocked, id);
-      applyAndRefresh(equipped, "buy");
+      applyAndRefresh(equipped, "buy", `${CLUBHOUSE_SWATCHES[id].name} unlocked and equipped.`);
     });
     return btn;
   };
@@ -283,7 +347,7 @@ export function createDecorPicker(
       buyCoins.addEventListener("click", () => {
         const current = deps.getState();
         const next = unlockPlushPedestals(deps.world, current, "coins");
-        if (next !== current) applyAndRefresh(next, "buy");
+        if (next !== current) applyAndRefresh(next, "buy", "Velvet Plush Pedestals unlocked.");
       });
       const buyTickets = el(
         "button",
@@ -296,7 +360,7 @@ export function createDecorPicker(
       buyTickets.addEventListener("click", () => {
         const current = deps.getState();
         const next = unlockPlushPedestals(deps.world, current, "tickets");
-        if (next !== current) applyAndRefresh(next, "buy");
+        if (next !== current) applyAndRefresh(next, "buy", "Velvet Plush Pedestals unlocked.");
       });
       actions.append(buyCoins, buyTickets);
     }
@@ -325,7 +389,7 @@ export function createDecorPicker(
       resetBtn.addEventListener("click", () => {
         const current = deps.getState();
         const next = resetBedroomShelfPrizes(current);
-        if (next !== current) applyAndRefresh(next, "toggle");
+        if (next !== current) applyAndRefresh(next, "toggle", "Bedroom shelf reset to auto.");
       });
       meta.append(resetBtn);
     }
@@ -360,7 +424,10 @@ export function createDecorPicker(
       pill.addEventListener("click", () => {
         const current = deps.getState();
         const next = toggleBedroomShelfPrize(deps.world, current, prize.id);
-        if (next !== current) applyAndRefresh(next, "toggle");
+        if (next !== current) {
+          const action = active ? "removed from" : "placed on";
+          applyAndRefresh(next, "toggle", `${prize.name} ${action} bedroom shelf.`);
+        }
       });
       list.append(pill);
     }
@@ -405,7 +472,14 @@ export function createDecorPicker(
       cycleBtn.addEventListener("click", () => {
         const current = deps.getState();
         const next = cycleClubhouseVisitor(deps.world, current);
-        if (next !== current) applyAndRefresh(next, "visitor");
+        if (next !== current) {
+          const nextVisitor = activeClubhouseVisitor(deps.world, next);
+          const msg =
+            nextVisitor !== null
+              ? `${nextVisitor.name} is now visiting the Clubhouse.`
+              : "Updated Clubhouse visitor.";
+          applyAndRefresh(next, "visitor", msg);
+        }
       });
       row.append(cycleBtn);
     }
@@ -434,6 +508,10 @@ export function createDecorPicker(
     if (key === lastRenderedKey) return;
     lastRenderedKey = key;
 
+    const prevFocused = restoreButtonAfterRender ? findFocusedButton() : null;
+    const prevIdentity = prevFocused !== null ? buttonIdentity(prevFocused) : null;
+    const prevIndex = prevFocused !== null ? enabledButtons().indexOf(prevFocused) : -1;
+
     const header = buildHeader(state, activeRoom);
     const body = el("div", "decor-picker-body");
     const swatches = buildSwatchesSection(state);
@@ -448,10 +526,34 @@ export function createDecorPicker(
     if (visitors !== null) body.append(visitors);
 
     modal.replaceChildren(header, body);
+
+    if (restoreButtonAfterRender) {
+      const sameBtn =
+        prevIdentity !== null
+          ? modal.querySelector<HTMLButtonElement>(prevIdentity)
+          : null;
+      if (sameBtn !== null && !sameBtn.disabled && !sameBtn.hidden) {
+        focusButton(sameBtn);
+      } else {
+        const nextButtons = enabledButtons();
+        const fallback =
+          nextButtons.length > 0 && prevIndex >= 0
+            ? nextButtons[Math.min(prevIndex, nextButtons.length - 1)]
+            : undefined;
+        if (fallback !== undefined) focusButton(fallback);
+        else modal.focus({ preventScroll: true });
+      }
+    }
   };
 
   const open = (room: DecorPickerRoom): void => {
     const wasOpen = activeRoom !== null;
+    if (!wasOpen) {
+      returnFocusEl =
+        typeof document !== "undefined" && document.activeElement instanceof HTMLElement
+          ? document.activeElement
+          : null;
+    }
     activeRoom = room;
     lastRenderedKey = "";
     backdrop.hidden = false;
@@ -460,8 +562,7 @@ export function createDecorPicker(
     syncDocumentFlag(true);
     render(true);
     if (!wasOpen) deps.onFeedback?.("open");
-    const closeBtn = modal.querySelector<HTMLButtonElement>("[data-decor-close]");
-    closeBtn?.focus();
+    modal.focus({ preventScroll: true });
   };
 
   const openForArea = (area: string): boolean => {
@@ -470,16 +571,85 @@ export function createDecorPicker(
     return true;
   };
 
+  const stepFocus = (delta: -1 | 1): void => {
+    if (activeRoom === null) return;
+    const buttons = enabledButtons();
+    if (buttons.length === 0) return;
+    const active = findFocusedButton();
+    const index = active !== null ? buttons.indexOf(active) : -1;
+    const nextIndex =
+      index < 0
+        ? delta > 0
+          ? 0
+          : buttons.length - 1
+        : (index + delta + buttons.length) % buttons.length;
+    const target = buttons[nextIndex];
+    if (target !== undefined) focusButton(target);
+  };
+
+  const focusEdge = (edge: "first" | "last"): void => {
+    if (activeRoom === null) return;
+    const buttons = enabledButtons();
+    const target = edge === "first" ? buttons[0] : buttons[buttons.length - 1];
+    if (target !== undefined) focusButton(target);
+  };
+
+  const clickFocusedButton = (button: HTMLButtonElement): void => {
+    restoreButtonAfterRender = true;
+    try {
+      button.click();
+    } finally {
+      restoreButtonAfterRender = false;
+    }
+  };
+
+  const activateFocused = (): void => {
+    if (activeRoom === null) return;
+    const active = findFocusedButton();
+    if (active !== null) clickFocusedButton(active);
+  };
+
   const handleKeydown = (event: ShortcutKeyEvent): boolean => {
     if (activeRoom === null) return false;
-    if (
-      !event.repeat &&
-      (event.code === "Escape" || event.code === "KeyX" || event.code === "KeyB")
-    ) {
+    const { code } = event;
+    if (!event.repeat && (code === "Escape" || code === "KeyX" || code === "KeyB")) {
       event.preventDefault();
       event.stopPropagation();
       close();
       return true;
+    }
+    if (code === "ArrowRight" || code === "ArrowDown" || code === "KeyD" || code === "KeyS") {
+      event.preventDefault();
+      event.stopPropagation();
+      stepFocus(1);
+      return true;
+    }
+    if (code === "ArrowLeft" || code === "ArrowUp" || code === "KeyA" || code === "KeyW") {
+      event.preventDefault();
+      event.stopPropagation();
+      stepFocus(-1);
+      return true;
+    }
+    if (!event.repeat && code === "Home") {
+      event.preventDefault();
+      event.stopPropagation();
+      focusEdge("first");
+      return true;
+    }
+    if (!event.repeat && code === "End") {
+      event.preventDefault();
+      event.stopPropagation();
+      focusEdge("last");
+      return true;
+    }
+    if (!event.repeat && (code === "Enter" || code === "Space" || code === "KeyZ")) {
+      const activeButton = findFocusedButton();
+      if (activeButton !== null) {
+        event.preventDefault();
+        event.stopPropagation();
+        clickFocusedButton(activeButton);
+        return true;
+      }
     }
     return false;
   };
@@ -490,6 +660,8 @@ export function createDecorPicker(
     close,
     isOpen: () => activeRoom !== null,
     render,
+    stepFocus,
+    activateFocused,
     handleKeydown,
   };
 }

@@ -10,12 +10,11 @@ export interface ChunkGroup {
 export const chunkGroups: ChunkGroup[] = [
   { name: "vendor-pixi", test: /node_modules\/pixi\.js\//, priority: 30 },
   { name: "vendor-ink", test: /node_modules\/inkjs\//, priority: 25 },
-  { name: "story-content", test: /\/content\/story\/main\.ink\.json/, priority: 22 },
   { name: "area-content", test: /\/content\/(areas|props)\//, priority: 20 },
   { name: "audio-scores", test: /\/src\/platform\/scores(-[a-z]+)?\.ts/, priority: 18 },
   {
     name: "render-engine",
-    test: /\/src\/render\//,
+    test: /\/src\/render\/|\/src\/platform\/reduced-motion\.ts/,
     priority: 16,
     includeDependenciesRecursively: false,
   },

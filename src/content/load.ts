@@ -144,7 +144,6 @@ import summitFixtureData from "../../content/fixtures/summit.json";
 import islandFixtureData from "../../content/fixtures/island.json";
 import festivalFixtureData from "../../content/fixtures/festival.json";
 import tunableData from "../../content/tunables.json";
-import storyData from "../../content/story/main.ink.json";
 import fountainFrogData from "../../content/critters/fountain-frog.json";
 import frogData from "../../content/critters/frog.json";
 import pupData from "../../content/critters/pup.json";
@@ -217,7 +216,78 @@ export {
 export { npcScheduleErrors, parseNpcProfiles, parseNpcStroll } from "./npc-parsers";
 export { endingContentErrors, parseStoryJson, storyTagErrors, storyTags } from "./story-checks";
 
-export function loadContent(): {
+export const STORY_ASSET_PATH = "assets/story/main.ink.json";
+export type StoryFetcher = (input: string) => Promise<Response>;
+
+export function storyAssetUrl(baseUrl?: string): string {
+  const envBase: unknown = import.meta.env?.BASE_URL;
+  const raw = baseUrl !== undefined
+    ? baseUrl
+    : typeof envBase === "string" && envBase.trim().length > 0
+      ? envBase
+      : "./";
+  const trimmed = raw.trim();
+  if (trimmed === "" || trimmed === "." || trimmed === "./") {
+    return `./${STORY_ASSET_PATH}`;
+  }
+  const prefix = trimmed.endsWith("/") ? trimmed : `${trimmed}/`;
+  return `${prefix}${STORY_ASSET_PATH}`;
+}
+
+export async function fetchStoryJson(options?: {
+  baseUrl?: string;
+  fetcher?: StoryFetcher;
+}): Promise<Record<string, unknown>> {
+  const url = storyAssetUrl(options?.baseUrl);
+  const fetcher: StoryFetcher = options?.fetcher ?? fetch;
+  const response = await fetcher(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${url}: HTTP ${response.status}`);
+  }
+  const data: unknown = await response.json();
+  return parseStoryJson(data, url);
+}
+
+export function loadStoryFromDisk(): Record<string, unknown> {
+  if (typeof process === "undefined" || typeof process.getBuiltinModule !== "function") {
+    throw new Error(
+      "loadContent() without options.story requires Node/Bun; use loadBrowserContent()",
+    );
+  }
+  const fsMod = process.getBuiltinModule("node:fs");
+  const pathMod = process.getBuiltinModule("node:path");
+  const urlMod = process.getBuiltinModule("node:url");
+  if (
+    typeof fsMod?.readFileSync !== "function" ||
+    typeof pathMod?.dirname !== "function" ||
+    typeof pathMod?.resolve !== "function" ||
+    typeof urlMod?.fileURLToPath !== "function"
+  ) {
+    throw new Error("Node/Bun builtin modules unavailable for loadStoryFromDisk()");
+  }
+  const currentDir = pathMod.dirname(urlMod.fileURLToPath(import.meta.url));
+  const storyPath = pathMod.resolve(
+    currentDir, "..", "..", "public", "assets", "story", "main.ink.json",
+  );
+  const raw: unknown = JSON.parse(fsMod.readFileSync(storyPath, "utf8"));
+  return parseStoryJson(raw, storyPath);
+}
+
+export async function loadBrowserContent(options?: {
+  baseUrl?: string;
+  fetcher?: StoryFetcher;
+}): Promise<{
+  world: World;
+  fixtures: Record<string, Fixture>;
+}> {
+  const story = await fetchStoryJson(options);
+  return loadContent({ story, storyFile: storyAssetUrl(options?.baseUrl) });
+}
+
+export function loadContent(options?: {
+  story?: unknown;
+  storyFile?: string;
+}): {
   world: World;
   fixtures: Record<string, Fixture>;
 } {
@@ -266,7 +336,9 @@ export function loadContent(): {
   const boardwalk = loadArea(boardwalkData, boardwalkPropsData, "boardwalk");
   const artRoom = loadArea(artRoomData, artRoomPropsData, "art-room");
   const lands = parseLands(landsData, "content/lands.json");
-  const story = parseStoryJson(storyData, "content/story/main.ink.json");
+  const story = options?.story !== undefined
+    ? parseStoryJson(options.story, options.storyFile ?? STORY_ASSET_PATH)
+    : loadStoryFromDisk();
   const critterFiles: [unknown, string][] = [
     [fountainFrogData, "fountain-frog"],
     [frogData, "frog"],

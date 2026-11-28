@@ -25,7 +25,7 @@ import { createArcade } from "../ui/arcade";
 import { createTitleScreen, type TitleView } from "../ui/title";
 import { createCredits } from "../ui/credits";
 import {
-  loadContent, parseClawCalibration, parseCookCalibration, parseFishCalibration,
+  loadBrowserContent, parseClawCalibration, parseCookCalibration, parseFishCalibration,
   parseMoleCalibration, parseCometCalibration, parseSkeeCalibration, parseTacoCalibration,
 } from "../content/load";
 import { createState, creditEntries, critterFieldNote, inkFacts, runInk } from "../core";
@@ -54,6 +54,9 @@ import cometAtlas from "../../public/assets/arcade/comet.json";
 import prizeAtlas from "../../public/assets/prizes/prizes.json";
 import toysJson from "../../public/assets/battle/toys/toys.json";
 
+// Load the runtime story asset before mounting any gallery DOM so tests that
+// wait on `.sticker-dialogue` or `.battle-meter` always observe rendered state.
+const content = await loadBrowserContent();
 const root = document.querySelector<HTMLElement>("#gallery");
 if (root === null) throw new Error("Missing gallery root");
 document.body.className = "gallery-body";
@@ -92,7 +95,6 @@ declare global {
 const state = params.get("state") ?? "short";
 const creditsState = state === "credits" || state === "credits-short";
 // The claw machine's states come from real game states (src/dev/claw-gallery.ts).
-const content = loadContent();
 const creditsFixture = content.fixtures["new-game"];
 if (creditsFixture === undefined) throw new Error("Missing new-game fixture");
 const creditsBase = createState(content.world, creditsFixture);

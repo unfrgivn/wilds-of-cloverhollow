@@ -14,6 +14,7 @@ import {
   everyPropFootprint,
 } from "../../src/core";
 import { loadContent } from "../../src/content/load";
+import { readStorySources } from "../../tools/ink/compile";
 
 // Contract for Milestone 24 (the bus line and the map), updated for discover-on-foot
 // travel. The bus stops in all three towns: Cloverhollow's plaza, Bubblegum Bay
@@ -206,7 +207,7 @@ describe("the bus line", () => {
   });
 
   it("only ever sends Fae to a place that exists", () => {
-    const source = readFileSync("content/story/main.ink", "utf8");
+    const source = readStorySources();
     const targets = [...new Set([...source.matchAll(/#\s*travel:\s*([^\s#]+)/g)]
       .map((match) => match[1] ?? ""))].sort();
     // The buses, the old oak's branch across the playing field's creek, ski lift, and rowboat.

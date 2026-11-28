@@ -225,6 +225,9 @@ test.describe("sticker gallery", () => {
       await page.setViewportSize(size);
       await page.goto(`/cloverhollow/ui-gallery.html?state=journal-prizes&touch=1&` +
         `insets=${insets}`);
+      await page.waitForFunction(
+        () => document.querySelector("#gallery[data-ready='true']") !== null,
+      );
       await page.evaluate(() => document.fonts.ready);
       await page.locator(".journal-prizes").scrollIntoViewIfNeeded();
       await expect(page).toHaveScreenshot(`journal-prizes-${name}.png`, {
@@ -236,6 +239,9 @@ test.describe("sticker gallery", () => {
   test("three-choices desktop visual baseline", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto("/cloverhollow/ui-gallery.html?state=three-choices");
+    await page.waitForFunction(
+      () => document.querySelector("#gallery[data-ready='true']") !== null,
+    );
     await expect(page).toHaveScreenshot("three-choices-desktop.png", {
       animations: "disabled",
       scale: "device",

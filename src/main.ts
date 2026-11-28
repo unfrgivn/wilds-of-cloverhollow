@@ -3,7 +3,7 @@ import {
   arcadeView, autosaveNeeded, battleView, blankInput, createState, drainTicks, soundCues,
   stableHash, step, type ActionFrame, type JukeboxTrack, type Point, type State,
 } from "./core";
-import { loadContent } from "./content/load";
+import { loadBrowserContent } from "./content/load";
 import { Keyboard } from "./platform/keyboard";
 import { combineInputFrames, GamepadInput } from "./platform/gamepad";
 import { createInputSource } from "./platform/input";
@@ -62,7 +62,6 @@ import { createNavPathFollower, mergeNavSteerInput } from "./shell/nav-steer";
 import { bindWebGlRecovery, renderBootError, shouldFreezeLiveLoop } from "./shell/lifecycle";
 import type { QaSession } from "./shell/qa-session";
 
-const content = loadContent();
 const app = new Application();
 let state: State;
 const levelUpNotices: string[] = [];
@@ -82,17 +81,26 @@ async function boot(): Promise<void> {
   });
   const haptics = createHaptics();
   const qaEnabled = import.meta.env.DEV || import.meta.env.MODE === "harness";
-  const qaModule = qaEnabled ? await import("./shell/qa-session") : null;
-  const qaBoot = qaModule === null ? null : await qaModule.loadQaBoot(window.location.search);
-  await app.init({
-    resizeTo: window,
-    backgroundColor: 0xf8edcf,
-    antialias: true,
-    resolution: Math.min(window.devicePixelRatio, 2),
-    // Keep the canvas at viewport size in CSS pixels; only the backing store is 2x.
-    autoDensity: true,
-    preference: "webgl",
-  });
+  const [content, qaLoaded] = await Promise.all([
+    loadBrowserContent(),
+    qaEnabled
+      ? import("./shell/qa-session").then(async (qaModule) => ({
+          qaModule,
+          qaBoot: await qaModule.loadQaBoot(window.location.search),
+        }))
+      : Promise.resolve(null),
+    app.init({
+      resizeTo: window,
+      backgroundColor: 0xf8edcf,
+      antialias: true,
+      resolution: Math.min(window.devicePixelRatio, 2),
+      // Keep the canvas at viewport size in CSS pixels; only the backing store is 2x.
+      autoDensity: true,
+      preference: "webgl",
+    }),
+  ]);
+  const qaModule = qaLoaded?.qaModule ?? null;
+  const qaBoot = qaLoaded?.qaBoot ?? null;
   app.renderer.background.color = 0xf8edcf;
   // We draw from our own ticker callback (below), so Pixi's per-frame render goes.
   app.ticker.remove(app.render, app);

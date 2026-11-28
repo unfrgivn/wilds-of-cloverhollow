@@ -1137,6 +1137,9 @@ test.describe("sticker gallery", () => {
           size.width === 1180 ? "0,0,20,0" : "0,0,0,0";
         await page.setViewportSize(size);
         await page.goto(`/cloverhollow/ui-gallery.html?state=${state}&touch=1&insets=${insets}`);
+        await page.waitForFunction(
+          () => document.querySelector("#gallery[data-ready='true']") !== null,
+        );
         await page.evaluate(() => document.fonts.ready);
         const facts = await page.evaluate((currentState) => {
           const style = getComputedStyle(document.documentElement);
@@ -1378,6 +1381,9 @@ test.describe("sticker gallery", () => {
           size.width === 1180 ? "0,0,20,0" : "0,0,0,0";
         await page.setViewportSize(size);
         await page.goto(`/cloverhollow/ui-gallery.html?state=${state}&touch=1&insets=${insets}`);
+        await page.waitForFunction(
+          () => document.querySelector("#gallery[data-ready='true']") !== null,
+        );
         await page.evaluate(() => document.fonts.ready);
         const facts = await page.evaluate(() => {
           const style = getComputedStyle(document.documentElement);

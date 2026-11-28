@@ -1,0 +1,102 @@
+{
+  "id": "milo-bay-wrapper",
+  "area": "bay",
+  "trigger": {
+    "kind": "after-knot",
+    "area": "bay",
+    "knot": "shells",
+    "forbidsVariable": "milo_revealed",
+    "once": true
+  },
+  "steps": [
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "cameraPan",
+          "to": {
+            "x": 900,
+            "y": 880
+          },
+          "ticks": 28,
+          "zoom": 1.09
+        },
+        {
+          "type": "face",
+          "actor": "fae",
+          "direction": "down"
+        },
+        {
+          "type": "face",
+          "actor": "party:0",
+          "direction": "down"
+        },
+        {
+          "type": "emote",
+          "actor": "fae",
+          "kind": "question",
+          "ticks": 26
+        },
+        {
+          "type": "sfx",
+          "cue": "lantern-on"
+        }
+      ]
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "pose",
+          "actor": "fae",
+          "pose": "hop",
+          "ticks": 20,
+          "effect": "purple-fizz"
+        },
+        {
+          "type": "emote",
+          "actor": "fae",
+          "kind": "sparkle",
+          "ticks": 28
+        },
+        {
+          "type": "emote",
+          "actor": "party:0",
+          "kind": "worry",
+          "ticks": 28
+        }
+      ]
+    },
+    {
+      "type": "sayKnot",
+      "knot": "milo_foreshadow_bay"
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "emote",
+          "actor": "fae",
+          "kind": "worry",
+          "ticks": 24
+        },
+        {
+          "type": "sfx",
+          "cue": "lantern-off"
+        }
+      ]
+    },
+    {
+      "type": "setFlag",
+      "flag": "milo_bay_wrapper_seen",
+      "value": true,
+      "scope": "cutscene"
+    },
+    {
+      "type": "cameraPan",
+      "to": "fae",
+      "ticks": 26,
+      "zoom": 1
+    }
+  ]
+}

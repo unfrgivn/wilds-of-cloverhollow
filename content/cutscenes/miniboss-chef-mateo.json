@@ -1,0 +1,87 @@
+{
+  "id": "miniboss-chef-mateo",
+  "area": "hills",
+  "trigger": {
+    "kind": "after-knot",
+    "area": "hills",
+    "knot": "taco_flyer",
+    "requiresVariable": "taco_chef_out",
+    "forbidsVariable": "milo_revealed",
+    "once": true
+  },
+  "steps": [
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "cameraPan",
+          "to": {
+            "x": 1460,
+            "y": 760
+          },
+          "ticks": 28,
+          "zoom": 1.09
+        },
+        {
+          "type": "face",
+          "actor": "fae",
+          "direction": "right"
+        },
+        {
+          "type": "face",
+          "actor": "party:0",
+          "direction": "right"
+        },
+        {
+          "type": "emote",
+          "actor": "fae",
+          "kind": "exclaim",
+          "ticks": 24
+        },
+        {
+          "type": "sfx",
+          "cue": "chime-red"
+        }
+      ]
+    },
+    {
+      "type": "sayKnot",
+      "knot": "vignette_chef_mateo"
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "pose",
+          "actor": "fae",
+          "pose": "cheer",
+          "ticks": 22
+        },
+        {
+          "type": "emote",
+          "actor": "fae",
+          "kind": "heart",
+          "ticks": 26
+        },
+        {
+          "type": "emote",
+          "actor": "party:0",
+          "kind": "worry",
+          "ticks": 24
+        }
+      ]
+    },
+    {
+      "type": "setFlag",
+      "flag": "miniboss_chef_mateo_seen",
+      "value": true,
+      "scope": "cutscene"
+    },
+    {
+      "type": "cameraPan",
+      "to": "fae",
+      "ticks": 24,
+      "zoom": 1
+    }
+  ]
+}

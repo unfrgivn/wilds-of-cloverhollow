@@ -1,0 +1,131 @@
+{
+  "id": "milo-plaza-raccoon",
+  "area": "plaza",
+  "trigger": {
+    "kind": "after-knot",
+    "area": "plaza",
+    "knot": "grocery",
+    "forbidsVariable": "milo_revealed",
+    "once": true
+  },
+  "steps": [
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "spawnTempActor",
+          "id": "milo",
+          "sprite": "milo",
+          "at": {
+            "x": 805,
+            "y": 455
+          },
+          "facing": "left",
+          "scale": 0.5
+        },
+        {
+          "type": "cameraPan",
+          "to": "actor:temp:milo",
+          "ticks": 30,
+          "zoom": 1.07
+        },
+        {
+          "type": "face",
+          "actor": "fae",
+          "direction": "up"
+        },
+        {
+          "type": "face",
+          "actor": "party:0",
+          "direction": "up"
+        }
+      ]
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "pose",
+          "actor": "temp:milo",
+          "pose": "hop",
+          "ticks": 20,
+          "effect": "sparkle-burst"
+        },
+        {
+          "type": "emote",
+          "actor": "temp:milo",
+          "kind": "worry",
+          "ticks": 28
+        },
+        {
+          "type": "emote",
+          "actor": "fae",
+          "kind": "question",
+          "ticks": 24
+        },
+        {
+          "type": "sfx",
+          "cue": "chime-green"
+        }
+      ]
+    },
+    {
+      "type": "sayKnot",
+      "knot": "milo_foreshadow_plaza"
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "face",
+          "actor": "temp:milo",
+          "direction": "down"
+        },
+        {
+          "type": "pose",
+          "actor": "temp:milo",
+          "pose": "wave",
+          "ticks": 22
+        },
+        {
+          "type": "emote",
+          "actor": "temp:milo",
+          "kind": "wave",
+          "ticks": 24
+        },
+        {
+          "type": "emote",
+          "actor": "party:0",
+          "kind": "heart",
+          "ticks": 26
+        }
+      ]
+    },
+    {
+      "type": "moveActor",
+      "actor": "temp:milo",
+      "to": {
+        "x": 830,
+        "y": 505
+      },
+      "speed": 4.2,
+      "facing": "down"
+    },
+    {
+      "type": "despawnTempActor",
+      "id": "milo"
+    },
+    {
+      "type": "setFlag",
+      "flag": "milo_plaza_raccoon_seen",
+      "value": true,
+      "scope": "cutscene"
+    },
+    {
+      "type": "cameraPan",
+      "to": "fae",
+      "ticks": 28,
+      "zoom": 1
+    }
+  ]
+}

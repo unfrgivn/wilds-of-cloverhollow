@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 238)
+Last updated: 2026-11-28 (Milestone 239)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -188,9 +188,15 @@ ios/            Capacitor iOS project (from Milestone 4).
   remaining choreography (pausing cleanly at any unplayed `sayKnot` recruitment
   beat). Automatic triggers (`area-enter` and `after-knot`) are opt-in via
   `StepOptions.cutscenes = true` (default `false`), preserving bit-identical
-  replays across all 74 existing sims and 23 QA packs. Ships 4 validated
-  story cutscenes (`dawn-wakeup`, `plaza-hood-sighting`, `sue-bay-intro`,
-  `jordan-pass-intro`) rendered with y-sorted temporary actors, animated NPC
+  replays across all 74 existing sims and 23 QA packs. Ships 15 validated
+  story cutscenes: 4 core chapter beats (`dawn-wakeup`, `plaza-hood-sighting`,
+  `sue-bay-intro`, `jordan-pass-intro`, Milestone 186), 5 Milo foreshadowing
+  beats (`milo-school-sketch`, `milo-plaza-raccoon`, `milo-bay-wrapper`,
+  `milo-pass-melody`, `milo-loft-sketch`, Milestone 239 / Track E10), and 6
+  empathetic mini-boss pre-battle stress vignettes (`miniboss-mrs-flurry`,
+  `miniboss-ms-rowan`, `miniboss-mr-bell`, `miniboss-ms-coral`,
+  `miniboss-mr-pip`, `miniboss-chef-mateo`, Milestone 239 / Track E10),
+  rendered with y-sorted temporary actors, animated NPC
   walk overrides, watercolor burst particles, emote bubbles, and opaque 24 px
   warm paper-edged cinema letterbox bars (snapping cleanly under Reduced Motion
   with zoom locked to `1`). While `html[data-cutscene="open"]` is active,
@@ -3227,8 +3233,9 @@ trunks keep its two exits.
   opening line and a locked door's included.
 - Load validation (`src/content/story-checks.ts`, re-exported identically from
   `src/content/load.ts` via `parseStoryJson`, `storyTags`, `storyTagErrors`,
-  `endingContentErrors`, `miloSecrecyErrors`, `STORY_EXPRESSIONS`, and
-  `STORY_POSES`, Milestones 148 & 189) reads every tag in the compiled
+  `endingContentErrors`, `miloSecrecyErrors`, `MILO_FORESHADOW_BEATS`,
+  `MINIBOSS_VIGNETTES`, `miloArcIntegrityErrors`, `STORY_EXPRESSIONS`, and
+  `STORY_POSES`, Milestones 148, 189 & 239) reads every tag in the compiled
   story (`storyTags`: a
   tag's text follows its `#` command, and its `/#` may close in an enclosing
   container) and rejects a travel tag naming an unknown area or spawn, any
@@ -3242,7 +3249,29 @@ trunks keep its two exits.
   tag outside `STORY_POSES` (`idle`, `sit`, `cheer`, `shock`, `tool_lantern`,
   `tool_lasso`, `tool_flute`, `talk`, `dash_lean`, with optional target prefix
   `fae`, `maddie`, `sue`, `jordan`, or `party`). `miloSecrecyErrors` verifies
-  zero §1.2 Milo name leaks across all branches of pre-reveal knots.
+  zero §1.2 Milo name leaks across all branches of pre-reveal knots, and
+  `miloArcIntegrityErrors` verifies reachability, variable flips, and strict
+  §1.2 culprit secrecy across all 5 Milo foreshadowing beats, 5 subtle
+  `"Quiet Clue:"` journal notes, and 6 empathetic mini-boss pre-battle
+  vignettes.
+- Acts 1 to 3 Narrative Depth, Milo Foreshadowing Arc & Empathetic Mini-Boss
+  Vignettes (Elevation Track E10, Milestone 239):
+  - Enriches Acts 1 to 3 dialogue voice, humor, character specificity, E3
+    `# expr:` portraits, E2 `# pose:` cues, and kinetic rich-text markup across
+    `act1_morning.ink`, `act1_school.ink`, `act2_bay.ink`, and `act3_pass.ink`
+    while preserving all existing sim choice indices and replay hashes.
+  - Adds 5 subtle, strictly §1.2-compliant Milo foreshadowing beats tracked by
+    `milo_beat_school`, `milo_beat_plaza`, `milo_beat_bay`, `milo_beat_pass`,
+    and `milo_beat_loft` (`milo_foreshadow_school`, `milo_foreshadow_plaza`,
+    `milo_foreshadow_bay`, `milo_foreshadow_pass`, `milo_foreshadow_loft`),
+    paired with 5 choreographed JSON cutscenes in `content/cutscenes/milo-*.json`
+    and 5 non-spoiler `"Quiet Clue:"` entries in `content/story/systems/journal.ink`
+    that never name Milo early.
+  - Adds 6 empathetic pre-battle stress vignettes (`vignette_mrs_flurry`,
+    `vignette_ms_rowan`, `vignette_mr_bell`, `vignette_ms_coral`,
+    `vignette_mr_pip`, `vignette_chef_mateo`), tracked by `vignette_*_seen` and
+    choreographed via `content/cutscenes/miniboss-*.json`, illuminating the
+    relatable everyday overwhelm each chaos spell exaggerated.
 - A line may carry `# play: <game> <price>` (Milestone 44): the dialogue keeps
   it to its close, and then, if Fae has the coins, she pays them and the game
   opens (spec 8.2). It is the one place a game's price is set.

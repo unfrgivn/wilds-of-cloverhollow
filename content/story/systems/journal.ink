@@ -1,4 +1,9 @@
 === journal ===
+{milo_beat_loft: Quiet Clue: Under rocket comics by the park, a torn sketch shows a lonely purple-caped hero waving from afar. # speaker: Fae}
+{milo_beat_pass: Quiet Clue: Behind Pinecone Pass's pines, a shy four-note hum drifted past, then tiny tracks vanished. # speaker: Fae}
+{milo_beat_bay: Quiet Clue: Found a crumpled purple-fizz wrapper at Bubblegum Bay with a glowing tiny rocket doodle inside. # speaker: Fae}
+{milo_beat_plaza: Quiet Clue: By the plaza market, a classmate shielded a jumpy stray raccoon, muttering town gets too loud. # speaker: Fae}
+{milo_beat_school: Quiet Clue: A quiet classmate sketched crayon rockets by the art wall and hummed a soft four-note countdown. # speaker: Fae}
 {milo_revealed and h2h_sanctuary_encore_done: Heart-to-Heart Memory: Maddie, Sue, Jordan, Milo, and I laughed in the sunlit Wildlife Sanctuary clover over our wildest dream-adventure moments! # speaker: Fae}
 {h2h_clubhouse_trio_done: Heart-to-Heart Memory: On Clubhouse Snack Night, Sue, Jordan, Maddie, and I toasted to our found family and promised to always listen first! # speaker: Fae}
 {h2h_sue_jordan_done: Heart-to-Heart Memory: Sue and Jordan settled their great Sea-Salt Taffy vs. Hot Cocoa debate at Bon Appetit Cafe with a Coast-Meets-Mountain Snack Treaty! # speaker: Fae}

@@ -1,0 +1,87 @@
+{
+  "id": "miniboss-mr-bell",
+  "area": "school",
+  "trigger": {
+    "kind": "after-knot",
+    "area": "school",
+    "knot": "megaphone",
+    "requiresVariable": "principal_out",
+    "forbidsVariable": "milo_revealed",
+    "once": true
+  },
+  "steps": [
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "cameraPan",
+          "to": {
+            "x": 530,
+            "y": 780
+          },
+          "ticks": 28,
+          "zoom": 1.09
+        },
+        {
+          "type": "face",
+          "actor": "fae",
+          "direction": "right"
+        },
+        {
+          "type": "face",
+          "actor": "party:0",
+          "direction": "right"
+        },
+        {
+          "type": "emote",
+          "actor": "fae",
+          "kind": "exclaim",
+          "ticks": 24
+        },
+        {
+          "type": "sfx",
+          "cue": "chime-red"
+        }
+      ]
+    },
+    {
+      "type": "sayKnot",
+      "knot": "vignette_mr_bell"
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "pose",
+          "actor": "fae",
+          "pose": "cheer",
+          "ticks": 22
+        },
+        {
+          "type": "emote",
+          "actor": "fae",
+          "kind": "heart",
+          "ticks": 26
+        },
+        {
+          "type": "emote",
+          "actor": "party:0",
+          "kind": "worry",
+          "ticks": 24
+        }
+      ]
+    },
+    {
+      "type": "setFlag",
+      "flag": "miniboss_mr_bell_seen",
+      "value": true,
+      "scope": "cutscene"
+    },
+    {
+      "type": "cameraPan",
+      "to": "fae",
+      "ticks": 24,
+      "zoom": 1
+    }
+  ]
+}

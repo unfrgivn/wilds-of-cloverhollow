@@ -1,0 +1,87 @@
+{
+  "id": "miniboss-mrs-flurry",
+  "area": "pass",
+  "trigger": {
+    "kind": "after-knot",
+    "area": "pass",
+    "knot": "lodge_door",
+    "requiresVariable": "keeper_back",
+    "forbidsVariable": "lodge_open",
+    "once": true
+  },
+  "steps": [
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "cameraPan",
+          "to": {
+            "x": 1300,
+            "y": 590
+          },
+          "ticks": 28,
+          "zoom": 1.09
+        },
+        {
+          "type": "face",
+          "actor": "fae",
+          "direction": "right"
+        },
+        {
+          "type": "face",
+          "actor": "party:0",
+          "direction": "right"
+        },
+        {
+          "type": "emote",
+          "actor": "fae",
+          "kind": "exclaim",
+          "ticks": 24
+        },
+        {
+          "type": "sfx",
+          "cue": "lantern-on"
+        }
+      ]
+    },
+    {
+      "type": "sayKnot",
+      "knot": "vignette_mrs_flurry"
+    },
+    {
+      "type": "parallel",
+      "steps": [
+        {
+          "type": "pose",
+          "actor": "fae",
+          "pose": "cheer",
+          "ticks": 22
+        },
+        {
+          "type": "emote",
+          "actor": "fae",
+          "kind": "heart",
+          "ticks": 26
+        },
+        {
+          "type": "emote",
+          "actor": "party:0",
+          "kind": "worry",
+          "ticks": 24
+        }
+      ]
+    },
+    {
+      "type": "setFlag",
+      "flag": "miniboss_mrs_flurry_seen",
+      "value": true,
+      "scope": "cutscene"
+    },
+    {
+      "type": "cameraPan",
+      "to": "fae",
+      "ticks": 24,
+      "zoom": 1
+    }
+  ]
+}

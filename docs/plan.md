@@ -7528,10 +7528,14 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   in `tools/sim/balance.ts`).
 
 ### Phase 4: Intentional Story, Foreshadowing & Unforgettable Finale
-- **Track E10 (Acts 1 to 3 Narrative Pass & Milo Foreshadowing Arc):** Tighten
-  Acts 1 to 3 writing; add 5 choreographed Milo foreshadowing cutscenes
-  (strictly obeying `spec.md` §1.2 secrecy rule) and empathetic pre-battle
-  stress vignettes for every mini-boss.
+- **Track E10 (Acts 1 to 3 Narrative Pass & Milo Foreshadowing Arc):**
+  ✅ Completed (Milestone 239, 2026-11-28) — Polished Acts 1 to 3 dialogue voice
+  and pacing across `act1_morning.ink`, `act1_school.ink`, `act2_bay.ink`, and
+  `act3_pass.ink` with E3 `# expr:` / kinetic markup and E2 `# pose:` cues;
+  added 5 choreographed Milo foreshadowing beats (`milo-*.json`) with 5 subtle
+  non-spoiler `"Quiet Clue:"` journal notes strictly obeying `spec.md` §1.2
+  secrecy; added 6 empathetic mini-boss pre-battle stress vignettes
+  (`miniboss-*.json`) plus `miloArcIntegrityErrors` load-check coverage.
 - **Track E11 (Party Heart-to-Hearts & Interactive Multi-Step Town Quests):**
   ✅ Completed (Milestone 189, 2026-11-27). Six optional Heart-to-Heart scenes
   (`content/story/party/heart_to_hearts.ink`, pure `src/core/heart-to-hearts.ts`,
@@ -10063,6 +10067,58 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   `milestone-100`), and 12/12 Chromium & WebKit `ui-gallery` `journal` (`0`
   snapshot diffs).
 
+## Milestone 239: Acts 1 to 3 Narrative Depth, Milo Foreshadowing Arc & Empathetic Mini-Boss Vignettes (Elevation Track E10) **Status:** ✅ Completed (2026-11-28)
+- **Acts 1 to 3 Writing & Pacing Polish:** Enriched dialogue voice, humor,
+  character specificity (Fae's curiosity, Maddie's dramatic orange-cat body
+  language, Sue's coastal warmth, Jordan's earnest mountain-kid charm), E3
+  `# expr:` portraits & kinetic text (`{shake}`, `{wave}`, `{pop}`,
+  `{whisper}`, `{color:...}`, `{pause:N}`), and E2 `# pose:` cues across
+  `content/story/chapters/act1_morning.ink`, `act1_school.ink`, `act2_bay.ink`,
+  and `act3_pass.ink` while preserving all existing sim choice indices and
+  line counts across all 77 recorded sims.
+- **5 Choreographed Milo Foreshadowing Beats (Strict §1.2 Secrecy):**
+  - Added 5 story variables (`milo_beat_school`, `milo_beat_plaza`,
+    `milo_beat_bay`, `milo_beat_pass`, `milo_beat_loft`), 5 Ink knots
+    (`milo_foreshadow_school`, `milo_foreshadow_plaza`, `milo_foreshadow_bay`,
+    `milo_foreshadow_pass`, `milo_foreshadow_loft`), 5 choreographed E4 JSON
+    cutscenes (`content/cutscenes/milo-school-sketch.json`,
+    `milo-plaza-raccoon.json`, `milo-bay-wrapper.json`,
+    `milo-pass-melody.json`, `milo-loft-sketch.json`), and 5 subtle non-spoiler
+    `"Quiet Clue:"` journal notes in `content/story/systems/journal.ink` that
+    never name Milo early.
+- **6 Empathetic Mini-Boss Pre-Battle Stress Vignettes:**
+  - Added 6 vignette tracking variables (`vignette_flurry_seen`,
+    `vignette_rowan_seen`, `vignette_bell_seen`, `vignette_coral_seen`,
+    `vignette_pip_seen`, `vignette_mateo_seen`), 6 Ink vignette knots
+    (`vignette_mrs_flurry`, `vignette_ms_rowan`, `vignette_mr_bell`,
+    `vignette_ms_coral`, `vignette_mr_pip`, `vignette_chef_mateo`), and 6
+    choreographed E4 JSON cutscenes (`content/cutscenes/miniboss-*.json`)
+    illuminating the relatable everyday overwhelm exaggerated by each chaos
+    spell for Mrs. Flurry, Ms. Rowan, Mr. Bell, Ms. Coral, Mr. Pip, and Chef
+    Mateo.
+- **Story Integrity Verification (`src/content/story-checks.ts`,
+  `src/content/cutscene-manifest.ts`, `src/content/load.ts`):** Exported
+  `MILO_FORESHADOW_BEATS`, `MINIBOSS_VIGNETTES`, and `miloArcIntegrityErrors`
+  enforcing reachability, variable flips, classmate-beat culprit-spoiler
+  isolation, and zero pre-reveal `"Milo"` leaks across clue beats, journal
+  clues, and mini-boss vignettes; extracted `CUTSCENE_FILES` into
+  `src/content/cutscene-manifest.ts` keeping `src/content/load.ts` cleanly
+  `< 600` lines; recompiled `public/assets/story/main.ink.json` and refreshed
+  affected QA save hashes (`content/qa/saves/jordan.json`, `lantern.json`,
+  `saves.json`).
+- **Evidence:** `tests/unit/e10-story-milo-arc.test.ts` (21 zero-mock unit
+  tests including synthetic negative leak-catcher cases),
+  `tests/e2e/e10-story-milo-arc.spec.ts` (`@smoke`, real keyboard presses on
+  Chromium & WebKit), and `vision`-verified review captures
+  `art/review/e10-milo-school-sketch.jpg`,
+  `art/review/e10-milo-plaza-raccoon.jpg`, `art/review/e10-journal-clues.jpg`,
+  and `art/review/e10-miniboss-ms-rowan.jpg`.
+- **Gates:** `just check` (307 unit files / 2,179 tests, all 77 recorded + 7
+  headless sims, 23 QA packs, purity, lint), `just build` (`index` `361.45 kB
+  < 500 kB`, hook leak + runtime story + harness checks), and Chromium/WebKit
+  Playwright e2e (`e10-story-milo-arc`, `cutscene`, `dialogue`, `bay`, `jordan`,
+  `school`, `lodge`, `lifeguard`, `art`, `milo-rosie`, `e3-dialogue`,
+  `e11-heart-to-hearts`, `e12-finale`) verified green.
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

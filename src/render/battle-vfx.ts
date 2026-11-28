@@ -1,6 +1,7 @@
 import type { Battle } from "../core";
 import { composePose, idleBreathing, type MotionPose } from "./motion";
 export {
+  applyRestFaint,
   ECHO_CHIME_COLORS,
   echoNoteColor,
   emitEchoChimeVfx,
@@ -39,7 +40,8 @@ export type BattleStageMood =
   | "windup"
   | "together-ready"
   | "together-active"
-  | "soothed";
+  | "soothed"
+  | "rest";
 
 export type BattleVfxParticle = {
   texture: BattleVfxTexture;

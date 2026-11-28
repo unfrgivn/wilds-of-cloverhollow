@@ -91,15 +91,19 @@ test("real keys: Fae pops the gull's puffs, Soothe then Snack, and its gust fizz
     expect(box.y).toBeGreaterThan(hud.y + hud.height);
     await expect(page).toHaveScreenshot("windup-menu.png");
 
-    // Soothe answers grumpy: its bubble pops as it's chosen, then the ring.
+    // Soothe answers grumpy: its bubble stays unpopped during the ring check
+    // and pops once the check lands (GREAT!).
     expect(start.selected).toBe(0);
     await press(page);
     const soothing = await readBattle(page);
     expect(soothing?.command).toBe("soothe");
-    expect(soothing?.windUp?.popped).toEqual([false, true]);
+    expect(soothing?.windUp?.popped).toEqual([false, false]);
     await expect(row).toBeHidden();
     await playBattleCheck(page);
-    expect((await readBattle(page))?.phase).toBe("result");
+    const afterSoothe = await readBattle(page);
+    expect(afterSoothe?.phase).toBe("result");
+    expect(afterSoothe?.lastGrade).toBe("great");
+    expect(afterSoothe?.windUp?.popped).toEqual([false, true]);
     await expect(page.locator(".battle-windup-bubble.is-popped")).toHaveCount(1);
     await step(page, 60);
     await expect(page).toHaveScreenshot("windup-popped.png");

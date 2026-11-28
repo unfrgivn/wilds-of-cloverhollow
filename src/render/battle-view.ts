@@ -157,6 +157,7 @@ export class BattleViewController {
   private readonly battleCritterAura = new Sprite();
   private readonly battleFae = new Sprite();
   private readonly battlePartySprites = new Map<string, Sprite>();
+  private hasRenderedBattle = false;
 
   constructor(
     private readonly world: World,
@@ -197,6 +198,14 @@ export class BattleViewController {
     const battle = state.battle;
     const arcade = state.arcade;
     if (battle === null && arcade === null) {
+      if (
+        state.transition?.tone === "dark" &&
+        state.transition.phase === "out" &&
+        this.hasRenderedBattle
+      ) {
+        return false;
+      }
+      this.hasRenderedBattle = false;
       this.battleLayer.visible = false;
       this.stage.hide();
       return true;
@@ -243,6 +252,11 @@ export class BattleViewController {
     );
     if (choreo.stageMood === "together-active") {
       this.stage.drawWash(width, height, 0.54, 0x201042);
+    } else if (choreo.stageMood === "rest") {
+      const washAlpha = reducedMotion
+        ? 0.55
+        : 0.25 + 0.37 * Math.min(1, Math.max(0, battle.phaseTicks / 36));
+      this.stage.drawWash(width, height, washAlpha, 0x120d1f);
     } else {
       this.stage.drawWash(width, height, 0.2);
     }
@@ -388,6 +402,7 @@ export class BattleViewController {
       party: partyAnchors,
     });
     this.battleLayer.alpha = introEase;
+    this.hasRenderedBattle = true;
     return false;
   }
 

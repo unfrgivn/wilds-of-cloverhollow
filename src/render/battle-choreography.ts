@@ -1,6 +1,7 @@
 import { peekabooStatus, type Battle, type BattleView } from "../core";
 import { composePose, idleBreathing, NEUTRAL_POSE, type MotionPose } from "./motion";
 import {
+  applyRestFaint,
   applySnackTheater,
   applySoothedAndReward,
   applyTalkTheater,
@@ -111,6 +112,7 @@ function puffLevel(battle: Battle, view: BattleView | null): number {
 }
 
 export function battleStageMood(battle: Battle, view: BattleView | null): BattleStageMood {
+  if (battle.phase === "rest") return "rest";
   if (battle.phase === "soothed" || battle.phase === "reward") return "soothed";
   if (
     battle.command === "together" &&
@@ -596,9 +598,10 @@ export function computeBattleChoreography(
   // 10. Critter result reaction, 3-tick impact hit-stop, & rainbow bursts.
   if (battle.phase === "result") {
     const impactful =
-      battle.lastGrade === "great" ||
-      battle.answered ||
-      (battle.command === "together" && battle.lastGrade !== null);
+      battle.lastGrade !== "miss" &&
+      (battle.lastGrade === "great" ||
+        battle.answered ||
+        (battle.command === "together" && battle.lastGrade !== null));
     if (impactful && battle.phaseTicks < 4) {
       hitStop = true;
       critter = {
@@ -745,6 +748,12 @@ export function computeBattleChoreography(
   auraScaleBoost = settled.auraScaleBoost;
   if (battle.phase === "soothed") {
     emitSoothedConfettiVfx(vfx, battle.phaseTicks, reducedMotion);
+  }
+
+  // 14. Rest (cozy faint): gentle dizzy sway -> sideways slump -> slow resting breath,
+  // sleepy pastel stars overhead, and sympathetic companion droop.
+  if (battle.phase === "rest") {
+    fae = applyRestFaint(battle.phaseTicks, tick, partyIds, party, vfx, reducedMotion);
   }
 
   return {

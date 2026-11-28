@@ -75,13 +75,14 @@ test("real keys: the frog is curious, Cast answers it, and the bonus lands", { t
     await press(page);
     const charging = await readBattle(page);
     expect(charging?.command).toBe("cast");
-    expect(charging?.answered).toBe(true);
+    expect(charging?.answered).toBe(false);
     // The cloud steps aside for the check.
     await expect(cloud).toBeHidden();
     await playBattleCheck(page);
     const result = await readBattle(page);
     expect(result?.phase).toBe("result");
     expect(result?.lastGrade).toBe("great");
+    expect(result?.answered).toBe(true);
     // Cast's 35, level-1 Magic +1, and the answered feeling's 15.
     expect(result?.calm).toBe(51);
     await expect(cloud).toBeVisible();

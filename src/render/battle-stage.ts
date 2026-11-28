@@ -47,6 +47,13 @@ export const BATTLE_STAGE_MOODS: Record<BattleStageMood, BattleStageMoodStyle> =
     pulse: false,
     spotlightTint: 0xf2fff7,
   },
+  rest: {
+    waveA: 0x2a2042,
+    waveB: 0x1a1430,
+    alpha: 0.34,
+    pulse: false,
+    spotlightTint: 0x6b5c8a,
+  },
 };
 
 export type StageLayerPlacement = {

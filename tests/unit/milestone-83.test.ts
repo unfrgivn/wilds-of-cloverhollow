@@ -201,6 +201,16 @@ describe("Milestone 83: Together! theater, hit-stop, and Relief Bloom choreograp
       computeBattleChoreography(answeredGood, null, 20, partyIds, partyCommands).hitStop,
     ).toBe(true);
 
+    const togetherGood = baseBattle({
+      phase: "result",
+      command: "together",
+      lastGrade: "good",
+      phaseTicks: 1,
+    });
+    expect(
+      computeBattleChoreography(togetherGood, null, 20, partyIds, partyCommands).hitStop,
+    ).toBe(true);
+
     const togetherMiss = baseBattle({
       phase: "result",
       command: "together",
@@ -209,7 +219,24 @@ describe("Milestone 83: Together! theater, hit-stop, and Relief Bloom choreograp
     });
     expect(
       computeBattleChoreography(togetherMiss, null, 20, partyIds, partyCommands).hitStop,
-    ).toBe(true);
+    ).toBe(false);
+
+    const answeredMiss = baseBattle({
+      phase: "result",
+      command: "soothe",
+      lastGrade: "miss",
+      answered: true,
+      phaseTicks: 1,
+    });
+    const answeredMissChoreo = computeBattleChoreography(
+      answeredMiss,
+      null,
+      20,
+      partyIds,
+      partyCommands,
+    );
+    expect(answeredMissChoreo.hitStop).toBe(false);
+    expect(answeredMissChoreo.stageShake).toEqual({ x: 0, y: 0 });
 
     const afterHitStop = baseBattle({ ...greatEarly, phaseTicks: 4 });
     const laterChoreo = computeBattleChoreography(

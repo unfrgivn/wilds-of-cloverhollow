@@ -1164,6 +1164,7 @@ export type State = {
     target: { area: string; spawn: string };
     phase: "out" | "in";
     elapsed: number;
+    tone?: "dark";
   } | null;
   party: PartyMember[];
   xp: number;

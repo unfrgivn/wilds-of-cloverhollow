@@ -106,6 +106,8 @@ export class GameView {
   private staticWidth = 0;
   private staticHeight = 0;
   private staticPaper = 0;
+  private staticFadeColor = 0xf8edcf;
+  private staticFadeFull = false;
   private lanternBlend = 0;
   private lanternTick: number | undefined;
   private readonly areaTextureUrls = new Set<string>();
@@ -190,8 +192,8 @@ export class GameView {
       this.paper,
       this.viewport,
       this.viewportMask,
-      this.fade,
       this.battleView.root,
+      this.fade,
     );
     this.scene.addChild(
       this.shadowLayer,
@@ -406,7 +408,25 @@ export class GameView {
     return this.photoMode;
   }
 
-  private drawStatic(width: number, height: number, paper: number): void {
+  private syncFadeGraphics(width: number, height: number, paper: number, dark: boolean): void {
+    const color = dark ? 0x0f0b18 : paper;
+    if (
+      width === this.staticWidth &&
+      height === this.staticHeight &&
+      color === this.staticFadeColor &&
+      dark === this.staticFadeFull
+    ) return;
+    if (dark) {
+      this.fade.clear().rect(0, 0, width, height).fill(color);
+    } else {
+      const { x, y, width: viewW, height: viewH } = this.viewportRect;
+      this.fade.clear().rect(x, y, viewW, viewH).fill(color);
+    }
+    this.staticFadeColor = color;
+    this.staticFadeFull = dark;
+  }
+
+  private drawStatic(width: number, height: number, paper: number, dark: boolean): void {
     const scale = Math.min(width / this.viewWidth, height / this.viewHeight);
     const letterboxX = (width - this.viewWidth * scale) / 2;
     const letterboxY = (height - this.viewHeight * scale) / 2;
@@ -418,11 +438,18 @@ export class GameView {
     this.paper.clear().rect(letterboxX, letterboxY, viewW, viewH).fill(paper);
     this.viewportMask.clear().rect(letterboxX, letterboxY, viewW, viewH).fill(0xffffff);
     this.lanternTint.clear().rect(letterboxX, letterboxY, viewW, viewH).fill(0x140a2e);
-    this.fade.clear().rect(letterboxX, letterboxY, viewW, viewH).fill(paper);
+    const fadeColor = dark ? 0x0f0b18 : paper;
+    if (dark) {
+      this.fade.clear().rect(0, 0, width, height).fill(fadeColor);
+    } else {
+      this.fade.clear().rect(letterboxX, letterboxY, viewW, viewH).fill(fadeColor);
+    }
     this.fade.alpha = 0;
     this.staticWidth = width;
     this.staticHeight = height;
     this.staticPaper = paper;
+    this.staticFadeColor = fadeColor;
+    this.staticFadeFull = dark;
   }
 
   render(
@@ -435,9 +462,10 @@ export class GameView {
     const area = this.world.areas[state.area];
     if (area === undefined) return;
     this.resize(width, height);
+    const darkFade = state.transition?.tone === "dark";
     const loaded = this.areaView;
     if (loaded === undefined || loaded.area.id !== area.id) {
-      this.drawStatic(width, height, loaded?.paper ?? 0xf8edcf);
+      this.drawStatic(width, height, loaded?.paper ?? 0xf8edcf, darkFade);
       this.fade.alpha = 1;
       return;
     }
@@ -445,8 +473,11 @@ export class GameView {
       width !== this.staticWidth ||
       height !== this.staticHeight ||
       this.staticPaper !== loaded.paper
-    )
-      this.drawStatic(width, height, loaded.paper);
+    ) {
+      this.drawStatic(width, height, loaded.paper, darkFade);
+    } else {
+      this.syncFadeGraphics(width, height, loaded.paper, darkFade);
+    }
     const paused = options?.paused ?? false;
     const reducedMotion = isReducedMotionActive();
     const previousState = options?.previousState;

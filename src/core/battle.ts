@@ -551,7 +551,7 @@ function stepBattleInner(
       return {
         ...nextBase,
         battle: null,
-        transition: { target: state.safeSpot, phase: "out", elapsed: 0 },
+        transition: { target: state.safeSpot, phase: "out", elapsed: 0, tone: "dark" },
       };
     }
     return { ...nextBase, battle: next };
@@ -751,12 +751,10 @@ function stepBattleInner(
         },
       };
     }
-    // Whether this turn's choice answers what the critter feels: this
-    // turn's feeling, or in a wind-up the first bubble it pops.
-    const { answered, windUp } = answerFeeling(world, next, chosen.id);
     if (chosen.id === "snack") {
       if (totalTreatCount(state.treats) > 0)
         return { ...nextBase, battle: { ...next, treatMenu: true, treatSelected: 0 } };
+      const { answered, windUp } = answerFeeling(world, next, chosen.id);
       return applyPlainSnack(world, state, nextBase, next, critter, answered, windUp);
     }
     const friend = critter.commands.friends[chosen.id];
@@ -771,7 +769,11 @@ function stepBattleInner(
       : { ...restTurn(next.rest), [chosen.id]: friend.rest };
     return {
       ...nextBase,
-      battle: startCheck({ ...next, command: chosen.id, answered, windUp, rest }, "critter", spec),
+      battle: startCheck(
+        { ...next, command: chosen.id, answered: false, rest },
+        "critter",
+        spec,
+      ),
     };
   }
   if (next.phase === "check" && next.check !== null) {
@@ -815,13 +817,21 @@ function stepBattleInner(
         : result === "good"
           ? command.numbers.good
           : 0;
-      const calm = Math.min(
-        calmLimit(critter),
-        next.calm + (next.command === "soothe" || next.command === null
-          ? actorStats.power : command.numbers.calm) +
-          (bonus > 0 ? actorStats.magic : 0) +
-          (next.answered ? world.battle.feelingBonus : 0),
-      );
+      // Missing a critter-side timing check deals 0 calm and leaves feelings /
+      // wind-up bubbles unpopped; landed checks (great or good) apply feeling
+      // answers and calm gain.
+      const resolved = result === "miss"
+        ? { answered: false, windUp: next.windUp }
+        : answerFeeling(world, next, next.command ?? "soothe");
+      const calm = result === "miss"
+        ? next.calm
+        : Math.min(
+            calmLimit(critter),
+            next.calm + (next.command === "soothe" || next.command === null
+              ? actorStats.power : command.numbers.calm) +
+              (bonus > 0 ? actorStats.magic : 0) +
+              (resolved.answered ? world.battle.feelingBonus : 0),
+          );
       const sparkle = nextSparkle(world, state, next, result, false);
       const { sparkle: _oldSparkle, ...withoutSparkle } = ended;
       return {
@@ -830,6 +840,8 @@ function stepBattleInner(
           {
             ...withoutSparkle,
             ...(sparkle === undefined ? {} : { sparkle }),
+            answered: resolved.answered,
+            windUp: resolved.windUp,
             calm,
             lastGrade: result,
           },

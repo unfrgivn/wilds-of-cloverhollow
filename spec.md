@@ -2824,7 +2824,9 @@ trunks keep its two exits.
             (or rest when energy reaches 0)
          -> command (a wind-up puffing on: no burst)
          -> fizzle -> command (a wind-up's last turn, every bubble popped)
-  rest -> door-style fade to safeSpot; the critter stays chaos; nothing lost
+  rest -> cozy fainting animation + twilight dim, then dark blackout fade
+          (`transition.tone = "dark"`) to `safeSpot` (autosave deferred until
+          respawn finishes); the critter stays chaos; nothing lost
   ```
 
 - Reward (Milestone 28): every calm pays the kind's `coins`; the species'
@@ -2833,6 +2835,23 @@ trunks keep its two exits.
   sticker: ... +N coins.") or null (no card; the line is "+N coins!"). The
   reward ends the battle with the set piece's or the recurring critter's
   mood calm. The aura and the check are gone at the reward.
+
+- Rest (losing a battle when `energy <= 0`): enters `phase: "rest"`, dims the
+  battle stage with `stageMood: "rest"` and a twilight wash (`0x120d1f`,
+  ramping `0.25 -> 0.62` over 36 ticks; steady `0.55` under reduced motion),
+  and plays Fae's cozy fainting animation (ticks `0..14` dizzy sway, `14..32`
+  smoothstep sideways slump with settle squash, `32+` slow resting breath, 3
+  orbiting pastel-gold/lavender overhead sparkle stars, and sympathetic party
+  droop; reduced motion holds a static slump and 2 overhead stars). Confirming
+  out of `rest` clears `battle` and starts a dark blackout transition
+  (`transition: { target: state.safeSpot, phase: "out", elapsed: 0, tone: "dark" }`,
+  preserving `tone: "dark"` across `"out" -> "in"`): the full-viewport
+  `0x0f0b18` fade sits above the battle stage, holds the fainted stage through
+  `"out"` (zero overworld flash), reaches `1.0` blackout by `65%` of `"out"`,
+  holds `1.0` through the first `35%` of `"in"` with `transitionZoom = 1`, and
+  fades cleanly up on Fae respawned at `state.safeSpot` with the critter still
+  in chaos. `autosaveNeeded` returns `false` whenever `next.transition !== null`,
+  deferring the post-rest autosave until the respawn transition finishes.
 
 - Commands are composed from the party: Soothe, then one command per party
   member in party order (Maddie's Play), then Snack and Run
@@ -3004,9 +3023,15 @@ trunks keep its two exits.
     accidental text selection or link callouts, while keeping dev QA console
     output and text inputs selectable.
 - Every critter kind has a content `level`; `content/levels.json` maps it to
-  `calmMax`, burst base/big strength, and calm XP. Soothe and a friend's command
-  use the actor's Power (20 at level 1, +2 per level), with Magic (+1) on great
-  and good timing, clamped to `calmMax`. Fae earns every calm; a friend earns it
+  `calmMax`, burst base/big strength, and calm XP. On `great` or `good` timing,
+  Soothe and a friend's command use the actor's Power (20 at level 1, +2 per
+  level), with Magic (+1), plus `feelingBonus` if the command answered this
+  turn's feeling or popped a wind-up bubble, clamped to `calmMax`. Missing an
+  ordinary critter-side timing check (`miss`) deals `0` calm (no base Power, no
+  feeling bonus, leaves wind-up bubbles unpopped, and triggers no hit-stop or
+  stage shake); `Together!` keeps its 3-star finisher scaling, and `Snack` /
+  specialty treats have no timing check so they apply immediately. Fae earns
+  every calm; a friend earns it
   only when that friend's command was used. A burst's check
   starts with seeded PRNG draws, in this order: first the big roll (under
   `bigChance` it's big, plays `burst.big`, or the burst's `check` if the kind
@@ -3085,10 +3110,12 @@ trunks keep its two exits.
     feelings Fae can answer at that moment, spread evenly
     (`min(n - 1, floor(value x n))`). These and a wind-up's are the only
     draws outside a burst's.
-  - Choosing a command sets `battle.answered` when it answers this turn's
-    feeling. An answered Snack adds the bonus to its calm at once; Soothe or
-    a friend's command adds it when its check resolves, whatever the grade.
-    Calm stays clamped to `calmMax`. A new turn clears `answered`.
+  - An answered Snack or specialty treat sets `battle.answered` and adds the
+    bonus to its calm at once. Soothe and friend commands evaluate
+    `answerFeeling` when their check resolves: `great` or `good` sets
+    `battle.answered` and adds `feelingBonus`, while `miss` leaves `answered`
+    false and deals `0` calm. Calm stays clamped to `calmMax`. A new turn clears
+    `answered`.
   - The lantern: once Fae has it, its button (L, X/Square, or the lantern
     sticker) in the command menu shows the turn after's feeling too, for the
     rest of the battle (`battle.lanternPeek`); it draws nothing, leaves the
@@ -3108,10 +3135,12 @@ trunks keep its two exits.
     `lines.start`, later turns `lines.puffing`. Meanwhile `battle.feelings`
     waits: no move, no draw, and the cloud gives way to the bubbles. Wind-ups
     don't need feelings on: a mini-boss winds up beside Maddie alone.
-  - Popping: a chosen command pops the first bubble not yet popped that it
-    answers, which counts as answering (the feeling bonus); one that answers
-    none earns nothing extra. Each command answering a bubble not yet popped
-    wears its badge.
+  - Popping: a Snack (or specialty treat) pops the first matching bubble at
+    once, and a check-based command pops it when its check lands (`great` or
+    `good`), counting as answering (the feeling bonus); a missed check leaves
+    the bubble unpopped and deals `0` calm, and a command that answers none
+    earns nothing extra. Each command answering a bubble not yet popped wears
+    its badge.
   - No burst comes between wind-up turns: after a result the next turn's
     menu opens. After the last turn's result it lets go: every bubble popped,
     it fizzles (phase `fizzle`, `lines.fizzle`, no burst) and the next turn

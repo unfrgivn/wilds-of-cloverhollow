@@ -131,17 +131,31 @@ describe("battle feelings", () => {
     expect(after.battle?.calm).toBe(content.world.critters["fountain-frog"]?.calmMax ?? 100);
   });
 
-  it("adds the bonus for a Soothe check even when the check misses", () => {
-    const state = commandState("plaza-party", ["grumpy", null, null], 0);
-    const selected = step(content.world, state, { ...blankInput(), choose: 0 }).state;
-    let current = selected;
-    while (current.battle?.phase === "check")
-      current = step(content.world, current, blankInput()).state;
+  it("deals 0 calm on a missed Soothe check and adds power + magic + feelingBonus on a hit",
+    () => {
+      const state = commandState("plaza-party", ["grumpy", null, null], 0);
+      const selected = step(content.world, state, { ...blankInput(), choose: 0 }).state;
+      expect(selected.battle?.answered).toBe(false);
+      let missed = selected;
+      while (missed.battle?.phase === "check")
+        missed = step(content.world, missed, blankInput()).state;
 
-    expect(current.battle?.lastGrade).toBe("miss");
-    expect(current.battle?.calm).toBe(content.world.battle.feelingBonus +
-      (content.world.critters["fountain-frog"]?.commands.soothe.calm ?? 0));
-  });
+      expect(missed.battle?.lastGrade).toBe("miss");
+      expect(missed.battle?.answered).toBe(false);
+      expect(missed.battle?.calm).toBe(0);
+
+      // Step to the Soothe ring's target tick and land a GREAT hit.
+      let landed = selected;
+      const check = landed.battle?.check;
+      if (check?.kind !== "ring") throw new Error("expected ring check");
+      for (let i = 0; i < check.spec.targetTick - 1; i += 1)
+        landed = step(content.world, landed, blankInput()).state;
+      landed = step(content.world, landed, { ...blankInput(), confirm: true }).state;
+
+      expect(landed.battle?.lastGrade).toBe("great");
+      expect(landed.battle?.answered).toBe(true);
+      expect(landed.battle?.calm).toBe(20 + 1 + content.world.battle.feelingBonus);
+    });
 
   it("marks only the answering command and exposes feelings in command and result", () => {
     const state = commandState("plaza-party", ["grumpy", "hungry", null]);

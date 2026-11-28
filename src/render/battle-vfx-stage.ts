@@ -5,6 +5,7 @@ import type {
   EchoNote,
   PeekabooStatus,
 } from "../core";
+import type { MotionPose } from "./motion";
 import type { BattleVfxParticle } from "./battle-vfx";
 
 function clamp01(value: number): number {
@@ -704,4 +705,111 @@ export function emitTraceBrushVfx(
     faeOffsetY: -3 * Math.abs(Math.sin(tick * 0.22)),
     faeRotation: 0.05 * Math.sin(tick * 0.22),
   };
+}
+
+const REST_STAR_TINTS: readonly number[] = [0xfff099, 0xd8b8ff, 0xffe09e];
+
+/**
+ * Cozy fainting choreography for `battle.phase === "rest"`: gentle dizzy sway
+ * (ticks 0..14) -> smoothstep sideways slump (14..32) -> slow resting breath
+ * (32+), orbiting pastel overhead sparkle stars, and sympathetic party droop.
+ */
+export function applyRestFaint(
+  phaseTicks: number,
+  tick: number,
+  partyIds: readonly string[],
+  party: Record<string, MotionPose>,
+  vfx: BattleVfxParticle[],
+  reducedMotion: boolean,
+): MotionPose {
+  if (reducedMotion) {
+    for (const id of partyIds) {
+      party[id] = { offsetX: 0, offsetY: 3, scaleX: 1, scaleY: 0.96, rotation: -0.05 };
+    }
+    vfx.push(
+      {
+        texture: "sparkle",
+        blend: "add",
+        anchor: "fae",
+        offsetX: -18,
+        offsetY: -34,
+        scaleX: 0.34,
+        scaleY: 0.34,
+        rotation: 0,
+        alpha: 0.78,
+        tint: 0xfff099,
+      },
+      {
+        texture: "sparkle",
+        blend: "add",
+        anchor: "fae",
+        offsetX: 6,
+        offsetY: -40,
+        scaleX: 0.32,
+        scaleY: 0.32,
+        rotation: 0,
+        alpha: 0.78,
+        tint: 0xd8b8ff,
+      },
+    );
+    return { offsetX: -8, offsetY: 16, scaleX: 1.06, scaleY: 0.92, rotation: -0.78 };
+  }
+
+  const slumpT = clamp01((phaseTicks - 14) / 18);
+  const s = slumpT * slumpT * (3 - 2 * slumpT);
+  let fae: MotionPose;
+  if (phaseTicks < 14) {
+    const u = phaseTicks / 14;
+    const wave = Math.sin(u * Math.PI * 3);
+    fae = {
+      offsetX: wave * 7 * (1 - u * 0.3),
+      offsetY: 3 * u,
+      scaleX: 1,
+      scaleY: 1,
+      rotation: wave * 0.14,
+    };
+  } else if (phaseTicks < 32) {
+    fae = {
+      offsetX: -10 * s,
+      offsetY: 3 + 15 * s,
+      scaleX: 1 + 0.08 * s,
+      scaleY: 1 - 0.1 * s,
+      rotation: -0.88 * s,
+    };
+  } else {
+    const breath = 0.012 * Math.sin(tick / 20);
+    fae = {
+      offsetX: -10,
+      offsetY: 18,
+      scaleX: 1.08 + breath,
+      scaleY: 0.9 - breath,
+      rotation: -0.88,
+    };
+  }
+  for (const id of partyIds) {
+    party[id] = {
+      offsetX: -3 * s,
+      offsetY: 4 * s,
+      scaleX: 1 + 0.02 * s,
+      scaleY: 1 - 0.05 * s,
+      rotation: -0.08 * s,
+    };
+  }
+  for (let i = 0; i < 3; i += 1) {
+    const angle = tick * 0.065 + (i * Math.PI * 2) / 3;
+    const scale = 0.34 + 0.06 * Math.sin(angle);
+    vfx.push({
+      texture: "sparkle",
+      blend: "add",
+      anchor: "fae",
+      offsetX: fae.offsetX - 6 * s + Math.cos(angle) * 22,
+      offsetY: -40 + fae.offsetY * 0.55 + Math.sin(angle) * 7,
+      scaleX: scale,
+      scaleY: scale,
+      rotation: angle * 0.5,
+      alpha: 0.78,
+      tint: REST_STAR_TINTS[i] ?? 0xfff099,
+    });
+  }
+  return fae;
 }

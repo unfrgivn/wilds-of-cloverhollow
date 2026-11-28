@@ -161,13 +161,31 @@ describe("wind-up commands and burst rules", () => {
     });
   }
 
-  it("pops the first matching bubble and adds the feeling bonus", () => {
+  it("pops the first matching bubble and adds the feeling bonus when the check lands", () => {
+    const selected = step(content.world, activeWindUp(), { ...blankInput(), choose: 0 }).state;
+    expect(selected.battle?.answered).toBe(false);
+    expect(selected.battle?.windUp?.popped).toEqual([false, false]);
+    const check = selected.battle?.check;
+    if (check?.kind !== "ring") throw new Error("expected ring check");
+    let current = selected;
+    for (let i = 0; i < check.spec.targetTick - 1; i += 1)
+      current = step(content.world, current, blankInput()).state;
+    const after = step(content.world, current, { ...blankInput(), confirm: true }).state;
+
+    expect(after.battle?.lastGrade).toBe("great");
+    expect(after.battle?.answered).toBe(true);
+    expect(after.battle?.windUp?.popped).toEqual([true, false]);
+    expect(after.battle?.calm).toBe(20 + 1 + content.world.battle.feelingBonus);
+  });
+
+  it("deals 0 calm and leaves wind-up bubbles unpopped when a Soothe check misses", () => {
     const selected = step(content.world, activeWindUp(), { ...blankInput(), choose: 0 }).state;
     const after = step(content.world, selected, { ...blankInput(), confirm: true }).state;
 
-    expect(after.battle?.answered).toBe(true);
-    expect(after.battle?.windUp?.popped).toEqual([true, false]);
-    expect(after.battle?.calm).toBe(20 + content.world.battle.feelingBonus);
+    expect(after.battle?.lastGrade).toBe("miss");
+    expect(after.battle?.answered).toBe(false);
+    expect(after.battle?.windUp?.popped).toEqual([false, false]);
+    expect(after.battle?.calm).toBe(0);
   });
 
   it("leaves an unmatched command unpopped and without a feeling bonus", () => {

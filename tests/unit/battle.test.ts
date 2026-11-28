@@ -121,7 +121,7 @@ describe("calm-down battle core", () => {
         ...none,
         confirm: true,
       }).state.battle?.calm,
-    ).toBe(20);
+    ).toBe(0);
     expect(
       step(content.world, aimState(battleState(), "play", 0, 39), {
         ...none,
@@ -139,7 +139,7 @@ describe("calm-down battle core", () => {
         ...none,
         confirm: true,
       }).state.battle?.calm,
-    ).toBe(30);
+    ).toBe(0);
   });
 
   it("clamps Snack energy, consumes snacks, and disables at zero", () => {
@@ -244,7 +244,12 @@ describe("calm-down battle core", () => {
     state = press(state);
     state = press(state);
     expect(state.battle).toBeNull();
-    expect(state.transition?.target).toEqual(state.safeSpot);
+    expect(state.transition).toEqual({
+      target: state.safeSpot,
+      phase: "out",
+      elapsed: 0,
+      tone: "dark",
+    });
     for (let i = 0; i < content.world.tunables.doorFadeTicks * 2 + 1; i += 1)
       state = step(content.world, state, none).state;
     expect(state.area).toBe("plaza");

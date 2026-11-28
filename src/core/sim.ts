@@ -655,7 +655,12 @@ function stepTick(
         facing: spawn.facing,
         previousInput: { ...input },
         motion: { ...state.motion, moving: false },
-        transition: { target: transition.target, phase: "in", elapsed: 0 },
+        transition: {
+          target: transition.target,
+          phase: "in",
+          elapsed: 0,
+          ...(transition.tone === undefined ? {} : { tone: transition.tone }),
+        },
         party: spawnParty(
           world,
           state.ink,

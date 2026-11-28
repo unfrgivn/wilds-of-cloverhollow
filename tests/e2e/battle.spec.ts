@@ -248,4 +248,99 @@ test.describe("frog battle", () => {
     expect(meterValues.at(-1)).toBe(0);
     expect(meterValues.length).toBeGreaterThanOrEqual(4);
   });
+
+  test("real keys: missing Soothe deals 0 calm and losing plays rest faint + dark blackout respawn",
+    { tag: "@smoke" }, async ({ page }) => {
+      await page.setViewportSize({ width: 1280, height: 720 });
+      await page.goto("./");
+      await page.waitForFunction(() => Boolean(window.__cloverhollow));
+      await resetPaused(page, "plaza");
+      const fountainSpawn = (await readState(page)).player;
+      for (const [key, ticks] of approach) await hold(page, key, ticks);
+      await hold(page, "ArrowLeft", 35);
+      await expect(page.locator("html")).toHaveAttribute("data-battle", "open");
+
+      const track = page.locator(".battle-calm-track");
+      const fill = page.locator(".battle-calm-fill");
+
+      // Advance through intro to command, pick Soothe, and let the ring time out to MISS.
+      for (let i = 0; i < 20; i += 1) {
+        const battle = await readBattle(page);
+        if (battle?.phase === "command" && await shown(page)) break;
+        await press(page);
+      }
+      await press(page);
+      expect((await readBattle(page))?.phase).toBe("check");
+      for (let i = 0; i < 90; i += 1) {
+        if ((await readBattle(page))?.phase === "result") break;
+        await step(page, 1);
+      }
+      const missed = await readBattle(page);
+      expect(missed?.phase).toBe("result");
+      expect(missed?.lastGrade).toBe("miss");
+      expect(missed?.calm).toBe(0);
+      await expect(page.locator(".battle-grade")).toHaveText("MISS");
+      await expect(track).toHaveAttribute("aria-valuenow", "100");
+      expect(await fill.evaluate((node) => node.getAttribute("style"))).toContain("width: 100%");
+      await expect(page.locator(".battle-popup")).toHaveCount(0);
+
+      // Keep missing Soothe checks and frog bursts until energy hits 0 -> phase === "rest".
+      for (let action = 0; action < 120; action += 1) {
+        const battle = await readBattle(page);
+        if (battle === null || battle.phase === "rest") break;
+        if (battle.phase === "check") {
+          for (let tick = 0; tick < 200; tick += 1) {
+            if ((await readBattle(page))?.phase !== "check") break;
+            await step(page, 1);
+          }
+          continue;
+        }
+        await press(page);
+      }
+      // Let Fae finish the dizzy sway + sideways slump and let the rest line type out.
+      await step(page, 120);
+      const resting = await readBattle(page);
+      expect(resting?.phase).toBe("rest");
+      expect(resting?.energy).toBeLessThanOrEqual(0);
+      expect(await shown(page)).toBe(true);
+
+      // Confirm out of rest: dark blackout fade covers the fainted battle stage with zero flash.
+      await press(page);
+      const fadeOutStart = await readState(page);
+      expect(fadeOutStart.battle).toBeNull();
+      expect(fadeOutStart.transition).toMatchObject({
+        target: { area: "plaza", spawn: "fountain" },
+        phase: "out",
+        tone: "dark",
+      });
+      expect((await renderInfo(page)).battle.overworldVisible).toBe(false);
+
+      // By tick 12 of "out", blackout reaches 1.0 while the fainted stage still stays up.
+      await step(page, 11);
+      const blackoutOut = await renderInfo(page);
+      expect(blackoutOut.fade).toBe(1);
+      expect(blackoutOut.battle.overworldVisible).toBe(false);
+
+      // Cross into "in": blackout holds at 1.0 as the respawned safe spot swaps in behind it.
+      await step(page, 8);
+      const fadingInState = await readState(page);
+      expect(fadingInState.transition).toMatchObject({
+        target: { area: "plaza", spawn: "fountain" },
+        phase: "in",
+        tone: "dark",
+      });
+      const blackoutIn = await renderInfo(page);
+      expect(blackoutIn.fade).toBe(1);
+      expect(blackoutIn.battle.overworldVisible).toBe(true);
+
+      // Finish fading in: cleanly respawned at plaza.fountain with the frog still in chaos.
+      await step(page, 20);
+      const after = await readState(page);
+      expect(after.transition).toBeNull();
+      expect(after.area).toBe("plaza");
+      expect(after.player).toEqual(fountainSpawn);
+      expect(after.critters["fountain-frog"]).toBe("chaos");
+      expect((await renderInfo(page)).fade).toBe(0);
+      await expect(page.locator("html")).not.toHaveAttribute("data-battle", "open");
+    });
 });

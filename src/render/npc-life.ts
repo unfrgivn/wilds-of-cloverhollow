@@ -303,7 +303,8 @@ export class NpcLifeController {
         (attention === "lantern-awe" ||
           attention === "celebrate" ||
           attention === "music-delight" ||
-          attention === "companion-greet")
+          attention === "companion-greet" ||
+          attention === "chaos-worry")
       ) {
         this.spawnReactionBurst(
           entry?.x ?? npc.point.x,
@@ -329,7 +330,12 @@ export class NpcLifeController {
   private spawnReactionBurst(
     x: number,
     y: number,
-    attention: "lantern-awe" | "celebrate" | "music-delight" | "companion-greet",
+    attention:
+      | "lantern-awe"
+      | "celebrate"
+      | "music-delight"
+      | "companion-greet"
+      | "chaos-worry",
     tick: number,
   ): void {
     const tints: readonly [number, number, number] =
@@ -339,7 +345,9 @@ export class NpcLifeController {
           ? [0xffd479, 0xf59ab4, 0xfff0a8]
           : attention === "music-delight"
             ? [0x8be2b5, 0xfff1a8, 0xb8f0d0]
-            : [0xf59ab4, 0xffd0de, 0xf7b2c6];
+            : attention === "chaos-worry"
+              ? [0x8ab3e2, 0xcfe4fa, 0xa8c6ec]
+              : [0xf59ab4, 0xffd0de, 0xf7b2c6];
     const offsets: readonly [number, number, number, number][] = [
       [-16, -4, -0.35, -0.65],
       [0, -12, 0, -0.85],

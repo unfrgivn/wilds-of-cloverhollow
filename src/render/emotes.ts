@@ -64,6 +64,7 @@ export type OverworldEmoteInput = {
 
 const CALMED_HUM_RANGE = 185;
 const NPC_EMOTE_RANGE = 360;
+const NPC_WORRY_EMOTE_RANGE = 650;
 const NAP_STILL_TICKS = 240;
 const EXCLAIM_WINDOW_TICKS = 30;
 const RECENT_TALK_TICKS = 38;
@@ -229,7 +230,8 @@ export function evaluateOverworldEmotes(input: OverworldEmoteInput): OverworldEm
 
   for (const item of input.npcEmotes ?? []) {
     const distance = Math.hypot(item.x - input.player.x, item.y - input.player.y);
-    if (distance > NPC_EMOTE_RANGE) continue;
+    const maxRange = item.kind === "worry" ? NPC_WORRY_EMOTE_RANGE : NPC_EMOTE_RANGE;
+    if (distance > maxRange) continue;
     if (reduced) {
       emotes.push({
         texture: NPC_EMOTE_TEXTURES[item.kind],

@@ -288,10 +288,19 @@ function npcBaseLivingPose(
   }
 
   if (attention === "chaos-worry") {
-    const quiver = Math.sin(tick * 1.15 + index);
     const lean = Math.sin(tick / 16 + phase) * 0.022;
+    if (age < 10) {
+      const flinch = Math.sin((age / 10) * Math.PI);
+      return {
+        offsetX: 0,
+        offsetY: -flinch * 3.2,
+        scaleX: 1.015 + flinch * 0.015,
+        scaleY: 0.985 - flinch * 0.015,
+        rotation: lean,
+      };
+    }
     return {
-      offsetX: quiver * 1.4,
+      offsetX: 0,
       offsetY: 0,
       scaleX: 1.015,
       scaleY: 0.985,

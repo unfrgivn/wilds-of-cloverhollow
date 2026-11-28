@@ -1,8 +1,40 @@
 import type { Area } from "../core";
 import { isArcadeGameId } from "../core/arcade";
-import { storyHasKnot } from "../core/ink";
+import { runInk, storyHasKnot, type InkFacts } from "../core/ink";
 import { isStorySound } from "../core/sound";
 import { field, record } from "./parsers";
+
+/** Canonical dialogue portrait expressions paired with Track E3 (`# expr:`). */
+export const STORY_EXPRESSIONS = [
+  "neutral",
+  "happy",
+  "worried",
+  "determined",
+  "surprised",
+] as const;
+
+/** Canonical sprite action poses paired with Track E2 (`# pose:`). */
+export const STORY_POSES = [
+  "idle",
+  "sit",
+  "cheer",
+  "shock",
+  "tool_lantern",
+  "tool_lasso",
+  "tool_flute",
+  "talk",
+  "dash_lean",
+] as const;
+
+const EXPRESSION_SET: ReadonlySet<string> = new Set<string>(STORY_EXPRESSIONS);
+const POSE_SET: ReadonlySet<string> = new Set<string>(STORY_POSES);
+const POSE_TARGET_SET: ReadonlySet<string> = new Set([
+  "fae",
+  "maddie",
+  "sue",
+  "jordan",
+  "party",
+]);
 
 export function parseStoryJson(value: unknown, file: string): Record<string, unknown> {
   field(record(value), file, "story");
@@ -93,8 +125,71 @@ export function storyTagErrors(
       const sound = tag.slice("sound:".length).trim();
       return isStorySound(sound) ? [] : [`unknown sound in "${tag}"`];
     }
+    if (tag.startsWith("expr:")) {
+      const expr = tag.slice("expr:".length).trim();
+      return EXPRESSION_SET.has(expr) ? [] : [`unknown expression in "${tag}"`];
+    }
+    if (tag.startsWith("pose:")) {
+      const tokens = tag.slice("pose:".length).trim().toLowerCase().split(/\s+/);
+      const valid =
+        (tokens.length === 1 && POSE_SET.has(tokens[0] ?? "")) ||
+        (tokens.length === 2 &&
+          POSE_TARGET_SET.has(tokens[0] ?? "") &&
+          POSE_SET.has(tokens[1] ?? ""));
+      return valid ? [] : [`unknown pose in "${tag}"`];
+    }
     return [];
   });
+}
+
+const MILO_NAME_RE = /\bMilo\b/i;
+
+/**
+ * Verifies spec §1.2 Milo secrecy across every branch of `knots` when executed
+ * from a pre-reveal Ink state (`milo_revealed = false`). Any line or choice
+ * mentioning "Milo" is reported as an error.
+ */
+export function miloSecrecyErrors(
+  story: Record<string, unknown>,
+  ink: string,
+  knots: readonly string[],
+  facts?: InkFacts,
+): string[] {
+  const errors: string[] = [];
+  const walk = (knot: string, currentInk: string, depth: number): void => {
+    let result = runInk(story, currentInk, { type: "start", knot }, facts);
+    const stepLine = (stepResult: ReturnType<typeof runInk>, path: string, step: number): void => {
+      if (step > 80) return;
+      if (stepResult.line !== null && MILO_NAME_RE.test(stepResult.line.text)) {
+        errors.push(`${path}: leaked Milo name in "${stepResult.line.text}"`);
+      }
+      for (const choice of stepResult.choices) {
+        if (MILO_NAME_RE.test(choice)) {
+          errors.push(`${path}: leaked Milo name in choice "${choice}"`);
+        }
+      }
+      if (stepResult.ended) return;
+      if (stepResult.choices.length > 0) {
+        if (depth >= 4) return;
+        stepResult.choices.forEach((_, index) => {
+          const picked = runInk(story, stepResult.ink, { type: "choose", index }, facts);
+          stepLine(picked, `${path}[${index}]`, step + 1);
+        });
+        return;
+      }
+      const next = runInk(story, stepResult.ink, { type: "next" }, facts);
+      stepLine(next, path, step + 1);
+    };
+    stepLine(result, knot, 0);
+  };
+  for (const knot of knots) {
+    if (!storyHasKnot(story, knot)) {
+      errors.push(`${knot}: missing knot`);
+      continue;
+    }
+    walk(knot, ink, 0);
+  }
+  return errors;
 }
 
 export function endingContentErrors(

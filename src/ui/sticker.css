@@ -859,6 +859,16 @@
   -webkit-touch-callout: none;
   transform: translate(-50%, calc(-100% - 45px));
 }
+.sticker-prompt.is-heart {
+  background: #f8d4dc;
+  border-color: #fffaf5;
+  color: #5e2736;
+  box-shadow: 0 7px 0 #7a2d4324, 0 10px 18px #7a2d4326, 0 0 16px #f7b7c688;
+}
+.sticker-prompt.is-heart::before {
+  border-color: #8a3a50;
+  opacity: .48;
+}
 /* On touch screens the left-hand stick spans the lower-left zone; keep the
    floating world prompt pass-through so a sign near the stick never steals a
    movement drag (players use the dedicated confirm thumb sticker). */

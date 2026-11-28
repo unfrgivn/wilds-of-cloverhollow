@@ -641,3 +641,210 @@ Wait, strawberry swirl WITH crunchy honey drizzle?! That's genius, Fae! I'm tell
 Here, take my spare Berry Swirl Cone treat and six lucky parlor coins for the pro scoop tip! # speaker: Danny # gift: treat berry-cone 1 # gift: coins 6 # sound: chime-blue
 Awesome, thanks, Danny! # speaker: Fae
 -> DONE
+
+// ===========================================================================
+// Elevation Track E11: Interactive Multi-Step Living NPC Quests (Wilds)
+// 3. Toby's Sleepy Lullaby (Harmony Flute: Plaza, Meadow Park, Whispering Woods)
+// 4. Chef Bea's Valley Spice Run (Sea-Salt, Pine-Sugar, Woodland Mint)
+// ===========================================================================
+
+=== function lullaby_count() ===
+~ temp total = 0
+{ lullaby_note_plaza:
+    ~ total += 1
+}
+{ lullaby_note_park:
+    ~ total += 1
+}
+{ lullaby_note_woods:
+    ~ total += 1
+}
+~ return total
+
+=== toby_lullaby_prompt ===
+{lullaby_count() >= 3: -> toby_lullaby.complete}
++ {not lullaby_quest} [Ask about his sleepy town-square lullaby]
+    -> toby_lullaby.start
++ {lullaby_quest} [Check Lullaby notes ({lullaby_count()}/3)]
+    -> toby_lullaby.progress
++ [Save me a cinnamon bun, Toby!]
+    You got it, Fae! Extra icing swirl! # speaker: Toby # expr: happy # pose: cheer
+    -> DONE
+
+=== toby_lullaby ===
+= start
+~ lullaby_quest = true
+WHOA, hold on, Fae! Is that Ms. Willow's Harmony Flute?! # speaker: Toby # expr: surprised # pose: cheer
+I'm trying to write a super-cozy Sleepy Cloverhollow Lullaby for bedtime in the town square, so even the bounciest critters can nap peacefully! # speaker: Toby # expr: happy # pose: talk
+I just need three real valley echoes: play your Harmony Flute by the Plaza Fountain garden, the Meadow Park Pond reeds, and the Whispering Woods Echo Stone! # speaker: Toby # expr: determined # pose: talk
+Just press your flute near each spot (or check the singing stones), jot down the notes, and bring all three back to me! # speaker: Toby # expr: happy # pose: talk
+Ooh, a town-square bedtime lullaby! I'll collect all three valley notes, Toby! # speaker: Fae # expr: happy # pose: tool_flute # sound: flute
+-> DONE
+
+= progress
+Awesome! You've already caught {lullaby_count()} of 3 Sleepy Lullaby echoes! # speaker: Toby # expr: happy # pose: talk
+{not lullaby_note_plaza: Play your Harmony Flute near the echoing garden stone southeast of Cloverhollow Plaza's fountain! # speaker: Toby # expr: neutral # pose: talk}
+{not lullaby_note_park: Try playing your Harmony Flute by the quiet reed bank beside Meadow Park's pond! # speaker: Toby # expr: neutral # pose: talk}
+{not lullaby_note_woods: And play a soft note by the mossy Echo Stone in Whispering Woods! # speaker: Toby # expr: neutral # pose: talk}
+On it, Toby! Flute at the ready! # speaker: Fae # expr: determined # pose: tool_flute
+-> DONE
+
+= complete
+~ lullaby_quest = true
+~ lullaby_done = true
+WAIT A SECOND! Water-chime blue, pond-reed green, AND pine-breeze gold?! # speaker: Toby # expr: surprised # pose: cheer
+Toby hums the three notes together while Fae plays them softly on her Harmony Flute! # speaker: Fae # expr: happy # pose: tool_flute # sound: flute-blue
+Doo-daa-diii... WHOA, even my eyelids got cozy! Maddie's already yawning! # speaker: Toby # expr: happy # pose: cheer
+{withParty("maddie"): Mrrrow-yaaaawn... Maddie stretches both front paws and curls her tail happily! # speaker: Maddie # expr: happy # pose: sit}
+That's officially the Cloverhollow Sleepy Lullaby! Take twenty-five coins, an Orchard Apple treat, and a cafe snack for co-writing it with me! # speaker: Toby # expr: happy # pose: cheer # gift: coins 25 # gift: treat orchard-apple 1 # gift: snack 1 # sound: chime-yellow
+Best band in Cloverhollow, Toby! # speaker: Fae # expr: happy # pose: cheer
+-> DONE
+
+=== lullaby_plaza ===
+{lullaby_note_plaza: -> after}
+A smooth carved garden stone near the plaza fountain hums faintly with the sound of splashing water. # speaker: Fae # expr: happy # pose: idle
+{not has_flute:
+    If I had a musical instrument, I bet this stone would echo the prettiest melody! # speaker: Fae # expr: neutral # pose: idle
+    -> DONE
+}
++ [Play the Harmony Flute here!]
+    Fae plays a gentle bluebell melody on her Harmony Flute beside the fountain garden! # speaker: Fae # expr: happy # pose: tool_flute # sound: flute-blue
+    ~ lullaby_note_plaza = true
+    Ping-loo-laa! The water drops echo back a sleepy, sparkling lullaby chord! ({lullaby_count()}/3 notes captured!) # speaker: Fae # expr: surprised # pose: cheer # sound: chime-blue
+    {lullaby_count() >= 3: That's all three valley lullaby notes! Let's bring the tune back to Toby at Bon Appetit Cafe! # speaker: Fae # expr: happy # pose: cheer}
+    -> DONE
++ [Listen quietly for now]
+    -> DONE
+= after
+The plaza fountain stone hums back the cozy blue water-chime note from Toby's Sleepy Lullaby. # speaker: Fae # expr: happy # pose: idle
+-> DONE
+
+=== lullaby_park ===
+{lullaby_note_park: -> after}
+Soft cattail reeds along the Meadow Park pond sway like tiny wind chimes in the afternoon breeze. # speaker: Fae # expr: happy # pose: idle
+{not has_flute:
+    They sound like they're waiting for a flute melody to answer them! # speaker: Fae # expr: neutral # pose: idle
+    -> DONE
+}
++ [Play the Harmony Flute here!]
+    Fae plays a warm meadow note on her Harmony Flute by the quiet pond bank! # speaker: Fae # expr: happy # pose: tool_flute # sound: flute-green
+    ~ lullaby_note_park = true
+    Hummm-shhh-laa! The pond reeds whisper back a sleepy emerald harmony! ({lullaby_count()}/3 notes captured!) # speaker: Fae # expr: surprised # pose: cheer # sound: chime-green
+    {lullaby_count() >= 3: All three lullaby echoes captured! Time to share the finished song with Toby at Bon Appetit Cafe! # speaker: Fae # expr: happy # pose: cheer}
+    -> DONE
++ [Listen quietly for now]
+    -> DONE
+= after
+The Meadow Park pond reeds sway gently in rhythm with the sleepy emerald harmony. # speaker: Fae # expr: happy # pose: idle
+-> DONE
+
+=== lullaby_woods ===
+{lullaby_note_woods: -> after}
+A mossy hollow Echo Stone sits beneath the tall pines of Whispering Woods, catching every hush of wind. # speaker: Fae # expr: happy # pose: idle
+{not has_flute:
+    The forest canopy sounds like a wooden music box waiting for a flute! # speaker: Fae # expr: neutral # pose: idle
+    -> DONE
+}
++ [Play the Harmony Flute here!]
+    Fae plays a soft, dreamy lullaby note on her Harmony Flute under the whispering pines! # speaker: Fae # expr: happy # pose: tool_flute # sound: flute-yellow
+    ~ lullaby_note_woods = true
+    Wooo-laaa-hmm! Golden pine needles shimmer as the woods echo a warm bedtime chord! ({lullaby_count()}/3 notes captured!) # speaker: Fae # expr: surprised # pose: cheer # sound: chime-yellow
+    {lullaby_count() >= 3: That's all three valley echoes! Let's take our Sleepy Lullaby straight back to Toby at Bon Appetit Cafe! # speaker: Fae # expr: happy # pose: cheer}
+    -> DONE
++ [Listen quietly for now]
+    -> DONE
+= after
+The mossy Echo Stone hums quietly beneath the pines, holding its warm bedtime harmony. # speaker: Fae # expr: happy # pose: idle
+-> DONE
+
+// ---------------------------------------------------------------------------
+// 4. Chef Bea's Valley Spice Run (Coastal Sea-Salt, Alpine Pine-Sugar, Woodland Mint)
+// ---------------------------------------------------------------------------
+=== function valley_spice_count() ===
+~ temp total = 0
+{ valley_spice_salt:
+    ~ total += 1
+}
+{ valley_spice_pine:
+    ~ total += 1
+}
+{ valley_spice_mint:
+    ~ total += 1
+}
+~ return total
+
+=== bea_spice_run ===
+{valley_spice_count() >= 3: -> complete}
+{valley_spice_quest: -> progress}
+~ valley_spice_quest = true
+Oh, sweetie, I've been dreaming up a brand-new Cloverhollow Festival pastry that celebrates every corner of our valley! # speaker: Chef Bea # expr: happy # pose: cheer
+To bake my Three-Biome Cloverhollow Tart, I need three fresh ingredients straight from the wilds: # speaker: Chef Bea # expr: determined # pose: talk
+Pink Coastal Sea-Salt from Bubblegum Bay's southern shore, Alpine Pine-Sugar from Pinecone Pass's eastern snowbank, and Woodland Mint from Whispering Woods! # speaker: Chef Bea # expr: happy # pose: talk
+If you gather all three on your travels, I'll bake the first golden batch just for your crew! # speaker: Chef Bea # expr: happy # pose: cheer
+Ooh, a Three-Biome Festival Tart! I'll forage every single flavor, Chef Bea! # speaker: Fae # expr: happy # pose: cheer # sound: chime-green
+-> DONE
+
+= progress
+Let's check your spice satchel: {valley_spice_count()} of 3 regional festival ingredients gathered so far! # speaker: Chef Bea # expr: happy # pose: talk
+{not valley_spice_salt: Check the sunny tide stones on the south shore of Bubblegum Bay for sparkling Coastal Sea-Salt! # speaker: Chef Bea # expr: neutral # pose: talk}
+{not valley_spice_pine: Look along the frosted eastern pine bank at Pinecone Pass for sweet Alpine Pine-Sugar! # speaker: Chef Bea # expr: neutral # pose: talk}
+{not valley_spice_mint: And sniff near the mossy west clearing of Whispering Woods for fresh Woodland Mint! # speaker: Chef Bea # expr: neutral # pose: talk}
+I'll bring back the whole spice rainbow, Chef Bea! # speaker: Fae # expr: determined # pose: cheer
+-> DONE
+
+= complete
+~ valley_spice_quest = true
+~ valley_spice_done = true
+OH MY STARS! Sparkling sea-salt, frosted pine-sugar, AND crisp woodland mint, fresh as morning dew! # speaker: Chef Bea # expr: surprised # pose: cheer
+Stand back, sweetie, the Bon Appetit oven is working pure Cloverhollow magic! # speaker: Chef Bea # expr: happy # pose: cheer # sound: chime-yellow
+A golden, flaky Three-Biome Cloverhollow Tart slides out of the oven smelling like sea breeze, snowy cocoa, and sweet forest clover! # speaker: Fae # expr: surprised # pose: cheer
+{withParty("sue"): Wait, salty-sweet crust AND fresh mint glaze?! Chef Bea, you're a culinary wizard! # speaker: Sue # expr: happy # pose: cheer}
+{withParty("jordan"): That pine-sugar crunch tastes just like sunrise on Pinecone Pass! # speaker: Jordan # expr: happy # pose: cheer}
+Here is your chef's honor reward: thirty shiny coins, two warm festival tart snacks, and a jar of Sunberry Nectar! # speaker: Chef Bea # expr: happy # pose: cheer # gift: coins 30 # gift: snack 2 # gift: treat sunberry-nectar 1 # sound: chime-red
+Thank you, Chef Bea! Best pastry in the whole valley! # speaker: Fae # expr: happy # pose: cheer
+-> DONE
+
+=== spice_sea_salt ===
+{valley_spice_salt: -> after}
+Glistening pink-and-white sea-salt crystals sparkle in a sun-baked hollow along Bubblegum Bay's shore! # speaker: Fae # expr: surprised # pose: idle
+{not (valley_spice_quest or spice_returned):
+    They smell crisp like ocean spray! Bet Chef Bea at Bon Appetit Cafe could bake wonders with these once her kitchen is back on track. # speaker: Fae # expr: happy # pose: talk
+    -> DONE
+}
+~ valley_spice_salt = true
+Fae scoops a tidy paper packet of sparkling Coastal Sea-Salt for Chef Bea! ({valley_spice_count()}/3 festival spices!) # speaker: Fae # expr: happy # pose: cheer # sound: chime-blue
+{valley_spice_count() >= 3: That's all three regional spices! Back to Chef Bea at Bon Appetit Cafe for the Festival Tart! # speaker: Fae # expr: happy # pose: cheer}
+-> DONE
+= after
+Tiny pink sea-salt crystals continue drying in the warm Bubblegum Bay sun. # speaker: Fae # expr: happy # pose: idle
+-> DONE
+
+=== spice_pine_sugar ===
+{valley_spice_pine: -> after}
+Sweet, frosted amber pine-sugar droplets glint like tiny icicles along an eastern pine bank in Pinecone Pass! # speaker: Fae # expr: surprised # pose: idle
+{not (valley_spice_quest or spice_returned):
+    Smells like winter caramel and pine needles! Chef Bea at Bon Appetit Cafe would flip for this once she's baking again. # speaker: Fae # expr: happy # pose: talk
+    -> DONE
+}
+~ valley_spice_pine = true
+Fae wraps a cozy scoop of frosted Alpine Pine-Sugar in wax paper for Chef Bea! ({valley_spice_count()}/3 festival spices!) # speaker: Fae # expr: happy # pose: cheer # sound: chime-yellow
+{valley_spice_count() >= 3: All three regional spices gathered! Time to head back to Chef Bea at Bon Appetit Cafe! # speaker: Fae # expr: happy # pose: cheer}
+-> DONE
+= after
+Snow-dusted pine boughs smell faintly of sweet mountain sugar. # speaker: Fae # expr: happy # pose: idle
+-> DONE
+
+=== spice_woodland_mint ===
+{valley_spice_mint: -> after}
+Tufts of bright emerald Woodland Mint sprout beside a mossy stone in Whispering Woods, smelling cool and sweet! # speaker: Fae # expr: surprised # pose: idle
+{not (valley_spice_quest or spice_returned):
+    Ooh, what a cozy peppermint scent! Chef Bea at Bon Appetit Cafe would love these leaves once her spice rack is ready. # speaker: Fae # expr: happy # pose: talk
+    -> DONE
+}
+~ valley_spice_mint = true
+Fae picks a fragrant bundle of fresh Woodland Mint leaves for Chef Bea! ({valley_spice_count()}/3 festival spices!) # speaker: Fae # expr: happy # pose: cheer # sound: chime-green
+{valley_spice_count() >= 3: That's all three valley spices! Let's bring them to Chef Bea at Bon Appetit Cafe! # speaker: Fae # expr: happy # pose: cheer}
+-> DONE
+= after
+Fresh woodland mint leaves sway in the shady Whispering Woods breeze. # speaker: Fae # expr: happy # pose: idle
+-> DONE

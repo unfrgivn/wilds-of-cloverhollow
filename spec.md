@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 187)
+Last updated: 2026-11-27 (Milestone 189)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -2825,16 +2825,22 @@ trunks keep its two exits.
   opening line and a locked door's included.
 - Load validation (`src/content/story-checks.ts`, re-exported identically from
   `src/content/load.ts` via `parseStoryJson`, `storyTags`, `storyTagErrors`,
-  and `endingContentErrors`, Milestone 148) reads every tag in the compiled
+  `endingContentErrors`, `miloSecrecyErrors`, `STORY_EXPRESSIONS`, and
+  `STORY_POSES`, Milestones 148 & 189) reads every tag in the compiled
   story (`storyTags`: a
   tag's text follows its `#` command, and its `/#` may close in an enclosing
   container) and rejects a travel tag naming an unknown area or spawn, any
   `buy` tag but `snack <digits>`, any `gift` tag but `snack <count>`,
   `coins <count>`, or `treat <known-treat-id> <count>`, any `feed` tag but
   `snack <count>`, each count 1 or more,
-  and any `play` tag but `<game> <digits>` naming an arcade, cooking, fishing,
+  any `play` tag but `<game> <digits>` naming an arcade, cooking, fishing,
   or taco truck game (`claw`, `skee`, `mole`, `comet`, `cook-nuggets`,
-  `cook-mac`, `fish`, `taco`).
+  `cook-mac`, `fish`, `taco`), any `expr:` tag outside `STORY_EXPRESSIONS`
+  (`neutral`, `happy`, `worried`, `determined`, `surprised`), and any `pose:`
+  tag outside `STORY_POSES` (`idle`, `sit`, `cheer`, `shock`, `tool_lantern`,
+  `tool_lasso`, `tool_flute`, `talk`, `dash_lean`, with optional target prefix
+  `fae`, `maddie`, `sue`, `jordan`, or `party`). `miloSecrecyErrors` verifies
+  zero §1.2 Milo name leaks across all branches of pre-reveal knots.
 - A line may carry `# play: <game> <price>` (Milestone 44): the dialogue keeps
   it to its close, and then, if Fae has the coins, she pays them and the game
   opens (spec 8.2). It is the one place a game's price is set.
@@ -2855,9 +2861,47 @@ trunks keep its two exits.
   command, not only a knot's first line. `calmed` answers a set piece by its id
   from its own mood, and a species once Fae owns its sticker (she has calmed one
   of them, anywhere).
-- The flute (Milestone 47): a flute press, once `has_flute` is true and Fae is
-  free (no dialogue, battle, journal, or door), opens the story's `flute` knot
-  like a talk. Its first line plays the `flute` story sound.
+- The flute (Milestone 47, extended in Milestone 189): a flute press, once
+  `has_flute` is true and Fae is free (no dialogue, battle, journal, or door),
+  checks `findLullabyFluteSpot` (`src/core/heart-to-hearts.ts`) first when
+  Toby's Sleepy Lullaby quest (`lullaby_quest`) is active and opens an
+  unrecorded nearby musical landmark (`lullaby_plaza`, `lullaby_park`,
+  `lullaby_woods`, within 115 units); otherwise it opens the story's `flute`
+  knot like a talk. Its first line plays the `flute` story sound.
+- Party Heart-to-Hearts & Interactive Multi-Step Town Quests (Elevation Track
+  E11, Milestone 189):
+  - Six optional Heart-to-Heart scenes live in
+    `content/story/party/heart_to_hearts.ink` (included from
+    `content/story/main.ink` and tracked by pure `src/core/heart-to-hearts.ts`:
+    `HEART_TO_HEARTS`, `heartToHeartSpotsInArea`, `heartToHeartSummary`):
+    `h2h_fae_maddie` (Fae's Bedroom + Meadow Park unseen fallback, Mom & Dad's
+    journal gift when baby Oliver was born and Maddie curling up beside it on
+    night one per `NOTES.md`), `h2h_fae_sue` (Bubblegum Bay dock, sea-glass
+    compass courage), `h2h_fae_jordan` (Pinecone Pass lookout, taking a
+    breather from being the cheerful guide), `h2h_sue_jordan` (Bon Appetit
+    Café, hot cocoa vs. sea-salt taffy treaty), `h2h_clubhouse_trio`
+    (Clubhouse snack night found-family reflection strictly obeying §1.2
+    secrecy before `milo_revealed`), and `h2h_sanctuary_encore` (post-finale
+    Wildlife Sanctuary encore with Milo once `milo_revealed` is true).
+  - Active Heart-to-Heart spots participate in `targetInteractable` without
+    mutating static `area.interactables`, projecting a warm rose-blush
+    `♥ HEART` prompt cue (`tone: "heart"`, `.sticker-prompt.is-heart`,
+    `data-tone="heart"`, >= 8:1 contrast) in `computePromptScreenView` and
+    `createPrompt`. Completing scenes awards Journal memories, coins, snacks,
+    specialty treats, and `h2h_*_done` friendship flags (replayable without
+    re-granting gifts).
+  - Four tool-driven multi-step Living NPC quests live in
+    `content/story/town/living_npcs_valley.ink` and `living_npcs_wilds.ink`
+    (with tool-gated entry hooks in `shops.ink` and `homes.ink`): Grandpa
+    Barnaby's Star Chart (3 invisible Blacklight Lantern `glows` across
+    `plaza`, `bay`, `pass`), Rosie's Runaway Kite Chain (4 Rainbow Lasso
+    ribbon tails across `park`, `lane`, `crossing`, `boardwalk`), Toby's
+    Sleepy Lullaby (3 Harmony Flute musical landmarks across `plaza`, `park`,
+    `woods`), and Chef Bea's Valley Spice Run (Coastal Sea-Salt in `bay`,
+    Alpine Pine-Sugar in `pass`, Woodland Mint in `woods`). All new lines carry
+    validated `# expr:` and `# pose:` direction tags, zero §1.2 Milo leaks
+    (also tightening `journal.ink`'s Milo identity line behind
+    `milo_revealed`), and zero Save v10 or QA-pack hash drift.
 - The calm hook (Milestone 43): after every battle that ends in a calm (the
   reward's last confirm), the core runs the story's `on_calm` knot, if it has
   one, with the facts as they are then, and keeps the variables it sets. It

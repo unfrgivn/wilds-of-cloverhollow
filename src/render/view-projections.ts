@@ -43,6 +43,7 @@ export type PromptScreenView = {
   label: string;
   x: number;
   y: number;
+  tone?: "default" | "heart";
 };
 
 export type NoticeMarkView = {
@@ -362,11 +363,13 @@ export function computePromptScreenView(
     canvasWidth,
     canvasHeight,
   );
+  const isHeart = target.prompt === "Heart";
   return {
     visible: true,
-    label: (target.prompt ?? "Look").toUpperCase(),
+    label: isHeart ? "♥ HEART" : (target.prompt ?? "Look").toUpperCase(),
     x: point.x,
     y: point.y,
+    ...(isHeart ? { tone: "heart" } : {}),
   };
 }
 

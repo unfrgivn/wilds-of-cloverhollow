@@ -1,4 +1,18 @@
 === journal ===
+{milo_revealed and h2h_sanctuary_encore_done: Heart-to-Heart Memory: Maddie, Sue, Jordan, Milo, and I laughed in the sunlit Wildlife Sanctuary clover over our wildest dream-adventure moments! # speaker: Fae}
+{h2h_clubhouse_trio_done: Heart-to-Heart Memory: On Clubhouse Snack Night, Sue, Jordan, Maddie, and I toasted to our found family and promised to always listen first! # speaker: Fae}
+{h2h_sue_jordan_done: Heart-to-Heart Memory: Sue and Jordan settled their great Sea-Salt Taffy vs. Hot Cocoa debate at Bon Appetit Cafe with a Coast-Meets-Mountain Snack Treaty! # speaker: Fae}
+{h2h_fae_jordan_done: Heart-to-Heart Memory: At the Pinecone Pass lookout, Jordan opened up about always feeling pressure to be the cheerful guide, and we took a peaceful breather together. # speaker: Fae}
+{h2h_fae_sue_done: Heart-to-Heart Memory: On Bubblegum Bay's dock, Sue shared how rough waves smoothed her lucky sea-glass compass and why bravery means casting your line anyway. # speaker: Fae}
+{h2h_fae_maddie_done: Heart-to-Heart Memory: I looked back at page one of my journal with Maddie, remembering how Mom and Dad gave it to me when baby Oliver was born so I'd always feel special, and how Maddie curled up beside it on night one. # speaker: Fae}
+{valley_spice_done: Chef Bea baked her golden Three-Biome Cloverhollow Festival Tart from my Coastal Sea-Salt, Alpine Pine-Sugar, and Woodland Mint! # speaker: Fae}
+{valley_spice_quest and not valley_spice_done: Chef Bea's Valley Spice Run ({valley_spice_count()}/3): gather Coastal Sea-Salt at Bubblegum Bay, Alpine Pine-Sugar at Pinecone Pass, and Woodland Mint in Whispering Woods! # speaker: Fae}
+{lullaby_done: Toby and I composed the Sleepy Cloverhollow Lullaby from three Harmony Flute echoes across the Plaza, Meadow Park, and Whispering Woods! # speaker: Fae}
+{lullaby_quest and not lullaby_done: Toby's Sleepy Lullaby ({lullaby_count()}/3): play the Harmony Flute near the Plaza Fountain garden, Meadow Park pond reeds, and Whispering Woods Echo Stone! # speaker: Fae}
+{kite_chain_done: I tracked and lassoed all four of Rosie's runaway pastel kite ribbons from Meadow Park clear across East Road to Salt-Marsh Boardwalk! # speaker: Fae}
+{kite_chain_quest and not kite_chain_done: Rosie's Runaway Kite Chain ({kite_tail_count()}/4): lasso-snag her fluttering pastel ribbons in Meadow Park, Sunberry Lane, Willowbrook Crossing, and Salt-Marsh Boardwalk! # speaker: Fae}
+{star_chart_done: I traced all three invisible blacklight constellations across the Plaza, Bubblegum Bay, and Pinecone Pass to restore Grandpa Barnaby's observatory Star Chart! # speaker: Fae}
+{star_chart_quest and not star_chart_done: Grandpa Barnaby's Star Chart ({star_chart_count()}/3): shine the Blacklight Lantern across Cloverhollow Plaza, Bubblegum Bay, and Pinecone Pass's northern ridge! # speaker: Fae}
 {festival_toast_done: We raised a Sunny Cloverhollow Festival Toast at the Wildlife Sanctuary with Milo, Rosie, Dad, Chef Bea, Ranger Fern, Sue, Jordan, and Maddie! # speaker: Fae}
 {milo_revealed and not festival_toast_done: Cloverhollow is sunny again! Friends and calm critters are gathering at the Wildlife Sanctuary for a Celebration Festival! # speaker: Fae}
 {island_shells_solved: I played the four giant pastel seashells in harmony by Starlight Island's tide pool and uncovered a Tide-Pool Pearl Cache! # speaker: Fae}
@@ -40,7 +54,7 @@
 {cavern_chime_seen and not cavern_chime_rung: A golden star chime hangs high in Crystal Cavern's northeast arch, too high to reach. # speaker: Fae}
 {cavern_bridge_lit: Reading the glowing fairy mural in Crystal Cavern lit three crystal stepping stones across the stream! # speaker: Fae}
 {heard_wish and not calmed("hooded-kid"): The kid in the purple hood is waiting under the Ancient Tree. Their wish made all this fizz! # speaker: Fae}
-{calmed("hooded-kid"): The kid in the purple hood was MILO! He wished to be the best at everything, and the fizz got out of hand. # speaker: Fae}
+{milo_revealed and calmed("hooded-kid"): The kid in the purple hood was MILO! He wished to be the best at everything, and the fizz got out of hand. # speaker: Fae}
 {heard_wish: The fairies told me the Ancient Tree dreams the whole land, and a wish made the Mystic Pond fizz purple. # speaker: Fae}
 {seal_open: The bell-flower seal opened, and a warm forest glow shone beyond the stones. # speaker: Fae}
 {rope_bridge: I pulled the old rope bridge across the misty gully with my lasso. # speaker: Fae}

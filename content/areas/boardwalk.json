@@ -212,6 +212,15 @@
         "y": 420
       },
       "prompt": "Look"
+    },
+    {
+      "id": "kite-ribbon-boardwalk",
+      "knot": "kite_ribbon_boardwalk",
+      "point": {
+        "x": 1990,
+        "y": 400
+      },
+      "prompt": "Look"
     }
   ],
   "critters": [],

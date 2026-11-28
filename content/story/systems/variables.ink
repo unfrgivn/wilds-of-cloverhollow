@@ -224,3 +224,37 @@ VAR festival_rosie_gift = false
 VAR festival_dad_talked = false
 VAR festival_chef_talked = false
 VAR festival_toast_done = false
+
+// Elevation Track E11: Party Heart-to-Hearts (6 optional character scenes).
+VAR h2h_fae_maddie_done = false
+VAR h2h_fae_sue_done = false
+VAR h2h_fae_jordan_done = false
+VAR h2h_sue_jordan_done = false
+VAR h2h_clubhouse_trio_done = false
+VAR h2h_sanctuary_encore_done = false
+
+// Elevation Track E11: Interactive Multi-Step Living NPC Quests.
+VAR star_chart_quest = false
+VAR star_chart_plaza = false
+VAR star_chart_bay = false
+VAR star_chart_pass = false
+VAR star_chart_done = false
+
+VAR kite_chain_quest = false
+VAR kite_tail_park = false
+VAR kite_tail_lane = false
+VAR kite_tail_crossing = false
+VAR kite_tail_boardwalk = false
+VAR kite_chain_done = false
+
+VAR lullaby_quest = false
+VAR lullaby_note_plaza = false
+VAR lullaby_note_park = false
+VAR lullaby_note_woods = false
+VAR lullaby_done = false
+
+VAR valley_spice_quest = false
+VAR valley_spice_salt = false
+VAR valley_spice_pine = false
+VAR valley_spice_mint = false
+VAR valley_spice_done = false

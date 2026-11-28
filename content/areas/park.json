@@ -518,6 +518,24 @@
         "y": 575
       },
       "prompt": "Look"
+    },
+    {
+      "id": "kite-ribbon-park",
+      "knot": "kite_ribbon_park",
+      "point": {
+        "x": 1180,
+        "y": 620
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "lullaby-park",
+      "knot": "lullaby_park",
+      "point": {
+        "x": 640,
+        "y": 775
+      },
+      "prompt": "Look"
     }
   ],
   "spawns": {

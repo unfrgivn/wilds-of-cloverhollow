@@ -368,6 +368,24 @@
         "y": 820
       },
       "prompt": "Look"
+    },
+    {
+      "id": "lullaby-woods",
+      "knot": "lullaby_woods",
+      "point": {
+        "x": 710,
+        "y": 650
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "spice-woodland-mint",
+      "knot": "spice_woodland_mint",
+      "point": {
+        "x": 460,
+        "y": 840
+      },
+      "prompt": "Look"
     }
   ],
   "critters": [

@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 234)
+Last updated: 2026-11-28 (Milestone 235)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -678,6 +678,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   so iOS WKWebView and Safari auto-resume music and ambience after lock-screen
   or app-switch interruptions without violating initial browser autoplay gates;
   ambience crossfades (~0.7 s), schedules spatialized one-shot biome accents
+  (`createAmbienceAccents` extracted into `src/platform/ambience-accents.ts` and
+  routed into the `audio-scores` chunk in `vite.config.ts`, Milestone 235 / Track
+  E19U)
   across all 9 active ambience beds via `AMBIENCE_ACCENT_CADENCE_MS` (including
   `mountain-wind` sweeping alpine pine gusts with whisper-soft D6/F6 frost-bell
   harmonics and `arcade-hum` distant Star Racer cabinet twinkles, Milestone 152)
@@ -2612,7 +2615,10 @@ ios/            Capacitor iOS project (from Milestone 4).
       Milestone 198; drawing nothing extra on `classic` so uncustomized
       baselines stay pixel-identical).
     - Interactive hand-drawn storybook Decor Picker (`src/ui/decor-picker.ts`,
-      `src/ui/decor-picker.css`) opens in `clubhouse` or `bedroom` via `KeyB`
+      with modular section builders `buildDecorHeader`, `buildSwatchesSection`,
+      `buildPedestalsSection`, `buildShelfSection`, and `buildVisitorsSection`
+      extracted into `src/ui/decor-picker-sections.ts` in Milestone 235 / Track
+      E19U, styled by `src/ui/decor-picker.css`) opens in `clubhouse` or `bedroom` via `KeyB`
       or diegetic `# open-decor: clubhouse|bedroom` dialogue events emitted by
       `club_decor` / `bedroom_shelf`, pausing overworld ticks while open and
       autosaving decor changes cleanly. Milestone 202 (Track E19C) adds full
@@ -5577,11 +5583,16 @@ trunks keep its two exits.
   `Amber`, `Clover`) in canonical `STAR_GEM_VARIABLES` order with faceted
   jewel-tinted SVG icons (zero `<text>` nodes), found locations/notes for
   collected gems, Grandpa Barnaby's gentle italic field hints for undiscovered
-  gems, a `N/7` or golden `★ 7/7 COMPLETE!` header badge, full keyboard vertical
-  scrolling (`ArrowDown`/`ArrowUp`/`PageDown`/`PageUp`/`Home`/`End` via
-  `applyModalScrollKey` in `src/ui/journal-nav.ts`, plus `Enter`/`Space` on the
-  focused `×` close button, Milestone 204 / Track E19D), and clean dismiss on
-  backdrop click, `×` close button (44×44 px), `Escape`, `X`, or Gamepad `B`
+  gems, a `N/7` or golden `★ 7/7 COMPLETE!` header badge, full keyboard 2D
+  tile focus & scrolling parity (`role="list"` on `.journal-gems-grid`,
+  `tabIndex = 0` + `role="listitem"` + descriptive `aria-label` + WCAG
+  `:focus-visible` outline ring on every `.journal-gem-tile`, 2D
+  `ArrowRight`/`ArrowLeft`/`ArrowDown`/`ArrowUp`/`Home`/`End` tile stepping
+  with `scrollIntoView({ block: "nearest" })` and overflowing-card
+  `applyModalScrollKey` parity, plus `PageDown`/`PageUp` scrolling and
+  `Enter`/`Space` on the focused `×` close button, Milestones 204 & 235 / Track
+  E19U), and clean dismiss on
+  backdrop click, `×` close button (44×44 px), `Escape`, `X`, `B`, or Gamepad `B`
   restoring focus directly to `.journal-gems` and playing `card-open` /
   `card-close` UI foley via `onOverlayChange`.
 - **Valley Merit Ribbons & Live Stitched Ribbon-Earned Toast** (Elevation Track
@@ -5609,10 +5620,17 @@ trunks keep its two exits.
   `874×402` phone (2-column scrollable on narrow `< 680 px` viewports) with
   progress pills on locked ribbons and golden `★ 16/16 VALLEY LEGEND!`
   celebration (`"★ All 16 Valley Merit Ribbons Stitched — True Cloverhollow
-  Legend!"`) at `16/16`, full keyboard vertical scrolling
-  (`ArrowDown`/`ArrowUp`/`PageDown`/`PageUp`/`Home`/`End` via
-  `applyModalScrollKey`, plus `Enter`/`Space` on the focused `×` close button,
-  Milestone 204 / Track E19D), full `Escape`/`X`/`B`/backdrop/`×` dismiss,
+  Legend!"`) at `16/16`, full keyboard 2D tile focus & scrolling parity
+  (`role="list"` on `.journal-ribbons-grid`, `tabIndex = 0` + `role="listitem"`
+  + descriptive `aria-label` + WCAG `:focus-visible` outline ring on every
+  `.journal-ribbon-tile`, responsive 4-col / 2-col 2D
+  `ArrowRight`/`ArrowLeft`/`ArrowDown`/`ArrowUp`/`Home`/`End` tile stepping
+  with `scrollIntoView({ block: "nearest" })` and overflowing-card
+  `applyModalScrollKey` parity, plus `PageDown`/`PageUp` scrolling and
+  `Enter`/`Space` on the focused `×` close button, Milestones 204 & 235 / Track
+  E19U — completing 6-of-6 Journal collection modal keyboard & VoiceOver tile
+  parity alongside Heart-to-Hearts, Dream Encore, Sky Almanac, and Soundtrack
+  Album), full `Escape`/`X`/`B`/backdrop/`×` dismiss,
   reduced-motion and iOS tap-selection hygiene, and two zero-baseline-diff entry
   points: `.journal-ribbons-btn` (`"★ Ribbons · N/16"`) in the `FIELD TREASURES`
   modal header and the hand-stitched `.journal-ribbons-banner`

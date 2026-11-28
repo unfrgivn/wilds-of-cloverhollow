@@ -2403,7 +2403,8 @@
   -webkit-touch-callout: none;
   transition: transform 110ms ease-out, background-color 110ms ease-out;
 }
-.journal-gems-close:focus-visible {
+.journal-gems-close:focus-visible,
+.journal-gem-tile:focus-visible {
   outline: 3px solid #6b9e56;
   outline-offset: 2px;
 }

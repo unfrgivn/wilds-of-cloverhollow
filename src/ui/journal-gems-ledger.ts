@@ -61,11 +61,26 @@ function isFocusableTarget(node: HTMLElement | null): node is HTMLElement {
   return node !== null && node.isConnected && node.closest("[hidden]") === null;
 }
 
+function gemGridColumns(grid: HTMLElement): number {
+  if (typeof window === "undefined") return 2;
+  const raw = window.getComputedStyle(grid).gridTemplateColumns.trim();
+  if (raw !== "" && raw !== "none" && !raw.includes("(")) {
+    return Math.max(1, raw.split(/\s+/).length);
+  }
+  return window.innerWidth <= 560 ? 1 : 2;
+}
+
 function buildGemTile(entry: StarGemEntry): HTMLDivElement {
   const tile = element(
     "div",
     entry.found ? "journal-gem-tile is-found" : "journal-gem-tile is-missing",
   );
+  tile.tabIndex = 0;
+  setAttribute(tile, "role", "listitem");
+  const ariaLabel = entry.found
+    ? `${entry.name} (${entry.areaName}) — Found: ${entry.foundNote}`
+    : `Undiscovered Star Gem (${entry.areaName}) — Not yet found: ${entry.hint}`;
+  setAttribute(tile, "aria-label", ariaLabel);
   setAttribute(tile, "data-gem", entry.id);
   setAttribute(tile, "data-found", String(entry.found));
 
@@ -122,6 +137,7 @@ export function createJournalGemsLedger(options?: {
   head.append(titleWrap, closeBtn);
 
   const grid = element("div", "journal-gems-grid");
+  grid.setAttribute("role", "list");
   const footer = element("p", "journal-gems-footer");
 
   card.append(head, grid, footer);
@@ -129,6 +145,7 @@ export function createJournalGemsLedger(options?: {
 
   let openState = false;
   let signature = "";
+  let tiles: HTMLDivElement[] = [];
   let returnFocusEl: HTMLElement | null = null;
 
   const clear = (): void => {
@@ -161,7 +178,8 @@ export function createJournalGemsLedger(options?: {
     const complete = total > 0 && foundCount >= total;
     count.classList.toggle("is-complete", complete);
     setText(count, complete ? `★ ${foundCount}/${total} COMPLETE!` : `${foundCount}/${total}`);
-    grid.replaceChildren(...gems.map(buildGemTile));
+    tiles = gems.map(buildGemTile);
+    grid.replaceChildren(...tiles);
     footer.classList.toggle("is-complete", complete);
     setText(
       footer,
@@ -201,16 +219,49 @@ export function createJournalGemsLedger(options?: {
     isOpen: () => openState,
     handleKeydown: (event) => {
       if (!openState) return false;
-      if (
-        event.key === "Escape" ||
-        ((event.key === "Enter" || event.key === " ") && document.activeElement === closeBtn)
-      ) {
+      const stop = (): void => {
         event.preventDefault();
         event.stopPropagation();
+      };
+      const key = event.key;
+      if (["Escape", "x", "X", "b", "B"].includes(key)) {
+        stop();
         close();
-      } else if (applyModalScrollKey([grid, card], event.key)) {
-        event.preventDefault();
-        event.stopPropagation();
+        return true;
+      }
+      if ((key === "Enter" || key === " ") && document.activeElement === closeBtn) {
+        stop();
+        close();
+        return true;
+      }
+      if (key === "PageDown" || key === "PageUp") {
+        stop();
+        applyModalScrollKey([grid, card], key);
+        return true;
+      }
+      const len = tiles.length;
+      if (len === 0) return true;
+      const cols = gemGridColumns(grid);
+      const idx = tiles.findIndex((tile) => tile === document.activeElement);
+      const next =
+        key === "Home" ? 0
+        : key === "End" ? len - 1
+        : key === "ArrowRight" ? (idx === -1 ? 0 : (idx + 1) % len)
+        : key === "ArrowLeft" ? (idx === -1 ? len - 1 : (idx - 1 + len) % len)
+        : key === "ArrowDown" ? (idx === -1 ? 0 : (idx + cols) % len)
+        : key === "ArrowUp" ? (idx === -1 ? len - 1 : (idx - cols + len) % len)
+        : null;
+      if (next !== null) {
+        stop();
+        const beforeTop = card.scrollTop;
+        const target = tiles[next];
+        target?.focus({ preventScroll: true });
+        target?.scrollIntoView?.({ block: "nearest" });
+        const scrollFallback =
+          (key === "ArrowDown" || key === "ArrowUp") && idx === -1 && card.scrollTop === beforeTop;
+        if (key === "Home" || key === "End" || scrollFallback) {
+          applyModalScrollKey([grid, card], key);
+        }
       }
       return true;
     },

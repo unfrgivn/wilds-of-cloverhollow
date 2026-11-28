@@ -9924,6 +9924,40 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   story + harness checks green), Chromium & WebKit (`milestone-234`,
   `milestone-233`, `milestone-232`, `milestone-113`, `milestone-115`), and 1/1
   Chromium (`encore-shrine`).
+
+## Milestone 235: Complete 6-of-6 Journal Collection Modal 2D Keyboard & VoiceOver Tile Parity (`Ribbons` & `Star Gems`) + `decor-picker-sections.ts` & `ambience-accents.ts` Modular Splits (Elevation Track E19U) **Status:** ✅ Completed (2026-11-28)
+- 6-of-6 Journal Collection Modal 2D Keyboard & VoiceOver Tile Parity
+  (`src/ui/journal-ribbons.ts`, `src/ui/journal-ribbons.css`,
+  `src/ui/journal-gems-ledger.ts`, `src/ui/journal.css`):
+  - Adds `role="list"` on `.journal-ribbons-grid` and `.journal-gems-grid`, plus
+    `tabIndex = 0`, `role="listitem"`, descriptive status/detail `aria-label`s,
+    and WCAG `#6b9e56` `:focus-visible` outline rings on every
+    `.journal-ribbon-tile` and `.journal-gem-tile`.
+  - Upgrades both modals' `handleKeydown` to full responsive 2D Arrow-key /
+    `Home` / `End` tile stepping with `scrollIntoView({ block: "nearest" })` and
+    overflowing-card `applyModalScrollKey` compatibility alongside `Escape`/`X`/`B`
+    dismiss and `PageDown`/`PageUp` scrolling.
+- Modular `src/ui/decor-picker-sections.ts` extraction (`src/ui/decor-picker.ts`
+  `667 -> 353` lines, `src/ui/decor-picker-sections.ts` `344` lines):
+  - Extracts `buildDecorHeader`, `buildSwatchesSection`, `buildPedestalsSection`,
+    `buildShelfSection`, `buildVisitorsSection`, and `el` cleanly while keeping
+    every public export and DOM attribute of `src/ui/decor-picker.ts` identical.
+- Modular `src/platform/ambience-accents.ts` extraction (`src/platform/ambience.ts`
+  `627 -> 351` lines, `src/platform/ambience-accents.ts` `297` lines):
+  - Extracts `createAmbienceAccents` (stereo-panned periodic acoustic accent
+    synthesizers) cleanly while preserving all 9 `scheduleAccent` cadence hooks
+    and public exports in `src/platform/ambience.ts`, and routes
+    `ambience-accents.ts` into the `audio-scores` chunk in `vite.config.ts`.
+- Evidence: `tests/unit/milestone-235.test.ts` and
+  `tests/e2e/milestone-235.spec.ts` (`@smoke`, Chromium & WebKit).
+- Gates: `just check` (303 unit files / 2,144 tests, all 77 recorded + 7
+  headless sims with zero hash shifts, 23 QA packs, purity, lint), `just build`
+  (largest non-vendor production chunk `index` `360.61 kB < 365 kB`, hook leak
+  + runtime story + harness checks green), 30/30 Chromium & WebKit
+  (`milestone-235`, `milestone-204`, `milestone-171`, `milestone-178`,
+  `milestone-201`, `milestone-202`, `soundtrack`), and 3/3 Chromium
+  (`e9b-decor-economy`).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

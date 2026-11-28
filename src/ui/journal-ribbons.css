@@ -44,6 +44,7 @@
 
 .journal-ribbons-btn:focus-visible,
 .journal-ribbons-banner:focus-visible,
+.journal-ribbon-tile:focus-visible,
 .journal-ribbons-close:focus-visible {
   outline: 3px solid #6b9e56;
   outline-offset: 2px;

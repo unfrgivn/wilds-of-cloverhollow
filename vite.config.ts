@@ -17,7 +17,7 @@ export const chunkGroups: ChunkGroup[] = [
     test: new RegExp(
       "/src/platform/(" +
         "scores(-[a-z]+)?|audio-(recipes|cue-recipes|effects|playback|settings)|" +
-        "voice(s|-catalog)|music-(synth|mix)|(weather-)?ambience|home-record-prefs" +
+        "voice(s|-catalog)|music-(synth|mix)|(weather-)?ambience(-accents)?|home-record-prefs" +
         ")\\.ts",
     ),
     priority: 18,

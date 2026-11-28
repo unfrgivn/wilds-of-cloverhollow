@@ -39,40 +39,29 @@ function ribbonMotif(ribbon: MeritRibbonEntry): RibbonMotif {
 function motifMarkup(motif: RibbonMotif, fill: string, stroke: string, earned: boolean): string {
   const f = earned ? fill : "none";
   const sw = earned ? "1.15" : "1.35";
+  const s = `fill="${f}" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round"`;
   if (motif === "heart") {
     return (
       `<path d="M 18 20.4 C 14.3 17.8 13.2 15.6 13.2 14.3 C 13.2 12.8 14.4 11.9 15.7 11.9 ` +
       `C 16.7 11.9 17.5 12.5 18 13.3 C 18.5 12.5 19.3 11.9 20.3 11.9 ` +
-      `C 21.6 11.9 22.8 12.8 22.8 14.3 C 22.8 15.6 21.7 17.8 18 20.4 Z" ` +
-      `fill="${f}" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round"/>`
+      `C 21.6 11.9 22.8 12.8 22.8 14.3 C 22.8 15.6 21.7 17.8 18 20.4 Z" ${s}/>`
     );
   }
   if (motif === "gem") {
-    return (
-      `<polygon points="15.3,12 20.7,12 23,14.9 18,20.5 13,14.9" ` +
-      `fill="${f}" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round"/>` +
-      `<path d="M 13.5 14.9 H 22.5" stroke="${stroke}" stroke-width="0.95" opacity="0.7"/>`
-    );
+    return `<polygon points="15.3,12 20.7,12 23,14.9 18,20.5 13,14.9" ${s}/>` +
+      `<path d="M 13.5 14.9 H 22.5" stroke="${stroke}" stroke-width="0.95" opacity="0.7"/>`;
   }
   if (motif === "wave") {
-    return (
-      `<path d="M 12.8 15.1 Q 15.4 12.3 18 15.1 T 23.2 15.1 ` +
+    return `<path d="M 12.8 15.1 Q 15.4 12.3 18 15.1 T 23.2 15.1 ` +
       `M 13.4 18.6 Q 15.7 16.3 18 18.6 T 22.6 18.6" fill="none" ` +
-      `stroke="${earned ? "#47321f" : stroke}" stroke-width="1.55" stroke-linecap="round"/>`
-    );
+      `stroke="${earned ? "#47321f" : stroke}" stroke-width="1.55" stroke-linecap="round"/>`;
   }
   if (motif === "crown") {
-    return (
-      `<path d="M 13.2 19.3 L 12.8 13.9 L 15.8 16.1 L 18 12.3 L 20.2 16.1 ` +
-      `L 23.2 13.9 L 22.8 19.3 Z" fill="${f}" stroke="${stroke}" ` +
-      `stroke-width="${sw}" stroke-linejoin="round"/>`
-    );
+    return `<path d="M 13.2 19.3 L 12.8 13.9 L 15.8 16.1 L 18 12.3 L 20.2 16.1 ` +
+      `L 23.2 13.9 L 22.8 19.3 Z" ${s}/>`;
   }
-  return (
-    `<path d="M 18 11.2 L 19.4 14.2 L 22.7 14.6 L 20.2 16.8 L 20.9 20.1 ` +
-    `L 18 18.3 L 15.1 20.1 L 15.8 16.8 L 13.3 14.6 L 16.6 14.2 Z" ` +
-    `fill="${f}" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round"/>`
-  );
+  return `<path d="M 18 11.2 L 19.4 14.2 L 22.7 14.6 L 20.2 16.8 L 20.9 20.1 ` +
+    `L 18 18.3 L 15.1 20.1 L 15.8 16.8 L 13.3 14.6 L 16.6 14.2 Z" ${s}/>`;
 }
 
 /** Pure inner SVG markup for a stitched Valley Merit Ribbon rosette (zero `<text>` nodes). */
@@ -138,29 +127,37 @@ function isFocusableTarget(node: HTMLElement | null): node is HTMLElement {
   return node !== null && node.isConnected && node.closest("[hidden]") === null;
 }
 
+function ribbonGridColumns(grid: HTMLElement): number {
+  if (typeof window === "undefined") return 4;
+  const raw = window.getComputedStyle(grid).gridTemplateColumns.trim();
+  if (raw !== "" && raw !== "none" && !raw.includes("(")) {
+    return Math.max(1, raw.split(/\s+/).length);
+  }
+  return window.innerWidth <= 680 ? 2 : 4;
+}
+
 function buildRibbonTile(ribbon: MeritRibbonEntry): HTMLDivElement {
   const tile = element("div", `journal-ribbon-tile ${ribbon.earned ? "is-earned" : "is-locked"}`);
+  tile.tabIndex = 0;
+  setAttribute(tile, "role", "listitem");
+  const status = ribbon.earned ? "Earned" : `Locked (${ribbon.progressText})`;
+  setAttribute(tile, "aria-label", `${ribbon.title} — ${status}: ${ribbon.description}`);
   setAttribute(tile, "data-ribbon", ribbon.id);
   setAttribute(tile, "data-category", ribbon.category);
   setAttribute(tile, "data-earned", String(ribbon.earned));
   if (ribbon.earned) tile.style.borderLeftColor = ribbon.color;
-  const emblemWrap = element("div", "journal-ribbon-emblem-wrap");
+  const emblemWrap = element("div", "journal-ribbon-emblem-wrap", tile);
   if (ribbon.earned) emblemWrap.style.borderColor = ribbon.color;
   emblemWrap.append(createMeritRibbonEmblem(ribbon));
-  const copy = element("div", "journal-ribbon-copy");
-  const top = element("div", "journal-ribbon-top");
-  const name = element("span", "journal-ribbon-name");
-  name.textContent = ribbon.earned ? `${ribbon.title} ★` : ribbon.title;
-  top.append(name);
+  const copy = element("div", "journal-ribbon-copy", tile);
+  const top = element("div", "journal-ribbon-top", copy);
+  element("span", "journal-ribbon-name", top).textContent = ribbon.earned
+    ? `${ribbon.title} ★`
+    : ribbon.title;
   if (!ribbon.earned) {
-    const progress = element("span", "journal-ribbon-progress");
-    progress.textContent = ribbon.progressText;
-    top.append(progress);
+    element("span", "journal-ribbon-progress", top).textContent = ribbon.progressText;
   }
-  const desc = element("p", "journal-ribbon-desc");
-  desc.textContent = ribbon.description;
-  copy.append(top, desc);
-  tile.append(emblemWrap, copy);
+  element("p", "journal-ribbon-desc", copy).textContent = ribbon.description;
   return tile;
 }
 
@@ -180,40 +177,36 @@ export function createJournalRibbonsShowcase(options?: {
 }): JournalRibbonsShowcase {
   const overlay = element("div", "journal-ribbons-overlay");
   overlay.hidden = true;
-  const card = element("article", "journal-ribbons-card");
+  const card = element("article", "journal-ribbons-card", overlay);
   card.tabIndex = -1;
-  card.setAttribute("role", "dialog");
-  card.setAttribute("aria-modal", "true");
-  card.setAttribute("aria-label", "Valley Merit Ribbons");
-  const head = element("div", "journal-ribbons-head");
-  const titleWrap = element("div", "journal-ribbons-title-wrap");
+  setAttribute(card, "role", "dialog");
+  setAttribute(card, "aria-modal", "true");
+  setAttribute(card, "aria-label", "Valley Merit Ribbons");
+  const head = element("div", "journal-ribbons-head", card);
+  const titleWrap = element("div", "journal-ribbons-title-wrap", head);
   const title = element("h3", "journal-ribbons-title");
   title.textContent = "VALLEY MERIT RIBBONS";
   const count = element("span", "journal-ribbons-count");
   titleWrap.append(createHeaderRibbonEmblem("journal-ribbons-emblem"), title, count);
   const closeBtn = makeRibbonButton("journal-ribbons-close", "Close Valley Merit Ribbons", "×");
-  head.append(titleWrap, closeBtn);
-  const grid = element("div", "journal-ribbons-grid");
-  const footer = element("p", "journal-ribbons-footer");
-  card.append(head, grid, footer);
-  overlay.append(card);
+  head.append(closeBtn);
+  const grid = element("div", "journal-ribbons-grid", card);
+  setAttribute(grid, "role", "list");
+  const footer = element("p", "journal-ribbons-footer", card);
 
   const treasuresBtn = makeRibbonButton(
-    "journal-ribbons-btn",
-    "Inspect Valley Merit Ribbons",
-    "★ Ribbons · 0/16",
+    "journal-ribbons-btn", "Inspect Valley Merit Ribbons", "★ Ribbons · 0/16",
   );
   const banner = makeRibbonButton("journal-ribbons-banner", "Inspect Valley Merit Ribbons");
   banner.hidden = true;
-  const bannerMain = element("span", "journal-ribbons-banner-main");
+  const bannerMain = element("span", "journal-ribbons-banner-main", banner);
   const bannerLabel = element("span", "journal-ribbons-banner-label");
   bannerMain.append(createHeaderRibbonEmblem("journal-ribbons-banner-emblem"), bannerLabel);
-  const bannerCta = element("span", "journal-ribbons-banner-cta");
-  bannerCta.textContent = "View ›";
-  banner.append(bannerMain, bannerCta);
+  element("span", "journal-ribbons-banner-cta", banner).textContent = "View ›";
 
   let openState = false;
   let signature = "";
+  let tiles: HTMLDivElement[] = [];
   let returnFocusEl: HTMLElement | null = null;
 
   const clear = (): void => {
@@ -222,7 +215,6 @@ export function createJournalRibbonsShowcase(options?: {
     openState = false;
     overlay.hidden = true;
   };
-
   const close = (): void => {
     if (!openState && overlay.hidden) return;
     const target = returnFocusEl;
@@ -231,39 +223,26 @@ export function createJournalRibbonsShowcase(options?: {
     options?.onVisibilityChange?.(false);
     if (isFocusableTarget(target)) target.focus({ preventScroll: true });
   };
-
   const sync = (summary: MeritRibbonSummary): void => {
-    if (!openState) {
-      if (!overlay.hidden) clear();
-      return;
-    }
+    if (!openState) { if (!overlay.hidden) clear(); return; }
     overlay.hidden = false;
-    const nextSignature = summary.ribbons
-      .map((item) => `${item.id}:${item.earned}:${item.progressText}`)
-      .join("|");
-    if (nextSignature === signature) return;
-    signature = nextSignature;
+    const nextSig = summary.ribbons
+      .map((item) => `${item.id}:${item.earned}:${item.progressText}`).join("|");
+    if (nextSig === signature) return;
+    signature = nextSig;
     count.classList.toggle("is-complete", summary.complete);
-    setText(
-      count,
-      summary.complete
-        ? `★ ${summary.earned}/${summary.total} VALLEY LEGEND!`
-        : `${summary.earned}/${summary.total}`,
-    );
-    grid.replaceChildren(...summary.ribbons.map(buildRibbonTile));
+    setText(count, summary.complete
+      ? `★ ${summary.earned}/${summary.total} VALLEY LEGEND!`
+      : `${summary.earned}/${summary.total}`);
+    tiles = summary.ribbons.map(buildRibbonTile);
+    grid.replaceChildren(...tiles);
     footer.classList.toggle("is-complete", summary.complete);
-    setText(
-      footer,
-      summary.complete
-        ? "★ All 16 Valley Merit Ribbons Stitched — True Cloverhollow Legend!"
-        : "Earn Merit Ribbons across Cloverhollow's stories, wilds, and arcades!",
-    );
+    setText(footer, summary.complete
+      ? "★ All 16 Valley Merit Ribbons Stitched — True Cloverhollow Legend!"
+      : "Earn Merit Ribbons across Cloverhollow's stories, wilds, and arcades!");
   };
-
   const syncTriggers = (
-    summary: MeritRibbonSummary,
-    showBanner: boolean,
-    anchor?: Element,
+    summary: MeritRibbonSummary, showBanner: boolean, anchor?: Element,
   ): void => {
     const aria = `Inspect Valley Merit Ribbons, ${summary.earned} of ${summary.total} earned`;
     treasuresBtn.classList.toggle("is-complete", summary.complete);
@@ -280,9 +259,7 @@ export function createJournalRibbonsShowcase(options?: {
   };
 
   closeBtn.addEventListener("click", close);
-  overlay.addEventListener("click", (event) => {
-    if (event.target === overlay) close();
-  });
+  overlay.addEventListener("click", (event) => { if (event.target === overlay) close(); });
 
   return {
     overlay, banner, treasuresBtn,
@@ -302,16 +279,36 @@ export function createJournalRibbonsShowcase(options?: {
     isOpen: () => openState,
     handleKeydown: (event) => {
       if (!openState) return false;
-      if (
-        event.key === "Escape" ||
-        ((event.key === "Enter" || event.key === " ") && document.activeElement === closeBtn)
-      ) {
-        event.preventDefault();
-        event.stopPropagation();
-        close();
-      } else if (applyModalScrollKey([grid, card], event.key)) {
-        event.preventDefault();
-        event.stopPropagation();
+      const stop = (): void => { event.preventDefault(); event.stopPropagation(); };
+      const key = event.key;
+      if (["Escape", "x", "X", "b", "B"].includes(key)) { stop(); close(); return true; }
+      if ((key === "Enter" || key === " ") && document.activeElement === closeBtn) {
+        stop(); close(); return true;
+      }
+      if (key === "PageDown" || key === "PageUp") {
+        stop(); applyModalScrollKey([grid, card], key); return true;
+      }
+      const len = tiles.length;
+      if (len === 0) return true;
+      const cols = ribbonGridColumns(grid);
+      const idx = tiles.findIndex((tile) => tile === document.activeElement);
+      const next =
+        key === "Home" ? 0 : key === "End" ? len - 1
+        : key === "ArrowRight" ? (idx === -1 ? 0 : (idx + 1) % len)
+        : key === "ArrowLeft" ? (idx === -1 ? len - 1 : (idx - 1 + len) % len)
+        : key === "ArrowDown" ? (idx === -1 ? 0 : (idx + cols) % len)
+        : key === "ArrowUp" ? (idx === -1 ? len - 1 : (idx - cols + len) % len) : null;
+      if (next !== null) {
+        stop();
+        const beforeTop = card.scrollTop;
+        const target = tiles[next];
+        target?.focus({ preventScroll: true });
+        target?.scrollIntoView?.({ block: "nearest" });
+        const scrollFallback =
+          (key === "ArrowDown" || key === "ArrowUp") && idx === -1 && card.scrollTop === beforeTop;
+        if (key === "Home" || key === "End" || scrollFallback) {
+          applyModalScrollKey([grid, card], key);
+        }
       }
       return true;
     },

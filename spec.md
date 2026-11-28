@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 200)
+Last updated: 2026-11-28 (Milestone 201)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -5194,31 +5194,51 @@ trunks keep its two exits.
   backdrop click, `×` close button (44×44 px), `Escape`, `X`, or Gamepad `B`
   restoring focus directly to `.journal-gems` and playing `card-open` /
   `card-close` UI foley via `onOverlayChange`.
-- **Valley Merit Ribbons** (Elevation Track E18B, Milestone 176, Owner-Unlocked
-  §13): pure zero-DOM engine (`src/core/ribbons.ts`) defining 12 full-journey
-  achievements (`MERIT_RIBBON_IDS`: `first-friend`, `party-reunited`,
-  `star-line-explorer`, `gem-scholar`, `master-angler`, `arcade-champion`,
-  `taco-fiesta`, `sanctuary-guardian`, `neighborhood-hearts`,
-  `alpine-stargazer`, `starlight-keeper`, `valley-legend`) across categories
-  `"story" | "explore" | "arcade" | "mastery"` with twin parity evaluators
-  `evaluateMeritRibbons` (core world/state/records) and
-  `evaluateMeritRibbonsFromJournal` (rendered `JournalView` projection, zero
-  save-version changes and zero `view-models.ts` drift). Surfaced via a
+- **Valley Merit Ribbons & Live Stitched Ribbon-Earned Toast** (Elevation Track
+  E18B, Milestone 176, expanded to the **Grand 16-Ribbon Tapestry** in Milestone
+  200, Owner-Unlocked §13): pure zero-DOM engine (`src/core/ribbons.ts`) defining
+  16 canonical full-journey achievements (`MERIT_RIBBON_IDS`: `first-friend`,
+  `party-reunited`, `star-line-explorer`, `gem-scholar`, `master-angler`,
+  `arcade-champion`, `taco-fiesta`, `sanctuary-guardian`, `neighborhood-hearts`,
+  `alpine-stargazer`, `starlight-keeper`, `heart-collector`, `encore-star`,
+  `cozy-decorator`, `puzzle-solver`, and crowning 16th `valley-legend`) across
+  categories `"story" | "explore" | "arcade" | "mastery"` with twin parity
+  evaluators `evaluateMeritRibbons` (core world/state/records),
+  `evaluateMeritRibbonsFromJournal` (rendered `JournalView` projection via
+  `buildJournalView` in `src/shell/view-models.ts`, zero save-version or
+  `sim.ts` changes), pure customization/trophy/puzzle counters
+  (`countEncoreTrophies`, `countDecorCustomizations`, `countSolvedPuzzles`), and
+  pure unlock diff helper `newlyEarnedRibbons(prev, next)`. Surfaced via a
   hand-stitched watercolor showcase modal (`src/ui/journal-ribbons.ts` +
   `src/ui/journal-ribbons.css`, composed into `createJournalFieldOverlays` in
   `src/ui/journal-field-note.ts` and mounted in `src/ui/journal.ts`) featuring
   hand-inked stitched rosette medallions (`createMeritRibbonEmblem` /
   `meritRibbonEmblemMarkup`, twin notched tails, dashed needlework ring,
   `heart`/`star`/`gem`/`wave`/`crown` motifs, zero `<text>` SVG nodes), a
-  3-column × 4-row grid with progress pills on locked ribbons and golden
-  `★ 12/12 VALLEY LEGEND!` celebration at 12/12, full `Escape`/`X`/`B`/backdrop/
-  `×` dismiss, reduced-motion and iOS tap-selection hygiene, and two
-  zero-baseline-diff entry points: `.journal-ribbons-btn` (`"★ Ribbons · N/12"`)
-  in the `FIELD TREASURES` modal header and the hand-stitched
-  `.journal-ribbons-banner` (`"★ Valley Merit Ribbons · N/12"`) below
-  `keepsakesGrid` on `STICKERS` (hidden and detached whenever
-  `view.keepsakes === undefined` or `stickersOwned === 0 && earned === 0`),
-  restoring focus directly to the triggering button on dismiss.
+  balanced **4-column × 4-row** grand tapestry at both `1280×720` desktop and
+  `874×402` phone (2-column scrollable on narrow `< 680 px` viewports) with
+  progress pills on locked ribbons and golden `★ 16/16 VALLEY LEGEND!`
+  celebration (`"★ All 16 Valley Merit Ribbons Stitched — True Cloverhollow
+  Legend!"`) at `16/16`, full `Escape`/`X`/`B`/backdrop/`×` dismiss,
+  reduced-motion and iOS tap-selection hygiene, and two zero-baseline-diff entry
+  points: `.journal-ribbons-btn` (`"★ Ribbons · N/16"`) in the `FIELD TREASURES`
+  modal header and the hand-stitched `.journal-ribbons-banner`
+  (`"★ Valley Merit Ribbons · N/16"`) below `keepsakesGrid` on `STICKERS`
+  (hidden and detached whenever `view.keepsakes === undefined` or
+  `stickersOwned === 0 && earned === 0`), restoring focus directly to the
+  triggering button on dismiss. During live real-time gameplay (`!paused &&
+  !harnessStepping && titleMode === null`), `createRibbonCelebrationSync`
+  (`src/shell/feedback.ts`, wired in `src/main.ts` and reset on load/reset/new
+  game/QA switch so paused harness steps and saves never emit false toasts)
+  watches newly unlocked ribbons via `newlyEarnedRibbons`, enqueues a die-cut
+  cream-and-gold **Merit Ribbon Earned Toast** (`src/ui/ribbon-toast.ts` +
+  `src/ui/ribbon-toast.css`, `RIBBON_TOAST_DURATION_MS = 3200`, `role="status"`,
+  `aria-live="polite"`, `data-ribbon-id`, colored stitched rosette SVG with zero
+  `<text>` nodes, `"RIBBON EARNED"` eyebrow + `"<Title> ★"`, safe-area top-right
+  on desktop / top-center on touch, hidden in photo/title/cutscene/credits), and
+  plays the warm 5-note `"ribbon-earned"` chime (`C5 -> E5 -> G5 -> B5 -> C6`,
+  `0.42 s`, gains `<= 0.08` in `src/platform/audio-effects.ts`) paired with a
+  `"celebrate"` haptic.
 - **Valley Sky Almanac** (Elevation Track E17, Milestone 183, Owner-Unlocked
   §13): storybook weather picker modal (`src/ui/journal-weather.ts` +
   `src/ui/journal-weather.css`, composed into `createJournalFieldOverlays` in

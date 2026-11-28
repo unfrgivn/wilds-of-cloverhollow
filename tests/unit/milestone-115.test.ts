@@ -216,6 +216,7 @@ describe("Milestone 114: modular audio-recipes.ts extraction & audio.ts re-expor
     "shop-bell",
     "arcade-bell",
     "sanctuary-hop",
+    "ribbon-earned",
   ];
 
   it("defines valid non-empty recipes for every SoundCue and matches audio.ts re-exports", () => {

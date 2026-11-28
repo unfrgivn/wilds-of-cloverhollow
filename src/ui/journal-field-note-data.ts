@@ -53,6 +53,10 @@ export type JournalFieldNoteSource = {
   starGems?: readonly StarGemEntry[];
   treasures?: TreasuresSummary;
   heartToHearts?: HeartToHeartSummary;
+  heartToHeartsCompleted?: number;
+  encoreTrophies?: number;
+  decorCount?: number;
+  puzzlesSolved?: number;
   stickersOwned?: number;
   stickersTotal?: number;
   prizesOwned?: number;

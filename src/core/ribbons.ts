@@ -1,3 +1,4 @@
+import { heartToHeartSummary } from "./heart-to-hearts";
 import {
   journalKeepsakes,
   journalProgress,
@@ -18,6 +19,10 @@ export const MERIT_RIBBON_IDS = [
   "neighborhood-hearts",
   "alpine-stargazer",
   "starlight-keeper",
+  "heart-collector",
+  "encore-star",
+  "cozy-decorator",
+  "puzzle-solver",
   "valley-legend",
 ] as const;
 
@@ -56,6 +61,11 @@ export type MeritRibbonJournalInput = {
   valleyComplete?: boolean;
   members?: readonly { id: string }[];
   arcadeRecords?: { taco?: number };
+  heartToHearts?: { completed: number };
+  heartToHeartsCompleted?: number;
+  encoreTrophies?: number;
+  decorCount?: number;
+  puzzlesSolved?: number;
 };
 
 type MeritRibbonFacts = {
@@ -70,6 +80,10 @@ type MeritRibbonFacts = {
   prizesTotal: number;
   tacoScore: number;
   ownedKeepsakes: ReadonlySet<string>;
+  heartToHeartsCompleted: number;
+  encoreTrophies: number;
+  decorCount: number;
+  puzzlesSolved: number;
   valleyComplete: boolean;
   collectiblesOwned: number;
   collectiblesTotal: number;
@@ -205,6 +219,38 @@ const MERIT_RIBBON_SPECS: readonly MeritRibbonSpec[] = [
     evaluate: (facts) => keepsakeProgress(facts, "shell-shard"),
   },
   {
+    id: "heart-collector",
+    title: "Heartfelt Confidant",
+    category: "story",
+    color: "#f08aa8",
+    description: "Share all 6 Party Heart-to-Hearts across Cloverhollow.",
+    evaluate: (facts) => countProgress(facts.heartToHeartsCompleted, 6),
+  },
+  {
+    id: "encore-star",
+    title: "Dream Encore Champion",
+    category: "mastery",
+    color: "#e8b84b",
+    description: "Earn a Star Trophy at the Wildlife Sanctuary's Dream Shrine.",
+    evaluate: (facts) => binaryProgress(facts.encoreTrophies >= 1),
+  },
+  {
+    id: "cozy-decorator",
+    title: "Cozy Home Stylist",
+    category: "explore",
+    color: "#88c999",
+    description: "Decorate Fae's Bedroom or Clubhouse with a keepsake or swatch.",
+    evaluate: (facts) => binaryProgress(facts.decorCount >= 1),
+  },
+  {
+    id: "puzzle-solver",
+    title: "Trailblazer Solver",
+    category: "explore",
+    color: "#74c0ef",
+    description: "Solve a spatial tool puzzle across Cloverhollow's wilds.",
+    evaluate: (facts) => binaryProgress(facts.puzzlesSolved >= 1),
+  },
+  {
     id: "valley-legend",
     title: "100% Valley Legend",
     category: "mastery",
@@ -243,10 +289,51 @@ function buildMeritRibbonSummary(facts: MeritRibbonFacts): MeritRibbonSummary {
   };
 }
 
-/** Evaluates all 12 canonical Valley Merit Ribbons from core world, state, and arcade records. */
+/** Counts distinct Dream Memory Shrine Star Trophies earned in `state.encore`. */
+export function countEncoreTrophies(encore: State["encore"]): number {
+  return new Set(encore?.trophies ?? []).size;
+}
+
+/** Counts Bedroom or Clubhouse decor customizations (non-default swatches, pedestals, shelves). */
+export function countDecorCustomizations(decor: State["decor"]): number {
+  if (decor === undefined) return 0;
+  const swatches = new Set<string>();
+  if (decor.swatch !== undefined && decor.swatch !== "classic") swatches.add(decor.swatch);
+  for (const id of decor.unlockedSwatches ?? []) {
+    if (id !== "classic") swatches.add(id);
+  }
+  const pedestals = decor.pedestals === true ? 1 : 0;
+  const placed = decor.bedroomSlots?.length ?? 0;
+  return swatches.size + pedestals + placed;
+}
+
+/** Counts solved spatial tool puzzles recorded in `state.puzzles`. */
+export function countSolvedPuzzles(puzzles: State["puzzles"]): number {
+  if (puzzles === undefined) return 0;
+  let count = 0;
+  for (const solved of Object.values(puzzles)) {
+    if (solved === true) count += 1;
+  }
+  return count;
+}
+
+/** Returns ribbons whose `earned` state transitioned from `false -> true` in tapestry order. */
+export function newlyEarnedRibbons(
+  prev: MeritRibbonSummary | null,
+  next: MeritRibbonSummary,
+): MeritRibbonEntry[] {
+  if (prev === null) return [];
+  const previouslyEarned = new Set<MeritRibbonId>(
+    prev.ribbons.filter((item) => item.earned).map((item) => item.id),
+  );
+  return next.ribbons.filter((item) => item.earned && !previouslyEarned.has(item.id));
+}
+
+/** Evaluates all 16 canonical Valley Merit Ribbons from core world, state, and arcade records. */
 export function evaluateMeritRibbons(
   world: Pick<World, "stickers" | "arcade" | "storyVariable">,
-  state: Pick<State, "stickers" | "prizes" | "caughtFish" | "ink" | "party">,
+  state: Pick<State, "stickers" | "prizes" | "caughtFish" | "ink" | "party"> &
+    Partial<Pick<State, "finale" | "encore" | "decor" | "puzzles">>,
   records?: { taco?: number },
 ): MeritRibbonSummary {
   const progress = journalProgress(world, state);
@@ -256,6 +343,12 @@ export function evaluateMeritRibbons(
     keepsakes.filter((item) => item.owned).map((item) => item.id),
   );
   const partyIds = new Set(state.party.map((member) => member.id));
+  const heartToHeartsCompleted = heartToHeartSummary(world, {
+    ink: state.ink,
+    stickers: state.stickers,
+    party: state.party,
+    finale: state.finale ?? null,
+  }).completed;
   return buildMeritRibbonSummary({
     stickersOwned: progress.stickers.owned,
     hasSue: partyIds.has("sue"),
@@ -268,13 +361,17 @@ export function evaluateMeritRibbons(
     prizesTotal: progress.prizes.total,
     tacoScore: records?.taco ?? 0,
     ownedKeepsakes,
+    heartToHeartsCompleted,
+    encoreTrophies: countEncoreTrophies(state.encore),
+    decorCount: countDecorCustomizations(state.decor),
+    puzzlesSolved: countSolvedPuzzles(state.puzzles),
     valleyComplete: completion.complete,
     collectiblesOwned: completion.owned,
     collectiblesTotal: completion.total,
   });
 }
 
-/** Projects all 12 Valley Merit Ribbons directly from a rendered JournalView snapshot. */
+/** Projects all 16 Valley Merit Ribbons directly from a rendered JournalView snapshot. */
 export function evaluateMeritRibbonsFromJournal(
   input: MeritRibbonJournalInput,
 ): MeritRibbonSummary {
@@ -314,6 +411,8 @@ export function evaluateMeritRibbonsFromJournal(
     (input.valleyComplete === undefined &&
       collectiblesTotal > 0 &&
       collectiblesOwned >= collectiblesTotal);
+  const heartToHeartsCompleted =
+    input.heartToHeartsCompleted ?? input.heartToHearts?.completed ?? 0;
 
   return buildMeritRibbonSummary({
     stickersOwned,
@@ -327,6 +426,10 @@ export function evaluateMeritRibbonsFromJournal(
     prizesTotal,
     tacoScore: input.arcadeRecords?.taco ?? 0,
     ownedKeepsakes,
+    heartToHeartsCompleted,
+    encoreTrophies: input.encoreTrophies ?? 0,
+    decorCount: input.decorCount ?? 0,
+    puzzlesSolved: input.puzzlesSolved ?? 0,
     valleyComplete,
     collectiblesOwned,
     collectiblesTotal,

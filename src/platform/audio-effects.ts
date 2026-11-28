@@ -7,7 +7,8 @@ export type CompanionAudioEffect =
   | "card-open" | "card-close"
   | "toggle-on" | "toggle-off" | "tool-sparkle"
   | "paper-flip" | "sticker-peel" | "atlas-pin"
-  | "beach-ball-boop" | "pebble-skip" | "shop-bell" | "arcade-bell" | "sanctuary-hop";
+  | "beach-ball-boop" | "pebble-skip" | "shop-bell" | "arcade-bell" | "sanctuary-hop"
+  | "ribbon-earned";
 
 // Companion petting, cozy resting, and storybook UI foley kept in the platform shell.
 export const effectRecipes: Record<CompanionAudioEffect, AudioRecipe> = {
@@ -73,12 +74,10 @@ export const effectRecipes: Record<CompanionAudioEffect, AudioRecipe> = {
     },
     { wave: "noise", offset: 0.055, duration: 0.065, gain: 0.02, lowpass: 1100, attack: 0.006 },
   ],
-  "title-move": [
-    {
-      wave: "triangle", frequency: 494, endFrequency: 523, offset: 0, duration: 0.055,
-      gain: 0.06, attack: 0.003,
-    },
-  ],
+  "title-move": [{
+    wave: "triangle", frequency: 494, endFrequency: 523, offset: 0, duration: 0.055,
+    gain: 0.06, attack: 0.003,
+  }],
   "title-start": [
     { wave: "triangle", frequency: 523, offset: 0, duration: 0.14, gain: 0.068, attack: 0.004 },
     { wave: "triangle", frequency: 659, offset: 0.055, duration: 0.15, gain: 0.07, attack: 0.004 },
@@ -107,18 +106,14 @@ export const effectRecipes: Record<CompanionAudioEffect, AudioRecipe> = {
       gain: 0.054, attack: 0.004,
     },
   ],
-  "toggle-on": [
-    {
-      wave: "triangle", frequency: 440, endFrequency: 659, offset: 0, duration: 0.065,
-      gain: 0.062, attack: 0.003,
-    },
-  ],
-  "toggle-off": [
-    {
-      wave: "triangle", frequency: 523, endFrequency: 392, offset: 0, duration: 0.062,
-      gain: 0.055, attack: 0.003,
-    },
-  ],
+  "toggle-on": [{
+    wave: "triangle", frequency: 440, endFrequency: 659, offset: 0, duration: 0.065,
+    gain: 0.062, attack: 0.003,
+  }],
+  "toggle-off": [{
+    wave: "triangle", frequency: 523, endFrequency: 392, offset: 0, duration: 0.062,
+    gain: 0.055, attack: 0.003,
+  }],
   "tool-sparkle": [
     { wave: "sine", frequency: 659, offset: 0, duration: 0.14, gain: 0.055, attack: 0.004 },
     { wave: "sine", frequency: 880, offset: 0.055, duration: 0.15, gain: 0.05, attack: 0.004 },
@@ -188,8 +183,7 @@ export const effectRecipes: Record<CompanionAudioEffect, AudioRecipe> = {
     { wave: "sine", frequency: 2637, offset: 0.006, duration: 0.16, gain: 0.024, attack: 0.004 },
     { wave: "sine", frequency: 987.8, offset: 0.11, duration: 0.27, gain: 0.062, attack: 0.005 },
     {
-      wave: "triangle", frequency: 1975.5, offset: 0.12, duration: 0.2,
-      gain: 0.022, attack: 0.005,
+      wave: "triangle", frequency: 1975.5, offset: 0.12, duration: 0.2, gain: 0.022, attack: 0.005,
     },
   ],
   "arcade-bell": [
@@ -206,6 +200,13 @@ export const effectRecipes: Record<CompanionAudioEffect, AudioRecipe> = {
       wave: "triangle", frequency: 784, endFrequency: 1046.5, offset: 0.045, duration: 0.095,
       gain: 0.036, attack: 0.004,
     },
+  ],
+  "ribbon-earned": [
+    { wave: "triangle", frequency: 523.25, offset: 0, duration: 0.13, gain: 0.068, attack: 0.004 },
+    { wave: "triangle", frequency: 659.3, offset: 0.06, duration: 0.14, gain: 0.07, attack: 0.004 },
+    { wave: "sine", frequency: 784, offset: 0.12, duration: 0.15, gain: 0.072, attack: 0.004 },
+    { wave: "sine", frequency: 987.8, offset: 0.18, duration: 0.17, gain: 0.074, attack: 0.004 },
+    { wave: "sine", frequency: 1046.5, offset: 0.24, duration: 0.18, gain: 0.078, attack: 0.005 },
   ],
 };
 

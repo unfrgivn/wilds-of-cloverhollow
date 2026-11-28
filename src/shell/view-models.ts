@@ -29,6 +29,11 @@ import {
   type TextSpeed,
   type World,
 } from "../core";
+import {
+  countDecorCustomizations,
+  countEncoreTrophies,
+  countSolvedPuzzles,
+} from "../core/ribbons";
 import type { AudioLevel } from "../platform/audio-settings";
 import type { MinigameRecords } from "../platform/minigame-records";
 import { findPettableCompanion, findRestSpot } from "../render/companions";
@@ -314,7 +319,12 @@ export type JournalViewParams = {
 /** Builds the complete DOM JournalView from core state, map centres, and atlas resolvers. */
 export function buildJournalView(
   params: JournalViewParams,
-): JournalView & { heartToHearts?: HeartToHeartSummary } {
+): JournalView & {
+  heartToHearts?: HeartToHeartSummary;
+  encoreTrophies?: number;
+  decorCount?: number;
+  puzzlesSolved?: number;
+} {
   const { world, state, mapCentres, art } = params;
   const open = state.journalOpen;
   const isStorySet = (variable: string): boolean =>
@@ -408,6 +418,9 @@ export function buildJournalView(
     reducedMotion: params.reducedMotion,
     treasures: open ? treasuresSummary(world, state) : undefined,
     heartToHearts: open ? heartToHeartSummary(world, state) : undefined,
+    encoreTrophies: open ? countEncoreTrophies(state.encore) : 0,
+    decorCount: open ? countDecorCustomizations(state.decor) : 0,
+    puzzlesSolved: open ? countSolvedPuzzles(state.puzzles) : 0,
     hasLantern: params.hasLantern,
     hasFlute: params.hasFlute,
     hasLasso: params.hasLasso,

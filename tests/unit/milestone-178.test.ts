@@ -84,17 +84,26 @@ describe("Milestone 176: Valley Merit Ribbons (Track E18B)", () => {
   const allFish = Object.fromEntries(world.arcade.fish.catches.map((item) => [item.id, 1]));
   const allGems = Object.fromEntries(STAR_GEM_VARIABLES.map((id) => [id, true]));
 
-  it("keeps core and JournalView evaluators identical at 0/12, 5/12, and 12/12", () => {
-    // 1. Empty fresh journey: 0/12
+  const allHeartVars: Record<string, boolean> = {
+    h2h_fae_maddie_done: true,
+    h2h_fae_sue_done: true,
+    h2h_fae_jordan_done: true,
+    h2h_sue_jordan_done: true,
+    h2h_clubhouse_trio_done: true,
+    h2h_sanctuary_encore_done: true,
+  };
+
+  it("keeps core and JournalView evaluators identical at 0/16, 5/16, and 16/16", () => {
+    // 1. Empty fresh journey: 0/16
     const emptyCore = evaluateMeritRibbons(world, baseState);
     const emptyJournal = evaluateMeritRibbonsFromJournal(buildOpenView(baseState));
     expect(emptyCore).toEqual(emptyJournal);
     expect(emptyCore.earned).toBe(0);
-    expect(emptyCore.total).toBe(12);
+    expect(emptyCore.total).toBe(16);
     expect(emptyCore.complete).toBe(false);
     expect(emptyCore.ribbons.map((r) => r.id)).toEqual([...MERIT_RIBBON_IDS]);
 
-    // 2. Mid-journey: 5/12 (first-friend, party-reunited, star-line-explorer, taco-fiesta,
+    // 2. Mid-journey: 5/16 (first-friend, party-reunited, star-line-explorer, taco-fiesta,
     //    alpine-stargazer) + partial counts for gems (3/7), fish (2/6), prizes (4/13).
     const midState: State = withVars(
       {
@@ -117,7 +126,7 @@ describe("Milestone 176: Valley Merit Ribbons (Track E18B)", () => {
     const midJournal = evaluateMeritRibbonsFromJournal(buildOpenView(midState, midRecords));
     expect(midCore).toEqual(midJournal);
     expect(midCore.earned).toBe(5);
-    expect(midCore.total).toBe(12);
+    expect(midCore.total).toBe(16);
     expect(midCore.complete).toBe(false);
     expect(midCore.ribbons.filter((r) => r.earned).map((r) => r.id)).toEqual([
       "first-friend",
@@ -132,7 +141,7 @@ describe("Milestone 176: Valley Merit Ribbons (Track E18B)", () => {
     expect(byId.get("arcade-champion")?.progressText).toBe("4/13");
     expect(byId.get("valley-legend")?.progressText).toBe("14/63");
 
-    // 3. Complete 100% Valley Legend: 12/12
+    // 3. Complete 100% Valley Legend: 16/16
     const fullState: State = withVars(
       {
         ...baseState,
@@ -140,15 +149,18 @@ describe("Milestone 176: Valley Merit Ribbons (Track E18B)", () => {
         prizes: world.arcade.prizes.map((p) => p.id),
         caughtFish: allFish,
         party: [makeMember("maddie"), makeMember("sue"), makeMember("jordan")],
+        encore: { bosses: {}, trophies: ["trophy-gull"] },
+        decor: { swatch: "sunlit-meadow", unlockedSwatches: ["sunlit-meadow"] },
+        puzzles: { "cavern-prism": true },
       },
-      { ...allKeepsakeVars, ...allGems },
+      { ...allKeepsakeVars, ...allGems, ...allHeartVars },
     );
     const fullRecords: MinigameRecords = { ...defaultMinigameRecords(), taco: 620 };
     const fullCore = evaluateMeritRibbons(world, fullState, fullRecords);
     const fullJournal = evaluateMeritRibbonsFromJournal(buildOpenView(fullState, fullRecords));
     expect(fullCore).toEqual(fullJournal);
-    expect(fullCore.earned).toBe(12);
-    expect(fullCore.total).toBe(12);
+    expect(fullCore.earned).toBe(16);
+    expect(fullCore.total).toBe(16);
     expect(fullCore.complete).toBe(true);
     expect(fullCore.ribbons.every((r) => r.earned && r.progressText === "★ Earned")).toBe(true);
   });
@@ -319,8 +331,8 @@ describe("Milestone 176: Valley Merit Ribbons (Track E18B)", () => {
     expect(uiSource.toLowerCase()).not.toContain("<text");
 
     const allRibbons = evaluateMeritRibbons(world, baseState).ribbons;
-    expect(new Set(allRibbons.map((r) => r.title)).size).toBe(12);
-    expect(new Set(allRibbons.map((r) => r.color)).size).toBe(12);
+    expect(new Set(allRibbons.map((r) => r.title)).size).toBe(16);
+    expect(new Set(allRibbons.map((r) => r.color)).size).toBe(16);
     for (const ribbon of allRibbons) {
       const lockedSvg = meritRibbonEmblemMarkup(ribbon);
       const earnedSvg = meritRibbonEmblemMarkup({ ...ribbon, earned: true });

@@ -312,6 +312,7 @@ describe("Milestone 172: Modular src/platform/audio-effects.ts Extraction", () =
     "shop-bell",
     "arcade-bell",
     "sanctuary-hop",
+    "ribbon-earned",
   ];
 
   it("re-exports effectRecipes and effectRecipe identically with gentle gains and lean modules",

@@ -19,6 +19,11 @@ import {
   type State,
   type World,
 } from "../core";
+import {
+  evaluateMeritRibbons,
+  newlyEarnedRibbons,
+  type MeritRibbonSummary,
+} from "../core/ribbons";
 import type { CompanionAudioEffect, SoundPlayContext } from "../platform/audio";
 import type { HapticKind } from "../platform/haptics";
 import type { MinigameRecordsController } from "../platform/minigame-records";
@@ -40,6 +45,7 @@ import {
   type PostcardDeliveryResult,
 } from "../ui/postcard";
 import { parseRichText, resolveRichTextProgress } from "../ui/rich-text";
+import { createRibbonToast } from "../ui/ribbon-toast";
 import { extractInkExpression } from "./view-models";
 
 export type ArcadeRecordsStore = Pick<MinigameRecordsController, "submit" | "bestOf">;
@@ -756,4 +762,85 @@ export function performOverworldConfirm(
     deps.playEffect("sanctuary-hop");
     deps.lightHaptic();
   }
+}
+
+export type RibbonCelebrationSync = {
+  reset: () => void;
+  observe: (
+    state: State,
+    previousTick: number,
+    records: { taco?: number },
+    live: boolean,
+  ) => void;
+};
+
+/**
+ * Watches live real-time ticks for newly stitched Valley Merit Ribbons and
+ * enqueues the die-cut RibbonToast alongside celebratory foley/haptics.
+ * Paused harness steps and resets/loads never emit false toasts.
+ */
+export function createRibbonCelebrationSync(
+  world: Pick<World, "stickers" | "arcade" | "storyVariable">,
+  uiRoot: HTMLElement,
+  onEarned: () => void,
+): RibbonCelebrationSync {
+  const toast = createRibbonToast(uiRoot);
+  let lastSummary: MeritRibbonSummary | null = null;
+  let lastSnapshot: {
+    stickers: State["stickers"];
+    prizes: State["prizes"];
+    caughtFish: State["caughtFish"];
+    ink: string;
+    party: State["party"];
+    encore: State["encore"];
+    decor: State["decor"];
+    puzzles: State["puzzles"];
+    taco: number;
+  } | null = null;
+
+  const reset = (): void => {
+    lastSummary = null;
+    lastSnapshot = null;
+    toast.clear();
+  };
+
+  return {
+    reset,
+    observe: (state, previousTick, records, live) => {
+      if (!live || state.tick <= previousTick) return;
+      const taco = records.taco ?? 0;
+      if (
+        lastSnapshot !== null &&
+        lastSnapshot.stickers === state.stickers &&
+        lastSnapshot.prizes === state.prizes &&
+        lastSnapshot.caughtFish === state.caughtFish &&
+        lastSnapshot.ink === state.ink &&
+        lastSnapshot.party === state.party &&
+        lastSnapshot.encore === state.encore &&
+        lastSnapshot.decor === state.decor &&
+        lastSnapshot.puzzles === state.puzzles &&
+        lastSnapshot.taco === taco
+      ) {
+        return;
+      }
+      const nextSummary = evaluateMeritRibbons(world, state, records);
+      const earned = newlyEarnedRibbons(lastSummary, nextSummary);
+      if (earned.length > 0) {
+        toast.enqueue(earned);
+        onEarned();
+      }
+      lastSummary = nextSummary;
+      lastSnapshot = {
+        stickers: state.stickers,
+        prizes: state.prizes,
+        caughtFish: state.caughtFish,
+        ink: state.ink,
+        party: state.party,
+        encore: state.encore,
+        decor: state.decor,
+        puzzles: state.puzzles,
+        taco,
+      };
+    },
+  };
 }

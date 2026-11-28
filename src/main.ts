@@ -33,8 +33,9 @@ import {
 } from "./shell/assets";
 import {
   buildSoundContext, collectLevelUpNotices, createAreaBannerTracker, createJournalNotesCache,
-  createNpcChatterSync, createToolEventChimeSync, hapticForTick, isOverworldConfirm,
-  performOverworldConfirm, resolveArcadeOutcome, resolveSoundtrack, shouldClearRest,
+  createNpcChatterSync, createRibbonCelebrationSync, createToolEventChimeSync, hapticForTick,
+  isOverworldConfirm, performOverworldConfirm, resolveArcadeOutcome, resolveSoundtrack,
+  shouldClearRest,
 } from "./shell/feedback";
 import { createSaveSession, createSaveStore } from "./shell/save-storage";
 import { createAudio, projectMusicMix } from "./platform/audio";
@@ -189,6 +190,9 @@ async function boot(): Promise<void> {
   const toolEventChime = createToolEventChimeSync(() => {
     sound.playEffect("tool-sparkle"); lightHaptic();
   });
+  const ribbonSync = createRibbonCelebrationSync(content.world, uiRoot, () => {
+    sound.playEffect("ribbon-earned"); haptics.trigger("celebrate");
+  });
   app.stage.addChild(view.root);
   const initialFixture = content.fixtures["new-game"];
   if (initialFixture === undefined) throw new Error("Missing new-game fixture");
@@ -231,14 +235,9 @@ async function boot(): Promise<void> {
       if (effect === "title-start") lightHaptic();
     }
     if (result.action === "new-game") {
-      state = createState(content.world, initialFixture);
-      previousState = state;
-      navFollower.clear();
-      bannerTracker.clear();
-      toolEventChime.reset();
-      saveToast.hide();
-      jukeboxTrack = null;
-      saveSession.clear();
+      state = createState(content.world, initialFixture); previousState = state;
+      navFollower.clear(); bannerTracker.clear(); toolEventChime.reset(); ribbonSync.reset();
+      saveToast.hide(); jukeboxTrack = null; saveSession.clear();
     }
   };
   title.onChoose((choose) => applyTitle({
@@ -252,9 +251,9 @@ async function boot(): Promise<void> {
   const swallowed = new Set<"confirm" | "cancel" | "menu">();
   const resetTransient = (): void => {
     saveSession.clearDirty(); bannerTracker.clear(); saveToast.hide(); decorPicker.close(true);
-    jukeboxTrack = null; battlePeekOpen = false; activeArcadeRecord = null;
-    fishStreak = 0; levelUpNotices.length = 0; toolEventChime.reset(); encoreShrine?.closeSilent();
-    setPhotoMode(false, true); releasePointer();
+    jukeboxTrack = null; battlePeekOpen = false; activeArcadeRecord = null; fishStreak = 0;
+    levelUpNotices.length = 0; toolEventChime.reset(); ribbonSync.reset();
+    encoreShrine?.closeSilent(); setPhotoMode(false, true); releasePointer();
     areaLoader.reset(); void areaLoader.ensureArea(true);
     void assets.warmJournalAssets(state); invalidate();
   };
@@ -278,7 +277,7 @@ async function boot(): Promise<void> {
         swallowed.clear(); saveSession.clear(); view.invalidateBackdrop();
         resetTransient();
       },
-      onConsoleApplied: () => { bannerTracker.clear(); invalidate(); },
+      onConsoleApplied: () => { bannerTracker.clear(); ribbonSync.reset(); invalidate(); },
       onReleasePointer: () => releasePointer(),
       invalidate,
       settings: createQaSettingsBindings({
@@ -752,14 +751,13 @@ async function boot(): Promise<void> {
     }
     if (!harnessStepping) {
       const haptic = hapticForTick(previous, state, cues, {
-        goldenCooked: arcadeOutcome.goldenCooked,
-        world: content.world,
+        goldenCooked: arcadeOutcome.goldenCooked, world: content.world,
       });
       if (haptic !== null) haptics.trigger(haptic);
     }
-    if (!(qa?.isRestricted() ?? false) && autosaveNeeded(previous, state)) {
-      void saveSession.save();
-    }
+    const liveTick = !paused && !harnessStepping && titleMode === null;
+    ribbonSync.observe(state, previous.tick, minigameRecords.records(), liveTick);
+    if (!(qa?.isRestricted() ?? false) && autosaveNeeded(previous, state)) void saveSession.save();
     devLog?.logBattle(state);
     devLog?.afterTick(state);
   };
@@ -829,8 +827,9 @@ async function boot(): Promise<void> {
   if (qaEnabled) {
     const resetTransientUi = (): void => {
       titleMode = null; jukeboxTrack = null; battlePeekOpen = false; activeArcadeRecord = null;
-      fishStreak = 0; toolEventChime.reset(); setPhotoMode(false, true); decorPicker.close(true);
-      encoreShrine?.closeSilent(); levelUpNotices.length = 0; swallowed.clear();
+      fishStreak = 0; toolEventChime.reset(); ribbonSync.reset(); setPhotoMode(false, true);
+      decorPicker.close(true); encoreShrine?.closeSilent(); levelUpNotices.length = 0;
+      swallowed.clear();
     };
     const { installShellHook } = await import("./dev/hook");
     installShellHook({

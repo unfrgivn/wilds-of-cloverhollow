@@ -8822,6 +8822,44 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   checks green), 33/33 targeted Chromium & WebKit e2e, and full-suite
   non-snapshot sweep (`751` Chromium + `637` WebKit = `1,388` passed, `2`
   skipped, `0` failed).
+
+## Milestone 201: Grand 16-Ribbon Valley Merit Tapestry & Live Stitched Ribbon-Earned Celebration Toast **Status:** ✅ Completed (2026-11-28)
+- Expands Fae's Valley Merit Ribbons from 12 to an iconic **16-Ribbon 4×4 Grand
+  Tapestry** (incorporating Party Heart-to-Hearts, Dream Memory Shrine Boss
+  Encore, Bedroom/Clubhouse Decorating, and Spatial Tool Puzzles) paired with a
+  live die-cut **Merit Ribbon Earned Toast**, warm `"ribbon-earned"` chime
+  foley, and celebrate haptic — zero `src/core/sim.ts` changes, zero
+  save-version bumps, zero replay hash drift across all 77 sims, and zero visual
+  baseline diffs.
+- Grand 16-Ribbon Core Engine (`src/core/ribbons.ts`, `src/shell/view-models.ts`,
+  `src/ui/journal-field-note-data.ts`):
+  - Added 4 Elevation ribbons before crowning 16th `valley-legend`:
+    `heart-collector` (*Heartfelt Confidant*, `6/6` Heart-to-Hearts),
+    `encore-star` (*Dream Encore Champion*, Dream Shrine trophy),
+    `cozy-decorator` (*Cozy Home Stylist*, room decor placement/swatch), and
+    `puzzle-solver` (*Trailblazer Solver*, spatial tool puzzle).
+  - Exported pure `countEncoreTrophies`, `countDecorCustomizations`,
+    `countSolvedPuzzles`, and `newlyEarnedRibbons(prev, next)`.
+- Grand 4×4 Stitched Tapestry & Live Ribbon-Earned Toast
+  (`src/ui/journal-ribbons.{ts,css}`, `src/ui/ribbon-toast.{ts,css}`,
+  `src/platform/audio-effects.ts`, `src/shell/feedback.ts`, `src/main.ts`):
+  - Upgraded the showcase to a crisp 4×4 tapestry (`★ 16/16 VALLEY LEGEND!`)
+    fitting cleanly at both `1280×720` and `874×402`.
+  - Built queued die-cut `.sticker-ui.ribbon-toast` (`RIBBON EARNED · <Title> ★`
+    with colored hand-inked SVG rosette, `role="status"`, `aria-live="polite"`,
+    hidden under photo/title/cutscene/credits, reduced-motion & iOS tap hygiene)
+    plus `"ribbon-earned"` 5-note chime foley & `"celebrate"` haptic triggered
+    strictly on live unpaused ticks (`createRibbonCelebrationSync`).
+  - Synced `tests/unit/milestone-159.test.ts` chunk expectations with M197's
+    `vite.config.ts` (`index.js` & `world-content`).
+- Evidence: `tests/unit/milestone-201.test.ts`,
+  `tests/e2e/milestone-201.spec.ts` (`@smoke` Chromium + WebKit), and all 3
+  review captures (`art/review/m200-grand-ribbons-1280.jpg`,
+  `m200-grand-ribbons-874.jpg`, `m200-ribbon-toast-1280.jpg`) independently
+  verified via `vision`.
+- Gates: `just check` (271 unit files / 2,027 tests, all 77 sims + `e7` +
+  `encore` + `e11`, 23 QA packs, purity, lint), `just build` (every non-vendor
+  chunk `< 375 kB`), and 18/18 Chromium & WebKit e2e tests.
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

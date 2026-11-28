@@ -28,10 +28,10 @@ const LEFT_TAIL_PATH = "M 11.4 23.4 L 8.4 39.2 L 13.4 35.8 L 17.2 39.2 L 17.8 24
 const RIGHT_TAIL_PATH = "M 24.6 23.4 L 27.6 39.2 L 22.6 35.8 L 18.8 39.2 L 18.2 24.4 Z";
 
 function ribbonMotif(ribbon: MeritRibbonEntry): RibbonMotif {
-  if (ribbon.category === "mastery") return "crown";
-  if (ribbon.id === "gem-scholar") return "gem";
+  if (ribbon.id === "encore-star" || ribbon.category === "mastery") return "crown";
+  if (ribbon.id === "gem-scholar" || ribbon.id === "puzzle-solver") return "gem";
   if (ribbon.id === "master-angler" || ribbon.id === "starlight-keeper") return "wave";
-  if (ribbon.category === "story") return "heart";
+  if (ribbon.id === "heart-collector" || ribbon.category === "story") return "heart";
   return "star";
 }
 
@@ -200,7 +200,7 @@ export function createJournalRibbonsShowcase(options?: {
   const treasuresBtn = makeRibbonButton(
     "journal-ribbons-btn",
     "Inspect Valley Merit Ribbons",
-    "★ Ribbons · 0/12",
+    "★ Ribbons · 0/16",
   );
   const banner = makeRibbonButton("journal-ribbons-banner", "Inspect Valley Merit Ribbons");
   banner.hidden = true;
@@ -254,7 +254,7 @@ export function createJournalRibbonsShowcase(options?: {
     setText(
       footer,
       summary.complete
-        ? "★ All 12 Valley Merit Ribbons Stitched — True Cloverhollow Legend!"
+        ? "★ All 16 Valley Merit Ribbons Stitched — True Cloverhollow Legend!"
         : "Earn Merit Ribbons across Cloverhollow's stories, wilds, and arcades!",
     );
   };

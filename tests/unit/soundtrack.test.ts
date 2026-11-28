@@ -83,8 +83,8 @@ describe("soundtrackFor", () => {
       "east-hall": ["school", "none"],
       classroom: ["school", "none"],
       gym: ["school", "none"],
-      music: ["school", "none"],
-      "art-room": ["school", "none"],
+      music: ["melody", "none"],
+      "art-room": ["canvas", "none"],
       field: ["school", "town-breeze"],
       bay: ["bay", "ocean"],
       island: ["island", "ocean"],
@@ -417,9 +417,9 @@ describe("complete 20-track world audio identity", () => {
     ).toBe(true);
   });
 
-  test("covers all 33 jukebox tracks with titles, multi-voice scores, and harmonic scales", () => {
-    expect(jukeboxTracks).toHaveLength(33);
-    expect(new Set(jukeboxTracks).size).toBe(33);
+  test("covers all 35 jukebox tracks with titles, multi-voice scores, and harmonic scales", () => {
+    expect(jukeboxTracks).toHaveLength(35);
+    expect(new Set(jukeboxTracks).size).toBe(35);
     for (const id of jukeboxTracks) {
       expect(trackTitles[id].trim().length, `${id} title`).toBeGreaterThan(0);
       const score = scores[id];
@@ -449,6 +449,8 @@ describe("complete 20-track world audio identity", () => {
       "taco",
       "encore",
       "hearts",
+      "melody",
+      "canvas",
     ] as const) {
       expect(scores[id].bars, `${id} bars`).toBeGreaterThanOrEqual(16);
       expect(scores[id].tracks.length, `${id} voices`).toBeGreaterThanOrEqual(4);
@@ -470,6 +472,8 @@ describe("composed scores integrity", () => {
     "sanctuary",
     "festival",
     "school",
+    "melody",
+    "canvas",
     "bay",
     "fishing",
     "cottage",

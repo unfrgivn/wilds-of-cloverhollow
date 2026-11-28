@@ -50,7 +50,7 @@ test.describe("Milestone 216: Soundtrack Album Foley, Auto-Scroll & Weather Phot
       await unlockAudio(page);
       await runQaCommands(page, ["keepsakes on"]);
 
-      // Open Journal -> MAP -> Field Treasures -> ♫ OST · 33.
+      // Open Journal -> MAP -> Field Treasures -> ♫ OST · 35.
       await tapKey(page, "j");
       await expect(page.locator(".journal-book")).toBeVisible();
       await page.locator(".journal-map-tab").click();
@@ -74,7 +74,7 @@ test.describe("Milestone 216: Soundtrack Album Foley, Auto-Scroll & Weather Phot
       await storyBtn.click();
       expect((await recordedEffects(page)).slice(afterFirstFilter)).not.toContain("paper-flip");
 
-      // Play track #33 ("encore" / Starlight Encore!), close & reopen -> auto-scrolls into view.
+      // Play "encore" (Starlight Encore!), close & reopen -> auto-scrolls into view.
       const encoreTrack = card.locator('.journal-album-track[data-track="encore"]');
       await encoreTrack.click();
       await expect(card).toHaveAttribute("data-jukebox-active", "true");

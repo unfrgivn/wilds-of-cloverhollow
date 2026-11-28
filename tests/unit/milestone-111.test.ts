@@ -16,6 +16,7 @@ import { runConsoleCommand, type ConsoleContext } from "../../src/dev/console";
 import { scores, type PlayableTrack } from "../../src/platform/scores";
 import { expansionScores } from "../../src/platform/scores-expansion";
 import { interiorScores } from "../../src/platform/scores-interiors";
+import { schoolScores } from "../../src/platform/scores-school";
 import { townScores } from "../../src/platform/scores-town";
 import { wildsScores } from "../../src/platform/scores-wilds";
 import { evaluateSunberryMotes, hasSunberryBloom } from "../../src/render/clubhouse-display";
@@ -298,7 +299,7 @@ describe("Milestone 111: Enriched Title Continue summary", () => {
 });
 
 describe("Milestone 111: Modular scores.ts split", () => {
-  it("exposes all 33 tracks across town, wilds, interior, and expansion scores", () => {
+  it("exposes all 35 tracks across town, wilds, interior, expansion, and school scores", () => {
     const expectedTracks: readonly PlayableTrack[] = [
       "title",
       "home",
@@ -312,6 +313,8 @@ describe("Milestone 111: Modular scores.ts split", () => {
       "sanctuary",
       "festival",
       "school",
+      "melody",
+      "canvas",
       "bay",
       "fishing",
       "cottage",
@@ -339,6 +342,7 @@ describe("Milestone 111: Modular scores.ts split", () => {
     expect(Object.keys(wildsScores)).toHaveLength(10);
     expect(Object.keys(interiorScores)).toHaveLength(6);
     expect(Object.keys(expansionScores)).toHaveLength(7);
+    expect(Object.keys(schoolScores)).toHaveLength(2);
     for (const trackId of expectedTracks) {
       const score = scores[trackId];
       expect(score.bpm, `${trackId} bpm`).toBeGreaterThan(0);

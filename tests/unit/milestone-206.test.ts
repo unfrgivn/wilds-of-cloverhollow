@@ -43,7 +43,7 @@ describe("Milestone 206: Track E19E Hearts Scroll, Flute Modal & Modular Splits"
     expect(css).toContain(':root[data-reduced-motion="on"] .flute-wheel-close');
   });
 
-  it("preserves 100% voice coverage across all compiled speakers, critters & 33 tracks", () => {
+  it("preserves 100% voice coverage across all compiled speakers, critters & 35 tracks", () => {
     const storySpeakers = new Set<string>();
     for (const tag of storyTags(world.story)) {
       if (tag.startsWith("speaker:")) {
@@ -65,7 +65,7 @@ describe("Milestone 206: Track E19E Hearts Scroll, Flute Modal & Modular Splits"
       expect(blip?.frequency).toBeGreaterThan(100);
     }
 
-    expect(jukeboxTracks.length).toBe(33);
+    expect(jukeboxTracks.length).toBe(35);
     for (const track of jukeboxTracks) {
       const scale = trackScaleNotes(track);
       expect(scale).toBe(TRACK_SCALES[track]);

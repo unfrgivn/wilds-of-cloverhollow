@@ -13,6 +13,8 @@ export type MusicTrack =
   | "sanctuary"
   | "festival"
   | "school"
+  | "melody"
+  | "canvas"
   | "bay"
   | "fishing"
   | "cottage"
@@ -59,6 +61,8 @@ export const jukeboxTracks: readonly JukeboxTrack[] = [
   "loft",
   "bloom",
   "school",
+  "melody",
+  "canvas",
   "bay",
   "fishing",
   "cottage",
@@ -118,6 +122,8 @@ export const trackTitles: Record<MusicTrack, string> = {
   sanctuary: "Meadow of Friends",
   festival: "Cloverhollow Jubilee",
   school: "Bell & Chalk",
+  melody: "Ms. Willow's Recital",
+  canvas: "Skylight Watercolor",
   bay: "Bubblegum Breeze",
   fishing: "Docked by the Tide",
   cottage: "Sea-Glass Sunroom",
@@ -164,6 +170,12 @@ const TRACK_ALBUM_NOTES: Readonly<Record<JukeboxTrack, TrackLinerNote>> = {
     "Rosie's Cottage", "interiors", "Sunlit flowerbeds & sweet pastoral bloom", "#e592b0",
   ),
   school: note("Cloverhollow School", "town", "Crisp morning bells, chalk & recess joy", "#d99a52"),
+  melody: note(
+    "Music Room", "interiors", "Sparkling 3/4 piano, flute & celesta recital", "#b596e8",
+  ),
+  canvas: note(
+    "Art Room", "interiors", "Dreamy sunlit harp & pastel studio wash", "#f0a4bc",
+  ),
   bay: note("Bubblegum Bay", "wilds", "Sparkling boardwalk waves & pastel skies", "#5cb4cf"),
   fishing: note("Bay Fishing Dock", "wilds", "Easygoing bobber sway & tide catches", "#4ea4bf"),
   cottage: note(
@@ -209,7 +221,7 @@ const TRACK_ALBUM_NOTES: Readonly<Record<JukeboxTrack, TrackLinerNote>> = {
   morning: note("Finale & Credits", "story", "Golden sunrise glow after a cozy dream", "#e6b34e"),
 };
 
-/** Exhaustive 33-track soundtrack album catalog ordered identically to `jukeboxTracks`. */
+/** Exhaustive 35-track soundtrack album catalog ordered identically to `jukeboxTracks`. */
 export const JUKEBOX_ALBUM: readonly TrackAlbumMeta[] = jukeboxTracks.map((track, index) => ({
   track,
   number: index + 1,
@@ -251,8 +263,8 @@ const areaTracks: Record<string, MusicTrack> = {
   "east-hall": "school",
   classroom: "school",
   gym: "school",
-  music: "school",
-  "art-room": "school",
+  music: "melody",
+  "art-room": "canvas",
   field: "school",
   bay: "bay",
   boardwalk: "bay",

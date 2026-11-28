@@ -104,9 +104,9 @@ async function readAlbumGeometry(page: Page): Promise<{
   });
 }
 
-test.describe("Milestone 213: 33-Track Soundtrack Album & Direct Music Box Jukebox", () => {
+test.describe("Milestone 213: 35-Track Soundtrack Album & Direct Music Box Jukebox", () => {
   test(
-    "filters 33 themes, plays tracks live, resets to Area Theme, and fits desktop + phone",
+    "filters 35 themes, plays tracks live, resets to Area Theme, and fits desktop + phone",
     { tag: "@smoke" },
     async ({ page }, testInfo) => {
       const errors: string[] = [];
@@ -120,7 +120,7 @@ test.describe("Milestone 213: 33-Track Soundtrack Album & Direct Music Box Jukeb
 
       await runQaCommands(page, ["keepsakes on"]);
 
-      // Open Journal -> MAP -> Treasures -> ♫ OST · 33.
+      // Open Journal -> MAP -> Treasures -> ♫ OST · 35.
       await tapKey(page, "j");
       const book = page.locator(".journal-book");
       await expect(book).toBeVisible();
@@ -138,7 +138,7 @@ test.describe("Milestone 213: 33-Track Soundtrack Album & Direct Music Box Jukeb
 
       const albumBtn = page.locator(".journal-album-btn");
       await expect(albumBtn).toBeVisible();
-      await expect(albumBtn).toHaveText("♫ OST · 33");
+      await expect(albumBtn).toHaveText("♫ OST · 35");
       await albumBtn.click();
 
       const overlay = page.locator(".journal-jukebox-overlay");
@@ -147,12 +147,12 @@ test.describe("Milestone 213: 33-Track Soundtrack Album & Direct Music Box Jukeb
       await settleAnimations(page, ".journal-jukebox-overlay");
 
       await expect(card.locator(".journal-jukebox-title")).toHaveText("SOUNDTRACK ALBUM");
-      await expect(card.locator(".journal-jukebox-count")).toHaveText("33 Themes");
+      await expect(card.locator(".journal-jukebox-count")).toHaveText("35 Themes");
       await expect(card.locator(".journal-album-reset")).toBeHidden();
       await expect(card).toHaveAttribute("data-jukebox-active", "false");
-      await expect(card.locator(".journal-album-track")).toHaveCount(33);
+      await expect(card.locator(".journal-album-track")).toHaveCount(35);
 
-      // Verify full 33-track geometry at 1280x720.
+      // Verify full 35-track geometry at 1280x720.
       const allGeom = await readAlbumGeometry(page);
       expect(allGeom).not.toBeNull();
       expect(allGeom?.insideBook).toBe(true);
@@ -160,7 +160,7 @@ test.describe("Milestone 213: 33-Track Soundtrack Album & Direct Music Box Jukeb
       expect(allGeom?.gridNoHorizontalOverflow).toBe(true);
       expect(allGeom?.closeSize).toBe(44);
       expect(allGeom?.cols).toBe(2);
-      expect(allGeom?.visibleCount).toBe(33);
+      expect(allGeom?.visibleCount).toBe(35);
       expect(allGeom?.minTrackHeight ?? 0).toBeGreaterThanOrEqual(44);
       expect(allGeom?.svgCount).toBe(1);
       expect(allGeom?.svgTextNodes).toBe(0);
@@ -191,7 +191,7 @@ test.describe("Milestone 213: 33-Track Soundtrack Album & Direct Music Box Jukeb
       await expect(festivalTrack).toHaveAttribute("aria-pressed", "true");
       await expect(festivalTrack.locator(".journal-album-playing")).toBeVisible();
 
-      // Return to All · 33 so the desktop review shot shows the full album + gold playing pill.
+      // Return to All · 35 so the desktop review shot shows the full album + gold playing pill.
       const allBtn = card.locator('.journal-album-filter[data-album-category="all"]');
       await allBtn.click();
       await festivalTrack.scrollIntoViewIfNeeded();
@@ -263,7 +263,7 @@ test.describe("Milestone 213: 33-Track Soundtrack Album & Direct Music Box Jukeb
         adaptive: { journalWarm: true },
       });
       await expect(card).toHaveAttribute("data-jukebox-active", "false");
-      await expect(card.locator(".journal-jukebox-count")).toHaveText("33 Themes");
+      await expect(card.locator(".journal-jukebox-count")).toHaveText("35 Themes");
       await expect(resetBtn).toBeHidden();
 
       // Escape closes Soundtrack Album, restores Field Treasures, and focuses .journal-album-btn!

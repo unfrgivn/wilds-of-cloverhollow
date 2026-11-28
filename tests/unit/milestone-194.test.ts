@@ -45,9 +45,9 @@ function withDialogue(area: string, knot: string, vars?: Record<string, boolean>
 }
 
 describe("Milestone 191: 32nd OST Theme Warm Hearth Hearts (hearts)", () => {
-  it("lists 33 unique jukebox tracks with hearts right after talk", () => {
-    expect(jukeboxTracks).toHaveLength(33);
-    expect(new Set(jukeboxTracks).size).toBe(33);
+  it("lists 35 unique jukebox tracks with hearts right after talk", () => {
+    expect(jukeboxTracks).toHaveLength(35);
+    expect(new Set(jukeboxTracks).size).toBe(35);
     expect(jukeboxTracks.indexOf("hearts")).toBe(jukeboxTracks.indexOf("talk") + 1);
     expect(trackTitles.hearts).toBe("Warm Hearth Hearts");
     expect(scores.hearts).toBe(interiorScores.hearts);

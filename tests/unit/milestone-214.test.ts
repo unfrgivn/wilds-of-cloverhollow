@@ -22,9 +22,9 @@ const VALID_CATEGORIES: readonly TrackCategory[] = [
   "story",
 ];
 
-describe("Milestone 213: 33-Track Soundtrack Album & Direct Music Box Jukebox Player", () => {
-  it("keeps JUKEBOX_ALBUM in exact 33-track parity with jukeboxTracks and trackTitles", () => {
-    expect(JUKEBOX_ALBUM).toHaveLength(33);
+describe("Milestone 213: 35-Track Soundtrack Album & Direct Music Box Jukebox Player", () => {
+  it("keeps JUKEBOX_ALBUM in exact 35-track parity with jukeboxTracks and trackTitles", () => {
+    expect(JUKEBOX_ALBUM).toHaveLength(35);
     expect(JUKEBOX_ALBUM.map((entry) => entry.track)).toEqual([...jukeboxTracks]);
 
     const seenNumbers = new Set<number>();
@@ -45,7 +45,7 @@ describe("Milestone 213: 33-Track Soundtrack Album & Direct Music Box Jukebox Pl
     }
   });
 
-  it("partitions all 33 tracks across 5 non-empty categories with expected flagship tracks", () => {
+  it("partitions all 35 tracks across 5 non-empty categories with expected flagship tracks", () => {
     const counts: Record<TrackCategory, number> = {
       town: 0,
       interiors: 0,
@@ -61,7 +61,7 @@ describe("Milestone 213: 33-Track Soundtrack Album & Direct Music Box Jukebox Pl
       expect(counts[category], `category ${category} non-empty`).toBeGreaterThan(0);
       total += counts[category];
     }
-    expect(total).toBe(33);
+    expect(total).toBe(35);
 
     expect(trackAlbumEntry("festival")).toMatchObject({
       track: "festival",

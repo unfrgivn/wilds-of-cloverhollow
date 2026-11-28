@@ -27,10 +27,10 @@ function routeModule(modulePath: string): string | null {
   return match?.name ?? null;
 }
 
-describe("Milestone 160: Complete 33-Track Expansion World Soundtrack", () => {
-  it("lists all 33 unique jukebox tracks in album order with titles, scores, and scales", () => {
-    expect(jukeboxTracks).toHaveLength(33);
-    expect(new Set(jukeboxTracks).size).toBe(33);
+describe("Milestone 160: Complete 35-Track Expansion World Soundtrack", () => {
+  it("lists all 35 unique jukebox tracks in album order with titles, scores, and scales", () => {
+    expect(jukeboxTracks).toHaveLength(35);
+    expect(new Set(jukeboxTracks).size).toBe(35);
 
     expect(jukeboxTracks.indexOf("loft")).toBe(jukeboxTracks.indexOf("parlor") + 1);
     expect(jukeboxTracks.indexOf("bloom")).toBe(jukeboxTracks.indexOf("loft") + 1);
@@ -60,7 +60,7 @@ describe("Milestone 160: Complete 33-Track Expansion World Soundtrack", () => {
         expect(scale[i] ?? 0, `${id} ascending scale`).toBeGreaterThan(scale[i - 1] ?? 0);
       }
     }
-    expect(seenTitles.size).toBe(33);
+    expect(seenTitles.size).toBe(35);
   });
 
   it("gives loft, bloom, island, summit, and taco bespoke 16-bar chamber scores", () => {

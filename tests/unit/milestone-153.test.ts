@@ -108,9 +108,9 @@ function tonalFrequencies(segments: readonly AudioSegment[]): number[] {
 }
 
 describe("Milestone 152: Complete 24-Track World Soundtrack", () => {
-  it("lists 33 unique jukebox tracks in album order with titles, scores, and scales", () => {
-    expect(jukeboxTracks).toHaveLength(33);
-    expect(new Set(jukeboxTracks).size).toBe(33);
+  it("lists 35 unique jukebox tracks in album order with titles, scores, and scales", () => {
+    expect(jukeboxTracks).toHaveLength(35);
+    expect(new Set(jukeboxTracks).size).toBe(35);
 
     expect(jukeboxTracks.indexOf("market")).toBe(jukeboxTracks.indexOf("cafe") + 1);
     expect(jukeboxTracks.indexOf("parlor")).toBe(jukeboxTracks.indexOf("market") + 1);
@@ -134,7 +134,7 @@ describe("Milestone 152: Complete 24-Track World Soundtrack", () => {
         expect(scale[i] ?? 0, `${id} ascending scale`).toBeGreaterThan(scale[i - 1] ?? 0);
       }
     }
-    expect(seenTitles.size).toBe(33);
+    expect(seenTitles.size).toBe(35);
   });
 
   it("gives market, parlor, cottage, cabin, hearts, and encore bespoke 16-bar scores", () => {

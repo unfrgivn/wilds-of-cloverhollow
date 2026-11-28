@@ -9619,6 +9619,35 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   checks green), Chromium & WebKit (`milestone-225`, `milestone-224`,
   `milestone-164`), `encore-shrine`, 66/66 `shows exactly its parts`, and 99/99
   Chromium `ui-gallery` (`0` visual diffs).
+
+## Milestone 226: Complete 35-Track Original Soundtrack — Ms. Willow's Music Room (`"melody"`) & Ms. Rowan's Art Room (`"canvas"`) (`src/platform/scores-school.ts`) **Status:** ✅ Completed (2026-11-28)
+- Gives Cloverhollow School's two signature creative studios their own bespoke
+  16-bar 5-voice stereo chamber themes, expanding the Music Box Jukebox &
+  Interactive Soundtrack Album from 33 to an iconic **35 Original Composed
+  Themes** (matching all 35 playable areas 1-to-1) — zero `src/core/sim.ts`
+  changes, zero save-version bumps, zero replay hash drift across all 77 sims,
+  and zero visual baseline diffs across all 99 `ui-gallery` & 12 `soundtrack`
+  baselines.
+- Pure 35-track soundtrack projection & liner notes (`src/core/music.ts`, 396
+  lines):
+  - Added `"melody"` (`"Ms. Willow's Recital"`, `Music Room`, `"interiors"`) and
+    `"canvas"` (`"Skylight Watercolor"`, `Art Room`, `"interiors"`) right after
+    `"school"` in `jukeboxTracks` and `JUKEBOX_ALBUM` (35 themes), routing
+    `areaTracks.music = "melody"` and `areaTracks["art-room"] = "canvas"`.
+- Two bespoke 16-bar 5-voice stereo chamber scores
+  (`src/platform/scores-school.ts`, 233 lines; wired via `src/platform/scores.ts`
+  & `src/platform/voice-catalog.ts`):
+  - `melodyScore` (96 BPM, 3/4 C major conservatory waltz: `piano`, `flute`,
+    `celesta`, `harp`, `bass`, `C_MAJOR` scale) and `canvasScore` (88 BPM, 4/4 F
+    major painterly studio air: `harp`, `celesta`, `flute`, `pad`, `bass`,
+    `F_MAJOR` scale), both bar-quantized via `resumeBarStep` and bundled cleanly
+    into `audio-scores` (`105.07 kB` / `25.52 kB` gzip).
+- Evidence: `tests/unit/milestone-226.test.ts` (5 tests) plus updated 35-track
+  assertions across `soundtrack`, `lasso-jukebox`, `milestone-116`,
+  `milestone-214`, `milestone-216`, and `art` suites.
+- Gates: `just check` (293 unit files / 2,105 tests, all 77 sims + all sim
+  scripts, 23 QA packs, purity, lint), `just build` (`index` `392.52 kB < 500 kB`),
+  32/32 Chromium & WebKit e2e, and 99/99 Chromium `ui-gallery` tests.
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

@@ -277,7 +277,7 @@ test(
 
 test(
   "lodge, clubhouse, sanctuary, interiors, and expansion areas play bespoke themes; " +
-    "Jukebox cycles all 33 tracks",
+    "Jukebox cycles all 35 tracks",
   { tag: "@smoke" },
   async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
@@ -397,6 +397,17 @@ test(
       playing: true,
     });
 
+    // Ms. Willow's Music Room -> Ms. Willow's Recital + none ambience.
+    await resetPaused(page, "music");
+    await hold(page, "ArrowRight", 8);
+    expect(await readMusic(page)).toMatchObject({
+      track: "melody",
+      ambience: "none",
+      duck: false,
+      title: "Ms. Willow's Recital",
+      playing: true,
+    });
+
     // Wildlife Sanctuary -> Meadow of Friends + forest ambience.
     await resetPaused(page, "sanctuary");
     await hold(page, "ArrowUp", 8);
@@ -408,7 +419,7 @@ test(
       playing: true,
     });
 
-    // Open journal OPTIONS and cycle cleanly through all 33 jukebox tracks back to sanctuary.
+    // Open journal OPTIONS and cycle cleanly through all 35 jukebox tracks back to sanctuary.
     await page.keyboard.press("j");
     await step(page, 2);
     await page.keyboard.press("ArrowRight");
@@ -419,7 +430,7 @@ test(
     const nextBtn = page.locator(".journal-jukebox-next");
     const visited: string[] = [];
     let prevTrack = "sanctuary";
-    for (let i = 0; i < 33; i += 1) {
+    for (let i = 0; i < 35; i += 1) {
       await nextBtn.click();
       await expect.poll(async () => (await readMusic(page)).track).not.toBe(prevTrack);
       const info = await readMusic(page);
@@ -428,7 +439,9 @@ test(
       expect(info.duck).toBe(false);
       await expect(nowPlaying).toHaveText(`♫ ${info.title}`);
     }
-    expect(new Set(visited).size).toBe(33);
+    expect(new Set(visited).size).toBe(35);
+    expect(visited).toContain("melody");
+    expect(visited).toContain("canvas");
     expect(visited).toContain("encore");
     expect(visited).toContain("hearts");
     expect(visited).toContain("road");

@@ -116,7 +116,7 @@ function buildTrackCard(
   return { meta, btn, playingPill };
 }
 
-/** Creates the interactive 33-track Storybook Soundtrack Album modal for Fae's Journal. */
+/** Creates the interactive 35-track Storybook Soundtrack Album modal for Fae's Journal. */
 export function createJournalJukeboxAlbum(options?: JournalJukeboxOptions): JournalJukeboxAlbum {
   const overlay = element("div", "journal-jukebox-overlay");
   overlay.hidden = true;

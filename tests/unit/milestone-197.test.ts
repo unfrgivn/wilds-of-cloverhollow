@@ -40,9 +40,9 @@ function lineCount(filePath: string): number {
 }
 
 describe("Milestone 195: 33rd OST Theme Starlight Encore! (encore)", () => {
-  it("lists 33 unique jukebox tracks with encore right after boss", () => {
-    expect(jukeboxTracks).toHaveLength(33);
-    expect(new Set(jukeboxTracks).size).toBe(33);
+  it("lists 35 unique jukebox tracks with encore right after boss", () => {
+    expect(jukeboxTracks).toHaveLength(35);
+    expect(new Set(jukeboxTracks).size).toBe(35);
     expect(jukeboxTracks.indexOf("encore")).toBe(jukeboxTracks.indexOf("boss") + 1);
     expect(trackTitles.encore).toBe("Starlight Encore!");
     expect(scores.encore).toBe(interiorScores.encore);

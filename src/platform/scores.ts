@@ -8,6 +8,7 @@ export type {
 import type { PlayableTrack, Score } from "./scores-helpers";
 import { expansionScores } from "./scores-expansion";
 import { interiorScores } from "./scores-interiors";
+import { schoolScores } from "./scores-school";
 import { townScores } from "./scores-town";
 import { wildsScores } from "./scores-wilds";
 
@@ -24,6 +25,8 @@ export const scores: Record<PlayableTrack, Score> = {
   sanctuary: wildsScores.sanctuary,
   festival: expansionScores.festival,
   school: townScores.school,
+  melody: schoolScores.melody,
+  canvas: schoolScores.canvas,
   bay: wildsScores.bay,
   fishing: townScores.fishing,
   cottage: interiorScores.cottage,

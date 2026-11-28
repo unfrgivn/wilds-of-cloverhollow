@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 225)
+Last updated: 2026-11-28 (Milestone 226)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -554,7 +554,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   `sanctuary` ("Meadow of Friends", pre-reveal Wildlife Sanctuary), `festival`
   ("Cloverhollow Jubilee", 108 BPM 4/4 D major / G major celebration jubilee for
   post-finale `sanctuary` once `milo_revealed === true`, over `"forest"`
-  ambience), `school` ("Bell & Chalk"), `bay`
+  ambience), `school` ("Bell & Chalk"), `melody` ("Ms. Willow's Recital", 96 BPM
+  3/4 C major 16-bar 5-voice conservatory waltz across `piano`, `flute`,
+  `celesta`, `harp`, and `bass` for `music` over `"none"` ambience, Milestone
+  225), `canvas` ("Skylight Watercolor", 88 BPM 4/4 F major 16-bar 5-voice
+  pastel studio air across `harp`, `celesta`, `flute`, `pad`, and `bass` for
+  `art-room` over `"none"` ambience, Milestone 225), `bay`
   ("Bubblegum Breeze"), `fishing` ("Docked by the Tide", unducked over
   `"ocean"` ambience while `state.arcade.game === "fish"` at Bubblegum Bay's
   dock, ducking only when dialogue opens), `cottage` ("Sea-Glass Sunroom", 88
@@ -580,16 +585,17 @@ ios/            Capacitor iOS project (from Milestone 4).
   softly ducked over the area's active ambience bed whenever a Party
   Heart-to-Heart `h2h_*` dialogue knot is active outside battles/arcade,
   Milestone 191), `morning` ("Waking Up", during the morning and credits
-  finale), and `silent` ("Quiet", for `harness`). `jukeboxTracks` exports all 33
+  finale), and `silent` ("Quiet", for `harness`). `jukeboxTracks` exports all 35
   non-silent themes in story/album order (`title`, `home`, `cafe`, `market`,
-  `parlor`, `loft`, `bloom`, `school`, `bay`, `fishing`, `cottage`, `island`,
+  `parlor`, `loft`, `bloom`, `school`, `melody`, `canvas`, `bay`, `fishing`,
+  `cottage`, `island`,
   `pass`, `lodge`, `cabin`, `summit`, `cavern`, `woods`, `clubhouse`, `hills`,
   `road`, `sanctuary`, `festival`, `arcade`, `taco`, `enchanted`,
   `enchanted-calm`, `battle`, `boss`, `encore`, `talk`, `hearts`, `morning`) for the
   Journal OPTIONS Music Box and the interactive **Soundtrack Album** modal
   (`JUKEBOX_ALBUM` / `trackAlbumEntry` / `TrackCategory` / `TrackAlbumMeta` in
-  `src/core/music.ts`, Milestone 213 — exhaustive 33-track liner-notes registry
-  with track numbers `1..33`, region tags, 5 categories `town` / `interiors` /
+  `src/core/music.ts`, Milestones 213 & 225 — exhaustive 35-track liner-notes registry
+  with track numbers `1..35`, region tags, 5 categories `town` / `interiors` /
   `wilds` / `festive` / `story`, warm 1-line mood notes, and accent hues; shell-only
   override, never saved, plays unducked while the journal is open and returns
   smoothly to the live area theme on close, title, or reset). Ambience beds
@@ -602,10 +608,11 @@ ios/            Capacitor iOS project (from Milestone 4).
 - `src/platform/audio.ts` creates a single AudioContext first thing at boot,
   before anything awaits, and resumes it at every chance: right away, on each
   key, pointer, or touch, and whenever a cue plays while it isn't running.
-  Its master chain routes SFX, music (`src/platform/music.ts` over the 33
+  Its master chain routes SFX, music (`src/platform/music.ts` over the 35
   multi-voice scores split across `src/platform/scores-helpers.ts`,
   `src/platform/scores-town.ts`, `src/platform/scores-wilds.ts`,
-  `src/platform/scores-interiors.ts`, and `src/platform/scores-expansion.ts`,
+  `src/platform/scores-interiors.ts`, `src/platform/scores-expansion.ts`, and
+  `src/platform/scores-school.ts`,
   re-exported by `src/platform/scores.ts`, dry plus warm stereo ConvolverNode
   reverb), and procedural ambience (`src/platform/ambience.ts`) through a
   shared `DynamicsCompressorNode`. Music arranges its 10 instrument voices
@@ -690,8 +697,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   bit-identical on `neutral`/omitted, pausing blips cleanly during `{pause:N}`
   dramatic beats via `buildSoundContext`), and pitch `choice-move`,
   `battle-command`, and `choice-select` clicks to the active soundtrack's
-  pentatonic scale (across all 33 tracks + `silent`, with `hearts` tuned to
-  `EB_MAJOR_WARM` and `encore` tuned to `G_MAJOR`).
+  pentatonic scale (across all 35 tracks + `silent`, with `hearts` tuned to
+  `EB_MAJOR_WARM`, `encore` tuned to `G_MAJOR`, `melody` tuned to `C_MAJOR`,
+  and `canvas` tuned to `F_MAJOR`).
   Browsers hold the context (`suspended`, or WebKit's `interrupted`) until a
   key, click, or tap; a gamepad press is not a user activation in any browser,
   so a pad-only player on the web hears nothing until one. The iOS app's web
@@ -5557,24 +5565,24 @@ trunks keep its two exits.
   foley, Reduced Motion and iOS tap-selection parity, and
   backdrop/`×`/`Escape`/`X`/`B` dismiss restoring Field Treasures and focus
   directly to `.journal-hearts-btn`.
-- **Interactive 33-Track Soundtrack Album & Direct Music Box Player**
-  (Milestone 213): hand-inked storybook Soundtrack Album modal
+- **Interactive 35-Track Soundtrack Album & Direct Music Box Player**
+  (Milestones 213 & 225): hand-inked storybook Soundtrack Album modal
   (`src/ui/journal-jukebox.ts` + `src/ui/journal-jukebox.css`, composed into
   `createJournalFieldOverlays` in `src/ui/journal-field-note.ts` and wired to
   `onSelectJukeboxTrack` / `onResetJukebox` through `src/ui/journal-options.ts`,
   `src/ui/journal.ts`, and `src/shell/shell-bindings.ts`, backed by pure
   `JUKEBOX_ALBUM` & `trackAlbumEntry` in `src/core/music.ts`) launched from the
-  lilac-cream `.journal-album-btn` (`"♫ OST · 33"`) pill in the `FIELD TREASURES`
+  lilac-cream `.journal-album-btn` (`"♫ OST · 35"`) pill in the `FIELD TREASURES`
   modal header (leaving all 99 `ui-gallery` and 12 `soundtrack.spec` baselines
   pixel-identical). Renders a hand-inked `#47321f` inline SVG music-box emblem
   (zero `<text>` nodes), `"SOUNDTRACK ALBUM"` heading, live `aria-live="polite"`
-  count/now-playing pill (`"33 Themes"` / golden `"♪ Playing: <Title>"`),
+  count/now-playing pill (`"35 Themes"` / golden `"♪ Playing: <Title>"`),
   conditional `"Area Theme"` reset button (`.journal-album-reset`, shown while
   Jukebox override is active), circular 44×44 `×` close button, 6 category
-  filter pills (`All · 33`, `Town`, `Homes & Shops`, `Wilds`, `Festive`,
+  filter pills (`All · 35`, `Town`, `Homes & Shops`, `Wilds`, `Festive`,
   `Story & Battle` with `aria-pressed`), and a scrollable 2-column grid of
   `>= 44 px` die-cut track cards across both `1280x720` and `874x402` viewports
-  showing track number `01`–`33`, colored accent border, bold title, region tag,
+  showing track number `01`–`35`, colored accent border, bold title, region tag,
   1-line mood note, and golden `"♪ Playing"` badge on the active track. Clicking
   any track plays it live unducked through the real Web Audio Music Box
   synthesizer with subtle toggle foley, switching category filters plays

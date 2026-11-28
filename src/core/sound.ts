@@ -8,7 +8,7 @@ export type SoundCue =
   | `footstep-${import("./surfaces").Surface}`
   | "door" | "area-arrive" | "coin" | "item" | "sticker"
   | "lantern-on" | "lantern-off" | "battle-start" | "battle-command"
-  | "battle-together" | "battle-hit" | "battle-win" | "battle-run" | "battle-rest"
+  | "battle-together" | "battle-hit" | "battle-win" | "battle-run" | "battle-rest" | "battle-faint"
   | "battle-beat"
   | "level-up"
   | "claw-move" | "claw-drop" | "claw-grab" | "claw-miss" | "prize-won"
@@ -17,6 +17,7 @@ export type SoundCue =
   | "comet-move" | "comet-star" | "comet-bump"
   | "cook-start" | "cook-frozen" | "cook-ding"
   | "fish-cast" | "fish-nibble" | "fish-bite" | "fish-reel" | "fish-catch"
+  | "taco-top" | "taco-oops" | "taco-order"
   | "chime-red" | "chime-yellow" | "chime-green" | "chime-blue" | "flute"
   | "flute-red" | "flute-yellow" | "flute-green" | "flute-blue"
   | "lasso-twirl";
@@ -126,6 +127,9 @@ export function soundCues(
         (next.battle.phase === "result" || next.battle.phase === "burstResult"))
       cues.push("battle-hit");
   }
+  if (next.battle?.phase === "rest" && previous.battle?.phase !== "rest") {
+    cues.push("battle-faint");
+  }
   const game = next.arcade;
   const newPhase = game !== null && previous.arcade?.phase !== game.phase;
   if (game?.game === "claw" && newPhase) {
@@ -174,9 +178,9 @@ export function soundCues(
   }
   if (game?.game === "taco") {
     const was = previous.arcade?.game === "taco" ? previous.arcade : null;
-    if (was !== null && game.stepIndex > was.stepIndex) cues.push("mole-boop");
-    if (was !== null && game.mistakes > was.mistakes) cues.push("mole-whiff");
-    if (newPhase && game.phase === "order-clear") cues.push("cook-ding");
+    if (was !== null && game.stepIndex > was.stepIndex) cues.push("taco-top");
+    if (was !== null && game.mistakes > was.mistakes) cues.push("taco-oops");
+    if (newPhase && game.phase === "order-clear") cues.push("taco-order");
     if (
       newPhase &&
       game.phase === "result" &&

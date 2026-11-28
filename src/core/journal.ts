@@ -86,8 +86,8 @@ const LAND_GEMS: Readonly<Record<string, readonly StarGemVariable[]>> = {
 const LAND_HIGHLIGHTS: Readonly<Record<string, string>> = {
   cloverhollow: "Shops, Café & Arcade",
   bay: "Fishing, Boats & Cottage",
-  pass: "Lodge, Cavern & Cabin",
-  hills: "Wildlife Sanctuary",
+  pass: "Lodge, Summit & Cavern",
+  hills: "Sanctuary & Taco Truck",
   forest: "Clubhouse & Garden",
   trail: "Cliffside Lookout",
   enchanted: "Misty Path & Ancient Tree",

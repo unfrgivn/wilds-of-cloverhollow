@@ -7085,6 +7085,34 @@ the old trail, the owl, and the clubhouse claim.
   purity, lint), `just build` (all non-vendor chunks `< 400 kB`), and 29/29
   Chromium & WebKit e2e tests.
 
+## Milestone 165: Bespoke Taco Truck Kitchen Audio Foley, Cozy Battle-Faint Lullaby & Low-Pass Music Ducking, Complete Taco/Faint Haptic Coverage & Expansion Land Field Guides **Status:** ✅ Completed (2026-11-27)
+- Replaces borrowed minigame SFX in Chef Mateo's Taco Truck Kitchen with
+  bespoke kitchen foley and haptics, adds a tender music-box lullaby + warm
+  low-pass music ducking when Fae faints in battle (`battle.phase === "rest"`),
+  and updates the Journal Map Land Field Guides for Alpine Summit and Taco
+  Truck — zero `src/core/sim.ts` changes, zero save-version bumps, zero replay
+  hash drift across all 74 sims, and zero visual baseline diffs.
+- Bespoke Taco Truck & Battle-Faint sound cues & haptics (`src/core/sound.ts`,
+  `src/platform/audio-recipes.ts`, `src/shell/feedback.ts`):
+  - Added `"taco-top"` (0.09 s marimba topping pop + `lowpass: 3200` crunch,
+    `"light"` haptic), `"taco-oops"` (0.11 s playful wooden klunk, `"medium"`
+    haptic), `"taco-order"` (0.36 s vintage service bell + fiesta bell trill,
+    `"celebrate"` haptic), and `"battle-faint"` (0.50 s descending
+    `E5 -> D5 -> C5 -> A4` music-box lullaby on entering `battle.phase === "rest"`,
+    `"medium"` haptic).
+- Cozy battle-faint low-pass music ducking (`src/core/music.ts`):
+  - Updated battle ducking in `soundtrackFor(...)` to `battle.phase === "reward" ||
+    battle.phase === "rest"`, smoothly pillowing battle music through the
+    `2600 Hz` low-pass filter on cozy faint-to-bed transitions.
+- Expansion Land Field Guides (`src/core/journal.ts`):
+  - Updated `LAND_HIGHLIGHTS` (`hills: "Sanctuary & Taco Truck"`,
+    `pass: "Lodge, Summit & Cavern"`) while keeping `bay` untouched.
+- Evidence: `tests/unit/milestone-165.test.ts` (6 tests) plus updated
+  `taco`, `taco-replay`, `milestone-113`, and `milestone-115` unit suites.
+- Gates: `just check` (228 unit files / 1,668 tests, all 74 sims, 23 QA packs,
+  purity, lint), `just build` (all non-vendor chunks `< 400 kB`), and 44/44
+  Chromium & WebKit e2e tests with zero baseline diffs.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

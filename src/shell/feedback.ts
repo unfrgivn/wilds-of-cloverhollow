@@ -52,17 +52,21 @@ const CELEBRATE_HAPTIC_CUES: ReadonlySet<SoundCue> = new Set<SoundCue>([
   "level-up",
   "sticker",
   "skee-hundred",
+  "taco-order",
 ]);
 
 const MEDIUM_HAPTIC_CUES: ReadonlySet<SoundCue> = new Set<SoundCue>([
   "comet-bump",
   "lasso-twirl",
   "cook-ding",
+  "taco-oops",
+  "battle-faint",
 ]);
 
 const LIGHT_HAPTIC_CUES: ReadonlySet<SoundCue> = new Set<SoundCue>([
   "claw-grab",
   "mole-boop",
+  "taco-top",
   "fish-bite",
   "skee-score",
   "comet-star",

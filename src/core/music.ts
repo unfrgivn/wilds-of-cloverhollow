@@ -219,7 +219,11 @@ export function soundtrackFor(
       critter !== undefined &&
       (critter.windUp !== null || critterTalk !== null || !critter.canRun);
     const track: MusicTrack = talkActive ? "talk" : isBoss ? "boss" : "battle";
-    return makeSoundtrack(track, "none", state.battle.phase === "reward");
+    return makeSoundtrack(
+      track,
+      "none",
+      state.battle.phase === "reward" || state.battle.phase === "rest",
+    );
   }
   if (state.area === "harness") return makeSoundtrack("silent", "none", false);
   if (state.arcade?.game === "fish") {

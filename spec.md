@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 164)
+Last updated: 2026-11-27 (Milestone 165)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -225,7 +225,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   `renderBootError` mounts a self-contained inline-styled `#f8edcf` / `#47321f`
   storybook recovery card (`"Cloverhollow hit a bump!"`, safe error summary,
   and `"Reload"` button) inside `#app` with zero cost on normal boot.
-- Tactile haptics (`src/platform/haptics.ts`, Milestones 91, 121, 122 & 142):
+- Tactile haptics (`src/platform/haptics.ts`, Milestones 91, 121, 122, 142 &
+  165):
   progressive enhancement with zero new npm dependencies. `createHaptics()`
   checks for a native Capacitor Haptics plugin (`Capacitor.Plugins.Haptics`) via
   strict type guards, then fires dual-rumble Gamepad haptic actuators via
@@ -240,11 +241,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   Projected via `hapticForTick` (`src/shell/feedback.ts`) with strict priority
   `"celebrate"` > `"medium"` > `"light"`:
   `"celebrate"` on Golden Chef (`goldenCooked`), `soothed` transition,
-  `battle-together`, `prize-won`, `fish-catch`, `level-up`, `sticker`, and
-  `skee-hundred`; `"medium"` on `GREAT!` `battle-hit`, `comet-bump`,
-  `lasso-twirl`, and `cook-ding`; and `"light"` on `claw-grab`, `mole-boop`,
-  `fish-bite`, `skee-score`, `comet-star`, `flute`, `lantern-on`, `coin`,
-  `item`, and companion pet.
+  `battle-together`, `prize-won`, `fish-catch`, `level-up`, `sticker`,
+  `skee-hundred`, and `taco-order`; `"medium"` on `GREAT!` `battle-hit`,
+  `comet-bump`, `lasso-twirl`, `cook-ding`, `taco-oops`, and `battle-faint`;
+  and `"light"` on `claw-grab`, `mole-boop`, `taco-top`, `fish-bite`,
+  `skee-score`, `comet-star`, `flute`, `lantern-on`, `coin`, `item`, and
+  companion pet.
 
 ### 3.2 Input
 - Devices produce one `ActionFrame` per tick: a `move` vector (x and y in
@@ -402,12 +404,15 @@ ios/            Capacitor iOS project (from Milestone 4).
   `tickets-won` for skee-ball, and `mole-pop`, `mole-boop`, and `mole-whiff`
   for Boop-a-Mole, `comet-move`, `comet-star`, and `comet-bump` for Comet
   Cruise, `cook-start`, `cook-frozen`, and `cook-ding` for the clubhouse
-  microwave, and `fish-cast`, `fish-nibble`, `fish-bite`, `fish-reel`, and
-  `fish-catch` for Bubblegum Bay fishing. Battle depth adds `battle-together` (a rising C-major-9th sparkle
-  arpeggio when Together! launches, replacing `battle-command`), projects
-  `flute` when Flute Friends assist in battle, and adds `lasso-twirl` (a rising
-  rope whoosh and wooden star ping) when Fae twirls Coach Ash's rainbow lasso
-  in battle.
+  microwave, `fish-cast`, `fish-nibble`, `fish-bite`, `fish-reel`, and
+  `fish-catch` for Bubblegum Bay fishing, and `taco-top`, `taco-oops`, and
+  `taco-order` for Chef Mateo's Taco Truck Kitchen (Milestone 165). Battle
+  depth adds `battle-together` (a rising C-major-9th sparkle arpeggio when
+  Together! launches, replacing `battle-command`), `battle-faint` (emitted on
+  entering `battle.phase === "rest"` when Fae runs out of energy and plays her
+  cozy fainting choreography, Milestone 165), projects `flute` when Flute
+  Friends assist in battle, and adds `lasso-twirl` (a rising rope whoosh and
+  wooden star ping) when Fae twirls Coach Ash's rainbow lasso in battle.
 - Soundtrack projection (`src/core/music.ts`): closed track set `title`
   ("Watercolor Morning"), `home` ("Cloverhollow Town"), `cafe` ("Cinnamon
   Waltz"), `market` ("Pippin's Basket Waltz", 102 BPM 3/4 G major corner-grocer
@@ -448,7 +453,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   `enchanted-shimmer`, `arcade-hum`, `cavern-drips`, `cafe-murmur`) match each
   outdoor area, the café, the lodge, the cavern, and the arcade, and pause in
   battles. Music ducks smoothly during dialogue, the journal, non-fishing /
-  non-taco arcade games (and clubhouse microwave cooking), and battle rewards.
+  non-taco arcade games (and clubhouse microwave cooking), battle rewards, and
+  cozy battle-faint rest (`battle.phase === "rest"`, Milestone 165).
 - `src/platform/audio.ts` creates a single AudioContext first thing at boot,
   before anything awaits, and resumes it at every chance: right away, on each
   key, pointer, or touch, and whenever a cue plays while it isn't running.
@@ -606,6 +612,16 @@ ios/            Capacitor iOS project (from Milestone 4).
   golden chime (1047 -> 1568 Hz, 0.42 s); and `tickets-won` plays a 6-segment
   ascending ticket/coin twinkle cascade (784 -> 880 -> 1047 -> 1175 -> 1568 Hz +
   3136 Hz sparkle overtone, 0.40 s).
+- Bespoke Taco Truck Kitchen foley & battle-faint lullaby (Milestone 165,
+  `src/platform/audio-recipes.ts`, re-exported via `src/platform/audio.ts`):
+  `taco-top` plays a cheerful marimba topping pop (`587.33 -> 783.99 Hz`
+  triangle/sine pluck + whisper crisp crunch burst at `lowpass: 3200`, `0.09 s`);
+  `taco-oops` plays a soft playful wooden klunk (`340 -> 235 Hz` triangle bend +
+  low woody body, `0.11 s`, peak gain `0.055`); `taco-order` pairs a crisp
+  vintage kitchen service bell (`1568 Hz` + `3136 Hz` sine resonance) with a
+  3-note fiesta bell trill (`783.99 -> 987.77 -> 1174.66 Hz`, `0.36 s`); and
+  `battle-faint` plays a tender descending music-box lullaby (`659.25 -> 587.33
+  -> 523.25 -> 440 Hz`, warm sine + triangle blend, `0.50 s`, gains `<= 0.065`).
 ## 4. Presentation (locked)
 - Logical view: 720 units tall. Width = 720 x screen aspect, clamped to
   960..1600 (4:3 to 20:9). Letterbox outside that range.
@@ -4147,10 +4163,10 @@ trunks keep its two exits.
   widened to 1620 = 27 s under Gentle Timing). During `serving`, fresh
   directional edges map directly to the 4 toppings (`up` `beans`, `right`
   `cheese`, `down` `salsa`, `left` `avocado`): matching the next ticket step
-  advances `stepIndex`, adds +10 score, and emits `mole-boop`; a wrong topping
+  advances `stepIndex`, adds +10 score, and emits `taco-top`; a wrong topping
   increments `mistakes`, sets `oopsTicks` (20) for a gentle wobble without
-  resetting progress, and emits `mole-whiff`. Completing an order adds +25
-  bonus, enters `order-clear` (`clearTicks` 42), and emits `cook-ding`. Serving
+  resetting progress, and emits `taco-oops`. Completing an order adds +25
+  bonus, enters `order-clear` (`clearTicks` 42), and emits `taco-order`. Serving
   all 3 orders (or timing out) enters `result`, awarding `coinsPerOrder` (5)
   coins per order (+5 spotless bonus for 3/3 with 0 mistakes -> up to 20 coins)
   and 1 snack for 2+ orders or 2 snacks for a spotless 3/3 shift (emitting
@@ -4362,8 +4378,10 @@ trunks keep its two exits.
   `landFieldGuide` (`src/core/journal.ts`, Milestone 110): sticker progress,
   Star Gem status (`★ Gem` / `◇ Gem` once any Star Gem is found or `gem_quest`
   is active), Star-Line bus stop status (`cloverhollow`, `bay`, `pass`), and
-  iconic land highlights, while keeping the default un-selected `"Here: ..."`
-  line unchanged.
+  iconic land highlights (with expansion highlights `Sanctuary & Taco Truck` for
+  `hills` and `Lodge, Summit & Cavern` for `pass`, keeping `bay` as
+  `Fishing, Boats & Cottage`, Milestone 165), while keeping the default
+  un-selected `"Here: ..."` line unchanged.
 - The OPTIONS spread (extracted into `src/ui/journal-options.ts` via
   `createJournalOptionsPage`, with `journalControlsLines`, `formatJukeboxLabel`,
   `JournalControlsTools`, `JournalControlsLines`, `JournalInputMode`, and

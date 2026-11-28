@@ -188,10 +188,10 @@ describe("Milestone 110: Battle Field Guide Peek & Interactive Map Land Guide", 
     expect(landFieldGuide(world, lateState, "trail")).toContain("◇ Gem");
     expect(landFieldGuide(world, lateState, "forest")).toContain("◇ Gem");
     expect(landFieldGuide(world, lateState, "hills")).toContain("◇ Gem");
-    expect(landFieldGuide(world, lateState, "hills")).toContain("Wildlife Sanctuary");
+    expect(landFieldGuide(world, lateState, "hills")).toContain("Sanctuary & Taco Truck");
     expect(landFieldGuide(world, lateState, "pass")).toContain("★ Gem (2/2)");
     expect(landFieldGuide(world, lateState, "pass")).toContain("Star-Line stop");
-    expect(landFieldGuide(world, lateState, "pass")).toContain("Lodge, Cavern & Cabin");
+    expect(landFieldGuide(world, lateState, "pass")).toContain("Lodge, Summit & Cavern");
 
     const enchantedGuide = landFieldGuide(world, lateState, "enchanted");
     expect(enchantedGuide).toContain("The Enchanted Forest");

@@ -111,7 +111,7 @@ describe("Chef Mateo's Taco Truck Kitchen (core & layout)", () => {
   });
 
   it("handles wrong topping oops without resetting progress and plays a spotless 3/3 shift", () => {
-    // 1. Test gentle wrong-topping oops preserves stepIndex and emits mole-whiff.
+    // 1. Test gentle wrong-topping oops preserves stepIndex and emits taco-oops.
     let oopsState = openTaco(12);
     oopsState = step(world, oopsState, confirmFrame).state;
     oopsState = step(world, oopsState, blankInput()).state;
@@ -124,7 +124,7 @@ describe("Chef Mateo's Taco Truck Kitchen (core & layout)", () => {
 
     const beforeRight = oopsState;
     oopsState = step(world, oopsState, { ...blankInput(), move: TOPPING_MOVE[step0] }).state;
-    expect(soundCues(beforeRight, oopsState, world)).toContain("mole-boop");
+    expect(soundCues(beforeRight, oopsState, world)).toContain("taco-top");
     expect(oopsState.arcade?.game === "taco" ? oopsState.arcade.stepIndex : -1).toBe(1);
     expect(oopsState.arcade?.game === "taco" ? oopsState.arcade.score : -1).toBe(10);
 
@@ -133,13 +133,13 @@ describe("Chef Mateo's Taco Truck Kitchen (core & layout)", () => {
     const wrongTopping: TacoTopping = step1 === "beans" ? "cheese" : "beans";
     const beforeWrong = oopsState;
     oopsState = step(world, oopsState, { ...blankInput(), move: TOPPING_MOVE[wrongTopping] }).state;
-    expect(soundCues(beforeWrong, oopsState, world)).toContain("mole-whiff");
+    expect(soundCues(beforeWrong, oopsState, world)).toContain("taco-oops");
     if (oopsState.arcade?.game !== "taco") throw new Error("expected taco");
     expect(oopsState.arcade.stepIndex).toBe(1);
     expect(oopsState.arcade.mistakes).toBe(1);
     expect(oopsState.arcade.oopsTicks).toBe(world.arcade.taco.oopsTicks);
 
-    // 2. Play a spotless 3/3 shift and verify +20 coins, +2 snacks, cook-ding, and prize-won.
+    // 2. Play a spotless 3/3 shift and verify +20 coins, +2 snacks, taco-order, and prize-won.
     let state = openTaco(31);
     const coinsBefore = state.coins;
     const snacksBefore = state.snacks;
@@ -179,8 +179,8 @@ describe("Chef Mateo's Taco Truck Kitchen (core & layout)", () => {
     }
     expect(state.coins).toBe(coinsBefore + 20);
     expect(state.snacks).toBe(snacksBefore + 2);
-    expect(cuesSeen).toContain("mole-boop");
-    expect(cuesSeen).toContain("cook-ding");
+    expect(cuesSeen).toContain("taco-top");
+    expect(cuesSeen).toContain("taco-order");
     expect(cuesSeen).toContain("prize-won");
     expect(cuesSeen).toContain("coin");
     expect(cuesSeen).toContain("item");

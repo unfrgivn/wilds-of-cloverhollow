@@ -47,8 +47,8 @@ describe("Chef Mateo's Taco Truck Kitchen replay", () => {
       "order-clear",
       "result",
     ]);
-    expect(cues).toContain("mole-boop");
-    expect(cues).toContain("cook-ding");
+    expect(cues).toContain("taco-top");
+    expect(cues).toContain("taco-order");
     expect(cues).toContain("prize-won");
     expect(cues).toContain("coin");
     expect(cues).toContain("item");

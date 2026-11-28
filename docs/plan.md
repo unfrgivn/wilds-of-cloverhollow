@@ -7523,9 +7523,13 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   (strictly obeying `spec.md` §1.2 secrecy rule) and empathetic pre-battle
   stress vignettes for every mini-boss.
 - **Track E11 (Party Heart-to-Hearts & Interactive Multi-Step Town Quests):**
-  6 optional Heart-to-Heart scenes (including Fae's journal / baby Oliver
-  backstory from `NOTES.md`, Sue, Jordan, and Clubhouse trio) unlocking
-  Friendship Charm Pins + 4 tool-driven Living NPC quests.
+  ✅ Completed (Milestone 189, 2026-11-27). Six optional Heart-to-Heart scenes
+  (`content/story/party/heart_to_hearts.ink`, pure `src/core/heart-to-hearts.ts`,
+  warm `♥ HEART` prompt cue) including Fae's journal/baby Oliver backstory from
+  `NOTES.md`, Sue, Jordan, Café debate, Clubhouse Snack Night, and post-finale
+  Sanctuary Encore + 4 tool-driven Living NPC quests (Grandpa Barnaby's Star
+  Chart, Rosie's Runaway Kite Chain, Toby's Sleepy Lullaby, Chef Bea's Valley
+  Spice Run) with validated `# expr:`/`# pose:` tags and `miloSecrecyErrors`.
 - **Track E12 (Enchanted Forest Climax, Waking-Up Morning Epilogue & Consolidated Sim/QA Sync):**
   Showstopping 3-Tool Seal ritual, clue-powered multi-phase Ancient Tree finale,
   hood-drop reconciliation, enriched playable waking-up morning + ending
@@ -8217,6 +8221,60 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
 - Gates: `just check`, `just build` (`< 500 kB` every non-vendor chunk, hook
   leak + runtime story + harness checks green), and Chromium + WebKit e2e
   verification.
+
+## Milestone 189: Party Heart-to-Hearts & Interactive Multi-Step Town Quests (Elevation Track E11) **Status:** ✅ Completed (2026-11-27)
+- Implements Elevation Track E11 with 6 optional Party Heart-to-Heart scenes
+  and 4 tool-driven multi-step Living NPC quests, rich `# expr:` / `# pose:`
+  Ink direction paired live with Tracks E2 and E3, and zero Save v10 or
+  existing QA-pack hash drift:
+  - **6 Optional Party Heart-to-Hearts (`content/story/party/heart_to_hearts.ink`,
+    included in `content/story/main.ink`, pure `src/core/heart-to-hearts.ts`):**
+    Fae & Maddie (Bedroom + Meadow Park unseen fallback, directly adapting
+    `NOTES.md` lines 82 to 83 on Mom & Dad's journal gift when baby Oliver was
+    born and Maddie curling up beside it on night one), Fae & Sue (Bubblegum
+    Bay dock, sea-glass compass courage), Fae & Jordan (Pinecone Pass lookout,
+    taking a breather from always being the cheerful guide), Sue & Jordan (Bon
+    Appetit Café, hot cocoa vs. sea-salt taffy treaty), Full Party Trio + Maddie
+    (Clubhouse Snack Night reflecting on the Kid in the Purple Hood while
+    strictly respecting §1.2 secrecy), and Post-Finale Sanctuary Encore (Milo +
+    full party laughing over dream memories, gated strictly on `milo_revealed`).
+  - **Subtle Warm Heart-Prompt Cue (`src/core/sim.ts`,
+    `src/render/view-projections.ts`, `src/ui/sticker.ts`,
+    `src/ui/sticker.css`):** active Heart-to-Heart spots appear in
+    `targetInteractable` once unlocked (never mutating static area interactable
+    arrays or visual baselines) and project a warm rose-blush `♥ HEART` prompt
+    pill (`tone: "heart"`, `.sticker-prompt.is-heart`, `data-tone="heart"`,
+    >= 8:1 dark-plum contrast).
+  - **4 Tool-Driven Multi-Step Living NPC Quests
+    (`content/story/town/living_npcs_valley.ink`, `living_npcs_wilds.ink`,
+    tool-gated hooks in `shops.ink` & `homes.ink`, non-colliding `glows` and
+    `interactables` across 8 areas):**
+    1. *Grandpa Barnaby's Star Chart:* 3 invisible Blacklight Lantern `glows`
+       across `plaza`, `bay`, and `pass` (`star_chart_plaza_glow`,
+       `star_chart_bay_glow`, `star_chart_pass_glow`).
+    2. *Rosie's Runaway Kite Chain:* 4 Rainbow Lasso ribbon tails across
+       `park`, `lane`, `crossing`, and `boardwalk`.
+    3. *Toby's Sleepy Lullaby:* 3 Harmony Flute musical landmarks across
+       `plaza`, `park`, and `woods` triggered via direct `F` flute press
+       (`findLullabyFluteSpot` within 115 units when `lullaby_quest` is active)
+       or Confirm interaction.
+    4. *Chef Bea's Valley Spice Run:* regional foraging for Coastal Sea-Salt
+       (`bay`), Alpine Pine-Sugar (`pass`), and Woodland Mint (`woods`).
+  - **Story Validation & §1.2 Secrecy (`src/content/story-checks.ts`,
+    `content/story/systems/journal.ink`, `package.json` `"ink:compile"`):**
+    added `STORY_EXPRESSIONS`, `STORY_POSES`, `# expr:` / `# pose:` validation
+    in `storyTagErrors`, and `miloSecrecyErrors` (which also caught and fixed a
+    pre-existing §1.2 gap in `journal.ink` by gating the Milo identity note on
+    `milo_revealed and calmed("hooded-kid")`).
+- Evidence: `tests/unit/e11-heart-to-hearts.test.ts` (17 zero-mock tests),
+  deterministic headless sim `tools/sim/e11-heart-to-hearts.ts` (4,331 ticks,
+  double-run hash parity `5dc7557d`, wired into `package.json` `"sim"`),
+  Playwright e2e `tests/e2e/e11-heart-to-hearts.spec.ts` (real key presses on
+  Chromium & WebKit), and `vision`-verified review captures
+  `art/review/e11-heart-prompt.jpg`, `art/review/e11-fae-maddie-h2h.jpg`, and
+  `art/review/e11-barnaby-star-chart.jpg`.
+- Gates: `just check`, `just build`, and Playwright e2e (`--workers=2`) verified
+  clean after rebasing onto `origin/main`.
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.

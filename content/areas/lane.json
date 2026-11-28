@@ -248,6 +248,15 @@
         "y": 780
       },
       "prompt": "Look"
+    },
+    {
+      "id": "kite-ribbon-lane",
+      "knot": "kite_ribbon_lane",
+      "point": {
+        "x": 1680,
+        "y": 760
+      },
+      "prompt": "Look"
     }
   ],
   "critters": [],

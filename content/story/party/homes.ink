@@ -158,11 +158,14 @@ I've been pressing Meadow Park daisies into bookmarks and sorting all my pastel 
 Here, I steeped a warm Sunlit Clover Tea Snack just in case a friend stopped by! # speaker: Rosie # gift: snack 1 # sound: chime-green
 Mmm, it smells like honey and sunny wildflowers! Thank you, Rosie! # speaker: Fae
 {(visited_hills or sanctuary_visited) and not rosie_clover_gift: -> clover_gift}
+{has_lasso and not kite_chain_done: -> rosie_kite_chain_prompt}
 -> DONE
 = again
 {(visited_hills or sanctuary_visited) and not rosie_clover_gift: -> clover_gift}
 Welcome back to my flower cottage, Fae! # speaker: Rosie
 {sanctuary_visited: I heard Ranger Fern's Wildlife Sanctuary east of Clover Hills is blooming brighter than ever! Every calm critter makes the whole valley happier. # speaker: Rosie|{visited_hills: Have you spotted the sunny east trail out of Clover Hills yet? Rumor says there's a whole Wildlife Sanctuary tucked past the wildflowers! # speaker: Rosie|Meadow Park's wildflowers are extra bright today! If you head past the play tower, the path opens right out into Clover Hills! # speaker: Rosie}}
+{has_lasso and not kite_chain_done: -> rosie_kite_chain_prompt}
+{kite_chain_done: My rainbow kite has all four pastel ribbon tails back, fluttering prettier than ever! # speaker: Rosie # expr: happy # pose: cheer}
 -> DONE
 = clover_gift
 ~ rosie_clover_gift = true

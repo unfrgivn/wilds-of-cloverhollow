@@ -522,6 +522,15 @@
         "y": 340
       },
       "prompt": "Talk"
+    },
+    {
+      "id": "lullaby-plaza",
+      "knot": "lullaby_plaza",
+      "point": {
+        "x": 1090,
+        "y": 735
+      },
+      "prompt": "Look"
     }
   ],
   "spawns": {
@@ -889,6 +898,18 @@
       "prop": "bush-southeast",
       "x": 1265,
       "y": 1050
+    }
+  ],
+  "glows": [
+    {
+      "id": "star-chart-plaza",
+      "frame": "ink_note",
+      "point": {
+        "x": 1380,
+        "y": 880
+      },
+      "knot": "star_chart_plaza_glow",
+      "prompt": "Look"
     }
   ]
 }

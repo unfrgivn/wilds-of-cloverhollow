@@ -252,7 +252,13 @@ export function createDialogueBox(root: HTMLElement): {
   };
 }
 
-export type PromptView = { label: string; x: number; y: number; visible: boolean };
+export type PromptView = {
+  label: string;
+  x: number;
+  y: number;
+  visible: boolean;
+  tone?: "default" | "heart";
+};
 export type Insets = { top: number; right: number; bottom: number; left: number };
 
 export function clampPromptPosition(x: number, y: number, width: number, height: number,
@@ -312,6 +318,10 @@ export function createPrompt(root: HTMLElement): {
   const apply = (view: PromptView): void => {
     label.textContent = view.label;
     prompt.hidden = !view.visible;
+    const isHeart = view.visible && view.tone === "heart";
+    prompt.classList.toggle("is-heart", isHeart);
+    if (isHeart) prompt.dataset.tone = "heart";
+    else delete prompt.dataset.tone;
     if (view.visible) {
       prompt.setAttribute("aria-label", view.label);
       const insets = currentInsets();
@@ -346,7 +356,8 @@ export function createPrompt(root: HTMLElement): {
     render: (view) => {
       lastView = view;
       const key = view.visible
-        ? `${view.label}|${view.x}|${view.y}|${window.innerWidth}x${window.innerHeight}`
+        ? `${view.label}|${view.tone ?? "default"}|${view.x}|${view.y}|` +
+          `${window.innerWidth}x${window.innerHeight}`
         : "hidden";
       if (key === lastKey) return;
       lastKey = key;

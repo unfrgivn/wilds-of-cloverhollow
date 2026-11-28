@@ -125,6 +125,8 @@ Whoa, it smells like warm cinnamon! I'll keep it in our clubhouse chest! # speak
 + {coins() >= 5} [Buy a warm cinnamon bun (5 coins)]
     One warm, swirly cinnamon bun, wrapped in wax paper just for you! # speaker: Chef Bea # buy: snack 5
     -> DONE
++ {spice_returned and (visited_pass or jordan_joined) and not valley_spice_done} [Ask about the Valley Spice Run]
+    -> bea_spice_run
 + [Just saying hi!]
     Always a treat to see your smiling face, Fae! Come back anytime. # speaker: Chef Bea
     -> DONE
@@ -185,6 +187,8 @@ When I was your age, folks around Cloverhollow whispered storybook legends about
 - gem_count() > 0:
     I hear you've gathered {gem_count()} of 7 Star Gems so far! Keep shining your lantern and bringing your animal friends along! # speaker: Grandpa Barnaby
 }
+{has_lantern and not star_chart_done: -> barnaby_star_chart_prompt}
+{star_chart_done: My restored Cloverhollow Star Chart hangs proud by my teacup thanks to your blacklight lantern, Fae! # speaker: Grandpa Barnaby # expr: happy # pose: talk}
 -> DONE
 
 === bree ===
@@ -239,6 +243,8 @@ If you toss a critter its favorite treat in a calm-down, it calms down WAY faste
 - calmed("principal"):
     Heard you calmed Mr. Bell down in the school hall! No more super-loud megaphone pop quizzes! # speaker: Toby
 }
+{has_flute and not lullaby_done: -> toby_lullaby_prompt}
+{lullaby_done: Half the plaza is humming our Sleepy Cloverhollow Lullaby already! Best flute duet partner ever, Fae! # speaker: Toby # expr: happy # pose: cheer}
 -> DONE
 
 === cafe_pastries ===

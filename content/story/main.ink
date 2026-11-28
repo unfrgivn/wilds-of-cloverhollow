@@ -10,6 +10,7 @@ INCLUDE chapters/act3_pass.ink
 INCLUDE chapters/act4_forest.ink
 INCLUDE party/companions.ink
 INCLUDE party/homes.ink
+INCLUDE party/heart_to_hearts.ink
 INCLUDE town/shops.ink
 INCLUDE town/sanctuary.ink
 INCLUDE town/living_npcs_valley.ink

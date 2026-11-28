@@ -11,6 +11,11 @@ import type {
   World,
 } from "./types";
 import { createInkState, runInk, setInkVariables, storyHasKnot } from "./ink";
+import {
+  findLullabyFluteSpot,
+  heartToHeartSpotsInArea,
+  type ActiveHeartSpot,
+} from "./heart-to-hearts";
 import { sceneryArea } from "./props";
 import {
   closestPointOnPolygon,
@@ -181,6 +186,7 @@ export function targetInteractable(
 ):
   | Area["interactables"][number]
   | Area["glows"][number]
+  | ActiveHeartSpot
   | { id: string; knot: string; point: Point; prompt: Npc["prompt"] }
   | undefined {
   if (
@@ -220,7 +226,8 @@ export function targetInteractable(
     ? area.glows.filter((glow): glow is Area["glows"][number] & { knot: string } =>
       glow.knot !== undefined).map((glow) => ({ ...glow, id: `glow:${glow.id}` }))
     : [];
-  return [...area.interactables, ...glows, ...calmCritters, ...people]
+  const hearts = heartToHeartSpotsInArea(world, state, area.id);
+  return [...area.interactables, ...glows, ...hearts, ...calmCritters, ...people]
     .map((item) => {
       const dx = item.point.x - state.player.x;
       const dy = item.point.y - state.player.y;
@@ -638,11 +645,16 @@ function stepTick(
       events: [],
     };
   }
-  // The flute plays its own knot: a friend called, or sent home (spec 5).
+  // The flute plays its own knot: a musical lullaby landmark when nearby on
+  // Toby's quest, otherwise a friend called or sent home (spec 5).
   if (fluteEdge && state.finale === null && state.transition === null &&
-      world.storyVariable(state.ink, "has_flute") === true &&
-      storyHasKnot(world.story, FLUTE_KNOT))
-    return { state: openTalk(world, state, input, FLUTE_KNOT), events: [] };
+      world.storyVariable(state.ink, "has_flute") === true) {
+    const lullaby = findLullabyFluteSpot(world, state);
+    if (lullaby !== undefined && storyHasKnot(world.story, lullaby.knot))
+      return { state: openTalk(world, state, input, lullaby.knot), events: [] };
+    if (storyHasKnot(world.story, FLUTE_KNOT))
+      return { state: openTalk(world, state, input, FLUTE_KNOT), events: [] };
+  }
   if (menuEdge && state.transition === null) {
     return {
       state: {

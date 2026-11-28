@@ -562,3 +562,239 @@ Ooh, for Wren's nature sketchbook?! Here's my luckiest four-leaf clover, pressed
 Tell Wren the clover lambs say hi! # speaker: Sunny
 Will do, Sunny! Thanks a bunch! # speaker: Fae
 -> DONE
+
+// ===========================================================================
+// Elevation Track E11: Interactive Multi-Step Living NPC Quests (Valley)
+// 1. Grandpa Barnaby's Star Chart (Blacklight Lantern: Plaza, Bay, Pass)
+// 2. Rosie's Runaway Kite Chain (Rainbow Lasso: Park, Lane, Crossing, Boardwalk)
+// ===========================================================================
+
+=== function star_chart_count() ===
+~ temp total = 0
+{ star_chart_plaza:
+    ~ total += 1
+}
+{ star_chart_bay:
+    ~ total += 1
+}
+{ star_chart_pass:
+    ~ total += 1
+}
+~ return total
+
+=== barnaby_star_chart_prompt ===
+{star_chart_count() >= 3: -> barnaby_star_chart.complete}
++ {not star_chart_quest} [Ask about his old Star Chart]
+    -> barnaby_star_chart.start
++ {star_chart_quest} [Check Star Chart progress ({star_chart_count()}/3)]
+    -> barnaby_star_chart.progress
++ [Enjoy your chamomile tea!]
+    Always a pleasure, young Fae. Keep your lantern bright! # speaker: Grandpa Barnaby # expr: happy # pose: talk
+    -> DONE
+
+=== barnaby_star_chart ===
+= start
+~ star_chart_quest = true
+Aha! Is that a genuine blacklight hiking lantern clipped to your pack, Fae?! # speaker: Grandpa Barnaby # expr: surprised # pose: talk
+Years ago, our Cloverhollow Stargazers painted three secret star-chart constellations in invisible glow-ink across the valley. # speaker: Grandpa Barnaby # expr: happy # pose: talk
+One sleeps on Cloverhollow Plaza's southeast cobblestones, one hides by Bubblegum Bay's southern sand, and one shines on Pinecone Pass's northern snowy ridge! # speaker: Grandpa Barnaby # expr: neutral # pose: talk
+Switch on your blacklight lantern to trace all three markings, and we can restore my observatory map! # speaker: Grandpa Barnaby # expr: happy # pose: cheer
+Count on me, Grandpa Barnaby! I'll light up every single constellation! # speaker: Fae # expr: determined # pose: tool_lantern # sound: chime-blue
+-> DONE
+
+= progress
+Let's see how our observatory map is coming along: {star_chart_count()} of 3 invisible star-chart markings copied so far! # speaker: Grandpa Barnaby # expr: happy # pose: talk
+{not star_chart_plaza: Shine your blacklight lantern over the southeast garden cobblestones in Cloverhollow Plaza for the Clover Dipper! # speaker: Grandpa Barnaby # expr: neutral # pose: talk}
+{not star_chart_bay: Check the southwest sandy shore of Bubblegum Bay under blacklight for the Starfish Compass constellation! # speaker: Grandpa Barnaby # expr: neutral # pose: talk}
+{not star_chart_pass: Look along the northern snowy ridge of Pinecone Pass near the cavern trail under blacklight for the Alpine Crown! # speaker: Grandpa Barnaby # expr: neutral # pose: talk}
+I'll keep my blacklight lantern ready, Grandpa Barnaby! # speaker: Fae # expr: determined # pose: tool_lantern
+-> DONE
+
+= complete
+~ star_chart_quest = true
+~ star_chart_done = true
+Well bless my spectacles! All three lost star-chart constellations, copied straight into your watercolor journal! # speaker: Grandpa Barnaby # expr: surprised # pose: cheer
+The Clover Dipper, the Starfish Compass, and the Alpine Crown! Look how they link the whole valley together! # speaker: Grandpa Barnaby # expr: happy # pose: talk
+{withParty("jordan"): Whoa, those northern ridge stars line up right with the Alpine Summit trail! # speaker: Jordan # expr: surprised # pose: cheer}
+{withParty("sue"): And the Starfish Compass points straight out toward Starlight Island! # speaker: Sue # expr: happy # pose: cheer}
+My observatory map is whole again, Fae! Please take twenty-five stargazer coins and two warm bakery snacks! # speaker: Grandpa Barnaby # expr: happy # pose: cheer # gift: coins 25 # gift: snack 2 # sound: chime-red
+Thank you so much, Grandpa Barnaby! Best treasure map in the sky! # speaker: Fae # expr: happy # pose: cheer
+-> DONE
+
+=== star_chart_plaza_glow ===
+{star_chart_plaza: -> after}
+~ star_chart_plaza = true
+Under Jordan's blacklight lantern, a delicate violet constellation blooms right across the plaza cobblestones! # speaker: Fae # expr: surprised # pose: tool_lantern # sound: chime-blue
+"STAR CHART I: THE CLOVER DIPPER. Four bright stars pointing east from Cloverhollow Plaza toward the sea." # speaker: Glow Note
+Fae carefully copies the Clover Dipper into her journal! ({star_chart_count()} of 3 Star Chart markings found!) # speaker: Fae # expr: happy # pose: cheer
+{star_chart_count() >= 3:
+    That's all three Star Chart constellations! Time to show Grandpa Barnaby at Bon Appetit Cafe! # speaker: Fae # expr: happy # pose: cheer
+- else:
+    {not star_chart_quest: Grandpa Barnaby at Bon Appetit Cafe would LOVE to see this old star-chart ink! # speaker: Fae # expr: happy # pose: talk}
+}
+-> DONE
+= after
+The violet Clover Dipper constellation shimmers softly on the plaza stones beneath the blacklight glow. # speaker: Fae # expr: happy # pose: tool_lantern
+-> DONE
+
+=== star_chart_bay_glow ===
+{star_chart_bay: -> after}
+~ star_chart_bay = true
+A swirling violet star-map gleams across the smooth beach pebbles in the blacklight beam! # speaker: Fae # expr: surprised # pose: tool_lantern # sound: chime-blue
+"STAR CHART II: THE STARFISH COMPASS. Five coastal stars guiding sailors over Bubblegum Bay's pink tide." # speaker: Glow Note
+Fae traces the Starfish Compass neatly onto her map page! ({star_chart_count()} of 3 Star Chart markings found!) # speaker: Fae # expr: happy # pose: cheer
+{star_chart_count() >= 3:
+    That's all three Star Chart constellations! Let's bring them straight to Grandpa Barnaby at Bon Appetit Cafe! # speaker: Fae # expr: happy # pose: cheer
+- else:
+    {not star_chart_quest: Bet Grandpa Barnaby at Bon Appetit Cafe knows the story behind these hidden star charts! # speaker: Fae # expr: happy # pose: talk}
+}
+-> DONE
+= after
+The glowing Starfish Compass constellation sparkles gently along the sandy cove shore. # speaker: Fae # expr: happy # pose: tool_lantern
+-> DONE
+
+=== star_chart_pass_glow ===
+{star_chart_pass: -> after}
+~ star_chart_pass = true
+High on the snowy northern ridge, violet star-lines flare bright across a frosted boulder under Fae's lantern! # speaker: Fae # expr: surprised # pose: tool_lantern # sound: chime-blue
+"STAR CHART III: THE ALPINE CROWN. Seven pine-peak stars crowning Pinecone Pass above the mountain clouds." # speaker: Glow Note
+Fae sketches the Alpine Crown beside her trail notes! ({star_chart_count()} of 3 Star Chart markings found!) # speaker: Fae # expr: happy # pose: cheer
+{star_chart_count() >= 3:
+    All three Star Chart constellations copied! Grandpa Barnaby at Bon Appetit Cafe is going to be thrilled! # speaker: Fae # expr: happy # pose: cheer
+- else:
+    {not star_chart_quest: Grandpa Barnaby at Bon Appetit Cafe loves old valley sky maps, let's show him! # speaker: Fae # expr: happy # pose: talk}
+}
+-> DONE
+= after
+The violet Alpine Crown star-chart shimmers quietly across the northern snow ridge. # speaker: Fae # expr: happy # pose: tool_lantern
+-> DONE
+
+// ---------------------------------------------------------------------------
+// 2. Rosie's Runaway Kite Chain (Park -> Lane -> Crossing -> Boardwalk)
+// ---------------------------------------------------------------------------
+=== function kite_tail_count() ===
+~ temp total = 0
+{ kite_tail_park:
+    ~ total += 1
+}
+{ kite_tail_lane:
+    ~ total += 1
+}
+{ kite_tail_crossing:
+    ~ total += 1
+}
+{ kite_tail_boardwalk:
+    ~ total += 1
+}
+~ return total
+
+=== rosie_kite_chain_prompt ===
+{kite_tail_count() >= 4: -> rosie_kite_chain.complete}
++ {not kite_chain_quest} [Ask about her runaway kite ribbons]
+    -> rosie_kite_chain.start
++ {kite_chain_quest} [Check runaway kite ribbons ({kite_tail_count()}/4)]
+    -> rosie_kite_chain.progress
++ [See you soon, Rosie!]
+    Bye, Fae! Watch out for breezy gusts! # speaker: Rosie # expr: happy # pose: talk
+    -> DONE
+
+=== rosie_kite_chain ===
+= start
+~ kite_chain_quest = true
+Oh, Fae! Wait, you've got Coach Ash's rainbow lasso! # speaker: Rosie # expr: surprised # pose: cheer
+A giant playful breeze untied all four pastel ribbon tails from my favorite kite and sent them dancing east! # speaker: Rosie # expr: worried # pose: talk
+One snagged high in Meadow Park, and the rest drifted right down East Road across Sunberry Lane, Willowbrook Crossing, and Salt-Marsh Boardwalk! # speaker: Rosie # expr: neutral # pose: talk
+Could you track the fluttering trail and lasso-snag all four ribbon tails back for me? # speaker: Rosie # expr: happy # pose: talk
+Leave it to my rainbow lasso, Rosie! I'll catch every single ribbon! # speaker: Fae # expr: determined # pose: tool_lasso # sound: chime-yellow
+-> DONE
+
+= progress
+Ooh, you've already lassoed {kite_tail_count()} of 4 runaway kite ribbons! # speaker: Rosie # expr: happy # pose: cheer
+{not kite_tail_park: The Rose Ribbon is still fluttering up in the eastern trees of Meadow Park! # speaker: Rosie # expr: neutral # pose: talk}
+{not kite_tail_lane: Look for the Lemon Ribbon looping above the meadow fence on Sunberry Lane! # speaker: Rosie # expr: neutral # pose: talk}
+{not kite_tail_crossing: The Mint Ribbon drifted into the willow branches at Willowbrook Crossing! # speaker: Rosie # expr: neutral # pose: talk}
+{not kite_tail_boardwalk: And the Sky-Blue Ribbon sailed all the way out to Salt-Marsh Boardwalk! # speaker: Rosie # expr: neutral # pose: talk}
+I'm right on their trail, Rosie! # speaker: Fae # expr: determined # pose: tool_lasso
+-> DONE
+
+= complete
+~ kite_chain_quest = true
+~ kite_chain_done = true
+MY RIBBONS!! Rose, Lemon, Mint, and Sky-Blue, not a single bow frayed! # speaker: Rosie # expr: surprised # pose: cheer
+You tracked that sneaky spring gust clear from Meadow Park to Salt-Marsh Boardwalk with Coach Ash's lasso! # speaker: Rosie # expr: happy # pose: cheer
+{withParty("sue"): Wait till you see how high that kite flies in the Bubblegum Bay sea breeze, Rosie! # speaker: Sue # expr: happy # pose: cheer}
+Thank you a million times, Fae! Take twenty-five shiny coins, a Berry Swirl Cone treat, and a cottage snack! # speaker: Rosie # expr: happy # pose: cheer # gift: coins 25 # gift: treat berry-cone 1 # gift: snack 1 # sound: chime-yellow
+Yay! Can't wait to fly it together in Meadow Park! # speaker: Fae # expr: happy # pose: cheer
+-> DONE
+
+=== kite_ribbon_park ===
+{kite_tail_park: -> after}
+A bright rose-pink kite ribbon flutters high in the eastern park breeze, trailing tiny paper stars eastward! # speaker: Fae # expr: surprised # pose: idle
+{not has_lasso:
+    It's way too high up in the branches to reach by hand. # speaker: Fae # expr: worried # pose: idle
+    -> DONE
+}
++ [Lasso-snag the Rose Ribbon!]
+    Fae spins Coach Ash's rainbow lasso overhead and loops the fluttering rose bow cleanly! # speaker: Fae # expr: determined # pose: tool_lasso # sound: chime-yellow
+    ~ kite_tail_park = true
+    Got it! Rose Ribbon Tail recovered ({kite_tail_count()}/4)! More pastel sparkles drift east toward Sunberry Lane! # speaker: Fae # expr: happy # pose: cheer
+    -> DONE
++ [Not now]
+    -> DONE
+= after
+The eastern meadow branches sway gently now that Rosie's rose kite ribbon is safe in Fae's pack. # speaker: Fae # expr: happy # pose: idle
+-> DONE
+
+=== kite_ribbon_lane ===
+{kite_tail_lane: -> after}
+A sunny lemon-yellow kite ribbon whips playfully atop a tall meadow sapling beside Sunberry Lane! # speaker: Fae # expr: surprised # pose: idle
+{not has_lasso:
+    It's caught way above my head. A lasso could flick it right down! # speaker: Fae # expr: worried # pose: idle
+    -> DONE
+}
++ [Lasso-snag the Lemon Ribbon!]
+    Whoosh! Fae flicks the rainbow lasso and snags the lemon ribbon right off the branch! # speaker: Fae # expr: determined # pose: tool_lasso # sound: chime-yellow
+    ~ kite_tail_lane = true
+    Snagged! Lemon Ribbon Tail recovered ({kite_tail_count()}/4)! The breeze points east toward Willowbrook Crossing! # speaker: Fae # expr: happy # pose: cheer
+    -> DONE
++ [Not now]
+    -> DONE
+= after
+Wildflowers bob peacefully along Sunberry Lane where Rosie's lemon ribbon was tangled. # speaker: Fae # expr: happy # pose: idle
+-> DONE
+
+=== kite_ribbon_crossing ===
+{kite_tail_crossing: -> after}
+A soft mint-green kite ribbon loops around a weeping willow bough dangling over Willowbrook Crossing! # speaker: Fae # expr: surprised # pose: idle
+{not has_lasso:
+    Too high to grab without something long and loopy! # speaker: Fae # expr: worried # pose: idle
+    -> DONE
+}
++ [Lasso-snag the Mint Ribbon!]
+    Fae twirls the rainbow lasso with a crisp snap and reels the mint ribbon down into her hand! # speaker: Fae # expr: determined # pose: tool_lasso # sound: chime-green
+    ~ kite_tail_crossing = true
+    Nice catch! Mint Ribbon Tail recovered ({kite_tail_count()}/4)! One more gust leads east to Salt-Marsh Boardwalk! # speaker: Fae # expr: happy # pose: cheer
+    -> DONE
++ [Not now]
+    -> DONE
+= after
+The weeping willow over Willowbrook Crossing sways softly in the creek breeze. # speaker: Fae # expr: happy # pose: idle
+-> DONE
+
+=== kite_ribbon_boardwalk ===
+{kite_tail_boardwalk: -> after}
+A fluttering sky-blue kite ribbon snaps in the salty breeze from a tall marsh post beside Salt-Marsh Boardwalk! # speaker: Fae # expr: surprised # pose: idle
+{not has_lasso:
+    That piling is way out over the marsh reeds. I'd need a lasso to snag it! # speaker: Fae # expr: worried # pose: idle
+    -> DONE
+}
++ [Lasso-snag the Sky-Blue Ribbon!]
+    Fae aims across the marsh reeds, casts the rainbow lasso, and tugs the sky-blue ribbon free! # speaker: Fae # expr: determined # pose: tool_lasso # sound: chime-blue
+    ~ kite_tail_boardwalk = true
+    Got the Sky-Blue Ribbon Tail ({kite_tail_count()}/4)! {kite_tail_count() >= 4: That's all four ribbons! Let's take them back to Rosie at her flower cottage!|Let's grab the rest along the trail!} # speaker: Fae # expr: happy # pose: cheer
+    -> DONE
++ [Not now]
+    -> DONE
+= after
+Sea-marsh reeds rustle gently by the boardwalk post where Rosie's sky-blue ribbon used to fly. # speaker: Fae # expr: happy # pose: idle
+-> DONE

@@ -49,6 +49,16 @@
       "knot": "old_trail_marker",
       "prompt": "Look",
       "flip": true
+    },
+    {
+      "id": "star-chart-pass",
+      "frame": "ink_note",
+      "point": {
+        "x": 830,
+        "y": 220
+      },
+      "knot": "star_chart_pass_glow",
+      "prompt": "Look"
     }
   ],
   "walkable": [
@@ -575,6 +585,15 @@
       "point": {
         "x": 1400,
         "y": 640
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "spice-pine-sugar",
+      "knot": "spice_pine_sugar",
+      "point": {
+        "x": 1410,
+        "y": 495
       },
       "prompt": "Look"
     }

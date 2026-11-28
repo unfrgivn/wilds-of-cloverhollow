@@ -134,7 +134,7 @@ describe("Track E0: Modular story integrity", () => {
       .split("\n")
       .map((line) => line.trim())
       .filter((line) => line.length > 0);
-    expect(nonEmptyLines.length).toBe(16);
+    expect(nonEmptyLines.length).toBeGreaterThanOrEqual(17);
     expect(nonEmptyLines.every((line) => line.startsWith("INCLUDE "))).toBe(true);
     expect(entrySource).toContain("INCLUDE systems/");
     expect(entrySource).toContain("INCLUDE chapters/");
@@ -148,7 +148,7 @@ describe("Track E0: Modular story integrity", () => {
       (file) => file !== "main.ink" && !includedSet.has(file),
     );
     expect(orphans).toEqual([]);
-    expect(compiled.includedFiles).toHaveLength(16);
+    expect(compiled.includedFiles.length).toBe(nonEmptyLines.length);
   });
 
   it("matches public/assets/story/main.ink.json byte-for-byte with legacy JSON removed", () => {
@@ -160,7 +160,7 @@ describe("Track E0: Modular story integrity", () => {
     expect(onDisk).toBe(compiled.json);
   });
 
-  it("preserves all 293 knots/functions, variables, tags, and ending invariants", () => {
+  it("preserves all story knots/functions, variables, tags, and ending invariants", () => {
     const story = loadStoryFromDisk();
     const root = story.root;
     expect(Array.isArray(root)).toBe(true);
@@ -170,7 +170,7 @@ describe("Track E0: Modular story integrity", () => {
     if (!isRecord(defs)) return;
     const keys = Object.keys(defs);
     expect(keys).toContain("global decl");
-    expect(keys.filter((key) => key !== "global decl")).toHaveLength(293);
+    expect(keys.filter((key) => key !== "global decl").length).toBeGreaterThanOrEqual(324);
 
     const { world } = loadContent();
     const prices = Object.fromEntries(

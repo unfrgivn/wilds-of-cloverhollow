@@ -251,6 +251,15 @@
         "y": 650
       },
       "prompt": "Look"
+    },
+    {
+      "id": "spice-sea-salt",
+      "knot": "spice_sea_salt",
+      "point": {
+        "x": 1210,
+        "y": 960
+      },
+      "prompt": "Look"
     }
   ],
   "critters": [
@@ -634,6 +643,18 @@
           "while": "has_lasso"
         }
       ]
+    }
+  ],
+  "glows": [
+    {
+      "id": "star-chart-bay",
+      "frame": "ink_note",
+      "point": {
+        "x": 420,
+        "y": 880
+      },
+      "knot": "star_chart_bay_glow",
+      "prompt": "Look"
     }
   ]
 }

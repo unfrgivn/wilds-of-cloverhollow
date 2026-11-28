@@ -222,7 +222,7 @@ export {
 } from "./battle-parsers";
 export { npcScheduleErrors, parseNpcProfiles, parseNpcStroll } from "./npc-parsers";
 export { parseCutscene, type CutsceneValidationContext } from "./cutscene-parsers";
-export { endingContentErrors, parseStoryJson, storyTagErrors, storyTags } from "./story-checks";
+export * from "./story-checks";
 
 export const STORY_ASSET_PATH = "assets/story/main.ink.json";
 export type StoryFetcher = (input: string) => Promise<Response>;

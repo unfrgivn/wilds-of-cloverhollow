@@ -257,6 +257,15 @@
         "y": 575
       },
       "prompt": "Look"
+    },
+    {
+      "id": "kite-ribbon-crossing",
+      "knot": "kite_ribbon_crossing",
+      "point": {
+        "x": 680,
+        "y": 780
+      },
+      "prompt": "Look"
     }
   ],
   "critters": [],

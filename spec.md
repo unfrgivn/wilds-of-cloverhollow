@@ -81,7 +81,10 @@ reference material only.
   under 500 kB, enforced automatically on production builds by
   `tools/check-dist.ts` via `just build`, Milestone 154), Bun (package manager
   and script runner), Node 24 LTS for Node-based tools (`.nvmrc`), `just` for
-  tasks.
+  tasks. Owner-approved (2026-11-27): compiled Ink story JSON may move out of
+  the static JS bundle to a runtime-fetched asset at
+  `public/assets/story/main.ink.json` (read directly from disk in Bun/Vitest/sim
+  loaders) with `tools/ink/compile.ts` supporting Ink `INCLUDE` modules.
 - Approved npm dependencies. Anything else needs the owner's approval first,
   then an update to this list:
   - Runtime: `pixi.js` 8, `inkjs` 2, `@capacitor/core` 8, `@capacitor/ios` 8,
@@ -5199,9 +5202,26 @@ trunks keep its two exits.
   talking raccoon's atlas (approved 2026-10-06) left the game with the
   talking raccoon; its recipe and raw sources stay
   (`art/recipes/raccoon-npc.json`).
+- Approved 2026-11-27 (Elevation Master Roadmap): owner authorized batched
+  Gemini image generation Waves A (multi-expression dialogue portraits and
+  expressive character pose strips), B (spatial puzzle prop kits, Clubhouse
+  garden/workbench, Charm Pin icons, and battle check props/VFX), and C
+  (watercolor chaos-to-paint area restoration layers and 5 scenic travel
+  vignettes), plus story canon expansion (5 pre-finale Milo foreshadowing
+  cutscenes while keeping his culprit identity strictly secret until the finale
+  hood-drop, and 6 optional party Heart-to-Hearts). Every kept generated asset
+  still records its recipe in `art/recipes/` and commits JPEG review sheets to
+  `art/review/`.
 - Style bible: `docs/art/style-bible.md`.
 
 ## 13. Out of scope until the owner adds it
-Multiplayer, merch, speedrun, boss rush, New Game Plus, achievements,
-analytics, voice acting, weather, bug minigames, and non-English localization.
-Keep player-facing text in Ink or JSON so it stays translatable.
+Multiplayer, merch, speedrun, New Game Plus, analytics, voice acting, bug
+minigames, and non-English localization. Keep player-facing text in Ink or JSON
+so it stays translatable.
+
+Unlocked by owner (2026-11-27) for the Elevation Master Roadmap:
+- Dynamic Cozy Weather (gentle biome weather cycles integrated with mood, fish,
+  and garden growth).
+- Cozy Replay Shrine / Boss Encore (optional post-finale replay of mini-bosses
+  and the Ancient Tree finale with remixed Star Challenge rules).
+- Valley Merit Ribbons (in-game hand-stitched Journal achievement ribbon page).

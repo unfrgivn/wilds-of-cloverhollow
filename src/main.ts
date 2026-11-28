@@ -491,7 +491,8 @@ async function boot(): Promise<void> {
     }));
     devLog?.logMusic(soundtrack);
     const arcadeState = arcadeView(content.world, state, gameSettings.gentleTiming());
-    assets.renderOverlays(arcadeState, activeArcadeRecord, inputShortcuts.inputMode());
+    const inputMode = inputShortcuts.inputMode();
+    assets.renderOverlays(arcadeState, activeArcadeRecord, inputMode);
     assets.warmJournalOnRender(state, wasJournalOpen, () => state.journalOpen);
     wasJournalOpen = state.journalOpen;
     syncOpenFlag("arcade", arcadeState !== null);
@@ -535,8 +536,7 @@ async function boot(): Promise<void> {
     hudHints.render(buildHudHintsView({
       world: content.world, state, keyHints: gameSettings.keyHints(), touchActive, overworldFree,
       isResting: view.isResting(), hasLantern, hasFlute, muted: sound.muted(),
-      canPhoto: canPhotoMode(gate) && !photoMode, canBattlePeek: canBattlePeek(gate),
-      inputMode: inputShortcuts.inputMode(),
+      canPhoto: canPhotoMode(gate) && !photoMode, canBattlePeek: canBattlePeek(gate), inputMode,
     }));
     areaBanner.render(bannerTracker.view(
       content.world, state, isBannerEligible(gate, hasLevelUpNotice), qa?.isActive() ?? false,
@@ -577,8 +577,7 @@ async function boot(): Promise<void> {
     battleHud.render(buildBattleHudView({
       world: content.world, state, battle, partyCommands, paused,
       canPeek: canBattlePeek(gate), peekOpen: battlePeekOpen,
-      speakerPortrait: assets.speakerPortrait, checkV2Art: assets.checkV2Art,
-      inputMode: inputShortcuts.inputMode(),
+      speakerPortrait: assets.speakerPortrait, checkV2Art: assets.checkV2Art, inputMode,
     }));
     commandMenu.render(buildCommandMenuView(state, battle, assets.checkV2Art));
     const feelingAt = view.battleFeelingAnchor(state, window.innerWidth, window.innerHeight);
@@ -593,11 +592,12 @@ async function boot(): Promise<void> {
     devLog?.logBattleButtons(activeBattle, state);
     const geometry = view.battleCheckGeometry(state, window.innerWidth, window.innerHeight);
     const traceRect = geometry?.kind === "trace" || geometry?.kind === "spin-snag"
-      ? geometry.rect
-      : undefined;
-    touch.setTraceRect(traceRect);
-    touch.setTraceElement(traceRect);
-    battleCheck.render(battleCheckOverlay(battle, geometry, assets.toyArt, assets.checkV2Art));
+      ? geometry.rect : undefined;
+    touch.setTraceRect(traceRect); touch.setTraceElement(traceRect);
+    battleCheck.render(
+      battleCheckOverlay(battle, geometry, assets.toyArt, assets.checkV2Art),
+      inputMode,
+    );
     rewardSticker.render(
       buildRewardStickerView(content.world, state, activeBattle, arcadeState, assets),
     );
@@ -609,7 +609,7 @@ async function boot(): Promise<void> {
       arcadeRecords: minigameRecords.records(), gentleTiming: gameSettings.gentleTiming(),
       keyHints: gameSettings.keyHints(), textSpeed: gameSettings.textSpeed(),
       reducedMotion: gameSettings.reducedMotion(), hasLantern, hasFlute, hasLasso,
-      inputMode: inputShortcuts.inputMode(), canPhoto: canPhotoFromJournal(gate),
+      inputMode, canPhoto: canPhotoFromJournal(gate),
     }));
     syncOpenFlag("journal", state.journalOpen);
     const dialogueView = buildDialogueView({

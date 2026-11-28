@@ -657,9 +657,9 @@ describe("Milestone 159: Production render-engine Chunk Split & File Budgets", (
     expect(routeModule("/repo/src/render/view.ts")).toBe("render-engine");
     expect(routeModule("/repo/src/render/atmosphere-indoor.ts")).toBe("render-engine");
     expect(routeModule("/repo/src/render/companions.ts")).toBe("render-engine");
-    expect(routeModule("/repo/src/core/sim.ts")).toBe("core-engine");
+    expect(routeModule("/repo/src/core/sim.ts")).toBeNull();
     expect(routeModule("/repo/src/main.ts")).toBeNull();
-    expect(routeModule("/repo/content/npc-profiles.json")).toBe("narrative-content");
+    expect(routeModule("/repo/content/npc-profiles.json")).toBe("world-content");
     expect(routeModule("/repo/content/qa/saves.json")).toBeNull();
   });
 

@@ -28,6 +28,7 @@ export type BattlePopupSnapshot = {
   lassoUsed?: boolean;
   lanternPeek?: boolean;
   togetherActive?: boolean;
+  comboActive?: boolean;
   recovered?: boolean;
   bossPhase2?: boolean;
 };
@@ -90,8 +91,12 @@ export function classifyBattlePopup(
     popups.push({ kind: "big", text: "TOGETHER! ★", side: "fae" });
   }
 
+  if (!prev.comboActive && next.comboActive === true) {
+    popups.push({ kind: "assist", text: "SYNERGY! ★", side: "fae" });
+  }
+
   if (!prev.bossPhase2 && next.bossPhase2 === true) {
-    popups.push({ kind: "big", text: "PHASE 2! ★", side: "critter" });
+    popups.push({ kind: "peek", text: "PHASE 2! ⚡", side: "critter" });
   }
 
   return popups;

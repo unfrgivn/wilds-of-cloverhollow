@@ -2,6 +2,7 @@ import { applyAtlasCrop, type AtlasImage } from "./atlas";
 import { element, setAttribute, setText, svgElement } from "./dom";
 import type { Point, WhackSlot } from "../core";
 import type { TimingGrade } from "./battle-checks";
+import type { HudInputMode } from "./hud-hints";
 
 export type BattleCheckV2View =
   | {
@@ -76,17 +77,41 @@ type WhackSlotMeta = {
   slot: WhackSlot;
   dx: number;
   dy: number;
-  keyCap: string;
   label: string;
 };
 
 const WHACK_SLOT_META: readonly WhackSlotMeta[] = [
-  { index: 0, slot: "up", dx: 0, dy: -1, keyCap: "↑", label: "Up ticket slot" },
-  { index: 1, slot: "right", dx: 1, dy: 0, keyCap: "→", label: "Right ticket slot" },
-  { index: 2, slot: "down", dx: 0, dy: 1, keyCap: "↓", label: "Down ticket slot" },
-  { index: 3, slot: "left", dx: -1, dy: 0, keyCap: "←", label: "Left ticket slot" },
-  { index: 4, slot: "middle", dx: 0, dy: 0, keyCap: "Z", label: "Center ticket slot" },
+  { index: 0, slot: "up", dx: 0, dy: -1, label: "Up ticket slot" },
+  { index: 1, slot: "right", dx: 1, dy: 0, label: "Right ticket slot" },
+  { index: 2, slot: "down", dx: 0, dy: 1, label: "Down ticket slot" },
+  { index: 3, slot: "left", dx: -1, dy: 0, label: "Left ticket slot" },
+  { index: 4, slot: "middle", dx: 0, dy: 0, label: "Center ticket slot" },
 ];
+
+/** Returns the adaptive keyboard/gamepad keycap for a Whack-a-Ticket slot. */
+export function whackKeyCap(slot: WhackSlot, inputMode: HudInputMode = "keyboard"): string {
+  switch (slot) {
+    case "up":
+      return "↑";
+    case "right":
+      return "→";
+    case "down":
+      return "↓";
+    case "left":
+      return "←";
+    case "middle":
+      return inputMode === "gamepad" ? "A" : "Z";
+  }
+}
+
+/** Returns the adaptive Spin-Snag action button label for keyboard or gamepad. */
+export function spinSnagButtonLabel(
+  snagReady: boolean,
+  inputMode: HudInputMode = "keyboard",
+): string {
+  if (!snagReady) return "SPIN!";
+  return inputMode === "gamepad" ? "SNAG! [A]" : "SNAG!";
+}
 
 const SPIN_PETALS: readonly {
   sector: number;
@@ -124,6 +149,7 @@ export function createBattleChecksV2(
   render: (
     view: BattleCheckV2View | null,
     renderGrade: (grade: TimingGrade | null, x: number, y: number) => void,
+    inputMode?: HudInputMode,
   ) => void;
 } {
   // 1. Which-One cup-shuffle board.
@@ -175,14 +201,14 @@ export function createBattleChecksV2(
     art.setAttribute("aria-hidden", "true");
     const key = element("span", "battle-whack-key");
     key.setAttribute("aria-hidden", "true");
-    key.textContent = meta.keyCap;
+    key.textContent = whackKeyCap(meta.slot);
     button.append(art, key);
     button.addEventListener("pointerdown", (event) => {
       event.preventDefault();
       callbacks.onWhackSlot(meta.index);
     });
     whackBoard.append(button);
-    return { meta, button, art, artKey: "" };
+    return { meta, button, art, key, artKey: "" };
   });
   whackLayer.append(whackDots, whackBoard);
 
@@ -263,7 +289,7 @@ export function createBattleChecksV2(
   root.append(whichLayer, whackLayer, spinLayer);
 
   return {
-    render: (view, renderGrade) => {
+    render: (view, renderGrade, inputMode = "keyboard") => {
       whichLayer.style.display = view?.kind === "which-one" ? "" : "none";
       whackLayer.style.display = view?.kind === "whack" ? "" : "none";
       spinLayer.style.display = view?.kind === "spin-snag" ? "" : "none";
@@ -385,6 +411,7 @@ export function createBattleChecksV2(
           entry.button.classList.toggle("is-active", isActive);
           entry.button.classList.toggle("is-hit", isHit);
           entry.button.classList.toggle("is-miss", isMiss);
+          setText(entry.key, whackKeyCap(entry.meta.slot, inputMode));
           const art = isHit ? view.art.hit : isActive ? view.art.pop : view.art.slot;
           const key = imageKey(art);
           if (entry.artKey !== key) {
@@ -433,6 +460,7 @@ export function createBattleChecksV2(
         btn.classList.toggle("is-lit", !inSnag && view.lastSector === idx);
       });
       spinSvg.style.display = inSnag ? "" : "none";
+      setText(snagBtn, spinSnagButtonLabel(inSnag, inputMode));
       snagBtn.hidden = !inSnag;
       if (inSnag) {
         const maxR = 86;

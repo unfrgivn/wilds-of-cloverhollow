@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 199)
+Last updated: 2026-11-28 (Milestone 200)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -4136,8 +4136,13 @@ trunks keep its two exits.
   WCAG-AAA `#47321f`-ink pills: Flute Friends (`FLUTE! ♪`, `.battle-popup-assist`,
   sky-meadow teal `#c7f0e8`, over Fae), Lasso (`STEADY! ✦`, `.battle-popup-steady`,
   buttercup gold `#ffe484`, over the critter), Lantern Mood Peek (`MOOD PEEK! ✦`,
-  `.battle-popup-peek`, pastel lavender `#ede0ff`, over the critter), and
-  `Together!` (`TOGETHER! ★`, `kind: "big"`, butter-yellow `#ffe896`, over Fae).
+  `.battle-popup-peek`, pastel lavender `#ede0ff`, over the critter),
+  `Together!` (`TOGETHER! ★`, `kind: "big"`, butter-yellow `#ffe896`, over Fae),
+  Dual-Friend Synergy Combos (`SYNERGY! ★`, `.battle-popup-assist`, teal
+  `#c7f0e8`, over Fae on `comboActive: false -> true`, Milestone 200 / Track
+  E19B), and Boss Phase-2 shifts (`PHASE 2! ⚡`, `.battle-popup-peek`, pastel
+  lavender `#ede0ff`, over the critter on `bossPhase2: false -> true`,
+  Milestone 200 / Track E19B).
 - **Battle Field Guide Peek** (Milestone 110, gamepad parity Milestone 114,
   `src/ui/battle-peek.ts`,
   `src/ui/battle.ts`, `src/main.ts`): during live battle `command` phase
@@ -4490,7 +4495,8 @@ trunks keep its two exits.
     **Phase 2** deterministically at `>= 50%` Calm (outside Talk/end phases),
     applying per-boss custom watercolor stage mood lighting tints, rendering the
     die-cut `.battle-phase2-banner` crest and signature line, firing a
-    `PHASE 2! ★` popup on transition, and tightening burst check rhythm via
+    `PHASE 2! ⚡` (`.battle-popup-peek`) popup on transition (Milestone 200 /
+    Track E19B), and tightening burst check rhythm via
     `upgradeBossPhase2Check` (while keeping PRNG draws and legacy single-foe
     replay timings intact).
   - **Dual-Friend Synergy Combos (`src/core/combos.ts`,
@@ -4528,12 +4534,18 @@ trunks keep its two exits.
     - `whack` (Popping Ticket Slots): pops arcade tickets (`ticket-pop` /
       `ticket-hit`) from 5 plus-shaped `ticket-slot` bezels; press Up/Right/
       Down/Left or Confirm (middle), or tap any slot directly (one swing per pop
-      to prevent mashing; `battle-beat` per hit).
+      to prevent mashing; `battle-beat` per hit). Adaptive keycap helper
+      `whackKeyCap(slot, inputMode)` renders `"Z"` on keyboard and `"A"` on
+      gamepad for the `"middle"` slot while keeping `"↑"`, `"→"`, `"↓"`, `"←"`
+      on directional slots (Milestone 200 / Track E19B).
     - `spin-snag` (Lasso Spin & Snag): circle directions (arrow keys, stick,
       directional petal taps, or finger/mouse circle via `pointer` in `0..1000`
       using zero-trig dominant-axis quadrants) for `spinsNeeded` quarter-turns
       (`battle-beat` per turn, rejecting opposite-axis bouncing), then press
       Confirm or tap `SNAG!` as the golden ring meets the dashed target.
+      Adaptive action label helper `spinSnagButtonLabel(snagReady, inputMode)`
+      renders `"SNAG!"` on keyboard and `"SNAG! [A]"` on gamepad when snag-ready
+      (and `"SPIN!"` while spinning, Milestone 200 / Track E19B).
 
 ### 8.2 Arcade games (Milestones 44 to 46, and 59) and the clubhouse microwave (52)
 - The claw machine, skee-ball, Boop-a-Mole, and Comet Cruise, once Mr. Pip

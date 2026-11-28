@@ -779,6 +779,11 @@ export function buildBattleHudView(params: BattleHudViewParams): BattleHudView {
             state.battle.command === "together" &&
             state.battle.phase === "check" &&
             state.battle.check?.side === "critter",
+          comboActive:
+            state.battle.phase === "check" &&
+            state.battle.command !== null &&
+            state.battle.command.startsWith("combo:") &&
+            state.battle.check?.side === "critter",
           recovered: state.battle.phase === "result" && state.battle.command === "recover",
           bossPhase2: bossPhase2 !== null,
         }

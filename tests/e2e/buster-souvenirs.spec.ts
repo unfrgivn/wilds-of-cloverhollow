@@ -181,10 +181,12 @@ test.describe("Buster the Bus Driver, Star-Line Stamp Card & regional souvenir s
       await finishDialogue(page, 1);
       await waitTransition(page, "pass");
 
-      // Talk to Pass Keeper (1190, 910) -> pine stamp + Maple Pine Brittle (11 coins).
+      // Approach Pass Keeper (1190, 910) from the north so the party clears the
+      // pass-snowball-coop plates (1175, 965) & snowball (1160, 1005).
+      await walkSafe(page, "x", 1090);
+      await walkSafe(page, "y", 865);
       await walkSafe(page, "x", 1190);
-      await walkSafe(page, "y", 955);
-      await press(page, "ArrowUp");
+      await press(page, "ArrowDown");
       await expect(page.locator(".sticker-prompt")).toContainText("TALK");
       await press(page, "z");
       const passLines = await finishDialogue(page, 0, async (text) => {
@@ -205,6 +207,7 @@ test.describe("Buster the Bus Driver, Star-Line Stamp Card & regional souvenir s
       });
 
       // Ride the bus from Pinecone Pass back to Cloverhollow Plaza (choice 0).
+      await walkSafe(page, "x", 1090);
       await walkSafe(page, "y", 965);
       await walkSafe(page, "x", 1017);
       await press(page, "ArrowUp");

@@ -1,6 +1,12 @@
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
 import { element, setAttribute, setText, svgElement } from "./dom";
-import { createBattleChecksV2, type BattleCheckV2View } from "./battle-checks-v2";
+import {
+  createBattleChecksV2,
+  spinSnagButtonLabel,
+  whackKeyCap,
+  type BattleCheckV2View,
+} from "./battle-checks-v2";
+import type { HudInputMode } from "./hud-hints";
 import {
   bindPointerHold,
   bindPointerMoveHold,
@@ -12,7 +18,7 @@ import {
 import type { ChainLook, EchoNote, PeekabooStatus, Point } from "../core";
 
 export type TimingGrade = "great" | "good" | "miss";
-export type { BattleCheckV2View };
+export { spinSnagButtonLabel, whackKeyCap, type BattleCheckV2View };
 
 export type BattleCheckView =
   | {
@@ -176,7 +182,7 @@ function clamp01(value: number): number {
 
 /** The complete check overlay, kept in one fixed DOM layer above the scene. */
 export function createBattleCheck(root: HTMLElement): {
-  render: (view: BattleCheckView | null) => void;
+  render: (view: BattleCheckView | null, inputMode?: HudInputMode) => void;
   onEchoNote: (callback: (note: EchoNote) => void) => void;
   onConfirmHold: (callback: (held: boolean) => void) => void;
   onDirectionHold: (callback: (dir: Point) => void) => void;
@@ -362,7 +368,7 @@ export function createBattleCheck(root: HTMLElement): {
     onSpinPointer: (callback) => {
       spinPointerHandler = callback;
     },
-    render: (view) => {
+    render: (view, inputMode = "keyboard") => {
       activeView = view;
       confirmActive = view !== null && isConfirmCheckKind(view.kind) && view.grade === null;
       directionalActive =
@@ -382,7 +388,7 @@ export function createBattleCheck(root: HTMLElement): {
       hide(hint, view?.hint === null || view === null);
       const isV2 = view !== null &&
         (view.kind === "which-one" || view.kind === "whack" || view.kind === "spin-snag");
-      if (!isV2) checksV2.render(null, () => undefined);
+      if (!isV2) checksV2.render(null, () => undefined, inputMode);
       if (view === null) {
         grade.hidden = true;
         return;
@@ -393,7 +399,7 @@ export function createBattleCheck(root: HTMLElement): {
         hint.style.top = `${view.hintAt.y}px`;
       }
       if (isV2) {
-        checksV2.render(view, (g, gx, gy) => renderGrade(grade, g, gx, gy));
+        checksV2.render(view, (g, gx, gy) => renderGrade(grade, g, gx, gy), inputMode);
         return;
       }
       if (view.kind === "ring") {

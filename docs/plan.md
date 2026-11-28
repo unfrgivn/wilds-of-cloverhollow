@@ -8788,6 +8788,40 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
 - Gates: `just check` (269 unit files / 2,020 tests, all sims + `e7-sim` +
   `encore` + `e11`, 23 QA packs, purity, lint), `just build` (every non-vendor
   chunk `< 375 kB`), and 29/29 Chromium & WebKit battle e2e tests.
+
+## Milestone 200: Track E7 v2 Battle Check Gamepad Parity, Dual-Combo & Phase-2 Battle Popups & `buster-souvenirs` Post-Puzzle Route Fix (Elevation Track E19B) **Status:** ✅ Completed (2026-11-28)
+- Pure UI gamepad-parity, Paper-Mario die-cut battle popup, and post-M193 route
+  hygiene pass with zero `src/core/` edits, zero save-version bumps, and
+  bit-identical replay hashes across all 77+ recorded and headless sims:
+  - **Adaptive Gamepad Keycaps on Track E7 v2 Battle Checks
+    (`src/ui/battle-checks-v2.ts`, `src/ui/battle-checks.ts`, `src/main.ts`):**
+    Added pure `whackKeyCap(slot, inputMode)` (`"Z"` on keyboard, `"A"` on
+    gamepad for `"middle"`, arrows preserved on directional slots) and
+    `spinSnagButtonLabel(snagReady, inputMode)` (`"SNAG!"` on keyboard,
+    `"SNAG! [A]"` on gamepad when snag-ready, `"SPIN!"` while spinning),
+    threaded `inputShortcuts.inputMode()` through `battleCheck.render(...)` ->
+    `checksV2.render(...)` with zero DOM churn via `setText`.
+  - **Dual-Friend Synergy Combo & Boss Phase-2 Die-Cut Battle Popups
+    (`src/ui/battle-popups.ts`, `src/shell/view-models.ts`):** Extended
+    `BattlePopupSnapshot` with `comboActive?: boolean`, emitted
+    `{ kind: "assist", text: "SYNERGY! ★", side: "fae" }` strictly on
+    `comboActive: false -> true` transitions (scoped to `phase === "check"`,
+    `command.startsWith("combo:")`, and `check.side === "critter"`), and updated
+    Boss Phase-2 transitions (`bossPhase2: false -> true`) to emit
+    `{ kind: "peek", text: "PHASE 2! ⚡", side: "critter" }`.
+  - **`buster-souvenirs` Post-M193 Pinecone Pass Route Fix
+    (`tests/e2e/buster-souvenirs.spec.ts`):** Routed Fae north around
+    `pass-snowball` `(1160, 1005)` and `pass-plate-jordan` `(1175, 965)` to
+    approach Pass Keeper `(1190, 910)` cleanly without accidentally solving
+    `pass-snowball-coop`.
+- **Evidence:** `tests/unit/milestone-200.test.ts` and real-input Chromium &
+  WebKit `tests/e2e/milestone-200.spec.ts` (`@smoke`).
+- **Gates:** `just check` (271 unit files / 2,027 tests, all 77+ recorded &
+  headless sims with zero hash shifts, 23 QA packs, purity, lint), `just build`
+  (largest non-vendor chunk `< 375 kB`, hook leak + runtime story + harness
+  checks green), 33/33 targeted Chromium & WebKit e2e, and full-suite
+  non-snapshot sweep (`751` Chromium + `637` WebKit = `1,388` passed, `2`
+  skipped, `0` failed).
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

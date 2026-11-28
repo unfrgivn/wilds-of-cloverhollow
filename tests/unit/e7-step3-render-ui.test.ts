@@ -316,7 +316,7 @@ describe("Track E7 Step 3: Touch Target, View Models, Popups & CSS Hygiene", () 
       bossPhase2: false,
     };
     expect(classifyBattlePopup(snapA, { ...snapA, bossPhase2: true, tick: 101 })).toEqual([
-      { kind: "big", text: "PHASE 2! ★", side: "critter" },
+      { kind: "peek", text: "PHASE 2! ⚡", side: "critter" },
     ]);
     expect(
       classifyBattlePopup(

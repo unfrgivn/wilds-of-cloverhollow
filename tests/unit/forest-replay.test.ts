@@ -19,7 +19,7 @@ describe("forest replay", () => {
         if (knot !== undefined && knots.at(-1) !== knot) knots.push(knot);
       }
     const story = (name: string): unknown => content.world.storyVariable(state.ink, name);
-    expect(state.tick).toBe(26878);
+    expect(state.tick).toBe(27137);
     expect(state.area).toBe("enchanted");
     expect(state.dialogue).toBeNull();
     expect(knots).toEqual(expect.arrayContaining([

@@ -25,7 +25,7 @@ describe("hooded kid replay", () => {
           grades.push(grade);
       }
     const story = (name: string): unknown => content.world.storyVariable(state.ink, name);
-    expect(state.tick).toBe(27383);
+    expect(state.tick).toBe(27627);
     expect(state.area).toBe("enchanted");
     expect(state.dialogue).toBeNull();
     expect(state.battle).toBeNull();
@@ -40,7 +40,7 @@ describe("hooded kid replay", () => {
     expect(state.stickers).toContain("hooded-kid");
     expect(state.coins).toBe(215);
     expect(story("forest_fizzy")).toBe(false);
-    expect(state.player).toEqual({ x: 1125.3605536091736, y: 775.5211655955634 });
+    expect(state.player).toEqual({ x: 1126.8463989408983, y: 768.9361399605747 });
     const area = content.world.areas.enchanted;
     if (area === undefined) throw new Error("enchanted area missing");
     const overlays = area.props.filter((item) =>

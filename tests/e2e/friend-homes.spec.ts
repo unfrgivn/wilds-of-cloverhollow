@@ -113,7 +113,7 @@ test("real keys: Sue's Beach Cottage & Jordan's Mountain Cabin match Bun hash at
 
     const end = await readState(page);
     expect(end.area).toBe("bay");
-    expect(end.coins).toBe(94);
+    expect(end.coins).toBe(86);
     expect(end.snacks).toBe(5);
     expect(await readHash(page)).toBe(await expectedHash);
   },

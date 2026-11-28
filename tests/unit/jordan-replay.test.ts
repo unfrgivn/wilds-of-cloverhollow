@@ -22,7 +22,8 @@ describe("Jordan replay", () => {
     expect({ area: state.area, battle: state.battle, dialogue: state.dialogue })
       .toEqual({ area: "pass", battle: null, dialogue: null });
     expect(state.party.map((member) => member.id)).toEqual(["maddie", "sue", "jordan"]);
-    expect(state.wild.find((critter) => critter.kind === "hamster")?.mood).toBe("calm");
+    expect(state.wild.some((critter) => critter.kind === "hamster" && critter.mood === "calm"))
+      .toBe(true);
     expect(state.stickers).toContain("hiker-hamster");
     expect(world.storyVariable(state.ink, "jordan_joined")).toBe(true);
     expect(world.storyVariable(state.ink, "has_lantern")).toBe(true);

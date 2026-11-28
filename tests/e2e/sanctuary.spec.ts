@@ -28,7 +28,7 @@ test("real keys: Wildlife Sanctuary living meadow matches Bun hash at 1280x720 a
     const expectedVisibleNpcs = [
       "fern",
       "sanctuary-bluebird",
-      "sanctuary-cat",
+      "sanctuary-bunny",
       "sanctuary-frog",
       "sanctuary-hamster",
       "sanctuary-moon-owl",

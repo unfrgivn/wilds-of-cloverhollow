@@ -47,7 +47,9 @@ const fizzyKind = (kind: string): boolean => presentCritters(world, play.state()
   .some((critter) => critter.kind.id === kind && critter.mood === "chaos");
 
 // Walk from Whispering Woods -> Pinecone Pass -> Cliffside Trail.
+play.clear();
 door("woods", "pass", "pass");
+play.clear();
 door("pass", "trail", "trail");
 
 // Ensure a fizzy bunny is out on Cliffside Trail.

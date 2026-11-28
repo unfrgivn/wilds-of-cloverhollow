@@ -161,7 +161,7 @@ test("Maddie alone: no feelings, no badges", async ({ page }) => {
 // typed out (re-recording moves it: find it with `bun tools/sim/run.ts
 // tests/sim/scripts/new-game/golden-woods.json --fixture new-game --trace`).
 const woods = "tests/sim/scripts/new-game/golden-woods.json";
-const menu = 9699;
+const menu = 8791;
 
 test("real keys: L peeks at the owl's turn-after feeling", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });

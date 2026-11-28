@@ -24,10 +24,18 @@ play.navigate({ x: 1440, y: 840 });
 play.leave({ x: 1, y: 0 }, "trail");
 const upper = kindAt(0);
 const lower = kindAt(1);
-play.meet(upper);
-play.battle([]);
-play.meet(lower);
-play.battle(["run"]);
+const byY = [...play.state().wild].sort((a, b) => a.y - b.y);
+if (byY[0]?.den === 1) {
+  play.meet(lower);
+  play.battle(["run"]);
+  play.meet(upper);
+  play.battle([]);
+} else {
+  play.meet(upper);
+  play.battle([]);
+  play.meet(lower);
+  play.battle(["run"]);
+}
 // It leaves her alone while it cools down; she heads down to the beach.
 play.navigate({ x: 1300, y: 1040 });
 play.leave(down, "bay");

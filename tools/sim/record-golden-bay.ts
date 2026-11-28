@@ -21,6 +21,11 @@ for (const segment of parseScript(JSON.parse(readFileSync(path, "utf8")), path))
   for (let count = 0; count < segment.ticks; count += 1) play.tick(segment.frame);
 play.approach("npc:sue");
 play.talk("npc:sue", [0]);
+if (play.state().wild.some((c) => c.kind === "frog" && c.mood === "chaos" && c.x > 1100 &&
+  c.y < 520)) {
+  play.meet("frog");
+  play.battle(["run"]);
+}
 play.meet("bluebird");
 play.battle(["cast"]);
 const end = play.state();

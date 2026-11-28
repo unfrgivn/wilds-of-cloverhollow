@@ -17,6 +17,10 @@ const fixture = fixtures.trail;
 if (fixture === undefined) throw new Error("trail fixture missing");
 const play = createRecorder(world, createState(world, fixture));
 const down = { x: 0, y: 1 };
+if (play.state().wild.some((critter) => critter.kind === "bunny" && critter.y > 650)) {
+  play.meet("bunny");
+  play.battle(["run"]);
+}
 play.navigate({ x: 1265, y: 560 });
 play.idle(30);
 for (let count = 0; count < 100 && play.state().battle === null; count += 1)

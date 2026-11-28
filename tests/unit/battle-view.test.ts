@@ -1,6 +1,11 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import type { BattleTalk } from "../../src/core";
-import { battleTalkDialogueView, talkChoicesShown } from "../../src/ui/battle";
+import {
+  battleMeterRemaining,
+  battleTalkDialogueView,
+  talkChoicesShown,
+} from "../../src/ui/battle";
 
 const question: BattleTalk = {
   knot: "kid_talk_2", turn: 2, speaker: "Hooded Kid",
@@ -33,5 +38,28 @@ describe("battle Talk dialogue projection", () => {
     expect(talkChoicesShown(question)).toBe(true);
     expect(talkChoicesShown({ ...question, text: "You... you saw those?", choices: [] }))
       .toBe(false);
+  });
+});
+
+describe("countdown battle meter", () => {
+  it("counts remaining fizz down from 1 to 0 as calm rises, clamped to [0, 1]", () => {
+    expect(battleMeterRemaining(0)).toBe(1);
+    expect(battleMeterRemaining(0.25)).toBe(0.75);
+    expect(battleMeterRemaining(0.5)).toBe(0.5);
+    expect(battleMeterRemaining(0.75)).toBe(0.25);
+    expect(battleMeterRemaining(1)).toBe(0);
+    expect(battleMeterRemaining(-0.4)).toBe(1);
+    expect(battleMeterRemaining(1.6)).toBe(0);
+  });
+
+  it("initializes .battle-calm-fill at full width and renders fizz countdown attributes", () => {
+    const css = readFileSync("src/ui/battle.css", "utf8");
+    expect(css).toMatch(/\.battle-calm-fill\s*\{[^}]*width:\s*100%;/);
+    const ts = readFileSync("src/ui/battle.ts", "utf8");
+    expect(ts).toContain("const remainingFraction = battleMeterRemaining(view.calm);");
+    expect(ts).toContain('setAttribute(track, "aria-label", `${view.critterName} fizz`);');
+    expect(ts).toContain('calmHeart.classList.toggle("is-warm", calmFraction >= 0.75);');
+    expect(ts).toContain("String(Math.round(remainingFraction * 100))");
+    expect(ts).toContain("fill.style.width = `${remainingFraction * 100}%`;");
   });
 });

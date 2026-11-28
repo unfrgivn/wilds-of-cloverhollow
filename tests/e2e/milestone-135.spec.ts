@@ -152,6 +152,52 @@ async function diffRegionPixels(
   );
 }
 
+async function walkSafe(page: Page, axis: "x" | "y", target: number): Promise<void> {
+  for (let tries = 0; tries < 5; tries += 1) {
+    await walk(page, axis, target);
+    if ((await readBattle(page)) === null) return;
+    for (let stepIdx = 0; stepIdx < 40; stepIdx += 1) {
+      const battle = await readBattle(page);
+      if (battle === null) break;
+      if (battle.phase === "check" && battle.check !== null) await playBattleCheck(page);
+      else if (battle.phase === "command" && battle.revealed >= battle.message.length) {
+        await press(page, "ArrowUp");
+        await press(page, "z");
+      } else await press(page, "z");
+    }
+  }
+}
+
+async function meetWildKind(page: Page, kind: string): Promise<void> {
+  for (let tries = 0; tries < 6; tries += 1) {
+    const battle = await readBattle(page);
+    if (battle?.critterId === kind) return;
+    if (battle !== null) {
+      for (let stepIdx = 0; stepIdx < 40; stepIdx += 1) {
+        const cur = await readBattle(page);
+        if (cur === null) break;
+        if (cur.phase === "check" && cur.check !== null) await playBattleCheck(page);
+        else if (cur.phase === "command" && cur.revealed >= cur.message.length) {
+          await press(page, "ArrowUp");
+          await press(page, "z");
+        } else await press(page, "z");
+      }
+    }
+    const target = (await readState(page)).wild.find((c) => c.kind === kind && c.mood === "chaos");
+    if (target === undefined) throw new Error(`no chaos ${kind} in plaza`);
+    if (target.cooldownTicks > 0) await step(page, target.cooldownTicks + 2);
+    if (tries % 2 === 0) {
+      await walk(page, "y", target.y);
+      if ((await readBattle(page))?.critterId === kind) return;
+      await walk(page, "x", target.x);
+    } else {
+      await walk(page, "x", target.x);
+      if ((await readBattle(page))?.critterId === kind) return;
+      await walk(page, "y", target.y);
+    }
+  }
+}
+
 test(
   "favourite treat renders visible heart/sparkle sharing theater VFX on battle stage",
   { tag: "@smoke" },
@@ -178,18 +224,18 @@ test(
     expect((await readState(page)).area).toBe("plaza");
 
     // Walk to Cloverhollow Grocery Market and buy Fish Cracker (Raccoon's favourite).
-    await walk(page, "y", 860);
-    await walk(page, "x", 560);
-    await walk(page, "y", 380);
-    await walk(page, "x", 655);
+    await walkSafe(page, "y", 860);
+    await walkSafe(page, "x", 560);
+    await walkSafe(page, "y", 380);
+    await walkSafe(page, "x", 655);
     await press(page, "ArrowUp");
     await press(page, "z");
     await finishDialogue(page, 1);
     expect((await readState(page)).treats).toEqual({ "fish-cracker": 1 });
 
     // Enter wild Sneaky Raccoon battle and advance to command phase.
-    await walk(page, "x", 760);
-    if ((await readBattle(page)) === null) await walk(page, "y", 395);
+    await walkSafe(page, "x", 560);
+    await meetWildKind(page, "raccoon");
     await expect(page.locator("html")).toHaveAttribute("data-battle", "open");
     expect((await readBattle(page))?.critterId).toBe("raccoon");
 

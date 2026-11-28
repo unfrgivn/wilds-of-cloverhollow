@@ -54,7 +54,14 @@ play.battle(["soothe", "play", "cast", "juggle"]);
 if (!play.state().stickers.includes("starry-owl"))
   throw new Error("Starry Owl sticker wasn't awarded");
 
-// Talk to calm Starry Owl.
+// Talk to calm Starry Owl (shoo any wild critter that wandered beside the perch).
+const nearOwl = play.state().wild.find(
+  (critter) => critter.mood === "chaos" && Math.hypot(critter.x - 1470, critter.y - 725) < 220,
+);
+if (nearOwl !== undefined) {
+  play.meet(nearOwl.kind);
+  play.battle(["run"]);
+}
 play.approach("critter:moon-owl", "down");
 play.talk("critter:moon-owl");
 

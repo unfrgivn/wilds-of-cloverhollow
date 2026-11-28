@@ -2105,15 +2105,27 @@ trunks keep its two exits.
   den quiet alone (Milestone 69), so a new kind can join an area's dens
   without disturbing what the dens before it roll: the bay's crabs wait for
   the lifeguard and the pass's penguins for the lodge keeper. The ones out
-  this visit are
-  `state.wild`: `{ kind, den, mood, x, y, target, pauseTicks,
-  cooldownTicks, facing, moving, notice }`, starting at their den in chaos,
-  `notice` 0. One Fae
-  calms stays calm, a Talk target, only until she leaves; the next arrival
-  rolls the area fresh.
-- A recurring critter wanders inside its den's radius and comes after a
-  Fae it has noticed in its sight (section 8); its home is its den's
-  point.
+  this visit are `state.wild`: `{ kind, den, mood, x, y, home?, target,
+  pauseTicks, cooldownTicks, facing, moving, notice }`, starting in chaos
+  with `notice` 0. Each spawning critter derives a deterministic 32-bit
+  local PRNG sub-stream from the post-pick `rng` and den index (preserving
+  the exact two-draw-per-den cadence on `state.rng`) and samples up to 32
+  walkable spots across the area's floor bounding box, choosing the first
+  spot clear of floor edges (`playerRadius + 8`) and solids (blockers,
+  closed crossings, prop footprints, and visible NPC footprints by
+  `playerRadius`), outside Fae's arrival sight (`roam.sight + touch`),
+  clear of door triggers (`touch + 60`), not over half occluded behind
+  non-canopy scenery (`50 × 70` body box), separated from active set pieces
+  (`>= 180`), visible NPCs (`>= 100`), and earlier wild critters (`>= 220`),
+  and reachable from `den.point` on the player-passable floor (25-unit
+  BFS), falling back to `den.point` if all samples fail; initial
+  `facing` and `pauseTicks` (`0..roam.pauseTicks`) are drawn from the same
+  local sub-stream. One Fae calms stays calm, a Talk target, only until she
+  leaves; the next arrival rolls the area fresh.
+- A recurring critter wanders inside its den's radius around its rolled
+  visit `home` (older saves without `home` fall back to `den.point`),
+  returns there on cooldown, and comes after a Fae it has noticed in its
+  sight (section 8).
 - The starting roster (owner, 2026-10-07): Cloverhollow's plaza (after the
   fountain frog) and the park, raccoons, pups, and cats; Bubblegum Bay,
   frogs and bluebirds, and after its lifeguard, crabs; the Cliffside Trail,
@@ -3251,9 +3263,13 @@ trunks keep its two exits.
 - HUD: ENERGY (showing Fae's own level from `levelForXp`; one leaf per point up
   to 10, compact for 6..10, and capped at 10 proportionally filled leaves plus
   a `current/max` count above 10; spent leaves outlined) at the top left and
-  the critter's CALM meter (its level and name in capitals, a cozy heart emblem
-  beside the track that warms to soft coral-pink at `calm >= 0.75`, and subtle
-  25% / 50% / 75% vertical milestone tick marks inside `.battle-calm-track`) at
+  the critter's fizz/calm countdown meter (its level and name in capitals,
+  a track starting full at `100%` and counting down to `0%` via
+  `battleMeterRemaining(calm) = 1 - clamp01(calm)` as Fae calms the critter,
+  exposing `<name> fizz` and remaining percentage on `.battle-calm-track`,
+  a cozy heart emblem beside the track that warms to soft coral-pink in the
+  final 25% of remaining fizz / `calm >= 0.75`, and subtle 25% / 50% / 75%
+  vertical milestone tick marks inside `.battle-calm-track`) at
   the top right, left of the menu button, inside the safe area. Directly under
   ENERGY sits `.battle-actions-left` (a compact wrapping horizontal row on
   phones and desktops, clear of ENERGY, thought clouds, wind-ups, commands,

@@ -54,21 +54,21 @@
     }
   },
   "new-game/chapter-one.json": {
-    "tick": 5143,
+    "tick": 4395,
     "area": "park",
     "player": {
-      "x": 731.1269837220834,
-      "y": 514.8730162779166
+      "x": 731.3279938488599,
+      "y": 514.6720061511401
     },
     "facing": "up",
     "follower": {
-      "x": 656.8826430346562,
-      "y": 533.1173569653438,
+      "x": 703.0437299458104,
+      "y": 586.9562700541896,
       "facing": "right",
       "moving": false,
-      "distance": 475.7400237056796,
+      "distance": 494.60155345674605,
       "stillTicks": 18,
-      "trail": 10
+      "trail": 9
     }
   },
   "new-game/door-round-trip.json": {
@@ -108,21 +108,21 @@
     }
   },
   "park/pup-win.json": {
-    "tick": 990,
+    "tick": 881,
     "area": "park",
     "player": {
-      "x": 874.5584412271592,
-      "y": 595.4415587728408
+      "x": 1235.4341085556887,
+      "y": 649.2894089488256
     },
-    "facing": "right",
+    "facing": "left",
     "follower": {
-      "x": 791.5666996363598,
-      "y": 609.5836943965719,
+      "x": 1172.5466631019324,
+      "y": 648.8318800802039,
       "facing": "right",
-      "moving": true,
-      "distance": 579.5431528569441,
-      "stillTicks": 834,
-      "trail": 11
+      "moving": false,
+      "distance": 951.4026325170958,
+      "stillTicks": 632,
+      "trail": 3
     }
   },
   "plaza/explore.json": {

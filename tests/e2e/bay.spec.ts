@@ -133,10 +133,32 @@ test("real keys: down the dock to Sue, she joins, and casts at the bluebird", as
   expect(order).toEqual(expect.arrayContaining(["fae", "maddie", "sue"]));
   await expect(page).toHaveScreenshot("bay-party-on-the-dock.png");
 
-  // Off the dock and across the sand to the bluebird.
+  // Off the dock and across the sand to the rolled bluebird.
   await walk(page, "x", 900);
   await walk(page, "y", 760);
-  await walk(page, "x", 1250);
+  for (let tries = 0; tries < 6; tries += 1) {
+    const battle = await readBattle(page);
+    if (battle?.critterId === "bluebird") break;
+    if (battle !== null) {
+      for (let stepIdx = 0; stepIdx < 40; stepIdx += 1) {
+        const cur = await readBattle(page);
+        if (cur === null) break;
+        if (cur.phase === "check" && cur.check !== null) await playBattleCheck(page);
+        else if (cur.phase === "command" && cur.revealed >= cur.message.length) {
+          await hold(page, "ArrowUp", 1);
+          await step(page, 1);
+          await press(page);
+        } else await press(page);
+      }
+    }
+    const bird = (await readState(page)).wild.find(
+      (critter) => critter.kind === "bluebird" && critter.mood === "chaos",
+    );
+    if (bird === undefined) throw new Error("no bluebird out in bay");
+    await walk(page, "x", bird.x);
+    if ((await readBattle(page))?.critterId === "bluebird") break;
+    await walk(page, "y", bird.y);
+  }
   await expect(page.locator("html")).toHaveAttribute("data-battle", "open");
   expect((await readBattle(page))?.critterId).toBe("bluebird");
   for (let count = 0; count < 20; count += 1) {

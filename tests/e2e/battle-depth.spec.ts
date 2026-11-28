@@ -178,8 +178,8 @@ test("clicking the Together! sticker button launches the finisher on touch phone
   await context.close();
 });
 
-const fluteScript = "tests/sim/scripts/new-game/golden-flute.json";
-const fluteBattleMenuTick = 20438;
+const fluteScript = "tests/sim/scripts/new-game/cavern.json";
+const fluteBattleMenuTick = 21531;
 
 test("real keys: Flute Friends assist in battle via F key", {
   tag: "@smoke",

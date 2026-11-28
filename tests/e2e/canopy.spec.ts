@@ -1,5 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
-import { openHarness, readState, renderInfo, resetPaused, step } from "./helpers";
+import {
+  openHarness, playBattleCheck, readBattle, readState, renderInfo, resetPaused, step,
+} from "./helpers";
 
 // Canopies (spec 6): walking under a palm's crown in Bubblegum Bay, Fae is
 // drawn behind it and the crown fades so she can still be seen; stepping out,
@@ -42,10 +44,34 @@ test("a palm's crown fades while Fae walks under it", async ({ page }) => {
     .filter((strip) => strip.left < feet.x + 25 && strip.right > feet.x - 25) ?? [];
   expect(palm.some((strip) => strip.zIndex > fae), "the palm is drawn over Fae").toBe(true);
   await expect(page).toHaveScreenshot("bay-under-palm.png");
-  // Back out the way she came.
-  await hold(page, "ArrowRight", 35);
-  await hold(page, "ArrowDown", 45);
-  await hold(page, "ArrowRight", 23);
+  // Back out the way she came, escaping any roaming bay critter that chased her in.
+  const holdSafe = async (key: string, ticks: number): Promise<void> => {
+    let remaining = ticks;
+    while (remaining > 0) {
+      const chunk = Math.min(remaining, 10);
+      await hold(page, key, chunk);
+      remaining -= chunk;
+      if ((await readBattle(page)) !== null) {
+        for (let stepIdx = 0; stepIdx < 40; stepIdx += 1) {
+          const battle = await readBattle(page);
+          if (battle === null) break;
+          if (battle.phase === "check" && battle.check !== null) await playBattleCheck(page);
+          else if (battle.phase === "command" && battle.revealed >= battle.message.length) {
+            await hold(page, "ArrowUp", 1);
+            await step(page, 1);
+            await page.keyboard.press("z");
+            await step(page, 2);
+          } else {
+            await page.keyboard.press("z");
+            await step(page, 2);
+          }
+        }
+      }
+    }
+  };
+  await holdSafe("ArrowRight", 35);
+  await holdSafe("ArrowDown", 45);
+  await holdSafe("ArrowRight", 23);
   await step(page, 20);
   expect(await canopy(page, "palm-top-left")).toBe(1);
 });

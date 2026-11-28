@@ -47,6 +47,12 @@ play.idle(60);
 if (play.state().area !== "pass") throw new Error("bus didn't reach Pinecone Pass");
 
 // Walk up Pinecone Pass's north snow gap into Crystal Cavern.
+for (let i = 0; i < 4; i += 1) {
+  const blocker = play.state().wild.find((c) => c.mood === "chaos" && c.cooldownTicks === 0);
+  if (blocker === undefined) break;
+  play.meet(blocker.kind);
+  play.battle(["run"]);
+}
 play.navigate({ x: 830, y: 220 }, 8);
 play.leave({ x: 0, y: -1 }, "cavern");
 if (play.state().area !== "cavern") throw new Error("didn't enter Crystal Cavern");

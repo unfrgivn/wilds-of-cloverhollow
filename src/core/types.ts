@@ -1231,6 +1231,8 @@ export type Wild = {
   mood: Mood;
   x: number;
   y: number;
+  // This visit's rolled roam anchor; older saves without it fall back to den.point.
+  home?: Point;
   target: Point;
   pauseTicks: number;
   cooldownTicks: number;

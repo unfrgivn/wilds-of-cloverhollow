@@ -117,7 +117,7 @@ test("real keys: Chef Mateo's Taco Truck ready, serving, order-clear, and spotle
     const end = await readState(page);
     expect(end.area).toBe("hills");
     expect(end.arcade).toBeNull();
-    expect(end.coins).toBe(170);
+    expect(end.coins).toBe(162);
     expect(end.snacks).toBe(10);
     expect(await readHash(page)).toBe(await expectedHash);
   });
@@ -135,7 +135,7 @@ test(
 
     // Fast-forward the recorded run directly to Chef Mateo's Taco Truck ready screen
     // (1 tick past open so dialogue confirm is released).
-    const targetTicks = 14536;
+    const targetTicks = 13217;
     const upTo: ReturnType<typeof recording> = [];
     let ticks = 0;
     for (const segment of recording("tests/sim/scripts/new-game/taco.json")) {
@@ -149,7 +149,7 @@ test(
 
     const readyState = await readState(page);
     if (readyState.arcade?.game !== "taco") {
-      throw new Error("Expected Taco Truck ready state at tick 14535");
+      throw new Error("Expected Taco Truck ready state at tick 13216");
     }
     expect(readyState.arcade.phase).toBe("ready");
     await expect(page.locator(".taco-stage")).toBeVisible();

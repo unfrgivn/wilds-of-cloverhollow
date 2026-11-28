@@ -27,14 +27,30 @@ const must = (name: string, what: string): void => {
   if (story(name) !== true) throw new Error(what);
 };
 if (play.state().area !== "hills") throw new Error("m81-festival didn't end in hills");
+const sanctuary = world.areas.sanctuary;
+if (sanctuary === undefined) throw new Error("sanctuary area missing");
+
+// Ensure at least 8 valley animals are calmed before visiting Ranger Fern (9 visible NPCs).
+const countVisible = (): number =>
+  sanctuary.npcs.filter((npc) => npcVisible(world, play.state(), npc)).length;
+while (countVisible() < 9) {
+  const fresh = play.state().wild.find(
+    (critter) =>
+      critter.mood === "chaos" &&
+      sanctuary.npcs.some(
+        (npc) => npc.visibleWhenCalmed === critter.kind && !npcVisible(world, play.state(), npc),
+      ),
+  );
+  if (fresh === undefined) break;
+  play.meet(fresh.kind);
+  play.battle([]);
+}
 
 // Walk north-east across Clover Hills to the sunlit east meadow exit into sanctuary.
 play.navigate({ x: 1525, y: 408 }, 8);
 play.leave({ x: 1, y: 0 }, "sanctuary");
 if (play.state().area !== "sanctuary") throw new Error("didn't enter Wildlife Sanctuary");
 
-const sanctuary = world.areas.sanctuary;
-if (sanctuary === undefined) throw new Error("sanctuary area missing");
 const visibleNow = sanctuary.npcs
   .filter((npc) => npcVisible(world, play.state(), npc))
   .map((npc) => npc.id)

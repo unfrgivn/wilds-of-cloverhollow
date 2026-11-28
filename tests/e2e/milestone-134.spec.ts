@@ -83,7 +83,7 @@ test(
     await page.setViewportSize({ width: 1280, height: 720 });
     await openHarness(page);
     await resetPaused(page, "new-game");
-    await replayToTick(page, "tests/sim/scripts/new-game/golden-woods.json", 9699);
+    await replayToTick(page, "tests/sim/scripts/new-game/golden-woods.json", 8791);
     await step(page, 1);
 
     const before = await readBattle(page);
@@ -129,7 +129,7 @@ test(
     await page.setViewportSize({ width: 1280, height: 720 });
     await openHarness(page);
     await resetPaused(page, "new-game");
-    await replayToTick(page, "tests/sim/scripts/new-game/golden-flute.json", 20438);
+    await replayToTick(page, "tests/sim/scripts/new-game/cavern.json", 21531);
 
     const fluteBtn = page.locator(".battle-flute-btn");
     const fluteKey = page.locator(".battle-flute-btn .battle-action-key");

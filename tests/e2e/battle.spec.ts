@@ -54,11 +54,19 @@ test.describe("frog battle", () => {
     const entry = (await readState(page)).player;
 
     const seen = new Set<string>();
+    const track = page.locator(".battle-calm-track");
+    const fill = page.locator(".battle-calm-fill");
+    const meterValues: number[] = [];
     for (let action = 0; action < 120; action += 1) {
       const battle = (await readBattle(page));
       if (battle === null) break;
       if (battle.phase === "intro" && !seen.has("intro") && await shown(page)) {
         seen.add("intro");
+        // Countdown battle meter starts full (100% fizz remaining).
+        await expect(track).toHaveAttribute("aria-label", "Lv 2 · Fizzy Frog fizz");
+        await expect(track).toHaveAttribute("aria-valuenow", "100");
+        expect(await fill.evaluate((node) => node.getAttribute("style"))).toContain("width: 100%");
+        meterValues.push(100);
         await expect(page.locator(".sticker-text-revealed")).toHaveText(
           "A fizzy frog hops out of the fountain, puffing pink bubbles!");
         await expect(page).toHaveScreenshot("battle-intro.png");
@@ -86,6 +94,13 @@ test.describe("frog battle", () => {
         // Press exactly on the target tick: GREAT every time.
          await playBattleCheck(page);
         await expect(page.locator(".battle-grade")).toHaveText("GREAT!");
+        if (side === "critter") {
+          const hit = await readBattle(page);
+          const expectedPct = Math.round((1 - (hit?.calm ?? 0) / 100) * 100);
+          await expect(track).toHaveAttribute("aria-valuenow", String(expectedPct));
+          expect(expectedPct).toBeLessThan(meterValues.at(-1) ?? 101);
+          meterValues.push(expectedPct);
+        }
         if (side === "critter" && !seen.has("great")) {
           seen.add("great");
           // Let the result line start typing before the picture.
@@ -95,6 +110,11 @@ test.describe("frog battle", () => {
         }
         await step(page, 1);
         continue;
+      }
+      if (battle.phase === "soothed" && !seen.has("soothed")) {
+        seen.add("soothed");
+        await expect(track).toHaveAttribute("aria-valuenow", "0");
+        expect(await fill.evaluate((node) => node.getAttribute("style"))).toContain("width: 0%");
       }
       if (battle.phase === "reward" && await shown(page)) {
         await expect(page.locator(".battle-reward")).toBeVisible();
@@ -111,7 +131,10 @@ test.describe("frog battle", () => {
     expect(after.stickers).toEqual(["fountain-frog"]);
     expect(after.player).toEqual(entry);
     await expect(page.locator("html")).not.toHaveAttribute("data-battle", "open");
-    expect([...seen].sort()).toEqual(["burst", "great", "intro"]);
+    expect(meterValues[0]).toBe(100);
+    expect(meterValues.at(-1)).toBe(0);
+    expect(meterValues.length).toBeGreaterThanOrEqual(3);
+    expect([...seen].sort()).toEqual(["burst", "great", "intro", "soothed"]);
     await step(page, 2);
     expect((await renderInfo(page)).critters)
       .toEqual([
@@ -176,5 +199,53 @@ test.describe("frog battle", () => {
     expect(after.player).toEqual(entry);
     await expect(page.locator("html")).not.toHaveAttribute("data-battle", "open");
     await context.close();
+  });
+
+  test("real keys: enemy battle meter starts at 100% fizz and counts down to 0%", {
+    tag: "@smoke",
+  }, async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.goto("./");
+    await page.waitForFunction(() => Boolean(window.__cloverhollow));
+    await resetPaused(page, "plaza");
+    for (const [key, ticks] of approach) await hold(page, key, ticks);
+    await hold(page, "ArrowLeft", 35);
+    await expect(page.locator("html")).toHaveAttribute("data-battle", "open");
+
+    const track = page.locator(".battle-calm-track");
+    const fill = page.locator(".battle-calm-fill");
+    await expect(track).toHaveAttribute("aria-label", /fizz$/);
+    await expect(track).toHaveAttribute("aria-valuenow", "100");
+    expect(await fill.evaluate((node) => node.getAttribute("style"))).toContain("width: 100%");
+
+    const meterValues: number[] = [100];
+    let sawSoothedZero = false;
+    for (let action = 0; action < 120; action += 1) {
+      const battle = await readBattle(page);
+      if (battle === null) break;
+      if (battle.phase === "check" && battle.check !== null) {
+        const side = battle.check.side;
+        await playBattleCheck(page);
+        if (side === "critter") {
+          const hit = await readBattle(page);
+          const expectedPct = Math.round((1 - (hit?.calm ?? 0) / 100) * 100);
+          await expect(track).toHaveAttribute("aria-valuenow", String(expectedPct));
+          expect(expectedPct).toBeLessThan(meterValues.at(-1) ?? 101);
+          meterValues.push(expectedPct);
+        }
+        await step(page, 1);
+        continue;
+      }
+      if (battle.phase === "soothed" && !sawSoothedZero) {
+        sawSoothedZero = true;
+        await expect(track).toHaveAttribute("aria-valuenow", "0");
+        expect(await fill.evaluate((node) => node.getAttribute("style"))).toContain("width: 0%");
+      }
+      await press(page);
+    }
+    expect(sawSoothedZero).toBe(true);
+    expect(meterValues[0]).toBe(100);
+    expect(meterValues.at(-1)).toBe(0);
+    expect(meterValues.length).toBeGreaterThanOrEqual(4);
   });
 });

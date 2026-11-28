@@ -2,12 +2,18 @@ import { describe, expect, it } from "vitest";
 import {
   blankInput,
   createState,
+  distanceToPolygon,
   firstTouch,
   nextNotice,
+  npcVisible,
+  pointInPolygon,
+  sceneryArea,
   step,
   wildMarks,
   type ActionFrame,
+  type Direction,
   type Fixture,
+  type Point,
   type State,
   type Wild,
 } from "../../src/core";
@@ -28,9 +34,60 @@ const pup = world.critters.pup;
 if (pup === undefined) throw new Error("pup missing");
 const right: ActionFrame = { ...blankInput(), move: { x: 1, y: 0 } };
 
-// The park's pup den always has one out. Fae stands 130 to its left: in its
-// sight, out of its reach. It rests where it is (a long pause) until it
-// notices her, so nothing turns on where it would have wandered.
+function approach(state: State): ActionFrame {
+  const target = state.wild[0];
+  if (target === undefined) return right;
+  const dx = target.x - state.player.x;
+  const dy = target.y - state.player.y;
+  const move = Math.abs(dx) >= Math.abs(dy)
+    ? { x: Math.sign(dx), y: 0 }
+    : { x: 0, y: Math.sign(dy) };
+  return { ...blankInput(), move };
+}
+
+function standableSpot(state: State, origin: Point): { player: Point; facing: Direction } {
+  const area = world.areas[state.area];
+  if (area === undefined) throw new Error(`missing area ${state.area}`);
+  const scenery = sceneryArea(world, state.ink, area);
+  const solids = [
+    ...scenery.blockers,
+    ...area.npcs.filter((npc) => npcVisible(world, state, npc)).map((npc) => npc.footprint),
+  ];
+  const radius = world.tunables.playerRadius;
+  const options: readonly { dx: number; dy: number; facing: Direction }[] = [
+    { dx: -1, dy: 0, facing: "right" },
+    { dx: 1, dy: 0, facing: "left" },
+    { dx: 0, dy: -1, facing: "down" },
+    { dx: 0, dy: 1, facing: "up" },
+  ];
+  for (const option of options) {
+    let clear = true;
+    for (let dist = 20; dist <= 130; dist += 10) {
+      const sample = { x: origin.x + option.dx * dist, y: origin.y + option.dy * dist };
+      if (
+        !pointInPolygon(sample, area.walkable) ||
+        distanceToPolygon(sample, area.walkable) < radius ||
+        solids.some(
+          (poly) => pointInPolygon(sample, poly) || distanceToPolygon(sample, poly) < radius,
+        )
+      ) {
+        clear = false;
+        break;
+      }
+    }
+    if (clear) {
+      return {
+        player: { x: origin.x + option.dx * 130, y: origin.y + option.dy * 130 },
+        facing: option.facing,
+      };
+    }
+  }
+  throw new Error(`no standable spot 130 from (${origin.x}, ${origin.y})`);
+}
+
+// The park's pup den always has one out. Fae stands 130 away in an open
+// cardinal direction: in its sight, out of its reach. It rests where it is (a
+// long pause) until it notices her, so nothing turns on where it would wander.
 function meeting(options: {
   notice?: number;
   calms?: State["calms"];
@@ -41,10 +98,11 @@ function meeting(options: {
   const base = createState(world, options.party ? { ...park, party: options.party } : park);
   const out = base.wild.find((critter) => critter.den === 0);
   if (out === undefined) throw new Error("no pup out");
+  const { player, facing } = standableSpot(base, out);
   return {
     ...base,
-    player: { x: out.x - 130, y: out.y },
-    facing: "right",
+    player,
+    facing,
     wild: [{ ...out, target: { x: out.x, y: out.y }, pauseTicks: 1000,
       notice: options.notice ?? 0 }],
     calms: options.calms ?? {},
@@ -123,7 +181,8 @@ describe("first touch", () => {
   });
 
   it("opens a quarter calm when Fae gets to the pup before it notices her", () => {
-    const state = until(meeting(), right, (next) => next.battle !== null);
+    const start = meeting();
+    const state = until(start, approach(start), (next) => next.battle !== null);
     expect(state.battle).toMatchObject({
       critterId: "pup",
       phase: "intro",
@@ -136,8 +195,8 @@ describe("first touch", () => {
   });
 
   it("opens plainly when Fae walks at a pup that has noticed her", () => {
-    const state = until(meeting({ notice: roam.noticeTicks }), right,
-      (next) => next.battle !== null);
+    const start = meeting({ notice: roam.noticeTicks });
+    const state = until(start, approach(start), (next) => next.battle !== null);
     expect(state.battle).toMatchObject({ turn: 1, calm: 0, message: pup.lines.intro });
   });
 
@@ -181,8 +240,8 @@ describe("first touch", () => {
 
 describe("old friends", () => {
   it("calms a species Fae has calmed three of on touch, pays, and counts it", () => {
-    let state = until(meeting({ calms: { pup: 3 }, stickers: [pup.sticker.id] }), right,
-      (next) => next.battle !== null);
+    const start = meeting({ calms: { pup: 3 }, stickers: [pup.sticker.id] });
+    let state = until(start, approach(start), (next) => next.battle !== null);
     expect(state.battle).toMatchObject({
       phase: "soothed",
       calm: pup.calmMax,
@@ -199,7 +258,8 @@ describe("old friends", () => {
   });
 
   it("battles as ever with two calmed", () => {
-    const state = until(meeting({ calms: { pup: 2 } }), right, (next) => next.battle !== null);
+    const start = meeting({ calms: { pup: 2 } });
+    const state = until(start, approach(start), (next) => next.battle !== null);
     expect(state.battle?.phase).toBe("intro");
   });
 

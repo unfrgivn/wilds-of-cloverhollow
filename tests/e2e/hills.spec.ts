@@ -69,6 +69,32 @@ test("real keys: a hills lamb pays coins and its sticker once", async ({ page })
   expect(state.stickers).toEqual(["meadow-hedgehog"]);
 });
 
+async function walkSafe(
+  page: import("@playwright/test").Page,
+  axis: "x" | "y",
+  target: number,
+): Promise<void> {
+  const press = async (key: string): Promise<void> => {
+    await page.keyboard.down(key);
+    await step(page, 1);
+    await page.keyboard.up(key);
+    await step(page, 1);
+  };
+  for (let tries = 0; tries < 5; tries += 1) {
+    await walk(page, axis, target);
+    if ((await readBattle(page)) === null) return;
+    for (let stepIdx = 0; stepIdx < 40; stepIdx += 1) {
+      const battle = await readBattle(page);
+      if (battle === null) break;
+      if (battle.phase === "check" && battle.check !== null) await playBattleCheck(page);
+      else if (battle.phase === "command" && battle.revealed >= battle.message.length) {
+        await press("ArrowUp");
+        await press("z");
+      } else await press("z");
+    }
+  }
+}
+
 async function reachLookout(page: import("@playwright/test").Page, qa = false): Promise<void> {
   if (qa) {
     await page.goto("./?qa=hills-lookout");
@@ -77,8 +103,8 @@ async function reachLookout(page: import("@playwright/test").Page, qa = false): 
     await openHarness(page);
     await resetPaused(page, "hills");
   }
-  await walk(page, "y", 345);
-  await walk(page, "x", 1160);
+  await walkSafe(page, "y", 345);
+  await walkSafe(page, "x", 1160);
   await page.keyboard.down("ArrowLeft");
   await step(page, 1);
   await page.keyboard.up("ArrowLeft");

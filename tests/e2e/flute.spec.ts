@@ -62,7 +62,8 @@ test("real keys: a pat and a snack, the flute, a friend along, and the pond", as
       await shoot(page, "flute-following");
     }
     const battle = state.battle;
-    if (!battleShot && along && battle !== null && battle.phase === "command" &&
+    if (!battleShot && along && battle !== null &&
+        (battle.phase === "command" || battle.phase === "soothed") &&
         battle.revealed >= battle.message.length) {
       // He's in the party, but not in the battle: three places beside Fae.
       const info = await renderInfo(page);

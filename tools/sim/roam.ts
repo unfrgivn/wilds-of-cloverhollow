@@ -40,9 +40,34 @@ const valid = (point: Point, area: Area): boolean => {
     );
 };
 
+const openNear = (origin: Point, area: Area, gap: number): Point => {
+  const dirs: readonly Point[] = [
+    { x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 },
+    { x: 0.7071, y: 0.7071 }, { x: -0.7071, y: 0.7071 },
+    { x: 0.7071, y: -0.7071 }, { x: -0.7071, y: -0.7071 },
+  ];
+  const radius = world.tunables.playerRadius;
+  for (const dir of dirs) {
+    const candidate = { x: origin.x + dir.x * gap, y: origin.y + dir.y * gap };
+    if (
+      pointInPolygon(candidate, area.walkable) &&
+      distanceToPolygon(candidate, area.walkable) >= radius &&
+      area.blockers.every(
+        (blocker) =>
+          !pointInPolygon(candidate, blocker) && distanceToPolygon(candidate, blocker) >= radius,
+      )
+    )
+      return candidate;
+  }
+  throw new Error(`no open spot ${gap} from (${origin.x}, ${origin.y})`);
+};
+
 const scripted = (): string => {
   let state = createState(world, { area: "harness", spawn: "start", seed: 7 });
-  state = { ...state, player: { x: home.x + 120, y: home.y } };
+  const initial = state.wild[0];
+  const startArea = world.areas[state.area];
+  if (initial === undefined || startArea === undefined) throw new Error("roamer did not spawn");
+  state = { ...state, player: openNear(initial, startArea, 120) };
   for (let tick = 0; tick < 200 && state.battle === null; tick += 1)
     state = step(world, state, blankInput()).state;
   if (state.battle === null) throw new Error("roamer did not start a battle");

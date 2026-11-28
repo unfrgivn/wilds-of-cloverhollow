@@ -125,6 +125,28 @@ describe("save format", () => {
     expect(restored?.critters["gull"]).toBe("chaos");
   });
 
+  it("round trips wild critters with home, accepts legacy saves without it, rejects bad home",
+    () => {
+      const legacy: State["wild"][number] = {
+        kind: "pup", den: 0, mood: "chaos", x: 700, y: 540,
+        target: { x: 700, y: 540 }, pauseTicks: 8, cooldownTicks: 0,
+        facing: "right", moving: false, notice: 0,
+      };
+      const withHome: State["wild"][number] = { ...legacy, home: { x: 700, y: 540 } };
+      const savedWithHome = { ...fresh, area: "park", wild: [withHome] };
+      expect(parseSave(serializeSave(savedWithHome), fresh)).toEqual(savedWithHome);
+      const savedLegacy = { ...fresh, area: "park", wild: [legacy] };
+      expect(parseSave(serializeSave(savedLegacy), fresh)).toEqual(savedLegacy);
+      for (const badHome of [null, [], { x: "700", y: 540 }, { x: 700 }]) {
+        const broken = JSON.stringify({
+          version: 10,
+          state: { ...fresh, area: "park", wild: [{ ...legacy, home: badHome }] },
+        });
+        expect(parseSave(broken, fresh)).toBeNull();
+      }
+    },
+  );
+
   it("rejects a save taken mid-battle but accepts one after battle ends", () => {
     const busy = { ...fresh, dialogue: { knot: "window", speaker: "Fae", text: "Hi", revealed: 1,
       choices: [], selected: 0, ended: false } };

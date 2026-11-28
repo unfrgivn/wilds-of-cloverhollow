@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import {
-  longFlowTimeout, openHarness, playBattleCheck, readBattle, renderInfo, resetPaused, step,
+  longFlowTimeout, openHarness, playBattleCheck, readBattle, readState, renderInfo, resetPaused,
+  step, walk,
 } from "./helpers";
 
 // Milestone 51: first touch. In Meadow Park (the park fixture, seed 1) the
@@ -11,12 +12,6 @@ import {
 // to the park or the roaming numbers move them.
 
 test.describe.configure({ timeout: longFlowTimeout });
-
-async function hold(page: Page, key: string, ticks: number): Promise<void> {
-  await page.keyboard.down(key);
-  await step(page, ticks);
-  await page.keyboard.up(key);
-}
 
 async function press(page: Page): Promise<void> {
   await page.keyboard.down("Enter");
@@ -54,8 +49,10 @@ test("real keys: Fae dashes at the pup before it notices her, a head start", { t
     await page.setViewportSize({ width: 1280, height: 720 });
     await openHarness(page);
     await resetPaused(page, "park");
-    await hold(page, "ArrowUp", 62);
-    await page.keyboard.down("ArrowRight");
+    const pup = (await readState(page)).wild.find((critter) => critter.den === 0);
+    if (pup === undefined) throw new Error("no pup spawned in park");
+    await walk(page, "x", pup.x);
+    await page.keyboard.down("ArrowUp");
     // In its sight: a "?" over the pup, which hasn't noticed her yet.
     await until(page, async () => (await pupMark(page)) === "?");
     const mark = (await renderInfo(page)).marks[0];
@@ -69,7 +66,7 @@ test("real keys: Fae dashes at the pup before it notices her, a head start", { t
     await expect(page).toHaveScreenshot("encounter-wondering.png");
     // On at it: she gets there first.
     await until(page, async () => (await readBattle(page)) !== null);
-    await page.keyboard.up("ArrowRight");
+    await page.keyboard.up("ArrowUp");
     const battle = await readBattle(page);
     expect(battle).toMatchObject({ critterId: "pup", turn: 1, calm: 25 });
     await expect(sticker).toBeHidden();
@@ -84,10 +81,14 @@ test("real keys: standing in the pup's sight, it notices her and pounces first",
     await page.setViewportSize({ width: 1280, height: 720 });
     await openHarness(page);
     await resetPaused(page, "park");
-    await hold(page, "ArrowUp", 62);
-    await hold(page, "ArrowRight", 125);
-    // She stands still: "?", then "!" as the pup notices her.
+    const pup = (await readState(page)).wild.find((critter) => critter.den === 0);
+    if (pup === undefined) throw new Error("no pup spawned in park");
+    await walk(page, "x", pup.x);
+    await page.keyboard.down("ArrowUp");
     await until(page, async () => (await pupMark(page)) === "?");
+    await step(page, 12);
+    await page.keyboard.up("ArrowUp");
+    // She stands still: "?", then "!" as the pup notices her.
     await until(page, async () => (await pupMark(page)) === "!");
     await expect(page.locator(".notice-mark")).toHaveText("!");
     await expect(page).toHaveScreenshot("encounter-alert.png");

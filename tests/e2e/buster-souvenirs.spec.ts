@@ -1,5 +1,5 @@
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
-import { longFlowTimeout, readState, step, walk } from "./helpers";
+import { longFlowTimeout, playBattleCheck, readBattle, readState, step, walk } from "./helpers";
 
 async function press(page: Page, key = "z"): Promise<void> {
   await page.keyboard.down(key);
@@ -74,15 +74,17 @@ async function waitTransition(page: Page, targetArea: string): Promise<void> {
 }
 
 async function walkSafe(page: Page, axis: "x" | "y", target: number): Promise<void> {
-  for (let tries = 0; tries < 3; tries += 1) {
+  for (let tries = 0; tries < 5; tries += 1) {
     await walk(page, axis, target);
     const current = await readState(page);
     if (current.battle === null) return;
-    // Escape a roaming plaza cat using real keys (advance intro -> Run -> close).
-    for (let stepIdx = 0; stepIdx < 20; stepIdx += 1) {
-      const phase = (await readState(page)).battle?.phase ?? null;
-      if (phase === null) break;
-      if (phase === "command") {
+    // Escape a roaming critter using real keys (advance intro/burst -> Run -> close).
+    for (let stepIdx = 0; stepIdx < 40; stepIdx += 1) {
+      const battle = await readBattle(page);
+      if (battle === null) break;
+      if (battle.phase === "check" && battle.check !== null) {
+        await playBattleCheck(page);
+      } else if (battle.phase === "command" && battle.revealed >= battle.message.length) {
         await press(page, "ArrowUp");
         await press(page, "z");
       } else {
@@ -119,10 +121,10 @@ test.describe("Buster the Bus Driver, Star-Line Stamp Card & regional souvenir s
       expect(startCoins).toBeGreaterThanOrEqual(20);
 
       // Walk south around the plaza to stand in front of Buster (515, 780).
-      await walk(page, "x", 1280);
-      await walk(page, "y", 875);
-      await walk(page, "x", 515);
-      await walk(page, "y", 835);
+      await walkSafe(page, "x", 1280);
+      await walkSafe(page, "y", 875);
+      await walkSafe(page, "x", 515);
+      await walkSafe(page, "y", 835);
       await press(page, "ArrowUp");
       await expect(page.locator(".sticker-prompt")).toContainText("TALK");
 
@@ -141,10 +143,10 @@ test.describe("Buster the Bus Driver, Star-Line Stamp Card & regional souvenir s
       expect(introLines.some((line) => line.includes("Star-Line Stamp Card"))).toBe(true);
 
       // Walk to the Plaza bus stop and ride to Bubblegum Bay (choice 1).
-      await walk(page, "y", 875);
-      await walk(page, "x", 955);
-      await walk(page, "y", 965);
-      await walk(page, "x", 878);
+      await walkSafe(page, "y", 875);
+      await walkSafe(page, "x", 955);
+      await walkSafe(page, "y", 965);
+      await walkSafe(page, "x", 878);
       await press(page, "ArrowUp");
       await expect(page.locator(".sticker-prompt")).toContainText("LOOK");
       await press(page, "z");
@@ -152,8 +154,8 @@ test.describe("Buster the Bus Driver, Star-Line Stamp Card & regional souvenir s
       await waitTransition(page, "bay");
 
       // Talk to Bay Keeper (785, 455) -> wave stamp + Sea-Salt Taffy (9 coins).
-      await walk(page, "x", 785);
-      await walk(page, "y", 505);
+      await walkSafe(page, "x", 785);
+      await walkSafe(page, "y", 505);
       await press(page, "ArrowUp");
       await expect(page.locator(".sticker-prompt")).toContainText("TALK");
       await press(page, "z");
@@ -172,16 +174,16 @@ test.describe("Buster the Bus Driver, Star-Line Stamp Card & regional souvenir s
       expect((await readState(page)).treats).toEqual({ "sea-salt-taffy": 1 });
 
       // Ride the bus from Bubblegum Bay to Pinecone Pass (choice 1).
-      await walk(page, "y", 545);
-      await walk(page, "x", 355);
+      await walkSafe(page, "y", 545);
+      await walkSafe(page, "x", 355);
       await press(page, "ArrowUp");
       await press(page, "z");
       await finishDialogue(page, 1);
       await waitTransition(page, "pass");
 
       // Talk to Pass Keeper (1190, 910) -> pine stamp + Maple Pine Brittle (11 coins).
-      await walk(page, "x", 1190);
-      await walk(page, "y", 955);
+      await walkSafe(page, "x", 1190);
+      await walkSafe(page, "y", 955);
       await press(page, "ArrowUp");
       await expect(page.locator(".sticker-prompt")).toContainText("TALK");
       await press(page, "z");
@@ -203,8 +205,8 @@ test.describe("Buster the Bus Driver, Star-Line Stamp Card & regional souvenir s
       });
 
       // Ride the bus from Pinecone Pass back to Cloverhollow Plaza (choice 0).
-      await walk(page, "y", 965);
-      await walk(page, "x", 1017);
+      await walkSafe(page, "y", 965);
+      await walkSafe(page, "x", 1017);
       await press(page, "ArrowUp");
       await press(page, "z");
       await finishDialogue(page, 0);

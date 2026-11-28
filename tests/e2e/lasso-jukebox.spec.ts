@@ -13,10 +13,10 @@ import {
 
 test.describe.configure({ timeout: longFlowTimeout });
 
-const fluteScript = "tests/sim/scripts/new-game/golden-flute.json";
-const fluteBattleMenuTick = 20438;
+const fluteScript = "tests/sim/scripts/new-game/cavern.json";
+const fluteBattleMenuTick = 21531;
 const kidScript = "tests/sim/scripts/new-game/golden-kid.json";
-const kidWindUpTick = 27035;
+const kidWindUpTick = 27294;
 
 async function replayTo(page: Page, path: string, targetTick: number): Promise<void> {
   const upTo: ReturnType<typeof recording> = [];

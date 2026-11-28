@@ -1,5 +1,8 @@
 import { expect, test } from '@playwright/test';
-import { openHarness, queueScript, recording, resetPaused, step } from './helpers';
+import {
+  openHarness, playBattleCheck, queueScript, readBattle, readState, recording, resetPaused, step,
+  walk,
+} from './helpers';
 
 test('real keys enter the Whispering Woods and meet its owl', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });
@@ -9,12 +12,38 @@ test('real keys enter the Whispering Woods and meet its owl', async ({ page }) =
   await page.setViewportSize({ width: 874, height: 402 });
   await expect(page).toHaveScreenshot('woods-arrival-874.png');
   await page.setViewportSize({ width: 1280, height: 720 });
-  await page.keyboard.down('ArrowLeft');
-  await page.keyboard.down('ArrowDown');
-  await step(page, 35);
-  await page.keyboard.up('ArrowDown');
-  await step(page, 140);
-  await page.keyboard.up('ArrowLeft');
+  // Cross the stream on the stepping stones, then steer straight into the rolled owl.
+  await walk(page, 'y', 720);
+  await walk(page, 'x', 900);
+  for (let tries = 0; tries < 6; tries += 1) {
+    const battle = await readBattle(page);
+    if (battle?.critterId === 'owl') break;
+    if (battle !== null) {
+      for (let stepIdx = 0; stepIdx < 40; stepIdx += 1) {
+        const cur = await readBattle(page);
+        if (cur === null) break;
+        if (cur.phase === 'check' && cur.check !== null) await playBattleCheck(page);
+        else if (cur.phase === 'command' && cur.revealed >= cur.message.length) {
+          await page.keyboard.down('ArrowUp');
+          await step(page, 1);
+          await page.keyboard.up('ArrowUp');
+          await step(page, 1);
+          await page.keyboard.press('z');
+          await step(page, 2);
+        } else {
+          await page.keyboard.press('z');
+          await step(page, 2);
+        }
+      }
+    }
+    const owl = (await readState(page)).wild.find(
+      (critter) => critter.kind === 'owl' && critter.mood === 'chaos',
+    );
+    if (owl === undefined) throw new Error('no chaos owl in woods');
+    await walk(page, 'x', owl.x);
+    if ((await readBattle(page))?.critterId === 'owl') break;
+    await walk(page, 'y', owl.y);
+  }
   await expect.poll(async () => page.evaluate(() =>
     window.__cloverhollow?.getState().battle?.critterId ?? null)).toBe('owl');
   await expect(page).toHaveScreenshot('woods-owl-battle.png');

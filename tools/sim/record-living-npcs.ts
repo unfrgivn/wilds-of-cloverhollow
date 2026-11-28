@@ -32,6 +32,22 @@ const spawnOf = (area: string, name: string): { x: number; y: number } => {
 const beforeCoins = play.state().coins;
 const beforeSnacks = play.state().snacks;
 
+const shooNear = (npcId: string): void => {
+  const area = world.areas[play.state().area];
+  const npc = area?.npcs.find((item) => item.id === npcId);
+  if (npc === undefined) return;
+  const near = play.state().wild.find(
+    (critter) =>
+      critter.mood === "chaos" &&
+      critter.cooldownTicks === 0 &&
+      Math.hypot(critter.x - npc.point.x, critter.y - npc.point.y) < 350,
+  );
+  if (near !== undefined) {
+    play.meet(near.kind);
+    play.battle(["run"]);
+  }
+};
+
 // Bubblegum Bay: Captain Sal (Sue interjection + 2 harbor snacks), Kai, Nora.
 play.approach("npc:sal");
 play.talk("npc:sal");
@@ -43,18 +59,22 @@ play.approach("npc:nora");
 play.talk("npc:nora", [0]);
 
 // Star Bus back to Cloverhollow Plaza.
+shooNear("bus-stop");
 play.approach("npc:bus-stop");
 play.talk("npc:bus-stop", [0]);
 play.idle(60);
 if (play.state().area !== "plaza") throw new Error("bus didn't return to plaza");
 
 // Cloverhollow Plaza: Flora (Sue tulip interjection), Mailman Gus, Sammy.
+shooNear("flora");
 play.approach("npc:flora");
 play.talk("npc:flora", [0]);
 
+shooNear("gus");
 play.approach("npc:gus");
 play.talk("npc:gus", [0]);
 
+shooNear("sammy");
 play.approach("npc:sammy");
 play.talk("npc:sammy", [0]);
 
@@ -64,9 +84,11 @@ play.leave({ x: 0, y: 1 }, "park");
 if (play.state().area !== "park") throw new Error("didn't enter Meadow Park");
 
 // Meadow Park: Pippa (solve park critter riddle for 5 coins + 1 snack) and Grandma Hazel.
+shooNear("pippa");
 play.approach("npc:pippa");
 play.talk("npc:pippa", [0, 0]);
 
+shooNear("hazel");
 play.approach("npc:hazel");
 play.talk("npc:hazel");
 

@@ -26,9 +26,9 @@ function replay(path: string): State {
 describe("the Bon Appetit Café recording", () => {
   it("completes Dad's visit, all five townspeople, and Chef Bea's Star Cinnamon errand", () => {
     const state = replay("tests/sim/scripts/new-game/cafe.json");
-    expect(state.tick).toBe(9341);
+    expect(state.tick).toBe(8461);
     expect(state.area).toBe("plaza");
-    expect(state.coins).toBe(83);
+    expect(state.coins).toBe(75);
     expect(state.snacks).toBe(6);
     expect(world.storyVariable(state.ink, "met_dad")).toBe(true);
     expect(world.storyVariable(state.ink, "spice_quest")).toBe(true);

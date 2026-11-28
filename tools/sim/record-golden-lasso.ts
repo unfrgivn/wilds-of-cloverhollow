@@ -69,6 +69,12 @@ door("trail", "bay", "bay");
 play.approach("dock-end");
 play.talk("dock-end", [0]);
 must("has_map", "no map from the bottle");
+for (let i = 0; i < 4; i += 1) {
+  const blocker = play.state().wild.find((c) => c.mood === "chaos" && c.cooldownTicks === 0);
+  if (blocker === undefined) break;
+  play.meet(blocker.kind);
+  play.battle(["run"]);
+}
 play.approach("palms");
 play.talk("palms", [0]);
 must("treasure_found", "no treasure dug up");

@@ -62,6 +62,13 @@ play.clear();
 // The tree house.
 play.navigate({ x: 1470, y: 965 });
 play.leave(down, "park");
+const nearTree = play.state().wild.find(
+  (critter) => critter.mood === "chaos" && Math.hypot(critter.x - 737, critter.y - 515) < 220,
+);
+if (nearTree !== undefined) {
+  play.meet(nearTree.kind);
+  play.battle(["run"]);
+}
 play.approach("tree-house");
 play.talk("tree-house");
 

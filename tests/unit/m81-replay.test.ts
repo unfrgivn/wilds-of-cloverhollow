@@ -45,7 +45,7 @@ describe("the Milestone 81 Peekaboo & Taco Truck recording", () => {
         }
       }
     }
-    expect(state.tick).toBe(14492);
+    expect(state.tick).toBe(13173);
     expect(state.area).toBe("hills");
     expect(sawPeekabooSafe).toBe(true);
     expect(sawPeekabooWatching).toBe(true);
@@ -57,7 +57,7 @@ describe("the Milestone 81 Peekaboo & Taco Truck recording", () => {
     expect(world.storyVariable(state.ink, "moon_owl_out")).toBe(true);
     expect(world.storyVariable(state.ink, "taco_chef_out")).toBe(true);
     expect(world.storyVariable(state.ink, "mateo_snacks_given")).toBe(true);
-    expect(state.coins).toBe(150);
+    expect(state.coins).toBe(142);
     expect(state.snacks).toBe(8);
     const notes = journalNotes(world, state);
     expect(notes.some((line) => line.includes("Starry Owl"))).toBe(true);

@@ -5,9 +5,9 @@
     "note": "In the kitchen, just after Fae eats breakfast and leaves the table.",
     "fixture": "new-game",
     "run": "new-game/chapter-one.json",
-    "tick": 189,
+    "tick": 188,
     "interim": false,
-    "hash": "e1e35daa"
+    "hash": "430ac167"
   },
   {
     "id": "fountain-frog",
@@ -15,9 +15,9 @@
     "note": "In the plaza, after the fountain frog is calm; the school is next.",
     "fixture": "new-game",
     "run": "new-game/chapter-one.json",
-    "tick": 1196,
+    "tick": 1192,
     "interim": false,
-    "hash": "868ece40"
+    "hash": "829daa49"
   },
   {
     "id": "tree-house",
@@ -25,9 +25,9 @@
     "note": "At the tree house, with chapter one complete; Bubblegum Bay is next.",
     "fixture": "new-game",
     "run": "new-game/chapter-one.json",
-    "tick": 5142,
+    "tick": 4394,
     "interim": false,
-    "hash": "c3032605"
+    "hash": "7609a4d7"
   },
   {
     "id": "bubblegum-bay",
@@ -35,9 +35,9 @@
     "note": "On the road into Bubblegum Bay, ready to explore the new lands.",
     "fixture": "new-game",
     "run": "new-game/east-road.json",
-    "tick": 6204,
+    "tick": 5500,
     "interim": false,
-    "hash": "07ad3994"
+    "hash": "b8886dad"
   },
   {
     "id": "bay-bluebird",
@@ -45,9 +45,9 @@
     "note": "On the bay's sand with Sue in the party and the bluebird calm; the bus up the mountain is next.",
     "fixture": "new-game",
     "run": "new-game/golden-bay.json",
-    "tick": 7324,
+    "tick": 6427,
     "interim": false,
-    "hash": "3ac768bf"
+    "hash": "e4dfbf59"
   },
   {
     "id": "jordan",
@@ -55,9 +55,9 @@
     "note": "At the pass with the whole party: Jordan joined and the hamster handed Fae the blacklight lantern.",
     "fixture": "new-game",
     "run": "new-game/golden-jordan.json",
-    "tick": 8757,
+    "tick": 7809,
     "interim": false,
-    "hash": "2d0a9611"
+    "hash": "05e122e2"
   },
   {
     "id": "lantern",
@@ -65,9 +65,9 @@
     "note": "At the pass with the lantern found: its arrow points west, into the pines.",
     "fixture": "new-game",
     "run": "new-game/golden-lantern.json",
-    "tick": 9401,
+    "tick": 8392,
     "interim": false,
-    "hash": "f8f886ae"
+    "hash": "9fe1c33a"
   },
   {
     "id": "woods",
@@ -75,9 +75,9 @@
     "note": "In the woods' clearing with the owl calm and the clubhouse claimed; the arcade is next.",
     "fixture": "new-game",
     "run": "new-game/golden-woods.json",
-    "tick": 9589,
+    "tick": 8722,
     "interim": false,
-    "hash": "6e256b82"
+    "hash": "4ba21e18"
   },
   {
     "id": "arcade",
@@ -85,9 +85,9 @@
     "note": "In the arcade with Mr. Pip calmed and his sticker won; school is next.",
     "fixture": "new-game",
     "run": "new-game/golden-arcade.json",
-    "tick": 10882,
+    "tick": 10460,
     "interim": false,
-    "hash": "748b8b2e"
+    "hash": "b9205643"
   },
   {
     "id": "lodge",
@@ -95,9 +95,9 @@
     "note": "Inside the pass's lodge with the keeper calmed, the fire lit, and Biscuit home.",
     "fixture": "new-game",
     "run": "new-game/golden-lodge.json",
-    "tick": 10468,
+    "tick": 9397,
     "interim": false,
-    "hash": "865aafb7"
+    "hash": "d55931d0"
   },
   {
     "id": "school",
@@ -105,9 +105,9 @@
     "note": "In the school's east hall after the kid in the purple hood was glimpsed; the gym doors are locked until PE.",
     "fixture": "new-game",
     "run": "new-game/golden-school.json",
-    "tick": 13095,
+    "tick": 12997,
     "interim": false,
-    "hash": "9edb9431"
+    "hash": "1456b79c"
   },
   {
     "id": "clubhouse",
@@ -115,9 +115,9 @@
     "note": "In the clubhouse with the fridge humming and the garden planted, ready to ripen.",
     "fixture": "new-game",
     "run": "new-game/golden-clubhouse.json",
-    "tick": 10197,
+    "tick": 9337,
     "interim": false,
-    "hash": "6870d4d1"
+    "hash": "2ec959d4"
   },
   {
     "id": "gym",
@@ -125,9 +125,9 @@
     "note": "In the gym with Coach Ash's things back and his lasso lent; music class is next.",
     "fixture": "new-game",
     "run": "new-game/golden-gym.json",
-    "tick": 15099,
+    "tick": 15125,
     "interim": false,
-    "hash": "42bbab30"
+    "hash": "1c7aafe6"
   },
   {
     "id": "music",
@@ -135,9 +135,9 @@
     "note": "In the music room with the class song played and Fae's first flute earned; recess is next.",
     "fixture": "new-game",
     "run": "new-game/golden-music.json",
-    "tick": 17053,
+    "tick": 17068,
     "interim": false,
-    "hash": "02326a7e"
+    "hash": "c117af0e"
   },
   {
     "id": "field",
@@ -145,9 +145,9 @@
     "note": "On the playing field with the squirrel calmed, the stash found, and the footbridge down.",
     "fixture": "new-game",
     "run": "new-game/golden-field.json",
-    "tick": 17643,
+    "tick": 17650,
     "interim": false,
-    "hash": "1bdce8fd"
+    "hash": "86155823"
   },
   {
     "id": "squirrel",
@@ -155,9 +155,9 @@
     "note": "In the woods with the Acorn Squirrel a friend, his golden acorn in the chest.",
     "fixture": "new-game",
     "run": "new-game/golden-squirrel.json",
-    "tick": 18296,
+    "tick": 18300,
     "interim": false,
-    "hash": "8775d2a6"
+    "hash": "739a051a"
   },
   {
     "id": "flute",
@@ -165,9 +165,9 @@
     "note": "In Meadow Park with the Pond Pup a friend and the old tin fished from the pond.",
     "fixture": "new-game",
     "run": "new-game/golden-flute.json",
-    "tick": 20046,
+    "tick": 20022,
     "interim": false,
-    "hash": "2a265793"
+    "hash": "a1a1d9c2"
   },
   {
     "id": "lasso",
@@ -175,9 +175,9 @@
     "note": "In the classroom with the kite back to Rosie, the scarf returned, and the treasure dug up.",
     "fixture": "new-game",
     "run": "new-game/golden-lasso.json",
-    "tick": 24473,
+    "tick": 24737,
     "interim": false,
-    "hash": "73c6b004"
+    "hash": "31df4821"
   },
   {
     "id": "mist",
@@ -185,9 +185,9 @@
     "note": "At the parted seal with the mist's three stretches open; the Enchanted Forest is next.",
     "fixture": "new-game",
     "run": "new-game/golden-mist.json",
-    "tick": 25854,
+    "tick": 26115,
     "interim": false,
-    "hash": "cf475d7f"
+    "hash": "6e313efa"
   },
   {
     "id": "kitchen",
@@ -195,9 +195,9 @@
     "note": "In the clubhouse with the nuggets cooked golden and the keepsake chest full.",
     "fixture": "new-game",
     "run": "new-game/golden-kitchen.json",
-    "tick": 26099,
+    "tick": 26344,
     "interim": false,
-    "hash": "ad58aa65"
+    "hash": "7e8fd9f4"
   },
   {
     "id": "forest",
@@ -205,9 +205,9 @@
     "note": "In the forest with the fairies' story told and the hooded kid waiting under the Ancient Tree.",
     "fixture": "new-game",
     "run": "new-game/golden-forest.json",
-    "tick": 26523,
+    "tick": 26784,
     "interim": false,
-    "hash": "33824163"
+    "hash": "4b1252df"
   },
   {
     "id": "kid",
@@ -215,9 +215,9 @@
     "note": "Under the restored Ancient Tree with the kid revealed as Milo and his story told; the ending is next.",
     "fixture": "new-game",
     "run": "new-game/golden-kid.json",
-    "tick": 27340,
+    "tick": 27584,
     "interim": false,
-    "hash": "2b42fbdc"
+    "hash": "d1788655"
   },
   {
     "id": "hills-lookout",
@@ -227,6 +227,6 @@
     "run": "hills/hills-lookout.json",
     "tick": 0,
     "interim": true,
-    "hash": "004c87f2"
+    "hash": "4db9e73e"
   }
 ]

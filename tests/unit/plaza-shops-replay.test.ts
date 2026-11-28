@@ -28,7 +28,7 @@ function replay(path: string): State {
 describe("the Cloverhollow Plaza Shops recording", () => {
   it("visits Cloverhollow Grocery Market and Sweet Scoop Ice Cream Parlor with blacklights", () => {
     const state = replay("tests/sim/scripts/new-game/plaza-shops.json");
-    expect(state.tick).toBe(13190);
+    expect(state.tick).toBe(13297);
     expect(state.area).toBe("plaza");
     expect(state.coins).toBe(99);
     expect(state.snacks).toBe(4);

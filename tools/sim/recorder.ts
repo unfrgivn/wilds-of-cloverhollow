@@ -87,26 +87,66 @@ export function createRecorder(world: World, initial: State): {
   const face = (direction: keyof typeof directions): void => nudge(directions[direction]);
 
   /*
-   * Breadth-first over 8-way moves of up to 5 ticks, through the real core
-   * (critters wander and chase as they would), so a route goes round furniture
-   * and critters the way a player would. It ends on the first tick where
-   * `done` is true; no route passes through a door, a talk, or a battle.
+   * Best-first (A* when a target hint is known, else BFS) over 8-way moves of
+   * up to 5 ticks through the real core (critters wander and chase as they
+   * would), so a route goes round furniture and critters the way a player
+   * would. Ends on the first tick where `done` is true; no route passes
+   * through a door, a talk, or a battle.
    */
-  const route = (done: (next: State) => boolean, goal: string): void => {
+  const route = (done: (next: State) => boolean, goal: string, hint?: Move): void => {
     if (done(state)) return;
     const moves = [-1, 0, 1].flatMap((x) => [-1, 0, 1].map((y) => ({ x, y })))
       .filter((move) => move.x !== 0 || move.y !== 0);
     type Leg = { move: Move; ticks: number };
-    type Node = { state: State; path: Leg[] };
+    type Node = { state: State; path: Leg[]; ticks: number; score: number };
     const key = (point: Move): string =>
       `${Math.round(point.x / 8)},${Math.round(point.y / 8)}`;
     const busy = (next: State): boolean => next.area !== state.area ||
       next.battle !== null || next.dialogue !== null || next.transition !== null;
-    const queue: Node[] = [{ state, path: [] }];
+    const score = (point: Move, ticks: number): number =>
+      hint === undefined ? ticks : ticks + Math.hypot(point.x - hint.x, point.y - hint.y) / 4;
+    const heap: Node[] = [{ state, path: [], ticks: 0, score: score(state.player, 0) }];
+    const push = (node: Node): void => {
+      heap.push(node);
+      let child = heap.length - 1;
+      while (child > 0) {
+        const parent = (child - 1) >> 1;
+        const p = heap[parent];
+        const c = heap[child];
+        if (p === undefined || c === undefined || p.score <= c.score) break;
+        heap[parent] = c;
+        heap[child] = p;
+        child = parent;
+      }
+    };
+    const pop = (): Node | undefined => {
+      const top = heap[0];
+      const last = heap.pop();
+      if (heap.length === 0 || last === undefined) return top;
+      heap[0] = last;
+      let parent = 0;
+      for (;;) {
+        const left = parent * 2 + 1;
+        const right = left + 1;
+        let smallest = parent;
+        if (left < heap.length && (heap[left]?.score ?? Infinity) < (heap[smallest]?.score ?? 0))
+          smallest = left;
+        if (right < heap.length && (heap[right]?.score ?? Infinity) < (heap[smallest]?.score ?? 0))
+          smallest = right;
+        if (smallest === parent) break;
+        const a = heap[parent];
+        const b = heap[smallest];
+        if (a === undefined || b === undefined) break;
+        heap[parent] = b;
+        heap[smallest] = a;
+        parent = smallest;
+      }
+      return top;
+    };
     const seen = new Set([key(state.player)]);
-    for (let index = 0; index < queue.length && index < 80000; index += 1) {
-      const node = queue[index];
-      if (node === undefined) continue;
+    for (let expanded = 0; heap.length > 0 && expanded < 80000; expanded += 1) {
+      const node = pop();
+      if (node === undefined) break;
       for (const move of moves) {
         let next = node.state;
         let ticks = 0;
@@ -123,7 +163,13 @@ export function createRecorder(world: World, initial: State): {
         }
         if (busy(next) || seen.has(key(next.player))) continue;
         seen.add(key(next.player));
-        queue.push({ state: next, path: [...node.path, { move, ticks }] });
+        const total = node.ticks + ticks;
+        push({
+          state: next,
+          path: [...node.path, { move, ticks }],
+          ticks: total,
+          score: score(next.player, total),
+        });
       }
     }
     throw new Error(`no way to ${goal} from ${JSON.stringify(state.player)} in ${state.area}`);
@@ -134,7 +180,7 @@ export function createRecorder(world: World, initial: State): {
     const area = state.area;
     route((next) => next.area === area && next.battle === null && next.dialogue === null &&
       next.transition === null && Math.abs(next.player.x - target.x) < tolerance &&
-      Math.abs(next.player.y - target.y) < tolerance, `reach ${JSON.stringify(target)}`);
+      Math.abs(next.player.y - target.y) < tolerance, `reach ${JSON.stringify(target)}`, target);
   };
 
   // Where a talk target stands: `npc:<id>`, `critter:<key>`, `glow:<id>`, or
@@ -220,8 +266,16 @@ export function createRecorder(world: World, initial: State): {
   };
 
   // Walks into a battle with a chaos critter of `kind`, meeting no other.
-  const meet = (kind: string): void =>
-    route((next) => next.battle?.critterId === kind, `meet a ${kind}`);
+  const meet = (kind: string): void => {
+    const target = presentCritters(world, state)
+      .filter((critter) => critter.kind.id === kind && critter.mood === "chaos")
+      .sort(
+        (a, b) =>
+          Math.hypot(a.point.x - state.player.x, a.point.y - state.player.y) -
+          Math.hypot(b.point.x - state.player.x, b.point.y - state.player.y),
+      )[0]?.point;
+    route((next) => next.battle?.critterId === kind, `meet a ${kind}`, target);
+  };
 
   // Calms every chaos critter out in the area, nearest first, so a long walk
   // after it can't be cut off (a critter that comes after Fae from ahead).

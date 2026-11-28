@@ -24,6 +24,13 @@ if (world.storyVariable(play.state().ink, "has_lantern") !== true)
 play.lantern();
 play.approach("glow:old-trail-marker");
 play.talk("glow:old-trail-marker");
+const blocking = play.state().wild.find(
+  (critter) => critter.mood === "chaos" && Math.hypot(critter.x - 465, critter.y - 600) < 260,
+);
+if (blocking !== undefined) {
+  play.meet(blocking.kind);
+  play.battle(["run"]);
+}
 play.navigate({ x: 465, y: 600 });
 play.leave({ x: 0, y: 1 }, "woods");
 play.meet("owl");

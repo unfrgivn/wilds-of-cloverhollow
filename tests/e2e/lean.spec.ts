@@ -11,7 +11,7 @@ import {
 // that tick (re-recording the run moves it: find it with
 // `bun tools/sim/run.ts tests/sim/scripts/bay/bay.json --fixture bay --trace`).
 const path = "tests/sim/scripts/bay/bay.json";
-const leaning = 652;
+const leaning = 1024;
 
 test.describe.configure({ timeout: longFlowTimeout });
 
@@ -34,7 +34,7 @@ async function toTheLean(page: Page): Promise<void> {
   if (check?.kind !== "lean") throw new Error("no lean");
   expect(check.tick).toBe(0);
   expect(check.big).toBe(false);
-  expect(check.strengths).toEqual([2, 3]);
+  expect(check.strengths).toEqual([2, 2]);
 }
 
 async function leanCheck(page: Page): Promise<{ tick: number; balance: number;

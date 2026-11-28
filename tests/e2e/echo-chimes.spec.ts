@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import {
-  longFlowTimeout, openHarness, playBattleCheck, readBattle, renderInfo, step, walk,
+  longFlowTimeout, openHarness, playBattleCheck, readBattle, readState, renderInfo, step, walk,
 } from "./helpers";
 
 test.describe.configure({ timeout: longFlowTimeout });
@@ -15,8 +15,13 @@ async function resetHills(page: Page, seed: number): Promise<void> {
 
 async function enterLambBurst(page: Page, seed: number): Promise<void> {
   await resetHills(page, seed);
-  await walk(page, "x", 450);
-  await walk(page, "y", 850);
+  for (let tries = 0; tries < 5 && (await readBattle(page)) === null; tries += 1) {
+    const lamb = (await readState(page)).wild.find((critter) => critter.kind === "lamb");
+    if (lamb === undefined) throw new Error("no lamb spawned in hills");
+    await walk(page, "y", lamb.y);
+    if ((await readBattle(page)) !== null) break;
+    await walk(page, "x", lamb.x);
+  }
   await expect.poll(async () => (await readBattle(page))?.critterId).toBe("lamb");
   for (let i = 0; i < 60; i += 1) {
     const battle = await readBattle(page);

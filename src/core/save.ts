@@ -117,9 +117,17 @@ function validCounts(value: unknown, max: number): boolean {
   );
 }
 
+function validOptionalPoint(value: unknown): boolean {
+  if (value === undefined) return true;
+  return record(value) && !Array.isArray(value) &&
+    typeof value.x === "number" && Number.isFinite(value.x) &&
+    typeof value.y === "number" && Number.isFinite(value.y);
+}
+
 function isState(value: unknown, template: State): value is State {
   return sameShape(template, value) && record(value) && Array.isArray(value.wild) &&
-    value.wild.every((item) => sameShape(wildShape, item)) &&
+    value.wild.every((item) =>
+      sameShape(wildShape, item) && record(item) && validOptionalPoint(item.home)) &&
     validCounts(value.treats, 99) &&
     validCounts(value.caughtFish, 9999);
 }

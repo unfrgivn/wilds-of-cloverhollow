@@ -180,7 +180,7 @@ test.describe("Milestone 128: Complete Mouse & Touch Pointer Play", () => {
 
       await page.setViewportSize({ width: 1280, height: 720 });
       await openHarness(page);
-      await replayTicks(page, "tests/sim/scripts/bay/bay.json", "bay", 652);
+      await replayTicks(page, "tests/sim/scripts/bay/bay.json", "bay", 1024);
 
       const tapStage = page.locator(".battle-check-tap");
       await expect(tapStage).toBeVisible();
@@ -225,7 +225,7 @@ test.describe("Milestone 128: Complete Mouse & Touch Pointer Play", () => {
 
       await page.setViewportSize({ width: 1280, height: 720 });
       await openHarness(page);
-      await replayTicks(page, "tests/sim/scripts/park/pup-win.json", "park", 389);
+      await replayTicks(page, "tests/sim/scripts/park/pup-win.json", "park", 488);
 
       const tapStage = page.locator(".battle-check-tap");
       await expect(tapStage).toBeVisible();

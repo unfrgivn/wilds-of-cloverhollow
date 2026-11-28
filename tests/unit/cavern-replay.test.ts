@@ -25,7 +25,7 @@ function replay(path: string): State {
 describe("the Crystal Cavern recording", () => {
   it("completes the full cavern loop and returns to Pinecone Pass", () => {
     const state = replay("tests/sim/scripts/new-game/cavern.json");
-    expect(state.tick).toBe(23604);
+    expect(state.tick).toBe(24043);
     expect(state.area).toBe("pass");
     expect(state.stickers).toContain("cozy-bat");
     expect(state.stickers).toContain("gem-mole");

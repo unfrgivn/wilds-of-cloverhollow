@@ -175,11 +175,16 @@ describe("meeting Jordan", () => {
 
 describe("the hamster's clue and the lantern", () => {
   it("gives Fae the lantern when she talks to the calm hamster", () => {
-    const hamster = clearingDen().point;
-    let state = atPass({ x: hamster.x, y: hamster.y + 45 }, "up",
-      ["maddie", "sue", "jordan"]);
-    state = { ...state, wild: state.wild.map((critter) =>
-      critter.den === 0 ? { ...critter, mood: "calm" } : critter) };
+    const initial = atPass(clearingDen().point, "up", ["maddie", "sue", "jordan"]);
+    const hamster = initial.wild.find((critter) => critter.den === 0);
+    if (hamster === undefined) throw new Error("hamster did not spawn");
+    let state: State = {
+      ...initial,
+      player: { x: hamster.x, y: hamster.y + 45 },
+      facing: "up",
+      wild: initial.wild.map((critter) =>
+        critter.den === 0 ? { ...critter, mood: "calm" } : critter),
+    };
     expect(targetInteractable(world, state)?.id).toBe("critter:wild:0");
     expect(world.storyVariable(state.ink, "has_lantern")).toBe(false);
     state = talk(state, 0);

@@ -18,6 +18,7 @@ const play = createRecorder(world, createState(world, fixture));
 const path = "tests/sim/scripts/new-game/chapter-one.json";
 for (const segment of parseScript(JSON.parse(readFileSync(path, "utf8")), path))
   for (let count = 0; count < segment.ticks; count += 1) play.tick(segment.frame);
+play.navigate({ x: 760, y: 780 });
 play.navigate({ x: 300, y: 925 });
 play.leave({ x: 0, y: 1 }, "plaza");
 play.clear();

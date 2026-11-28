@@ -28,6 +28,7 @@ play.lantern();
 play.navigate({ x: 170, y: 560 });
 play.leave({ x: -1, y: 0 }, "pass");
 // The bus home.
+play.clear();
 play.approach("pass-bus-stop");
 play.talk("pass-bus-stop", [0]);
 play.idle(60);

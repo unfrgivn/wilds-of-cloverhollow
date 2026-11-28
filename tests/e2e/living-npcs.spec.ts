@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import {
-  bunHash, longFlowTimeout, openHarness, playAfter, readHash, readState,
-  renderInfo, resetPaused, step, walk,
+  bunHash, longFlowTimeout, openHarness, playAfter, playBattleCheck, readBattle, readHash,
+  readState, renderInfo, resetPaused, step, walk,
 } from "./helpers";
 
 test.describe.configure({ timeout: longFlowTimeout });
@@ -232,7 +232,7 @@ test(
 
     const end = await readState(page);
     expect(end.area).toBe("park");
-    expect(end.coins).toBe(53);
+    expect(end.coins).toBe(45);
     expect(end.snacks).toBe(7);
     expect(await readHash(page)).toBe(await expectedHash);
     expect(errors).toEqual([]);
@@ -353,9 +353,29 @@ test(
     expect(plazaAfterIds).not.toContain("sammy");
     expect(plazaAfterIds).toEqual(expect.arrayContaining(["flora", "gus"]));
 
-    await walk(page, "x", 1300);
-    await walk(page, "y", 560);
-    await walk(page, "x", 1412);
+    const walkSafe = async (axis: "x" | "y", target: number): Promise<void> => {
+      for (let tries = 0; tries < 5; tries += 1) {
+        await walk(page, axis, target);
+        if ((await readBattle(page)) === null) return;
+        for (let stepIdx = 0; stepIdx < 40; stepIdx += 1) {
+          const battle = await readBattle(page);
+          if (battle === null) break;
+          if (battle.phase === "check" && battle.check !== null) await playBattleCheck(page);
+          else if (battle.phase === "command" && battle.revealed >= battle.message.length) {
+            await page.keyboard.press("ArrowUp");
+            await step(page, 2);
+            await page.keyboard.press("z");
+            await step(page, 2);
+          } else {
+            await page.keyboard.press("z");
+            await step(page, 2);
+          }
+        }
+      }
+    };
+    await walkSafe("x", 1300);
+    await walkSafe("y", 560);
+    await walkSafe("x", 1412);
     await holdThroughDoor(page, "ArrowUp", "arcade");
     expect((await readState(page)).area).toBe("arcade");
     assertNpcsRendered((await renderInfo(page)).npcs, ["sammy", "poppy"]);

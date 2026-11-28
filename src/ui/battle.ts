@@ -109,6 +109,11 @@ function clamp01(value: number): number {
   return Math.min(1, Math.max(0, value));
 }
 
+/** Remaining fizz fraction (1..0) shown by the countdown battle meter. */
+export function battleMeterRemaining(calm: number): number {
+  return 1 - clamp01(calm);
+}
+
 function leafIcon(): SVGSVGElement {
   const icon = svgElement("svg", "battle-leaf");
   icon.setAttribute("viewBox", "0 0 24 18");
@@ -546,15 +551,16 @@ export function createBattleHud(root: HTMLElement): {
       actionsLeft.hidden =
         !showSparkle && !showTogether && !showFlute && !showSoften && !showLasso && !showSteady;
       setText(calmLabel, view.critterName.toUpperCase());
-      setAttribute(track, "aria-label", `${view.critterName} calm`);
       const calmFraction = clamp01(view.calm);
+      const remainingFraction = battleMeterRemaining(view.calm);
+      setAttribute(track, "aria-label", `${view.critterName} fizz`);
       calmHeart.classList.toggle("is-warm", calmFraction >= 0.75);
       setAttribute(
         track,
         "aria-valuenow",
-        String(Math.round(calmFraction * 100)),
+        String(Math.round(remainingFraction * 100)),
       );
-      fill.style.width = `${calmFraction * 100}%`;
+      fill.style.width = `${remainingFraction * 100}%`;
       peekable = view.visible && view.canPeek === true;
       calm.classList.toggle("is-peekable", peekable);
       if (peekable) {

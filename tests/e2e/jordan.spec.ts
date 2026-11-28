@@ -118,9 +118,14 @@ test("Fae meets Jordan, Juggle calms the hamster, and he gives her his lantern",
     .toEqual(expect.arrayContaining(["fae", "maddie", "sue", "jordan"]));
   await expect(page).toHaveScreenshot("pass-party-of-four.png");
 
-  // Into the hamster's reach: the battle has six commands. Fae steers at it
-  // all the way, so it can't catch her first (Milestone 51) and the battle
-  // opens on her menu.
+  // Walk along the open south road toward the rolled hamster's column, then
+  // steer straight at it so it can't catch her first (Milestone 51) and the
+  // battle opens on her menu.
+  const rolledHamster = (await readState(page)).wild.find((critter) => critter.kind === "hamster");
+  if (rolledHamster !== undefined && rolledHamster.x < 900) {
+    await walk(page, "y", 1015);
+    await walk(page, "x", Math.max(680, rolledHamster.x));
+  }
   const keys = { x: "", y: "" };
   for (let count = 0; count < 200 && (await readBattle(page)) === null; count += 1) {
     const where = await page.evaluate(() => {

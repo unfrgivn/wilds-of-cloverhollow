@@ -59,14 +59,17 @@ test("the plaza's lower path leads to Meadow Park, and its exit path leads back"
   expect(park.area).toBe("park");
   expect(park.player).toEqual({ x: 360, y: 850 });
   expect(park.facing).toBe("up");
-  expect(park.wild.find((critter) => critter.den === 0))
-    .toMatchObject({ kind: "pup", mood: "chaos" });
+  const pupWild = park.wild.find((critter) => critter.den === 0);
+  expect(pupWild).toMatchObject({ kind: "pup", mood: "chaos" });
+  expect(pupWild?.home).toBeDefined();
   const info = await renderInfo(page);
   expect(info.area).toBe("park");
   const pup = info.critters.find((critter) => critter.id === "wild:0");
   expect(pup).toMatchObject({ kind: "pup", frame: "chaos_idle_01" });
-  // It has wandered a little since Fae arrived, within its den.
-  expect(Math.hypot((pup?.x ?? 0) - 880, (pup?.y ?? 0) - 600)).toBeLessThanOrEqual(90);
+  // It has wandered a little since Fae arrived, within its den radius of its visit home.
+  expect(
+    Math.hypot((pup?.x ?? 0) - (pupWild?.home?.x ?? 0), (pup?.y ?? 0) - (pupWild?.home?.y ?? 0)),
+  ).toBeLessThanOrEqual(90);
   expect(info.drawOrder.map((item) => item.label))
     .toEqual(expect.arrayContaining(["critter:wild:0", "critter:wild:0:aura", "maddie"]));
   // The plaza just left stays resident: the park's exit path back to it is a
@@ -94,17 +97,18 @@ test("the plaza's lower path leads to Meadow Park, and its exit path leads back"
 test("the Zoomie Pup's battle uses his own content, and Fae can run away", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });
   await toThePark(page);
-  await walk(page, "x", 480);
-  await walk(page, "y", 600);
+  const pup = (await readState(page)).wild.find((critter) => critter.den === 0);
+  if (pup === undefined) throw new Error("no pup spawned in park");
+  await walk(page, "x", pup.x);
   // Into the pup's sight, then stand until it notices her. Walking at it as
   // it comes, neither got the jump: it opens with its own intro.
-  await page.keyboard.down("ArrowRight");
+  await page.keyboard.down("ArrowUp");
   await until(page, async () => (await pupMark(page)) !== null);
-  await page.keyboard.up("ArrowRight");
+  await page.keyboard.up("ArrowUp");
   await until(page, async () => (await pupMark(page)) === "!");
-  await page.keyboard.down("ArrowRight");
+  await page.keyboard.down("ArrowUp");
   await until(page, async () => (await readBattle(page)) !== null);
-  await page.keyboard.up("ArrowRight");
+  await page.keyboard.up("ArrowUp");
   await expect(page.locator("html")).toHaveAttribute("data-battle", "open");
   const met = await readBattle(page);
   expect(met).toMatchObject({ critterId: "pup", den: 0 });

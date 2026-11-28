@@ -91,7 +91,8 @@ test("real keys from Pinecone Pass down the Cliffside Trail to Bubblegum Bay", a
     if (battle?.critterId === "squirrel" && battle.phase === "run") ranFromSquirrel = true;
     if (ranFromSquirrel && battle === null) afterRun = true;
     if (afterRun && state.area === "trail")
-      expect(battle, "the squirrel leaves Fae alone after she runs").toBeNull();
+      expect(battle?.critterId, "the squirrel leaves Fae alone after she runs")
+        .not.toBe("squirrel");
   });
   expect(arrived).toBe(true);
   // The bunny came after Fae: the gap closed over the last steps before it

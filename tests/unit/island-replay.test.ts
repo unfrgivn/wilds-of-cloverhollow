@@ -32,7 +32,7 @@ describe("the Starlight Island & Rowboat Crossing recording", () => {
   it("rows out to Starlight Island, solves shells, visits lighthouse, bottle, glow & returns",
     () => {
       const state = replay("tests/sim/scripts/new-game/island.json");
-      expect(state.tick).toBe(23464);
+      expect(state.tick).toBe(23356);
       expect(state.area).toBe("bay");
       expect(state.player).toEqual({ x: 1450, y: 685 });
       expect(state.coins).toBe(210);

@@ -106,7 +106,10 @@ test.describe("Milestone 127: Direct Mouse & Touch Pointer Play", () => {
       // Arrive at Bubblegum Bay and walk onto Sue's dock (before opening fishing).
       const bayScript = recording("tests/sim/scripts/new-game/golden-bay.json");
       const fishScript = recording("tests/sim/scripts/new-game/fish.json");
-      const arriveAtDock = fishScript.slice(0, bayScript.length + 8);
+      const talkIndex = fishScript.findIndex(
+        (segment, index) => index >= bayScript.length && segment.frame.confirm,
+      );
+      const arriveAtDock = fishScript.slice(0, talkIndex > 0 ? talkIndex : bayScript.length + 8);
       const arriveTicks = arriveAtDock.reduce((total, segment) => total + segment.ticks, 0);
       await queueScript(page, arriveAtDock);
       await step(page, arriveTicks);

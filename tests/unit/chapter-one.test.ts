@@ -42,13 +42,11 @@ describe("chapter one", () => {
       "moon-owl": "chaos",
       "taco-chef": "chaos",
     });
-    // And on the way: a park pup, and a cat in the plaza once the town's
-    // critters were out (Milestone 28; two raccoons until Milestone 51's
-    // noticing changed how the critters wander). Fae got to both before they
-    // noticed her. Every calm paid 8 coins and counts for its species.
-    expect(state.stickers).toEqual(["fountain-frog", "pond-pup", "ringtail-raccoon", "cozy-cat"]);
-    expect(state.coins).toBe(32);
-    expect(state.calms).toEqual({ frog: 1, pup: 1, raccoon: 1, cat: 1 });
+    // And on the way: a park pup once the park's critters were out. Every calm
+    // paid 8 coins and counts for its species.
+    expect(state.stickers).toEqual(["fountain-frog", "pond-pup", "ringtail-raccoon"]);
+    expect(state.coins).toBe(24);
+    expect(state.calms).toEqual({ frog: 1, pup: 1, raccoon: 1 });
     expect({
       plan: story("plan"),
       ate_breakfast: story("ate_breakfast"),

@@ -57,15 +57,67 @@ function roamer(state: State): Point {
   return { x: spot.x, y: spot.y };
 }
 
-function onFloor(point: Point): boolean {
+function visitHome(state: State): Point {
+  const spot = state.wild[0];
+  if (spot === undefined) throw new Error("the frog isn't out");
+  return spot.home ?? home;
+}
+
+function onFloor(point: Point, radius = world.tunables.follow.radius): boolean {
   const area = world.areas["harness"];
   if (area === undefined) throw new Error("no harness");
-  const clear = world.tunables.follow.radius - 0.01;
+  const clear = radius - 0.01;
   if (!pointInPolygon(point, area.walkable) || distanceToPolygon(point, area.walkable) < clear)
     return false;
   return area.blockers.every(
     (blocker) => !pointInPolygon(point, blocker) && distanceToPolygon(point, blocker) >= clear,
   );
+}
+
+function openOffset(
+  origin: Point,
+  gap: number,
+  runway = gap,
+): { point: Point; away: Point; toward: "up" | "down" | "left" | "right" } {
+  const dirs: readonly { dx: number; dy: number; toward: "up" | "down" | "left" | "right" }[] = [
+    { dx: 1, dy: 0, toward: "left" },
+    { dx: -1, dy: 0, toward: "right" },
+    { dx: 0, dy: 1, toward: "up" },
+    { dx: 0, dy: -1, toward: "down" },
+  ];
+  const radius = world.tunables.playerRadius;
+  for (const dir of dirs) {
+    let ok = true;
+    for (let stepDist = 20; stepDist <= runway; stepDist += 20) {
+      const sample = { x: origin.x + dir.dx * stepDist, y: origin.y + dir.dy * stepDist };
+      if (!onFloor(sample, radius)) {
+        ok = false;
+        break;
+      }
+    }
+    if (ok) {
+      return {
+        point: { x: origin.x + dir.dx * gap, y: origin.y + dir.dy * gap },
+        away: { x: dir.dx, y: dir.dy },
+        toward: dir.toward,
+      };
+    }
+  }
+  throw new Error(`no open offset from (${origin.x}, ${origin.y})`);
+}
+
+function farCorner(origin: Point): Point {
+  const corners: Point[] = [
+    { x: 1800, y: 200 },
+    { x: 200, y: 200 },
+    { x: 1800, y: 900 },
+    { x: 200, y: 900 },
+  ];
+  let best = corners[0]!;
+  for (const corner of corners) {
+    if (distance(origin, corner) > distance(origin, best)) best = corner;
+  }
+  return best;
 }
 
 describe("a roaming critter", () => {
@@ -75,15 +127,18 @@ describe("a roaming critter", () => {
     expect(tune.sight).toBeGreaterThan(touch);
   });
 
-  it("starts at home and wanders near it, on the floor, while Fae is far away", () => {
-    let state = start({ x: 1800, y: 200 });
-    expect(roamer(state)).toEqual(home);
+  it("starts at its visit home and wanders near it, on the floor, while Fae is far away", () => {
+    const initial = createState(world, { area: "harness", spawn: "start", seed: 7 });
+    const anchor = visitHome(initial);
+    let state = start(farCorner(anchor));
+    expect(roamer(state)).toEqual(anchor);
+    expect(onFloor(anchor)).toBe(true);
     let moved = 0;
     let previous = roamer(state);
     for (let tick = 0; tick < 900; tick += 1) {
       state = step(world, state, blankInput()).state;
       const spot = roamer(state);
-      expect(distance(spot, home), `tick ${tick}`).toBeLessThanOrEqual(roamRadius + 1e-6);
+      expect(distance(spot, anchor), `tick ${tick}`).toBeLessThanOrEqual(roamRadius + 1e-6);
       expect(onFloor(spot), `tick ${tick}`).toBe(true);
       const stepped = distance(spot, previous);
       expect(stepped).toBeLessThanOrEqual(tune.wanderSpeed + 1e-9);
@@ -95,7 +150,9 @@ describe("a roaming critter", () => {
   });
 
   it("comes after Fae when she's within sight, and touching starts a battle", () => {
-    let state = start({ x: home.x + 180, y: home.y });
+    const initial = createState(world, { area: "harness", spawn: "start", seed: 7 });
+    const offset = openOffset(roamer(initial), 140);
+    let state = start(offset.point);
     let previous = roamer(state);
     for (let tick = 0; tick < 200 && state.battle === null; tick += 1) {
       state = step(world, state, blankInput()).state;
@@ -107,14 +164,19 @@ describe("a roaming critter", () => {
   });
 
   it("can't catch Fae when she walks away", () => {
-    let state = start({ x: home.x + 160, y: home.y });
+    const initial = createState(world, { area: "harness", spawn: "start", seed: 7 });
+    const offset = openOffset(roamer(initial), 140, 500);
+    let state = start(offset.point);
     for (let tick = 0; tick < 240; tick += 1)
-      state = step(world, state, press({ move: { x: 1, y: 0 } })).state;
+      state = step(world, state, press({ move: offset.away })).state;
     expect(state.battle).toBeNull();
   });
 
   it("leaves Fae alone for a while after she runs, and wanders home", () => {
-    let state = start({ x: home.x + 120, y: home.y });
+    const initial = createState(world, { area: "harness", spawn: "start", seed: 7 });
+    const anchor = visitHome(initial);
+    const offset = openOffset(anchor, 120);
+    let state = start(offset.point);
     for (let tick = 0; tick < 200 && state.battle === null; tick += 1)
       state = step(world, state, blankInput()).state;
     if (state.battle === null) throw new Error("no battle");
@@ -132,16 +194,18 @@ describe("a roaming critter", () => {
       state = step(world, state, press({ confirm: tick % 2 === 0 })).state;
     expect(state.battle).toBeNull();
     expect(state.transition, "she ran; she didn't faint").toBeNull();
-    const away = distance(roamer(state), home);
+    const away = distance(roamer(state), anchor);
     for (let tick = 0; tick < tune.cooldownTicks - 10; tick += 1) {
       state = step(world, state, blankInput()).state;
       expect(state.battle, `tick ${tick}`).toBeNull();
     }
-    expect(distance(roamer(state), home)).toBeLessThan(Math.max(away, 1));
+    expect(distance(roamer(state), anchor)).toBeLessThan(Math.max(away, 1));
   });
 
   it("holds still while the journal is open", () => {
-    let state = start({ x: home.x + 180, y: home.y });
+    const initial = createState(world, { area: "harness", spawn: "start", seed: 7 });
+    const offset = openOffset(roamer(initial), 140);
+    let state = start(offset.point);
     state = { ...state, journalOpen: true };
     const before = roamer(state);
     for (let tick = 0; tick < 60; tick += 1) state = step(world, state, blankInput()).state;
@@ -149,10 +213,13 @@ describe("a roaming critter", () => {
   });
 
   it("stays put once calm, a Talk target where it stands", () => {
-    let state = start({ x: home.x, y: home.y + 45 }, "calm");
-    state = { ...state, facing: "up" };
+    const initial = createState(world, { area: "harness", spawn: "start", seed: 7 });
+    const anchor = visitHome(initial);
+    const offset = openOffset(anchor, 45);
+    let state = start(offset.point, "calm");
+    state = { ...state, facing: offset.toward };
     for (let tick = 0; tick < 120; tick += 1) state = step(world, state, blankInput()).state;
-    expect(roamer(state)).toEqual(home);
+    expect(roamer(state)).toEqual(anchor);
     expect(targetInteractable(world, state)?.id).toBe("critter:wild:0");
   });
 

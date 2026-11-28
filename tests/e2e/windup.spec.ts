@@ -11,7 +11,7 @@ import {
 // tick (re-recording the run moves it: find it with `bun tools/sim/run.ts
 // tests/sim/scripts/trail/lookout.json --fixture trail --trace`).
 const path = "tests/sim/scripts/trail/lookout.json";
-const windingUp = 428;
+const windingUp = 513;
 
 test.describe.configure({ timeout: longFlowTimeout });
 
@@ -56,7 +56,7 @@ async function toTheWindUp(page: Page): Promise<void> {
   expect(battle?.critterId).toBe("gull");
   expect(battle?.phase).toBe("command");
   expect(battle?.turn).toBe(2);
-  expect(battle?.windUp).toEqual({ feelings: ["grumpy", "hungry"], popped: [false, false],
+  expect(battle?.windUp).toEqual({ feelings: ["hungry", "grumpy"], popped: [false, false],
     left: 2 });
 }
 
@@ -79,7 +79,7 @@ test("real keys: Fae pops the gull's puffs, Soothe then Snack, and its gust fizz
     // between Fae and the gull; Soothe and Snack wear their badges.
     const row = page.locator(".battle-windup");
     await expect(row).toBeVisible();
-    await expect(page.locator(".battle-windup-label")).toHaveText(["Grumpy", "Hungry"]);
+    await expect(page.locator(".battle-windup-label")).toHaveText(["Hungry", "Grumpy"]);
     await expect(page.locator(".battle-feeling")).toBeHidden();
     expect(await badged(page)).toEqual(["Soothe", "Snack"]);
     const layout = (await renderInfo(page)).battle.layout;
@@ -96,7 +96,7 @@ test("real keys: Fae pops the gull's puffs, Soothe then Snack, and its gust fizz
     await press(page);
     const soothing = await readBattle(page);
     expect(soothing?.command).toBe("soothe");
-    expect(soothing?.windUp?.popped).toEqual([true, false]);
+    expect(soothing?.windUp?.popped).toEqual([false, true]);
     await expect(row).toBeHidden();
     await playBattleCheck(page);
     expect((await readBattle(page))?.phase).toBe("result");

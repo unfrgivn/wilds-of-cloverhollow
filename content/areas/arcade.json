@@ -187,28 +187,28 @@
     {
       "id": "sammy",
       "point": {
-        "x": 540,
-        "y": 680
+        "x": 420,
+        "y": 630
       },
-      "facing": "up",
+      "facing": "right",
       "knot": "npc_sammy_arcade",
       "prompt": "Talk",
       "footprint": [
         [
-          525,
-          670
+          405,
+          620
         ],
         [
-          555,
-          670
+          435,
+          620
         ],
         [
-          555,
-          690
+          435,
+          640
         ],
         [
-          525,
-          690
+          405,
+          640
         ]
       ],
       "visibleAfterCalm": "arcade-keeper"
@@ -216,28 +216,28 @@
     {
       "id": "poppy",
       "point": {
-        "x": 680,
-        "y": 680
+        "x": 710,
+        "y": 690
       },
-      "facing": "up",
+      "facing": "left",
       "knot": "npc_poppy",
       "prompt": "Talk",
       "footprint": [
         [
-          665,
-          670
+          695,
+          680
+        ],
+        [
+          725,
+          680
+        ],
+        [
+          725,
+          700
         ],
         [
           695,
-          670
-        ],
-        [
-          695,
-          690
-        ],
-        [
-          665,
-          690
+          700
         ]
       ],
       "visibleAfterCalm": "arcade-keeper"

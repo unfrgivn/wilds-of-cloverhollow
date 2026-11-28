@@ -199,21 +199,24 @@
     "idleTicks": [
       172,
       8
-    ]
+    ],
+    "scale": 0.47
   },
   "sal": {
     "atlas": "assets/characters/sal/sal.json",
     "idleTicks": [
       195,
       8
-    ]
+    ],
+    "scale": 0.46
   },
   "lark": {
     "atlas": "assets/characters/lark/lark.json",
     "idleTicks": [
       164,
       8
-    ]
+    ],
+    "scale": 0.47
   },
   "mina": {
     "atlas": "assets/characters/mina/mina.json",
@@ -227,21 +230,24 @@
     "idleTicks": [
       204,
       8
-    ]
+    ],
+    "scale": 0.48
   },
   "pebble": {
     "atlas": "assets/characters/pebble/pebble.json",
     "idleTicks": [
       158,
       8
-    ]
+    ],
+    "scale": 0.49
   },
   "moss": {
     "atlas": "assets/characters/moss/moss.json",
     "idleTicks": [
       188,
       8
-    ]
+    ],
+    "scale": 0.47
   },
   "sammy": {
     "atlas": "assets/characters/sammy/sammy.json",
@@ -249,7 +255,7 @@
       148,
       8
     ],
-    "scale": 0.47
+    "scale": 0.45
   },
   "pippa": {
     "atlas": "assets/characters/pippa/pippa.json",
@@ -257,7 +263,7 @@
       156,
       8
     ],
-    "scale": 0.47
+    "scale": 0.43
   },
   "leo": {
     "atlas": "assets/characters/leo/leo.json",
@@ -265,7 +271,7 @@
       168,
       8
     ],
-    "scale": 0.47
+    "scale": 0.46
   },
   "maya": {
     "atlas": "assets/characters/maya/maya.json",
@@ -273,7 +279,7 @@
       160,
       8
     ],
-    "scale": 0.47
+    "scale": 0.44
   },
   "nora": {
     "atlas": "assets/characters/nora/nora.json",
@@ -281,7 +287,7 @@
       152,
       8
     ],
-    "scale": 0.47
+    "scale": 0.42
   },
   "sunny": {
     "atlas": "assets/characters/sunny/sunny.json",
@@ -289,14 +295,15 @@
       176,
       8
     ],
-    "scale": 0.47
+    "scale": 0.43
   },
   "gus": {
     "atlas": "assets/characters/gus/gus.json",
     "idleTicks": [
       184,
       8
-    ]
+    ],
+    "scale": 0.48
   },
   "hazel": {
     "atlas": "assets/characters/hazel/hazel.json",
@@ -310,7 +317,8 @@
     "idleTicks": [
       174,
       8
-    ]
+    ],
+    "scale": 0.48
   },
   "wren": {
     "atlas": "assets/characters/wren/wren.json",
@@ -318,7 +326,7 @@
       162,
       8
     ],
-    "scale": 0.47
+    "scale": 0.44
   },
   "tuck": {
     "atlas": "assets/characters/tuck/tuck.json",
@@ -334,35 +342,39 @@
       154,
       8
     ],
-    "scale": 0.47
+    "scale": 0.46
   },
   "sage": {
     "atlas": "assets/characters/sage/sage.json",
     "idleTicks": [
       198,
       8
-    ]
+    ],
+    "scale": 0.44
   },
   "clara": {
     "atlas": "assets/characters/clara/clara.json",
     "idleTicks": [
       178,
       8
-    ]
+    ],
+    "scale": 0.46
   },
   "bramble": {
     "atlas": "assets/characters/bramble/bramble.json",
     "idleTicks": [
       166,
       8
-    ]
+    ],
+    "scale": 0.48
   },
   "bert": {
     "atlas": "assets/characters/bert/bert.json",
     "idleTicks": [
       192,
       8
-    ]
+    ],
+    "scale": 0.48
   },
   "poppy": {
     "atlas": "assets/characters/poppy/poppy.json",
@@ -370,7 +382,7 @@
       144,
       8
     ],
-    "scale": 0.47
+    "scale": 0.44
   },
   "gemma": {
     "atlas": "assets/characters/gemma/gemma.json",
@@ -378,7 +390,7 @@
       150,
       8
     ],
-    "scale": 0.47
+    "scale": 0.45
   },
   "theo": {
     "atlas": "assets/characters/theo/theo.json",
@@ -393,7 +405,8 @@
     "idleTicks": [
       176,
       8
-    ]
+    ],
+    "scale": 0.46
   },
   "danny": {
     "atlas": "assets/characters/danny/danny.json",

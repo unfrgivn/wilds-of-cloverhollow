@@ -7158,6 +7158,39 @@ the old trail, the owl, and the clubhouse claim.
   purity, lint), `just build` (all non-vendor chunks `< 400 kB`), and 44/44
   Chromium & WebKit e2e tests with zero baseline diffs.
 
+## Milestone 166: Living NPC Scale Calibration & Spatial Dispersion Polish **Status:** ✅ Completed (2026-11-27)
+- **Mass-Calibrated Scale Normalization (`content/characters.json`)**:
+  - Normalized all 28 Living NPC character scales with zero art regeneration so
+    every kid sits in `[0.42, 0.47]` (`nora` `0.42`; `pippa`/`sunny` `0.43`;
+    `poppy`/`wren`/`maya` `0.44`; `sammy`/`gemma` `0.45`; `kai`/`leo` `0.46`;
+    `danny`/`tuck`/`theo` `0.47`) and every adult sits in `[0.44, 0.50]`
+    (`sage` `0.44`; `marigold`/`sal`/`clara` `0.46`; `lark`/`flora`/`moss`
+    `0.47`; `otis`/`bramble`/`bert`/`bram`/`gus` `0.48`; `pebble` `0.49`;
+    `hazel`/`mina` `0.50` default), leaving all `origin/main` cast scales
+    untouched.
+- **Spatial Dispersion & Breaking Stacks / Mannequin Lineups (`content/areas/{plaza,bay,trail,pass,park,field,lodge,arcade,east-hall,parlor}.json`)**:
+  - Rebalanced 9 areas (updating centered 30×20 footprints and facings) with 0%
+    solid/canopy occlusion and zero replay drift across all 73 `origin/main`
+    recorded sims: `plaza.gus` `(1200, 990)` facing `left`; `bay.kai`
+    `(520, 880)` facing `right`; `trail.bramble` `(980, 240)` & `trail.lark`
+    `(700, 520)` facing `right`; `park.pippa` `(1220, 360)` facing `left`
+    (with `park-flute-concert` radius `440`); `field.maya` `(560, 690)` facing
+    `up`; `lodge.clara` `(410, 630)` & `lodge.otis` `(710, 680)`; `arcade.sammy`
+    `(420, 630)` & `arcade.poppy` `(710, 690)`; `east-hall.leo` `(480, 580)` &
+    `east-hall.bert` `(860, 650)`; `parlor.danny` `(360, 450)` facing `right`.
+- **Automated Regression Guardrails & Replay (`tests/unit/living-npcs.test.ts`, `tools/sim/record-living-npcs.ts`, `tests/sim/scripts/new-game/living-npcs.json`, `tests/unit/living-npcs-replay.test.ts`, `tests/e2e/living-npcs.spec.ts`)**:
+  - Added permanent **Spatial Dispersion Guard** (`>= 220u` outdoors, `>= 190u`
+    indoors between Living NPCs across all strolling waypoints, `>= 120u` from
+    other cast/critters, and bans flat `Δy = 0` lineups) and **Scale
+    Consistency Guard** (`[0.42, 0.47]` kids, `[0.44, 0.50]` adults).
+  - Re-recorded `tests/sim/scripts/new-game/living-npcs.json` (10,179 ticks,
+    hash `7613ecf2`, zero shifts across all 73 other recorded sims) and updated
+    `tests/e2e/living-npcs.spec.ts` (12/12 Chromium + WebKit pass).
+- **Visual Review**: captured and `vision`-verified 3 crisp 1280×720 review
+  JPEGs (`art/review/living-npcs-dispersed-plaza.jpg`,
+  `art/review/living-npcs-dispersed-bay.jpg`,
+  `art/review/living-npcs-dispersed-interiors.jpg`).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

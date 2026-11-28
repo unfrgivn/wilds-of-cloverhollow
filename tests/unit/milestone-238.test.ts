@@ -34,7 +34,7 @@ describe("Milestone 238: Postcard Lightbox Touch/Keyboard Parity & < 600-Line sr
 
     const ts = readFileSync("src/ui/journal-postcards.ts", "utf8");
     expect(ts).toContain('["ArrowDown", "ArrowUp", "Home", "End"]');
-    expect(ts).toContain("[lbBack, lbSave, lbRemove, closeBtn]");
+    expect(ts).toContain("[lbBack, lbPin, lbSave, lbRemove, closeBtn]");
   });
 
   it("enforces the global < 600-line src/ui/ architecture gate after Treasures extraction", () => {

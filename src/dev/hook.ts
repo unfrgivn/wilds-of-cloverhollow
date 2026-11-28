@@ -15,6 +15,7 @@ import type { AudioController } from "../platform/audio";
 import type { GameSettingsController } from "../platform/game-settings";
 import type { MinigameRecords } from "../platform/minigame-records";
 import type { BattleCheckInfo } from "../render/view";
+import type { PinnedPostcardRenderInfo } from "../render/clubhouse-display";
 import type { CutsceneRenderInfo } from "../render/cutscene-render";
 import type { MicroDelightsRenderInfo } from "../render/micro-delights-render";
 import type { NpcLifeRenderInfo } from "../render/npc-life";
@@ -86,6 +87,7 @@ export type CloverhollowHook = {
     // The recurring critters' "?" and "!" over their heads (Milestone 51).
     marks: { key: string; mark: "?" | "!"; x: number; y: number }[];
     clubhouseDisplay: number;
+    pinnedPostcard: PinnedPostcardRenderInfo | null;
     atmosphereParticles: number;
     footstepPuffs: number;
     starGemGlints: number;

@@ -24,6 +24,7 @@
 .journal-lightbox-back:focus-visible,
 .journal-lightbox-prev:focus-visible,
 .journal-lightbox-next:focus-visible,
+.journal-postcard-pin-btn:focus-visible,
 .journal-lightbox-save:focus-visible,
 .journal-lightbox-remove:focus-visible { outline: 3px solid #6b9e56; outline-offset: 2px; }
 
@@ -142,9 +143,23 @@
   transform: translateX(-50%) rotate(2.5deg); background: rgb(212 237 210 / 0.86);
 }
 
+.journal-postcard-tile.is-pinned {
+  box-shadow: inset 0 0 0 2px #d8a02e, 0 4px 0 #47321f22, 0 6px 12px #47321f22;
+}
+
 .journal-postcard-thumb-wrap {
-  display: block; width: 100%; overflow: hidden;
+  position: relative; display: block; width: 100%; overflow: hidden;
   border: 1.5px solid #47321f55; border-radius: 7px; background: #f4ead2;
+}
+
+.journal-postcard-pinned-tag {
+  position: absolute; top: 5px; right: 5px; z-index: 2; padding: 1.5px 7px;
+  border: 1.5px solid var(--sticker-ink); border-radius: 999px;
+  background: linear-gradient(180deg, #fff6c2 0%, #f5cf58 100%);
+  box-shadow: inset 0 0 0 1px #c98f22, 0 2px 0 #47321f2a;
+  color: var(--sticker-ink); font-size: 9.5px; font-weight: 900; line-height: 1.2;
+  white-space: nowrap; pointer-events: none;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
 }
 
 .journal-postcard-thumb {
@@ -174,6 +189,7 @@
 .journal-lightbox-back,
 .journal-lightbox-prev,
 .journal-lightbox-next,
+.journal-postcard-pin-btn,
 .journal-lightbox-save,
 .journal-lightbox-remove {
   display: inline-flex; align-items: center; justify-content: center;
@@ -237,6 +253,11 @@
 }
 
 .journal-lightbox-actions { display: inline-flex; align-items: center; gap: 7px; flex: 0 0 auto; }
+.journal-postcard-pin-btn { background: linear-gradient(180deg, #fffdf8 0%, #f5e6c4 100%); }
+.journal-postcard-pin-btn[aria-pressed="true"] {
+  background: linear-gradient(180deg, #fff6bf 0%, #f5ce54 100%);
+  box-shadow: inset 0 0 0 1.5px #c98f22, 0 2px 0 #47321f33;
+}
 .journal-lightbox-save { background: linear-gradient(180deg, #fffdf6 0%, #cfecc8 100%); }
 .journal-lightbox-remove { background: linear-gradient(180deg, #fffdf8 0%, #f8d8d2 100%); }
 
@@ -250,6 +271,8 @@
   .journal-lightbox-back:hover,
   .journal-lightbox-prev:hover:not(:disabled),
   .journal-lightbox-next:hover:not(:disabled) { background: #fff3d2; transform: translateY(-1px); }
+  .journal-postcard-pin-btn:hover { background: linear-gradient(180deg, #fffef9 0%, #f5de9c 100%); transform: translateY(-1px); }
+  .journal-postcard-pin-btn[aria-pressed="true"]:hover { background: linear-gradient(180deg, #fff7c9 0%, #f1c33d 100%); }
   .journal-lightbox-save:hover { background: linear-gradient(180deg, #fffef9 0%, #bce5b3 100%); transform: translateY(-1px); }
   .journal-lightbox-remove:hover { background: linear-gradient(180deg, #fffef9 0%, #f5c6bd 100%); transform: translateY(-1px); }
 }
@@ -257,13 +280,14 @@
 @media (prefers-reduced-motion: reduce) {
   .journal-postcards-btn, .journal-postcards-close, .journal-postcard-tile,
   .journal-lightbox-back, .journal-lightbox-prev, .journal-lightbox-next,
-  .journal-lightbox-save, .journal-lightbox-remove { transition: none; }
+  .journal-postcard-pin-btn, .journal-lightbox-save, .journal-lightbox-remove { transition: none; }
   .journal-postcard-tile[data-postcard-tilt="left"],
   .journal-postcard-tile[data-postcard-tilt="right"],
   .journal-postcard-tile:hover, .journal-postcards-btn:hover,
   .journal-postcards-close:hover, .journal-lightbox-back:hover,
   .journal-lightbox-prev:hover, .journal-lightbox-next:hover,
-  .journal-lightbox-save:hover, .journal-lightbox-remove:hover { transform: none; }
+  .journal-postcard-pin-btn:hover, .journal-lightbox-save:hover,
+  .journal-lightbox-remove:hover { transform: none; }
   .journal-postcards-head, .journal-postcards-empty,
   .journal-postcards-grid, .journal-postcards-lightbox { animation: none; }
 }
@@ -274,6 +298,7 @@
 :root[data-reduced-motion="on"] .journal-lightbox-back,
 :root[data-reduced-motion="on"] .journal-lightbox-prev,
 :root[data-reduced-motion="on"] .journal-lightbox-next,
+:root[data-reduced-motion="on"] .journal-postcard-pin-btn,
 :root[data-reduced-motion="on"] .journal-lightbox-save,
 :root[data-reduced-motion="on"] .journal-lightbox-remove { transition: none; }
 
@@ -285,6 +310,7 @@
 :root[data-reduced-motion="on"] .journal-lightbox-back:hover,
 :root[data-reduced-motion="on"] .journal-lightbox-prev:hover,
 :root[data-reduced-motion="on"] .journal-lightbox-next:hover,
+:root[data-reduced-motion="on"] .journal-postcard-pin-btn:hover,
 :root[data-reduced-motion="on"] .journal-lightbox-save:hover,
 :root[data-reduced-motion="on"] .journal-lightbox-remove:hover { transform: none; }
 
@@ -309,10 +335,12 @@
   .journal-postcards-empty-title { font-size: 13px; }
   .journal-postcards-empty-note { font-size: 11px; }
   .journal-postcard-tile { padding: 5px 5px 6px; gap: 4px; }
+  .journal-postcard-pinned-tag { top: 4px; right: 4px; padding: 1px 5px; font-size: 8.5px; }
   .journal-postcard-tile-caption { font-size: 10.5px; }
   .journal-postcard-tile-sub { font-size: 8.8px; }
   .journal-lightbox-back, .journal-lightbox-prev, .journal-lightbox-next,
-  .journal-lightbox-save, .journal-lightbox-remove { min-height: 28px; padding: 2px 10px; font-size: 10.2px; }
+  .journal-postcard-pin-btn, .journal-lightbox-save,
+  .journal-lightbox-remove { min-height: 28px; padding: 2px 10px; font-size: 10.2px; }
   .journal-lightbox-content { flex-direction: row; align-items: stretch; gap: 8px; }
   .journal-lightbox-frame { flex: 1 1 58%; padding: 5px; }
   .journal-lightbox-img { max-height: 196px; }
@@ -328,6 +356,7 @@
 :root[data-touch="on"] .journal-lightbox-back,
 :root[data-touch="on"] .journal-lightbox-prev,
 :root[data-touch="on"] .journal-lightbox-next,
+:root[data-touch="on"] .journal-postcard-pin-btn,
 :root[data-touch="on"] .journal-lightbox-save,
 :root[data-touch="on"] .journal-lightbox-remove { min-height: 44px; padding: 4px 13px; }
 

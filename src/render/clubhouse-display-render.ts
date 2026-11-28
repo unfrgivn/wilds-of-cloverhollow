@@ -1,14 +1,17 @@
 import { Assets, Container, Graphics, Sprite, Spritesheet } from "pixi.js";
 import { hasPlushPedestals, type Area, type State, type World } from "../core";
+import { getPinnedPostcard } from "../platform/postcard-album";
 import { makeShadowSprite } from "./battle-view";
 import {
   evaluateBedroomDisplay, evaluateClubhouseDecor, evaluateClubhouseDisplay,
-  evaluateSunberryMotes, type ClubhouseDecorVisuals, type RoomDisplayPlacement,
+  evaluateRoomPostcardPerch, evaluateSunberryMotes, type ClubhouseDecorVisuals,
+  type PinnedPostcardRenderInfo, type RoomDisplayPlacement,
 } from "./clubhouse-display";
 import {
   ClubhouseEncoreTrophyRenderer,
   ENCORE_TROPHY_ASSET_PATH,
 } from "./clubhouse-encore-render";
+import { ClubhousePostcardRenderer } from "./clubhouse-postcard-render";
 import type { VfxTextures } from "./vfx-textures";
 
 export { ENCORE_TROPHY_ASSET_PATH };
@@ -36,14 +39,17 @@ export class ClubhouseDisplayRenderer {
   private readonly keepsakePool: KeepsakeEntry[] = [];
   private readonly sunberryPool: Sprite[] = [];
   private readonly encoreTrophy: ClubhouseEncoreTrophyRenderer;
+  private readonly postcard: ClubhousePostcardRenderer;
   private activeDisplayCount = 0;
 
   constructor(
     private readonly world: World,
     private readonly vfx: VfxTextures,
     private readonly depthLayer: Container,
+    onAssetReady?: () => void,
   ) {
     this.encoreTrophy = new ClubhouseEncoreTrophyRenderer(vfx, depthLayer);
+    this.postcard = new ClubhousePostcardRenderer(depthLayer, onAssetReady);
     this.rugLayer.label = "clubhouse:rug";
     this.rugLayer.visible = false;
     this.rugLayer.addChild(this.rugGraphics);
@@ -64,6 +70,9 @@ export class ClubhouseDisplayRenderer {
   get displayCount(): number {
     return this.activeDisplayCount;
   }
+  get pinnedPostcard(): PinnedPostcardRenderInfo | null {
+    return this.postcard.info();
+  }
 
   hide(): void {
     for (const entry of this.prizePool) {
@@ -73,6 +82,7 @@ export class ClubhouseDisplayRenderer {
     for (const entry of this.keepsakePool) entry.container.visible = false;
     for (const mote of this.sunberryPool) mote.visible = false;
     this.encoreTrophy.hide();
+    this.postcard.hide();
     this.hideDecorLayers();
     this.activeDisplayCount = 0;
   }
@@ -225,6 +235,7 @@ export class ClubhouseDisplayRenderer {
       state.battle === null &&
       state.arcade === null;
     if (!roomVisible) { this.hide(); return; }
+    this.postcard.update(evaluateRoomPostcardPerch(area.id, getPinnedPostcard(), reducedMotion));
 
     if (area.id === "bedroom") {
       this.hideDecorLayers();

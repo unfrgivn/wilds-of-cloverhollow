@@ -41,6 +41,7 @@ import {
 import { createSaveSession, createSaveStore } from "./shell/save-storage";
 import { createAudio, projectMusicMix, resolveSoundtrackWeather } from "./platform/audio";
 import { getHomeRecordTrack, subscribeHomeRecord } from "./platform/home-record-prefs";
+import { getPinnedPostcardId, subscribePostcardAlbum } from "./platform/postcard-album";
 import { getCozyWeatherMode, subscribeCozyWeather } from "./platform/weather-prefs";
 import { createHaptics } from "./platform/haptics";
 import { findPettableCompanion, findRestSpot } from "./render/companions";
@@ -165,15 +166,16 @@ async function boot(): Promise<void> {
     sound.playEffect(on ? "toggle-on" : "toggle-off"); lightHaptic();
   };
   subscribeHomeRecord((t, user) => { if (user) playToggleFeedback(t !== null); invalidate(); });
+  let lastPinned = getPinnedPostcardId();
+  subscribePostcardAlbum(() => {
+    const next = getPinnedPostcardId();
+    if (next !== lastPinned) { lastPinned = next; playToggleFeedback(next !== null); }
+    invalidate();
+  });
   const bindToggle = (toggle: () => void, isOn: () => boolean): (() => void) =>
-    withInvalidate(() => {
-      toggle();
-      playToggleFeedback(isOn());
-    });
-  const journal = createJournal(uiRoot);
-  let jukeboxTrack: JukeboxTrack | null = null;
-  const title = createTitleScreen(uiRoot);
-  const credits = createCredits(uiRoot);
+    withInvalidate(() => { toggle(); playToggleFeedback(isOn()); });
+  const journal = createJournal(uiRoot); let jukeboxTrack: JukeboxTrack | null = null;
+  const title = createTitleScreen(uiRoot); const credits = createCredits(uiRoot);
   battleHud.onSelectTarget((index) => touch.tapTarget(index));
   const stepBattleTarget = (delta: -1 | 1): boolean => {
     const next = stepMultiFoeTargetIndex(state.battle?.foes, state.battle?.targetIndex ?? 0, delta);
@@ -181,7 +183,8 @@ async function boot(): Promise<void> {
     touch.tapTarget(next); return true;
   };
   battleHud.onPeekStepTarget((delta) => { stepBattleTarget(delta); invalidate(); });
-  const view = new GameView(content.world, { debugLabel: qaEnabled, renderer: app.renderer });
+  const viewOpts = { debugLabel: qaEnabled, renderer: app.renderer, onAssetReady: invalidate };
+  const view = new GameView(content.world, viewOpts);
   const navFollower = createNavPathFollower(content.world);
   const syncNpcChatter = createNpcChatterSync(
     content.world, uiRoot, view.npcChatterScreen.bind(view), sound.playAmbientChatter,

@@ -16,6 +16,7 @@ import {
   CLUBHOUSE_PRIZES_ALIAS,
   ClubhouseDisplayRenderer,
 } from "./clubhouse-display-render";
+import type { PinnedPostcardRenderInfo } from "./clubhouse-display";
 import type { RestSpot } from "./companions";
 import { evaluateOverworldEmotes } from "./emotes";
 import {
@@ -131,12 +132,15 @@ export class OverworldEffectsController {
     private readonly vfx: VfxTextures,
     depthLayer: Container,
     emissiveLayer: Container,
+    onAssetReady?: () => void,
   ) {
     this.ground = new GroundReactivityController(this.world, this.vfx);
     this.grassLayer = this.ground.grassLayer;
     this.footstepLayer = this.ground.footstepLayer;
 
-    this.clubhouseDisplay = new ClubhouseDisplayRenderer(this.world, this.vfx, depthLayer);
+    this.clubhouseDisplay = new ClubhouseDisplayRenderer(
+      this.world, this.vfx, depthLayer, onAssetReady,
+    );
     this.clubhouseRugLayer = this.clubhouseDisplay.rugLayer;
     this.clubhouseBannerLayer = this.clubhouseDisplay.bannerLayer;
 
@@ -191,6 +195,10 @@ export class OverworldEffectsController {
 
   get clubhouseDisplayCount(): number {
     return this.clubhouseDisplay.displayCount;
+  }
+
+  get pinnedPostcard(): PinnedPostcardRenderInfo | null {
+    return this.clubhouseDisplay.pinnedPostcard;
   }
 
   clearFootsteps(): void {

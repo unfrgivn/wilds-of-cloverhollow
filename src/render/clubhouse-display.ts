@@ -333,3 +333,80 @@ export function evaluateClubhouseDisplay(world: World, state: State): ClubhouseD
 
   return { prizes, keepsakes, encoreTrophy };
 }
+
+export type RoomPostcardArea = "bedroom" | "clubhouse";
+
+export type RoomPostcardPerch = {
+  area: RoomPostcardArea;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  zIndex: number;
+  rotation: number;
+};
+
+export type PinnedPostcardSource = {
+  id: string;
+  caption: string;
+  dataUrl: string;
+};
+
+export type EvaluatedRoomPostcard = RoomPostcardPerch & PinnedPostcardSource;
+
+export type PinnedPostcardRenderInfo = {
+  id: string;
+  caption: string;
+  area: string;
+  ready: boolean;
+};
+
+/**
+ * Unobstructed hand-inked wall-frame perches for Fae's pinned memory postcard:
+ * - `bedroom` (1050x700): sunlit back wall above the bed, clear of fairy lights, headboard,
+ *   door frame, window, and plush shelf.
+ * - `clubhouse` (1200x800): upper-left warm wood plank pocket, strictly outside walkable space
+ *   and >= 95 px clear of all 13 prizes, 13 keepsakes, and the Encore Star Trophy.
+ */
+export const ROOM_POSTCARD_PERCHES: Readonly<Record<RoomPostcardArea, RoomPostcardPerch>> = {
+  bedroom: {
+    area: "bedroom",
+    x: 348,
+    y: 150,
+    width: 96,
+    height: 60,
+    zIndex: 180,
+    rotation: -0.025,
+  },
+  clubhouse: {
+    area: "clubhouse",
+    x: 336,
+    y: 220,
+    width: 52,
+    height: 33,
+    zIndex: 315,
+    rotation: -0.34,
+  },
+};
+
+/**
+ * Pure evaluator projecting the player's pinned Postcard Album memory onto Fae's Bedroom or
+ * Clubhouse wall frame. Returns `null` when unpinned or outside those two rooms (zero baseline
+ * drift), and flattens `rotation` to `0` under `reducedMotion === true`.
+ */
+export function evaluateRoomPostcardPerch(
+  areaId: string,
+  pinned: PinnedPostcardSource | null,
+  reducedMotion = false,
+): EvaluatedRoomPostcard | null {
+  if (pinned === null) return null;
+  if (areaId !== "bedroom" && areaId !== "clubhouse") return null;
+  const perch = ROOM_POSTCARD_PERCHES[areaId];
+  return {
+    ...perch,
+    rotation: reducedMotion ? 0 : perch.rotation,
+    id: pinned.id,
+    caption: pinned.caption,
+    dataUrl: pinned.dataUrl,
+  };
+}

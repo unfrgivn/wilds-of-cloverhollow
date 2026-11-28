@@ -8,6 +8,7 @@ import type { BattleRenderInfo } from "./battle-view";
 import {
   cutsceneCameraPoint, interpolatePoint, smoothFollowCamera, worldToScreen,
 } from "./camera";
+import type { PinnedPostcardRenderInfo } from "./clubhouse-display";
 import { findPettableCompanion, findRestSpot, type RestSpot } from "./companions";
 import type { CutsceneRenderInfo } from "./cutscene-render";
 import type {
@@ -88,6 +89,7 @@ export type GameViewRenderInfo = {
   lantern: { on: boolean; glows: string[] };
   marks: NoticeMarkView[];
   clubhouseDisplay: number;
+  pinnedPostcard: PinnedPostcardRenderInfo | null;
   atmosphereParticles: number;
   footstepPuffs: number;
   starGemGlints: number;

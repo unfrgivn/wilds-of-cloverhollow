@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 239)
+Last updated: 2026-11-28 (Milestone 240)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -1212,6 +1212,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   header `.journal-postcards-btn` `"📷 Photos"` / `"📷 Photos · N"`,
   `src/ui/journal-postcards.{ts,css}`, Milestone 234) with a 3×2 watercolor
   corkboard grid (2-column compact at `874×402`), inline lightbox preview,
+  tactile `.journal-postcard-pin-btn` (`"☆ Pin to Room"` / golden `aria-pressed="true"`
+  `"★ Pinned in Room"`, `>= 44 px` on touch) plus warm-gold `.journal-postcard-pinned-tag`
+  (`"★ In Room"`) tile badge persisting the pinned postcard ID in
+  `localStorage["cloverhollow-pinned-postcard"]` (`PINNED_POSTCARD_KEY`, default `null`,
+  auto-cleared on `remove`/`clear`/eviction, Milestone 237),
   1-click `Save PNG` / Web Share delivery, `Remove`, 2D keyboard/gamepad
   navigation (including Lightbox `ArrowDown` / `ArrowUp` / `Home` / `End`
   focus cycling across enabled `← Back to Album`, `Save PNG`, `Remove`, and `×`
@@ -2610,6 +2615,25 @@ ios/            Capacitor iOS project (from Milestone 4).
       twinkling star sparkles (`2` at `1..4`, `4` at `5..8`, and a `6`-sparkle
       radiant crown glow at `9/9`; steady zero-rotation glow under
       `reducedMotion === true`).
+    - **Pinned Wall Memory Postcards in Bedroom & Clubhouse (Milestone 237):**
+      Pure Pixi-free `ROOM_POSTCARD_PERCHES` and `evaluateRoomPostcardPerch`
+      (`src/render/clubhouse-display.ts`) project the player's pinned Postcard
+      Album entry (`getPinnedPostcard` from `src/platform/postcard-album.ts`,
+      persisted in `localStorage["cloverhollow-pinned-postcard"]`, default
+      `null`) onto unobstructed non-walkable wall frames in Fae's Bedroom
+      (`(348, 150)`, `96×60`, `zIndex: 180`, `rotation: -0.025`, sunlit back
+      wall above the bed) and Living Clubhouse (`(336, 220)`, `52×33`,
+      `zIndex: 315`, `rotation: -0.34` matching the upper-left plank wall slope,
+      `>= 95 px` clear of all 13 prizes, 13 keepsakes, and the Encore Star
+      Trophy), returning `null` when unpinned or outside those two rooms (zero
+      baseline drift) and flattening `rotation` to `0` under
+      `reducedMotion === true`. `ClubhousePostcardRenderer`
+      (`src/render/clubhouse-postcard-render.ts`, mounted in
+      `ClubhouseDisplayRenderer` under container label `clubhouse:pinned-postcard`
+      and reported read-only via `renderInfo().pinnedPostcard`) draws a soft
+      drop shadow, crisp hand-inked cream watercolor mat, pastel washi-tape
+      strip, and golden push-pin over the asynchronously decoded `dataUrl`
+      texture (cached by `id + dataUrl` and cleanly disposed on change or unpin).
   - **Bedroom Shelf Plush Display, Clubhouse Decor Swatches, Velvet Plush
     Pedestals & Visiting Friends (Milestone 195, Elevation Track E9B):**
     - Pure `src/core/decor.ts` manages optional `state.decor` (omitted when

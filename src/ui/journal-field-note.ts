@@ -82,6 +82,7 @@ export function createJournalFieldOverlays(options?: {
   onSelectTrack?: (track: JukeboxTrack) => void;
   onResetTrack?: () => void;
   onJukeboxFilter?: () => void;
+  onPostcardPinChange?: (pinned: boolean) => void;
 }): JournalFieldOverlays {
   const fieldBackdrop = element("div", "journal-field-backdrop"); fieldBackdrop.hidden = true;
   const fieldCard = element("article", "journal-field-note");
@@ -196,6 +197,7 @@ export function createJournalFieldOverlays(options?: {
   const postcardsAlbum = createJournalPostcardsAlbum({
     ...peerHooks("postcards"),
     onAction: options?.onJukeboxFilter, onStep: options?.onStep,
+    onPinChange: options?.onPostcardPinChange,
   });
   const peerModals = {
     weather: weatherAlmanac, ribbons: ribbonsShowcase, hearts: heartsAlbum,

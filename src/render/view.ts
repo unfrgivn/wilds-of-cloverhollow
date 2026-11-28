@@ -105,7 +105,7 @@ export class GameView {
 
   constructor(
     private readonly world: World,
-    options: { debugLabel: boolean; renderer: Renderer },
+    options: { debugLabel: boolean; renderer: Renderer; onAssetReady?: () => void },
   ) {
     this.vfx = createVfxTextures();
     this.atmosphere = new BiomeAtmosphere(this.vfx);
@@ -117,6 +117,7 @@ export class GameView {
       this.vfx,
       this.depth,
       this.emissiveLayer,
+      options.onAssetReady,
     );
     this.battleView = new BattleViewController(this.world, this.vfx, options.renderer);
     this.paperGrain = new PaperGrainOverlay(this.vfx.paperGrain);
@@ -634,6 +635,7 @@ export class GameView {
       },
       marks: this.noticeMarks(state),
       clubhouseDisplay: this.effects.clubhouseDisplayCount,
+      pinnedPostcard: this.effects.pinnedPostcard,
       atmosphereParticles: this.atmosphere.activeCount,
       footstepPuffs: this.effects.footstepPuffCount,
       starGemGlints: this.effects.starGemGlintCount,

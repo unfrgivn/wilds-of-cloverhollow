@@ -10119,6 +10119,43 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   Playwright e2e (`e10-story-milo-arc`, `cutscene`, `dialogue`, `bay`, `jordan`,
   `school`, `lodge`, `lifeguard`, `art`, `milo-rosie`, `e3-dialogue`,
   `e11-heart-to-hearts`, `e12-finale`) verified green.
+
+## Milestone 240: Pinned Wall Memory Postcards in Fae's Bedroom & Living Clubhouse (`src/render/clubhouse-postcard-render.ts`) **Status:** ✅ Completed (2026-11-28)
+- Lets players pin ANY snapped postcard from Fae's Postcard Album onto her
+  Bedroom and Living Clubhouse walls — framed in a hand-inked cream mat with
+  soft cast shadow, pastel washi-tape, and golden push-pin (isometrically
+  aligned to the Clubhouse wood wall planks!) — zero `src/core` changes, zero
+  save-version bumps, zero replay hash drift across all 77 sims, and zero visual
+  baseline diffs across all 99 `ui-gallery`, `bedroom`, `clubhouse-petting`,
+  `milestone-164`, `milestone-212`, and `e9b-decor-economy` baselines.
+- Pinned postcard preference & pure wall-perch geometry
+  (`src/platform/postcard-album.ts`, `src/render/clubhouse-display.ts`):
+  - Added `PINNED_POSTCARD_KEY = "cloverhollow-pinned-postcard"` (default `null`,
+    auto-clears on remove/evict/clear so zero dangling IDs occur).
+  - Exported pure `ROOM_POSTCARD_PERCHES` (`bedroom` `(348, 150)` above the bed,
+    `clubhouse` `(336, 220)` `-0.34 rad` isometric wood plank pocket `>= 95 px`
+    clear of all 26 prizes/keepsakes and Star Trophy) and
+    `evaluateRoomPostcardPerch` (flattens rotation to `0` under `reducedMotion`,
+    returns `null` when unpinned or outside `bedroom`/`clubhouse`).
+- Framed wall postcard renderer & Postcard Album pin UI
+  (`src/render/clubhouse-postcard-render.ts`, `clubhouse-display-render.ts`,
+  `overworld-effects.ts`, `view-projections.ts`, `view.ts`, `src/dev/hook.ts`,
+  `src/ui/journal-postcards.{ts,css}`, `src/ui/journal-field-note.ts`,
+  `src/main.ts`):
+  - Built `ClubhousePostcardRenderer` (`clubhouse:pinned-postcard`, async Pixi
+    `Texture` cache with clean GPU disposal on change/unpin) and read-only
+    `renderInfo().pinnedPostcard`.
+  - Added `.journal-postcard-pin-btn` (`☆ Pin to Room` / golden `★ Pinned in
+    Room`, `>= 44 px` touch target) inside the Lightbox and golden `★ In Room`
+    corkboard tile badge, with toggle foley + light haptic + instant canvas
+    invalidation on pin/unpin.
+- Evidence: `tests/unit/milestone-240.test.ts`,
+  `tests/e2e/milestone-240.spec.ts` (`@smoke` Chromium + WebKit), and review
+  captures `art/review/m237-bedroom-pinned-postcard-1280.jpg` and
+  `m237-clubhouse-pinned-postcard-1280.jpg` independently verified via `vision`.
+- Gates: `just check` (305 unit files / 2,153 tests, all 77 sims + all sim
+  scripts, 23 QA packs, purity, lint), `just build` (`index` `< 365 kB`),
+  20/20 Chromium & WebKit room/album e2e, and 99/99 Chromium `ui-gallery` tests.
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

@@ -166,6 +166,7 @@ test.describe("Milestone 238: Postcard Lightbox Touch Parity & Keyboard Action N
 
       const albumCard = page.locator(".journal-postcards-card");
       const lbBack = albumCard.locator(".journal-lightbox-back");
+      const lbPin = albumCard.locator(".journal-postcard-pin-btn");
       const lbSave = albumCard.locator(".journal-lightbox-save");
       const lbRemove = albumCard.locator(".journal-lightbox-remove");
       const lbClose = albumCard.locator(".journal-postcards-close");
@@ -180,7 +181,9 @@ test.describe("Milestone 238: Postcard Lightbox Touch Parity & Keyboard Action N
       await page.keyboard.press("ArrowLeft");
       await expect(lbPos).toHaveText("1 / 2");
 
-      // ArrowDown steps cleanly across Back -> Save PNG -> Remove -> Close -> Back.
+      // ArrowDown steps cleanly across Back -> Pin -> Save PNG -> Remove -> Close -> Back.
+      await page.keyboard.press("ArrowDown");
+      await expect(lbPin).toBeFocused();
       await page.keyboard.press("ArrowDown");
       await expect(lbSave).toBeFocused();
       await page.keyboard.press("ArrowDown");

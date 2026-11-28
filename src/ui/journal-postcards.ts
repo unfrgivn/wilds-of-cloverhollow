@@ -3,8 +3,8 @@ import { element, setAttribute, setText } from "./dom";
 import { applyModalScrollKey } from "./journal-nav";
 import { deliverPostcard } from "./postcard";
 import {
-  getPostcardAlbum, POSTCARD_ALBUM_LIMIT, removePostcardFromAlbum, subscribePostcardAlbum,
-  type SavedPostcard,
+  getPinnedPostcardId, getPostcardAlbum, POSTCARD_ALBUM_LIMIT, removePostcardFromAlbum,
+  setPinnedPostcardId, subscribePostcardAlbum, type SavedPostcard,
 } from "../platform/postcard-album";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
@@ -12,8 +12,8 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 export type JournalPostcardsOptions = {
   onBeforeOpen?: () => void; onVisibilityChange?: (open: boolean) => void;
   onClose?: () => void; onAction?: () => void; onStep?: () => void;
+  onPinChange?: (pinned: boolean) => void;
 };
-
 export type JournalPostcardsAlbum = {
   overlay: HTMLDivElement; treasuresBtn: HTMLButtonElement;
   open: (returnTarget?: HTMLElement | null) => void; sync: () => void;
@@ -27,33 +27,29 @@ export const HEADER_POSTCARD_ALBUM_MARKUP =
   'fill="#fff9e8" stroke="#47321f" stroke-width="1.5"/>' +
   '<rect x="13.4" y="6.3" width="11.2" height="7.4" rx="1.2" transform="rotate(9 19 10)" ' +
   'fill="#b6dfb5" stroke="#47321f" stroke-width="1.15"/>' +
-  '<path d="M 4.4 13.6 C 4.4 12.2 5.5 11.2 6.8 11.2 H 9.6 L 11.1 8.8 ' +
-  'C 11.5 8.2 12.1 7.9 12.8 7.9 H 16.4 C 17.1 7.9 17.7 8.2 18.1 8.8 L 19.6 11.2 H 22.4 ' +
-  'C 23.7 11.2 24.8 12.2 24.8 13.6 V 24.4 C 24.8 25.8 23.7 26.8 22.4 26.8 H 6.8 ' +
-  'C 5.5 26.8 4.4 25.8 4.4 24.4 Z" fill="#f5d594" stroke="#47321f" stroke-width="1.65" ' +
-  'stroke-linejoin="round"/>' +
+  '<path d="M 4.4 13.6 C 4.4 12.2 5.5 11.2 6.8 11.2 H 9.6 L 11.1 8.8 C 11.5 8.2 12.1 7.9 12.8 ' +
+  '7.9 H 16.4 C 17.1 7.9 17.7 8.2 18.1 8.8 L 19.6 11.2 H 22.4 C 23.7 11.2 24.8 12.2 24.8 13.6 ' +
+  'V 24.4 C 24.8 25.8 23.7 26.8 22.4 26.8 H 6.8 C 5.5 26.8 4.4 25.8 4.4 24.4 Z" fill="#f5d594" ' +
+  'stroke="#47321f" stroke-width="1.65" stroke-linejoin="round"/>' +
   '<circle cx="14.6" cy="18.9" r="4.6" fill="#9fd8ff" stroke="#47321f" stroke-width="1.6"/>' +
   '<circle cx="13.1" cy="17.3" r="1.25" fill="#fffdf7"/>' +
   '<circle cx="21.1" cy="14.5" r="1.2" fill="#47321f"/>' +
-  '<path d="M 27.6 15.8 L 28.4 17.6 L 30.2 18.4 L 28.4 19.2 L 27.6 21 L 26.8 19.2 ' +
-  'L 25 18.4 L 26.8 17.6 Z" fill="#ffe478" stroke="#47321f" stroke-width="0.95" ' +
-  'stroke-linejoin="round"/>';
+  '<path d="M 27.6 15.8 L 28.4 17.6 L 30.2 18.4 L 28.4 19.2 L 27.6 21 L 26.8 19.2 L 25 18.4 ' +
+  'L 26.8 17.6 Z" fill="#ffe478" stroke="#47321f" stroke-width="0.95" stroke-linejoin="round"/>';
 
 /** Pure inner SVG markup for the empty-album camera illustration (no SVG text nodes). */
 export const EMPTY_ALBUM_MARKUP =
   '<rect x="6" y="8" width="36" height="28" rx="4.5" fill="#fbf3dc" stroke="#47321f" ' +
   'stroke-width="1.6" stroke-dasharray="3.2 2.4"/>' +
-  '<path d="M 12.2 18.2 C 12.2 16.6 13.5 15.4 15.1 15.4 H 18.2 L 19.9 12.7 ' +
-  'C 20.4 12 21.1 11.6 21.9 11.6 H 26.1 C 26.9 11.6 27.6 12 28.1 12.7 L 29.8 15.4 H 32.9 ' +
-  'C 34.5 15.4 35.8 16.6 35.8 18.2 V 29.2 C 35.8 30.8 34.5 32 32.9 32 H 15.1 ' +
-  'C 13.5 32 12.2 30.8 12.2 29.2 Z" fill="#f7dca1" stroke="#47321f" stroke-width="1.7" ' +
-  'stroke-linejoin="round"/>' +
+  '<path d="M 12.2 18.2 C 12.2 16.6 13.5 15.4 15.1 15.4 H 18.2 L 19.9 12.7 C 20.4 12 21.1 11.6 ' +
+  '21.9 11.6 H 26.1 C 26.9 11.6 27.6 12 28.1 12.7 L 29.8 15.4 H 32.9 C 34.5 15.4 35.8 16.6 35.8 ' +
+  '18.2 V 29.2 C 35.8 30.8 34.5 32 32.9 32 H 15.1 C 13.5 32 12.2 30.8 12.2 29.2 Z" ' +
+  'fill="#f7dca1" stroke="#47321f" stroke-width="1.7" stroke-linejoin="round"/>' +
   '<circle cx="24" cy="23.8" r="5.1" fill="#a8ddf8" stroke="#47321f" stroke-width="1.65"/>' +
   '<circle cx="22.3" cy="22.1" r="1.4" fill="#fffdf7"/>' +
   '<circle cx="31.4" cy="19.1" r="1.3" fill="#47321f"/>' +
-  '<path d="M 38.6 9.8 L 39.6 12.2 L 42 13.2 L 39.6 14.2 L 38.6 16.6 L 37.6 14.2 ' +
-  'L 35.2 13.2 L 37.6 12.2 Z" fill="#ffe57a" stroke="#47321f" stroke-width="1" ' +
-  'stroke-linejoin="round"/>';
+  '<path d="M 38.6 9.8 L 39.6 12.2 L 42 13.2 L 39.6 14.2 L 38.6 16.6 L 37.6 14.2 L 35.2 13.2 ' +
+  'L 37.6 12.2 Z" fill="#ffe57a" stroke="#47321f" stroke-width="1" stroke-linejoin="round"/>';
 
 function makeSvg(className: string, viewBox: string, markup: string): SVGSVGElement {
   const svg = document.createElementNS(SVG_NS, "svg");
@@ -67,13 +63,12 @@ function makeButton(className: string, ariaLabel: string, text = ""): HTMLButton
   if (text !== "") btn.textContent = text;
   return btn;
 }
-function isFocusable(node: HTMLElement | null): node is HTMLElement {
-  return node !== null && node.isConnected && node.closest("[hidden]") === null;
-}
-function shortTileCaption(caption: string): string {
+const isFocusable = (node: HTMLElement | null): node is HTMLElement =>
+  node !== null && node.isConnected && node.closest("[hidden]") === null;
+const shortTileCaption = (caption: string): string => {
   const stripped = caption.replace(/\s*·\s*Wilds of Cloverhollow$/i, "").trim();
   return stripped.length > 0 ? stripped : caption.trim();
-}
+};
 function imageToPngDataUrl(img: HTMLImageElement, fallback: string): string {
   if (img.naturalWidth <= 0 || img.naturalHeight <= 0) return fallback;
   const canvas = document.createElement("canvas");
@@ -129,9 +124,11 @@ export function createJournalPostcardsAlbum(
   setAttribute(lbStatus, "role", "status"); setAttribute(lbStatus, "aria-live", "polite");
   lbStatus.hidden = true;
   const lbActions = element("div", "journal-lightbox-actions", lbMeta);
+  const lbPin = makeButton("journal-postcard-pin-btn", "Pin to room walls", "☆ Pin to Room");
+  setAttribute(lbPin, "aria-pressed", "false");
   const lbSave = makeButton("journal-lightbox-save", "Save postcard as PNG", "Save PNG");
   const lbRemove = makeButton("journal-lightbox-remove", "Remove postcard from album", "Remove");
-  lbActions.append(lbSave, lbRemove);
+  lbActions.append(lbPin, lbSave, lbRemove);
   const treasuresBtn = makeButton("journal-postcards-btn", "Open Postcard Album", "📷 Photos");
 
   let openState = false; let entries: SavedPostcard[] = []; let selectedId: string | null = null;
@@ -145,8 +142,40 @@ export function createJournalPostcardsAlbum(
     window.clearTimeout(statusTimer); lbStatus.textContent = message; lbStatus.hidden = false;
     statusTimer = window.setTimeout(clearStatus, 1800);
   };
+  const syncPinBtn = (entryId: string, pinnedId: string | null): void => {
+    const pinned = pinnedId === entryId;
+    setText(lbPin, pinned ? "★ Pinned in Room" : "☆ Pin to Room");
+    setAttribute(lbPin, "aria-pressed", pinned ? "true" : "false");
+    setAttribute(lbPin, "aria-label",
+      pinned ? "Unpin postcard from Bedroom and Clubhouse walls"
+        : "Pin postcard to Bedroom and Clubhouse walls");
+    lbPin.classList.toggle("is-pinned", pinned);
+  };
+  const thumb = (item: SavedPostcard, idx: number, pinnedId: string | null): HTMLButtonElement => {
+    const isPinned = item.id === pinnedId;
+    const btn = makeButton("journal-postcard-tile", `View postcard: ${item.caption}`);
+    setAttribute(btn, "data-postcard-id", item.id);
+    setAttribute(btn, "data-postcard-tilt", idx % 2 === 0 ? "left" : "right");
+    btn.classList.toggle("is-pinned", isPinned);
+    const img = document.createElement("img");
+    img.className = "journal-postcard-thumb"; img.src = item.dataUrl;
+    img.alt = item.caption; img.draggable = false;
+    const wrap = element("span", "journal-postcard-thumb-wrap", btn); wrap.append(img);
+    if (isPinned) element("span", "journal-postcard-pinned-tag", wrap).textContent = "★ In Room";
+    const copy = element("span", "journal-postcard-tile-copy", btn);
+    element("span", "journal-postcard-tile-caption", copy).textContent =
+      shortTileCaption(item.caption);
+    if (item.subcaption.length > 0) {
+      element("span", "journal-postcard-tile-sub", copy).textContent = item.subcaption;
+    }
+    btn.addEventListener("click", () => {
+      selectedId = item.id; clearStatus(); renderState();
+      options?.onAction?.(); lbBack.focus({ preventScroll: true });
+    });
+    return btn;
+  };
   const renderState = (forceGrid = false): void => {
-    const count = entries.length;
+    const count = entries.length; const pinnedId = getPinnedPostcardId();
     setText(treasuresBtn, count > 0 ? `📷 Photos · ${count}` : "📷 Photos");
     setAttribute(treasuresBtn, "aria-label",
       `Open Postcard Album, ${count} of ${POSTCARD_ALBUM_LIMIT} saved`);
@@ -159,8 +188,7 @@ export function createJournalPostcardsAlbum(
     if (selectedId !== null && activeIdx === -1) selectedId = null;
     const inLightbox = selectedId !== null && activeIdx !== -1;
     setAttribute(card, "data-album-mode", inLightbox ? "lightbox" : "grid");
-    emptyBox.hidden = inLightbox || count > 0;
-    grid.hidden = inLightbox || count === 0;
+    emptyBox.hidden = inLightbox || count > 0; grid.hidden = inLightbox || count === 0;
     lightbox.hidden = !inLightbox;
     if (inLightbox) {
       const current = entries[activeIdx];
@@ -170,32 +198,15 @@ export function createJournalPostcardsAlbum(
         lbSub.hidden = current.subcaption.length === 0; setText(lbSub, current.subcaption);
         setText(lbPos, `${activeIdx + 1} / ${count}`);
         lbPrev.disabled = count < 2; lbNext.disabled = count < 2;
+        syncPinBtn(current.id, pinnedId);
       }
       return;
     }
-    const sig = entries.map((item) => `${item.id}:${item.caption}:${item.subcaption}`).join("|");
+    const sig = `${pinnedId ?? ""}|` +
+      entries.map((item) => `${item.id}:${item.caption}:${item.subcaption}`).join("|");
     if (!forceGrid && sig === lastGridSig) return;
     lastGridSig = sig;
-    tileButtons = entries.map((item, idx) => {
-      const btn = makeButton("journal-postcard-tile", `View postcard: ${item.caption}`);
-      setAttribute(btn, "data-postcard-id", item.id);
-      setAttribute(btn, "data-postcard-tilt", idx % 2 === 0 ? "left" : "right");
-      const img = document.createElement("img");
-      img.className = "journal-postcard-thumb"; img.src = item.dataUrl;
-      img.alt = item.caption; img.draggable = false;
-      element("span", "journal-postcard-thumb-wrap", btn).append(img);
-      const copy = element("span", "journal-postcard-tile-copy", btn);
-      element("span", "journal-postcard-tile-caption", copy).textContent =
-        shortTileCaption(item.caption);
-      if (item.subcaption.length > 0) {
-        element("span", "journal-postcard-tile-sub", copy).textContent = item.subcaption;
-      }
-      btn.addEventListener("click", () => {
-        selectedId = item.id; clearStatus(); renderState();
-        options?.onAction?.(); lbBack.focus({ preventScroll: true });
-      });
-      return btn;
-    });
+    tileButtons = entries.map((item, idx) => thumb(item, idx, pinnedId));
     grid.replaceChildren(...tileButtons);
   };
 
@@ -220,19 +231,22 @@ export function createJournalPostcardsAlbum(
   };
   const closeModal = (): void => {
     if (!openState && overlay.hidden) return;
-    const target = returnFocusEl;
-    clear(); options?.onClose?.(); options?.onVisibilityChange?.(false);
+    const target = returnFocusEl; clear();
+    options?.onClose?.(); options?.onVisibilityChange?.(false);
     if (isFocusable(target)) target.focus({ preventScroll: true });
   };
-  const close = (): void => {
-    if (!openState) return;
-    if (selectedId !== null) backToGrid();
-    else closeModal();
-  };
-
+  const close = (): void => { if (openState) (selectedId !== null ? backToGrid : closeModal)(); };
   lbBack.addEventListener("click", () => backToGrid());
   lbPrev.addEventListener("click", () => stepLightbox(-1));
   lbNext.addEventListener("click", () => stepLightbox(1));
+  lbPin.addEventListener("click", () => {
+    const current = entries.find((item) => item.id === selectedId);
+    if (current === undefined) return;
+    const nextId = setPinnedPostcardId(getPinnedPostcardId() === current.id ? null : current.id);
+    const pinned = nextId === current.id; options?.onPinChange?.(pinned);
+    showStatus(pinned ? "Pinned in Bedroom & Clubhouse!" : "Unpinned from room walls");
+    lastGridSig = ""; renderState(true);
+  });
   lbSave.addEventListener("click", () => {
     const current = entries.find((item) => item.id === selectedId);
     if (current === undefined) return;
@@ -243,9 +257,9 @@ export function createJournalPostcardsAlbum(
         filename: current.filename, caption: current.caption,
       },
       { preferShare: document.documentElement.dataset.touch === "on" },
-    ).then((delivery) => {
-      if (delivery === "shared") showStatus("Postcard shared!");
-      else if (delivery === "downloaded") showStatus("PNG saved!");
+    ).then((d) => {
+      if (d === "shared") showStatus("Postcard shared!");
+      else if (d === "downloaded") showStatus("PNG saved!");
     });
   });
   lbRemove.addEventListener("click", () => {
@@ -258,18 +272,15 @@ export function createJournalPostcardsAlbum(
   overlay.addEventListener("click", (event) => { if (event.target === overlay) closeModal(); });
   subscribePostcardAlbum((next) => { entries = next; lastGridSig = ""; renderState(true); });
   sync();
-
   const open = (returnTarget?: HTMLElement | null): void => {
-    const wasOpen = openState;
-    options?.onBeforeOpen?.();
+    const wasOpen = openState; options?.onBeforeOpen?.();
     if (!openState) {
       const active = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       returnFocusEl = returnTarget ?? active;
     }
     openState = true; selectedId = null; clearStatus();
     entries = getPostcardAlbum(); lastGridSig = ""; renderState(true);
-    card.focus({ preventScroll: true });
-    if (!wasOpen) options?.onVisibilityChange?.(true);
+    card.focus({ preventScroll: true }); if (!wasOpen) options?.onVisibilityChange?.(true);
   };
   const handleKeydown = (event: KeyboardEvent): boolean => {
     if (!openState) return false;
@@ -283,7 +294,9 @@ export function createJournalPostcardsAlbum(
       if (key === "ArrowLeft") { stop(); stepLightbox(-1); }
       else if (key === "ArrowRight") { stop(); stepLightbox(1); }
       else if (["ArrowDown", "ArrowUp", "Home", "End"].includes(key)) {
-        const btns = [lbBack, lbSave, lbRemove, closeBtn].filter((b) => !b.disabled && !b.hidden);
+        const btns = [lbBack, lbPin, lbSave, lbRemove, closeBtn].filter(
+          (b) => !b.disabled && !b.hidden,
+        );
         if (btns.length > 0) {
           const i = btns.findIndex((b) => b === document.activeElement);
           const next = key === "Home" ? 0 : key === "End" ? btns.length - 1
@@ -312,7 +325,6 @@ export function createJournalPostcardsAlbum(
     }
     return true;
   };
-  return {
-    overlay, treasuresBtn, open, sync, close, clear, isOpen: () => openState, handleKeydown,
-  };
+  const isOpen = (): boolean => openState;
+  return { overlay, treasuresBtn, open, sync, close, clear, isOpen, handleKeydown };
 }

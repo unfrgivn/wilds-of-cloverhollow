@@ -73,11 +73,3 @@ export function vignetteEnvelope(
   }
   return { opacity: 1, scale: 1, progress };
 }
-
-export function travelFadeAlpha(
-  transition: State["transition"],
-  doorFadeTicks: number,
-  vignetteActive: boolean,
-): number {
-  return vignetteActive ? 1 : fadeAlpha(transition, doorFadeTicks);
-}

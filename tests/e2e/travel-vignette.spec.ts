@@ -301,3 +301,127 @@ test(
   expect((await readState(page)).transition).toBeNull();
   await expect(page.locator("html")).not.toHaveAttribute("data-travel-vignette", "open");
 });
+
+test(
+  "Notched iPhone SE 667x375 fits longest summit caption and coastal bus-coast card @smoke",
+  async ({ page }) => {
+    await page.setViewportSize({ width: 667, height: 375 });
+    await page.goto("./?touch=1");
+    await page.waitForFunction(() => Boolean(window.__cloverhollow));
+    await page.evaluate(() => {
+      const style = document.documentElement.style;
+      style.setProperty("--safe-left", "44px");
+      style.setProperty("--safe-right", "44px");
+      style.setProperty("--safe-bottom", "21px");
+      style.setProperty("--safe-top", "0px");
+    });
+
+    // Ride down from Summit paused so Fae lands beside Pinecone Pass ski lift.
+    await resetPaused(page, "summit");
+    await walk(page, "y", 875);
+    await walk(page, "x", 465);
+    await page.keyboard.down("ArrowLeft");
+    await step(page, 2);
+    await page.keyboard.up("ArrowLeft");
+    await pressZ(page);
+    await advanceToFinalTravelLine(page, 0);
+    await page.keyboard.press("z");
+    await step(page, 40);
+    expect((await readState(page)).area).toBe("pass");
+
+    // Approach ski lift (500, 412), lasso the scarf once, then board up to Summit live.
+    await walk(page, "x", 500);
+    await walk(page, "y", 455);
+    await page.keyboard.down("ArrowUp");
+    await step(page, 2);
+    await page.keyboard.up("ArrowUp");
+    await pressZ(page);
+    // Clear the one-time scarf lasso knot first.
+    for (let i = 0; i < 40; i += 1) {
+      const d = (await readState(page)).dialogue;
+      if (d === null) break;
+      await pressZ(page);
+    }
+    await pressZ(page);
+    expect((await readState(page)).dialogue?.knot).toBe("ski_lift");
+    await advanceToFinalTravelLine(page, 0);
+
+    await resume(page);
+    await page.keyboard.press("z");
+    await waitForVignetteOpen(page, "lift-summit", "Next stop: Alpine Summit Overlook!");
+    await waitForStableOpacity(page);
+
+    const notched = await page.evaluate(() => {
+      const card = document.querySelector(".travel-card")?.getBoundingClientRect();
+      const caption = document.querySelector(".travel-caption")?.getBoundingClientRect();
+      const skip = document.querySelector(".travel-skip-btn")?.getBoundingClientRect();
+      return { card, caption, skip };
+    });
+    expect(notched.card).not.toBeNull();
+    expect(notched.caption).not.toBeNull();
+    expect(notched.skip).not.toBeNull();
+    if (
+      notched.card === undefined ||
+      notched.caption === undefined ||
+      notched.skip === undefined
+    ) {
+      throw new Error("Missing notched SE vignette layout elements");
+    }
+    expect(notched.card.left).toBeGreaterThanOrEqual(44);
+    expect(notched.card.right).toBeLessThanOrEqual(667 - 44 + 1);
+    expect(notched.card.top).toBeGreaterThanOrEqual(0);
+    expect(notched.card.bottom).toBeLessThanOrEqual(375 - 21 + 1);
+    expect(notched.caption.height).toBeLessThanOrEqual(24);
+    expect(notched.caption.right).toBeLessThanOrEqual(notched.skip.left + 1);
+    expect(notched.skip.height).toBeGreaterThanOrEqual(44);
+
+    if (REVIEW_SHOTS) {
+      await page.screenshot({
+        path: "art/review/e14-travel-summit-se-667.jpg",
+        type: "jpeg",
+        quality: 90,
+      });
+    }
+
+    await page.locator(".travel-overlay").click();
+    await page.waitForFunction(() => {
+      const state = window.__cloverhollow?.getState();
+      return state?.area === "summit" && state.transition === null;
+    });
+
+    // Also verify coastal bus-coast.webp card live (plaza -> bay via sue-cottage).
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await resetPaused(page, "sue-cottage");
+    await walk(page, "y", 510);
+    await walk(page, "x", 150);
+    await step(page, 40);
+    expect((await readState(page)).area).toBe("bay");
+    await walk(page, "y", 545);
+    await walk(page, "x", 355);
+    await page.keyboard.down("ArrowUp");
+    await step(page, 2);
+    await page.keyboard.up("ArrowUp");
+    await pressZ(page);
+    await advanceToFinalTravelLine(page, 0);
+    await page.keyboard.press("z");
+    await step(page, 40);
+    expect((await readState(page)).area).toBe("plaza");
+
+    await page.keyboard.down("ArrowUp");
+    await step(page, 2);
+    await page.keyboard.up("ArrowUp");
+    await pressZ(page);
+    expect((await readState(page)).dialogue?.knot).toBe("bus_stop");
+    await advanceToFinalTravelLine(page, 0);
+
+    await resume(page);
+    await page.keyboard.press("z");
+    await waitForVignetteOpen(page, "bus-coast", "Next stop: Bubblegum Bay!");
+    await expect(page.locator(".travel-badge-label")).toHaveText("Star-Line Bus");
+    await page.keyboard.press("z");
+    await page.waitForFunction(() => {
+      const state = window.__cloverhollow?.getState();
+      return state?.area === "bay" && state.transition === null;
+    });
+  },
+);

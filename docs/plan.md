@@ -7589,7 +7589,8 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
     `island/props-0.webp`).
   - Audited every card and the labeled 3×2 review sheet
     (`art/review/travel-vignettes-sheet.jpg`) plus live desktop/phone renders
-    (`art/review/e14-travel-bus-1280.jpg`, `art/review/e14-travel-boat-874.jpg`)
+    (`art/review/e14-travel-bus-1280.jpg`, `art/review/e14-travel-boat-874.jpg`,
+    `art/review/e14-travel-summit-se-667.jpg`)
     with `vision`.
 - **Pure Route Classifier & Fade Envelope (`src/render/travel-vignette.ts`,
   `src/render/fade.ts`):**
@@ -7601,14 +7602,15 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
     rest fades, and `harness`.
   - `shouldShowTravelVignette` enforces instant zero-delay bypass during paused
     harness steps, `paused` mode, and Reduced Motion (`isReducedMotionActive()`).
-  - Added `travelMarkerMotion`, `vignetteEnvelope`, and `travelFadeAlpha`
-    leaving `fadeAlpha` and `transitionZoom` intact.
+  - Added `travelMarkerMotion` and `vignetteEnvelope`, leaving `fadeAlpha` and
+    `transitionZoom` intact.
 - **Postcard Overlay & AreaLoader Integration (`src/ui/travel-overlay.ts`,
   `src/ui/travel-overlay.css`, `src/shell/area-loader.ts`, `src/main.ts`):**
   - Framed die-cut cream postcard (`z-index: 65`, `.sticker-ui.travel-overlay`
     specificity guard against CSS bundle order, dashed stitch border, hand-inked
     SVG vehicle badge & animated progress-fill route strip, `>= 44 px` touch
-    skip button, safe-area fit on both `1280x720` and `874x402`).
+    skip button, safe-area fit on `1280x720`, `874x402`, and notched iPhone SE
+    `667x375`).
   - `createAreaLoader` preloads the travel WebP on `syncTransition("out", false)`
     and runs the scenic hold in parallel with `setArea` / `warmAreaMedia` during
     live play, supporting instant tap, Confirm/Cancel key, and rising-edge

@@ -743,8 +743,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   During live fast-travel rides (Star-Line Bus between `plaza`, `bay`, and
   `pass`; Bay Rowboat between `bay` and `island`; and Alpine Ski Lift between
   `pass` and `summit`), presentation-only **Illustrated Storybook Travel
-  Vignettes** (`src/render/travel-vignette.ts`, `vignetteEnvelope` /
-  `travelFadeAlpha` in `src/render/fade.ts`, `src/ui/travel-overlay.ts` /
+  Vignettes** (`src/render/travel-vignette.ts`, `vignetteEnvelope` in
+  `src/render/fade.ts`, `src/ui/travel-overlay.ts` /
   `src/ui/travel-overlay.css`, and `src/shell/area-loader.ts`, Milestone 176 /
   Track E14, Art Wave C2) present one of 5 compact `800x450` hand-painted
   watercolor WebP diorama cards (`public/assets/travel/{bus-hills,bus-coast,

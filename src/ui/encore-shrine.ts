@@ -158,6 +158,8 @@ export function createEncoreShrine(parent: HTMLElement): EncoreShrineOverlay {
 
   const launchBox = element("div", "encore-launch-box", detailPane);
   const rewardPreview = element("div", "encore-reward-preview", launchBox);
+  rewardPreview.setAttribute("aria-live", "polite");
+  rewardPreview.setAttribute("aria-atomic", "true");
   const rewardCoins = element("span", "encore-reward-coins", rewardPreview);
   const rewardStars = element("span", "encore-reward-stars", rewardPreview);
   const launchBtn = element("button", "encore-launch", launchBox);

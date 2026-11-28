@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 224)
+Last updated: 2026-11-28 (Milestone 225)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -883,10 +883,12 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Procedural watercolor VFX kit (`src/render/vfx-textures.ts` composing the eight
   comic-bubble emote builders from `src/render/emote-textures.ts` and re-exporting
   `EMOTE_TEXTURE_KEYS` / `EmoteTextureKey` in Milestone 220 / Track E19L, plus the thirteen
-  keepsake builders from `src/render/keepsake-textures.ts` and
+  keepsake builders from `src/render/keepsake-textures.ts`,
+  `src/render/keepsake-textures-valley.ts` (extracted in Milestone 225 / Track E19O so every
+  `.ts` file across `src/render/` and `src/ui/` stays cleanly under `700` lines), and
   `src/render/keepsake-textures-expansion.ts` and re-exporting
   `KeepsakeTextureKey`, Milestones 72–73,
-  84, 88, 93, 95–96, 98, 114, 164, 219): thirty-four small cached offscreen-canvas Pixi
+  84, 88, 93, 95–96, 98, 114, 164, 219, 224): thirty-four small cached offscreen-canvas Pixi
   textures (`contactShadow`, `softGlow`, `sparkle`, `starGemCharm`, `petal`,
   `waterGlint`, `mistWisp`, `sunbeam`, `sunburst`, `paperGrain`, `puff`, `heart`,
   `energyRing`, eight hand-inked 48x48 comic emote bubbles `emoteQuestion`,
@@ -4211,6 +4213,9 @@ trunks keep its two exits.
     with live adaptive `.encore-foot-hint` copy (`encoreFooterHint` in
     `src/ui/encore-shrine.ts`, Milestone 202 / Track E19C: touch tap copy,
     gamepad `D-Pad`/`L/R`/`A`/`B` copy, and keyboard `Arrows/WASD` copy),
+    `aria-live="polite"` / `aria-atomic="true"` on `.encore-reward-preview`
+    (Milestone 225 / Track E19O) so toggling Star Challenges announces updated
+    coin and star payouts live to screen readers,
     on-demand boss atlas loading (`GameView.ensureCritterAtlas`), and a floating
     `.encore-battle-banner` during active Encore rematches.
   - **Journal Dream Encore Trophy Case (Milestone 211):** Pure
@@ -5346,6 +5351,16 @@ trunks keep its two exits.
   `aim` / `waiting` cancel exit), while paid arcade machines (`claw`, `skee`,
   `mole`, `comet`) never exit on `ready` so players cannot accidentally forfeit
   spent coins.
+- **Universal 7-of-7 Minigame WCAG 4.1.3 & iOS VoiceOver Accessibility Parity
+  (`src/ui/{claw,skee,mole,comet,cook,fish,taco}.ts`, Milestone 225 / Track
+  E19O):** Every minigame overlay (`claw`, `skee`, `mole`, `comet`, `cook`,
+  `fish`, `taco`) declares `role="dialog"` and `aria-modal="true"` alongside
+  its descriptive `aria-label`, and marks its live phase/hint caption node
+  (`.arcade-plate`, `.skee-plate`, `.mole-plate`, `.comet-marquee`,
+  `.cook-front-text`, `.fish-front-text`, `.taco-front-text`) with
+  `aria-live="polite"` and `aria-atomic="true"` so phase transitions, fishing
+  bites, taco orders, and microwave cues announce cleanly to desktop screen
+  readers and iOS VoiceOver with zero CSS or layout changes.
 
 ## 9. Journal and stickers
 - Experience is saved as XP for Fae and each party member. A member's level is

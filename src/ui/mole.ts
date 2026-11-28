@@ -59,6 +59,8 @@ export function createMole(
   info: () => MoleInfo | null;
 } {
   const overlay = element("section", "mole-overlay", root);
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
   overlay.setAttribute("aria-label", "Boop-a-Mole");
   overlay.hidden = true;
   const popups = createArcadePopupLayer(overlay);
@@ -66,6 +68,8 @@ export function createMole(
   const paint = element("div", "mole-paint", machine);
   paint.style.backgroundImage = `url("${image}")`;
   const plate = element("div", "mole-plate", machine);
+  plate.setAttribute("aria-live", "polite");
+  plate.setAttribute("aria-atomic", "true");
   const plateText = element("span", "mole-plate-text", plate);
   const hud = element("div", "mole-hud", machine);
   const bestBadge = element("div", "arcade-best-badge is-left-anchored", machine);

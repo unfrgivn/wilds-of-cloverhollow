@@ -60,6 +60,8 @@ export function createComet(
   info: () => CometInfo | null;
 } {
   const overlay = element("section", "comet-overlay", root);
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
   overlay.setAttribute("aria-label", "Comet Cruise");
   overlay.hidden = true;
   const popups = createArcadePopupLayer(overlay);
@@ -67,6 +69,8 @@ export function createComet(
   const paint = element("div", "comet-paint", machine);
   paint.style.backgroundImage = `url("${image}")`;
   const marquee = element("div", "comet-marquee", machine);
+  marquee.setAttribute("aria-live", "polite");
+  marquee.setAttribute("aria-atomic", "true");
   const marqueeText = element("span", "comet-marquee-text", marquee);
   const hud = element("div", "comet-hud", machine);
   const bestBadge = element("div", "arcade-best-badge is-left-anchored", machine);

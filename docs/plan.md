@@ -9585,6 +9585,40 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   scripts, 23 QA packs, purity, lint), `just build` (`index` `391.98 kB < 500 kB`),
   18/18 `qa.spec`, 22/22 minigame/gamepad e2e, and 99/99 Chromium `ui-gallery`
   tests.
+
+## Milestone 225: Universal 7-of-7 Minigame WCAG 4.1.3 / VoiceOver Live-Region & Dialog Parity + Complete `< 700`-Line Render/UI Modularization (Elevation Track E19O) **Status:** ✅ Completed (2026-11-28)
+- Universal 7-of-7 Minigame WCAG 4.1.3 & iOS VoiceOver Accessibility Parity
+  (`src/ui/{claw,skee,mole,comet,cook,fish,taco}.ts`, `src/ui/encore-shrine.ts`):
+  - Adds `role="dialog"` and `aria-modal="true"` alongside `aria-label` on all
+    7 minigame overlays (`claw`, `skee`, `mole`, `comet`, `cook`, `fish`, `taco`).
+  - Adds `aria-live="polite"` and `aria-atomic="true"` to all 7 live minigame
+    phase/hint caption nodes (`.arcade-plate`, `.skee-plate`, `.mole-plate`,
+    `.comet-marquee`, `.cook-front-text`, `.fish-front-text`, `.taco-front-text`)
+    and to the Dream Memory Shrine's `.encore-reward-preview` node
+    (`src/ui/encore-shrine.ts`), with zero CSS/layout changes and zero `src/core`
+    changes.
+- Complete `< 700`-Line Render & UI Modularization
+  (`src/render/keepsake-textures.ts` `752 -> 370` lines,
+  `src/render/keepsake-textures-valley.ts` `397` lines,
+  `src/render/keepsake-textures-expansion.ts` `358` lines):
+  - Extracts the 4 Valley expedition keepsake canvas builders
+    (`buildKeepsakeWreath`, `buildKeepsakeCompass`, `buildKeepsakeClover`,
+    `buildKeepsakeWhistle` via `createValleyKeepsakeTextures`) into
+    `src/render/keepsake-textures-valley.ts`, composed alongside
+    `createExpansionKeepsakeTextures` inside `createKeepsakeTextures()` while
+    keeping `KEEPSAKE_TEXTURE_KEYS`, `KeepsakeTextureKey`, and all 13 keepsakes
+    100% identical.
+  - Every `.ts` file across all of `src/render/` and `src/ui/` is now strictly
+    `< 700` lines (largest remaining: `src/render/puzzles-render.ts` at 688 lines,
+    `src/ui/battle.ts` at 687 lines).
+- Evidence: `tests/unit/milestone-225.test.ts` and `tests/e2e/milestone-225.spec.ts`
+  (`@smoke`, Chromium & WebKit).
+- Gates: `just check` (293 unit files / 2,107 tests, all 77 recorded + 7
+  headless sims with zero hash shifts, 23 QA packs, purity, lint), `just build`
+  (largest non-vendor chunk `< 400 kB`, hook leak + runtime story + harness
+  checks green), Chromium & WebKit (`milestone-225`, `milestone-224`,
+  `milestone-164`), `encore-shrine`, 66/66 `shows exactly its parts`, and 99/99
+  Chromium `ui-gallery` (`0` visual diffs).
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

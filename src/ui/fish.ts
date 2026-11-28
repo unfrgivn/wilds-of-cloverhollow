@@ -61,6 +61,8 @@ export function createFish(
   info: () => FishInfo | null;
 } {
   const overlay = element("section", "fish-overlay", root);
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
   overlay.setAttribute("aria-label", "Bubblegum Bay fishing dock");
   overlay.hidden = true;
   const pointerHold = bindPointerHold(
@@ -255,6 +257,8 @@ export function createFish(
   const front = element("div", "fish-front", stage);
   const frontPill = element("div", "fish-front-pill", front);
   const frontText = element("span", "fish-front-text", frontPill);
+  frontText.setAttribute("aria-live", "polite");
+  frontText.setAttribute("aria-atomic", "true");
 
   let lastKey = "";
   let lastFrontKey = "";

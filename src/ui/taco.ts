@@ -59,6 +59,8 @@ export function createTaco(
   info: () => TacoInfo | null;
 } {
   const overlay = element("section", "taco-overlay", root);
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
   overlay.setAttribute("aria-label", "Chef Mateo's Taco Truck Kitchen");
   overlay.hidden = true;
   const popups = createArcadePopupLayer(overlay);
@@ -159,6 +161,8 @@ export function createTaco(
   const front = element("div", "taco-front", stage);
   const frontPill = element("div", "taco-front-pill", front);
   const frontText = element("span", "taco-front-text", frontPill);
+  frontText.setAttribute("aria-live", "polite");
+  frontText.setAttribute("aria-atomic", "true");
 
   const frames = new Map<string, AtlasImage | null>();
   const frameArt = (name: string): AtlasImage | null => {

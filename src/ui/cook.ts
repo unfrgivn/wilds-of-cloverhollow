@@ -50,6 +50,8 @@ export function createCook(
   info: () => CookInfo | null;
 } {
   const overlay = element("section", "cook-overlay", root);
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
   overlay.setAttribute("aria-label", "The clubhouse microwave");
   overlay.hidden = true;
   const pointerHold = bindPointerHold(
@@ -72,6 +74,8 @@ export function createCook(
   bestBadge.hidden = true;
   const front = element("div", "cook-front", machine);
   const frontText = element("span", "cook-front-text", front);
+  frontText.setAttribute("aria-live", "polite");
+  frontText.setAttribute("aria-atomic", "true");
   let lastKey = "";
   let lastFrontKey = "";
   let lastView: CookView | null = null;

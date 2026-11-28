@@ -87,6 +87,8 @@ export function createClaw(
   info: () => ClawInfo | null;
 } {
   const overlay = element("section", "arcade-overlay", root);
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
   overlay.setAttribute("aria-label", "Claw machine");
   overlay.hidden = true;
   const pointerHold = bindPointerHold(
@@ -126,6 +128,8 @@ export function createClaw(
   const glass = element("div", "arcade-glass", machine);
   const chute = element("div", "arcade-chute", machine);
   const plate = element("div", "arcade-plate", machine);
+  plate.setAttribute("aria-live", "polite");
+  plate.setAttribute("aria-atomic", "true");
   const plateText = element("span", "arcade-plate-text", plate);
   const plushes = new Map<string, HTMLDivElement>();
   let lastKey = "";

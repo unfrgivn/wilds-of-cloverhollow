@@ -58,6 +58,8 @@ export function createSkee(
   info: () => SkeeInfo | null;
 } {
   const overlay = element("section", "skee-overlay", root);
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
   overlay.setAttribute("aria-label", "Skee-ball");
   overlay.hidden = true;
   const pointerHold = bindPointerHold(
@@ -75,6 +77,8 @@ export function createSkee(
   target.setAttribute("aria-hidden", "true");
   const board = element("div", "skee-board", machine);
   const plate = element("div", "skee-plate", machine);
+  plate.setAttribute("aria-live", "polite");
+  plate.setAttribute("aria-atomic", "true");
   const plateText = element("span", "skee-plate-text", plate);
   const hud = element("div", "skee-hud", machine);
   const bestBadge = element("div", "arcade-best-badge", machine);

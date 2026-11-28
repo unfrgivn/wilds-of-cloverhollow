@@ -67,8 +67,8 @@ describe("flute friends replay", () => {
     expect(areas.slice(0, 6)).toEqual(["field", "gym", "east-hall", "school", "plaza", "park"]);
     expect(areas.at(-1)).toBe("park");
     expect(knots).toEqual(["pup_calm", "pup_calm", "flute", "pond", "flute"]);
-    expect(parties).toEqual(["maddie,sue,jordan", "maddie,sue,jordan,pond-pup",
-      "maddie,sue,jordan"]);
+    expect(parties).toEqual(["sue,jordan,maddie", "sue,jordan,maddie,pond-pup",
+      "sue,jordan,maddie"]);
     // The calm pup Fae befriended is the one who came: he stepped out of the park.
     expect(calmPups).toEqual({ before: 1, after: 0 });
     // The park's pup first; then a battle he came along to, and sat out.

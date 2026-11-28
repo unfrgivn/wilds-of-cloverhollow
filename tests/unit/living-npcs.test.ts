@@ -200,7 +200,7 @@ describe("Living NPC Ink externals, knots, and spoiler safety", () => {
     expect(bossesCalmedCount(world, base)).toBe(0);
     expect(bossesCalmedCount(world, state)).toBe(3);
     const facts = inkFacts(world, state);
-    expect(facts.party).toEqual(["maddie", "sue"]);
+    expect(facts.party).toEqual(["sue", "maddie"]);
     expect(facts.lantern).toBe(true);
     expect(facts.areaCalm).toBe(false);
     expect(facts.level).toBeGreaterThan(1);

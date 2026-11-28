@@ -202,8 +202,8 @@ describe("joining", () => {
     state = walkUntilTarget(npcWorld, state, "npc:sue");
     state = talk(npcWorld, state);
 
-    expect(state.party.map((member) => member.id)).toEqual(["maddie", "sue"]);
-    const joined = state.party[1];
+    expect(state.party.map((member) => member.id)).toEqual(["sue", "maddie"]);
+    const joined = state.party[0];
     if (joined === undefined) throw new Error("Sue missing");
     expect({ x: joined.x, y: joined.y }).toEqual(sueNpc.point);
     expect(npcVisible(npcWorld, state, sueNpc), "a party member isn't also a person").toBe(false);
@@ -216,27 +216,27 @@ describe("joining", () => {
     const start = { x: joined.x, y: joined.y };
     for (let tick = 0; tick < 330; tick += 1) {
       state = step(npcWorld, state, press({ move: { x: tick < 240 ? 1 : 0, y: 0 } })).state;
-      expect(state.party.map((member) => member.id)).toEqual(["maddie", "sue"]);
+      expect(state.party.map((member) => member.id)).toEqual(["sue", "maddie"]);
       for (const member of state.party)
         expect(validFollowerPoint(npcWorld, state, member), `${member.id} at ${state.tick}`)
           .toBe(true);
     }
-    const [maddie, sue] = state.party;
-    if (maddie === undefined || sue === undefined) throw new Error("party short");
+    const [sue, maddie] = state.party;
+    if (sue === undefined || maddie === undefined) throw new Error("party short");
     expect(distance(sue, start)).toBeGreaterThan(500);
-    expect(distance(sue, maddie)).toBeLessThanOrEqual(tune.distance * 1.5);
+    expect(distance(maddie, sue)).toBeLessThanOrEqual(tune.distance * 1.5);
 
     const template = createState(npcWorld, fixtureFor("harness"));
     expect(parseSave(serializeSave(state), template)).toEqual(state);
   });
 
-  it("brings Sue in at a slot behind the last member when she has no spot here", () => {
+  it("brings Sue in ahead of Maddie when she has no spot here", () => {
     let state = createState(bellWorld, fixtureFor("harness"));
     state = walkUntilTarget(bellWorld, state, "bell");
     state = talk(bellWorld, state);
-    expect(state.party.map((member) => member.id)).toEqual(["maddie", "sue"]);
-    const [maddie, sue] = state.party;
-    if (maddie === undefined || sue === undefined) throw new Error("party short");
+    expect(state.party.map((member) => member.id)).toEqual(["sue", "maddie"]);
+    const [sue, maddie] = state.party;
+    if (sue === undefined || maddie === undefined) throw new Error("party short");
     expect(validFollowerPoint(bellWorld, state, sue)).toBe(true);
     expect(distance(sue, maddie)).toBeLessThanOrEqual(tune.heel + 10);
     expect(distance(sue, maddie)).toBeGreaterThanOrEqual(tune.radius * 2);

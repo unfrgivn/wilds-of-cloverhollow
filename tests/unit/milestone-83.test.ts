@@ -36,10 +36,11 @@ function baseBattleView(battle: Battle, overrides: Partial<BattleView> = {}): Ba
   return {
     critterId: battle.critterId,
     critterName: "Chaos Frog",
-    battleHeight: 190,
+    battleHeight: 145,
     auraCentre: { x: 256, y: 256 },
     bodyCentre: { x: 256, y: 256 },
     phase: battle.phase,
+    activeActor: { id: "fae", name: "Fae" },
     message: battle.message,
     revealed: battle.revealed,
     commands: [

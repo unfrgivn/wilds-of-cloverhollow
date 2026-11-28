@@ -35,6 +35,12 @@ play.navigate({ x: 465, y: 600 });
 play.leave({ x: 0, y: 1 }, "woods");
 play.meet("owl");
 play.battle([]);
+for (let i = 0; i < 4; i += 1) {
+  const inWay = play.state().wild.find((c) => c.mood === "chaos" && c.cooldownTicks === 0);
+  if (inWay === undefined) break;
+  play.meet(inWay.kind);
+  play.battle(["run"]);
+}
 play.approach("clubhouse");
 play.talk("clubhouse");
 const end = play.state();

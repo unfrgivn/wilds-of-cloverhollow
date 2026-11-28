@@ -262,6 +262,30 @@ export function createQaError(root: HTMLElement, message: string): void {
   card.append(heading, detail); menu.append(card); root.append(menu);
 }
 
+export type QaSettingToggleId =
+  | "gentleTiming"
+  | "keyHints"
+  | "reducedMotion"
+  | "muted"
+  | "photoMode"
+  | "navOverlay";
+
+export const QA_SETTING_TOGGLES: readonly { id: QaSettingToggleId; label: string }[] = [
+  { id: "gentleTiming", label: "Gentle Timing" },
+  { id: "keyHints", label: "Key Hints" },
+  { id: "reducedMotion", label: "Reduced Motion" },
+  { id: "muted", label: "Mute Audio" },
+  { id: "photoMode", label: "Photo Mode" },
+  { id: "navOverlay", label: "Nav Heatmap" },
+];
+
+export function qaSettingPressed(
+  settings: QaSettingsSnapshot,
+  id: QaSettingToggleId,
+): "true" | "false" {
+  return settings[id] === true ? "true" : "false";
+}
+
 export type QaSettingsSnapshot = {
   gentleTiming: boolean;
   keyHints: boolean;
@@ -270,6 +294,7 @@ export type QaSettingsSnapshot = {
   textSpeed: TextSpeed;
   photoMode: boolean;
   canPhotoMode: boolean;
+  navOverlay?: boolean;
 };
 
 export type QaConsoleSnapshot = {
@@ -300,6 +325,7 @@ export type QaConsoleHandlers = {
   toggleMute: () => void;
   setTextSpeed: (speed: TextSpeed) => void;
   togglePhotoMode: () => void;
+  toggleNavOverlay?: () => void;
 };
 
 type QaTabId = "cheats" | "saves" | "settings";
@@ -685,32 +711,28 @@ export function createQaConsole(root: HTMLElement, handlers: QaConsoleHandlers):
     tabPanels.set("settings", settingsPanel);
 
     const togglesGrid = el("div", "qa-chip-grid");
-    const makeSettingToggle = (
-      id: string,
-      label: string,
-      onClick: () => void,
-    ): HTMLButtonElement => {
+    const settingActions: Record<QaSettingToggleId, () => void> = {
+      gentleTiming: handlers.toggleGentleTiming,
+      keyHints: handlers.toggleKeyHints,
+      reducedMotion: handlers.toggleReducedMotion,
+      muted: handlers.toggleMute,
+      photoMode: handlers.togglePhotoMode,
+      navOverlay: () => { handlers.toggleNavOverlay?.(); },
+    };
+    const settingButtons = new Map<QaSettingToggleId, HTMLButtonElement>();
+    for (const spec of QA_SETTING_TOGGLES) {
       const button = el("button", "qa-toggle");
       button.type = "button";
-      button.dataset.qaSetting = id;
+      button.dataset.qaSetting = spec.id;
       button.setAttribute("aria-pressed", "false");
-      button.textContent = label;
+      button.textContent = spec.label;
       button.addEventListener("click", () => {
-        onClick();
+        settingActions[spec.id]();
         syncView(handlers.getSnapshot());
       });
+      settingButtons.set(spec.id, button);
       togglesGrid.append(button);
-      return button;
-    };
-    const gentleToggle = makeSettingToggle(
-      "gentleTiming", "Gentle Timing", handlers.toggleGentleTiming,
-    );
-    const keyHintsToggle = makeSettingToggle("keyHints", "Key Hints", handlers.toggleKeyHints);
-    const reducedMotionToggle = makeSettingToggle(
-      "reducedMotion", "Reduced Motion", handlers.toggleReducedMotion,
-    );
-    const muteToggle = makeSettingToggle("muted", "Mute Audio", handlers.toggleMute);
-    const photoToggle = makeSettingToggle("photoMode", "Photo Mode", handlers.togglePhotoMode);
+    }
 
     const speedRow = el("div", "qa-speed-row");
     const speedLabel = el("span", "qa-section-title");
@@ -813,12 +835,15 @@ export function createQaConsole(root: HTMLElement, handlers: QaConsoleHandlers):
       }
 
       // Sync Settings tab.
-      gentleToggle.setAttribute("aria-pressed", String(snapshot.settings.gentleTiming));
-      keyHintsToggle.setAttribute("aria-pressed", String(snapshot.settings.keyHints));
-      reducedMotionToggle.setAttribute("aria-pressed", String(snapshot.settings.reducedMotion));
-      muteToggle.setAttribute("aria-pressed", String(snapshot.settings.muted));
-      photoToggle.setAttribute("aria-pressed", String(snapshot.settings.photoMode));
-      photoToggle.disabled = !snapshot.settings.photoMode && !snapshot.settings.canPhotoMode;
+      for (const spec of QA_SETTING_TOGGLES) {
+        settingButtons
+          .get(spec.id)
+          ?.setAttribute("aria-pressed", qaSettingPressed(snapshot.settings, spec.id));
+      }
+      const photoToggle = settingButtons.get("photoMode");
+      if (photoToggle !== undefined) {
+        photoToggle.disabled = !snapshot.settings.photoMode && !snapshot.settings.canPhotoMode;
+      }
       for (const spec of TEXT_SPEED_OPTIONS) {
         speedButtons
           .get(spec.id)

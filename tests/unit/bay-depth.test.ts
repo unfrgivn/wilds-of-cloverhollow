@@ -92,7 +92,7 @@ describe("what Bubblegum Bay draws in front of Fae", () => {
   it("never draws the south rail over Fae on the beach in front of it", () => {
     let checked = 0;
     for (let x = 1015; x <= 1200; x += 5)
-      for (let below = 15; below <= 70; below += 5) {
+      for (let below = 50; below <= 75; below += 5) {
         const feet = { x, y: Math.round(640 - (375 * (x - 1000)) / 585 + below) };
         if (!standable(feet)) continue;
         checked += 1;

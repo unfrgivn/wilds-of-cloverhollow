@@ -13,6 +13,7 @@ export * from "./sound";
 export * from "./checks";
 export * from "./feelings";
 export * from "./geometry";
+export * from "./nav";
 export * from "./party";
 export * from "./roam";
 export * from "./arcade";

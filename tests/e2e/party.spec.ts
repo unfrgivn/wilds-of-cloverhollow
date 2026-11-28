@@ -56,18 +56,33 @@ test("real keys: Maddie walks the plaza as the party, and brings Play to the fro
     await press(page);
   }
   expect((await readBattle(page))?.phase).toBe("command");
+  await expect(page.locator(".battle-turn-header")).toHaveText("FAE'S TURN");
   await expect(page.locator(".battle-command-label")).toHaveText([
-    "Soothe", "Play", "Snack", "Run",
+    "Soothe", "Recover", "Snack", "Run",
   ]);
   const layout = (await renderInfo(page)).battle.layout;
   expect(layout?.party).toHaveLength(1);
   expect(layout?.party[0]?.y).toBe(layout?.fae.baseline);
+  expect(layout?.party[0]?.x).toBeLessThan(layout?.fae.x ?? 0);
   await expect(page).toHaveScreenshot("battle-party-commands.png");
 
-  // Down once selects Play; confirm starts its check with Play's rest set.
+  // Down once selects Recover; confirm recovers and passes through burst to Maddie's turn.
   await hold(page, "ArrowDown", 1);
   await step(page, 1);
   expect((await readBattle(page))?.selected).toBe(1);
+  await press(page);
+  expect((await readBattle(page))?.command).toBe("recover");
+  for (let steps = 0; steps < 80; steps += 1) {
+    const battle = await readBattle(page);
+    if (battle?.phase === "command" && battle.actorIndex === 1 &&
+        battle.revealed >= battle.message.length) break;
+    if (battle?.phase === "check") await step(page, 10);
+    else await press(page);
+  }
+  await expect(page.locator(".battle-turn-header")).toHaveText("MADDIE'S TURN");
+  await expect(page.locator(".battle-command-label")).toHaveText([
+    "Play", "Recover", "Snack", "Run",
+  ]);
   await press(page);
   const aiming = await readBattle(page);
   expect(aiming?.phase).toBe("check");

@@ -207,7 +207,7 @@ describe("Milestone 90: evaluateBattlePortraits", () => {
       "jordan:cozy:false",
     ]);
 
-    const play = makeBattle({ selected: 1 });
+    const play = makeBattle({ actorIndex: 1, selected: 0 });
     const playItems = evaluateBattlePortraits({
       battle: play,
       view: viewFor(play),
@@ -223,7 +223,7 @@ describe("Milestone 90: evaluateBattlePortraits", () => {
       "jordan:cozy",
     ]);
 
-    const cast = makeBattle({ selected: 2 });
+    const cast = makeBattle({ actorIndex: 2, selected: 0 });
     const castItems = evaluateBattlePortraits({
       battle: cast,
       view: viewFor(cast),
@@ -239,7 +239,7 @@ describe("Milestone 90: evaluateBattlePortraits", () => {
       "jordan:cozy",
     ]);
 
-    const juggle = makeBattle({ selected: 3 });
+    const juggle = makeBattle({ actorIndex: 3, selected: 0 });
     const juggleItems = evaluateBattlePortraits({
       battle: juggle,
       view: viewFor(juggle),

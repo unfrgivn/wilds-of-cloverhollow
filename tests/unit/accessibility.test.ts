@@ -229,25 +229,25 @@ describe("world map land progress and bus routes", () => {
     const initial = landStickerProgress(world, emptyState);
 
     expect(Object.keys(initial)).toEqual(world.lands.map((land) => land.id));
-    expect(initial.cloverhollow).toEqual({ owned: 0, total: 9 });
+    expect(initial.cloverhollow).toEqual({ owned: 0, total: 10 });
     expect(initial.bay).toEqual({ owned: 0, total: 4 });
     expect(initial.pass).toEqual({ owned: 0, total: 5 });
-    expect(initial.trail).toEqual({ owned: 0, total: 3 });
+    expect(initial.trail).toEqual({ owned: 0, total: 5 });
     expect(initial.forest).toEqual({ owned: 0, total: 3 });
     expect(initial.enchanted).toEqual({ owned: 0, total: 1 });
-    expect(initial.hills).toEqual({ owned: 0, total: 6 });
+    expect(initial.hills).toEqual({ owned: 0, total: 7 });
 
     const withFrogAndKid = landStickerProgress(world, {
       stickers: ["fountain-frog", "hooded-kid"],
     });
-    expect(withFrogAndKid.cloverhollow).toEqual({ owned: 1, total: 9 });
+    expect(withFrogAndKid.cloverhollow).toEqual({ owned: 1, total: 10 });
     expect(withFrogAndKid.bay).toEqual({ owned: 1, total: 4 });
     expect(withFrogAndKid.enchanted).toEqual({ owned: 1, total: 1 });
   });
 
-  it("gates the three bus routes on club_open and bay-bluebird", () => {
+  it("gates the three bus routes on visited_bay/sue_joined and visited_pass/rode_bus", () => {
     const { world } = loadContent();
-    const none = mapBusRoutes(world.lands, () => false, () => false);
+    const none = mapBusRoutes(world.lands, () => false);
     expect(none).toEqual([
       { from: "cloverhollow", to: "bay", open: false },
       { from: "cloverhollow", to: "pass", open: false },
@@ -256,8 +256,7 @@ describe("world map land progress and bus routes", () => {
 
     const bayOnly = mapBusRoutes(
       world.lands,
-      (name) => name === "club_open",
-      () => false,
+      (name) => name === "visited_bay",
     );
     expect(bayOnly).toEqual([
       { from: "cloverhollow", to: "bay", open: true },
@@ -267,8 +266,7 @@ describe("world map land progress and bus routes", () => {
 
     const passOnly = mapBusRoutes(
       world.lands,
-      () => false,
-      (id) => id === "bay-bluebird",
+      (name) => name === "visited_pass",
     );
     expect(passOnly).toEqual([
       { from: "cloverhollow", to: "bay", open: false },
@@ -278,8 +276,7 @@ describe("world map land progress and bus routes", () => {
 
     const allOpen = mapBusRoutes(
       world.lands,
-      (name) => name === "club_open",
-      (id) => id === "bay-bluebird",
+      (name) => name === "sue_joined" || name === "rode_bus",
     );
     expect(allOpen).toEqual([
       { from: "cloverhollow", to: "bay", open: true },

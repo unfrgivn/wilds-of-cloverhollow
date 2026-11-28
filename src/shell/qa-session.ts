@@ -23,6 +23,7 @@ import {
   type PackState,
   type QaConsoleSnapshot,
   type QaPack,
+  type QaSettingsSnapshot,
 } from "../dev/qa";
 import type { ShortcutQaControl } from "./input-shortcuts";
 import { qaFlow } from "./qa-flow";
@@ -49,6 +50,8 @@ export type QaSessionSettingsDeps = {
   photoMode: () => boolean;
   canPhotoMode: () => boolean;
   setPhotoMode: (on: boolean) => void;
+  navOverlay?: () => boolean;
+  toggleNavOverlay?: () => void;
 };
 
 export type QaSessionDeps = {
@@ -84,6 +87,20 @@ export type QaSession = {
   stepQaMenu: (frame: ActionFrame, previousFrame: ActionFrame) => boolean;
   reset: () => void;
 };
+
+/** Reads the live Settings tab snapshot for the QA console. */
+export function readQaSettingsSnapshot(settings: QaSessionSettingsDeps): QaSettingsSnapshot {
+  return {
+    gentleTiming: settings.gentleTiming(),
+    keyHints: settings.keyHints(),
+    reducedMotion: settings.reducedMotion(),
+    muted: settings.muted(),
+    textSpeed: settings.textSpeed(),
+    photoMode: settings.photoMode(),
+    canPhotoMode: settings.canPhotoMode(),
+    navOverlay: settings.navOverlay?.() ?? false,
+  };
+}
 
 /** Loads QA save packs, console slots, and any `?qa=<id>` boot target. */
 export async function loadQaBoot(search: string): Promise<QaBoot> {
@@ -140,15 +157,7 @@ export function createQaSession(boot: QaBoot, deps: QaSessionDeps): QaSession {
     state: deps.getState(),
     context: consoleContext,
     partyNames,
-    settings: {
-      gentleTiming: deps.settings.gentleTiming(),
-      keyHints: deps.settings.keyHints(),
-      reducedMotion: deps.settings.reducedMotion(),
-      muted: deps.settings.muted(),
-      textSpeed: deps.settings.textSpeed(),
-      photoMode: deps.settings.photoMode(),
-      canPhotoMode: deps.settings.canPhotoMode(),
-    },
+    settings: readQaSettingsSnapshot(deps.settings),
   });
 
   const pickQa = (item: PackState): void => {
@@ -236,6 +245,10 @@ export function createQaSession(boot: QaBoot, deps: QaSessionDeps): QaSession {
         consoleOpen = false;
         deps.settings.setPhotoMode(true);
       }
+      deps.invalidate();
+    },
+    toggleNavOverlay: () => {
+      deps.settings.toggleNavOverlay?.();
       deps.invalidate();
     },
   });

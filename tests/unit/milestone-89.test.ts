@@ -237,7 +237,7 @@ describe("Milestone 89: Companion petting & cozy resting", () => {
 
   it("yields to real interactables and active overlays", () => {
     const base = stateIn("clubhouse");
-    const maddie = base.party[0];
+    const maddie = base.party.find((member) => member.id === "maddie");
     if (maddie === undefined) throw new Error("Missing maddie");
 
     // Facing club-fridge (585, 390) from (585, 425): targetInteractable wins!

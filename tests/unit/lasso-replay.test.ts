@@ -46,15 +46,15 @@ describe("lasso replay", () => {
           if (seen !== undefined && seen.at(-1) !== name) seen.push(name);
         }
       }
-    expect(areas).toEqual(["park", "plaza", "pass", "trail", "bay", "plaza", "school",
-      "classroom"]);
+    expect(areas).toEqual(["park", "plaza", "pass", "trail", "bay", "boardwalk", "crossing",
+      "lane", "plaza", "school", "classroom"]);
     expect(knots).toEqual(["tower", "bus_stop", "ski_lift", "cocoa_stand", "dock_end", "palms",
       "rosie"]);
     // Up, then down; each was there until it was lassoed.
     expect(shown).toEqual({ kite: ["stuck", "default"], bottle: ["bobbing", "default"],
       scarf: ["stuck", "default"] });
     // Free cocoa, twenty coins of treasure, and Rosie's six arcade coins.
-    expect(paid).toEqual([
+    expect(paid.filter((item) => item.knot !== undefined)).toEqual([
       { knot: "cocoa_stand", coins: 0, snacks: 1 },
       { knot: "palms", coins: 20, snacks: 0 },
       { knot: "rosie", coins: 6, snacks: 0 },

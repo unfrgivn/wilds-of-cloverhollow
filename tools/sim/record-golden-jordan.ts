@@ -20,15 +20,13 @@ const play = createRecorder(world, createState(world, fixture));
 const path = "tests/sim/scripts/new-game/golden-bay.json";
 for (const segment of parseScript(JSON.parse(readFileSync(path, "utf8")), path))
   for (let count = 0; count < segment.ticks; count += 1) play.tick(segment.frame);
-// Back along the bay road into town.
-play.navigate({ x: 85, y: 545 });
-play.leave({ x: -1, y: 0 }, "plaza");
-// The plaza rolled its critters fresh on arrival; calm them before the stop.
-play.clear();
-play.approach("npc:bus-stop");
-play.talk("npc:bus-stop", [0]);
-play.idle(60);
-if (play.state().area !== "pass") throw new Error("the bus didn't go up");
+// Up Cliffside Trail from Bubblegum Bay into Pinecone Pass (bluebird_calmed
+// opens the cliff path and arriving at the pass unlocks the Star Bus).
+play.navigate({ x: 850, y: 1000 });
+play.leave({ x: 0, y: 1 }, "trail");
+play.navigate({ x: 150, y: 200 });
+play.leave({ x: -1, y: 0 }, "pass");
+if (play.state().area !== "pass") throw new Error("didn't reach the pass");
 play.approach("npc:jordan");
 play.talk("npc:jordan", [0]);
 play.meet("hamster");
@@ -37,7 +35,7 @@ play.battle(["juggle"]);
 play.approach(`critter:wild:${den ?? -1}`);
 play.talk(`critter:wild:${den ?? -1}`);
 const end = play.state();
-if (end.party.map((member) => member.id).join(",") !== "maddie,sue,jordan" ||
+if (end.party.map((member) => member.id).join(",") !== "sue,jordan,maddie" ||
   !end.stickers.includes("hiker-hamster") ||
   world.storyVariable(end.ink, "has_lantern") !== true)
   throw new Error("the golden Jordan run didn't end with Jordan, a calm hamster, and the lantern");

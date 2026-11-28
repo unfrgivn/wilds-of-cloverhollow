@@ -29,7 +29,7 @@ if (play.state().wild.some((c) => c.kind === "frog" && c.mood === "chaos" && c.x
 play.meet("bluebird");
 play.battle(["cast"]);
 const end = play.state();
-if (end.party.map((member) => member.id).join(",") !== "maddie,sue" ||
+if (end.party.map((member) => member.id).join(",") !== "sue,maddie" ||
   world.storyVariable(end.ink, "sue_joined") !== true ||
   !end.stickers.includes("bay-bluebird"))
   throw new Error("the golden bay run didn't end with Sue joined and a calm bluebird");

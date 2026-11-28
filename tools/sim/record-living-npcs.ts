@@ -109,7 +109,7 @@ shooNear("pippa");
 play.approach("npc:pippa");
 play.talk("npc:pippa", [0, 0]);
 
-play.hold({ x: -1, y: -1 }, 72);
+play.navigate({ x: 750, y: 780 });
 shooNear("hazel");
 play.approach("npc:hazel");
 play.talk("npc:hazel");

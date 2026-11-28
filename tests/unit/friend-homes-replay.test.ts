@@ -29,9 +29,9 @@ function replay(path: string): State {
 describe("the Other Kids' Houses recording", () => {
   it("visits Jordan's Mountain Cabin and Sue's Beach Cottage with blacklight secrets", () => {
     const state = replay("tests/sim/scripts/new-game/friend-homes.json");
-    expect(state.tick).toBe(10375);
+    expect(state.tick).toBe(12828);
     expect(state.area).toBe("bay");
-    expect(state.coins).toBe(86);
+    expect(state.coins).toBe(94);
     expect(state.snacks).toBe(5);
     expect(state.lantern).toBe(false);
     expect(world.storyVariable(state.ink, "jordan_cabin_visited")).toBe(true);

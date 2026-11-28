@@ -990,6 +990,8 @@ export type Battle = {
   // The turn, from 1 (Milestone 50); 0 while a critter that caught Fae
   // bursts first (Milestone 51).
   turn: number;
+  // Index into the battle turn roster (0 = Fae, 1..N = fighting party members).
+  actorIndex?: number;
   // A mini-boss puffed up (Milestone 50): the feelings it shows at once,
   // which are popped, and the turns left before it lets go (this one too).
   // `feelings` wait meanwhile.
@@ -1092,6 +1094,7 @@ export type BattleView = {
   auraCentre: Point;
   bodyCentre: Point;
   phase: BattlePhase;
+  activeActor: { id: string; name: string };
   message: string;
   revealed: number;
   commands: {

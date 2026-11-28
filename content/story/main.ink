@@ -6,6 +6,9 @@ VAR raccoon_waiting = false
 VAR knows_password = false
 VAR club_open = false
 VAR sue_joined = false
+VAR visited_bay = false
+VAR visited_pass = false
+VAR bluebird_calmed = false
 VAR rode_bus = false
 VAR jordan_joined = false
 VAR has_lantern = false
@@ -199,12 +202,12 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 {has_lantern: Jordan gave me his blacklight lantern. The kid in the purple hood took a secret trail you can only see in its light! # speaker: Fae}
 {jordan_joined: Jordan is on my team now! He's hiked every trail on the mountain. # speaker: Fae}
 {calmed("bunny") and calmed("squirrel"): The Cliffside Trail runs between Pinecone Pass and Bubblegum Bay. I've calmed its fizzy bunnies and squirrels! # speaker: Fae}
-{rode_bus: Pinecone Pass is covered in snow, with a lodge and a cocoa stand. The kid in the purple hood must be up here somewhere. # speaker: Fae}
-{calmed("bluebird") and not rode_bus: The bus at the plaza's star sign goes up into the mountains, to Pinecone Pass! # speaker: Fae}
+{visited_pass or rode_bus: Pinecone Pass is covered in snow, with a lodge and a cocoa stand. The kid in the purple hood must be up here somewhere. # speaker: Fae}
+{calmed("bluebird") and not (visited_pass or rode_bus): The Cliffside Trail climbs south from Bubblegum Bay into the mountains toward Pinecone Pass, and Whispering Woods leads there too! # speaker: Fae}
 {calmed("bluebird"): A calm bluebird says the kid in the purple hood zipped off toward the mountains. # speaker: Fae}
 {sue_joined: Sue is on my team now! She knows every good fishing spot. # speaker: Fae}
 {club_open: The purple hood in the tree house has a Cloverhollow School name tag. Whose is it? # speaker: Fae}
-{club_open and not sue_joined: The east road leads to Bubblegum Bay. The club's fizzy purple soda smelled just like the fountain's bubblegum bubbles. # speaker: Fae}
+{club_open and not sue_joined: The east road winds through Sunberry Lane, Willowbrook Crossing, and Salt-Marsh Boardwalk all the way to Bubblegum Bay. The club's fizzy purple soda smelled just like the fountain's bubblegum bubbles. # speaker: Fae}
 {knows_password and not club_open: The hooded kid's club password is "Fizzlesticks". A club... like the tree house in the park? # speaker: Fae}
 {hall_pass: I have a hall pass! Time to follow the hooded kid's trail. # speaker: Fae}
 {calmed("pup"): A calm pup found a purple thread that leads toward the school. # speaker: Fae}
@@ -444,17 +447,17 @@ Chirp-chirp! The bay is peaceful now. # speaker: Bay Bluebird
 -> DONE
 
 === bus_stop ===
-{not calmed("bluebird") and not club_open:
-    The bus waits by the star sign, but there's no reason to leave town yet. # speaker: Fae
-    Maybe once I find a clue that leads up the mountain. # speaker: Fae
+{not (visited_bay or sue_joined) and not (visited_pass or rode_bus):
+    The Star-Line bus connects Cloverhollow to faraway towns, once I've walked the trail there and found their bus stop! # speaker: Fae
+    {club_open: Maybe I should head down the east road past the plaza to find Bubblegum Bay first. # speaker: Fae}
     -> DONE
 }
 The bus is here! Where to? # speaker: Fae
-+ {calmed("bluebird")} [Pinecone Pass!]
++ {visited_pass or rode_bus} [Pinecone Pass!]
     ~ rode_bus = true
     Up we go! # speaker: Fae # travel: pass.bus
     -> DONE
-+ {club_open} [Bubblegum Bay!]
++ {visited_bay or sue_joined} [Bubblegum Bay!]
     To the beach! # speaker: Fae # travel: bay.bus-stop
     -> DONE
 + [Not yet.]
@@ -466,7 +469,7 @@ The bus stops here on its way between the towns. Where to? # speaker: Fae
 + [Cloverhollow!]
     Home to town! # speaker: Fae # travel: plaza.bus-stop
     -> DONE
-+ {calmed("bluebird")} [Pinecone Pass!]
++ {visited_pass or rode_bus} [Pinecone Pass!]
     ~ rode_bus = true
     Up we go! # speaker: Fae # travel: pass.bus
     -> DONE
@@ -479,12 +482,40 @@ The bus is ready to roll. Where to? # speaker: Fae
 + [Cloverhollow!]
     Back to town! # speaker: Fae # travel: plaza.bus-stop
     -> DONE
-+ {club_open} [Bubblegum Bay!]
++ {visited_bay or sue_joined} [Bubblegum Bay!]
     Down to the beach! # speaker: Fae # travel: bay.bus-stop
     -> DONE
 + [Not yet.]
     Not yet. I want to look around a little more. # speaker: Fae
      -> DONE
+
+=== lane_signpost ===
+SUNBERRY LANE. West: Cloverhollow Town Square. East: Willowbrook Crossing & Bubblegum Bay. # speaker: Sign
+-> DONE
+
+=== lane_bench ===
+A sunny wooden bench right beside the clover meadow. Perfect for catching my breath and listening to the bees! # speaker: Fae
+-> DONE
+
+=== lane_berries ===
+Wild sunberries! They're warm from the afternoon sun and smell a little bit like strawberry jam. # speaker: Fae
+-> DONE
+
+=== crossing_signpost ===
+WILLOWBROOK CROSSING. West: Sunberry Lane. East: Salt-Marsh Boardwalk to Bubblegum Bay. # speaker: Sign
+-> DONE
+
+=== crossing_bench ===
+From this bench under the weeping willows, I can watch sparkles race under the wooden bridge. # speaker: Fae
+-> DONE
+
+=== boardwalk_signpost ===
+SALT-MARSH BOARDWALK. Watch your step over the tide pools, and smell the sea breeze! East: Bubblegum Bay. # speaker: Sign
+-> DONE
+
+=== boardwalk_bench ===
+Ooh, I can smell salt air and bubblegum-pink waves from here! Bubblegum Bay must be right around the bend. # speaker: Fae
+-> DONE
 
 === pass_sign ===
 PINECONE PASS. Trails, sledding, and the best cocoa in the mountains! # speaker: Sign
@@ -1586,6 +1617,14 @@ VAR visited_hills = false
 ~ visited_hills = true
 -> DONE
 
+=== arrive_bay ===
+~ visited_bay = true
+-> DONE
+
+=== arrive_pass ===
+~ visited_pass = true
+-> DONE
+
 VAR lookout_cache_found = false
 
 === hills_lookout ===
@@ -1759,6 +1798,9 @@ VAR sunberry_harvests = 0
 // The core runs this after every calm (spec 7). It only counts: it never
 // prints. The garden sprouts after one calm and ripens after three.
 === on_calm ===
+{calmed("bluebird"):
+    ~ bluebird_calmed = true
+}
 {calmed("hooded-kid"):
     ~ forest_fizzy = false
 }

@@ -9,7 +9,7 @@ import {
   type Renderer,
   type Texture,
 } from "pixi.js";
-import { battleFoe, type State, type World } from "../core";
+import { battleFoe, type Point, type State, type World } from "../core";
 import type { AreaView } from "./area-view";
 import type { BattleStageMood, BattleVfxParticle } from "./battle-choreography";
 import {
@@ -47,6 +47,7 @@ export function makeShadowSprite(texture: Texture, label: string): Sprite {
 export class BattleStageRenderer {
   readonly backdropSprite = new Sprite();
   readonly wash = new Graphics();
+  readonly turnIndicator = new Graphics();
   readonly vfxLayer = new Container();
   readonly underlaySprites: readonly Sprite[];
   readonly shadowSprites: readonly Sprite[];
@@ -82,6 +83,16 @@ export class BattleStageRenderer {
     private readonly renderer: Renderer,
   ) {
     this.vfxLayer.label = "battle:vfx";
+    this.turnIndicator.label = "battle:turn-indicator";
+    this.turnIndicator.visible = false;
+    // Floating die-cut golden/cream chevron pointing down at the active actor.
+    this.turnIndicator
+      .poly([-13, -18, 13, -18, 0, 2])
+      .fill({ color: 0x47321f })
+      .poly([-10.5, -16, 10.5, -16, 0, -0.5])
+      .fill({ color: 0xfffdf7 })
+      .poly([-7.5, -14, 7.5, -14, 0, -3.5])
+      .fill({ color: 0xffe27a });
     for (let i = 0; i < BATTLE_VFX_POOL_SIZE; i += 1) {
       const particle = new Sprite(this.vfx.sparkle);
       particle.label = `battle:vfx:${i}`;
@@ -162,6 +173,7 @@ export class BattleStageRenderer {
   hide(): void {
     this.wash.visible = false;
     this.backdropSprite.visible = false;
+    this.turnIndicator.visible = false;
     this.backdropBounds = null;
     this.fluteSeen = false;
     this.fluteCameoStartTick = undefined;
@@ -328,6 +340,16 @@ export class BattleStageRenderer {
     shadow.width = width;
     shadow.height = width * 0.36;
     shadow.alpha = 0.32 * lift;
+  }
+
+  updateTurnIndicator(head: Point | undefined, tick: number, reducedMotion: boolean): void {
+    if (head === undefined) {
+      this.turnIndicator.visible = false;
+      return;
+    }
+    const bob = reducedMotion ? 0 : Math.sin(tick / 10) * 5;
+    this.turnIndicator.visible = true;
+    this.turnIndicator.position.set(head.x, head.y + bob);
   }
 
   /** Renders Flute Friend on-stage cameo sprites + shadows and returns cameo sparkle particles. */

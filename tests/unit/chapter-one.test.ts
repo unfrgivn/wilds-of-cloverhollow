@@ -45,8 +45,8 @@ describe("chapter one", () => {
     // And on the way: a park pup once the park's critters were out. Every calm
     // paid 8 coins and counts for its species.
     expect(state.stickers).toEqual(["fountain-frog", "pond-pup", "ringtail-raccoon"]);
-    expect(state.coins).toBe(24);
-    expect(state.calms).toEqual({ frog: 1, pup: 1, raccoon: 1 });
+    expect(state.coins).toBe(32);
+    expect(state.calms).toEqual({ frog: 1, pup: 1, raccoon: 2 });
     expect({
       plan: story("plan"),
       ate_breakfast: story("ate_breakfast"),

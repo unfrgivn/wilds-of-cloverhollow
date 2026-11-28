@@ -217,11 +217,10 @@ export function landFieldGuide(
 export function mapBusRoutes(
   lands: readonly { id: string; busStop: boolean }[],
   isSet: (variable: string) => boolean,
-  hasSticker: (id: string) => boolean,
 ): BusRoute[] {
   const stops = new Set(lands.filter((land) => land.busStop).map((land) => land.id));
-  const bayOpen = isSet("club_open");
-  const passOpen = hasSticker("bay-bluebird");
+  const bayOpen = isSet("visited_bay") || isSet("sue_joined");
+  const passOpen = isSet("visited_pass") || isSet("rode_bus");
   const routes: BusRoute[] = [];
   if (stops.has("cloverhollow") && stops.has("bay"))
     routes.push({ from: "cloverhollow", to: "bay", open: bayOpen });

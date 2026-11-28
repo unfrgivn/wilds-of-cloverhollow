@@ -144,8 +144,8 @@ describe("Milestone 93: Battle portraits active actor highlight during radiant m
       [2, "sue"],
       [3, "jordan"],
     ];
-    for (const [selected, activeId] of expectedActors) {
-      const battle = makeBattle({ phase: "command", sparkle: 3, selected });
+    for (const [actorIndex, activeId] of expectedActors) {
+      const battle = makeBattle({ phase: "command", sparkle: 3, actorIndex, selected: 0 });
       const view = viewFor(battle, partyIds);
       expect(view.sparkle?.ready).toBe(true);
       const items = evaluateBattlePortraits({

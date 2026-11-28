@@ -186,15 +186,18 @@ describe("the arrival roll", () => {
     expect(moleCrossedWest).toBe(true);
   });
 
-  it("never spawns critters in unreachable pockets across all 8 recurring areas", () => {
+  it("never spawns critters in unreachable pockets across all 11 recurring areas", () => {
     const recurringIds = Object.values(world.areas)
       .filter((area) => area.recurring !== undefined)
       .map((area) => area.id)
       .sort();
     expect(recurringIds).toEqual([
       "bay",
+      "boardwalk",
       "cavern",
+      "crossing",
       "hills",
+      "lane",
       "park",
       "pass",
       "plaza",

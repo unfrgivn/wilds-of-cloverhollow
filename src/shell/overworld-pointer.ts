@@ -35,6 +35,7 @@ export type OverworldPointerSteerOptions = {
   playerScreen: () => Point | null;
   onMove: (dir: Point) => void;
   onTapNearPlayer?: () => void;
+  onTapGround?: (screenPoint: Point) => void;
   isPhotoMode?: () => boolean;
   isTouchUi?: () => boolean;
   onPhotoSnap?: () => void;
@@ -253,17 +254,22 @@ export function bindOverworldPointerSteer(
       return;
     }
     if (activePointerId === null || event.pointerId !== activePointerId) return;
-    const shouldTap =
-      options.onTapNearPlayer !== undefined &&
+    const upPoint: Point = { x: event.clientX, y: event.clientY };
+    const elapsedMs = now() - downTime;
+    const drag = Math.hypot(upPoint.x - downPoint.x, upPoint.y - downPoint.y);
+    const canTap =
       options.canSteer() &&
-      isOverworldTap(
-        downPoint,
-        { x: event.clientX, y: event.clientY },
-        now() - downTime,
-        options.playerScreen(),
-      );
+      Number.isFinite(elapsedMs) &&
+      elapsedMs >= 0 &&
+      elapsedMs <= DEFAULT_OVERWORLD_TAP_DURATION_MS &&
+      Number.isFinite(drag) &&
+      drag <= DEFAULT_OVERWORLD_TAP_DRAG;
+    const player = canTap ? options.playerScreen() : null;
+    const nearTap = canTap && isOverworldTap(downPoint, upPoint, elapsedMs, player);
+    const groundTap = canTap && !nearTap && player !== null;
     release();
-    if (shouldTap) options.onTapNearPlayer?.();
+    if (nearTap) options.onTapNearPlayer?.();
+    else if (groundTap) options.onTapGround?.(upPoint);
   };
 
   const onPointerCancel = (event: OverworldPointerEvent): void => {

@@ -106,23 +106,15 @@ function through(state: State, facing: State["facing"], after: number): State {
   throw new Error(`Fae never got out of ${from} going ${facing}`);
 }
 
-// The story after the first bus ride up the mountain (Milestone 20).
-function riddenInk(): State["ink"] {
-  const start = createState(world, { area: "plaza", spawn: "bus-stop" });
-  // The fountain frog, a pup, and a bluebird calmed: the bus goes up the mountain.
-  let state: State = { ...start, player: { x: 878, y: 985 }, facing: "up",
-    critters: { ...start.critters, "fountain-frog": "calm" },
-    stickers: ["fountain-frog", "pond-pup", "bay-bluebird"] };
-  state = step(world, state, blankInput()).state;
-  state = step(world, state, press({ confirm: true })).state;
-  for (let tick = 0; tick < 600 && state.dialogue !== null; tick += 1) {
-    const dialogue = state.dialogue;
-    const frame = dialogue.choices.length > 0 && dialogue.revealed >= dialogue.text.length
-      ? press({ choose: 0 })
-      : press({ confirm: tick % 2 === 1 });
-    state = step(world, state, frame).state;
-  }
-  if (world.storyVariable(state.ink, "rode_bus") !== true) throw new Error("no bus ride");
+// The story once Fae has calmed the Bay Bluebird (`bluebird_calmed`).
+function bluebirdCalmedInk(): State["ink"] {
+  const state = createState(world, {
+    area: "bay",
+    spawn: "plaza-road",
+    variables: { bluebird_calmed: true },
+  });
+  if (world.storyVariable(state.ink, "bluebird_calmed") !== true)
+    throw new Error("bluebird_calmed not set");
   return state.ink;
 }
 
@@ -263,9 +255,9 @@ describe("the ways in and out", () => {
     expect(triggerOf(trail, "pass").requires).toBeUndefined();
   });
 
-  it("keeps the cliff path closed from the bay before the bus ride", () => {
+  it("keeps the cliff path closed from the bay before calming the bluebird", () => {
     const way = triggerOf(bay, "trail");
-    expect(way.requires).toEqual({ variable: "rode_bus", knot: "bay_cliff_path" });
+    expect(way.requires).toEqual({ variable: "bluebird_calmed", knot: "bay_cliff_path" });
     const centre = middle(way.polygon);
     const start = { x: centre.x, y: centre.y - 70 };
     expect(standable(bay, start)).toBe(true);
@@ -277,9 +269,9 @@ describe("the ways in and out", () => {
     expect(state.area).toBe("bay");
   });
 
-  it("opens from the bay after the bus ride, and holding down doesn't bounce Fae back", () => {
+  it("opens from the bay once the bluebird is calmed, and holding down doesn't bounce back", () => {
     const centre = middle(triggerOf(bay, "trail").polygon);
-    let state = at("bay", { x: centre.x, y: centre.y - 70 }, "down", riddenInk());
+    let state = at("bay", { x: centre.x, y: centre.y - 70 }, "down", bluebirdCalmedInk());
     state = through(state, "down", 90);
     expect({ area: state.area, transition: state.transition })
       .toEqual({ area: "trail", transition: null });

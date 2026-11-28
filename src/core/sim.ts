@@ -28,6 +28,9 @@ import {
   haltedParty,
   hiddenFraction,
   npcVisible,
+  orderPartyContent,
+  orderPartyIds,
+  orderPartyMembers,
   partyCommand,
   partyLeader,
   partySlots,
@@ -48,8 +51,10 @@ import {
 } from "./roam";
 import {
   CALM_HOOK,
+  activeBattleActor,
   addTreat,
   battleCommands,
+  battleTurnRoster,
   battleView,
   consumeTreat,
   purchaseTreat,
@@ -66,10 +71,12 @@ import { openArcade, stepArcade, isArcadeGameId, type ArcadeGameId } from "./arc
 export {
   BOSS_SET_PIECES,
   CALM_HOOK,
+  activeBattleActor,
   addTreat,
   battleCommands,
   battleFoe,
   battleParty,
+  battleTurnRoster,
   battleView,
   bossesCalmedCount,
   calmedFact,
@@ -80,6 +87,9 @@ export {
   hiddenFraction,
   inkFacts,
   npcVisible,
+  orderPartyContent,
+  orderPartyIds,
+  orderPartyMembers,
   partyCommand,
   partyLeader,
   partySlots,
@@ -349,14 +359,21 @@ function applyItemTags(state: State, tags: string[]): State {
   return next;
 }
 
-function afterArrival(world: World, state: State): State {
-  const area = world.areas[state.area];
-  if (area?.land !== "hills" || !storyHasKnot(world.story, "arrive_hills")) return state;
-  const result = runInk(world.story, state.ink, { type: "start", knot: "arrive_hills" },
-    inkFacts(world, state));
+function runSilentKnot(world: World, state: State, knot: string): State {
+  if (!storyHasKnot(world.story, knot)) return state;
+  const result = runInk(world.story, state.ink, { type: "start", knot }, inkFacts(world, state));
   return result.line === null && result.choices.length === 0 && result.ended
     ? { ...state, ink: result.ink }
     : state;
+}
+
+function afterArrival(world: World, state: State): State {
+  const area = world.areas[state.area];
+  let next = state;
+  if (area?.land === "hills") next = runSilentKnot(world, next, "arrive_hills");
+  if (state.area === "bay") next = runSilentKnot(world, next, "arrive_bay");
+  if (state.area === "pass") next = runSilentKnot(world, next, "arrive_pass");
+  return next;
 }
 
 // Opens a conversation at `knot`: a look point's, a person's, or the flute's.

@@ -48,8 +48,8 @@ describe("Bubblegum Bay fishing replay", () => {
     expect(state.area).toBe("bay");
     expect(state.arcade).toBeNull();
     expect(state.dialogue).toBeNull();
-    expect(state.caughtFish).toEqual({ perch: 1 });
-    expect(state.coins).toBe(coinsBefore + 6);
-    expect(state.snacks).toBe(snacksBefore + 1);
+    expect(state.caughtFish).toEqual({ shell: 1 });
+    expect(state.coins).toBe(coinsBefore + 8);
+    expect(state.snacks).toBe(snacksBefore);
   });
 });

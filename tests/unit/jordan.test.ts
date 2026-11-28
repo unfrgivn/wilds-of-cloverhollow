@@ -168,7 +168,7 @@ describe("meeting Jordan", () => {
       expect(standable(state.player)).toBe(true);
       expect(targetInteractable(world, state)?.id).toBe("npc:jordan");
       state = talk(state, choice);
-      expect(state.party.map((member) => member.id)).toEqual(["maddie", "sue", "jordan"]);
+      expect(state.party.map((member) => member.id)).toEqual(["sue", "jordan", "maddie"]);
       expect(world.storyVariable(state.ink, "jordan_joined")).toBe(true);
     });
 });

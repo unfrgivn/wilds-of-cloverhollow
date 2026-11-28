@@ -42,6 +42,12 @@ const door = (area: string, spawn: string, to: string): void => {
 
 // Exit clubhouse into Whispering Woods.
 door("clubhouse", "ladder", "woods");
+for (let i = 0; i < 4; i += 1) {
+  const blocker = play.state().wild.find((c) => c.mood === "chaos" && c.cooldownTicks === 0);
+  if (blocker === undefined) break;
+  play.meet(blocker.kind);
+  play.battle(["run"]);
+}
 
 // Examine moon-perch in the southeast clearing to summon Starey Owl.
 play.approach("moon-perch", "down");

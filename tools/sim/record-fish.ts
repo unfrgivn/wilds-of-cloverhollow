@@ -21,7 +21,14 @@ for (const segment of parseScript(JSON.parse(readFileSync(basePath, "utf8")), ba
   for (let count = 0; count < segment.ticks; count += 1) play.tick(segment.frame);
 
 const coinsBefore = play.state().coins;
-play.approach("dock-end");
+for (let i = 0; i < 4; i += 1) {
+  const blocker = play.state().wild.find((c) => c.mood === "chaos" && c.cooldownTicks === 0);
+  if (blocker === undefined) break;
+  play.meet(blocker.kind);
+  play.battle(["run"]);
+}
+play.navigate({ x: 1350, y: 315 });
+play.approach("dock-end", "left");
 play.talk("dock-end", [0]);
 if (play.state().arcade?.game !== "fish")
   throw new Error("dock-end did not open the fishing minigame");

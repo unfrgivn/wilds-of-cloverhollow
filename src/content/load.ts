@@ -42,6 +42,12 @@ import summitData from "../../content/areas/summit.json";
 import summitPropsData from "../../content/props/summit.json";
 import islandData from "../../content/areas/island.json";
 import islandPropsData from "../../content/props/island.json";
+import laneData from "../../content/areas/lane.json";
+import lanePropsData from "../../content/props/lane.json";
+import crossingData from "../../content/areas/crossing.json";
+import crossingPropsData from "../../content/props/crossing.json";
+import boardwalkData from "../../content/areas/boardwalk.json";
+import boardwalkPropsData from "../../content/props/boardwalk.json";
 import artRoomData from "../../content/areas/art-room.json";
 import enchantedPropsData from "../../content/props/enchanted.json";
 import arcadeGameData from "../../content/arcade.json";
@@ -78,6 +84,9 @@ import miloHouseSurfaceData from "../../content/surfaces/milo-house.json";
 import rosieCottageSurfaceData from "../../content/surfaces/rosie-cottage.json";
 import summitSurfaceData from "../../content/surfaces/summit.json";
 import islandSurfaceData from "../../content/surfaces/island.json";
+import laneSurfaceData from "../../content/surfaces/lane.json";
+import crossingSurfaceData from "../../content/surfaces/crossing.json";
+import boardwalkSurfaceData from "../../content/surfaces/boardwalk.json";
 import artRoomSurfaceData from "../../content/surfaces/art-room.json";
 import plazaPropsData from "../../content/props/plaza.json";
 import bedroomPropsData from "../../content/props/bedroom.json";
@@ -252,6 +261,9 @@ export function loadContent(): {
   const rosieCottage = loadArea(rosieCottageData, rosieCottagePropsData, "rosie-cottage");
   const summit = loadArea(summitData, summitPropsData, "summit");
   const island = loadArea(islandData, islandPropsData, "island");
+  const lane = loadArea(laneData, lanePropsData, "lane");
+  const crossing = loadArea(crossingData, crossingPropsData, "crossing");
+  const boardwalk = loadArea(boardwalkData, boardwalkPropsData, "boardwalk");
   const artRoom = loadArea(artRoomData, artRoomPropsData, "art-room");
   const lands = parseLands(landsData, "content/lands.json");
   const story = parseStoryJson(storyData, "content/story/main.ink.json");
@@ -400,6 +412,9 @@ export function loadContent(): {
     [rosieCottage.id]: rosieCottage,
     [summit.id]: summit,
     [island.id]: island,
+    [lane.id]: lane,
+    [crossing.id]: crossing,
+    [boardwalk.id]: boardwalk,
   };
   const surfaceData: Record<string, unknown> = {
     harness: harnessSurfaceData, bedroom: bedroomSurfaceData, plaza: plazaSurfaceData,
@@ -422,6 +437,9 @@ export function loadContent(): {
     "rosie-cottage": rosieCottageSurfaceData,
     summit: summitSurfaceData,
     island: islandSurfaceData,
+    lane: laneSurfaceData,
+    crossing: crossingSurfaceData,
+    boardwalk: boardwalkSurfaceData,
     "art-room": artRoomSurfaceData,
   };
   const surfaces = completeSurfaceMaps(areas, surfaceData);

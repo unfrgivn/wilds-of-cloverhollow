@@ -161,8 +161,9 @@ describe("props", () => {
       state = step(world, state, { ...none, move: { x: 0, y: -1 } }).state;
     const footprint = bench.states.default?.footprint[0];
     if (footprint === undefined) throw new Error("bench-south footprint missing");
-    expect(distanceToPolygon(state.player, footprint)).toBeGreaterThanOrEqual(19.99);
-    expect(state.player.y).toBeGreaterThan(761);
+    expect(distanceToPolygon(state.player, footprint))
+      .toBeGreaterThanOrEqual(world.tunables.playerRadius - 0.01);
+    expect(state.player.y).toBeGreaterThan(755);
   });
 
   it("reject what doesn't fit the catalogue", () => {
@@ -220,7 +221,7 @@ describe("props", () => {
       }
     expect(areaConnectionErrors({ harness: { ...harness, walkable: room, props: place(packed) } },
       world.tunables, world.critters, world.party))
-      .toContain("harness: spawn start has no slot for maddie");
+      .toContain("harness: spawn start has no slot for sue");
   });
 
   it("can't split a room in two: every spawn must reach every other", () => {

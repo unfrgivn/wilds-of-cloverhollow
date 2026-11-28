@@ -3,16 +3,16 @@
     "tick": 600,
     "area": "harness",
     "player": {
-      "x": 879.999,
-      "y": 660.001
+      "x": 885.999,
+      "y": 654.001
     },
     "facing": "right",
     "follower": {
-      "x": 817.0735283258891,
-      "y": 693.8075892197926,
+      "x": 824.1166309890223,
+      "y": 698.7644865566594,
       "facing": "right",
       "moving": true,
-      "distance": 1791.5391866262296,
+      "distance": 1799.686302808235,
       "stillTicks": 0,
       "trail": 10
     }
@@ -21,16 +21,16 @@
     "tick": 600,
     "area": "harness",
     "player": {
-      "x": 159.99900000000002,
-      "y": 1139.999
+      "x": 165.99900000000002,
+      "y": 1145.999
     },
     "facing": "left",
     "follower": {
-      "x": 247.08895212789776,
-      "y": 1139.999,
+      "x": 252.853744063033,
+      "y": 1145.999,
       "facing": "left",
       "moving": true,
-      "distance": 1655.54912677802,
+      "distance": 1663.5430275169342,
       "stillTicks": 0,
       "trail": 11
     }
@@ -39,8 +39,8 @@
     "tick": 295,
     "area": "bedroom",
     "player": {
-      "x": 779.3843236649041,
-      "y": 430.01865685863925
+      "x": 780,
+      "y": 430
     },
     "facing": "right",
     "follower": {
@@ -50,23 +50,23 @@
       "moving": true,
       "distance": 1141.401005092053,
       "stillTicks": 0,
-      "trail": 10
+      "trail": 11
     }
   },
   "new-game/chapter-one.json": {
-    "tick": 4395,
+    "tick": 4601,
     "area": "park",
     "player": {
-      "x": 731.3279938488599,
-      "y": 514.6720061511401
+      "x": 733.7544007200531,
+      "y": 512.2455992799469
     },
     "facing": "up",
     "follower": {
-      "x": 703.0437299458104,
-      "y": 586.9562700541896,
+      "x": 664.2978345636388,
+      "y": 545.7021654363612,
       "facing": "right",
       "moving": false,
-      "distance": 494.60155345674605,
+      "distance": 479.70035697721687,
       "stillTicks": 18,
       "trail": 9
     }
@@ -93,54 +93,54 @@
     "tick": 569,
     "area": "bedroom",
     "player": {
-      "x": 470.001,
+      "x": 464.001,
       "y": 386
     },
     "facing": "down",
     "follower": {
-      "x": 516.4562508203409,
-      "y": 339.6301599609373,
+      "x": 516.4971454576048,
+      "y": 339.0926773305648,
       "facing": "left",
       "moving": false,
-      "distance": 331.34039758862247,
+      "distance": 331.34039758862235,
       "stillTicks": 202,
-      "trail": 6
+      "trail": 5
     }
   },
   "park/pup-win.json": {
-    "tick": 881,
+    "tick": 848,
     "area": "park",
     "player": {
-      "x": 1235.4341085556887,
-      "y": 649.2894089488256
+      "x": 1236.1108885019487,
+      "y": 638.7197550519492
     },
-    "facing": "left",
+    "facing": "up",
     "follower": {
-      "x": 1172.5466631019324,
-      "y": 648.8318800802039,
+      "x": 1179.532992267163,
+      "y": 659.5514026341267,
       "facing": "right",
       "moving": false,
-      "distance": 951.4026325170958,
-      "stillTicks": 632,
-      "trail": 3
+      "distance": 955.559214880164,
+      "stillTicks": 598,
+      "trail": 8
     }
   },
   "plaza/explore.json": {
     "tick": 330,
     "area": "plaza",
     "player": {
-      "x": 1177.7983686379346,
-      "y": 393.90328787643006
+      "x": 1228.7412811667646,
+      "y": 384.041476093461
     },
     "facing": "up",
     "follower": {
-      "x": 1175.401,
-      "y": 450.0463058446719,
+      "x": 1227.3806193399455,
+      "y": 450.46627326929945,
       "facing": "up",
-      "moving": false,
-      "distance": 915.2884306286805,
-      "stillTicks": 2,
-      "trail": 1
+      "moving": true,
+      "distance": 875.3122596747835,
+      "stillTicks": 0,
+      "trail": 8
     }
   },
   "plaza/frog-rest.json": {
@@ -180,43 +180,43 @@
     }
   },
   "plaza/frog-win.json": {
-    "tick": 769,
+    "tick": 618,
     "area": "plaza",
     "player": {
-      "x": 1034.5502065111666,
-      "y": 756.8772003600266
+      "x": 1037.6286299012095,
+      "y": 758.8883219575386
     },
     "facing": "left",
     "follower": {
-      "x": 1095.1790328196394,
-      "y": 696.2483740515538,
+      "x": 1096.7044049769215,
+      "y": 699.8125468818265,
       "facing": "left",
       "moving": false,
-      "distance": 239.3749951207334,
-      "stillTicks": 698,
-      "trail": 11
+      "distance": 239.52080871729135,
+      "stillTicks": 547,
+      "trail": 10
     }
   },
   "plaza/maddie-loop.json": {
     "tick": 360,
     "area": "plaza",
     "player": {
-      "x": 1430.406196192288,
-      "y": 640.0626032185112
+      "x": 1429.0468194230957,
+      "y": 637.001
     },
     "facing": "right",
     "follower": {
-      "x": 1341.3297254836618,
-      "y": 643.001,
+      "x": 1342.7741572021084,
+      "y": 637.001,
       "facing": "right",
       "moving": true,
-      "distance": 799.0984932560305,
+      "distance": 815.0834687852242,
       "stillTicks": 0,
       "trail": 11
     }
   },
   "school/hall-pass.json": {
-    "tick": 558,
+    "tick": 554,
     "area": "plaza",
     "player": {
       "x": 290,
@@ -234,21 +234,21 @@
     }
   },
   "school/raccoon.json": {
-    "tick": 1433,
+    "tick": 1241,
     "area": "plaza",
     "player": {
-      "x": 400.91168824543183,
-      "y": 897.7157287525379
+      "x": 395.0538238691629,
+      "y": 898.2010101267765
     },
     "facing": "up",
     "follower": {
-      "x": 325.84248860846185,
-      "y": 888.558656421674,
-      "facing": "right",
+      "x": 330.1898925698849,
+      "y": 888.1359251448183,
+      "facing": "up",
       "moving": false,
-      "distance": 95.99999999999982,
+      "distance": 107.56493390577198,
       "stillTicks": 22,
-      "trail": 10
+      "trail": 8
     }
   }
 }

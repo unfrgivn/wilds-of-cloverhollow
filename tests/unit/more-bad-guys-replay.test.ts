@@ -25,7 +25,7 @@ function replay(path: string): State {
 describe("the crab recording", () => {
   it("calms Ms. Coral, re-enters the bay, and calms a Snappy Crab", () => {
     const state = replay("tests/sim/scripts/new-game/crab.json");
-    expect(state.tick).toBe(8130);
+    expect(state.tick).toBe(11302);
     expect(state.area).toBe("bay");
     expect(state.critters.lifeguard).toBe("calm");
     expect(state.wild.find((critter) => critter.kind === "crab")?.mood).toBe("calm");
@@ -42,7 +42,7 @@ describe("the crab recording", () => {
 describe("the penguin recording", () => {
   it("leaves Mrs. Flurry's lodge and calms a Slippy Penguin on the pass", () => {
     const state = replay("tests/sim/scripts/new-game/penguin.json");
-    expect(state.tick).toBe(10490);
+    expect(state.tick).toBe(13324);
     expect(state.area).toBe("pass");
     expect(state.critters["lodge-keeper"]).toBe("calm");
     expect(state.wild.find((critter) => critter.kind === "penguin")?.mood).toBe("calm");
@@ -57,7 +57,7 @@ describe("the penguin recording", () => {
 describe("the principal recording", () => {
   it("reads the megaphone and calms Mr. Bell in the school hall", () => {
     const state = replay("tests/sim/scripts/new-game/principal.json");
-    expect(state.tick).toBe(13795);
+    expect(state.tick).toBe(16306);
     expect(state.area).toBe("school");
     expect(state.critters.principal).toBe("calm");
     expect(state.stickers).toContain("principal");

@@ -111,6 +111,7 @@ export type CloverhollowHook = {
   };
   boot: { title: () => "fresh" | "continue" | "confirm" | null };
   qa: { active: () => boolean; packs: () => QaPack[] };
+  navOverlay?: (visible?: boolean) => boolean;
   sound: {
     log: AudioController["log"];
     effects: AudioController["effects"];
@@ -151,6 +152,7 @@ export function installHook(deps: {
   save: CloverhollowHook["save"];
   boot: CloverhollowHook["boot"];
   qa: CloverhollowHook["qa"];
+  navOverlay?: (visible?: boolean) => boolean;
   sound: CloverhollowHook["sound"];
   settings: CloverhollowHook["settings"];
 }): void {
@@ -203,6 +205,7 @@ export function installHook(deps: {
     save: deps.save,
     boot: deps.boot,
     qa: deps.qa,
+    ...(deps.navOverlay !== undefined ? { navOverlay: deps.navOverlay } : {}),
     sound: deps.sound,
     settings: deps.settings,
   };
@@ -238,6 +241,7 @@ export function installShellHook(deps: {
   setPhotoMode: (on: boolean) => void;
   snapPostcard: (options?: { download?: boolean }) => Promise<PostcardCapture | null>;
   minigameRecords: () => MinigameRecords;
+  navOverlay?: (visible?: boolean) => boolean;
 }): void {
   const invalidateAfter = <Args extends unknown[]>(
     fn: (...args: Args) => void,
@@ -269,6 +273,7 @@ export function installShellHook(deps: {
     renderInfo: deps.renderInfo,
     boot: deps.boot,
     qa: deps.qa,
+    ...(deps.navOverlay !== undefined ? { navOverlay: deps.navOverlay } : {}),
     save: {
       clear: async () => {
         if (deps.isQaRestricted()) return;

@@ -356,6 +356,36 @@ export const REST_SPOTS: readonly RestSpot[] = [
     seatY: 506,
     facing: "down",
   },
+  {
+    id: "lane-sunberry-meadow",
+    area: "lane",
+    x: 1000,
+    y: 650,
+    radius: 64,
+    seatX: 1000,
+    seatY: 646,
+    facing: "down",
+  },
+  {
+    id: "crossing-brook-bank",
+    area: "crossing",
+    x: 640,
+    y: 500,
+    radius: 64,
+    seatX: 640,
+    seatY: 496,
+    facing: "down",
+  },
+  {
+    id: "boardwalk-marsh-lookout",
+    area: "boardwalk",
+    x: 1180,
+    y: 635,
+    radius: 64,
+    seatX: 1180,
+    seatY: 631,
+    facing: "down",
+  },
 ];
 
 const FACING_VECTORS: Readonly<Record<Direction, Point>> = {

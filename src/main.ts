@@ -56,6 +56,7 @@ import {
   isBannerEligible, isOverworldFree, type OverlayGateContext,
 } from "./shell/input-shortcuts";
 import { bindOverworldPointerSteer } from "./shell/overworld-pointer";
+import { createNavPathFollower, mergeNavSteerInput } from "./shell/nav-steer";
 import { bindWebGlRecovery, renderBootError, shouldFreezeLiveLoop } from "./shell/lifecycle";
 import type { QaSession } from "./shell/qa-session";
 
@@ -226,6 +227,7 @@ async function boot(): Promise<void> {
   journal.onClose(() => touch.tapButton("cancel"));
   credits.onClose(() => touch.tapButton("confirm"));
   const view = new GameView(content.world, { debugLabel: qaEnabled, renderer: app.renderer });
+  const navFollower = createNavPathFollower(content.world);
   const syncNpcChatter = createNpcChatterSync(
     content.world, uiRoot, view.npcChatterScreen.bind(view), sound.playAmbientChatter,
   );
@@ -241,16 +243,10 @@ async function boot(): Promise<void> {
   let qa: QaSession | null = null;
   let titleMode: TitleMode | null = null;
   const saveSession = createSaveSession({
-    store: saveStore,
-    world: content.world,
-    fresh,
-    getState: () => state,
-    isDocumentHidden: () => document.hidden,
-    isPaused: () => paused,
-    isHarnessStepping: () => harnessStepping,
-    isTitleOpen: () => titleMode !== null,
-    isPhotoMode: () => photoMode,
-    isQaRestricted: () => qa?.isRestricted() ?? false,
+    store: saveStore, world: content.world, fresh, getState: () => state,
+    isDocumentHidden: () => document.hidden, isPaused: () => paused,
+    isHarnessStepping: () => harnessStepping, isTitleOpen: () => titleMode !== null,
+    isPhotoMode: () => photoMode, isQaRestricted: () => qa?.isRestricted() ?? false,
     isQaOverlayOpen: () => qa !== null && (qa.isMenuOpen() || qa.isConsoleOpen()),
     showSaveToast: () => saveToast.show(),
   });
@@ -281,6 +277,7 @@ async function boot(): Promise<void> {
     if (result.action === "new-game") {
       state = createState(content.world, initialFixture);
       previousState = state;
+      navFollower.clear();
       bannerTracker.clear();
       toolEventChime.reset();
       saveToast.hide();
@@ -301,7 +298,7 @@ async function boot(): Promise<void> {
     saveSession.clearDirty(); bannerTracker.clear(); saveToast.hide();
     jukeboxTrack = null; battlePeekOpen = false; activeArcadeRecord = null;
     fishStreak = 0; levelUpNotices.length = 0; toolEventChime.reset();
-    setPhotoMode(false, true); overworldPointer.release();
+    setPhotoMode(false, true); releasePointer();
     areaLoader.reset(); void areaLoader.ensureArea(true);
     void assets.warmJournalAssets(state); invalidate();
   };
@@ -326,7 +323,7 @@ async function boot(): Promise<void> {
         resetTransient();
       },
       onConsoleApplied: () => { bannerTracker.clear(); invalidate(); },
-      onReleasePointer: () => overworldPointer.release(),
+      onReleasePointer: () => releasePointer(),
       invalidate,
       settings: {
         gentleTiming: gameSettings.gentleTiming,
@@ -348,18 +345,19 @@ async function boot(): Promise<void> {
         photoMode: () => photoMode,
         canPhotoMode: () => canPhotoMode({ ...overlayContext(), qaConsoleOpen: false }),
         setPhotoMode: (on) => setPhotoMode(on),
+        navOverlay: () => view.isNavHeatmapVisible(),
+        toggleNavOverlay: () => {
+          const next = view.setNavHeatmap(!view.isNavHeatmapVisible());
+          playToggleFeedback(next);
+          invalidate();
+        },
       },
     });
   if (qa !== null) title.onQa(qa.openMenu);
   const assets = createShellAssets({
-    world: content.world,
-    uiRoot,
-    invalidate,
-    onHole: createMoleHoleHandler(touch),
-    onConfirmHold: handleConfirmHold,
-    onLaneStep: (delta) => touch.tapArrow({ x: delta, y: 0 }),
-    onPickTopping: createTacoToppingHandler(touch),
-    onCancel: () => touch.tapButton("cancel"),
+    world: content.world, uiRoot, invalidate, onHole: createMoleHoleHandler(touch),
+    onConfirmHold: handleConfirmHold, onLaneStep: (delta) => touch.tapArrow({ x: delta, y: 0 }),
+    onPickTopping: createTacoToppingHandler(touch), onCancel: () => touch.tapButton("cancel"),
   });
   const partyCommands: Record<string, string | null> = Object.fromEntries(
     Object.entries(content.world.party).map(([id, member]) => [id, member.command?.id ?? null]),
@@ -402,7 +400,7 @@ async function boot(): Promise<void> {
     photoMode = next;
     document.documentElement.dataset.photo = next ? "on" : "off";
     view.setPhotoMode(next);
-    if (next) { overworldPointer.release(); saveToast.hide(); }
+    if (next) { releasePointer(); saveToast.hide(); }
     else { shutterFlash.hide(); photoToast.hide(); }
     if (changed && !silent && titleMode === null && state.battle === null) {
       sound.playEffect(next ? "toggle-on" : "toggle-off");
@@ -454,14 +452,25 @@ async function boot(): Promise<void> {
         touch.tapButton("confirm");
       }
     },
+    onTapGround: (screenPoint) => {
+      const worldPoint = view.screenToWorldPoint(screenPoint);
+      if (worldPoint !== null && navFollower.setTarget(state, worldPoint)) invalidate();
+    },
     isPhotoMode: () => photoMode,
     isTouchUi: () => document.documentElement.dataset.touch === "on",
     onPhotoSnap: () => { void snapPostcard({ download: true }); },
     onPhotoExit: () => setPhotoMode(false),
   });
+  const releasePointer = (): void => { overworldPointer.release(); navFollower.clear(); };
   const input = createInputSource(() => {
     overworldPointer.sync();
-    return combineInputFrames(keyboard.frame(), touch.sample(), gamepad.frame());
+    return mergeNavSteerInput(
+      combineInputFrames(keyboard.frame(), touch.sample(), gamepad.frame()),
+      overworldPointer.isActive(),
+      canOverworldSteer(overlayContext()),
+      navFollower,
+      state,
+    );
   });
   const inputShortcuts = createInputShortcuts({
     getContext: overlayContext,
@@ -489,6 +498,7 @@ async function boot(): Promise<void> {
     warmBattlePortraits: assets.warmBattlePortraits,
     onLoaded: (loadedState) => {
       view.resetCamera();
+      navFollower.clear();
       previousState = loadedState;
     },
     invalidate,
@@ -504,7 +514,7 @@ async function boot(): Promise<void> {
   const render = (alpha = 1): void => {
     const gate = overlayContext();
     const qaMenuOpen = gate.qaMenuOpen;
-    if (!canOverworldSteer(gate)) overworldPointer.release();
+    if (!canOverworldSteer(gate)) releasePointer();
     if (photoMode && !canPhotoMode(gate)) {
       photoMode = false;
       document.documentElement.dataset.photo = "off";
@@ -528,6 +538,10 @@ async function boot(): Promise<void> {
     syncOpenFlag("arcade", arcadeState !== null);
     if (state.arcade !== null) document.documentElement.dataset.arcadeGame = state.arcade.game;
     else delete document.documentElement.dataset.arcadeGame;
+    view.setNavOverlayData(
+      view.isNavHeatmapVisible() ? navFollower.getField(state) : null,
+      navFollower.snapshot(),
+    );
     view.render(state, window.innerWidth, window.innerHeight, app.renderer.resolution, {
       paused, alpha: paused ? 1 : alpha, previousState,
     });
@@ -612,24 +626,15 @@ async function boot(): Promise<void> {
     }
     if (activeBattle && !wasBattleOpen) void assets.warmBattlePortraits(state).then(invalidate);
     wasBattleOpen = activeBattle;
-    battleHud.render(
-      buildBattleHudView({
-        world: content.world,
-        state,
-        battle,
-        partyCommands,
-        paused,
-        canPeek: canBattlePeek(gate),
-        peekOpen: battlePeekOpen,
-        speakerPortrait: assets.speakerPortrait,
-        inputMode: inputShortcuts.inputMode(),
-      }),
-    );
+    battleHud.render(buildBattleHudView({
+      world: content.world, state, battle, partyCommands, paused,
+      canPeek: canBattlePeek(gate), peekOpen: battlePeekOpen,
+      speakerPortrait: assets.speakerPortrait, inputMode: inputShortcuts.inputMode(),
+    }));
     commandMenu.render({
       visible: activeBattle && state.battle?.phase === "command" && battle?.talk === null,
-      commands: battle?.commands ?? [],
-      selected: battle?.selected ?? 0,
-      treatTray: battle?.treatTray ?? null,
+      commands: battle?.commands ?? [], selected: battle?.selected ?? 0,
+      activeActor: battle?.activeActor, treatTray: battle?.treatTray ?? null,
     });
     const feelingAt = view.battleFeelingAnchor(state, window.innerWidth, window.innerHeight);
     feelingBubble.render(
@@ -649,38 +654,20 @@ async function boot(): Promise<void> {
     rewardSticker.render(
       buildRewardStickerView(content.world, state, activeBattle, arcadeState, assets),
     );
-    journal.render(
-      buildJournalView({
-        world: content.world,
-        state,
-        notes: state.journalOpen ? notesNow(state) : [],
-        mapCentres,
-        art: assets,
-        muted: sound.muted(),
-        level: sound.level(),
-        musicMuted: sound.musicMuted(),
-        musicLevel: sound.musicLevel(),
-        ambienceMuted: sound.ambienceMuted(),
-        nowPlaying: soundtrack.title,
-        jukebox,
-        arcadeRecords: minigameRecords.records(),
-        gentleTiming: gameSettings.gentleTiming(),
-        keyHints: gameSettings.keyHints(),
-        textSpeed: gameSettings.textSpeed(),
-        reducedMotion: gameSettings.reducedMotion(),
-        hasLantern, hasFlute, hasLasso,
-        inputMode: inputShortcuts.inputMode(),
-        canPhoto: canPhotoFromJournal(gate),
-      }),
-    );
+    journal.render(buildJournalView({
+      world: content.world, state, notes: state.journalOpen ? notesNow(state) : [],
+      mapCentres, art: assets, muted: sound.muted(), level: sound.level(),
+      musicMuted: sound.musicMuted(), musicLevel: sound.musicLevel(),
+      ambienceMuted: sound.ambienceMuted(), nowPlaying: soundtrack.title, jukebox,
+      arcadeRecords: minigameRecords.records(), gentleTiming: gameSettings.gentleTiming(),
+      keyHints: gameSettings.keyHints(), textSpeed: gameSettings.textSpeed(),
+      reducedMotion: gameSettings.reducedMotion(), hasLantern, hasFlute, hasLasso,
+      inputMode: inputShortcuts.inputMode(), canPhoto: canPhotoFromJournal(gate),
+    }));
     syncOpenFlag("journal", state.journalOpen);
     const dialogueView = buildDialogueView({
-      world: content.world,
-      state,
-      battle,
-      arcadeState,
-      levelUpNotice: levelUpNotices[0] ?? null,
-      speakerPortrait: assets.speakerPortrait,
+      world: content.world, state, battle, arcadeState,
+      levelUpNotice: levelUpNotices[0] ?? null, speakerPortrait: assets.speakerPortrait,
     });
     if (dialogueView === null) {
       dialogueBox.hide();
@@ -751,6 +738,7 @@ async function boot(): Promise<void> {
     state = stepped.state;
     view.observeNpcTick(state);
     if (!paused && !harnessStepping && state.tick !== previous.tick) saveSession.markDirty();
+    if (state.area !== previous.area) navFollower.clear();
     previousState = state.area === previous.area ? previous : state;
     const arcadeOutcome = resolveArcadeOutcome(
       content.world, previous, state, gameSettings.gentleTiming(),
@@ -865,7 +853,7 @@ async function boot(): Promise<void> {
     }
   });
   const suspendLiveInput = (): void => {
-    keyboard.clearAll(); gamepad.clearTaps(); overworldPointer.release();
+    keyboard.clearAll(); gamepad.clearTaps(); releasePointer();
     touch.releaseArrows(); accumulator = 0; saveSession.flushOnHide();
   };
   bindWebGlRecovery(app.canvas, {
@@ -896,7 +884,7 @@ async function boot(): Promise<void> {
       paused: () => paused, setPaused: (value) => { paused = value; },
       setStepping: (value) => { harnessStepping = value; },
       applyResetState: async (next) => {
-        keyboard.clearTaps(); gamepad.clearTaps(); overworldPointer.release();
+        keyboard.clearTaps(); gamepad.clearTaps(); releasePointer();
         saveSession.setSuppressed(true); saveSession.clearDirty();
         state = next; previousState = state;
         bannerTracker.clear(); saveToast.hide(); saveSession.setSuppressed(false);
@@ -910,13 +898,14 @@ async function boot(): Promise<void> {
       isQaRestricted: () => qa?.isRestricted() ?? false,
       saveStore, clearSaveDirty: saveSession.clearDirty,
       applyImportedSave: async (imported) => {
-        state = imported; previousState = state; saveSession.clearDirty();
+        releasePointer(); state = imported; previousState = state; saveSession.clearDirty();
         bannerTracker.clear(); saveToast.hide(); areaLoader.reset(); resetTransientUi();
         await Promise.all([areaLoader.ensureArea(true), assets.warmJournalAssets(state)]);
         render(); invalidate();
       },
       sound, gameSettings, photoMode: () => photoMode, setPhotoMode: (on) => setPhotoMode(on),
       snapPostcard, minigameRecords: () => minigameRecords.records(),
+      navOverlay: (visible) => { const on = view.setNavHeatmap(visible); invalidate(); return on; },
       boot: { title: () => titleMode },
     });
   }

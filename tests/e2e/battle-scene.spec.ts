@@ -11,7 +11,7 @@ const sizes = [
   { name: "desktop", width: 1280, height: 720, touch: false },
   { name: "phone", width: 874, height: 402, touch: true },
 ];
-const battleHeight = 190;
+const battleHeight = 145;
 const viewHeight = 720;
 // Logical view width: 720 x aspect, clamped to 960..1600 (spec 4).
 const viewWidth = (width: number, height: number): number =>

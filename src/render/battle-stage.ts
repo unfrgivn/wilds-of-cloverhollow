@@ -171,7 +171,7 @@ export function evaluateFluteCameo(input: {
   ids.forEach((id, idx) => {
     const content = party[id];
     if (content === undefined) return;
-    const baseScale = ((content.scale ?? 0.5) / 0.5) * 0.58;
+    const baseScale = ((content.scale ?? 0.5) / 0.5) * 0.72;
     const hopY = -Math.abs(Math.sin((tick + idx * 4) / 6)) * 16;
     const cameoX = faeX + 106 + idx * 48;
     const cameoY = faeY + 16 - idx * 8;

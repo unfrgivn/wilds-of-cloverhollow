@@ -141,24 +141,227 @@ export function resolveCollision(
   return result;
 }
 
-function validResolved(point: Point, area: Area, radius: number): boolean {
+export function validResolved(point: Point, area: Area, radius: number): boolean {
   return pointInPolygon(point, area.walkable) &&
     distanceToPolygon(point, area.walkable) >= radius - 0.01 &&
     area.blockers.every((blocker) => beyond(point, blocker, radius) ||
       (!pointInPolygon(point, blocker) && distanceToPolygon(point, blocker) >= radius - 0.01));
 }
 
+const NUDGE_OFFSETS = [10, 18, 26] as const;
+
+function tryNudgeSide(
+  previous: Point,
+  ux: number,
+  uy: number,
+  px: number,
+  py: number,
+  desiredLen: number,
+  sign: -1 | 1,
+  area: Area,
+  radius: number,
+): { offset: number; point: Point } | null {
+  const lateralTarget = {
+    x: previous.x + px * sign * (desiredLen * 0.85) + ux * (desiredLen * 0.25),
+    y: previous.y + py * sign * (desiredLen * 0.85) + uy * (desiredLen * 0.25),
+  };
+  const lateral = resolveCollision(lateralTarget, area, radius);
+  if (!validResolved(lateral, area, radius)) return null;
+  const sideMove =
+    (lateral.x - previous.x) * (px * sign) + (lateral.y - previous.y) * (py * sign);
+  if (sideMove <= 0.05) return null;
+  for (const offset of NUDGE_OFFSETS) {
+    const lookahead = {
+      x: previous.x + ux * (desiredLen * 2.5) + px * sign * offset,
+      y: previous.y + uy * (desiredLen * 2.5) + py * sign * offset,
+    };
+    if (validResolved(lookahead, area, radius)) return { offset, point: lateral };
+  }
+  return null;
+}
+
+function cornerNudge(
+  previous: Point,
+  ux: number,
+  uy: number,
+  desiredLen: number,
+  area: Area,
+  radius: number,
+): Point | null {
+  const px = -uy;
+  const py = ux;
+  const neg = tryNudgeSide(previous, ux, uy, px, py, desiredLen, -1, area, radius);
+  const pos = tryNudgeSide(previous, ux, uy, px, py, desiredLen, 1, area, radius);
+  if (neg === null && pos === null) return null;
+  if (neg !== null && pos === null) return neg.point;
+  if (pos !== null && neg === null) return pos.point;
+  if (neg !== null && pos !== null) {
+    if (neg.offset <= pos.offset - 8) return neg.point;
+    if (pos.offset <= neg.offset - 8) return pos.point;
+  }
+  return null;
+}
+
+function pushNormal(normals: Point[], nx: number, ny: number): void {
+  const len = Math.sqrt(nx * nx + ny * ny);
+  if (len < 0.0001) return;
+  const ux = nx / len;
+  const uy = ny / len;
+  for (const existing of normals) {
+    if (existing.x * ux + existing.y * uy > 0.995) return;
+  }
+  normals.push({ x: ux, y: uy });
+}
+
+function addPolygonNormals(
+  normals: Point[],
+  previous: Point,
+  candidate: Point,
+  polygon: Polygon,
+  reach: number,
+  keepInside: boolean,
+): void {
+  if (!keepInside && beyond(candidate, polygon, reach)) return;
+  const inside = pointInPolygon(candidate, polygon);
+  const closest = closestPointOnPolygon(candidate, polygon);
+  const active = keepInside
+    ? !inside || closest.distance <= reach
+    : inside || closest.distance <= reach;
+  if (!active) return;
+
+  if (closest.distance >= 0.0001) {
+    const dir = keepInside ? (inside ? 1 : -1) : inside ? -1 : 1;
+    pushNormal(
+      normals,
+      dir * (candidate.x - closest.point.x),
+      dir * (candidate.y - closest.point.y),
+    );
+  } else {
+    const fromPrev = closestPointOnPolygon(previous, polygon);
+    if (fromPrev.distance >= 0.0001) {
+      pushNormal(normals, previous.x - fromPrev.point.x, previous.y - fromPrev.point.y);
+    }
+  }
+
+  for (let index = 0; index < polygon.length; index += 1) {
+    const start = vertex(polygon, index);
+    const end = vertex(polygon, (index + 1) % polygon.length);
+    const edx = end[0] - start[0];
+    const edy = end[1] - start[1];
+    const lenSq = edx * edx + edy * edy;
+    if (lenSq < 0.0001) continue;
+    const proj = ((candidate.x - start[0]) * edx + (candidate.y - start[1]) * edy) / lenSq;
+    const t = Math.max(0, Math.min(1, proj));
+    const nearX = start[0] + edx * t;
+    const nearY = start[1] + edy * t;
+    const distX = candidate.x - nearX;
+    const distY = candidate.y - nearY;
+    if (distX * distX + distY * distY > reach * reach) continue;
+    const eLen = Math.sqrt(lenSq);
+    let nx = -edy / eLen;
+    let ny = edx / eLen;
+    const prevSide = (previous.x - nearX) * nx + (previous.y - nearY) * ny;
+    if (Math.abs(prevSide) > 0.001) {
+      if (prevSide < 0) {
+        nx = -nx;
+        ny = -ny;
+      }
+    } else {
+      const midX = (start[0] + end[0]) * 0.5;
+      const midY = (start[1] + end[1]) * 0.5;
+      const probe = { x: midX + nx * 0.5, y: midY + ny * 0.5 };
+      if (pointInPolygon(probe, polygon) !== keepInside) {
+        nx = -nx;
+        ny = -ny;
+      }
+    }
+    pushNormal(normals, nx, ny);
+  }
+}
+
 /*
  * One step from `previous` toward `candidate` (spec 6). The solver pushes out of
- * each shape in turn; in a gap narrower than the collider those pushes fight,
- * and it can stop inside one. Then the step slides along one axis, or stays.
- * Where the solver succeeds (every area before props) nothing changes.
+ * each shape in turn; when progress stalls against a corner it checks for an
+ * asymmetric opening to funnel around, and when pushes fight in a tight gap or
+ * acute corner it tests tangent slides and open bisectors before falling back.
  */
 export function resolveMove(previous: Point, candidate: Point, area: Area, radius: number): Point {
   const resolved = resolveCollision(candidate, area, radius);
-  if (validResolved(resolved, area, radius)) return resolved;
-  const alongX = resolveCollision({ x: candidate.x, y: previous.y }, area, radius);
-  if (validResolved(alongX, area, radius)) return alongX;
-  const alongY = resolveCollision({ x: previous.x, y: candidate.y }, area, radius);
-  return validResolved(alongY, area, radius) ? alongY : previous;
+  const dx = candidate.x - previous.x;
+  const dy = candidate.y - previous.y;
+  const desiredLen = Math.sqrt(dx * dx + dy * dy);
+  if (desiredLen < 0.0001) return validResolved(resolved, area, radius) ? resolved : previous;
+  const ux = dx / desiredLen;
+  const uy = dy / desiredLen;
+
+  if (validResolved(resolved, area, radius)) {
+    const moved = distance(previous, resolved);
+    if (moved >= desiredLen * 0.15) return resolved;
+    const nudged = cornerNudge(previous, ux, uy, desiredLen, area, radius);
+    return nudged ?? resolved;
+  }
+
+  const reach = radius + desiredLen + 2;
+  const normals: Point[] = [];
+  addPolygonNormals(normals, previous, candidate, area.walkable, reach, true);
+  for (const blocker of area.blockers) {
+    addPolygonNormals(normals, previous, candidate, blocker, reach, false);
+  }
+
+  const trials: Point[] = [
+    { x: candidate.x, y: previous.y },
+    { x: previous.x, y: candidate.y },
+  ];
+  for (const normal of normals) {
+    let tx = -normal.y;
+    let ty = normal.x;
+    let dot = ux * tx + uy * ty;
+    if (dot < 0) {
+      tx = -tx;
+      ty = -ty;
+      dot = -dot;
+    }
+    if (dot > 0.01) {
+      trials.push({
+        x: previous.x + tx * (dot * desiredLen),
+        y: previous.y + ty * (dot * desiredLen),
+      });
+    }
+  }
+  for (let i = 0; i < normals.length; i += 1) {
+    const first = normals[i];
+    if (first === undefined) continue;
+    for (let j = i + 1; j < normals.length; j += 1) {
+      const second = normals[j];
+      if (second === undefined) continue;
+      const bx = first.x + second.x;
+      const by = first.y + second.y;
+      const bLen = Math.sqrt(bx * bx + by * by);
+      if (bLen <= 0.01) continue;
+      const bux = bx / bLen;
+      const buy = by / bLen;
+      const dot = ux * bux + uy * buy;
+      if (dot > 0.01) {
+        trials.push({
+          x: previous.x + bux * (dot * desiredLen),
+          y: previous.y + buy * (dot * desiredLen),
+        });
+      }
+    }
+  }
+
+  let best: Point | null = null;
+  let bestProgress = 0.05;
+  for (const trial of trials) {
+    const p = resolveCollision(trial, area, radius);
+    if (!validResolved(p, area, radius)) continue;
+    const progress = (p.x - previous.x) * ux + (p.y - previous.y) * uy;
+    if (progress >= bestProgress) {
+      bestProgress = progress;
+      best = p;
+    }
+  }
+  if (best !== null) return best;
+  const nudged = cornerNudge(previous, ux, uy, desiredLen, area, radius);
+  return nudged ?? previous;
 }

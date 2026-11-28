@@ -54,7 +54,8 @@ door("east-hall", "west", "school");
 door("school", "front-doors", "plaza");
 door("plaza", "park-path", "park");
 play.clear();
-door("park", "hills", "hills");
+play.navigate({ x: 1310, y: 360 }, 6);
+play.leave({ x: 0, y: -1 }, "hills");
 play.clear();
 // Dismiss any shell-side level-up notices in Clover Hills before entering Sanctuary.
 for (let i = 0; i < 4; i += 1) {

@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   createState,
+  distanceToPolygon,
   npcVisible,
+  pointInPolygon,
   step,
   targetInteractable,
   type ActionFrame,
@@ -76,7 +78,12 @@ describe("people who come and go with the story", () => {
     expect(npcVisible(world, below, { ...mom, visibleWhile: "ate_breakfast" })).toBe(true);
     expect(targetInteractable(world, below)?.id).toBe("npc:mom");
     const walker = walkLeft(inKitchen(mom.point.x + 45, mom.point.y, "left", fed), 40);
-    expect(walker.player.x, "stopped by her footprint").toBeGreaterThanOrEqual(645);
+    expect(pointInPolygon(walker.player, mom.footprint)).toBe(false);
+    expect(distanceToPolygon(walker.player, mom.footprint)).toBeGreaterThanOrEqual(
+      world.tunables.playerRadius - 0.01,
+    );
+    expect(Math.abs(walker.player.y - mom.point.y), "deflected around her footprint")
+      .toBeGreaterThan(10);
   });
 
   it("unscheduled people are always there; every schedule rule references real content", () => {

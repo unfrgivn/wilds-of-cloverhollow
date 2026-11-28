@@ -123,11 +123,11 @@ describe("Milestone 159: 100% Complete World Cozy Resting (All 32/32 Playable Ar
     const playableAreas = Object.keys(world.areas)
       .filter((id) => id !== "harness")
       .sort();
-    expect(playableAreas).toHaveLength(32);
+    expect(playableAreas).toHaveLength(35);
 
     const restAreas = [...new Set(REST_SPOTS.map((spot) => spot.area))].sort();
     expect(restAreas).toEqual(playableAreas);
-    expect(REST_SPOTS).toHaveLength(33);
+    expect(REST_SPOTS).toHaveLength(36);
 
     const addedSet = new Set(addedSpotIds);
     const directions: readonly Direction[] = ["up", "down", "left", "right"];

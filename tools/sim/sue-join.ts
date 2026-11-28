@@ -64,7 +64,7 @@ state = advance(state, { ...blankInput(), confirm: true });
 if (state.dialogue === null) throw new Error("Sue talk did not open");
 for (let tick = 0; tick < 600 && state.dialogue !== null; tick += 1)
   state = advance(state, { ...blankInput(), confirm: tick % 2 === 1 });
-if (state.dialogue !== null || state.party.map((member) => member.id).join(",") !== "maddie,sue")
+if (state.dialogue !== null || state.party.map((member) => member.id).join(",") !== "sue,maddie")
   throw new Error("Sue did not join after the talk");
 
 for (let tick = 0; tick < 330; tick += 1) {

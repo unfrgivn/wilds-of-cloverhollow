@@ -19,6 +19,9 @@ export type TimeOfDayGrade = {
 const OUTDOOR_GOLDEN_AREAS = new Set([
   "plaza",
   "park",
+  "lane",
+  "crossing",
+  "boardwalk",
   "bay",
   "island",
   "pass",

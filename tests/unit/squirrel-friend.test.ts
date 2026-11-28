@@ -170,7 +170,7 @@ describe("the squirrel along", () => {
     expect(friend === undefined ? undefined : { x: friend.x, y: friend.y }).toEqual(at);
     expect(called.wild).toEqual([]);
     const home = fluted(called, 0);
-    expect(home.party.map((member) => member.id)).toEqual(["maddie", "sue"]);
+    expect(home.party.map((member) => member.id)).toEqual(["sue", "maddie"]);
   });
 
   it("sits battles out, like the pup", () => {

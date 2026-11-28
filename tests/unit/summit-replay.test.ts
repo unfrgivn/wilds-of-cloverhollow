@@ -29,11 +29,11 @@ function replay(path: string): State {
 describe("the Alpine Summit Overlook & Ski Lift recording", () => {
   it("rides the ski lift up, explores telescope, cocoa, aurora cairn, and glides back down", () => {
     const state = replay("tests/sim/scripts/new-game/summit.json");
-    expect(state.tick).toBe(11800);
+    expect(state.tick).toBe(14851);
     expect(state.area).toBe("pass");
     expect(state.player).toEqual({ x: 485, y: 490 });
-    expect(state.coins).toBe(122);
-    expect(state.snacks).toBe(5);
+    expect(state.coins).toBe(130);
+    expect(state.snacks).toBe(3);
     expect(state.lantern).toBe(false);
     expect(world.storyVariable(state.ink, "summit_visited")).toBe(true);
     expect(world.storyVariable(state.ink, "summit_telescope_used")).toBe(true);

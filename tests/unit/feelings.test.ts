@@ -55,7 +55,7 @@ describe("battle feelings", () => {
 
   it("counts only friends with a battle command toward turning feelings on", () => {
     const state = introState("plaza-party");
-    expect(state.party.map((member) => member.id)).toEqual(["maddie", "sue"]);
+    expect(state.party.map((member) => member.id)).toEqual(["sue", "maddie"]);
     expect(feelingsOn(content.world, state)).toBe(true);
     // A party member the roster gives no battle command doesn't count.
     const { sue: _sue, ...withoutSue } = content.world.party;
@@ -124,7 +124,7 @@ describe("battle feelings", () => {
   it("adds the bonus immediately for an answered Snack and clamps calm", () => {
     const state = commandState("plaza-party", ["hungry", "grumpy", null], 95);
     const after = step(
-      content.world, { ...state, snacks: 1 }, { ...blankInput(), choose: 3 },
+      content.world, { ...state, snacks: 1 }, { ...blankInput(), choose: 2 },
     ).state;
 
     expect(after.battle?.answered).toBe(true);

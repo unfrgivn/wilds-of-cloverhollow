@@ -284,7 +284,7 @@ export function buildJournalView(params: JournalViewParams): JournalView {
         )
       : {},
     busRoutes: open
-      ? mapBusRoutes(world.lands, isStorySet, (id) => state.stickers.includes(id))
+      ? mapBusRoutes(world.lands, isStorySet)
       : [],
     stickersOwned: state.stickers.length,
     stickersTotal: world.stickers.catalogue.length,

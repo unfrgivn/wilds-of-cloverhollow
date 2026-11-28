@@ -158,23 +158,31 @@ describe("calm-down battle core", () => {
 
   it("skips disabled Play and Snack commands in both menu directions", () => {
     let state = battleState();
-    state = { ...state, snacks: 0, battle: { ...state.battle!, rest: { play: 1 } } };
+    state = {
+      ...state,
+      snacks: 0,
+      battle: { ...state.battle!, actorIndex: 1, selected: 1, rest: { play: 1 } },
+    };
     state = step(content.world, state, { ...none, move: { x: 0, y: 1 } }).state;
     expect(state.battle?.selected).toBe(3);
     state = step(content.world, state, {
       ...none,
       move: { x: 0, y: -1 },
     }).state;
-    expect(state.battle?.selected).toBe(0);
+    expect(state.battle?.selected).toBe(1);
   });
 
   it("touch choose starts an enabled command and ignores disabled choices", () => {
     let state = battleState();
-    state = step(content.world, state, { ...none, choose: 1 }).state;
+    state = { ...state, battle: { ...state.battle!, actorIndex: 1 } };
+    state = step(content.world, state, { ...none, choose: 0 }).state;
     expect(state.battle?.phase).toBe("check");
-    state = { ...battleState(), battle: { ...battleState().battle!, rest: { play: 1 } } };
+    state = {
+      ...battleState(),
+      battle: { ...battleState().battle!, actorIndex: 1, rest: { play: 1 } },
+    };
     expect(
-      step(content.world, state, { ...none, choose: 1 }).state.battle?.phase,
+      step(content.world, state, { ...none, choose: 0 }).state.battle?.phase,
     ).toBe("command");
   });
 
@@ -259,17 +267,22 @@ describe("calm-down battle core", () => {
 
   it("uses the chosen command id and sets Play rest", () => {
     let state = battleState();
-    state = step(content.world, state, { ...none, move: { x: 0, y: 1 } }).state;
+    state = { ...state, battle: { ...state.battle!, actorIndex: 1, selected: 0 } };
     state = press(state);
     expect(state.battle?.command).toBe("play");
     expect(state.battle?.rest).toEqual({ play: 1 });
-    expect(battleCommands(content.world, state)[1]?.disabled).toBe(true);
+    expect(battleCommands(content.world, state)[0]?.disabled).toBe(true);
   });
 
   it("expires Play rest after a command turn", () => {
     let state = battleState();
     state = { ...state, battle: { ...state.battle!, rest: { play: 1 } } };
-    expect(battleCommands(content.world, state)[1]?.disabled).toBe(true);
+    expect(
+      battleCommands(content.world, {
+        ...state,
+        battle: { ...state.battle!, actorIndex: 1 },
+      })[0]?.disabled,
+    ).toBe(true);
     state = press(state);
     expect(state.battle?.rest).toEqual({});
   });

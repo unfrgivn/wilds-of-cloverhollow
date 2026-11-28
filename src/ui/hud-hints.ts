@@ -8,6 +8,7 @@ export type HudHintAction =
   | "journal"
   | "lantern"
   | "flute"
+  | "lasso"
   | "photo"
   | "mute"
   | "battle-guide";
@@ -17,6 +18,7 @@ export type HudHintKeys = {
   journal: string;
   lantern: string;
   flute: string;
+  lasso: string;
   mute: string;
   photo: string;
   guide: string;
@@ -29,6 +31,7 @@ export function hudHintKeys(mode: HudInputMode): HudHintKeys {
       journal: "Y",
       lantern: "X",
       flute: "RB",
+      lasso: "LB",
       mute: "M",
       photo: "View",
       guide: "View",
@@ -39,6 +42,7 @@ export function hudHintKeys(mode: HudInputMode): HudHintKeys {
     journal: "J",
     lantern: "L",
     flute: "F",
+    lasso: "R",
     mute: "M",
     photo: "P",
     guide: "I",
@@ -52,6 +56,7 @@ export type HudHintsView = {
   hasLantern: boolean;
   lanternOn: boolean;
   hasFlute: boolean;
+  hasLasso?: boolean;
   muted: boolean;
   canPhoto?: boolean;
   battlePeekHint?: boolean;
@@ -70,6 +75,11 @@ export function resolveHudHintVisibility(view: HudHintsView): ResolvedHudHints {
   const showPhoto = showRibbon && view.canPhoto === true;
   const showBattleGuide = !showRibbon && view.battlePeekHint === true;
   return { showRibbon, showPhoto, showBattleGuide };
+}
+
+/** Reports whether the overworld Rainbow Lasso Key Hint pill should be visible. */
+export function shouldShowLassoHint(view: HudHintsView): boolean {
+  return view.visible && view.hasLasso === true;
 }
 
 export type HudInteractHint = {
@@ -192,6 +202,9 @@ export function createHudHints(root: HTMLElement): {
   lanternPill.root.hidden = true;
   const flutePill = makeHintPill("flute", "F", "Flute", fire);
   flutePill.root.hidden = true;
+  const lassoPill = makeHintPill("lasso", "R", "Lasso", fire);
+  lassoPill.root.hidden = true;
+  lassoPill.root.setAttribute("aria-label", "Throw Rainbow Lasso");
   const mutePill = makeHintPill("mute", "M", "Mute", fire);
   const photoPill = makeHintPill("photo", "P", "Photo", fire);
   photoPill.root.hidden = true;
@@ -201,6 +214,7 @@ export function createHudHints(root: HTMLElement): {
     interactPill.root,
     lanternPill.root,
     flutePill.root,
+    lassoPill.root,
     mutePill.root,
     photoPill.root,
   );
@@ -227,10 +241,11 @@ export function createHudHints(root: HTMLElement): {
     render: (view) => {
       const mode: HudInputMode = view.inputMode ?? "keyboard";
       const resolved = resolveHudHintVisibility(view);
+      const showLasso = shouldShowLassoHint(view);
       const signature =
         `${resolved.showRibbon}|${resolved.showPhoto}|${resolved.showBattleGuide}|` +
         `${view.canInteract}|${view.interactLabel}|` +
-        `${view.hasLantern}|${view.lanternOn}|${view.hasFlute}|${view.muted}|${mode}`;
+        `${view.hasLantern}|${view.lanternOn}|${view.hasFlute}|${showLasso}|${view.muted}|${mode}`;
       if (signature === lastSignature) return;
       lastSignature = signature;
 
@@ -246,6 +261,7 @@ export function createHudHints(root: HTMLElement): {
       setText(interactPill.key, keys.interact);
       setText(lanternPill.key, keys.lantern);
       setText(flutePill.key, keys.flute);
+      setText(lassoPill.key, keys.lasso);
       setText(mutePill.key, keys.mute);
       setText(photoPill.key, keys.photo);
 
@@ -260,6 +276,7 @@ export function createHudHints(root: HTMLElement): {
       lanternPill.root.setAttribute("aria-label", lanternOn ? "Lantern on" : "Lantern");
 
       flutePill.root.hidden = !view.hasFlute;
+      lassoPill.root.hidden = !showLasso;
 
       const muteText = view.muted ? "Muted" : "Mute";
       mutePill.root.classList.toggle("is-muted", view.muted);

@@ -162,6 +162,7 @@ export function bindShellUiControls(deps: ShellUiBindingDeps): void {
     else if (action === "journal") ui.touch.tapButton("menu");
     else if (action === "lantern") ui.touch.tapButton("lantern");
     else if (action === "flute") ui.touch.tapButton("flute");
+    else if (action === "lasso") ui.touch.tapButton("lasso");
     else if (action === "photo" && deps.canPhotoMode()) deps.setPhotoMode(true);
     else if (action === "mute") {
       sound.toggle();

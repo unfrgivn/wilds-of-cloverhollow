@@ -8895,6 +8895,33 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   checks green), and 25/25 Chromium & WebKit e2e tests (`milestone-202`,
   `e9b-decor-economy`, `encore-shrine`, `travel-vignette`, `milestone-198`,
   `milestone-200`).
+
+## Milestone 203: Complete Elevation Document Titles, Clickable Overworld Rainbow Lasso Key Hint Pill & Verified `ui-gallery` / `soundtrack` Visual Baseline Sync **Status:** ✅ Completed (2026-11-28)
+- Extends dynamic browser/PWA tab titles across all Elevation modes, adds a
+  clickable `Lasso [R]` (`LB` on gamepad) Key Hint pill beside `Lantern` and
+  `Flute`, and refreshes the 5 `vision`-audited stale post-M179/M193 visual
+  baselines so both `ui-gallery` (99/99) and `soundtrack` (12/12) return to
+  100% green — zero `src/core` changes, zero save-version bumps, and zero replay
+  hash drift across all 77 sims.
+- Complete Elevation document titles (`src/shell/document-title.ts`, `src/main.ts`):
+  - Added Boss Encore (`Starlight Encore: <Boss>`), multi-critter formations
+    (`Calming <Critter> +<N>` collapsing cleanly as foes soothe), Dream Memory
+    Shrine (`Dream Memory Shrine`), Room Decor Picker (`Decorating <Area>`), and
+    Photo Mode (`Photo Mode · <Area>`), backwards-compatible with all callers.
+- Clickable Overworld Rainbow Lasso Key Hint (`src/ui/hud-hints.ts`,
+  `src/shell/shell-bindings.ts`, `src/main.ts`):
+  - Added `lasso` to `HudHintAction` and `hudHintKeys` (`"R"` keyboard, `"LB"`
+    gamepad), mounted `.hud-hint[data-hint="lasso"]` strictly when
+    `hasLasso === true`, and wired clicks directly to `ui.touch.tapButton("lasso")`.
+- Verified visual baseline sync:
+  - Audited via `vision` and refreshed `ui-gallery` `prompt-chromium-darwin.png`
+    (M193 `.touch-dash` `»` button) and `soundtrack` `journal-options-{1280,874}`
+    Chromium & WebKit PNGs (M179 Plaza restoration decals behind Journal).
+- Evidence: `tests/unit/milestone-203.test.ts` and
+  `tests/e2e/milestone-203.spec.ts` (`@smoke` Chromium + WebKit).
+- Gates: `just check` (273 unit files / 2,037 tests, all 77 sims + 7 sim
+  scripts, 23 QA packs, purity, lint), `just build` (`index` `374.46 kB < 500 kB`),
+  20/20 Chromium & WebKit e2e, and 99/99 Chromium `ui-gallery` tests.
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

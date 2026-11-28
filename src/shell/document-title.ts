@@ -15,6 +15,9 @@ const ARCADE_TITLES: Record<NonNullable<State["arcade"]>["game"], string> = {
 export type DocumentTitleFlags = {
   titleOpen: boolean;
   creditsOpen: boolean;
+  photoMode?: boolean;
+  encoreShrineOpen?: boolean;
+  decorOpen?: boolean;
 };
 
 /** Formats the browser tab title for the active screen, battle, minigame, or area. */
@@ -27,11 +30,25 @@ export function formatDocumentTitle(
   if (flags.creditsOpen) return `Thank You for Playing · ${BASE_TITLE}`;
   if (state.battle !== null) {
     const name = world.critters[state.battle.critterId]?.name;
-    return name === undefined || name === "" ? BASE_TITLE : `Calming ${name} · ${BASE_TITLE}`;
+    if (name === undefined || name === "") return BASE_TITLE;
+    if (state.battle.encore !== undefined) return `Starlight Encore: ${name} · ${BASE_TITLE}`;
+    if (state.battle.foes !== undefined && state.battle.foes.length > 1) {
+      const activeFoes = state.battle.foes.filter((foe) => !foe.soothed).length;
+      if (activeFoes > 1) return `Calming ${name} +${activeFoes - 1} · ${BASE_TITLE}`;
+    }
+    return `Calming ${name} · ${BASE_TITLE}`;
   }
   if (state.arcade !== null) {
     return `${ARCADE_TITLES[state.arcade.game]} · ${BASE_TITLE}`;
   }
+  if (flags.encoreShrineOpen === true) return `Dream Memory Shrine · ${BASE_TITLE}`;
   const areaName = world.areas[state.area]?.name;
-  return areaName === undefined || areaName === "" ? BASE_TITLE : `${areaName} · ${BASE_TITLE}`;
+  const hasArea = areaName !== undefined && areaName !== "";
+  if (flags.decorOpen === true) {
+    return hasArea ? `Decorating ${areaName} · ${BASE_TITLE}` : `Decorating · ${BASE_TITLE}`;
+  }
+  if (flags.photoMode === true) {
+    return hasArea ? `Photo Mode · ${areaName} · ${BASE_TITLE}` : `Photo Mode · ${BASE_TITLE}`;
+  }
+  return hasArea ? `${areaName} · ${BASE_TITLE}` : BASE_TITLE;
 }

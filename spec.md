@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 202)
+Last updated: 2026-11-28 (Milestone 203)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -3260,15 +3260,24 @@ trunks keep its two exits.
 - Dev builds log `[cloverhollow] title {mode, options}` (the visible buttons'
   rects, CSS px) when the mode changes; `just ios-smoke` taps New game from
   them on a fresh install and Continue after the relaunch.
-- Dynamic browser tab title (`src/shell/document-title.ts`, Milestone 138):
-  `formatDocumentTitle(world, state, { titleOpen, creditsOpen })` keeps
-  `document.title` in sync on change only (zero per-frame DOM churn):
-  `"Wilds of Cloverhollow"` on the title screen or `harness`, `"Thank You for
-  Playing · Wilds of Cloverhollow"` during credits, `"Calming <Critter> · Wilds
-  of Cloverhollow"` during calm-down battles, `"<Minigame> · Wilds of
-  Cloverhollow"` across all six minigames (`Claw Machine`, `Skee-Ball`,
-  `Boop-a-Mole`, `Comet Cruise`, `Clubhouse Microwave`, `Bubblegum Bay
-  Fishing`), and `"<Area Name> · Wilds of Cloverhollow"` in overworld areas.
+- Dynamic browser tab title (`src/shell/document-title.ts`, Milestones 138 &
+  202): `formatDocumentTitle(world, state, { titleOpen, creditsOpen, photoMode?,
+  encoreShrineOpen?, decorOpen? })` keeps `document.title` in sync on change
+  only (zero per-frame DOM churn): `"Wilds of Cloverhollow"` on the title screen
+  or `harness`, `"Thank You for Playing · Wilds of Cloverhollow"` during
+  credits, `"Starlight Encore: <Boss> · Wilds of Cloverhollow"` during Boss
+  Encore rematches (`battle.encore`), `"Calming <Critter> +<N> · Wilds of
+  Cloverhollow"` during multi-critter formations while more than one active foe
+  remains (collapsing to `"Calming <Critter> · Wilds of Cloverhollow"` once one
+  remains or in single-foe calm-downs), `"<Minigame> · Wilds of Cloverhollow"`
+  across all seven minigames (`Claw Machine`, `Skee-Ball`, `Boop-a-Mole`,
+  `Comet Cruise`, `Clubhouse Microwave`, `Bubblegum Bay Fishing`, `Chef Mateo's
+  Taco Truck`), `"Dream Memory Shrine · Wilds of Cloverhollow"` while the
+  Encore Shrine is open, `"Decorating <Area Name> · Wilds of Cloverhollow"` (or
+  `"Decorating · Wilds of Cloverhollow"`) while the Room Decor Picker is open,
+  `"Photo Mode · <Area Name> · Wilds of Cloverhollow"` (or `"Photo Mode · Wilds
+  of Cloverhollow"`) in Photo Mode, and `"<Area Name> · Wilds of Cloverhollow"`
+  in overworld areas.
 
 ### 7.4 The wake-up and the credits (Milestones 56 & 192, Elevation Track E12)
 - `state.finale` is `null` in the dream, `morning` once the ending wakes Fae,
@@ -5457,7 +5466,10 @@ trunks keep its two exits.
   resting, `Pet` when actively facing a pettable companion with forward dot
   `>= 0.15`, `Rest` at a rest spot, or inactive `Talk`), Lantern (`L` / `X`,
   shown once unlocked and glowing lavender when lit), Flute (`F` / `RB`, shown
-  once unlocked), Mute (`M`), and Photo (`P` / `View`, `[data-hint="photo"]`,
+  once unlocked), Rainbow Lasso (`R` / `LB`, `[data-hint="lasso"]`,
+  `aria-label="Throw Rainbow Lasso"`, shown beside Flute once `has_lasso` is
+  unlocked and clicking pulses the overworld lasso input, Milestone 202), Mute
+  (`M`), and Photo (`P` / `View`, `[data-hint="photo"]`,
   shown beside Mute whenever `canPhoto` is true in the free overworld outside
   Photo Mode). During battle `command` phase (outside the treat tray and touch
   mode) with Key Hints enabled, a single compact die-cut pill
@@ -5473,8 +5485,9 @@ trunks keep its two exits.
   `role="button"`, `tabindex="0"`, synced `aria-label`, click + `Enter`/`Space`
   with propagation stopped so clicks never trigger canvas steering, Milestone
   130), letting one-handed mouse/trackpad players open Journal, interact
-  (`Talk`/`Pet`/`Rest`/`Stand`), toggle Lantern/Flute/Mute, enter Photo Mode,
-  and toggle the Battle Field Guide while keeping identical visual geometry.
+  (`Talk`/`Pet`/`Rest`/`Stand`), toggle Lantern/Flute/Lasso/Mute, enter Photo
+  Mode, and toggle the Battle Field Guide while keeping identical visual
+  geometry.
   Both hide automatically when Key Hints is off or during touch mode,
   title, dialogue, arcade, journal, credits, or QA overlays.
 - `data-journal="open"` hides all touch controls while the book is open.

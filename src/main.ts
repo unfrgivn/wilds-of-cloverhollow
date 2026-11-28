@@ -533,11 +533,11 @@ async function boot(): Promise<void> {
       state.area, overworldFree && state.area !== "harness" && state.transition === null,
       !paused && !harnessStepping, view.npcLifeInfo()?.activeToolEventId ?? null,
     );
-    hudHints.render(buildHudHintsView({
+    hudHints.render({ ...buildHudHintsView({
       world: content.world, state, keyHints: gameSettings.keyHints(), touchActive, overworldFree,
       isResting: view.isResting(), hasLantern, hasFlute, muted: sound.muted(),
       canPhoto: canPhotoMode(gate) && !photoMode, canBattlePeek: canBattlePeek(gate), inputMode,
-    }));
+    }), hasLasso });
     areaBanner.render(bannerTracker.view(
       content.world, state, isBannerEligible(gate, hasLevelUpNotice), qa?.isActive() ?? false,
     ));
@@ -546,11 +546,11 @@ async function boot(): Promise<void> {
       visible: titleMode !== null && !qaMenuOpen, mode: titleMode ?? "fresh",
       selected: titleSelected, continueDetail: continueDetail(content.world, state),
     });
-    qa?.render();
-    syncOpenFlag("qaConsole", gate.qaConsoleOpen);
+    qa?.render(); syncOpenFlag("qaConsole", gate.qaConsoleOpen);
     const creditsOpen = state.finale === "credits";
     syncDocumentTitle(formatDocumentTitle(content.world, state, {
-      titleOpen: titleMode !== null, creditsOpen,
+      titleOpen: titleMode !== null, creditsOpen, photoMode,
+      encoreShrineOpen: encoreShrine?.isOpen() ?? false, decorOpen: decorPicker.isOpen(),
     }));
     if (photoMode || titleMode !== null || activeBattle || state.journalOpen || creditsOpen ||
       state.cutscene !== undefined || (encoreShrine?.isOpen() ?? false) || decorPicker.isOpen()
@@ -564,8 +564,7 @@ async function boot(): Promise<void> {
     syncOpenFlag("battle", activeBattle); syncOpenFlag("cutscene", state.cutscene !== undefined);
     syncOpenFlag("talk", battle?.talk !== null && battle?.talk !== undefined);
     syncOpenFlag("shrine", encoreShrine?.isOpen() ?? false);
-    syncOpenFlag("decor", decorPicker.isOpen());
-    syncOpenFlag("fluteWheel", fluteWheelView.visible);
+    syncOpenFlag("decor", decorPicker.isOpen()); syncOpenFlag("fluteWheel", fluteWheelView.visible);
     const checkKind = state.battle?.phase === "check" ? state.battle.check?.kind : undefined;
     if (checkKind !== undefined) document.documentElement.dataset.check = checkKind;
     else delete document.documentElement.dataset.check;

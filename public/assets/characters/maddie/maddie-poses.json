@@ -1,0 +1,123 @@
+{
+  "frames": {
+    "pose_groom_01": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.96484375
+      }
+    },
+    "pose_stretch_01": {
+      "frame": {
+        "x": 256,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.96484375
+      }
+    },
+    "pose_nap_01": {
+      "frame": {
+        "x": 512,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.96484375
+      }
+    },
+    "pose_cheer_01": {
+      "frame": {
+        "x": 768,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.96484375
+      }
+    }
+  },
+  "animations": {
+    "pose_groom": [
+      "pose_groom_01"
+    ],
+    "pose_stretch": [
+      "pose_stretch_01"
+    ],
+    "pose_nap": [
+      "pose_nap_01"
+    ],
+    "pose_cheer": [
+      "pose_cheer_01"
+    ]
+  },
+  "meta": {
+    "image": "maddie-poses.webp",
+    "size": {
+      "w": 1024,
+      "h": 256
+    },
+    "scale": "1",
+    "baseline": 247
+  }
+}

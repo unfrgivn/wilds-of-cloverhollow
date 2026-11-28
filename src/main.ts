@@ -935,6 +935,7 @@ async function boot(): Promise<void> {
       sound, gameSettings, photoMode: () => photoMode, setPhotoMode: (on) => setPhotoMode(on),
       snapPostcard, minigameRecords: () => minigameRecords.records(),
       navOverlay: (visible) => { const on = view.setNavHeatmap(visible); invalidate(); return on; },
+      previewDialogueTags: (tags) => { view.setPreviewDialogueTags(tags); render(); invalidate(); },
       boot: { title: () => titleMode },
     });
   }

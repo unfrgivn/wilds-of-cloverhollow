@@ -4,6 +4,7 @@ import {
   Sprite,
   Spritesheet,
   type Renderer,
+  type Texture,
 } from "pixi.js";
 import {
   battleParty,
@@ -16,6 +17,7 @@ import {
   type World,
 } from "../core";
 import type { AreaView } from "./area-view";
+import { selectBattleActorPose } from "./animation";
 import { computeBattleChoreography } from "./battle-choreography";
 import { battleLayout, type BattleLayout } from "./battle-layout";
 import {
@@ -96,6 +98,8 @@ export type BattleRenderInfo = {
   } | null;
   check: BattleCheckInfo | null;
   critter: { id: string; frame: string } | null;
+  faePose: string | null;
+  partyPoses: Record<string, string>;
   layout: {
     critter: { x: number; baseline: number; height: number };
     fae: { x: number; baseline: number; height: number };
@@ -135,6 +139,20 @@ export function placeAura(
   );
 }
 
+function resolveBattleActorFrame(
+  actorId: string,
+  battle: NonNullable<State["battle"]>,
+  fallback: Texture | undefined,
+): { texture: Texture | undefined; mirror: boolean; poseName: string } {
+  const pose = selectBattleActorPose(actorId, battle);
+  const poseTex = pose === null
+    ? undefined
+    : Assets.get<Spritesheet | undefined>(`${actorId}-poses`)?.animations[pose.animation]?.[0];
+  return poseTex !== undefined && pose !== null
+    ? { texture: poseTex, mirror: pose.mirror, poseName: pose.animation }
+    : { texture: fallback, mirror: true, poseName: "idle_left" };
+}
+
 function critterFrameForBattle(battle: NonNullable<State["battle"]>): string {
   const peekabooWatching =
     battle.phase === "check" &&
@@ -162,6 +180,8 @@ export class BattleViewController {
   private readonly battleFae = new Sprite();
   private readonly battlePartySprites = new Map<string, Sprite>();
   private hasRenderedBattle = false;
+  private lastFaePose: string | null = null;
+  private lastPartyPoses: Record<string, string> = {};
 
   constructor(
     private readonly world: World,
@@ -211,6 +231,8 @@ export class BattleViewController {
         return false;
       }
       this.hasRenderedBattle = false;
+      this.lastFaePose = null;
+      this.lastPartyPoses = {};
       this.battleLayer.visible = false;
       this.stage.hide();
       return true;
@@ -230,6 +252,8 @@ export class BattleViewController {
     // The claw machine's close-up is DOM over the blurred room: no battle
     // figures, and a lighter wash.
     if (arcade !== null) {
+      this.lastFaePose = null;
+      this.lastPartyPoses = {};
       this.stage.drawWash(width, height, 0.28);
       return false;
     }
@@ -243,12 +267,7 @@ export class BattleViewController {
       partyCommands[member.id] = this.world.party[member.id]?.command?.id ?? null;
     }
     const choreo = computeBattleChoreography(
-      battle,
-      viewModel,
-      state.tick,
-      partyIds,
-      partyCommands,
-      reducedMotion,
+      battle, viewModel, state.tick, partyIds, partyCommands, reducedMotion,
     );
     this.battleLayer.scale.set(scale);
     this.battleLayer.position.set(
@@ -297,20 +316,14 @@ export class BattleViewController {
     );
     this.battleCritter.rotation = critterPose.rotation;
     this.stage.updateCritterShadow(
-      critterX + critterPose.offsetX * 0.85,
-      critterY,
-      critter.battleHeight,
-      swell,
+      critterX + critterPose.offsetX * 0.85, critterY, critter.battleHeight, swell,
       liftShadowScale(critterPose.offsetY),
     );
 
     this.battleCritterAura.texture = aura;
     placeAura(
-      this.battleCritterAura,
-      this.battleCritter.position,
-      critterScale * choreo.auraScaleBoost,
-      critter.auraCentre,
-      critter.bodyCentre,
+      this.battleCritterAura, this.battleCritter.position, critterScale * choreo.auraScaleBoost,
+      critter.auraCentre, critter.bodyCentre,
     );
     // The aura fades as the critter is soothed, and a calm one (the reward)
     // has none.
@@ -323,39 +336,28 @@ export class BattleViewController {
     this.battleCritterAura.rotation = state.tick / 180;
 
     const faeSheet = Assets.get<Spritesheet>("fae-sheet");
-    const faeFrames = faeSheet.animations.idle_left ?? faeSheet.animations.idle_up;
-    const fae = faeFrames?.[0];
+    const faeFallback = (faeSheet.animations.idle_left ?? faeSheet.animations.idle_up)?.[0];
+    const faeFrame = resolveBattleActorFrame("fae", battle, faeFallback);
+    this.lastFaePose = faeFrame.poseName;
     const faeX = (layout.fae.x - x) / scale - slideOffset;
     const faeY = (layout.fae.baseline - y) / scale;
     const faePose = choreo.fae;
-    if (fae !== undefined) {
-      this.battleFae.texture = fae;
-      if (fae.defaultAnchor !== undefined) {
-        this.battleFae.anchor.copyFrom(fae.defaultAnchor);
-      }
-      this.battleFae.scale.set(
-        -FAE_BATTLE_SCALE * faePose.scaleX,
-        FAE_BATTLE_SCALE * faePose.scaleY,
-      );
+    if (faeFrame.texture !== undefined) {
+      this.battleFae.texture = faeFrame.texture;
+      if (faeFrame.texture.defaultAnchor !== undefined)
+        this.battleFae.anchor.copyFrom(faeFrame.texture.defaultAnchor);
+      const sign = faeFrame.mirror ? -FAE_BATTLE_SCALE : FAE_BATTLE_SCALE;
+      this.battleFae.scale.set(sign * faePose.scaleX, FAE_BATTLE_SCALE * faePose.scaleY);
       this.battleFae.position.set(faeX + faePose.offsetX, faeY + faePose.offsetY);
       this.battleFae.rotation = faePose.rotation;
       this.battleFae.tint = warmFlashTint(faePose.tintFlash);
     }
     this.stage.updateFaeShadow(
-      faeX + faePose.offsetX * 0.85,
-      faeY,
-      liftShadowScale(faePose.offsetY),
+      faeX + faePose.offsetX * 0.85, faeY, liftShadowScale(faePose.offsetY),
     );
     this.stage.renderLighting(
-      choreo.stageMood,
-      state.tick,
-      viewWidth,
-      viewHeight,
-      faeX,
-      faeY,
-      critterX,
-      critterY,
-      reducedMotion,
+      choreo.stageMood, state.tick, viewWidth, viewHeight, faeX, faeY,
+      critterX, critterY, reducedMotion,
     );
 
     // Fae and all fighting party members face right toward the critter
@@ -374,19 +376,24 @@ export class BattleViewController {
       x: faeX + faePose.offsetX,
       y: faeY - faeBox.height * (FAE_BATTLE_SCALE / 0.5) - 10,
     });
+    const nextPartyPoses: Record<string, string> = {};
     fighting.forEach((member, index) => {
       const sprite = this.battlePartySprites.get(member.id);
       const content = this.world.party[member.id];
       const place = layout.party[index];
       if (sprite === undefined || content === undefined || place === undefined) return;
       const memberSheet = Assets.get<Spritesheet>(`${member.id}-sheet`);
-      const frame = (memberSheet.animations.idle_left ?? memberSheet.animations.idle_down)?.[0];
-      if (frame === undefined) return;
-      sprite.texture = frame;
-      if (frame.defaultAnchor !== undefined) sprite.anchor.copyFrom(frame.defaultAnchor);
+      const fallback = (memberSheet.animations.idle_left ?? memberSheet.animations.idle_down)?.[0];
+      const resolved = resolveBattleActorFrame(member.id, battle, fallback);
+      if (resolved.texture === undefined) return;
+      nextPartyPoses[member.id] = resolved.poseName;
+      sprite.texture = resolved.texture;
+      if (resolved.texture.defaultAnchor !== undefined)
+        sprite.anchor.copyFrom(resolved.texture.defaultAnchor);
       const baseScale = ((content.scale ?? 0.5) / 0.5) * FAE_BATTLE_SCALE;
       const memberPose = choreo.party[member.id] ?? NEUTRAL_POSE;
-      sprite.scale.set(-baseScale * memberPose.scaleX, baseScale * memberPose.scaleY);
+      const sign = resolved.mirror ? -baseScale : baseScale;
+      sprite.scale.set(sign * memberPose.scaleX, baseScale * memberPose.scaleY);
       const memberX = (place.x - x) / scale - slideOffset;
       const memberY = (place.y - y) / scale;
       sprite.position.set(memberX + memberPose.offsetX, memberY + memberPose.offsetY);
@@ -397,13 +404,11 @@ export class BattleViewController {
         y: memberY - content.box.height * (baseScale / 0.5) - 10,
       });
       this.stage.updatePartyShadow(
-        member.id,
-        memberX + memberPose.offsetX * 0.85,
-        memberY,
-        content.box.width,
+        member.id, memberX + memberPose.offsetX * 0.85, memberY, content.box.width,
         liftShadowScale(memberPose.offsetY),
       );
     });
+    this.lastPartyPoses = nextPartyPoses;
 
     const activeHead = battle.phase === "command" && viewModel !== null
       ? actorHeads.get(viewModel.activeActor.id)
@@ -678,6 +683,8 @@ export class BattleViewController {
               id: state.battle.critterId,
               frame: critterFrameForBattle(state.battle),
             },
+      faePose: state.battle === null ? null : this.lastFaePose,
+      partyPoses: state.battle === null ? {} : { ...this.lastPartyPoses },
       overworldVisible,
       auraAlpha: state.battle === null ? 0 : this.battleCritterAura.alpha,
     };

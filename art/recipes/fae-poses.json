@@ -1,0 +1,42 @@
+{
+  "asset": "fae-poses",
+  "status": "generated-validator-passing",
+  "model": "gemini-3-pro-image-preview",
+  "date": "2026-11-27",
+  "generationCalls": 3,
+  "referenceImages": [
+    "art/source/fae/fae-model-sheet-v2.png",
+    "docs/art/concepts/props/blacklight_lantern.png",
+    "docs/art/concepts/props/tools_lasso_flute_journal.png"
+  ],
+  "prompts": {
+    "expressive": "Four isolated full-body watercolor chibi Fae poses on pure green #00FF00 matching fae-model-sheet-v2: cheer, shock (clear warm-brown pupils inside wide surprised eyes), sit (with backpack and brown journal), talk_01 (with backpack and brown journal). No ground shadow, no text, no floating icons.",
+    "tools": "Three isolated full-body watercolor chibi Fae tool poses on pure green #00FF00 matching fae-model-sheet-v2 and the approved blacklight lantern, rainbow lasso, and painted flute concepts: tool_lantern, tool_lasso, tool_flute. Each figure and held tool forms one clean connected silhouette."
+  },
+  "selectedRawSources": [
+    "art/source/fae/fae-poses-expressive-v2.png",
+    "art/source/fae/fae-poses-tools-v1.png"
+  ],
+  "postProcessing": {
+    "build": "bun tools/art/build-poses.ts --only fae && bun tools/art/optimize-atlases.ts",
+    "extract": "extract-figures.ts connected-component extraction (4 expressive poses, 3 tool poses)",
+    "key": "#00FF00 border flood plus enclosed holes (--holes, 18% fuzz, edge despill only)",
+    "despill": "despill-edge.ts green edge-only despill (band 12 pre-resize and post-resize)",
+    "scalePercent": { "expressive": 23.0, "tools": 21.5 },
+    "canvas": "384x384 source px, baseline 375, anchor {x: 0.5, y: 0.9765625}",
+    "atlas": "4 columns x 2 rows alpha-WebP companion atlas (public/assets/characters/fae/fae-poses.webp + .json)",
+    "review": "art/review/e2-fae-poses-cream.jpg and art/review/e2-fae-poses-dark.jpg (with base down_idle_01 in slot 0)"
+  },
+  "validator": {
+    "key": "green",
+    "poses": [
+      "cheer",
+      "shock",
+      "sit",
+      "talk",
+      "tool_lantern",
+      "tool_lasso",
+      "tool_flute"
+    ]
+  }
+}

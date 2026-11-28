@@ -43,6 +43,7 @@ export type CloverhollowHook = {
     drawOrder: { label: string; zIndex: number }[];
     animation: string;
     frame: number;
+    paperFlipScaleX: number;
     party: { id: string; hidden: number; animation: string; frame: number }[];
     fade: number;
     cachedAreaTextures: string[];
@@ -91,6 +92,8 @@ export type CloverhollowHook = {
       phase: string | null;
       check: BattleCheckInfo | null;
       critter: { id: string; frame: string } | null;
+      faePose: string | null;
+      partyPoses: Record<string, string>;
       layout: {
         critter: { x: number; baseline: number; height: number };
         fae: { x: number; baseline: number; height: number };
@@ -112,6 +115,7 @@ export type CloverhollowHook = {
   boot: { title: () => "fresh" | "continue" | "confirm" | null };
   qa: { active: () => boolean; packs: () => QaPack[] };
   navOverlay?: (visible?: boolean) => boolean;
+  previewDialogueTags?: (tags: string[] | null) => void;
   sound: {
     log: AudioController["log"];
     effects: AudioController["effects"];
@@ -153,6 +157,7 @@ export function installHook(deps: {
   boot: CloverhollowHook["boot"];
   qa: CloverhollowHook["qa"];
   navOverlay?: (visible?: boolean) => boolean;
+  previewDialogueTags?: (tags: string[] | null) => void;
   sound: CloverhollowHook["sound"];
   settings: CloverhollowHook["settings"];
 }): void {
@@ -206,6 +211,9 @@ export function installHook(deps: {
     boot: deps.boot,
     qa: deps.qa,
     ...(deps.navOverlay !== undefined ? { navOverlay: deps.navOverlay } : {}),
+    ...(deps.previewDialogueTags !== undefined
+      ? { previewDialogueTags: deps.previewDialogueTags }
+      : {}),
     sound: deps.sound,
     settings: deps.settings,
   };
@@ -242,6 +250,7 @@ export function installShellHook(deps: {
   snapPostcard: (options?: { download?: boolean }) => Promise<PostcardCapture | null>;
   minigameRecords: () => MinigameRecords;
   navOverlay?: (visible?: boolean) => boolean;
+  previewDialogueTags?: (tags: string[] | null) => void;
 }): void {
   const invalidateAfter = <Args extends unknown[]>(
     fn: (...args: Args) => void,
@@ -274,6 +283,9 @@ export function installShellHook(deps: {
     boot: deps.boot,
     qa: deps.qa,
     ...(deps.navOverlay !== undefined ? { navOverlay: deps.navOverlay } : {}),
+    ...(deps.previewDialogueTags !== undefined
+      ? { previewDialogueTags: deps.previewDialogueTags }
+      : {}),
     save: {
       clear: async () => {
         if (deps.isQaRestricted()) return;

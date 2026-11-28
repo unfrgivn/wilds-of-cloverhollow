@@ -1,0 +1,204 @@
+{
+  "frames": {
+    "pose_cheer_01": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "sourceSize": {
+        "w": 384,
+        "h": 384
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9765625
+      }
+    },
+    "pose_shock_01": {
+      "frame": {
+        "x": 384,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "sourceSize": {
+        "w": 384,
+        "h": 384
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9765625
+      }
+    },
+    "pose_sit_01": {
+      "frame": {
+        "x": 768,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "sourceSize": {
+        "w": 384,
+        "h": 384
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9765625
+      }
+    },
+    "pose_talk_01": {
+      "frame": {
+        "x": 1152,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "sourceSize": {
+        "w": 384,
+        "h": 384
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9765625
+      }
+    },
+    "pose_tool_lantern_01": {
+      "frame": {
+        "x": 0,
+        "y": 384,
+        "w": 384,
+        "h": 384
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "sourceSize": {
+        "w": 384,
+        "h": 384
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9765625
+      }
+    },
+    "pose_tool_lasso_01": {
+      "frame": {
+        "x": 384,
+        "y": 384,
+        "w": 384,
+        "h": 384
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "sourceSize": {
+        "w": 384,
+        "h": 384
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9765625
+      }
+    },
+    "pose_tool_flute_01": {
+      "frame": {
+        "x": 768,
+        "y": 384,
+        "w": 384,
+        "h": 384
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 384
+      },
+      "sourceSize": {
+        "w": 384,
+        "h": 384
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9765625
+      }
+    }
+  },
+  "animations": {
+    "pose_cheer": [
+      "pose_cheer_01"
+    ],
+    "pose_shock": [
+      "pose_shock_01"
+    ],
+    "pose_sit": [
+      "pose_sit_01"
+    ],
+    "pose_talk": [
+      "pose_talk_01"
+    ],
+    "pose_tool_lantern": [
+      "pose_tool_lantern_01"
+    ],
+    "pose_tool_lasso": [
+      "pose_tool_lasso_01"
+    ],
+    "pose_tool_flute": [
+      "pose_tool_flute_01"
+    ]
+  },
+  "meta": {
+    "image": "fae-poses.webp",
+    "size": {
+      "w": 1536,
+      "h": 768
+    },
+    "scale": "1",
+    "baseline": 375
+  }
+}

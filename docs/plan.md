@@ -7461,11 +7461,13 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   crystals, sand flecks, concentric water ripples, grass flecks), reactive
   grass-tuft / wildflower sway, and unified cold-press watercolor paper grain
   across the Pixi stage and CSS UI.
-- **Track E2 (Expressive Sprite Action Poses & Paper-Flip Motion, Art Wave A):**
-  Expressive pose strips (`sit`, `cheer`, `shock`, `tool_lantern`, `tool_lasso`,
-  `tool_flute`, `talk`, `dash_lean`) for Fae, Maddie, Sue, Jordan, and core
-  cast; deterministic pose selector + Maddie groom/stretch/nap idle states;
-  snappy Paper Mario-style 2D card-flip turns.
+- **Track E2 (Expressive Sprite Action Poses & Paper-Flip Motion, Art Wave A):** ✅ Completed
+  (Milestone 184, 2026-11-27) — 17 hand-painted watercolor pose frames across 4
+  companion alpha-WebP pose atlases (`fae`, `maddie`, `sue`, `jordan`),
+  deterministic tool/dialogue `# pose:`/battle-victory/resting pose selectors,
+  Maddie `stretch -> groom -> nap` long-idle cycle, and snappy 8-tick
+  Paper-Flip horizontal turns (disabled under Reduced Motion & paused harness
+  snapshots).
 - **Track E3 (Storybook Dialogue Box, Multi-Expression Portraits & Kinetic Text, Art Wave A):**
   5-expression portrait sheets (`neutral`, `happy`, `worried`, `determined`,
   `surprised`) for main cast and school staff; hand-inked deckled-paper dialogue
@@ -7958,6 +7960,58 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   `fish-dock-ready`).
 - Evidence: `tests/unit/milestone-183.test.ts` (7 tests), `just check`,
   `just build`, and Chromium + WebKit e2e verification of the repaired specs.
+
+## Milestone 184: Expressive Sprite Action Poses & Paper-Flip Motion (Elevation Track E2, Art Wave A1) **Status:** ✅ Completed (2026-11-27)
+- Elevates main-cast character animation from static 1-idle + 6-walk sprites to
+  expressive *Paper Mario* / Saturday-morning-storybook physicality (100%
+  presentation-only, zero `src/core/sim.ts` changes, save `v10`, zero replay
+  hash drift across all 74 recorded sims, zero `fae-faint` edits).
+- **Art Wave A1 — Expressive Companion Pose Atlases (`art/recipes/*-poses.json`,
+  `tools/art/build-poses.ts`, `tools/art/validate-sprite.ts`,
+  `public/assets/characters/*/*-poses.{json,webp}`):**
+  - Generated 17 watercolor chibi pose frames with `gemini-3-pro-image-preview`
+    (8 total Gemini calls across 5 raw strips in `art/source/`, edge-band-only
+    despill matching each character's non-costume chroma key `#00FF00` /
+    `#FF00FF`, uniform per-strip scaling, zero post-export warping):
+    - **Fae** (`fae-poses.webp`, 102 KB, 45.24 dB PSNR): `cheer`, `shock`,
+      `sit`, `talk_01`, `tool_lantern`, `tool_lasso`, `tool_flute`.
+    - **Maddie** (`maddie-poses.webp`, 18 KB, 47.78 dB PSNR): `groom`,
+      `stretch`, `nap`, `cheer`.
+    - **Sue** (`sue-poses.webp`, 46 KB, 45.16 dB PSNR) & **Jordan**
+      (`jordan-poses.webp`, 44 KB, 45.99 dB PSNR): `cheer`, `shock`, `sit`.
+  - Extended `tools/art/validate-sprite.ts` cleanly for `.webp` atlases and
+    `validator.poses` pose-sheet validation; all 4 atlases pass every mandatory
+    check (edges, single alpha component, zero chroma spill, baseline,
+    blockiness). Committed cream + dark contact sheets
+    (`art/review/e2-{fae,maddie,sue,jordan}-poses-{cream,dark}.jpg`) and 5 live
+    gameplay shots (`art/review/e2-gameplay-{lantern,maddie-stretch,maddie-nap,resting-sit,pose-cheer}.jpg`),
+    every single sheet verified with `vision`.
+- **Deterministic Pose Selector & Maddie Idle State Machine
+  (`src/render/animation.ts`, `src/render/companions.ts`,
+  `src/render/overworld-render.ts`, `src/render/entity-layer.ts`,
+  `src/render/battle-view.ts`, `src/render/view.ts`):**
+  - Added pure `maddieIdlePhase` (`120` stretch -> `180` groom -> `240` nap on
+    a 420-tick cycle aligned with `emoteZzz`), pure Ink `# pose:` parser &
+    `state.ink`/`world.story` tag extractor (`parsePoseTags`,
+    `extractInkOutputTags`, `extractStoryKnotLineTags`, `extractDialogueTags`),
+    and deterministic `selectFaeOverworldPose`, `selectPartyOverworldPose`, and
+    `selectBattleActorPose` driving tool poses (`lantern`, `flute`, `lasso` +
+    micro-events), dialogue `# pose:` reactions, battle `soothed`/`reward`
+    cheers, companion pet cheers, Cozy Resting `sit` poses, and live speaking
+    `talk` gestures.
+- **Snappy Paper-Flip Horizontal Turns (`src/render/motion.ts`):**
+  - Added pure 8-tick `stepPaperFlip` + `paperFlipPose` card-flip horizontal
+    squash (`scaleX` easing to `0.16` at midpoint with subtle vertical arc and
+    settle overshoot, strictly positive so mirroring never inverts), strictly
+    disabled under Reduced Motion, in `harness`, and in paused harness
+    snapshots (`scaleX === 1`).
+- **Evidence:** `tests/unit/e2-sprite-poses.test.ts` (19 tests including real
+  `inkjs/full` `# pose:` compilation + blank-conditional fallback),
+  `tests/e2e/e2-sprite-poses.spec.ts` (`@smoke` Chromium + WebKit verifying
+  lantern/flute/lasso poses, Maddie `stretch -> groom -> nap -> pet`, Cozy
+  Resting `sit`, `# pose: party cheer`, live vs paused/Reduced-Motion
+  Paper-Flip, and hash parity), `vision`-verified review JPEGs & refreshed
+  `battle-reward` / `overworld-frog-calm` baselines, and `docs/review-queue.md`.
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.

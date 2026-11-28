@@ -1,0 +1,34 @@
+{
+  "asset": "sue-poses",
+  "status": "generated-validator-passing",
+  "model": "gemini-3-pro-image-preview",
+  "date": "2026-11-27",
+  "generationCalls": 2,
+  "referenceImages": [
+    "art/source/sue/sue-model-sheet-v2.png"
+  ],
+  "prompts": {
+    "poses": "Three isolated full-body watercolor chibi Sue poses on pure magenta #FF00FF matching sue-model-sheet-v2 with backpack straps, mini-backpack, and consistent coral/mint socks: cheer, shock (hands cleanly clear of hair bob), sit. No ground shadow, no text, no floating icons."
+  },
+  "selectedRawSources": [
+    "art/source/sue/sue-poses-v2.png"
+  ],
+  "postProcessing": {
+    "build": "bun tools/art/build-poses.ts --only sue && bun tools/art/optimize-atlases.ts",
+    "extract": "extract-figures.ts connected-component extraction (3 poses)",
+    "key": "#FF00FF border flood plus enclosed holes (--holes, 18% fuzz, edge despill only)",
+    "despill": "despill-edge.ts magenta edge-only despill (band 12 pre-resize and post-resize)",
+    "scalePercent": 20.1,
+    "canvas": "384x384 source px, baseline 375, anchor {x: 0.5, y: 0.9765625}",
+    "atlas": "3 columns x 1 row alpha-WebP companion atlas (public/assets/characters/sue/sue-poses.webp + .json)",
+    "review": "art/review/e2-sue-poses-cream.jpg and art/review/e2-sue-poses-dark.jpg (with base down_idle_01 in slot 0)"
+  },
+  "validator": {
+    "key": "magenta",
+    "poses": [
+      "cheer",
+      "shock",
+      "sit"
+    ]
+  }
+}

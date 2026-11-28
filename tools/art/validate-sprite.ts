@@ -22,6 +22,7 @@ type SpriteSheet = {
 type ValidatorOptions = {
   biped: boolean;
   idleOnly: boolean;
+  poses: string[];
   directions: string[];
   key: "green" | "magenta";
 };
@@ -99,21 +100,13 @@ function recipePath(atlas: string): string {
   const explicit = arg("recipe", "");
   if (explicit.length > 0) return explicit;
   const file = atlas.split("/").at(-1) ?? "fae.png";
-  const asset = file.endsWith(".png") ? file.slice(0, -4) : file;
+  const asset = file.replace(/\.(png|webp)$/i, "");
   return `art/recipes/${asset}.json`;
 }
 
-async function isBiped(atlas: string): Promise<boolean> {
-  const path = recipePath(atlas);
-  const file = Bun.file(path);
-  if (!(await file.exists())) return false;
-  const raw: unknown = JSON.parse(await file.text());
-  if (!isObject(raw) || !isObject(raw.validator)) return false;
-  return raw.validator.biped === true;
-}
 async function validatorOptions(atlas: string): Promise<ValidatorOptions> {
   const defaults: ValidatorOptions = {
-    biped: false, idleOnly: false, directions: ["down", "left", "right"], key: "green",
+    biped: false, idleOnly: false, poses: [], directions: ["down", "left", "right"], key: "green",
   };
   const file = Bun.file(recipePath(atlas));
   if (!(await file.exists())) return defaults;
@@ -123,6 +116,9 @@ async function validatorOptions(atlas: string): Promise<ValidatorOptions> {
   return {
     biped: validator.biped === true,
     idleOnly: validator.idleOnly === true,
+    poses: Array.isArray(validator.poses)
+      ? validator.poses.filter((value): value is string => typeof value === "string")
+      : [],
     directions: Array.isArray(validator.directions)
       ? validator.directions.filter((value): value is string => typeof value === "string")
       : defaults.directions,
@@ -562,7 +558,9 @@ for (const [name, frame] of Object.entries(sheet.frames)) {
   errors.push(...result.errors);
   metrics.set(name, result.metrics);
 }
-for (const direction of options.idleOnly ? [] : ["down", "up"]) {
+const poseOnly = options.poses.length > 0;
+const skipWalk = options.idleOnly || poseOnly;
+for (const direction of skipWalk ? [] : ["down", "up"]) {
   const names = sheet.animations[`walk_${direction}`] ?? [];
   const values: number[] = [];
   for (const name of names) {
@@ -588,7 +586,7 @@ for (const direction of options.idleOnly ? [] : ["down", "up"]) {
     );
   }
 }
-if (biped && !options.idleOnly) for (const direction of ["down", "up", "left"]) {
+if (biped && !skipWalk) for (const direction of ["down", "up", "left"]) {
   const idle = metrics.get(`${direction}_idle_01`);
   if (idle === undefined || idle.headWidth === 0) continue;
   for (const name of sheet.animations[`walk_${direction}`] ?? []) {
@@ -612,9 +610,11 @@ if (biped && !options.idleOnly) for (const direction of ["down", "up", "left"]) 
     }
   }
 }
-const requiredAnimations = options.idleOnly
-  ? options.directions.map((direction) => `idle_${direction}`)
-  : ["walk_down", "walk_up", "walk_left", "idle_down", "idle_up", "idle_left"];
+const requiredAnimations = poseOnly
+  ? options.poses.map((pose) => `pose_${pose}`)
+  : options.idleOnly
+    ? options.directions.map((direction) => `idle_${direction}`)
+    : ["walk_down", "walk_up", "walk_left", "idle_down", "idle_up", "idle_left"];
 if (Object.keys(sheet.animations).sort().join(",")
   !== requiredAnimations.slice().sort().join(",")) {
   errors.push(`animations must be exactly ${requiredAnimations.join(", ")}`);
@@ -645,14 +645,14 @@ for (const [animation, names] of Object.entries(sheet.animations)) {
 const walkCounts = ["down", "up", "left"].map(
   (direction) => sheet.animations[`walk_${direction}`]?.length ?? 0,
 );
-if (!options.idleOnly && (new Set(walkCounts).size !== 1 || walkCounts[0] === undefined
+if (!skipWalk && (new Set(walkCounts).size !== 1 || walkCounts[0] === undefined
   || walkCounts[0] % 2 !== 0 || walkCounts[0] !== expectedWalk)) {
   errors.push(
     `walk animations must all have an even count of ${expectedWalk}, `
     + `got ${walkCounts.join(",")}`,
   );
 }
-for (const direction of options.idleOnly ? [] : ["down", "up", "left"]) {
+for (const direction of skipWalk ? [] : ["down", "up", "left"]) {
   const walk = (sheet.animations[`walk_${direction}`] ?? [])
     .map((name) => metrics.get(name)?.opaqueArea ?? 0);
   const idle = metrics.get(`${direction}_idle_01`)?.opaqueArea ?? 0;
@@ -712,7 +712,7 @@ function colourDifference(
 }
 
 const sideFacingMargin = 1.1;
-if (!options.idleOnly) {
+if (!skipWalk) {
   const idleName = sheet.animations.idle_left?.[0];
   const idle = idleName === undefined ? undefined : frameBytes.get(idleName);
   const idleFrame = idleName === undefined ? undefined : sheet.frames[idleName];
@@ -734,6 +734,14 @@ if (!options.idleOnly) {
         + `${asDrawn.toFixed(1)}, mirrored ${mirrored.toFixed(1)})`);
   }
 }
+if (poseOnly) {
+  for (const pose of options.poses) {
+    const names = sheet.animations[`pose_${pose}`] ?? [];
+    if (names.length < 1 || names.length > 4) {
+      errors.push(`pose_${pose}: missing or invalid animation length`);
+    }
+  }
+}
 if (options.idleOnly) {
   for (const direction of options.directions) {
     const names = sheet.animations[`idle_${direction}`] ?? [];
@@ -742,7 +750,7 @@ if (options.idleOnly) {
     }
   }
 }
-for (const direction of options.idleOnly ? [] : ["down", "up", "left"]) {
+for (const direction of skipWalk ? [] : ["down", "up", "left"]) {
   for (const type of ["walk", "idle"]) {
     const name = `${type}_${direction}`;
     const animation = sheet.animations[name];

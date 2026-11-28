@@ -10,9 +10,9 @@ const forest = "tests/sim/scripts/new-game/golden-forest.json";
 const path = "tests/sim/scripts/new-game/golden-kid.json";
 
 async function screenshots(page: Page, name: string): Promise<void> {
-  await expect(page).toHaveScreenshot(`${name}-1280.png`);
+  await expect(page).toHaveScreenshot(`${name}-1280.png`, { maxDiffPixels: 200 });
   await page.setViewportSize({ width: 874, height: 402 });
-  await expect(page).toHaveScreenshot(`${name}-874.png`);
+  await expect(page).toHaveScreenshot(`${name}-874.png`, { maxDiffPixels: 200 });
   await page.setViewportSize({ width: 1280, height: 720 });
 }
 

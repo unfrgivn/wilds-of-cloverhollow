@@ -205,9 +205,9 @@
     "note": "In the forest with the fairies' story told and the hooded kid waiting under the Ancient Tree.",
     "fixture": "new-game",
     "run": "new-game/golden-forest.json",
-    "tick": 31732,
+    "tick": 31764,
     "interim": false,
-    "hash": "3984abda"
+    "hash": "9276e74d"
   },
   {
     "id": "kid",
@@ -215,9 +215,9 @@
     "note": "Under the restored Ancient Tree with the kid revealed as Milo and his story told; the ending is next.",
     "fixture": "new-game",
     "run": "new-game/golden-kid.json",
-    "tick": 32586,
+    "tick": 32650,
     "interim": false,
-    "hash": "6fe98182"
+    "hash": "59f22da6"
   },
   {
     "id": "hills-lookout",

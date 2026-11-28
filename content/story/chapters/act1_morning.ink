@@ -14,7 +14,7 @@ The fountain is still fizzing. {plan == "now": I'm going to go look!|I'll check 
 -> DONE
 
 === pillow_journal ===
-{awake: -> morning_journal}
+{awake: -> milo_calm.morning_journal}
 My journal, right under my pillow where it belongs. # speaker: Fae
 {
 - plan == "now": Note to self: fizzing fountain. Go look NOW. # speaker: Fae
@@ -22,15 +22,14 @@ My journal, right under my pillow where it belongs. # speaker: Fae
 - else: Mom and Dad gave it to me when Oliver was born. # speaker: Fae
 }
 -> DONE
-= morning_journal
-My journal is full of drawings from the dream. # speaker: Fae
--> DONE
 
 === desk ===
+{awake: -> milo_calm.morning_desk}
 {My sketchbook! I drew Maddie as a dragon yesterday.|Paints, pencils, and one very chewed eraser.} # speaker: Fae
 -> DONE
 
 === cat_bed ===
+{awake: -> milo_calm.morning_cat_bed}
 Maddie's bed. Still warm, and full of orange fur. # speaker: Fae
 -> DONE
 
@@ -63,10 +62,12 @@ Ribbit! The fountain is singing again. # speaker: Fountain Frog
 -> DONE
 
 === breakfast ===
+{awake: -> milo_calm.morning_breakfast}
 Three plates, three cups, and a tiny spoon for Oliver. Breakfast is almost ready. # speaker: Fae
 -> DONE
 
 === fridge ===
+{awake: -> milo_calm.morning_fridge}
 {has_microwave and not (has_nuggets or has_mac): -> freezer}
 {has_nuggets or has_mac: I've already got a box for the clubhouse microwave. # speaker: Fae}
 The fridge is covered in drawings, shopping lists, and one very proud glittery family photo. # speaker: Fae
@@ -87,7 +88,7 @@ A big bowl of pancake batter and a whole mountain of blueberries. Yum. # speaker
 -> DONE
 
 === oliver ===
-{awake: -> morning_oliver}
+{awake: -> milo_calm.morning_oliver}
 {
 - milo_revealed:
     Oliver claps both chubby hands at Maddie and beams up at Fae. "Ba! Yay!" # speaker: Oliver
@@ -100,12 +101,9 @@ A big bowl of pancake batter and a whole mountain of blueberries. Yum. # speaker
     Mom laughs from the kitchen. # speaker: Mom
 }
 -> DONE
-= morning_oliver
-Oliver giggles and points at the fridge drawings. They look like the forest, the fairies, and a purple scribble. # speaker: Fae
--> DONE
 
 === mom ===
-{awake: -> morning}
+{awake: -> milo_calm.morning_mom}
 {clubhouse_claimed and not has_microwave: -> kitchen}
 {ate_breakfast: -> again}
 Morning, sleepyhead! Blueberry pancakes are almost ready. # speaker: Mom
@@ -135,19 +133,6 @@ Morning, sleepyhead! Blueberry pancakes are almost ready. # speaker: Mom
     Have a good day, sweetie. Stay curious! # speaker: Mom
 }
 -> DONE
-= morning
-// Mom wakes Fae once; after that, upstairs or down, she sends her to Milo.
-{morning > 1: -> morning_again}
-Fae! Wake up, sleepyhead! You'll be late for school! # speaker: Mom
-...Mom? But the forest... and Milo... it was all a dream? # speaker: Fae
-Breakfast is on the table. Pancakes! # speaker: Mom
-Oh, and your friend Milo is downstairs! # speaker: Mom
-You two will have fun walking to school together! # speaker: Mom
--> DONE
-= morning_again
-Milo's waiting by the front door, sweetie. Have fun at school! # speaker: Mom
--> DONE
-
 = kitchen
 Fae! A little bird told me you and your friends have a clubhouse now. # speaker: Mom
 Every clubhouse needs a kitchen. Take my old microwave! # speaker: Mom
@@ -164,21 +149,13 @@ There are dino nuggets and mac n cheese in the freezer. Take a box whenever you 
 -> DONE
 
 === front_door_morning ===
-Morning, Fae! Your mom let me in. # speaker: Milo
-Hi! Want to walk to school together? I had the WEIRDEST dream... # speaker: Milo
-With a purple hood? # speaker: Fae
-How did you know?! # speaker: Milo
-Maybe some dreams are better when you share them. # speaker: Fae # credits
--> DONE
+-> milo_calm.epilogue_front_door
 
 === front_door_morning_notice ===
-Milo's right here. I should say hi first! # speaker: Fae
--> DONE
+-> milo_calm.front_door_notice
 
 === tree_ending ===
-The Ancient Tree glows brighter and brighter. # speaker: Fae
-Everything goes soft and white. # speaker: Fae # ending
--> DONE
+-> milo_calm.epilogue_tree_ending
 
 === tree_house ===
 {club_open: -> again}

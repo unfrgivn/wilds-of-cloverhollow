@@ -226,39 +226,43 @@ A little dirt path winds off between the misty trees. Something purple is tucked
 
 === mist_flowers ===
 {found_mist_way: -> again}
-The bluebells glow in a little line toward the lavender mist. # speaker: Fae
-They are showing stepping stones! I can hop across, one stone at a time. # speaker: Fae
+Under the lantern's violet beam, tiny silver runes wake up inside the bluebells! # speaker: Fae # expr: surprised # sound: chime-blue # zoom: 1.09
+They are showing hidden stepping stones right through the lavender mist! # speaker: Fae # expr: determined
+{jordan_joined: Jordan grins. "Grandma's lantern found the secret rune path! One stone at a time!" # speaker: Jordan # expr: happy}
+Mrrrow! Maddie's whiskers glow soft lavender as she hops onto the first stone. # speaker: Maddie # expr: happy
 ~ found_mist_way = true
-Fae hops across the mist, stone by stone. # speaker: Fae # travel: mist.stones
+Fae follows the glowing bluebell runes across the mist, stone by shimmering stone! # speaker: Fae # expr: happy # travel: mist.stones
 -> DONE
 = again
-The bluebells still glow along the safe path through the mist. # speaker: Fae
+The bluebell runes still shimmer along the safe stepping stones through the mist. # speaker: Fae # expr: happy
 -> DONE
 
 === mist_band ===
-{found_mist_way: The stepping stones are glowing in the mist. I can follow them now!|The lavender mist is too thick to see through. Maybe something can show me the way.} # speaker: Fae
+{found_mist_way: The bluebell stepping stones are glowing through the mist. I can hop right across now!|The lavender mist is too thick to see through. Maybe my blacklight lantern can show hidden runes.} # speaker: Fae
 -> DONE
 
 === gully_bridge ===
-{rope_bridge: The old rope bridge is pulled across the gully now. # speaker: Fae}
+{rope_bridge: The old rope bridge stretches safely across the misty gully now. # speaker: Fae # expr: happy}
 {rope_bridge: -> DONE}
-The gully is deep and misty, with two little posts on this side. # speaker: Fae
-{not has_lasso: The far posts have a rolled-up bridge. If only I had a rope! # speaker: Fae}
+The gully is deep and misty, with two mossy posts on this side. # speaker: Fae # expr: worried
+{not has_lasso: A thorny mist-veil coils round a rolled-up bridge on the far posts. If only I had a rope! # speaker: Fae # expr: worried}
 {not has_lasso: -> DONE}
-Fae loops her lasso over the far post and pulls. # speaker: Fae
+A thorny mist-veil coils around the far posts, holding the old rope bridge shut! # speaker: Fae # expr: determined
+{sue_joined: Coach Ash's rainbow lasso can reach across! Give it a real smooth twirl, Fae! # speaker: Sue # expr: determined}
+Fae whips her rainbow lasso across the gully, hooks the far post, and pulls! # speaker: Fae # expr: determined # sound: chime-yellow # shake: 0.35
 ~ rope_bridge = true
-The old rope bridge rolls across the gully with a soft creak. Now there is a way through! # speaker: Fae
+The thorny veil parts in pastel sparks as the old rope bridge rolls across with a creak! # speaker: Fae # expr: happy # sound: chime-green
 -> DONE
 
 === mist_seal ===
-{seal_open: The forest glows warmly beyond the bell-flower arch. # speaker: Fae}
+{seal_open: The forest glows warmly beyond the bell-flower arch. # speaker: Fae # expr: happy}
 {seal_open: -> DONE}
-{not has_flute: Three bell flowers hum softly: red, yellow-green, and blue. Some notes are missing... what song are they waiting for? # speaker: Fae}
+{not has_flute: Three bell flowers hum softly beside carved runes: red, yellow-green, and blue. What song are they waiting for? # speaker: Fae # expr: surprised}
 {not has_flute: -> DONE}
 ~ mist_notes = 0
 ~ mist_right = true
 ~ mist_tune = ""
-The bell flowers are waiting for a tune. The class song colours might help! # speaker: Fae
+The bell flowers shimmer with the lantern's runes. The class song colours will wake them! # speaker: Fae # expr: determined # zoom: 1.08
 -> mist_bells
 = mist_bells
 + [Red] -> mist_red
@@ -295,23 +299,36 @@ A blue bell flower rings{mist_notes == 4:!|...} # speaker: Fae # sound: flute-bl
 = mist_next
 {mist_notes < 4: -> mist_bells}
 {mist_right:
-  That's it! Red, yellow, blue, red! The bell flowers ring together. # speaker: Fae
-  The mist wall parts, and a warm forest glow shines through the arch. # speaker: Fae
+  That's it! \{color:berry\}Red\{/color\}, \{color:gold\}yellow\{/color\}, \{color:teal\}blue\{/color\}, \{color:berry\}red\{/color\}! All three bell flowers sing in harmony! # speaker: Fae # expr: happy # sound: chime-yellow # zoom: 1.12
+  Lantern runes, rainbow lasso sparks, and flute music weave together in the air! # speaker: Fae # expr: surprised # sound: chime-blue # shake: 0.25
+  Glowing fairies swirl awake beyond the arch, lighting an ancient mossy path! # speaker: Fae # expr: happy # sound: chime-green
+  The mist wall parts, and a warm forest glow shines through the arch. # speaker: Fae # expr: happy
   ~ seal_open = true
+  {sue_joined: Whoa... look at those glowing fairies! Ready whenever you are, Fae! # speaker: Sue # expr: surprised}
+  {jordan_joined: We made it all the way to the Enchanted Forest. Together! # speaker: Jordan # expr: happy}
 - else:
-  The bells give a gentle wobble. They only ring for a song I already know... # speaker: Fae
+  The bells give a gentle wobble. They only ring for a song I already know... # speaker: Fae # expr: worried
 }
 -> DONE
 
 === mystic_pond ===
-The Mystic Pond is fizzing purple, just like the clubhouse soda. # speaker: Fae
-{heard_wish: This is where wishes come true. The fairies said someone drank from it after making a wish. # speaker: Fae}
+{milo_revealed:
+    The Mystic Pond shimmers clear and golden again, reflecting drifting fairy petals. # speaker: Fae # expr: happy
+    -> DONE
+}
+The Mystic Pond is fizzing bright purple, smelling just like the clubhouse soda. # speaker: Fae # expr: worried
+{heard_wish: This is where wishes come true. The fairies said someone drank from it after making a wish. # speaker: Fae # expr: worried}
+{heard_wish: Deep beneath the fizz, golden ripples are still trying to shine through. # speaker: Fae # expr: determined}
 -> DONE
 
 === ancient_tree ===
-Purple scribbles are all over the Ancient Tree's bark. # speaker: Fae
-It looks tired. # speaker: Fae
-{heard_wish: If it's dreaming the whole land, it can't dream properly with all this fizz. # speaker: Fae}
+{milo_revealed:
+    Golden-pastel light pours softly through the Ancient Tree's leaves. The whole forest breathes easy. # speaker: Fae # expr: happy
+    -> DONE
+}
+Tangled purple scribbles twist all the way up the Ancient Tree's warm bark. # speaker: Fae # expr: worried
+It looks tired, like a painting someone tried too hard to scribble over. # speaker: Fae # expr: worried
+{heard_wish: If it's dreaming the whole land, it can't dream properly with all this fizz. # speaker: Fae # expr: determined}
 -> DONE
 
 === fairy_lavender ===
@@ -364,64 +381,126 @@ It looks tired. # speaker: Fae
 -> DONE
 
 === kid_talk_1 ===
-You don't even know who I am! # speaker: Hooded Kid
-* [You beat the Star Racer high score, then scribbled out your initials.]
-    ...You figured THAT out? # speaker: Hooded Kid # grade: great
+You don't even know who I am! Just leave the \{color:lavender\}BOSS\{/color\} alone! # speaker: Hooded Kid
+* [You beat Star Racer, then scribbled your initials in purple marker!]
+    {calmed("art-teacher"): ...You matched Ms. Rowan's missing purple markers to Star Racer?!|{saw_hood: ...You matched the purple marker I dropped in the hall to Star Racer?!|...You figured THAT out?!}} # speaker: Hooded Kid # grade: great
     -> DONE
-* [You left a Star Racer token in your stash.]
+* [You left a Star Racer token and purple markers in your stump stash.]
     Maybe. Lots of kids play Star Racer. # speaker: Hooded Kid # grade: good
     -> DONE
-* [You're the boss of the whole forest!]
+* [You're the boss of the whole Enchanted Forest!]
     Ha! I WISH. ...Wait. That's kind of what I wished for. # speaker: Hooded Kid # grade: miss
     -> DONE
 -> DONE
 
 === kid_talk_2 ===
-Nobody ever notices me anyway... # speaker: Hooded Kid
-* [I notice you! The paper planes, the star doodles...]
-    You... you saw those? # speaker: Hooded Kid # grade: great
+\{whisper\}Nobody ever notices me anyway... not really.\{/whisper\} # speaker: Hooded Kid
+* [I notice you! Your paper planes, rocket doodles, and star sketches!]
+    {milo_loft_glow_read: ...You even saw my rocket sketches? You didn't laugh at them?|{club_open: ...You saw the school name tag and my star doodles, and still came to find me?|...You actually saw my paper planes and star doodles?}} # speaker: Hooded Kid # grade: great
     -> DONE
-* [Everybody noticed the scribbles.]
-    That's not the same thing. # speaker: Hooded Kid # grade: good
+* [Everybody across Cloverhollow noticed all the purple scribbles.]
+    Making a mess isn't the same as somebody wanting to hang out... # speaker: Hooded Kid # grade: good
     -> DONE
-* [Maybe nobody likes purple?]
-    Hey! Purple is the BEST color. # speaker: Hooded Kid # grade: miss
+* [Maybe nobody likes purple hoodies?]
+    Hey! Purple is the BEST color, okay?! # speaker: Hooded Kid # grade: miss
     -> DONE
 -> DONE
 
 === kid_talk_3 ===
-So go on, Fae. Who am I? # speaker: Hooded Kid
-* [Milo?]
-    ...Yeah. It's me. # speaker: Hooded Kid # grade: great
+\{whisper\}If you really know me, Fae... then say it. Who am I?\{/whisper\} # speaker: Hooded Kid
+* [Milo? You don't have to hide under that hood.]
+    \{pause:8\}...Yeah. \{whisper\}It's me, Fae.\{/whisper\} # speaker: Hooded Kid # grade: great
     -> DONE
-* [Someone from my class.]
-    Warmer... but who? # speaker: Hooded Kid # grade: good
+* [My classmate from Ms. Maple's room, the Star Racer fan!]
+    Warmer... you're right there. Say my name. # speaker: Hooded Kid # grade: good
     -> DONE
 * [Rosie?]
-    Nope! Rosie's way better at kites than me. # speaker: Hooded Kid # grade: miss
+    Nope! Rosie's way better at flying kites than me. # speaker: Hooded Kid # grade: miss
     -> DONE
 -> DONE
 
 === milo_calm ===
 { milo_revealed: -> again }
 ~ milo_revealed = true
-Fae... it's me. I'm really sorry about all the scribbles. # speaker: Milo
-My paper plane flew into the mist, so I followed it. I found this forest and wished at the Mystic Pond to be the best at everything, even Star Racer. # speaker: Milo
-I drank from the pond, and the fizz got out of hand. Fizz-fast, I could zip from our classroom to the hall and back before anyone noticed. That's how I peeked in, then sat back down. # speaker: Milo
-I only wanted to be noticed. # speaker: Milo
-I always notice you, Milo. You're my friend. # speaker: Fae
-{sue_joined: Sue gives Milo a small wave. "We noticed you too." # speaker: Sue}
-{jordan_joined: Jordan smiles. "You don't have to be the best at everything." # speaker: Jordan}
+Milo slowly pulls back the purple hood and wipes his eyes on his sleeve. # speaker: Milo # expr: worried # zoom: 1.12
+Fae... it's me. I'm really sorry about all the scribbles and all the fizz. # speaker: Milo # expr: worried
+My paper plane drifted into the mist, so I chased it here and found the Mystic Pond. # speaker: Milo # expr: worried
+\{whisper\}Everyone in class always seemed so good at something, and I felt like I was getting left behind.\{/whisper\} # speaker: Milo # expr: worried
+So I wished to be the best at everything, even Star Racer, and drank from the pond. # speaker: Milo # expr: worried
+Fizz-fast, I zipped from class to the hall and back before anyone blinked... but I just made everyone stressed. # speaker: Milo # expr: worried
+\{whisper\}I only wanted someone to notice me.\{/whisper\} # speaker: Milo # expr: worried
+I always notice you, Milo. You're my friend, not because of high scores, just because you're you. # speaker: Fae # expr: happy # sound: chime-yellow
+{milo_loft_glow_read: Your rocket sketches are amazing too. You never have to worry about being left behind. # speaker: Fae # expr: happy}
+Mrrrow-purrrr! Maddie trots right over and rubs her soft cheek against Milo's sneaker! # speaker: Maddie # expr: happy
+{sue_joined: Sue smiles warmly and waves. "We noticed you too, Milo. Come fish at the bay with us sometime!" # speaker: Sue # expr: happy}
+{jordan_joined: Jordan grins. "You don't have to be the best at everything. Our clubhouse always has room for one more." # speaker: Jordan # expr: happy}
+\{pause:8\}Milo blinks through a wobbly smile. "Wait... really? Even after all the purple soda?" # speaker: Milo # expr: surprised
+Really. Look up! # speaker: Fae # expr: happy # sound: chime-green # zoom: 1.04
+High above them, the Ancient Tree bursts into \{color:gold\}\{wave\}golden-pastel watercolor light\{/wave\}\{/color\}! # speaker: Fae # expr: happy # sound: chime-blue
 -> DONE
 = again
-The Ancient Tree is glowing again. It's so pretty now. # speaker: Fae
+The Ancient Tree is blooming in warm golden light. The whole forest feels like a gentle hug. # speaker: Fae # expr: happy
 // Sticky: the dream save is taken as the ending starts, so Continue comes back
 // here with the ending ready to watch again.
 + [Watch the tree glow]
-    It's like it's... waking up? # speaker: Milo
+    Milo looks up as petals drift like morning sunbeams. "Wait... do you hear that?" # speaker: Milo # expr: surprised
     -> tree_ending
 + [Not yet]
-    Not yet. We can stay here a little longer. # speaker: Fae
+    Not yet. We can stay here a little longer. # speaker: Fae # expr: happy
+-> DONE
+= epilogue_tree_ending
+The Ancient Tree glows brighter and warmer, bathing Cloverhollow in \{color:gold\}\{wave\}golden-pastel light\{/wave\}\{/color\}. # speaker: Fae # expr: surprised # sound: chime-yellow # zoom: 1.1
+Milo, Sue, Jordan, and Maddie smile through drifting clover petals... # speaker: Fae # expr: happy
+\{whisper\}...Fae? Sweetie? Time to wake up...\{/whisper\} # speaker: Mom # expr: happy # sound: chime-blue
+The golden light wraps around everything, soft and bright as morning sunshine. # speaker: Fae # expr: happy # ending
+-> DONE
+= morning_mom
+{morning_mom > 1: -> morning_mom_again}
+Fae! Wake up, sleepyhead! Sunlight's all over your quilt, and you'll be late for school! # speaker: Mom # expr: happy
+...Mom? Wait, the Ancient Tree, the lantern, and Milo... it was all a dream? # speaker: Fae # expr: surprised
+Must've been a big one! You were smiling in your sleep while Maddie purred by your pillow. # speaker: Mom # expr: happy
+Blueberry pancakes are warm downstairs, and Oliver's already clapping at the kitchen drawings! # speaker: Mom # expr: happy
+Oh, and your classmate Milo just stopped by! He's waiting downstairs by the front door! # speaker: Mom # expr: happy
+Grab your backpack whenever you're ready, sweetie. Take a peek around your room if you like! # speaker: Mom # expr: happy
+-> DONE
+= morning_mom_again
+Milo's waiting by the front door, sweetie. Have fun at school! # speaker: Mom # expr: happy
+-> DONE
+= morning_desk
+My sketchbook lies open on the desk, the watercolour paint still softly curled on the page! # speaker: Fae # expr: surprised
+There's a cozy frog by a fountain, a bay dock, snowy pines, and a glowing golden tree with fairies! # speaker: Fae # expr: happy # sound: chime-yellow
+{sue_joined or jordan_joined: Even Sue and Jordan are doodled in the margin, laughing right beside Maddie! # speaker: Fae # expr: happy}
+Maybe the best dreams come straight out of our own sketchbook. # speaker: Fae # expr: happy
+-> DONE
+= morning_journal
+My brown leather journal sits tucked under my pillow, warm from the morning sun. # speaker: Fae # expr: happy
+Every page is full of clover doodles, star maps, and little notes about my friends. # speaker: Fae # expr: happy
+-> DONE
+= morning_cat_bed
+Maddie's round bed is empty. She's already padding at my heels, purring loud enough to shake the floorboards! # speaker: Fae # expr: happy
+Mrrrow-purrrr! Maddie blinks slowly up at Fae with her tail curled like a happy question mark. # speaker: Maddie # expr: happy
+-> DONE
+= morning_breakfast
+Warm blueberry pancakes, sunny maple syrup, and Oliver's tiny silver spoon. Morning smells wonderful! # speaker: Fae # expr: happy
+-> DONE
+= morning_fridge
+My watercolor paintings cover the fridge: a sparkling fountain, snowy pines, and a sunlit four-leaf clover! # speaker: Fae # expr: happy
+-> DONE
+= morning_oliver
+Oliver giggles, waves his chubby hands at Maddie, and points right at the fridge drawings! # speaker: Oliver
+A glowing golden tree, tiny fairies, and one silly purple scribble... he remembers too! # speaker: Fae # expr: happy
+-> DONE
+= front_door_notice
+Milo's right here by the front door in his purple hoodie. I should say hi first! # speaker: Fae # expr: happy
+-> DONE
+= epilogue_front_door
+Milo stands in the sunny doorway in his real purple hoodie, hugging a rocket sketchbook to his chest. # speaker: Fae # expr: surprised # zoom: 1.08
+Morning, Fae! Your mom let me in, and Maddie already gave my shoe a five-star headbutt! # speaker: Milo # expr: happy
+Milo grins shyly and lifts his sketchbook. "Want to walk to school together? I had the \{pop\}WEIRDEST\{/pop\} dream..." # speaker: Milo # expr: happy
+Let me guess: a glowing forest, a rocket doodle, and a purple hood? # speaker: Fae # expr: happy
+\{pop\}Wait, how did you know?!\{/pop\} I literally just sketched that golden tree before breakfast! # speaker: Milo # expr: surprised # sound: chime-yellow
+Mrrrow! Maddie trots toward the open front door, ready to lead the way down the clover lane! # speaker: Maddie # expr: happy
+Maybe some dreams are even brighter when you share them with friends. Let's go, Milo! # speaker: Fae # expr: happy # sound: chime-green # credits
 -> DONE
 
 === festival_milo ===

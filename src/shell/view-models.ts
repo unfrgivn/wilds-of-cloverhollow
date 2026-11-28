@@ -41,7 +41,7 @@ import {
   type BattleHudView,
 } from "../ui/battle";
 import { evaluateBattlePortraits } from "../ui/battle-portraits";
-import type { CreditsView } from "../ui/credits";
+import { DEFAULT_ENDING_POSTCARD, type CreditsView } from "../ui/credits";
 import {
   resolveHudInteractHint,
   type HudHintsView,
@@ -724,5 +724,6 @@ export function buildCreditsView(
         })
       : [],
     summary: visible ? creditsSummary(world, state) : [],
+    postcard: visible ? DEFAULT_ENDING_POSTCARD : null,
   };
 }

@@ -116,9 +116,10 @@ export function createJournalNavController(host: JournalNavHost): {
     ].filter(isElementVisible);
 
   const inspectableSlots = (): HTMLElement[] =>
-    [...host.stickersPage.querySelectorAll<HTMLElement>(".journal-slot.is-inspectable")].filter(
-      isElementVisible,
-    );
+    [
+      ...host.notesPage.querySelectorAll<HTMLElement>("button.journal-gems:not([hidden])"),
+      ...host.stickersPage.querySelectorAll<HTMLElement>(".journal-slot.is-inspectable"),
+    ].filter(isElementVisible);
 
   const scrollActivePage = (deltaY: number): boolean => {
     if (host.book.hidden || host.hasOpenOverlay() || deltaY === 0) return false;

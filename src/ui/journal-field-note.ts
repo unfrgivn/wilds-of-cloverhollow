@@ -1,7 +1,8 @@
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
 import { element, setAttribute, setText } from "./dom";
 import { feelingMarkup, heartMarkup, icon, keepsakeIcon } from "./icons";
-import type { CritterFieldNote, JournalKeepsake } from "../core/journal";
+import { createJournalGemsLedger } from "./journal-gems-ledger";
+import type { CritterFieldNote, JournalKeepsake, StarGemEntry } from "../core/journal";
 import type { TreasuresSummary } from "../core/treasures";
 
 export type InspectedJournalItem = {
@@ -46,20 +47,25 @@ export type JournalFieldNoteSource = {
   prizes?: readonly JournalFieldNotePrize[];
   fish?: readonly JournalFieldNoteFish[];
   keepsakes?: readonly JournalKeepsake[];
+  starGems?: readonly StarGemEntry[];
   treasures?: TreasuresSummary;
 };
 
 export type JournalFieldOverlays = {
   fieldBackdrop: HTMLDivElement;
   treasuresBackdrop: HTMLDivElement;
+  gemsOverlay: HTMLDivElement;
   inspect: (item: InspectedJournalItem, view: JournalFieldNoteSource | null) => void;
   openPrize: (prize: JournalFieldNotePrize, view?: JournalFieldNoteSource | null) => void;
   openTreasures: (view: JournalFieldNoteSource | null) => void;
+  openGems: (view: JournalFieldNoteSource | null, returnTarget?: HTMLElement | null) => void;
   syncFieldNote: (view: JournalFieldNoteSource) => void;
   syncTreasures: (view: JournalFieldNoteSource) => void;
+  syncGems: (view: JournalFieldNoteSource) => void;
   stepFieldNote: (delta: -1 | 1) => boolean;
   closeFieldNote: () => void;
   closeTreasures: () => void;
+  closeGems: () => void;
   closeAll: () => void;
   hasOpen: () => boolean;
   dismiss: () => boolean;
@@ -350,6 +356,7 @@ export function createJournalFieldOverlays(options?: {
   let treasuresOpen = false;
   let fieldReturnFocusEl: HTMLElement | null = null;
   let treasuresReturnFocusEl: HTMLElement | null = null;
+  let lastNotifiedOpen = false;
   const onVisibilityChange = options?.onVisibilityChange;
   const onStep = options?.onStep;
 
@@ -372,11 +379,38 @@ export function createJournalFieldOverlays(options?: {
     if (isFocusableTarget(fallback)) fallback.focus({ preventScroll: true });
   };
 
-  const hasOpen = (): boolean => treasuresOpen || inspectedItem !== null;
+  const clearFieldNote = (): void => {
+    fieldReturnFocusEl = null;
+    if (inspectedItem === null && fieldBackdrop.hidden) return;
+    inspectedItem = null;
+    fieldSignature = "";
+    fieldPager.hidden = true;
+    fieldBackdrop.hidden = true;
+  };
 
-  const notifyVisibility = (wasOpen: boolean): void => {
+  const clearTreasures = (): void => {
+    treasuresReturnFocusEl = null;
+    if (!treasuresOpen && treasuresBackdrop.hidden) return;
+    treasuresOpen = false;
+    treasuresBackdrop.hidden = true;
+  };
+
+  const gemsLedger = createJournalGemsLedger({
+    onBeforeOpen: () => {
+      clearFieldNote();
+      clearTreasures();
+    },
+    onVisibilityChange: () => syncVisibility(),
+  });
+
+  const hasOpen = (): boolean => treasuresOpen || inspectedItem !== null || gemsLedger.isOpen();
+
+  const syncVisibility = (): void => {
     const nowOpen = hasOpen();
-    if (nowOpen !== wasOpen) onVisibilityChange?.(nowOpen);
+    if (nowOpen !== lastNotifiedOpen) {
+      lastNotifiedOpen = nowOpen;
+      onVisibilityChange?.(nowOpen);
+    }
   };
 
   const syncPager = (view: JournalFieldNoteSource | null): void => {
@@ -394,36 +428,18 @@ export function createJournalFieldOverlays(options?: {
     setText(fieldCounter, `${index + 1} / ${ids.length}`);
   };
 
-  const clearFieldNote = (): void => {
-    fieldReturnFocusEl = null;
-    if (inspectedItem === null && fieldBackdrop.hidden) return;
-    inspectedItem = null;
-    fieldSignature = "";
-    fieldPager.hidden = true;
-    fieldBackdrop.hidden = true;
-  };
-
-  const clearTreasures = (): void => {
-    treasuresReturnFocusEl = null;
-    if (!treasuresOpen && treasuresBackdrop.hidden) return;
-    treasuresOpen = false;
-    treasuresBackdrop.hidden = true;
-  };
-
   const closeFieldNote = (): void => {
-    const wasOpen = hasOpen();
     const closingItem = inspectedItem;
     const returnTarget = fieldReturnFocusEl;
     clearFieldNote();
-    notifyVisibility(wasOpen);
+    syncVisibility();
     restoreFieldFocus(closingItem, returnTarget);
   };
 
   const closeTreasures = (): void => {
-    const wasOpen = hasOpen();
     const returnTarget = treasuresReturnFocusEl;
     clearTreasures();
-    notifyVisibility(wasOpen);
+    syncVisibility();
     if (isFocusableTarget(returnTarget)) returnTarget.focus({ preventScroll: true });
   };
 
@@ -722,9 +738,15 @@ export function createJournalFieldOverlays(options?: {
   const closeAll = (): void => {
     clearFieldNote();
     clearTreasures();
+    gemsLedger.clear();
+    lastNotifiedOpen = false;
   };
 
   const dismiss = (): boolean => {
+    if (gemsLedger.isOpen()) {
+      gemsLedger.close();
+      return true;
+    }
     if (treasuresOpen) {
       closeTreasures();
       return true;
@@ -739,8 +761,8 @@ export function createJournalFieldOverlays(options?: {
   return {
     fieldBackdrop,
     treasuresBackdrop,
+    gemsOverlay: gemsLedger.overlay,
     inspect: (item, view) => {
-      const wasOpen = hasOpen();
       if (inspectedItem === null) {
         fieldReturnFocusEl =
           document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -748,11 +770,10 @@ export function createJournalFieldOverlays(options?: {
       inspectedItem = item;
       if (view !== null) syncFieldNote(view);
       if (!fieldBackdrop.hidden) fieldCard.focus({ preventScroll: true });
-      notifyVisibility(wasOpen);
+      syncVisibility();
     },
     openPrize: (prize, view) => {
       if (!prize.owned || prize.image === null) return;
-      const wasOpen = hasOpen();
       if (inspectedItem === null) {
         fieldReturnFocusEl =
           document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -764,11 +785,10 @@ export function createJournalFieldOverlays(options?: {
         renderPrizeNote(prize, null);
       }
       if (!fieldBackdrop.hidden) fieldCard.focus({ preventScroll: true });
-      notifyVisibility(wasOpen);
+      syncVisibility();
     },
     openTreasures: (view) => {
       if (view?.treasures?.hasAny !== true) return;
-      const wasOpen = hasOpen();
       if (!treasuresOpen) {
         treasuresReturnFocusEl =
           document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -776,17 +796,23 @@ export function createJournalFieldOverlays(options?: {
       treasuresOpen = true;
       syncTreasures(view);
       if (!treasuresBackdrop.hidden) treasuresCard.focus({ preventScroll: true });
-      notifyVisibility(wasOpen);
+      syncVisibility();
+    },
+    openGems: (view, returnTarget) => {
+      gemsLedger.open(view?.starGems, returnTarget);
     },
     syncFieldNote,
     syncTreasures,
+    syncGems: (view) => gemsLedger.sync(view.starGems),
     stepFieldNote,
     closeFieldNote,
     closeTreasures,
+    closeGems: () => gemsLedger.close(),
     closeAll,
     hasOpen,
     dismiss,
     handleKeydown: (event) => {
+      if (gemsLedger.handleKeydown(event)) return true;
       if (treasuresOpen) {
         if (event.key === "Escape") {
           event.preventDefault();

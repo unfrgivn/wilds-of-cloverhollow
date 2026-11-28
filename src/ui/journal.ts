@@ -17,7 +17,7 @@ import {
 } from "./journal-options";
 import { formatArcadeRecordPills, type MinigameRecords } from "../platform/minigame-records";
 import type {
-  BusRoute, CarriedTreat, JournalKeepsake, KeepsakeId, LandProgress,
+  BusRoute, CarriedTreat, JournalKeepsake, KeepsakeId, LandProgress, StarGemEntry,
 } from "../core/journal";
 import type { LevelStats } from "../core/levels";
 import type { TreasuresSummary } from "../core/treasures";
@@ -56,6 +56,7 @@ export type JournalView = JournalOptionsView & {
   tickets: number;
   snacks: number;
   gems?: { found: number; total: number };
+  starGems?: StarGemEntry[];
   valleyComplete?: boolean;
   treasures?: TreasuresSummary;
   members: {
@@ -213,11 +214,13 @@ const supplyMarkup = {
 } as const;
 
 function supply(kind: keyof typeof supplyMarkup, label: string): {
-  root: HTMLSpanElement;
+  root: HTMLElement;
   count: HTMLSpanElement;
 } {
   const pill = kind === "tickets" ? "journal-tickets" : "journal-supply";
-  const root = element("span", kind === "gems" ? `${pill} journal-gems` : pill);
+  const root: HTMLElement = kind === "gems"
+    ? Object.assign(element("button", `${pill} journal-gems`), { type: "button" })
+    : element("span", pill);
   setAttribute(root, "data-supply", kind);
   const svg = document.createElementNS(svgNamespace, "svg");
   svg.setAttribute("viewBox", "0 0 20 20");
@@ -338,7 +341,7 @@ export function createJournal(root: HTMLElement): JournalControl {
 
   book.append(
     label, close, notesPage, stickersPage, mapPage.root, optionsPage.root, tabs,
-    fieldOverlays.fieldBackdrop, fieldOverlays.treasuresBackdrop,
+    fieldOverlays.fieldBackdrop, fieldOverlays.treasuresBackdrop, fieldOverlays.gemsOverlay,
   );
   root.append(book);
 
@@ -386,6 +389,7 @@ export function createJournal(root: HTMLElement): JournalControl {
   applyPage("notes", false);
 
   close.addEventListener("click", () => onClose());
+  gems.root.addEventListener("click", () => fieldOverlays.openGems(latestView, gems.root));
   audio.addEventListener("click", () => optionsPage.toggleAudio());
   sliderSteppers.set(
     volume.button,
@@ -425,10 +429,13 @@ export function createJournal(root: HTMLElement): JournalControl {
       setText(tickets.count, String(view.tickets));
       setText(snacks.count, String(view.snacks));
       const showGems = view.gems !== undefined && view.gems.found > 0;
-      if (showGems) {
+      if (showGems && view.gems !== undefined) {
         if (!gems.root.isConnected) snacks.root.after(gems.root);
-        if (view.gems !== undefined)
-          setText(gems.count, `${view.gems.found}/${view.gems.total}`);
+        setText(gems.count, `${view.gems.found}/${view.gems.total}`);
+        setAttribute(
+          gems.root, "aria-label",
+          `Inspect Star Gem Ledger, ${view.gems.found} of ${view.gems.total} found`,
+        );
       } else if (gems.root.isConnected) {
         gems.root.remove();
       }
@@ -659,6 +666,7 @@ export function createJournal(root: HTMLElement): JournalControl {
       }
       fieldOverlays.syncFieldNote(view);
       fieldOverlays.syncTreasures(view);
+      fieldOverlays.syncGems(view);
       mapPage.render(view, {
         fishOwned,
         fishTotal: fishList.length,

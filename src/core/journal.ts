@@ -72,9 +72,71 @@ export const STAR_GEM_VARIABLES = [
   "gem_hills",
 ] as const;
 
-type StarGemVariable = (typeof STAR_GEM_VARIABLES)[number];
+export type StarGemId = (typeof STAR_GEM_VARIABLES)[number];
 
-const LAND_GEMS: Readonly<Record<string, readonly StarGemVariable[]>> = {
+export type StarGemEntry = {
+  id: StarGemId;
+  name: string;
+  areaName: string;
+  color: string;
+  hint: string;
+  foundNote: string;
+  found: boolean;
+};
+
+const STAR_GEM_SPECS: Readonly<Record<StarGemId, Omit<StarGemEntry, "id" | "found">>> = {
+  gem_park: {
+    name: "Amethyst Star Gem",
+    areaName: "Meadow Park",
+    color: "#b580e8",
+    hint: "Shine the blacklight lantern over the north meadow clover.",
+    foundNote: "Found glowing in the north meadow clover under blacklight.",
+  },
+  gem_bay: {
+    name: "Aqua Star Gem",
+    areaName: "Bubblegum Bay",
+    color: "#5fc9d8",
+    hint: "Bring Pond Pup to fetch the glint out in the tide pool.",
+    foundNote: "Fetched from the sparkling tide pool by Pond Pup.",
+  },
+  gem_trail: {
+    name: "Citrine Star Gem",
+    areaName: "Cliffside Trail",
+    color: "#f2c44d",
+    hint: "Ask Ribbon Bunny to hop into the rocky cliffside burrow.",
+    foundNote: "Rolled out of the cliffside burrow by Ribbon Bunny.",
+  },
+  gem_pass: {
+    name: "Frost Star Gem",
+    areaName: "Pinecone Pass",
+    color: "#7cc4f5",
+    hint: "Twirl Coach Ash's Rainbow Lasso at the snowy pine branch.",
+    foundNote: "Looped down from a snow-dusted pine branch with the lasso.",
+  },
+  gem_cavern: {
+    name: "Prism Star Gem",
+    areaName: "Crystal Cavern",
+    color: "#e886b6",
+    hint: "Shine the blacklight lantern on the east crystal grotto floor.",
+    foundNote: "Lifted from a secret rainbow prism pocket in the east grotto.",
+  },
+  gem_woods: {
+    name: "Amber Star Gem",
+    areaName: "Whispering Woods",
+    color: "#eb9b52",
+    hint: "Ask Acorn Squirrel to climb the mossy east tree hollow.",
+    foundNote: "Climbed down from the mossy east tree hollow by Acorn Squirrel.",
+  },
+  gem_hills: {
+    name: "Clover Star Gem",
+    areaName: "Clover Hills",
+    color: "#72c77d",
+    hint: "Ask Ribbon Bunny to explore the clover burrow by the boulders.",
+    foundNote: "Fetched from the four-leaf clover burrow by Ribbon Bunny.",
+  },
+};
+
+const LAND_GEMS: Readonly<Record<string, readonly StarGemId[]>> = {
   cloverhollow: ["gem_park"],
   bay: ["gem_bay"],
   trail: ["gem_trail"],
@@ -103,6 +165,18 @@ export function starGemsFound(
     if (world.storyVariable(state.ink, variable) === true) found += 1;
   }
   return { found, total: STAR_GEM_VARIABLES.length };
+}
+
+/** Returns all seven valley Star Gems in canonical order with Grandpa Barnaby's field hints. */
+export function journalStarGems(
+  world: Pick<World, "storyVariable">,
+  state: Pick<State, "ink">,
+): StarGemEntry[] {
+  return STAR_GEM_VARIABLES.map((id) => ({
+    id,
+    ...STAR_GEM_SPECS[id],
+    found: world.storyVariable(state.ink, id) === true,
+  }));
 }
 
 export function mapLandName(

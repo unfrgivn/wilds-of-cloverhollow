@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 170)
+Last updated: 2026-11-27 (Milestone 171)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -4432,10 +4432,25 @@ trunks keep its two exits.
   stickers with ink outlines, `Coins N` with a gold coin and `Snacks N` with
   a cookie (inline SVG, like the map's bus-stop sign). Once Fae has found at
   least one Star Gem (`starGemsFound(world, state).found > 0`), a pale lavender
-  `Gems N/7` pill (with the faceted amethyst `gemIconSvg` from `src/ui/icons.ts`)
-  appears beside Coins and Snacks on a dedicated second pill row under NOTES
-  while the audio controls stay on the first row; when 0 gems are found, the
-  pill is hidden and the original single-row heading layout is preserved.
+  `Gems N/7` button pill (`button.journal-supply.journal-gems` with the faceted
+  amethyst `gemIconSvg` from `src/ui/icons.ts`, pixel-identical at rest with
+  `@media (hover: hover) and (pointer: fine)` lift and WCAG `:focus-visible`
+  ring) appears beside Coins and Snacks on a dedicated second pill row under
+  NOTES while the audio controls stay on the first row; when 0 gems are found,
+  the pill is hidden and the original single-row heading layout is preserved.
+  Clicking or activating `.journal-gems` (keyboard `Enter`/`Space`, gamepad `A`,
+  mouse, or touch) opens the die-cut **Star Gem Field Ledger** modal
+  (`src/ui/journal-gems-ledger.ts`, composed into `createJournalFieldOverlays`
+  in `src/ui/journal-field-note.ts` and backed by pure `journalStarGems` /
+  `StarGemId` / `StarGemEntry` in `src/core/journal.ts`, Milestone 171) listing
+  all 7 valley Star Gems (`Amethyst`, `Aqua`, `Citrine`, `Frost`, `Prism`,
+  `Amber`, `Clover`) in canonical `STAR_GEM_VARIABLES` order with faceted
+  jewel-tinted SVG icons (zero `<text>` nodes), found locations/notes for
+  collected gems, Grandpa Barnaby's gentle italic field hints for undiscovered
+  gems, a `N/7` or golden `★ 7/7 COMPLETE!` header badge, and clean dismiss on
+  backdrop click, `×` close button (44×44 px), `Escape`, `X`, or Gamepad `B`
+  restoring focus directly to `.journal-gems` and playing `card-open` /
+  `card-close` UI foley via `onOverlayChange`.
 - A chunky four-step sound volume slider sits beside the `♪ on/off` pill and
   fits the heading row at 874x402, including with `♪ off` and 999 coins. At
   narrow widths, the supplies wrap beneath NOTES so every control remains

@@ -7302,6 +7302,39 @@ the old trail, the owl, and the clubhouse claim.
 - Gates: `just check`, `just build` (`< 400 kB` every non-vendor chunk), and
   100/100 Chromium & WebKit e2e tests across all 19 touched/guarded specs.
 
+## Milestone 171: Interactive Star Gem Field Ledger & Grandpa Barnaby's Gem Tracker (`src/ui/journal-gems-ledger.ts`) **Status:** ✅ Completed (2026-11-27)
+- Turns the Journal NOTES page's `.journal-gems` supply pill into a tactile,
+  keyboard/gamepad/mouse/touch-accessible button that opens a die-cut storybook
+  **Star Gem Field Ledger** modal showing all 7 named valley Star Gems with
+  faceted jewel-tinted SVG icons, discovery notes, and Grandpa Barnaby's gentle
+  field hints for unfound gems — zero `src/core/sim.ts` changes, zero
+  save-version bumps, zero replay hash drift across all 74 sims, and zero
+  visual baseline diffs (including 99/99 `ui-gallery` and pixel-identical
+  `bunny-journal-{1280,874}`).
+- Pure Star Gem Field Ledger registry (`src/core/journal.ts`, re-exported via
+  `src/core/index.ts`):
+  - Exported `StarGemId`, `StarGemEntry`, and `journalStarGems(world, state)`
+    in canonical `STAR_GEM_VARIABLES` order (`Amethyst`, `Aqua`, `Citrine`,
+    `Frost`, `Prism`, `Amber`, `Clover`) matching `content/story/main.ink` lore.
+- Interactive `.journal-gems` pill & Star Gem Field Ledger modal
+  (`src/ui/journal-gems-ledger.ts`, `src/ui/journal-field-note.ts`,
+  `src/ui/journal.ts`, `src/ui/journal-nav.ts`, `src/ui/journal.css`,
+  `src/shell/view-models.ts`):
+  - Upgraded `.journal-supply.journal-gems` to a native `<button type="button">`
+    with pixel-identical rest styling, desktop hover lift, WCAG `:focus-visible`,
+    and `journal-nav.ts` keyboard/gamepad discovery.
+  - Built `createJournalGemsLedger` with faceted jewel-colored inline SVGs
+    (zero `<text>` nodes), balanced 2-column + centered 7th-tile layout,
+    golden `★ 7/7 COMPLETE!` header & footer, backdrop/`×`/`Escape`/`X`/`B`
+    dismissal, `.journal-gems` focus restoration, and `onOverlayChange` foley.
+- Evidence: `tests/unit/milestone-171.test.ts` and
+  `tests/e2e/milestone-171.spec.ts` (`@smoke` Chromium + WebKit); review
+  captures `art/review/m171-gems-ledger-1280.jpg` and
+  `m171-gems-ledger-874.jpg` independently verified via `vision`.
+- Gates: `just check` (234 unit files / 1,694 tests, all 74 sims, 23 QA packs,
+  purity, lint), `just build` (`< 400 kB` every non-vendor chunk), 35/35
+  targeted Chromium & WebKit e2e, and 99/99 Chromium `ui-gallery` tests.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

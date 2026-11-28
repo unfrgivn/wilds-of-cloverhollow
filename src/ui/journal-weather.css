@@ -1,0 +1,400 @@
+.journal-weather-overlay[hidden],
+.journal-weather-btn[hidden] {
+  display: none;
+}
+
+.journal-weather-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 30px;
+  padding: 3px 11px;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fffdf6 0%, #d9eefc 100%);
+  box-shadow:
+    inset 0 0 0 1.5px #fffdf7,
+    0 2px 0 #47321f33;
+  color: var(--sticker-ink);
+  font: 900 11.5px/1.2 var(--sticker-font);
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition: transform 110ms ease-out, background-color 110ms ease-out;
+}
+
+.journal-weather-btn:focus-visible,
+.journal-weather-option:focus-visible,
+.journal-weather-close:focus-visible {
+  outline: 3px solid #6b9e56;
+  outline-offset: 2px;
+}
+
+.journal-weather-overlay {
+  position: absolute;
+  inset: 12px;
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background: rgb(71 50 31 / 0.36);
+}
+
+.journal-weather-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  width: min(680px, calc(100% - 14px));
+  max-height: calc(100% - 10px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 10px 14px 12px;
+  border: 5px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 20px;
+  background: linear-gradient(180deg, #fbf6e9 0%, #f4ecd7 100%);
+  box-shadow: var(--sticker-shadow);
+  color: var(--sticker-ink);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.journal-weather-card:focus,
+.journal-weather-card:focus-visible {
+  outline: 2px solid var(--sticker-ink);
+}
+
+.journal-weather-head,
+.journal-weather-grid,
+.journal-weather-effects {
+  animation: weather-almanac-pop 170ms cubic-bezier(0.22, 1.3, 0.36, 1);
+}
+
+@keyframes weather-almanac-pop {
+  from {
+    transform: translateY(5px) scale(0.96);
+  }
+  to {
+    transform: translateY(0) scale(1);
+  }
+}
+
+.journal-weather-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.journal-weather-title-wrap {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+
+.journal-weather-emblem {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  display: block;
+}
+
+.journal-weather-title {
+  margin: 0;
+  color: var(--sticker-ink);
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.journal-weather-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: #e4f3fc;
+  box-shadow: 0 1px 0 #47321f22;
+  color: var(--sticker-ink);
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.journal-weather-close {
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  border: 4px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 50%;
+  background: var(--sticker-paper);
+  color: var(--sticker-ink);
+  cursor: pointer;
+  font: 700 22px var(--sticker-font);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition: transform 110ms ease-out, background-color 110ms ease-out;
+}
+
+.journal-weather-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.journal-weather-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: 50px;
+  padding: 6px 9px;
+  box-sizing: border-box;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fffdf8 0%, #f5ebd4 100%);
+  box-shadow:
+    inset 0 0 0 1.5px #fffaf0,
+    0 2px 0 #47321f29;
+  color: var(--sticker-ink);
+  font-family: var(--sticker-font);
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition: transform 110ms ease-out, background-color 110ms ease-out;
+}
+
+.journal-weather-option[aria-pressed="true"] {
+  border: 2.5px solid var(--sticker-ink);
+  border-left: 6px solid #4ea2d8;
+  background: linear-gradient(180deg, #fffdf0 0%, #cceaff 100%);
+  box-shadow:
+    inset 0 0 0 2px #fffdf7,
+    0 2px 0 #47321f48;
+}
+
+.journal-weather-option-svg {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  display: block;
+}
+
+.journal-weather-option-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 1px;
+}
+
+.journal-weather-option-label {
+  color: var(--sticker-ink);
+  font-size: 11.5px;
+  font-weight: 900;
+  line-height: 1.15;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.journal-weather-option-sub {
+  color: #654b32;
+  font-size: 9.5px;
+  font-weight: 700;
+  line-height: 1.15;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.journal-weather-effects {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 9px 12px;
+  border: 2px dashed #47321f66;
+  border-left: 5px solid #7cc8f0;
+  border-radius: 14px;
+  background: #fffaf0;
+}
+
+.journal-weather-effects-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.journal-weather-effects-eyebrow {
+  color: var(--sticker-ink);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+
+.journal-weather-effects-note {
+  color: #654b32;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.journal-weather-effect-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 11.5px;
+  line-height: 1.25;
+}
+
+.journal-weather-effect-key {
+  flex: 0 0 92px;
+  color: #6b4e33;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.journal-weather-effect-val {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--sticker-ink);
+  font-weight: 800;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .journal-weather-btn:hover {
+    background: linear-gradient(180deg, #fffdf8 0%, #c8e7fc 100%);
+    transform: translateY(-1px);
+  }
+  .journal-weather-option:hover {
+    background: linear-gradient(180deg, #fffef6 0%, #f9efcb 100%);
+    transform: translateY(-1px);
+  }
+  .journal-weather-option[aria-pressed="true"]:hover {
+    background: linear-gradient(180deg, #fffdf2 0%, #cdeaff 100%);
+  }
+  .journal-weather-close:hover {
+    background: #fff9e6;
+    transform: scale(1.05);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journal-weather-btn,
+  .journal-weather-option,
+  .journal-weather-close {
+    transition: none;
+  }
+  .journal-weather-btn:hover,
+  .journal-weather-option:hover,
+  .journal-weather-close:hover {
+    transform: none;
+  }
+  .journal-weather-head,
+  .journal-weather-grid,
+  .journal-weather-effects {
+    animation: none;
+  }
+}
+
+:root[data-reduced-motion="on"] .journal-weather-btn,
+:root[data-reduced-motion="on"] .journal-weather-option,
+:root[data-reduced-motion="on"] .journal-weather-close {
+  transition: none;
+}
+
+:root[data-reduced-motion="on"] .journal-weather-btn:hover,
+:root[data-reduced-motion="on"] .journal-weather-option:hover,
+:root[data-reduced-motion="on"] .journal-weather-close:hover {
+  transform: none;
+}
+
+:root[data-reduced-motion="on"] .journal-weather-head,
+:root[data-reduced-motion="on"] .journal-weather-grid,
+:root[data-reduced-motion="on"] .journal-weather-effects {
+  animation: none;
+}
+
+@media (max-width: 520px) {
+  .journal-weather-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-height: 500px) {
+  .journal-weather-btn {
+    min-height: 26px;
+    padding: 2px 9px;
+    font-size: 10.5px;
+  }
+  .journal-weather-card {
+    gap: 5px;
+    padding: 6px 11px 7px;
+  }
+  .journal-weather-emblem {
+    width: 22px;
+    height: 22px;
+  }
+  .journal-weather-title {
+    font-size: 13.5px;
+  }
+  .journal-weather-pill {
+    padding: 1px 8px;
+    font-size: 10px;
+  }
+  .journal-weather-grid {
+    gap: 5px;
+  }
+  .journal-weather-option {
+    min-height: 44px;
+    padding: 4px 7px;
+    gap: 6px;
+  }
+  .journal-weather-option-svg {
+    width: 22px;
+    height: 22px;
+    flex-basis: 22px;
+  }
+  .journal-weather-option-label {
+    font-size: 10.5px;
+  }
+  .journal-weather-option-sub {
+    font-size: 8.8px;
+  }
+  .journal-weather-effects {
+    gap: 3px;
+    padding: 5px 9px;
+  }
+  .journal-weather-effects-eyebrow {
+    font-size: 10px;
+  }
+  .journal-weather-effects-note {
+    font-size: 9px;
+  }
+  .journal-weather-effect-row {
+    font-size: 10px;
+    line-height: 1.18;
+  }
+  .journal-weather-effect-key {
+    flex-basis: 80px;
+    font-size: 9px;
+  }
+}

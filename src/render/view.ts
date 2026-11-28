@@ -4,11 +4,13 @@ import {
 import {
   creditEntries, type Area, type NavField, type Point, type State, type World,
 } from "../core";
+import { weatherForArea } from "../core/weather";
 import { AreaView } from "./area-view";
 import { CHARACTER_POSE_ATLASES } from "./animation";
 import { CameraDirector, screenToWorld, worldToScreen } from "./camera";
 import { assetUrl } from "../platform/assets";
 import { isReducedMotionActive } from "../platform/reduced-motion";
+import { getCozyWeatherMode } from "../platform/weather-prefs";
 import { fadeAlpha } from "./fade";
 import { PaperGrainOverlay, syncPresentationTelemetry } from "./paper-grain";
 import { createVfxTextures, type VfxTextures } from "./vfx-textures";
@@ -517,9 +519,20 @@ export class GameView {
     this.renderGlows(state, playerPos, paused, reducedMotion);
     this.effects.updateStarGemGlints(state, reducedMotion);
     this.restoration.update(this.world, state, { paused, reducedMotion });
+    const baseAtmos = computeStoryAtmosphereOptions(this.world, state, area.id, reducedMotion);
+    const weatherInfo = weatherForArea(area.id, state.tick, getCozyWeatherMode());
+    if (
+      typeof document !== "undefined" &&
+      document.documentElement.dataset.activeWeather !== weatherInfo.kind
+    ) {
+      document.documentElement.dataset.activeWeather = weatherInfo.kind;
+    }
+    const atmosOptions =
+      weatherInfo.kind === "clear" ? baseAtmos : { ...baseAtmos, weather: weatherInfo.kind };
     this.atmosphere.update(
-      area.id, area.width, area.height, state.tick, state.battle === null && state.arcade === null,
-      this.lanternBlend, computeStoryAtmosphereOptions(this.world, state, area.id, reducedMotion),
+      area.id, area.width, area.height, state.tick,
+      state.battle === null && state.arcade === null, this.lanternBlend,
+      atmosOptions,
     );
     loaded.update(this.world, state.ink, state.player, state.tick, this.entities.figures());
     this.navOverlay.render(

@@ -1,4 +1,5 @@
 import type { State, World } from "../core";
+import type { CozyWeatherKind } from "../core/weather";
 
 export type AtmosphereLayer = "under" | "over" | "emissive";
 export type AtmosphereTextureKey =
@@ -8,7 +9,8 @@ export type AtmosphereTextureKey =
   | "waterGlint"
   | "mistWisp"
   | "sunbeam"
-  | "energyRing";
+  | "energyRing"
+  | "puff";
 export type AtmosphereBlend = "normal" | "add";
 
 export type AtmosphereParticle = {
@@ -35,6 +37,7 @@ export type AtmosphereOptions = {
   musicRoomHarmony?: boolean;
   artRoomPaletteGlow?: boolean;
   sanctuaryFestival?: boolean;
+  weather?: CozyWeatherKind;
   reducedMotion?: boolean;
 };
 

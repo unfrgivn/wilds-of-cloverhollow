@@ -8143,6 +8143,46 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
 - **Gates:** `just check`, `just build` (`< 500 kB` every non-vendor chunk),
   `bun tools/sim/cutscene-plaza-hood.ts`, and targeted + `@smoke` Chromium e2e.
 
+## Milestone 187: Dynamic Cozy Weather Engine, Watercolor Sky Effects & Valley Sky Almanac (Elevation Track E17, §13 Unlock) **Status:** ✅ Completed (2026-11-27)
+- Implements the owner-unlocked **Dynamic Cozy Weather** (§13, Elevation Track
+  E17) as a pure deterministic biome weather engine, zero-Pixi watercolor sky
+  effects evaluator, persisted preference controller, and hand-inked **Valley
+  Sky Almanac** inside Fae's Journal — zero `src/core/sim.ts` changes, zero
+  save-version bumps, zero replay hash drift across all 74 recorded sims, and
+  zero visual baseline diffs across all 99 `ui-gallery` baselines.
+- Pure core weather engine (`src/core/weather.ts`, 218 lines — zero DOM, Pixi,
+  `Date`, or `Math.random`):
+  - Mapped all 35 playable areas across 6 biomes (`town`, `woods`, `coast`,
+    `alpine`, `enchanted`, and 19 sheltered `indoor` rooms that always resolve
+    to `"clear"`), supporting 6 modes (`clear`, `auto`, `sunshower`,
+    `breeze-petals`, `snow-flurry`, `twilight-fireflies`), deterministic
+    3,600-tick biome cycles, and weather gameplay effects (`fishFlavor`,
+    `fishBiteBonus`, `gardenDewBonus`, `moodNote`, sky tints).
+- Watercolor weather particles & pastel rainbow arc
+  (`src/render/weather-particles.ts`, 261 lines; wired cleanly through
+  `src/render/atmosphere-shared.ts`, `atmosphere-recipes.ts`, `view.ts`, and
+  `src/platform/weather-prefs.ts`):
+  - `clear` emits `0` particles (zero baseline drift); `sunshower` emits 16
+    diagonal `mistWisp` watercolor streaks, 6 puddle `sparkle` glints, and a
+    20-lobe 5-band pastel rainbow wash; `snow-flurry` emits 20 frost crystals;
+    `breeze-petals` emits 14 floating pastel petals; `twilight-fireflies` emits
+    14 emissive golden-lime lanterns — all honoring `reducedMotion` (`rotation: 0`,
+    tick-invariant placement).
+- Valley Sky Almanac (`src/ui/journal-weather.ts`, `src/ui/journal-weather.css`,
+  `src/ui/journal-field-note.ts`):
+  - 6 hand-inked inline SVG weather emblems (zero `<text>` nodes), `>= 44 px`
+    tactile selector cards with live `Sky Forecast` effects panel (`Fish
+    Forecast`, `Garden Dew`, `Valley Mood`), launched via `.journal-weather-btn`
+    in the Field Treasures header with exact trigger focus restoration, reduced
+    motion, and Safari/iOS tap-selection parity.
+- Evidence: `tests/unit/milestone-187.test.ts`,
+  `tests/e2e/milestone-187.spec.ts` (`@smoke` Chromium + WebKit), and review
+  captures `art/review/m183-sky-almanac-1280.jpg` and
+  `m183-plaza-sunshower-1280.jpg` independently verified via `vision`.
+- Gates: `just check` (251 unit files / 1,816 tests, all 74 sims, 23 QA packs,
+  purity, lint), `just build` (`index` `389.27 kB < 500 kB`), 12/12 targeted
+  Chromium & WebKit e2e, and 99/99 Chromium `ui-gallery` tests.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

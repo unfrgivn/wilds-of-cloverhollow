@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 186)
+Last updated: 2026-11-27 (Milestone 187)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -816,7 +816,24 @@ ios/            Capacitor iOS project (from Milestone 4).
   golden-star sparkles drifting gently across the picnic meadow; all biomes
   and story-reactive accents respect
   `reducedMotion` by holding positions and pulses steady across ticks,
-  Milestones 119 and 159), and an `emissive`
+  Milestones 119 and 159), plus **Dynamic Cozy Weather & Watercolor Sky Effects**
+  (Elevation Track E17, Milestone 183, Owner-Unlocked §13): pure zero-DOM core
+  engine `src/core/weather.ts` (`weatherBiomeForArea` across all 35 playable
+  areas into `town`, `woods`, `coast`, `alpine`, `enchanted`, and sheltered
+  `indoor`; `weatherForArea` deterministic `WEATHER_CYCLE_TICKS = 3600` biome
+  schedules under `"auto"` plus explicit `COZY_WEATHER_MODES`; `weatherEffects`
+  fish bite charm, garden dew bonus, and pastel sky notes), pure zero-Pixi
+  particle & 5-band pastel rainbow evaluator `src/render/weather-particles.ts`
+  (`RAINBOW_ARC_TINTS`, `evaluateWeatherParticles`: 0 particles for `"clear"`,
+  42 for `"sunshower"` including 16 rain streaks, 6 ground ripples, and 20
+  emissive 5-band watercolor rainbow arc lobes, 20 `"snow-flurry"` puff/sparkle
+  crystals, 14 `"breeze-petals"`, and 14 emissive `"twilight-fireflies"`, all
+  honoring `reducedMotion` with `rotation: 0` and tick-invariant positions),
+  and resilient preference store `src/platform/weather-prefs.ts`
+  (`"cloverhollow-weather"`, default `"clear"`, reflecting `data-weather` on
+  `<html>` while `GameView` merges outdoor weather into `BiomeAtmosphere` and
+  reflects `data-active-weather`, keeping interiors sheltered and `"clear"` with
+  zero baseline drift), and an `emissive`
   `emissiveLayer` (boosted smoothly
   during lantern dusk for cavern crystals/lanterns, enchanted fairies, plaza lamp
   arches, lodge hearth, and café counter glows, plus cool subterranean edge
@@ -4765,6 +4782,19 @@ trunks keep its two exits.
   `keepsakesGrid` on `STICKERS` (hidden and detached whenever
   `view.keepsakes === undefined` or `stickersOwned === 0 && earned === 0`),
   restoring focus directly to the triggering button on dismiss.
+- **Valley Sky Almanac** (Elevation Track E17, Milestone 183, Owner-Unlocked
+  §13): storybook weather picker modal (`src/ui/journal-weather.ts` +
+  `src/ui/journal-weather.css`, composed into `createJournalFieldOverlays` in
+  `src/ui/journal-field-note.ts` with a compact `.journal-weather-btn`
+  (`"☀ Sky Almanac"`) beside `.journal-ribbons-btn` in the `FIELD TREASURES`
+  modal header, zero `ui-gallery` or Journal baseline diffs). Displays
+  hand-inked `#47321f` inline SVG weather emblems (zero `<text>` nodes), 6
+  tactile `>= 44 px` mode selector buttons (`Clear Skies`, `Auto Cycle`,
+  `Rainbow Sunshower`, `Blossom Breeze`, `Snow Flurry`, `Twilight Fireflies`)
+  with `aria-pressed` and WCAG `:focus-visible`, a live Sky Effects Card
+  (Fish Forecast, Garden Dew, Valley Mood), reduced-motion and iOS
+  tap-selection hygiene, and clean backdrop/`×`/`Escape`/`X`/`B` dismiss
+  restoring Field Treasures and focus directly to `.journal-weather-btn`.
 - A chunky four-step sound volume slider sits beside the `♪ on/off` pill and
   fits the heading row at 874x402, including with `♪ off` and 999 coins. At
   narrow widths, the supplies wrap beneath NOTES so every control remains

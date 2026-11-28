@@ -4,6 +4,7 @@ import { feelingMarkup, heartMarkup, icon, keepsakeIcon } from "./icons";
 import { createBlessingPlaque, createTreasuresBlessingsStrip } from "./journal-blessings";
 import { createJournalGemsLedger } from "./journal-gems-ledger";
 import { createJournalRibbonsShowcase } from "./journal-ribbons";
+import { createJournalWeatherAlmanac } from "./journal-weather";
 import { isKeepsakeId } from "../core/blessings";
 import type { CritterFieldNote, JournalKeepsake, StarGemEntry } from "../core/journal";
 import { evaluateMeritRibbonsFromJournal } from "../core/ribbons";
@@ -150,88 +151,71 @@ const CLAW_ORIGIN = "Claw Machine · Mr. Pip's Arcade";
 const COUNTER_ORIGIN = "Ticket Counter · Mr. Pip's Arcade";
 const PRIZE_HOME = "Clubhouse Shelf";
 
+const prizeNote = (origin: string, blurb: string): PrizeFieldNoteMeta => ({
+  origin,
+  displayNote: PRIZE_HOME,
+  blurb,
+});
+
 const PRIZE_FIELD_NOTES: Readonly<Record<string, PrizeFieldNoteMeta>> = {
-  "frog-plush": {
-    origin: CLAW_ORIGIN,
-    displayNote: PRIZE_HOME,
-    blurb:
-      "Squishy moss-green frog with a big stitched grin; Maddie swears it squeaks on rainy nights.",
-  },
-  "pup-plush": {
-    origin: CLAW_ORIGIN,
-    displayNote: PRIZE_HOME,
-    blurb: "Floppy-eared puppy with a velvet nose, rescued right from the top of the claw heap.",
-  },
-  "raccoon-plush": {
-    origin: CLAW_ORIGIN,
-    displayNote: PRIZE_HOME,
-    blurb:
-      "A delightfully smug bandit in plush form, guarding the clubhouse shelf with tiny paws.",
-  },
-  "cat-plush": {
-    origin: CLAW_ORIGIN,
-    displayNote: PRIZE_HOME,
-    blurb:
-      "Soft ginger tabby stitched with a curled tail, always ready for a sunlit afternoon nap.",
-  },
-  "bunny-plush": {
-    origin: CLAW_ORIGIN,
-    displayNote: PRIZE_HOME,
-    blurb:
-      "Long pastel ears and a cotton-puff tail that feels like hugging a sunny meadow cloud.",
-  },
-  "bluebird-plush": {
-    origin: CLAW_ORIGIN,
-    displayNote: PRIZE_HOME,
-    blurb: "Plump sky-blue songbird with stitched wings that brighten up the whole clubhouse.",
-  },
-  "hamster-plush": {
-    origin: CLAW_ORIGIN,
-    displayNote: PRIZE_HOME,
-    blurb: "Round golden cheeks packed tight with stuffing, looking ready to stash a warm snack.",
-  },
-  "squirrel-plush": {
-    origin: CLAW_ORIGIN,
-    displayNote: PRIZE_HOME,
-    blurb:
-      "Fluffy chestnut tail curled taller than its head, like a tiny friend from Pinecone Pass.",
-  },
-  "owl-plush": {
-    origin: CLAW_ORIGIN,
-    displayNote: PRIZE_HOME,
-    blurb: "Wide starry button eyes watching gently over Fae's clubhouse adventures after dusk.",
-  },
-  pinwheel: {
-    origin: COUNTER_ORIGIN,
-    displayNote: PRIZE_HOME,
-    blurb: "Spinning pastel petals that whirl into a rainbow whenever a breeze drifts by.",
-  },
-  "bouncy-ball": {
-    origin: COUNTER_ORIGIN,
-    displayNote: PRIZE_HOME,
-    blurb:
-      "Clear speckled bouncy ball with a tiny gold star floating right in the bouncy center.",
-  },
-  "toy-rocket": {
-    origin: COUNTER_ORIGIN,
-    displayNote: PRIZE_HOME,
-    blurb:
-      "Tin-painted red-and-cream comet cruiser ready for pretend launches past the marquee.",
-  },
-  "star-racer-keychain": {
-    origin: COUNTER_ORIGIN,
-    displayNote: PRIZE_HOME,
-    blurb:
-      "Mr. Pip's legendary 80-ticket champ prize, the very Star Racer charm Milo dreamed about.",
-  },
+  "frog-plush": prizeNote(
+    CLAW_ORIGIN,
+    "Squishy moss-green frog with a big stitched grin; Maddie swears it squeaks on rainy nights.",
+  ),
+  "pup-plush": prizeNote(
+    CLAW_ORIGIN,
+    "Floppy-eared puppy with a velvet nose, rescued right from the top of the claw heap.",
+  ),
+  "raccoon-plush": prizeNote(
+    CLAW_ORIGIN,
+    "A delightfully smug bandit in plush form, guarding the clubhouse shelf with tiny paws.",
+  ),
+  "cat-plush": prizeNote(
+    CLAW_ORIGIN,
+    "Soft ginger tabby stitched with a curled tail, always ready for a sunlit afternoon nap.",
+  ),
+  "bunny-plush": prizeNote(
+    CLAW_ORIGIN,
+    "Long pastel ears and a cotton-puff tail that feels like hugging a sunny meadow cloud.",
+  ),
+  "bluebird-plush": prizeNote(
+    CLAW_ORIGIN,
+    "Plump sky-blue songbird with stitched wings that brighten up the whole clubhouse.",
+  ),
+  "hamster-plush": prizeNote(
+    CLAW_ORIGIN,
+    "Round golden cheeks packed tight with stuffing, looking ready to stash a warm snack.",
+  ),
+  "squirrel-plush": prizeNote(
+    CLAW_ORIGIN,
+    "Fluffy chestnut tail curled taller than its head, like a tiny friend from Pinecone Pass.",
+  ),
+  "owl-plush": prizeNote(
+    CLAW_ORIGIN,
+    "Wide starry button eyes watching gently over Fae's clubhouse adventures after dusk.",
+  ),
+  pinwheel: prizeNote(
+    COUNTER_ORIGIN,
+    "Spinning pastel petals that whirl into a rainbow whenever a breeze drifts by.",
+  ),
+  "bouncy-ball": prizeNote(
+    COUNTER_ORIGIN,
+    "Clear speckled bouncy ball with a tiny gold star floating right in the bouncy center.",
+  ),
+  "toy-rocket": prizeNote(
+    COUNTER_ORIGIN,
+    "Tin-painted red-and-cream comet cruiser ready for pretend launches past the marquee.",
+  ),
+  "star-racer-keychain": prizeNote(
+    COUNTER_ORIGIN,
+    "Mr. Pip's legendary 80-ticket champ prize, the very Star Racer charm Milo dreamed about.",
+  ),
 };
 
-const FALLBACK_PRIZE_NOTE: PrizeFieldNoteMeta = {
-  origin: "Mr. Pip's Arcade",
-  displayNote: PRIZE_HOME,
-  blurb:
-    "A treasured prize won at Mr. Pip's Arcade and tucked proudly onto the clubhouse shelf.",
-};
+const FALLBACK_PRIZE_NOTE = prizeNote(
+  "Mr. Pip's Arcade",
+  "A treasured prize won at Mr. Pip's Arcade and tucked proudly onto the clubhouse shelf.",
+);
 
 /** Returns handcrafted Cloverhollow field-note lore for an Arcade Prize. */
 export function prizeFieldNote(prizeId: string): PrizeFieldNoteMeta {
@@ -420,34 +404,55 @@ export function createJournalFieldOverlays(options?: {
   };
 
   let ribbonsReturnToTreasures = false;
+  let weatherReturnToTreasures = false;
+
+  const weatherAlmanac = createJournalWeatherAlmanac({
+    onBeforeOpen: () => {
+      clearFieldNote();
+      gemsLedger.clear();
+      ribbonsReturnToTreasures = false;
+      ribbonsShowcase.clear();
+    },
+    onClose: () => {
+      if (weatherReturnToTreasures && treasuresOpen) treasuresBackdrop.hidden = false;
+      weatherReturnToTreasures = false;
+    },
+    onVisibilityChange: () => syncVisibility(),
+  });
 
   const ribbonsShowcase = createJournalRibbonsShowcase({
     onBeforeOpen: () => {
       clearFieldNote();
       gemsLedger.clear();
+      weatherReturnToTreasures = false;
+      weatherAlmanac.clear();
     },
     onClose: () => {
-      if (ribbonsReturnToTreasures && treasuresOpen) {
-        treasuresBackdrop.hidden = false;
-      }
+      if (ribbonsReturnToTreasures && treasuresOpen) treasuresBackdrop.hidden = false;
       ribbonsReturnToTreasures = false;
     },
     onVisibilityChange: () => syncVisibility(),
   });
-  treasuresTitleWrap.append(ribbonsShowcase.treasuresBtn);
+  treasuresTitleWrap.append(ribbonsShowcase.treasuresBtn, weatherAlmanac.treasuresBtn);
 
   const gemsLedger = createJournalGemsLedger({
     onBeforeOpen: () => {
       clearFieldNote();
       clearTreasures();
       ribbonsReturnToTreasures = false;
+      weatherReturnToTreasures = false;
       ribbonsShowcase.clear();
+      weatherAlmanac.clear();
     },
     onVisibilityChange: () => syncVisibility(),
   });
 
   const hasOpen = (): boolean =>
-    treasuresOpen || inspectedItem !== null || gemsLedger.isOpen() || ribbonsShowcase.isOpen();
+    treasuresOpen ||
+    inspectedItem !== null ||
+    gemsLedger.isOpen() ||
+    ribbonsShowcase.isOpen() ||
+    weatherAlmanac.isOpen();
 
   const syncVisibility = (): void => {
     const nowOpen = hasOpen();
@@ -493,7 +498,9 @@ export function createJournalFieldOverlays(options?: {
       if (!treasuresBackdrop.hidden) clearTreasures();
       return;
     }
-    treasuresBackdrop.hidden = ribbonsReturnToTreasures && ribbonsShowcase.isOpen();
+    treasuresBackdrop.hidden =
+      (ribbonsReturnToTreasures && ribbonsShowcase.isOpen()) ||
+      (weatherReturnToTreasures && weatherAlmanac.isOpen());
     const signature = [
       summary.stamps.started,
       summary.stamps.bay,
@@ -817,33 +824,33 @@ export function createJournalFieldOverlays(options?: {
   ribbonsShowcase.banner.addEventListener("click", () => {
     openRibbons(latestView, ribbonsShowcase.banner);
   });
+  weatherAlmanac.treasuresBtn.addEventListener("click", () => {
+    const host = options?.focusRoot ?? treasuresBackdrop.parentElement;
+    if (host !== null && weatherAlmanac.overlay.parentElement !== host) {
+      host.append(weatherAlmanac.overlay);
+    }
+    weatherReturnToTreasures = treasuresOpen;
+    if (treasuresOpen) treasuresBackdrop.hidden = true;
+    weatherAlmanac.open(weatherAlmanac.treasuresBtn);
+  });
 
   const closeAll = (): void => {
     ribbonsReturnToTreasures = false;
+    weatherReturnToTreasures = false;
     clearFieldNote();
     clearTreasures();
     gemsLedger.clear();
     ribbonsShowcase.clear();
+    weatherAlmanac.clear();
     lastNotifiedOpen = false;
   };
 
   const dismiss = (): boolean => {
-    if (ribbonsShowcase.isOpen()) {
-      ribbonsShowcase.close();
-      return true;
-    }
-    if (gemsLedger.isOpen()) {
-      gemsLedger.close();
-      return true;
-    }
-    if (treasuresOpen) {
-      closeTreasures();
-      return true;
-    }
-    if (inspectedItem !== null) {
-      closeFieldNote();
-      return true;
-    }
+    if (weatherAlmanac.isOpen()) { weatherAlmanac.close(); return true; }
+    if (ribbonsShowcase.isOpen()) { ribbonsShowcase.close(); return true; }
+    if (gemsLedger.isOpen()) { gemsLedger.close(); return true; }
+    if (treasuresOpen) { closeTreasures(); return true; }
+    if (inspectedItem !== null) { closeFieldNote(); return true; }
     return false;
   };
 
@@ -912,6 +919,7 @@ export function createJournalFieldOverlays(options?: {
     hasOpen,
     dismiss,
     handleKeydown: (event) => {
+      if (weatherAlmanac.handleKeydown(event)) return true;
       if (ribbonsShowcase.handleKeydown(event)) return true;
       if (gemsLedger.handleKeydown(event)) return true;
       if (treasuresOpen) {

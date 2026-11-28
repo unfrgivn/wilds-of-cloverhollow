@@ -206,8 +206,40 @@ export function treatTrayItems(world: World, state: State, critter: Critter): Tr
   return items;
 }
 
-// Soothe, then one command per party member in party order, then Snack and
-// Run (spec 8). A friend's command rests for its content turns after use.
+export function battleTurnRoster(
+  world: World,
+  state: State,
+): { id: string; name: string }[] {
+  return [
+    { id: "fae", name: "Fae" },
+    ...battleParty(world, state.party).map((member) => ({
+      id: member.id,
+      name: world.party[member.id]?.name ?? member.id,
+    })),
+  ];
+}
+
+export function activeBattleActor(
+  world: World,
+  state: State,
+): { id: string; name: string; index: number } {
+  const roster = battleTurnRoster(world, state);
+  const fae = roster[0] ?? { id: "fae", name: "Fae" };
+  const battle = state.battle;
+  if (battle === null) return { ...fae, index: 0 };
+  const critter = world.critters[battle.critterId];
+  if (critter !== undefined && inTalkMode(battle, critter)) {
+    return { ...fae, index: 0 };
+  }
+  const raw = battle.actorIndex ?? 0;
+  const index = ((raw % roster.length) + roster.length) % roster.length;
+  const actor = roster[index] ?? fae;
+  return { ...actor, index };
+}
+
+// Per-member battle commands (spec 8): outside Talk mode, only the active
+// actor's signature action (Soothe for Fae; Cast, Juggle, or Play for a party
+// member) plus Recover, Snack, and Run (when `critter.canRun`).
 export function battleCommands(
   world: World,
   state: State,
@@ -230,30 +262,36 @@ export function battleCommands(
     : going.feelings.filter((_, index) => going.popped[index] !== true);
   const feeling = (id: string): FeelingId | null =>
     showing.find((item) => answers(world, item, id)) ?? null;
-  const friends = battleParty(world, state.party).flatMap((member) => {
-    const command = world.party[member.id]?.command;
-    if (command === undefined || command === null) return [];
-    const rest = battle.rest[command.id] ?? 0;
-    return [
-      {
-        id: command.id,
-        label: command.label,
-        detail: rest > 0 ? command.resting : null,
-        disabled: rest > 0,
-        feeling: feeling(command.id),
-      },
-    ];
-  });
+  const actor = activeBattleActor(world, state);
+  const memberCommand = actor.id === "fae" ? null : (world.party[actor.id]?.command ?? null);
+  const primary = memberCommand === null
+    ? {
+        id: "soothe",
+        label: world.battle.commands.soothe.label,
+        detail: null,
+        disabled: false,
+        feeling: feeling("soothe"),
+      }
+    : (() => {
+        const rest = battle.rest[memberCommand.id] ?? 0;
+        return {
+          id: memberCommand.id,
+          label: memberCommand.label,
+          detail: rest > 0 ? memberCommand.resting : null,
+          disabled: rest > 0,
+          feeling: feeling(memberCommand.id),
+        };
+      })();
   const totalSnacks = state.snacks + totalTreatCount(state.treats);
   return [
+    primary,
     {
-      id: "soothe",
-      label: world.battle.commands.soothe.label,
-      detail: null,
+      id: "recover",
+      label: "Recover",
+      detail: "+1 leaf",
       disabled: false,
-      feeling: feeling("soothe"),
+      feeling: null,
     },
-    ...friends,
     {
       id: "snack",
       label: world.battle.commands.snack.label,
@@ -383,6 +421,7 @@ export function battleView(world: World, state: State): BattleView | null {
         items: trayItems,
         selected: Math.max(0, Math.min(trayItems.length - 1, battle.treatSelected ?? 0)),
       };
+  const turnActor = activeBattleActor(world, state);
   return {
     critterId: critter.id,
     critterName: critter.name,
@@ -390,6 +429,7 @@ export function battleView(world: World, state: State): BattleView | null {
     auraCentre: critter.auraCentre,
     bodyCentre: critter.bodyCentre,
     phase: battle.phase,
+    activeActor: { id: turnActor.id, name: turnActor.name },
     message: battle.message,
     revealed: battle.revealed,
     commands: battleCommands(world, state),

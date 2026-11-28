@@ -103,7 +103,7 @@ const SPECIALTY_TREAT_RE =
 export function classifySnackTheater(
   battle: Pick<Battle, "phase" | "command" | "message"> & { lastGrade?: Battle["lastGrade"] },
 ): SnackTheaterKind {
-  if (battle.phase !== "result") return "none";
+  if (battle.phase !== "result" || battle.command === "recover") return "none";
   // Core snack and specialty treat results never run a check, so `lastGrade` is
   // always `null` while `command` stays null (turn 1) or holds the prior turn's
   // command; every check-based result carries a non-null grade.

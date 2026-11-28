@@ -1,6 +1,8 @@
 import {
+  auditAreaNavigation,
   distanceToPolygon,
   frontEdge,
+  orderPartyContent,
   propCoversPoint,
   type Prop,
   type PropState,
@@ -407,7 +409,7 @@ export function areaConnectionErrors(
   party: Record<string, PartyContent> = {},
 ): string[] {
   const radius = tunables.playerRadius;
-  const roster = Object.values(party);
+  const roster = orderPartyContent(Object.values(party));
   const errors: string[] = [];
   for (const area of Object.values(areas)) {
     for (const [name, spawn] of Object.entries(area.spawns))
@@ -595,6 +597,45 @@ export function areaConnectionErrors(
         errors.push(`${area.id}: trigger ${trigger.id} has an invalid target`);
       if (!reachable.some((point) => pointInPolygon(point, trigger.polygon)))
         errors.push(`${area.id}: trigger ${trigger.id} is unreachable`);
+    }
+  }
+  return errors;
+}
+
+/**
+ * Navigation quality check: flags areas with large pinched-off unreachable
+ * floor pockets (>= maxClusterCells on the 10-unit nav grid) or spawns placed
+ * below playerRadius clearance.
+ */
+export function navigationQualityErrors(
+  areas: Record<string, Area>,
+  tunables: Tunables,
+  maxClusterCells = 15,
+): string[] {
+  const radius = tunables.playerRadius;
+  const errors: string[] = [];
+  for (const area of Object.values(areas)) {
+    const navArea: Area = {
+      ...area,
+      blockers: [
+        ...area.blockers,
+        ...area.props.flatMap((prop) => prop.states[prop.state]?.footprint ?? []),
+        ...area.npcs
+          .filter((npc) => npc.stroll === undefined)
+          .map((npc) => npc.footprint),
+      ],
+    };
+    const report = auditAreaNavigation(navArea, radius);
+    if (report.minSpawnClearance < radius - 0.01) {
+      errors.push(
+        `${area.id}: minimum spawn clearance ${report.minSpawnClearance.toFixed(1)} < ${radius}`,
+      );
+    }
+    for (const cluster of report.unreachableClusters) {
+      if (cluster.count >= maxClusterCells) {
+        const at = `(${cluster.cx}, ${cluster.cy})`;
+        errors.push(`${area.id}: unreachable pocket of ${cluster.count} cells at ${at}`);
+      }
     }
   }
   return errors;

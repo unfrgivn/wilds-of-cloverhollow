@@ -11,12 +11,13 @@ import {
 import {
   creditEntries,
   type Area,
+  type NavField,
   type Point,
   type State,
   type World,
 } from "../core";
 import { AreaView } from "./area-view";
-import { worldToScreen } from "./camera";
+import { screenToWorld, worldToScreen } from "./camera";
 import { assetUrl } from "../platform/assets";
 import { isReducedMotionActive } from "../platform/reduced-motion";
 import { fadeAlpha } from "./fade";
@@ -31,10 +32,12 @@ import {
 } from "./battle-view";
 import { OverworldEntityLayer } from "./entity-layer";
 import { NpcLifeController, type NpcLifeRenderInfo } from "./npc-life";
+import { NavOverlayController } from "./nav-overlay";
 import {
   CLUBHOUSE_PRIZES_ALIAS,
   OverworldEffectsController,
 } from "./overworld-effects";
+import type { NavPathSnapshot } from "../shell/nav-steer";
 import type { NpcChatterView } from "../ui/npc-chatter";
 import {
   areaEntityAtlases,
@@ -90,6 +93,9 @@ export class GameView {
   private readonly effects: OverworldEffectsController;
   private readonly entities: OverworldEntityLayer;
   private readonly npcLife: NpcLifeController;
+  private readonly navOverlay = new NavOverlayController();
+  private navField: NavField | null = null;
+  private navSnapshot: NavPathSnapshot | null = null;
   private readonly background = new Graphics();
   private readonly paper = new Graphics();
   private readonly fade = new Graphics();
@@ -209,6 +215,7 @@ export class GameView {
     this.scene.addChild(
       this.shadowLayer,
       this.effects.footstepLayer,
+      this.navOverlay.groundLayer,
       this.atmosphere.under,
       this.depth,
       this.ambientLayer,
@@ -216,6 +223,7 @@ export class GameView {
       this.npcLife.reactionLayer,
       this.effects.emoteLayer,
       this.paperGrain,
+      this.navOverlay.debugLayer,
     );
     if (options.debugLabel) {
       this.label = new Text({
@@ -291,6 +299,9 @@ export class GameView {
     this.effects.clearStarGemGlints();
     this.effects.clearEmotes();
     this.npcLife.clear();
+    this.navOverlay.clearArea();
+    this.navField = null;
+    this.navSnapshot = null;
     this.clearCompanionActions();
     this.effects.hideClubhouseDisplay();
   }
@@ -556,6 +567,9 @@ export class GameView {
       state.tick,
       this.entities.figures(),
     );
+    this.navOverlay.render(
+      area, state, this.navField, this.navSnapshot, this.photoMode, reducedMotion,
+    );
     const overworldVisible = this.battleView.render({
       state,
       areaView: loaded,
@@ -631,6 +645,28 @@ export class GameView {
       state.player, this.previousCamera, this.viewWidth, this.viewHeight,
       window.innerWidth, window.innerHeight,
     );
+  }
+
+  /** Converts a CSS-pixel viewport point to world coordinates, or null before first render. */
+  screenToWorldPoint(client: Point): Point | null {
+    if (this.previousCamera === undefined) return null;
+    return screenToWorld(
+      client, this.previousCamera, this.viewWidth, this.viewHeight,
+      window.innerWidth, window.innerHeight,
+    );
+  }
+
+  setNavHeatmap(visible?: boolean): boolean {
+    return this.navOverlay.setHeatmapVisible(visible ?? !this.navOverlay.isHeatmapVisible());
+  }
+
+  isNavHeatmapVisible(): boolean {
+    return this.navOverlay.isHeatmapVisible();
+  }
+
+  setNavOverlayData(field: NavField | null, snapshot: NavPathSnapshot | null): void {
+    this.navField = field;
+    this.navSnapshot = snapshot;
   }
 
   /** The interaction prompt for this frame, anchored at the target in CSS px. */

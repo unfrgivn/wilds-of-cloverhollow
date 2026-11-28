@@ -18,16 +18,25 @@ const play = createRecorder(world, createState(world, fixture));
 const path = "tests/sim/scripts/bay/bay.json";
 for (const segment of parseScript(JSON.parse(readFileSync(path, "utf8")), path))
   for (let count = 0; count < segment.ticks; count += 1) play.tick(segment.frame);
-play.navigate({ x: 85, y: 545 });
-play.leave({ x: -1, y: 0 }, "plaza");
+// Up Cliffside Trail to Pinecone Pass (unlocks the pass Star Bus), then bus
+// home to Cloverhollow, back up to the pass (rode_bus), and home again.
+play.navigate({ x: 850, y: 1000 });
+play.leave({ x: 0, y: 1 }, "trail");
+play.navigate({ x: 150, y: 200 });
+play.leave({ x: -1, y: 0 }, "pass");
+if (play.state().area !== "pass") throw new Error("didn't reach the pass");
+play.approach("pass-sign");
+play.talk("pass-sign");
+// Along to the lodge's porch, then down to the stop and home to town.
+play.navigate({ x: 1180, y: 556 });
+play.approach("pass-bus-stop");
+play.talk("pass-bus-stop", [0]);
+play.idle(60);
+if (play.state().area !== "plaza") throw new Error("the bus didn't go home");
 play.approach("npc:bus-stop");
 play.talk("npc:bus-stop", [0]);
 play.idle(60);
-if (play.state().area !== "pass") throw new Error("the bus didn't go to the pass");
-play.approach("pass-sign");
-play.talk("pass-sign");
-// Along to the lodge's porch, then down to the stop.
-play.navigate({ x: 1180, y: 556 });
+if (play.state().area !== "pass") throw new Error("the bus didn't go up to the pass");
 play.approach("pass-bus-stop");
 play.talk("pass-bus-stop", [0]);
 play.idle(60);

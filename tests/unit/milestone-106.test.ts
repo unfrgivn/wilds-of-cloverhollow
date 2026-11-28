@@ -114,16 +114,18 @@ describe("Milestone 106: Wildlife Flyers, Credits Scaling, Shop Voices & 14-Area
 
   it("validates all 32 resting areas strictly inside walkable floor and clear of obstacles", () => {
     const areas = new Set(REST_SPOTS.map((spot) => spot.area));
-    expect(areas.size).toBe(32);
+    expect(areas.size).toBe(35);
     expect([...areas].sort()).toEqual([
       "arcade",
       "art-room",
       "bay",
       "bedroom",
+      "boardwalk",
       "cafe",
       "cavern",
       "classroom",
       "clubhouse",
+      "crossing",
       "east-hall",
       "enchanted",
       "field",
@@ -132,6 +134,7 @@ describe("Milestone 106: Wildlife Flyers, Credits Scaling, Shop Voices & 14-Area
       "island",
       "jordan-cabin",
       "kitchen",
+      "lane",
       "lodge",
       "market",
       "milo-house",

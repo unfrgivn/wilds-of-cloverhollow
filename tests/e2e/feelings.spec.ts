@@ -52,7 +52,19 @@ test("real keys: the frog is curious, Cast answers it, and the bonus lands", { t
     // The next turn's feeling rides in the trail; the lantern's dot is empty.
     await expect(page.locator(".battle-feeling-next .battle-icon")).toHaveCount(1);
     await expect(page.locator(".battle-feeling-later .battle-icon")).toHaveCount(0);
-    // Cast wears the badge; nothing else does.
+    // Advance past Fae's turn (Recover) to Sue's turn where Cast matches Curious.
+    await hold(page, "ArrowDown", 1);
+    await step(page, 1);
+    await press(page);
+    for (let steps = 0; steps < 80; steps += 1) {
+      const current = await readBattle(page);
+      if (current?.phase === "command" && current.actorIndex === 1 &&
+          current.revealed >= current.message.length) break;
+      if (current?.phase === "check") await playBattleCheck(page);
+      else await press(page);
+    }
+    // Cast wears the badge on Sue's turn; nothing else does.
+    await expect(page.locator(".battle-turn-header")).toHaveText("SUE'S TURN");
     const badged = page.locator(".battle-command:has(.battle-command-badge:not([hidden]))");
     await expect(badged).toHaveCount(1);
     await expect(badged.locator(".battle-command-label")).toHaveText("Cast");
@@ -67,11 +79,8 @@ test("real keys: the frog is curious, Cast answers it, and the bonus lands", { t
     expect(box.y).toBeGreaterThan(hud.y + hud.height);
     await expect(page).toHaveScreenshot("feelings-menu.png");
 
-    // Down twice to Cast, choose it, and wind up on a real held key.
-    await hold(page, "ArrowDown", 1);
-    await step(page, 1);
-    await hold(page, "ArrowDown", 1);
-    expect((await readBattle(page))?.selected).toBe(2);
+    // Cast is index 0 on Sue's turn: choose it and wind up on a real held key.
+    expect((await readBattle(page))?.selected).toBe(0);
     await press(page);
     const charging = await readBattle(page);
     expect(charging?.command).toBe("cast");
@@ -162,7 +171,7 @@ test("Maddie alone: no feelings, no badges", async ({ page }) => {
 // typed out (re-recording moves it: find it with `bun tools/sim/run.ts
 // tests/sim/scripts/new-game/golden-woods.json --fixture new-game --trace`).
 const woods = "tests/sim/scripts/new-game/golden-woods.json";
-const menu = 8791;
+const menu = 11206;
 
 test("real keys: L peeks at the owl's turn-after feeling", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });

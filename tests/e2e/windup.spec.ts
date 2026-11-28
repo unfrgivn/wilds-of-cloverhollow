@@ -11,7 +11,7 @@ import {
 // tick (re-recording the run moves it: find it with `bun tools/sim/run.ts
 // tests/sim/scripts/trail/lookout.json --fixture trail --trace`).
 const path = "tests/sim/scripts/trail/lookout.json";
-const windingUp = 513;
+const windingUp = 512;
 
 test.describe.configure({ timeout: longFlowTimeout });
 
@@ -76,12 +76,12 @@ test("real keys: Fae pops the gull's puffs, Soothe then Snack, and its gust fizz
     await expect(page.locator(".sticker-text-revealed"))
       .toHaveText("The gull puffs up bigger and bigger! It's feeling everything at once!");
     // Two bubbles where the thought cloud would float, below the HUD and
-    // between Fae and the gull; Soothe and Snack wear their badges.
+    // between Fae and the gull; on Maddie's turn (turn 2), Snack wears its badge.
     const row = page.locator(".battle-windup");
     await expect(row).toBeVisible();
     await expect(page.locator(".battle-windup-label")).toHaveText(["Hungry", "Grumpy"]);
     await expect(page.locator(".battle-feeling")).toBeHidden();
-    expect(await badged(page)).toEqual(["Soothe", "Snack"]);
+    expect(await badged(page)).toEqual(["Snack"]);
     const layout = (await renderInfo(page)).battle.layout;
     const box = await row.boundingBox();
     const hud = await page.locator(".battle-energy").boundingBox();
@@ -91,24 +91,20 @@ test("real keys: Fae pops the gull's puffs, Soothe then Snack, and its gust fizz
     expect(box.y).toBeGreaterThan(hud.y + hud.height);
     await expect(page).toHaveScreenshot("windup-menu.png");
 
-    // Soothe answers grumpy: its bubble stays unpopped during the ring check
-    // and pops once the check lands (GREAT!).
-    expect(start.selected).toBe(0);
+    // On Maddie's turn, Down twice to Snack: answers hungry and pops the first bubble.
+    await hold(page, "ArrowDown", 1);
+    await step(page, 1);
+    await hold(page, "ArrowDown", 1);
+    expect((await readBattle(page))?.selected).toBe(2);
     await press(page);
-    const soothing = await readBattle(page);
-    expect(soothing?.command).toBe("soothe");
-    expect(soothing?.windUp?.popped).toEqual([false, false]);
-    await expect(row).toBeHidden();
-    await playBattleCheck(page);
-    const afterSoothe = await readBattle(page);
-    expect(afterSoothe?.phase).toBe("result");
-    expect(afterSoothe?.lastGrade).toBe("great");
-    expect(afterSoothe?.windUp?.popped).toEqual([false, true]);
+    const afterSnack = await readBattle(page);
+    expect(afterSnack?.phase).toBe("result");
+    expect(afterSnack?.windUp?.popped).toEqual([true, false]);
     await expect(page.locator(".battle-windup-bubble.is-popped")).toHaveCount(1);
     await step(page, 60);
     await expect(page).toHaveScreenshot("windup-popped.png");
 
-    // No burst: the gull puffs on into turn three, where only Snack is left.
+    // No burst: the gull puffs on into turn three (Fae's turn), where Soothe answers grumpy.
     await until(page, "command");
     const puffing = await readBattle(page);
     expect(puffing?.turn).toBe(3);
@@ -116,18 +112,19 @@ test("real keys: Fae pops the gull's puffs, Soothe then Snack, and its gust fizz
     expect(puffing?.check).toBeNull();
     await expect(page.locator(".sticker-text-revealed"))
       .toHaveText("The gull puffs up even bigger!");
-    expect(await badged(page)).toEqual(["Snack"]);
+    expect(await badged(page)).toEqual(["Soothe"]);
 
-    // Down twice (past Play) to Snack: the last bubble pops, and the gust
-    // fizzles out with no burst at all.
-    await hold(page, "ArrowDown", 1);
-    await step(page, 1);
-    await hold(page, "ArrowDown", 1);
-    expect((await readBattle(page))?.selected).toBe(2);
+    // Soothe (index 0) answers grumpy: pops the last bubble and the gust fizzles with no burst.
+    expect(puffing?.selected).toBe(0);
     await press(page);
-    const snacked = await readBattle(page);
-    expect(snacked?.phase).toBe("result");
-    expect(snacked?.windUp?.popped).toEqual([true, true]);
+    const soothing = await readBattle(page);
+    expect(soothing?.command).toBe("soothe");
+    await expect(row).toBeHidden();
+    await playBattleCheck(page);
+    const afterSoothe = await readBattle(page);
+    expect(afterSoothe?.phase).toBe("result");
+    expect(afterSoothe?.lastGrade).toBe("great");
+    expect(afterSoothe?.windUp?.popped).toEqual([true, true]);
     await until(page, "fizzle");
     const fizzled = await readBattle(page);
     expect(fizzled?.windUp).toBeNull();

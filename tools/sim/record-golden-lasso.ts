@@ -47,6 +47,18 @@ const ride = (stop: string, choice: number, to: string): void => {
   if (play.state().area !== to) throw new Error(`the bus didn't go to ${to}`);
 };
 
+const shooAll = (): void => {
+  for (let i = 0; i < 4; i += 1) {
+    const p = play.state().player;
+    const blocker = play.state().wild.find(
+      (c) => c.mood === "chaos" && c.cooldownTicks === 0 && Math.hypot(c.x - p.x, c.y - p.y) < 450,
+    );
+    if (blocker === undefined) break;
+    play.meet(blocker.kind);
+    play.battle(["run"]);
+  }
+};
+
 // Rosie's kite, off the play tower's flagpole.
 play.approach("tower");
 play.talk("tower", [0]);
@@ -55,6 +67,7 @@ must("kite_down", "the kite didn't come down");
 // Up to the pass: the cocoa seller's scarf, off the lift chair and given back.
 door("park", "plaza-path", "plaza");
 ride("npc:bus-stop", 0, "pass");
+play.navigate({ x: 500, y: 650 });
 play.approach("ski-lift");
 play.talk("ski-lift", [0]);
 must("scarf_down", "the scarf didn't come down");
@@ -66,21 +79,29 @@ must("scarf_returned", "the scarf wasn't given back");
 // treasure between the palms.
 door("pass", "trail", "trail");
 door("trail", "bay", "bay");
+shooAll();
 play.approach("dock-end");
 play.talk("dock-end", [0]);
 must("has_map", "no map from the bottle");
-for (let i = 0; i < 4; i += 1) {
-  const blocker = play.state().wild.find((c) => c.mood === "chaos" && c.cooldownTicks === 0);
-  if (blocker === undefined) break;
-  play.meet(blocker.kind);
-  play.battle(["run"]);
-}
+shooAll();
 play.approach("palms");
 play.talk("palms", [0]);
 must("treasure_found", "no treasure dug up");
 
-// Home by the bay road, and the kite back to Rosie.
-door("bay", "plaza-road", "plaza");
+// Home by the east road (boardwalk -> crossing -> lane -> plaza), and the kite back to Rosie.
+door("bay", "plaza-road", "boardwalk");
+shooAll();
+play.navigate({ x: 1240, y: 615 });
+shooAll();
+door("boardwalk", "crossing", "crossing");
+shooAll();
+play.navigate({ x: 1350, y: 560 });
+shooAll();
+door("crossing", "lane", "lane");
+shooAll();
+play.navigate({ x: 1280, y: 620 });
+shooAll();
+door("lane", "plaza", "plaza");
 door("plaza", "school-path", "school");
 door("school", "classroom-door", "classroom");
 play.approach("npc:rosie");

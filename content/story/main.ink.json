@@ -3715,8 +3715,12 @@
         "\n",
         "ev",
         {
+          "VAR?": "visited_pass"
+        },
+        {
           "VAR?": "rode_bus"
         },
+        "||",
         "/ev",
         [
           {
@@ -3729,7 +3733,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1004"
+                "->": ".^.^.^.1006"
               },
               null
             ]
@@ -3747,8 +3751,12 @@
           "exArgs": 1
         },
         {
+          "VAR?": "visited_pass"
+        },
+        {
           "VAR?": "rode_bus"
         },
+        "||",
         "!",
         "&&",
         "/ev",
@@ -3759,11 +3767,11 @@
           },
           {
             "b": [
-              "^ The bus at the plaza's star sign goes up into the mountains, to Pinecone Pass! ",
+              "^ The Cliffside Trail climbs south from Bubblegum Bay into the mountains toward Pinecone Pass, and Whispering Woods leads there too! ",
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1017"
+                "->": ".^.^.^.1021"
               },
               null
             ]
@@ -3792,7 +3800,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1027"
+                "->": ".^.^.^.1031"
               },
               null
             ]
@@ -3817,7 +3825,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1034"
+                "->": ".^.^.^.1038"
               },
               null
             ]
@@ -3842,7 +3850,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1041"
+                "->": ".^.^.^.1045"
               },
               null
             ]
@@ -3868,11 +3876,11 @@
           },
           {
             "b": [
-              "^ The east road leads to Bubblegum Bay. The club's fizzy purple soda smelled just like the fountain's bubblegum bubbles. ",
+              "^ The east road winds through Sunberry Lane, Willowbrook Crossing, and Salt-Marsh Boardwalk all the way to Bubblegum Bay. The club's fizzy purple soda smelled just like the fountain's bubblegum bubbles. ",
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1051"
+                "->": ".^.^.^.1055"
               },
               null
             ]
@@ -3902,7 +3910,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1061"
+                "->": ".^.^.^.1065"
               },
               null
             ]
@@ -3927,7 +3935,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1068"
+                "->": ".^.^.^.1072"
               },
               null
             ]
@@ -3956,7 +3964,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1078"
+                "->": ".^.^.^.1082"
               },
               null
             ]
@@ -3994,7 +4002,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1094"
+                "->": ".^.^.^.1098"
               },
               null
             ]
@@ -4021,7 +4029,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1103"
+                "->": ".^.^.^.1107"
               },
               null
             ]
@@ -4050,7 +4058,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1113"
+                "->": ".^.^.^.1117"
               },
               null
             ]
@@ -4075,7 +4083,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1120"
+                "->": ".^.^.^.1124"
               },
               null
             ]
@@ -4104,7 +4112,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1131"
+                "->": ".^.^.^.1135"
               },
               null
             ]
@@ -4133,7 +4141,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1142"
+                "->": ".^.^.^.1146"
               },
               null
             ]
@@ -5693,17 +5701,21 @@
       "bus_stop": [
         [
           "ev",
-          "str",
-          "^bluebird",
-          "/str",
           {
-            "x()": "calmed",
-            "exArgs": 1
+            "VAR?": "visited_bay"
           },
+          {
+            "VAR?": "sue_joined"
+          },
+          "||",
           "!",
           {
-            "VAR?": "club_open"
+            "VAR?": "visited_pass"
           },
+          {
+            "VAR?": "rode_bus"
+          },
+          "||",
           "!",
           "&&",
           "/ev",
@@ -5715,19 +5727,39 @@
             {
               "b": [
                 "\n",
-                "^The bus waits by the star sign, but there's no reason to leave town yet. ",
+                "^The Star-Line bus connects Cloverhollow to faraway towns, once I've walked the trail there and found their bus stop! ",
                 "#",
                 "^speaker: Fae",
                 "/#",
                 "\n",
-                "^Maybe once I find a clue that leads up the mountain. ",
-                "#",
-                "^speaker: Fae",
+                "ev",
+                {
+                  "VAR?": "club_open"
+                },
+                "/ev",
+                [
+                  {
+                    "->": ".^.b",
+                    "c": true
+                  },
+                  {
+                    "b": [
+                      "^ Maybe I should head down the east road past the plaza to find Bubblegum Bay first. ",
+                      "#",
+                      "^speaker: Fae",
+                      {
+                        "->": ".^.^.^.10"
+                      },
+                      null
+                    ]
+                  }
+                ],
+                "nop",
                 "/#",
                 "\n",
                 "done",
                 {
-                  "->": ".^.^.^.11"
+                  "->": ".^.^.^.12"
                 },
                 null
               ]
@@ -5744,13 +5776,13 @@
           "str",
           "^Pinecone Pass!",
           "/str",
-          "str",
-          "^bluebird",
-          "/str",
           {
-            "x()": "calmed",
-            "exArgs": 1
+            "VAR?": "visited_pass"
           },
+          {
+            "VAR?": "rode_bus"
+          },
+          "||",
           "/ev",
           {
             "*": ".^.c-0",
@@ -5761,8 +5793,12 @@
           "^Bubblegum Bay!",
           "/str",
           {
-            "VAR?": "club_open"
+            "VAR?": "visited_bay"
           },
+          {
+            "VAR?": "sue_joined"
+          },
+          "||",
           "/ev",
           {
             "*": ".^.c-1",
@@ -5845,13 +5881,13 @@
           "str",
           "^Pinecone Pass!",
           "/str",
-          "str",
-          "^bluebird",
-          "/str",
           {
-            "x()": "calmed",
-            "exArgs": 1
+            "VAR?": "visited_pass"
           },
+          {
+            "VAR?": "rode_bus"
+          },
+          "||",
           "/ev",
           {
             "*": ".^.c-1",
@@ -5935,8 +5971,12 @@
           "^Bubblegum Bay!",
           "/str",
           {
-            "VAR?": "club_open"
+            "VAR?": "visited_bay"
           },
+          {
+            "VAR?": "sue_joined"
+          },
+          "||",
           "/ev",
           {
             "*": ".^.c-1",
@@ -5990,6 +6030,69 @@
             ]
           }
         ],
+        null
+      ],
+      "lane_signpost": [
+        "^SUNBERRY LANE. West: Cloverhollow Town Square. East: Willowbrook Crossing & Bubblegum Bay. ",
+        "#",
+        "^speaker: Sign",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "lane_bench": [
+        "^A sunny wooden bench right beside the clover meadow. Perfect for catching my breath and listening to the bees! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "lane_berries": [
+        "^Wild sunberries! They're warm from the afternoon sun and smell a little bit like strawberry jam. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "crossing_signpost": [
+        "^WILLOWBROOK CROSSING. West: Sunberry Lane. East: Salt-Marsh Boardwalk to Bubblegum Bay. ",
+        "#",
+        "^speaker: Sign",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "crossing_bench": [
+        "^From this bench under the weeping willows, I can watch sparkles race under the wooden bridge. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "boardwalk_signpost": [
+        "^SALT-MARSH BOARDWALK. Watch your step over the tide pools, and smell the sea breeze! East: Bubblegum Bay. ",
+        "#",
+        "^speaker: Sign",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "boardwalk_bench": [
+        "^Ooh, I can smell salt air and bubblegum-pink waves from here! Bubblegum Bay must be right around the bend. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
         null
       ],
       "pass_sign": [
@@ -14250,6 +14353,28 @@
         "done",
         null
       ],
+      "arrive_bay": [
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "visited_bay",
+          "re": true
+        },
+        "done",
+        null
+      ],
+      "arrive_pass": [
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "visited_pass",
+          "re": true
+        },
+        "done",
+        null
+      ],
       "hills_lookout": [
         "ev",
         {
@@ -15680,6 +15805,39 @@
       "on_calm": [
         "ev",
         "str",
+        "^bluebird",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "bluebird_calmed",
+                "re": true
+              },
+              {
+                "->": ".^.^.^.7"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        "str",
         "^hooded-kid",
         "/str",
         {
@@ -15703,7 +15861,7 @@
                 "re": true
               },
               {
-                "->": ".^.^.^.7"
+                "->": ".^.^.^.16"
               },
               null
             ]
@@ -15803,7 +15961,7 @@
               "nop",
               "\n",
               {
-                "->": ".^.^.^.16"
+                "->": ".^.^.^.25"
               },
               null
             ]
@@ -43832,6 +43990,18 @@
         false,
         {
           "VAR=": "sue_joined"
+        },
+        false,
+        {
+          "VAR=": "visited_bay"
+        },
+        false,
+        {
+          "VAR=": "visited_pass"
+        },
+        false,
+        {
+          "VAR=": "bluebird_calmed"
         },
         false,
         {

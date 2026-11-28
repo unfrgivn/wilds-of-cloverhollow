@@ -306,13 +306,16 @@ describe("Milestone 154: Pure src/content/area-parsers.ts Modular Extraction", (
     }
   });
 
-  it("parses content/lands.json and keeps all 33 areas intact in loadContent()", () => {
+  it("parses content/lands.json and keeps all 36 areas intact in loadContent()", () => {
     const rawLands: unknown = JSON.parse(readFileSync("content/lands.json", "utf8"));
     const parsedLands = areaParsers.parseLands(rawLands, "content/lands.json");
     const { world } = contentLoad.loadContent();
     expect(parsedLands).toEqual(world.lands);
-    expect(Object.keys(world.areas)).toHaveLength(33);
-    for (const id of ["milo-house", "rosie-cottage", "summit", "island", "market", "parlor"]) {
+    expect(Object.keys(world.areas)).toHaveLength(36);
+    for (const id of [
+      "milo-house", "rosie-cottage", "summit", "island", "market", "parlor",
+      "lane", "crossing", "boardwalk",
+    ]) {
       expect(world.areas[id], `missing area ${id}`).toBeDefined();
     }
     expect(world.areas.bay?.spawns["bus-stop"]).toEqual({ x: 355, y: 545, facing: "down" });

@@ -28,6 +28,39 @@ export function partyContent(world: World, id: string): PartyContent {
   return content;
 }
 
+// Canonical party ordering (spec 5): standing/human friends (`sits === false`)
+// always walk ahead of pet/animal companions (`sits === true`), preserving
+// relative order within each group.
+export function orderPartyContent(members: readonly PartyContent[]): PartyContent[] {
+  const standing: PartyContent[] = [];
+  const pets: PartyContent[] = [];
+  for (const member of members) {
+    if (member.sits) pets.push(member);
+    else standing.push(member);
+  }
+  return [...standing, ...pets];
+}
+
+export function orderPartyIds(world: World, ids: readonly string[]): string[] {
+  const standing: string[] = [];
+  const pets: string[] = [];
+  for (const id of ids) {
+    if (world.party[id]?.sits === true) pets.push(id);
+    else standing.push(id);
+  }
+  return [...standing, ...pets];
+}
+
+export function orderPartyMembers(world: World, party: readonly PartyMember[]): PartyMember[] {
+  const standing: PartyMember[] = [];
+  const pets: PartyMember[] = [];
+  for (const member of party) {
+    if (world.party[member.id]?.sits === true) pets.push(member);
+    else standing.push(member);
+  }
+  return [...standing, ...pets];
+}
+
 // The party in a battle: everyone with a battle command. Flute friends sit
 // battles out (spec 5): they give no command, aren't drawn, and don't count
 // toward feelings.
@@ -260,6 +293,15 @@ export function visibleFollowerSlot(
         );
       }
     }
+    // Extra diagonal-south fallback for 6-member chains in narrow mouths (e.g. pass.cavern).
+    for (const dy of [40, 56, 72]) {
+      for (const dx of [0, 36, 60, 84, 120]) {
+        candidates.push(
+          { x: leader.x + sign * dx, y: leader.y + dy },
+          { x: leader.x - sign * dx, y: leader.y + dy },
+        );
+      }
+    }
   }
   return candidates.find((point) => {
     if (
@@ -312,11 +354,11 @@ export function spawnParty(
   ink: string,
   room: Area,
   spawn: Spawn,
-  ids: string[],
+  ids: readonly string[],
 ): PartyMember[] {
   const area = sceneryArea(world, ink, room);
   const fae = { x: spawn.x, y: spawn.y };
-  const members = ids.map((id) => partyContent(world, id));
+  const members = orderPartyIds(world, ids).map((id) => partyContent(world, id));
   const slots = partySlots(area, fae, world.tunables.follow, members);
   let leader = fae;
   return members.map((member, index) => {
@@ -576,6 +618,10 @@ export function syncParty(world: World, state: State): State {
       world.storyVariable(state.ink, content.joins) === true;
   });
   const existing = new Set(staying.map((member) => member.id));
+  const leaderBefore = new Map<string, string>();
+  state.party.forEach((member, index) => {
+    leaderBefore.set(member.id, index === 0 ? "fae" : (state.party[index - 1]?.id ?? "fae"));
+  });
   let party = staying.slice();
   let wild = state.wild;
   for (const content of Object.values(world.party)) {
@@ -621,6 +667,7 @@ export function syncParty(world: World, state: State): State {
       );
     if (point === undefined) continue;
     if (critter !== undefined) wild = wild.filter((item) => item !== critter);
+    leaderBefore.set(content.id, last?.id ?? "fae");
     party.push({
       id: content.id,
       xp: state.xp === 0 ? 0 : world.levels.thresholds[Math.max(0,
@@ -634,7 +681,22 @@ export function syncParty(world: World, state: State): State {
     });
     existing.add(content.id);
   }
-  return party.length === state.party.length && staying.length === state.party.length
-    ? state
-    : { ...state, party, wild };
+  const ordered = orderPartyMembers(world, party);
+  const sameOrder =
+    ordered.length === state.party.length &&
+    ordered.every((member, index) => member.id === state.party[index]?.id);
+  if (sameOrder && staying.length === state.party.length) return state;
+  const refreshed = ordered.map((member, index) => {
+    const leaderMember = index === 0 ? undefined : ordered[index - 1];
+    const newLeaderId = leaderMember?.id ?? "fae";
+    if (leaderBefore.get(member.id) === newLeaderId) return member;
+    const newLeader: Point = leaderMember === undefined
+      ? { x: state.player.x, y: state.player.y }
+      : { x: leaderMember.x, y: leaderMember.y };
+    return {
+      ...member,
+      trail: [{ x: member.x, y: member.y }, newLeader],
+    };
+  });
+  return { ...state, party: refreshed, wild };
 }

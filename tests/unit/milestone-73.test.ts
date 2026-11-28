@@ -44,10 +44,11 @@ function baseBattleView(battle: Battle, overrides: Partial<BattleView> = {}): Ba
   return {
     critterId: battle.critterId,
     critterName: "Chaos Frog",
-    battleHeight: 190,
+    battleHeight: 145,
     auraCentre: { x: 256, y: 256 },
     bodyCentre: { x: 256, y: 256 },
     phase: battle.phase,
+    activeActor: { id: "fae", name: "Fae" },
     message: battle.message,
     revealed: battle.revealed,
     commands: [
@@ -211,28 +212,28 @@ describe("Milestone 73: Paper Mario / EarthBound battle choreography", () => {
     jordan: "juggle",
   };
 
-  it("steps the selected command actor eagerly forward on the command menu", () => {
-    const faeTurn = baseBattle({ phase: "command", selected: 0 });
+  it("steps the active command actor eagerly forward on the command menu", () => {
+    const faeTurn = baseBattle({ phase: "command", selected: 0, actorIndex: 0 });
     const faeChoreo = computeBattleChoreography(
       faeTurn,
-      baseBattleView(faeTurn),
+      baseBattleView(faeTurn, { activeActor: { id: "fae", name: "Fae" } }),
       10,
       partyIds,
       partyCommands,
     );
-    expect(faeChoreo.fae.offsetX).toBe(10);
+    expect(faeChoreo.fae.offsetX).toBe(16);
     expect(faeChoreo.party.maddie?.offsetX).toBe(0);
 
-    const sueTurn = baseBattle({ phase: "command", selected: 2 });
+    const sueTurn = baseBattle({ phase: "command", selected: 0, actorIndex: 1 });
     const sueChoreo = computeBattleChoreography(
       sueTurn,
-      baseBattleView(sueTurn),
+      baseBattleView(sueTurn, { activeActor: { id: "sue", name: "Sue" } }),
       10,
       partyIds,
       partyCommands,
     );
     expect(sueChoreo.fae.offsetX).toBe(0);
-    expect(sueChoreo.party.sue?.offsetX).toBe(10);
+    expect(sueChoreo.party.sue?.offsetX).toBe(16);
   });
 
   it("tilts Fae live with Lean balance and wind-braced squash when a puff blows", () => {

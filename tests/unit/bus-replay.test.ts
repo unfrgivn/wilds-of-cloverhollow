@@ -18,7 +18,7 @@ describe("Pinecone Pass bus replay", () => {
     expect(state.area).toBe("plaza");
     expect(state.player).toEqual({ x: 878, y: 985 });
     expect(state.stickers).toContain("bay-bluebird");
-    expect(state.party.map((member) => member.id)).toEqual(["maddie", "sue"]);
+    expect(state.party.map((member) => member.id)).toEqual(["sue", "maddie"]);
     expect(content.world.storyVariable(state.ink, "rode_bus")).toBe(true);
   });
 });

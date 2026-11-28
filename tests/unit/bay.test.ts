@@ -121,7 +121,7 @@ describe("the bay's geometry follows its painting", () => {
   const things: [string, Point][] = [
     ["the sign's left post", { x: 143, y: 452 }],
     ["the sign's right post", { x: 259, y: 472 }],
-    ["the driftwood log at the bottom left", { x: 330, y: 1010 }],
+    ["the driftwood log at the bottom left", { x: 330, y: 1040 }],
     ["the driftwood log at the bottom right", { x: 1380, y: 1030 }],
     ["the bucket", { x: 1093, y: 690 }],
     ["the beach ball at the top", { x: 480, y: 116 }],
@@ -145,16 +145,17 @@ describe("the bay's geometry follows its painting", () => {
 
 describe("the east road", () => {
   const plaza = areaFor("plaza");
+  const lane = areaFor("lane");
   const bay = areaFor("bay");
 
-  it("joins the plaza's east road and the bay's entry path both ways", () => {
+  it("joins the plaza's east road and the bay's entry path via the coastal route", () => {
     expect(plaza.triggers.find((trigger) => trigger.id === "bay-road")).toMatchObject({
-      target: { area: "bay", spawn: "plaza-road" },
+      target: { area: "lane", spawn: "plaza" },
       requires: { variable: "club_open", knot: "bay_road_closed" },
     });
     expect(plaza.spawns["bay-road"]?.facing).toBe("left");
     expect(bay.triggers.find((trigger) => trigger.id === "plaza-road")).toMatchObject({
-      target: { area: "plaza", spawn: "bay-road" },
+      target: { area: "boardwalk", spawn: "bay" },
     });
     const arrival = bay.spawns["plaza-road"];
     if (arrival === undefined) throw new Error("no plaza-road spawn in the bay");
@@ -182,11 +183,11 @@ describe("the east road", () => {
     expect(state.dialogue?.knot).toBe("bay_road_closed");
   });
 
-  it("leads to the bay once the club is open", () => {
+  it("leads onto Sunberry Lane toward the bay once the club is open", () => {
     expect(world.storyVariable(clubOpen, "club_open")).toBe(true);
     const state = walkEast(clubOpen);
-    expect(state.area).toBe("bay");
-    const arrival = bay.spawns["plaza-road"];
+    expect(state.area).toBe("lane");
+    const arrival = lane.spawns["plaza"];
     expect(state.player).toEqual({ x: arrival?.x, y: arrival?.y });
     expect(state.party.map((member) => member.id)).toEqual(["maddie"]);
   });

@@ -732,7 +732,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   `enchanted-twilight` washes `mist` and fizzy `enchanted`; `golden-meadow`
   warms calmed `enchanted` (`forest_fizzy === false`) and post-finale
   `sanctuary` (`milo_revealed === true`); `golden-hour` bathes outdoor
-  adventure areas (`plaza`, `park`, `bay`, `island`, `pass`, `summit`, `trail`, `woods`, `hills`,
+  adventure areas (`plaza`, `park`, `lane`, `crossing`, `boardwalk`, `bay`,
+  `island`, `pass`, `summit`, `trail`, `woods`, `hills`,
   `sanctuary`, `field`) once `has_lantern` is set; and `morning` washes `bedroom` and
   `kitchen` before any sticker is earned and before `has_lantern`.
 - Photo / Showcase mode (Milestone 90), Postcard Camera (Milestone 107),
@@ -1037,10 +1038,19 @@ ios/            Capacitor iOS project (from Milestone 4).
   Maddie is `maddie`: box 44x60, `walkCycleUnits` 84, sits, starts, command
   `play` / "Play" / "resting". Sue (`cast` / "Cast" / "reeling in", joins
   `sue_joined`) and Jordan (`juggle` / "Juggle" / "finding pinecones", joins
-  `jordan_joined`) follow in roster order. A party of three fits at every
-  spawn: members after the first also try wider diagonal heel slots, after the
-  existing candidates, so no earlier placement moves and no spawn has to.
-  `state.party` is the ordered list of members, each
+  `jordan_joined`) are standing human friends (`sits: false`). Canonical party
+  ordering (`orderPartyContent`, `orderPartyIds`, `orderPartyMembers` in
+  `src/core/party.ts`) always places standing/human friends (`sits === false`,
+  e.g. `sue`, `jordan`) ahead of pet/animal companions (`sits === true`, e.g.
+  `maddie`, `pond-pup`, `acorn-squirrel`, `ribbon-bunny`), preserving relative
+  order within each group. `spawnParty` orders IDs before placing slots,
+  `syncParty` maintains this order when members join, leave, or load from older
+  saves (refreshing any member's `trail` to `[member, newLeader]` whenever its
+  leader changes), and `areaConnectionErrors` checks all spawns against the
+  canonical ordered roster. A full 6-member party fits at every spawn: members
+  after the first also try wider diagonal heel slots and narrow-mouth fallbacks,
+  after the existing candidates, so no earlier placement moves and no spawn has
+  to. `state.party` is the ordered list of members, each
   `{ id, x, y, facing, motion, stillTicks, trail }`. No one joins while
   `finale` isn't null: the morning's party is Maddie alone (section 7.4),
   though the dream's join variables are still true.
@@ -1105,14 +1115,32 @@ ios/            Capacitor iOS project (from Milestone 4).
   Doors arrive in Milestone 6 and interactables in Milestone 8. An area's
   `critters` are its story set pieces and its optional `recurring` its
   recurring critters (section 6.1).
-- Player collider: a circle of radius 20 units at the feet that slides along
-  blockers. Each step is resolved by the solver; in a gap narrower than the
-  collider, where its pushes fight and it would stop inside a shape, the step
-  slides along one axis instead, or stays put (`resolveMove`). Followers and
-  roaming critters move the same way. Where the solver succeeds the step is
-  exactly the solver's, so areas without props move as before.
+- Player collider: a circle of radius 14 units at the feet that slides along
+  blockers. Each step is resolved by the solver (`resolveMove` in
+  `src/core/geometry.ts`). Where the solver succeeds and moves cleanly
+  (`moved >= 0.15 * desiredLen`), the step is exactly the solver's. When a step
+  stalls against a corner near an opening, asymmetric corner-funneling nudges
+  Fae smoothly around the corner into the gap (while dead-center hits on wide
+  obstacles stop cleanly). In a tight gap or acute corner where opposing pushes
+  fight, multi-constraint tangent and open-bisector sliding replaces pure-axis
+  dead stops so characters glide smoothly through corridors. Followers and
+  roaming critters move the same way.
+- Navigation field & smart pathing (`src/core/nav.ts`, `src/shell/nav-steer.ts`,
+  `src/render/nav-overlay.ts`, `tools/audit-navigation.ts`): a deterministic
+  10-unit signed clearance field (`NavField`, zero trig) powers clearance-
+  weighted A* with line-of-sight string-pulling (`findPath`), medial-axis
+  gradient queries (`gradientAt`), and navigation auditing
+  (`auditAreaNavigation`, `navigationQualityErrors` in
+  `src/content/area-checks.ts`). Crisp ground clicks/taps outside the
+  near-player pet/rest radius (`onTapGround` in `src/shell/overworld-pointer.ts`)
+  walk Fae smoothly around obstacles along the corridor centerline, cancelling
+  immediately on any manual directional/button input or overlay. Playable areas
+  show subtle diegetic exit approach cues near triggers and a warm watercolor
+  destination ring while pathing (respecting `reducedMotion`); the dev hook
+  exposes `navOverlay(visible?)` to toggle a live clearance/pinch heatmap
+  overlay over the area painting.
 - `content/tunables.json`: `walkSpeed` (240 units per second), `playerRadius`
-  (20), and `walkCycleUnits` (126).
+  (14), and `walkCycleUnits` (126).
 - Transitions: entering a trigger fades out, loads the target area, places the
   player at the named spawn facing the given direction, and fades in. The
   target's art is prefetched as the fade-out begins and its tiles and prop
@@ -1166,9 +1194,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   kitchen's stairs, the kitchen's front door to the plaza, and the plaza's
   house door back to the kitchen; the plaza's lower-right cobbled path leads to
   the park, the lower-left path to the school's front doors, and the east road
-  (its doorway at the plaza's right edge, x 1600-1625, y 500-610) to the bay,
-  and each leads back. The east road `requires` `club_open` (knot
-  `bay_road_closed`): Fae goes to the bay once the tree house club is open.
+  (its doorway at the plaza's right edge, x 1600-1625, y 500-610) through three
+  2520x1080 open-world coastal route areas (`lane` "Sunberry Lane", `crossing`
+  "Willowbrook Crossing", and `boardwalk` "Salt-Marsh Boardwalk", totaling 7,560
+  logical units across ~6 desktop screens) to the bay, and each leads back. The
+  east road `requires` `club_open` (knot `bay_road_closed`): Fae walks the east
+  road to the bay once the tree house club is open.
   The kitchen's front door `requires` `dreaming` (knot
   `front_door_morning_notice`), so it's shut only in the morning (section
   7.4).
@@ -2069,8 +2100,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   floor's outer edges: the pass's east edge to the trail's west edge
   (`trail.pass`, facing right) and back (`pass.trail`, facing left); the bay's
   south edge to the trail's beach (`trail.bay`, facing up) and back
-  (`bay.trail`, facing up). The bay's way requires `rode_bus` (knot
-  `bay_cliff_path` while it's false). Look points: `trail-signpost`,
+  (`bay.trail`, facing up). The bay's way requires `bluebird_calmed` (set by
+  `on_calm` once the Bay Bluebird is calmed; knot `bay_cliff_path` while it's
+  false), letting Fae hike up Cliffside Trail to Pinecone Pass on foot. Look
+  points: `trail-signpost`,
   `lookout-bench`, and the pass's `pass-trail-sign`. The Grumpy Gull stands at
   (1440, 480), between the lookout rock and bench, guarding the bench until its
   mini-boss battle is calmed. Bunnies and squirrels roam the upper and lower
@@ -2440,10 +2473,14 @@ trunks keep its two exits.
   dialogue state through that line and its close, then starts the same 18-tick
   fade as a door, placing Fae and the party at the named spawn and autosaving
   on arrival. Load validation rejects travel tags naming an unknown area or
-  spawn. The bus line (Milestone 24) is three stops' knots (`bus_stop`,
-  `bay_bus_stop`, `pass_bus_stop`) travelling between `plaza.bus-stop`,
-  `bay.bus-stop`, and `pass.bus`: the bay once `club_open`, the pass once the
-  bluebird is calm (setting `rode_bus`), home any time.
+  spawn. The bus line (Milestone 24, updated for open-world discovery) is three
+  stops' knots (`bus_stop`, `bay_bus_stop`, `pass_bus_stop`) travelling between
+  `plaza.bus-stop`, `bay.bus-stop`, and `pass.bus`. Towns must be discovered on
+  foot before fast-traveling to them: silent arrival knots (`arrive_bay`,
+  `arrive_pass`) set `visited_bay` and `visited_pass` when Fae arrives in `bay`
+  or `pass`. Bubblegum Bay unlocks once `visited_bay` (or legacy `sue_joined`)
+  is true; Pinecone Pass unlocks once `visited_pass` (or legacy `rode_bus`) is
+  true; riding back home to Cloverhollow is available any time.
 - The finale tags (Milestone 56) take no argument (load validation refuses
   one) and act as their line's dialogue closes. `# ending` (the last line of
   `tree_ending`) emits an `ending-save` event carrying the dream as it stands,
@@ -2797,7 +2834,9 @@ trunks keep its two exits.
   battle atlas is built by `tools/art/build-person.ts <id>` from one 2x2 body
   sheet.
 - Mini-boss numbers: the Grumpy Gull has `overworldHeight` 110 (ordinary
-  critters are 66 or 70), `battleHeight` 260 (ordinary critters are 190),
+  critters are 66 or 70), `battleHeight` 260 (ordinary critters are 145;
+  bosses remain 260–280 so small critters stand ~70% of Fae's battle height
+  while bosses tower over her),
   `touchRadius` 85 (ordinary critters are 70), `calmMax` 160 (ordinary
   critters are 100), and `energyMax` 6 (ordinary critters are 5). Its burst
   `bigChance` is 0.5 (ordinary critters are 0.3), so its gust can hit harder.
@@ -2812,12 +2851,16 @@ trunks keep its two exits.
   knots, and the final knot fills the meter. The three Talk grades add 35, 25,
   or 20 calm. Its battle atlas contains the chaos, burst, soothed, and calm
   looks. The battle reward is Milo's sticker.
-- Friend commands: Maddie's Play, Sue's Cast, and Jordan's Juggle (pinecones;
-  calm 30, great 15, good 5, rest 2 on every critter). Each plays its own
-  check (Milestone 40): Play the ring (Maddie's pounce), Cast a charge (Sue
-  winds up and throws her bobber), Juggle a beat chain. The menu lists Soothe,
-  each member's command in party order, then Snack and Run: six with the
-  whole party, in one column on desktop and two on phones (section 8.1).
+- Friend commands & per-member turns: Maddie's Play, Sue's Cast, and Jordan's
+  Juggle (pinecones; calm 30, great 15, good 5, rest 2 on every critter). Each
+  plays its own check (Milestone 40): Play the ring (Maddie's pounce), Cast a
+  charge (Sue winds up and throws her bobber), Juggle a beat chain. Battle
+  turns rotate through `battleTurnRoster(world, state)` (`Fae`, then fighting
+  party members in canonical order via `battle.actorIndex`, resetting to `0` on
+  `intro -> command`, after a turn-0 caught burst, and during Talk mode). Each
+  turn's menu shows only the active member's signature move (`Soothe` for Fae,
+  or `Cast`/`Juggle`/`Play` for a party member), `Recover` (`+1 leaf`), `Snack`,
+  and `Run` (when `critter.canRun`).
 - Content: `content/critters/*.json` (validated by the loader) supplies every
   battle number and line: the touch radius, calm and energy maxima, the
   `coins` it pays when calmed (8 for ordinary critters, 25 for the gull and
@@ -2891,18 +2934,25 @@ trunks keep its two exits.
   in chaos. `autosaveNeeded` returns `false` whenever `next.transition !== null`,
   deferring the post-rest autosave until the respawn transition finishes.
 
-- Commands are composed from the party: Soothe, then one command per party
-  member in party order (Maddie's Play), then Snack and Run
-  (`battleCommands`). Up/down edges skip disabled commands; confirm or a touch
-  `choose` picks. The chosen command id (`soothe` or a friend's id) is stored
-  in `battle.command`. `battle.rest` maps each friend's command id to the
-  turns it still rests (missing means ready): choosing a friend's command sets
-  its rest to the critter's content `rest` for it, and every command choice
-  (Soothe, Snack, or a friend's) takes one turn off every other resting
-  friend. A resting command is disabled with its member's `resting` detail.
-  Snack spends one of Fae's `snacks` (gone for good, whatever happens next),
-  shows her combined snack and specialty treat count (`×N`), and is disabled at
-  zero.
+- Commands & per-member turn rotation: outside Talk mode, `battleCommands`
+  builds the active actor's menu (`activeBattleActor(world, state)`): their
+  signature command (`soothe` for Fae; `cast`, `juggle`, or `play` for a party
+  member), `recover` (`"Recover"`, `"+1 leaf"`), `snack`, and `run` (when
+  `critter.canRun`). On entering a command menu, `selected` defaults to the
+  first enabled command (`firstEnabledCommand`) so the cursor never starts on a
+  resting move. Up/down edges skip disabled commands; confirm or a touch
+  `choose` picks. Choosing `recover` restores `+1` energy (clamped to
+  `critter.energyMax`), ticks `battle.rest`, clears any rest cooldown on the
+  active member's own command, sets `battle.command = "recover"`, and enters
+  `"result"` with a character-specific breath/stretch line. The chosen command
+  id (`soothe`, `recover`, or a friend's id) is stored in `battle.command`.
+  `battle.rest` maps each friend's command id to the turns it still rests
+  (missing means ready): choosing a friend's command sets its rest to the
+  critter's content `rest` for it, and every command choice (Soothe, Recover,
+  Snack, or a friend's) takes one turn off every other resting friend. A
+  resting command is disabled with its member's `resting` detail. Snack spends
+  one of Fae's `snacks` (gone for good, whatever happens next), shows her
+  combined snack and specialty treat count (`×N`), and is disabled at zero.
 - Specialty Treats & Battle Treat Tray (`content/treats.json`): when Fae carries
   zero specialty treats, choosing `Snack` spends a plain snack immediately as
   before. When Fae carries one or more specialty treats (`totalTreatCount > 0`),
@@ -3507,12 +3557,29 @@ trunks keep its two exits.
   125), and leaving `command` phase or closing battle auto-hides it. Responsive
   layout keeps it clear of HUD meters, party medallions, commands, dialogue,
   sprites, and touch buttons at `1280x720`, `874x402`, and `667x375`.
+- Battle staging, facing & proportions: Fae (`scale: 0.72`) and all fighting
+  party members (`((content.scale ?? 0.5) / 0.5) * 0.72`; flute cameos match
+  this `0.72` base scale) face right toward the critter using horizontally
+  mirrored `idle_left` frames (`-scaleX`, positive `scaleY`). `battleLayout`
+  places Fae at the front (`x = width * 0.27`, `baseline = height * 0.59`),
+  all fighting party members lined up behind her (`x = fae.x - (index + 1) *
+  68 * scale`, `y = fae.baseline`, keeping pets like Maddie at the end of the
+  line), and the critter at `x = width * 0.5`, `baseline = height * 0.42 +
+  (critterHeight * scale) / 2`. During `command` phase, the active turn actor
+  steps `+16` logical units forward toward the critter with a floating golden
+  and cream die-cut chevron (`battle:turn-indicator`, static under reduced
+  motion, hidden outside `command` phase) above their head, and party
+  medallions highlight `view.activeActor.id` directly.
 - Commands: a two-column grid of sticker buttons on phones (one column from
   1000 px wide), right-aligned above confirm and cancel, clear of the HUD, the
-  dialogue box, and the touch buttons. The menu grows with the party: four
-  commands with Maddie alone, up to six (three rows on a phone) with Sue and
-  Jordan; the gallery previews a bigger party with `?party=N`. Each button
-  renders a zero-text inline-SVG storybook icon (`.battle-command-icon`), its
+  dialogue box, and the touch buttons. A compact `.battle-turn-header` badge at
+  the top of `.battle-commands` (`FAE'S TURN`, `SUE'S TURN`, `MADDIE'S TURN`,
+  `data-actor`, spanning both columns on phones, updating `aria-label` to
+  `<Name>'s battle commands`) announces whose turn it is above that member's
+  four actions (signature move, `Recover`, `Snack`, `Run`; three when
+  `!critter.canRun`). Each button
+  renders a zero-text inline-SVG storybook icon (`.battle-command-icon`,
+  including a leaf-sparkle icon for `recover`), its
   label/detail column, and a feeling-match badge tucked cleanly inside its
   right edge (never clipping outside the button border). Commands matching a
   current feeling receive `.is-match` (warm golden-honey accent border and
@@ -4757,10 +4824,15 @@ trunks keep its two exits.
   malformed, unknown-app, unknown-format, or corrupted payload.
 - QA mode never reads or writes `cloverhollow-save` and never autosaves. QA
   packs are separate files in the dev/harness-only save library; movement,
-  doors, and ending events cannot change the player's slot. The QA menu can be
-  cancelled back to the prior title mode, and a harness fixture reset clears
-  the active pack and badge. The console's `save` command (section 11) keeps
-  slots under `cloverhollow-qa-save:<name>`, indexed by
+  doors, and ending events cannot change the player's slot. Opening the QA
+  console during normal live gameplay leaves `cloverhollow-save` untouched;
+  applying any state-mutating cheat outside an active pack activates a synthetic
+  `Sandbox` pack (`QA · Sandbox`), immediately blocking autosave and writes to
+  `cloverhollow-save`. Switching to a QA pack or saved QA slot from inside the
+  console loads it cleanly in-place without touching the player's slot. The QA
+  menu can be cancelled back to the prior title mode, and a harness fixture
+  reset clears the active pack and badge. The console's `save` command (section
+  11) keeps slots under `cloverhollow-qa-save:<name>`, indexed by
   `cloverhollow-qa-slots`, never inside the player's key.
 - `tools/qa/build-saves.ts` is the only writer of the save library: it cuts
   story packs from the golden path's recorded runs (Milestone 68, one

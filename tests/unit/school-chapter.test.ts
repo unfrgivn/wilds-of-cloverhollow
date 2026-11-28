@@ -142,12 +142,12 @@ describe("story time", () => {
     const spawn = school.spawns["classroom-door"];
     if (spawn === undefined) throw new Error("no classroom-door spawn");
     expect(spawn.facing).toBe("down");
-    // From in front of the door, walking up into it.
-    const shut = walk(at("school", "classroom-door", fresh, spawn, "up"), { x: 0, y: -1 }, 40);
+    // From in front of the door, walking up-left into it.
+    const shut = walk(at("school", "classroom-door", fresh, spawn, "up"), { x: -0.3, y: -1 }, 40);
     expect(shut.dialogue).toMatchObject({ knot: "classroom_closed",
       text: "The classroom door is shut. Story time hasn't started yet." });
     const open = walk(at("school", "classroom-door", storyTime, spawn, "up"),
-      { x: 0, y: -1 }, 40);
+      { x: -0.3, y: -1 }, 40);
     expect(open.transition?.target).toEqual({ area: "classroom", spawn: "door" });
     expect({ name: classroom.name, land: classroom.land })
       .toEqual({ name: "Ms. Maple's Classroom", land: "cloverhollow" });

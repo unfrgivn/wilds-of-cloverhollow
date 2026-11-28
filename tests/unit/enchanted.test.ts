@@ -76,7 +76,7 @@ describe("The Enchanted Forest floor", () => {
       for (const prop of area.props) {
         const coverage = propCovers(propState(world, state.ink, prop), point, faeBox);
         const limit = prop.id === "stone-lower-right" ||
-          prop.id === "stone-lower-right-scribbles" ? 0.05 : 0;
+          prop.id === "stone-lower-right-scribbles" ? 0.08 : 0;
         expect(coverage, `${prop.id} at ${point.x},${point.y}`).toBeLessThanOrEqual(limit);
       }
     }

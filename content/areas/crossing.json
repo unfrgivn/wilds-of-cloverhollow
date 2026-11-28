@@ -1,0 +1,305 @@
+{
+  "id": "crossing",
+  "name": "Willowbrook Crossing",
+  "land": "hills",
+  "width": 2520,
+  "height": 1080,
+  "ground": "crossing",
+  "ambient": [
+    {
+      "id": "crossing-blue-west",
+      "animation": "butterfly_blue",
+      "path": [
+        [
+          340,
+          560
+        ],
+        [
+          620,
+          520
+        ],
+        [
+          670,
+          680
+        ],
+        [
+          390,
+          720
+        ]
+      ],
+      "loopTicks": 480,
+      "phase": 40,
+      "frameTicks": 10,
+      "size": 19
+    },
+    {
+      "id": "crossing-pink-brook",
+      "animation": "butterfly_pink",
+      "path": [
+        [
+          1180,
+          480
+        ],
+        [
+          1440,
+          490
+        ],
+        [
+          1500,
+          620
+        ],
+        [
+          1230,
+          610
+        ]
+      ],
+      "loopTicks": 500,
+      "phase": 190,
+      "frameTicks": 9,
+      "size": 19
+    },
+    {
+      "id": "crossing-blue-east",
+      "animation": "butterfly_blue",
+      "path": [
+        [
+          1890,
+          440
+        ],
+        [
+          2160,
+          420
+        ],
+        [
+          2210,
+          560
+        ],
+        [
+          1940,
+          590
+        ]
+      ],
+      "loopTicks": 460,
+      "phase": 310,
+      "frameTicks": 10,
+      "size": 18
+    }
+  ],
+  "walkable": [
+    [
+      0,
+      320
+    ],
+    [
+      520,
+      260
+    ],
+    [
+      980,
+      300
+    ],
+    [
+      1220,
+      340
+    ],
+    [
+      1140,
+      440
+    ],
+    [
+      1370,
+      465
+    ],
+    [
+      1630,
+      545
+    ],
+    [
+      1700,
+      420
+    ],
+    [
+      1820,
+      360
+    ],
+    [
+      2520,
+      360
+    ],
+    [
+      2520,
+      950
+    ],
+    [
+      1380,
+      950
+    ],
+    [
+      1450,
+      810
+    ],
+    [
+      1610,
+      655
+    ],
+    [
+      1350,
+      585
+    ],
+    [
+      1080,
+      555
+    ],
+    [
+      950,
+      680
+    ],
+    [
+      820,
+      820
+    ],
+    [
+      680,
+      950
+    ],
+    [
+      0,
+      950
+    ]
+  ],
+  "blockers": [
+    [
+      [
+        1740,
+        480
+      ],
+      [
+        1790,
+        480
+      ],
+      [
+        1790,
+        545
+      ],
+      [
+        1740,
+        545
+      ]
+    ]
+  ],
+  "triggers": [
+    {
+      "id": "lane",
+      "polygon": [
+        [
+          0,
+          355
+        ],
+        [
+          65,
+          355
+        ],
+        [
+          65,
+          475
+        ],
+        [
+          0,
+          475
+        ]
+      ],
+      "target": {
+        "area": "lane",
+        "spawn": "crossing"
+      }
+    },
+    {
+      "id": "boardwalk",
+      "polygon": [
+        [
+          2455,
+          530
+        ],
+        [
+          2520,
+          530
+        ],
+        [
+          2520,
+          660
+        ],
+        [
+          2455,
+          660
+        ]
+      ],
+      "target": {
+        "area": "boardwalk",
+        "spawn": "crossing"
+      }
+    }
+  ],
+  "interactables": [
+    {
+      "id": "crossing-bench",
+      "knot": "crossing_bench",
+      "point": {
+        "x": 1120,
+        "y": 380
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "crossing-signpost",
+      "knot": "crossing_signpost",
+      "point": {
+        "x": 1765,
+        "y": 575
+      },
+      "prompt": "Look"
+    }
+  ],
+  "critters": [],
+  "recurring": {
+    "dens": [
+      {
+        "point": {
+          "x": 600,
+          "y": 650
+        },
+        "radius": 110,
+        "kinds": [
+          "frog",
+          "squirrel",
+          "bunny"
+        ]
+      },
+      {
+        "point": {
+          "x": 2020,
+          "y": 720
+        },
+        "radius": 110,
+        "kinds": [
+          "frog",
+          "squirrel",
+          "bunny"
+        ]
+      }
+    ]
+  },
+  "npcs": [],
+  "spawns": {
+    "lane": {
+      "x": 140,
+      "y": 415,
+      "facing": "right"
+    },
+    "boardwalk": {
+      "x": 2380,
+      "y": 595,
+      "facing": "left"
+    }
+  },
+  "props": []
+}

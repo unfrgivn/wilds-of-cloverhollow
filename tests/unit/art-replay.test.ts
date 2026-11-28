@@ -36,7 +36,7 @@ describe("art teacher replay", () => {
     expect({ stash: story("stash_found"), out: story("art_teacher_out"), open: story("art_open") })
       .toEqual({ stash: true, out: true, open: true });
     expect(state.stickers).toContain("art-teacher");
-    expect(state.coins).toBe(146);
+    expect(state.coins).toBe(154);
     expect({ area: state.area, dialogue: state.dialogue, battle: state.battle })
       .toEqual({ area: "art-room", dialogue: null, battle: null });
   }, 30_000);

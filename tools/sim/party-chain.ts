@@ -24,7 +24,7 @@ const scout: PartyContent = {
   atlas: "assets/characters/scout/scout.json",
   box: { width: 50, height: 140 },
   walkCycleUnits: 84,
-  sits: false,
+  sits: true,
   start: false,
   joins: null,
   flute: false,

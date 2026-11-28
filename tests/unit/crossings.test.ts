@@ -30,7 +30,7 @@ describe("crossings", () => {
     const area = withCrossing("club_open");
     const openWorld = { ...world, areas: { ...world.areas, woods: withCrossing("maple_in_hall") } };
     const closedWorld = { ...world, areas: { ...world.areas, woods: area } };
-    const start = { ...state, area: area.id, player: { x: 980, y: 520 } };
+    const start = { ...state, area: area.id, player: { x: 985, y: 520 } };
     const closed = step(closedWorld, { ...start, area: area.id }, {
       move: { x: 1, y: 0 }, confirm: false, cancel: false, menu: false,
     }).state;

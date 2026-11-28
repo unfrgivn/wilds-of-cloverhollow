@@ -172,14 +172,22 @@ export function computeBattleChoreography(
     if (base !== undefined) party[actorId] = composePose(base, delta);
   };
 
-  // 1. Command menu: selected actor steps eagerly forward.
+  // 1. Command menu: active actor steps eagerly forward toward the critter.
   if (battle.phase === "command") {
-    const selectedId = view?.commands[battle.selected]?.id ?? null;
-    if (selectedId === "soothe" || selectedId === "snack" || selectedId === "talk") {
-      fae = composePose(fae, { offsetX: 10, offsetY: 0, scaleX: 1, scaleY: 1.02, rotation: 0 });
-    } else if (selectedId !== null && selectedId !== "run") {
-      const actor = actorForCommand(partyIds, partyCommands, selectedId);
-      applyParty(actor, { offsetX: 10, offsetY: 0, scaleX: 1, scaleY: 1.02, rotation: 0 });
+    const activeId = view?.activeActor?.id ?? null;
+    if (activeId === "fae") {
+      fae = composePose(fae, { offsetX: 16, offsetY: 0, scaleX: 1, scaleY: 1.02, rotation: 0 });
+    } else if (activeId !== null) {
+      applyParty(activeId, { offsetX: 16, offsetY: 0, scaleX: 1, scaleY: 1.02, rotation: 0 });
+    } else {
+      const selectedId = view?.commands[battle.selected]?.id ?? null;
+      if (selectedId === "soothe" || selectedId === "snack" || selectedId === "talk" ||
+          selectedId === "recover") {
+        fae = composePose(fae, { offsetX: 16, offsetY: 0, scaleX: 1, scaleY: 1.02, rotation: 0 });
+      } else if (selectedId !== null && selectedId !== "run") {
+        const actor = actorForCommand(partyIds, partyCommands, selectedId);
+        applyParty(actor, { offsetX: 16, offsetY: 0, scaleX: 1, scaleY: 1.02, rotation: 0 });
+      }
     }
   }
 

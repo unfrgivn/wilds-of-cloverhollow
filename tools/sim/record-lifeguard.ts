@@ -17,7 +17,7 @@ play.battle(["cast", "soothe"]);
 play.approach("critter:lifeguard");
 play.talk("critter:lifeguard");
 const end = play.state();
-if (end.party.map((member) => member.id).join(",") !== "maddie,sue" ||
+if (end.party.map((member) => member.id).join(",") !== "sue,maddie" ||
   end.critters.lifeguard !== "calm" || !end.stickers.includes("lifeguard"))
   throw new Error("the lifeguard run did not finish");
 console.error(`lifeguard: ${end.tick} ticks, ${play.script.length} segments`);

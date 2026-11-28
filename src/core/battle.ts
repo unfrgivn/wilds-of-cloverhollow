@@ -35,9 +35,11 @@ import { battleParty, restingParty } from "./party";
 import { nextRandom } from "./random";
 import { inkFacts, sendHome } from "./roam";
 import {
+  activeBattleActor,
   answerFeeling,
   battleCalmXp,
   battleCommands,
+  battleTurnRoster,
   battleView,
   calmLimit,
   critterSideCommand,
@@ -55,7 +57,15 @@ import {
   type TextSpeed,
 } from "./battle-view";
 
-export { battleCommands, battleView, revealCharacters, totalTreatCount, type TextSpeed };
+export {
+  activeBattleActor,
+  battleCommands,
+  battleTurnRoster,
+  battleView,
+  revealCharacters,
+  totalTreatCount,
+  type TextSpeed,
+};
 
 /*
  * The story hears about every calm (spec 7): after a battle ends in a calm,
@@ -150,6 +160,19 @@ function moveOn(battle: Battle, text: string, phase: Battle["phase"]): Battle {
   return { ...battleMessage(battle, text, phase), check: null, lastGrade: null };
 }
 
+function firstEnabledCommand(commands: ReturnType<typeof battleCommands>): number {
+  const index = commands.findIndex((command) => !command.disabled);
+  return index >= 0 ? index : 0;
+}
+
+function recoverMessage(actor: { id: string; name: string }): string {
+  if (actor.id === "fae") return "Fae takes a slow, steady breath and catches her energy.";
+  if (actor.id === "maddie") return "Maddie curls up for a quick stretch, tail wagging again!";
+  if (actor.id === "sue") return "Sue reels in her line and takes a calm breath.";
+  if (actor.id === "jordan") return "Jordan gathers his pinecones and shakes out his hands.";
+  return `${actor.name} takes a calm breath and regains energy.`;
+}
+
 // A new turn (spec 8). A wind-up puffs on, or starts on its turn with its
 // bubbles drawn while the feelings wait; otherwise the feelings move up one
 // and one more is drawn.
@@ -158,32 +181,46 @@ function nextTurn(world: World, state: State, battle: Battle, critter: Critter):
   const talk = critter.talk;
   const talkMode = talk !== null && battle.calm >= talk.talkAt;
   if (talkMode && talk === null) throw new Error(`Critter ${critter.id} has no Talk content`);
+  const roster = battleTurnRoster(world, state);
+  const actorIndex = talkMode || battle.turn === 0
+    ? 0
+    : ((battle.actorIndex ?? 0) + 1) % roster.length;
   const label = talkMode ? talk.prompt : critter.lines.command;
-  const fresh = { ...moveOn(battle, label, "command"), turn, answered: false, talkMode };
+  const fresh: Battle = {
+    ...moveOn(battle, label, "command"),
+    turn,
+    actorIndex,
+    answered: false,
+    talkMode,
+  };
+  const withSelected = (nextBattle: Battle): Battle => ({
+    ...nextBattle,
+    selected: firstEnabledCommand(battleCommands(world, { ...state, battle: nextBattle })),
+  });
   if (talkMode)
-    return { ...state, battle: { ...fresh, feelings: [], windUp: null } };
+    return { ...state, battle: withSelected({ ...fresh, feelings: [], windUp: null }) };
   // After a caught opening's burst, turn 1's feelings are the first drawn.
-  if (battle.turn === 0) return { ...state, battle: fresh };
+  if (battle.turn === 0) return { ...state, battle: withSelected(fresh) };
   const going = battle.windUp;
   if (going !== null && going.left > 1)
     return {
       ...state,
-      battle: {
+      battle: withSelected({
         ...fresh,
         message: critter.windUp?.lines.puffing ?? critter.lines.command,
         windUp: { ...going, left: going.left - 1 },
-      },
+      }),
     };
   if (critter.windUp !== null && windUpStarts(critter.windUp, turn)) {
     const [feelings, rolled] = drawWindUp(world, state, critter, critter.windUp.bubbles);
     if (feelings.length > 0)
       return {
         ...rolled,
-        battle: {
+        battle: withSelected({
           ...fresh,
           message: critter.windUp.lines.start,
           windUp: { feelings, popped: feelings.map(() => false), left: feelings.length },
-        },
+        }),
       };
   }
   const [drawn, rolled] = battle.feelings.length === 0
@@ -191,7 +228,11 @@ function nextTurn(world: World, state: State, battle: Battle, critter: Critter):
     : drawFeelings(world, state, critter, 1);
   return {
     ...rolled,
-    battle: { ...fresh, windUp: null, feelings: [...battle.feelings.slice(1), ...drawn] },
+    battle: withSelected({
+      ...fresh,
+      windUp: null,
+      feelings: [...battle.feelings.slice(1), ...drawn],
+    }),
   };
 }
 
@@ -326,6 +367,7 @@ export function startBattle(
     answered: false,
     lanternPeek: false,
     turn: !friend && jump === "caught" ? 0 : 1,
+    actorIndex: 0,
     windUp: null,
     talkMode: false,
     talk: null,
@@ -445,7 +487,16 @@ function stepBattleInner(
       const opening = next.turn === 0
         ? moveOn(next, critter.lines.burst, "burst")
         : moveOn(next, talkMode ? talkValue.prompt : critter.lines.command, "command");
-      return { ...rolled, battle: { ...opening, feelings: talkMode ? [] : feelings, talkMode } };
+      const entered: Battle = {
+        ...opening,
+        actorIndex: 0,
+        feelings: talkMode ? [] : feelings,
+        talkMode,
+      };
+      const selected = entered.phase === "command"
+        ? firstEnabledCommand(battleCommands(world, { ...rolled, battle: entered }))
+        : 0;
+      return { ...rolled, battle: { ...entered, selected } };
     } else if (next.phase === "result") {
       // Calm enough, it's soothed, any wind-up over with it. In a wind-up it
       // puffs on with no burst until its last turn; then, every bubble
@@ -714,6 +765,22 @@ function stepBattleInner(
     if (chosen === undefined || chosen.disabled) return { ...nextBase, battle: next };
     if (chosen.id === "run")
       return { ...nextBase, battle: battleMessage(next, critter.lines.run, "run") };
+    if (chosen.id === "recover") {
+      const actor = activeBattleActor(world, { ...state, battle: next });
+      const nextRest = restTurn(next.rest);
+      const ownCmdId = actor.id === "fae" ? undefined : world.party[actor.id]?.command?.id;
+      if (ownCmdId !== undefined) delete nextRest[ownCmdId];
+      return {
+        ...nextBase,
+        battle: {
+          ...moveOn(next, recoverMessage(actor), "result"),
+          command: "recover",
+          answered: false,
+          rest: nextRest,
+          energy: Math.min(critter.energyMax, next.energy + 1),
+        },
+      };
+    }
     if (chosen.id === "talk" && critter.talk !== null) {
       const content = talkContent(critter);
       const turn = next.talkTurns ?? 0;

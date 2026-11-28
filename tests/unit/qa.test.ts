@@ -5,8 +5,15 @@ import { loadContent } from "../../src/content/load";
 import { parseScript } from "../../src/content/script";
 import { qaFlow } from "../../src/shell/qa-flow";
 import {
+  readQaSettingsSnapshot,
+  type QaSessionSettingsDeps,
+} from "../../src/shell/qa-session";
+import { NavOverlayController } from "../../src/render/nav-overlay";
+import {
+  QA_SETTING_TOGGLES,
   ensureSandboxPack,
   qaPackFromUrl,
+  qaSettingPressed,
   shouldShowQaTouchTrigger,
   type PackState,
 } from "../../src/dev/qa";
@@ -75,6 +82,49 @@ describe("QA menu flow", () => {
     expect(shouldShowQaTouchTrigger({ ...base, consoleOpen: true })).toBe(false);
     expect(shouldShowQaTouchTrigger({ ...base, photoMode: true })).toBe(false);
     expect(shouldShowQaTouchTrigger({ ...base, blocked: true })).toBe(false);
+  });
+
+  it("wires the Nav Heatmap QA setting toggle and aria-pressed state cleanly", () => {
+    expect(QA_SETTING_TOGGLES).toContainEqual({ id: "navOverlay", label: "Nav Heatmap" });
+
+    const navOverlay = new NavOverlayController();
+    const baseDeps: QaSessionSettingsDeps = {
+      gentleTiming: () => false,
+      toggleGentleTiming: () => undefined,
+      keyHints: () => true,
+      toggleKeyHints: () => undefined,
+      reducedMotion: () => false,
+      toggleReducedMotion: () => undefined,
+      muted: () => false,
+      toggleMute: () => undefined,
+      textSpeed: () => "cozy",
+      setTextSpeed: () => undefined,
+      photoMode: () => false,
+      canPhotoMode: () => true,
+      setPhotoMode: () => undefined,
+    };
+
+    const omitted = readQaSettingsSnapshot(baseDeps);
+    expect(omitted.navOverlay).toBe(false);
+    expect(qaSettingPressed(omitted, "navOverlay")).toBe("false");
+
+    const wiredDeps = {
+      ...baseDeps,
+      navOverlay: () => navOverlay.isHeatmapVisible(),
+      toggleNavOverlay: () => {
+        navOverlay.setHeatmapVisible(!navOverlay.isHeatmapVisible());
+      },
+    };
+
+    expect(qaSettingPressed(readQaSettingsSnapshot(wiredDeps), "navOverlay")).toBe("false");
+    wiredDeps.toggleNavOverlay();
+    expect(navOverlay.isHeatmapVisible()).toBe(true);
+    expect(navOverlay.debugLayer.visible).toBe(true);
+    expect(qaSettingPressed(readQaSettingsSnapshot(wiredDeps), "navOverlay")).toBe("true");
+    wiredDeps.toggleNavOverlay();
+    expect(navOverlay.isHeatmapVisible()).toBe(false);
+    expect(navOverlay.debugLayer.visible).toBe(false);
+    expect(qaSettingPressed(readQaSettingsSnapshot(wiredDeps), "navOverlay")).toBe("false");
   });
 });
 

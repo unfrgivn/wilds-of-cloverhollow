@@ -136,6 +136,11 @@ test.describe("frog battle", () => {
     expect(meterValues.length).toBeGreaterThanOrEqual(3);
     expect([...seen].sort()).toEqual(["burst", "great", "intro", "soothed"]);
     await step(page, 2);
+    // Dismiss any post-battle level-up notices (e.g. Maddie leveling up after Play).
+    for (let notices = 0; notices < 6; notices += 1) {
+      if (!(await page.locator(".sticker-dialogue").isVisible())) break;
+      await press(page);
+    }
     expect((await renderInfo(page)).critters)
       .toEqual([
         { id: "fountain-frog", kind: "fountain-frog", frame: "calm_idle_01", x: 1000, y: 820 },

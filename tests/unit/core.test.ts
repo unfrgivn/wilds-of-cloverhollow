@@ -298,7 +298,9 @@ describe("core", () => {
     };
     expect(areaConnectionErrors({ ...world.areas, plaza: badSpawn }, world.tunables,
       world.critters, world.party))
-      .toContain("plaza: spawn bad is within 40 units of house-front-door");
+      .toContain(
+        `plaza: spawn bad is within ${world.tunables.playerRadius * 2} units of house-front-door`,
+      );
   }, 30_000);
 
   it("never lets props hide most of Fae anywhere she can stand", () => {

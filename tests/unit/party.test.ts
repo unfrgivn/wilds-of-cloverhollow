@@ -6,6 +6,7 @@ import {
   blankInput,
   createState,
   distanceToPolygon,
+  orderPartyIds,
   parseSave,
   pointInPolygon,
   serializeSave,
@@ -73,7 +74,7 @@ const scout: PartyContent = {
   atlas: "assets/characters/scout/scout.json",
   box: { width: 50, height: 140 },
   walkCycleUnits: 84,
-  sits: false,
+  sits: true,
   start: false,
   joins: null,
   flute: false,
@@ -140,7 +141,9 @@ describe("party content", () => {
   it("starts every fixture with its own party, else the roster's starting members", () => {
     for (const fixture of Object.values(content.fixtures)) {
       const state = createState(world, fixture);
-      expect(state.party.map((member) => member.id)).toEqual(fixture.party ?? ["maddie"]);
+      expect(state.party.map((member) => member.id)).toEqual(
+        orderPartyIds(world, fixture.party ?? ["maddie"]),
+      );
     }
   });
 });
@@ -264,33 +267,35 @@ describe("party battle commands", () => {
   }
   const plaza = fixtureFor("plaza");
 
-  it("keeps Soothe, Play, Snack, Run with Maddie alone", () => {
+  it("gives Fae Soothe, Recover, Snack, Run and Maddie Play, Recover, Snack, Run", () => {
     const state = intoBattle(world, plaza);
     expect(battleCommands(world, state).map((command) => command.id)).toEqual([
-      "soothe", "play", "snack", "run",
+      "soothe", "recover", "snack", "run",
+    ]);
+    const maddieTurn = { ...state, battle: { ...state.battle!, actorIndex: 1 } };
+    expect(battleCommands(world, maddieTurn).map((command) => command.id)).toEqual([
+      "play", "recover", "snack", "run",
     ]);
   });
 
-  it("adds each member's command between Soothe and Snack", () => {
+  it("gives each party member their own signature command on their turn", () => {
     const state = intoBattle(twoWorld, twoParty(plaza));
-    const commands = battleCommands(twoWorld, state);
+    const scoutTurn = { ...state, battle: { ...state.battle!, actorIndex: 2 } };
+    const commands = battleCommands(twoWorld, scoutTurn);
     expect(commands.map((command) => command.id)).toEqual([
-      "soothe", "play", "whistle", "snack", "run",
+      "whistle", "recover", "snack", "run",
     ]);
-    expect(commands[2]?.label).toBe("Whistle");
+    expect(commands[0]?.label).toBe("Whistle");
     expect(commands.every((command) => !command.disabled)).toBe(true);
   });
 
   it("runs the whistle through aim with its own numbers and its own rest", () => {
     let state = intoBattle(twoWorld, twoParty(plaza));
     const critter = twoWorld.critters[state.battle?.critterId ?? ""];
-    if (critter === undefined || state.battle === null) throw new Error("no critter");
-    const calmBefore = state.battle.calm;
-    state = advance(twoWorld, state, press({ move: { x: 0, y: 1 } }), 1);
-    state = advance(twoWorld, state, blankInput(), 1);
-    state = advance(twoWorld, state, press({ move: { x: 0, y: 1 } }), 1);
-    state = advance(twoWorld, state, blankInput(), 1);
-    expect(state.battle?.selected).toBe(2);
+    const startBattle = state.battle;
+    if (critter === undefined || startBattle === null) throw new Error("no critter");
+    state = { ...state, battle: { ...startBattle, actorIndex: 2, selected: 0 } };
+    const calmBefore = startBattle.calm;
     state = advance(twoWorld, state, press({ confirm: true }), 1);
     expect(state.battle?.phase).toBe("check");
     expect(state.battle?.command).toBe("whistle");
@@ -303,12 +308,21 @@ describe("party battle commands", () => {
     );
     expect(state.battle?.message).toBe(whistleLines.great);
     state = toCommandMenu(twoWorld, advance(twoWorld, state, blankInput(), 1));
-    const commands = battleCommands(twoWorld, state);
-    expect(commands.find((command) => command.id === "whistle")).toMatchObject({
+    const scoutCommands = battleCommands(twoWorld, {
+      ...state,
+      battle: { ...state.battle!, actorIndex: 2 },
+    });
+    expect(scoutCommands.find((command) => command.id === "whistle")).toMatchObject({
       disabled: true,
       detail: "catching breath",
     });
-    expect(commands.find((command) => command.id === "play")).toMatchObject({ disabled: false });
+    const maddieCommands = battleCommands(twoWorld, {
+      ...state,
+      battle: { ...state.battle!, actorIndex: 1 },
+    });
+    expect(maddieCommands.find((command) => command.id === "play")).toMatchObject({
+      disabled: false,
+    });
   });
 });
 

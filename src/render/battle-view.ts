@@ -31,6 +31,10 @@ export { makeShadowSprite };
 
 // Half the widest hint sticker, in CSS px, to keep hints on screen.
 const hintHalfWidth = 130;
+// Battle sprite scale for Fae (overworld is 0.5); fighting friends scale proportionally.
+const FAE_BATTLE_SCALE = 0.72;
+// Logical Fae height used for battle layout & check anchors (clears HUD on 874x402).
+const FAE_BATTLE_LAYOUT_HEIGHT = 156;
 
 // Where a battle check is drawn, in CSS px (spec 8.1).
 // `hintAt` is where the check's hint sticker hangs (its top centre).
@@ -180,8 +184,9 @@ export class BattleViewController {
       ...this.stage.shadowSprites,
       this.battleCritterAura,
       this.battleCritter,
-      this.battleFae,
       ...this.battlePartySprites.values(),
+      this.battleFae,
+      this.stage.turnIndicator,
       this.stage.vfxLayer,
     );
     this.root.addChild(this.stage.backdropSprite, this.stage.wash, this.battleLayer);
@@ -318,7 +323,7 @@ export class BattleViewController {
     this.battleCritterAura.rotation = state.tick / 180;
 
     const faeSheet = Assets.get<Spritesheet>("fae-sheet");
-    const faeFrames = faeSheet.animations.idle_up;
+    const faeFrames = faeSheet.animations.idle_left ?? faeSheet.animations.idle_up;
     const fae = faeFrames?.[0];
     const faeX = (layout.fae.x - x) / scale - slideOffset;
     const faeY = (layout.fae.baseline - y) / scale;
@@ -328,7 +333,10 @@ export class BattleViewController {
       if (fae.defaultAnchor !== undefined) {
         this.battleFae.anchor.copyFrom(fae.defaultAnchor);
       }
-      this.battleFae.scale.set(0.58 * faePose.scaleX, 0.58 * faePose.scaleY);
+      this.battleFae.scale.set(
+        -FAE_BATTLE_SCALE * faePose.scaleX,
+        FAE_BATTLE_SCALE * faePose.scaleY,
+      );
       this.battleFae.position.set(faeX + faePose.offsetX, faeY + faePose.offsetY);
       this.battleFae.rotation = faePose.rotation;
       this.battleFae.tint = warmFlashTint(faePose.tintFlash);
@@ -350,9 +358,9 @@ export class BattleViewController {
       reducedMotion,
     );
 
-    // The party stands with Fae: a sitter (Maddie) sits facing the critter,
-    // anyone else is seen from behind like Fae. Flute friends sit it out,
-    // hopping in only for a brief cameo when Fae calls them with the flute.
+    // Fae and all fighting party members face right toward the critter
+    // (mirrored `idle_left`), lined up behind Fae with pets at the end. Flute
+    // friends sit battles out, hopping in only for a brief cameo.
     const inParty = new Set(fighting.map((member) => member.id));
     for (const [id, sprite] of this.battlePartySprites) {
       const visible = inParty.has(id);
@@ -361,25 +369,33 @@ export class BattleViewController {
     }
     this.stage.setPartyShadowsVisible(inParty);
     const partyAnchors = new Map<string, Point>();
+    const actorHeads = new Map<string, Point>();
+    actorHeads.set("fae", {
+      x: faeX + faePose.offsetX,
+      y: faeY - faeBox.height * (FAE_BATTLE_SCALE / 0.5) - 10,
+    });
     fighting.forEach((member, index) => {
       const sprite = this.battlePartySprites.get(member.id);
       const content = this.world.party[member.id];
       const place = layout.party[index];
       if (sprite === undefined || content === undefined || place === undefined) return;
       const memberSheet = Assets.get<Spritesheet>(`${member.id}-sheet`);
-      const pose = content.sits ? "idle_down" : "idle_up";
-      const frame = (memberSheet.animations[pose] ?? memberSheet.animations.idle_down)?.[0];
+      const frame = (memberSheet.animations.idle_left ?? memberSheet.animations.idle_down)?.[0];
       if (frame === undefined) return;
       sprite.texture = frame;
       if (frame.defaultAnchor !== undefined) sprite.anchor.copyFrom(frame.defaultAnchor);
-      const baseScale = ((content.scale ?? 0.5) / 0.5) * 0.58;
+      const baseScale = ((content.scale ?? 0.5) / 0.5) * FAE_BATTLE_SCALE;
       const memberPose = choreo.party[member.id] ?? NEUTRAL_POSE;
-      sprite.scale.set(baseScale * memberPose.scaleX, baseScale * memberPose.scaleY);
+      sprite.scale.set(-baseScale * memberPose.scaleX, baseScale * memberPose.scaleY);
       const memberX = (place.x - x) / scale - slideOffset;
       const memberY = (place.y - y) / scale;
       sprite.position.set(memberX + memberPose.offsetX, memberY + memberPose.offsetY);
       sprite.rotation = memberPose.rotation;
       partyAnchors.set(member.id, { x: memberX, y: memberY - 58 });
+      actorHeads.set(member.id, {
+        x: memberX + memberPose.offsetX,
+        y: memberY - content.box.height * (baseScale / 0.5) - 10,
+      });
       this.stage.updatePartyShadow(
         member.id,
         memberX + memberPose.offsetX * 0.85,
@@ -388,6 +404,11 @@ export class BattleViewController {
         liftShadowScale(memberPose.offsetY),
       );
     });
+
+    const activeHead = battle.phase === "command" && viewModel !== null
+      ? actorHeads.get(viewModel.activeActor.id)
+      : undefined;
+    this.stage.updateTurnIndicator(activeHead, state.tick, reducedMotion);
 
     const cameoSparkles = this.stage.renderFluteCameo(
       state,
@@ -419,8 +440,8 @@ export class BattleViewController {
       height,
       viewWidth,
       viewHeight,
-      this.world.critters[state.battle?.critterId ?? ""]?.battleHeight ?? 190,
-      faeBox.height,
+      this.world.critters[state.battle?.critterId ?? ""]?.battleHeight ?? 145,
+      FAE_BATTLE_LAYOUT_HEIGHT,
       battleParty(this.world, state.party).length,
     );
   }
@@ -574,9 +595,9 @@ export class BattleViewController {
   }
 
   // Where the critter's thought cloud floats (spec 8.1), in CSS px: centred
-  // in the open ground between Fae's party (Maddie sits on her near side)
-  // and the critter's aura, its top just above the critter's head. The shell
-  // keeps it below the HUD.
+  // in the open ground between Fae (at the front of her party) and the
+  // critter's aura, its top just above the critter's head. The shell keeps it
+  // below the HUD.
   battleFeelingAnchor(
     state: State,
     width: number,

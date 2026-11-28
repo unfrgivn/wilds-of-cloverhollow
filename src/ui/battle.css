@@ -9,6 +9,7 @@
 .battle-soften-pill[hidden],
 .battle-steady-pill[hidden],
 .battle-commands[hidden],
+.battle-turn-header[hidden],
 .battle-command-detail[hidden],
 .battle-treat-tray[hidden],
 .battle-treat-count[hidden],
@@ -574,6 +575,34 @@
     display: flex;
     flex-direction: column;
     width: 230px;
+  }
+}
+.battle-turn-header {
+  grid-column: 1 / -1;
+  justify-self: stretch;
+  box-sizing: border-box;
+  padding: 4px 10px;
+  border: 3px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 11px 13px 10px 12px;
+  background: #fff3c4;
+  box-shadow: 0 3px 0 var(--sticker-border);
+  color: var(--sticker-ink);
+  font-size: 11.5px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 1.15;
+  text-align: center;
+  text-transform: uppercase;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+@media (min-width: 1000px) {
+  .battle-turn-header {
+    padding: 5px 12px;
+    border-width: 4px;
+    font-size: 12.5px;
   }
 }
 .battle-command {

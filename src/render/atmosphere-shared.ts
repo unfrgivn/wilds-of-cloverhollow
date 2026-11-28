@@ -50,7 +50,7 @@ export const INDOOR_SUNLIT = new Set([
   "clubhouse",
 ]);
 
-export const MEADOW_AREAS = new Set(["park", "hills", "field"]);
+export const MEADOW_AREAS = new Set(["park", "hills", "field", "lane", "crossing"]);
 
 export const PLAZA_ARCHES: readonly [number, number][] = [
   [691, 490],

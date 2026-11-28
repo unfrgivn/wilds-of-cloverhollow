@@ -38,11 +38,13 @@ describe("battle check wiring", () => {
     expect(choose(state, 0).battle?.check).toMatchObject({
       kind: "ring", spec: content.world.battle.commands.soothe.check,
     });
-    expect(choose(state, 1).battle?.check).toMatchObject({
-      kind: "ring", spec: content.world.party.maddie?.command?.check,
-    });
-    expect(choose(state, 2).battle?.check).toMatchObject({
+    const sueTurn: State = { ...state, battle: { ...state.battle!, actorIndex: 1 } };
+    expect(choose(sueTurn, 0).battle?.check).toMatchObject({
       kind: "charge", spec: content.world.party.sue?.command?.check,
+    });
+    const maddieTurn: State = { ...state, battle: { ...state.battle!, actorIndex: 2 } };
+    expect(choose(maddieTurn, 0).battle?.check).toMatchObject({
+      kind: "ring", spec: content.world.party.maddie?.command?.check,
     });
   });
 
@@ -53,8 +55,9 @@ describe("battle check wiring", () => {
     const state: State = {
       ...base,
       party: [...base.party, { ...first, id: "jordan" }],
+      battle: { ...base.battle!, actorIndex: 3 },
     };
-    expect(choose(state, 3).battle?.check).toMatchObject({
+    expect(choose(state, 0).battle?.check).toMatchObject({
       kind: "chain", spec: content.world.party.jordan?.command?.check,
     });
   });

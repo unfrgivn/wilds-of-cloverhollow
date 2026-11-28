@@ -29,8 +29,8 @@ play.talk("critter:lifeguard");
 if (play.state().critters.lifeguard !== "calm")
   throw new Error("Ms. Coral didn't calm down");
 play.navigate({ x: 120, y: 550 });
-play.leave({ x: -1, y: 0 }, "plaza");
-play.navigate({ x: 1540, y: 555 });
+play.leave({ x: -1, y: 0 }, "boardwalk");
+play.navigate({ x: 2430, y: 480 });
 play.leave({ x: 1, y: 0 }, "bay");
 const crab = play.state().wild.find((critter) => critter.kind === "crab");
 if (crab === undefined) throw new Error("no crab rolled at the bay");

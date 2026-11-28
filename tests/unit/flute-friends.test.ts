@@ -208,9 +208,9 @@ describe("a flute friend", () => {
     const fixture = content.fixtures["pass-party"];
     if (fixture === undefined) throw new Error("no pass-party fixture");
     const start: State = { ...createState(world, fixture), ink: befriended };
-    expect(ids(start)).toEqual(["maddie", "sue"]);
+    expect(ids(start)).toEqual(["sue", "maddie"]);
     const with_ = fluted(start, 0);
-    expect(ids(with_)).toEqual(["maddie", "sue", "pond-pup"]);
+    expect(ids(with_)).toEqual(["sue", "maddie", "pond-pup"]);
     // He follows: Fae walks (whichever way is open), and he walks after her.
     const pup = (state: State): PartyMember | undefined =>
       state.party.find((member) => member.id === "pond-pup");
@@ -231,7 +231,7 @@ describe("a flute friend", () => {
     };
     expect(moved(walked)).toBeGreaterThan(60);
     const home = fluted(walked, 0);
-    expect(ids(home)).toEqual(["maddie", "sue"]);
+    expect(ids(home)).toEqual(["sue", "maddie"]);
     // The fixture's Sue never had her join variable set: only a flute friend
     // leaves with its variable.
     expect(world.storyVariable(home.ink, "sue_joined")).toBe(false);

@@ -24,6 +24,7 @@ export type CommandMenuView = {
   visible: boolean;
   commands: BattleCommand[];
   selected: number;
+  activeActor?: { id: string; name: string };
   treatTray?: {
     items: BattleTreatItem[];
     selected: number;
@@ -89,6 +90,14 @@ const commandIconMarkup: Record<string, string> = {
     '<circle cx="4.6" cy="14.2" r="2.6" fill="#f3a5be" stroke="#47321f" stroke-width="1.3"/>' +
     '<circle cx="10" cy="5.6" r="2.6" fill="#f6cf4f" stroke="#47321f" stroke-width="1.3"/>' +
     '<circle cx="15.4" cy="14.2" r="2.6" fill="#9bd5cb" stroke="#47321f" stroke-width="1.3"/>',
+  recover:
+    '<path d="M4.2 15.2 C4.6 7.8 10.2 3.8 16.4 3.8 C15.8 10.2 11.8 15.4 4.2 15.2 Z" ' +
+    'fill="#9bd58c" stroke="#47321f" stroke-width="1.4" stroke-linejoin="round"/>' +
+    '<path d="M4.8 14.8 C8 11.8 11.4 8.8 14.4 6.2" fill="none" stroke="#47321f" ' +
+    'stroke-width="1.3" stroke-linecap="round"/>' +
+    '<path d="M14.8 11.2 L15.6 13 L17.4 13.8 L15.6 14.6 L14.8 16.4 L14 14.6 ' +
+    'L12.2 13.8 L14 13 Z" fill="#f6cf4f" stroke="#47321f" stroke-width="1" ' +
+    'stroke-linejoin="round"/>',
   snack:
     '<path d="M10 6.2 C6.4 5.4 3.8 8.2 4.4 12.2 C5 15.8 7.8 17.6 10 16.4 ' +
     'C12.2 17.6 15 15.8 15.6 12.2 C16.2 8.2 13.6 5.4 10 6.2 Z" ' +
@@ -137,6 +146,8 @@ export function battleCommandPreview(
     base = "Sue casts a sparkling lure. Hold to charge!";
   } else if (command.id === "juggle") {
     base = "Jordan juggles glowing stars. Tap on the beat!";
+  } else if (command.id === "recover") {
+    base = "Take a calm breath to restore 1 leaf and ready your move.";
   } else if (command.id === "snack") {
     base = "Share a snack or favourite treat.";
   } else if (command.id === "talk") {
@@ -182,6 +193,9 @@ export function createCommandMenu(root: HTMLElement): {
   menu.setAttribute("role", "listbox");
   menu.setAttribute("aria-label", "Battle commands");
   menu.hidden = true;
+  const turnHeader = element("div", "battle-turn-header");
+  turnHeader.hidden = true;
+  menu.append(turnHeader);
   const tray = element("div", "battle-treat-tray");
   tray.setAttribute("role", "listbox");
   tray.setAttribute("aria-label", "Treat tray");
@@ -246,6 +260,16 @@ export function createCommandMenu(root: HTMLElement): {
       const showTray = trayView !== null;
       menu.hidden = !view.visible || showTray;
       tray.hidden = !showTray;
+      const actor = view.activeActor;
+      if (actor !== undefined) {
+        setText(turnHeader, `${actor.name.toUpperCase()}'S TURN`);
+        setAttribute(turnHeader, "data-actor", actor.id);
+        turnHeader.hidden = false;
+        setAttribute(menu, "aria-label", `${actor.name}'s battle commands`);
+      } else {
+        turnHeader.hidden = true;
+        setAttribute(menu, "aria-label", "Battle commands");
+      }
       if (showTray) {
         while (treatButtons.length < trayView.items.length)
           treatButtons.push(addTreatButton(treatButtons.length));

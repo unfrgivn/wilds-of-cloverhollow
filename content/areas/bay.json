@@ -125,8 +125,8 @@
         ]
       ],
       "target": {
-        "area": "plaza",
-        "spawn": "bay-road"
+        "area": "boardwalk",
+        "spawn": "bay"
       }
     },
     {
@@ -154,7 +154,7 @@
         "spawn": "bay"
       },
       "requires": {
-        "variable": "rode_bus",
+        "variable": "bluebird_calmed",
         "knot": "bay_cliff_path"
       }
     },

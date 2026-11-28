@@ -112,3 +112,19 @@ export function worldToScreen(
     y: (height - viewHeight * scale) / 2 + (point.y - camera.y) * scale,
   };
 }
+
+export function screenToWorld(
+  point: Point,
+  camera: Point,
+  viewWidth: number,
+  viewHeight: number,
+  width: number,
+  height: number,
+): Point {
+  const scale = Math.min(width / viewWidth, height / viewHeight);
+  if (!Number.isFinite(scale) || scale <= 0) return { x: camera.x, y: camera.y };
+  return {
+    x: camera.x + (point.x - (width - viewWidth * scale) / 2) / scale,
+    y: camera.y + (point.y - (height - viewHeight * scale) / 2) / scale,
+  };
+}

@@ -1,0 +1,260 @@
+{
+  "id": "boardwalk",
+  "name": "Salt-Marsh Boardwalk",
+  "land": "trail",
+  "width": 2520,
+  "height": 1080,
+  "ground": "boardwalk",
+  "ambient": [
+    {
+      "id": "boardwalk-blue-marsh",
+      "animation": "butterfly_blue",
+      "path": [
+        [
+          840,
+          510
+        ],
+        [
+          1120,
+          490
+        ],
+        [
+          1180,
+          640
+        ],
+        [
+          890,
+          660
+        ]
+      ],
+      "loopTicks": 480,
+      "phase": 80,
+      "frameTicks": 10,
+      "size": 19
+    },
+    {
+      "id": "boardwalk-pink-dune",
+      "animation": "butterfly_pink",
+      "path": [
+        [
+          1720,
+          340
+        ],
+        [
+          1990,
+          320
+        ],
+        [
+          2040,
+          460
+        ],
+        [
+          1770,
+          480
+        ]
+      ],
+      "loopTicks": 510,
+      "phase": 260,
+      "frameTicks": 9,
+      "size": 19
+    }
+  ],
+  "walkable": [
+    [
+      0,
+      110
+    ],
+    [
+      460,
+      110
+    ],
+    [
+      680,
+      390
+    ],
+    [
+      820,
+      445
+    ],
+    [
+      1120,
+      560
+    ],
+    [
+      1360,
+      500
+    ],
+    [
+      1550,
+      370
+    ],
+    [
+      1880,
+      330
+    ],
+    [
+      2150,
+      380
+    ],
+    [
+      2150,
+      120
+    ],
+    [
+      2520,
+      120
+    ],
+    [
+      2520,
+      605
+    ],
+    [
+      2200,
+      635
+    ],
+    [
+      1880,
+      515
+    ],
+    [
+      1580,
+      575
+    ],
+    [
+      1320,
+      720
+    ],
+    [
+      1060,
+      745
+    ],
+    [
+      680,
+      590
+    ],
+    [
+      440,
+      520
+    ],
+    [
+      0,
+      330
+    ]
+  ],
+  "blockers": [],
+  "triggers": [
+    {
+      "id": "crossing",
+      "polygon": [
+        [
+          0,
+          130
+        ],
+        [
+          65,
+          130
+        ],
+        [
+          65,
+          280
+        ],
+        [
+          0,
+          280
+        ]
+      ],
+      "target": {
+        "area": "crossing",
+        "spawn": "boardwalk"
+      }
+    },
+    {
+      "id": "bay",
+      "polygon": [
+        [
+          2455,
+          220
+        ],
+        [
+          2520,
+          220
+        ],
+        [
+          2520,
+          580
+        ],
+        [
+          2455,
+          580
+        ]
+      ],
+      "target": {
+        "area": "bay",
+        "spawn": "plaza-road"
+      }
+    }
+  ],
+  "interactables": [
+    {
+      "id": "boardwalk-signpost",
+      "knot": "boardwalk_signpost",
+      "point": {
+        "x": 780,
+        "y": 440
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "boardwalk-bench",
+      "knot": "boardwalk_bench",
+      "point": {
+        "x": 1580,
+        "y": 420
+      },
+      "prompt": "Look"
+    }
+  ],
+  "critters": [],
+  "recurring": {
+    "dens": [
+      {
+        "point": {
+          "x": 420,
+          "y": 350
+        },
+        "radius": 110,
+        "kinds": [
+          "bluebird",
+          "crab",
+          "bunny"
+        ]
+      },
+      {
+        "point": {
+          "x": 2220,
+          "y": 240
+        },
+        "radius": 100,
+        "kinds": [
+          "bluebird",
+          "crab",
+          "bunny"
+        ]
+      }
+    ]
+  },
+  "npcs": [],
+  "spawns": {
+    "crossing": {
+      "x": 140,
+      "y": 205,
+      "facing": "right"
+    },
+    "bay": {
+      "x": 2370,
+      "y": 480,
+      "facing": "left"
+    }
+  },
+  "props": []
+}

@@ -261,6 +261,28 @@ export function createRecorder(world: World, initial: State): {
       navigate(spot, 6);
       face(facing);
       if (targetInteractable(world, state)?.id === id) return;
+      const live = targetPoint(id);
+      const ldx = live.x - state.player.x;
+      const ldy = live.y - state.player.y;
+      const liveDir: Direction =
+        Math.abs(ldx) >= Math.abs(ldy) ? (ldx > 0 ? "right" : "left") : ldy > 0 ? "down" : "up";
+      face(liveDir);
+      if (targetInteractable(world, state)?.id === id) return;
+    }
+    if (id.startsWith("critter:wild:")) {
+      const key = id.slice("critter:".length);
+      for (let attempt = 0; attempt < 4; attempt += 1) {
+        const live = presentCritters(world, state).find((item) => item.key === key)?.point;
+        if (live === undefined) break;
+        navigate(live, 45);
+        const now = presentCritters(world, state).find((item) => item.key === key)?.point ?? live;
+        const ldx = now.x - state.player.x;
+        const ldy = now.y - state.player.y;
+        const liveDir: Direction =
+          Math.abs(ldx) >= Math.abs(ldy) ? (ldx > 0 ? "right" : "left") : ldy > 0 ? "down" : "up";
+        face(liveDir);
+        if (targetInteractable(world, state)?.id === id) return;
+      }
     }
     throw new Error(`couldn't get in front of ${id}`);
   };
@@ -391,13 +413,25 @@ export function createRecorder(world: World, initial: State): {
           nudge(directions.down);
         press();
       } else if (current.phase === "command" && current.revealed >= current.message.length) {
-        const popper = current.windUp === null ? undefined : battleCommands(world, state)
-          .find((item) => item.feeling !== null && !item.disabled)?.id;
         const available = battleCommands(world, state);
-        while (commands.length > 0 &&
-          !available.some((item) => item.id === commands[0])) commands.shift();
-        const wanted = commands[0] ?? (current.talkMode ? "talk" : popper ?? "soothe");
-        const index = available.findIndex((item) => item.id === wanted);
+        const popper = current.windUp === null ? undefined : available
+          .find((item) => item.feeling !== null && !item.disabled)?.id;
+        const ownedByParty = (id: string): boolean =>
+          id === "soothe" || id === "recover" || id === "snack" || id === "run" || id === "talk" ||
+          state.party.some((member) => world.party[member.id]?.command?.id === id);
+        while (commands.length > 0 && !ownedByParty(commands[0] ?? "")) commands.shift();
+        const planned = commands[0];
+        const plannedHere = planned !== undefined &&
+          available.some((item) => item.id === planned && !item.disabled);
+        const defaultCmd = available.find((item) =>
+          item.id !== "run" && item.id !== "snack" && !item.disabled)?.id ??
+          available.find((item) => !item.disabled)?.id;
+        const wanted = plannedHere
+          ? planned
+          : current.talkMode
+            ? "talk"
+            : popper ?? defaultCmd ?? "soothe";
+        const index = available.findIndex((item) => item.id === wanted && !item.disabled);
         if (index < 0)
           throw new Error(
             `no ${wanted} command in this battle (calm ${current.calm}, talk ${current.talkMode})`);
@@ -406,7 +440,7 @@ export function createRecorder(world: World, initial: State): {
           continue;
         }
         if (pause?.(state) === true) idle(30);
-        commands.shift();
+        if (plannedHere) commands.shift();
         press();
       } else if (current.phase === "check" && current.check !== null) {
         playCheck(current.check);

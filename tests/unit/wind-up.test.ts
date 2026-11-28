@@ -201,11 +201,15 @@ describe("wind-up commands and burst rules", () => {
     const state = withJordan(activeWindUp({
       windUp: { feelings: ["grumpy", "hungry", "curious"], popped: [true, false, false], left: 3 },
     }));
-    const commands = battleCommands(content.world, state);
+    const faeCommands = battleCommands(content.world, state);
+    const sueCommands = battleCommands(content.world, {
+      ...state,
+      battle: { ...state.battle!, actorIndex: 1 },
+    });
 
-    expect(commands.find((command) => command.id === "soothe")?.feeling).toBe(null);
-    expect(commands.find((command) => command.id === "snack")?.feeling).toBe("hungry");
-    expect(commands.find((command) => command.id === "cast")?.feeling).toBe("curious");
+    expect(faeCommands.find((command) => command.id === "soothe")?.feeling).toBe(null);
+    expect(faeCommands.find((command) => command.id === "snack")?.feeling).toBe("hungry");
+    expect(sueCommands.find((command) => command.id === "cast")?.feeling).toBe("curious");
   });
 
   it("puffs to the next command without checking for a burst", () => {

@@ -26,10 +26,10 @@ function replay(path: string): State {
 describe("the Wildlife Sanctuary recording", () => {
   it("visits Ranger Fern, pets calmed visitors, shares a picnic, and returns to hills", () => {
     const state = replay("tests/sim/scripts/new-game/sanctuary.json");
-    expect(state.tick).toBe(14814);
+    expect(state.tick).toBe(16924);
     expect(state.area).toBe("hills");
-    expect(state.coins).toBe(175);
-    expect(state.snacks).toBe(11);
+    expect(state.coins).toBe(191);
+    expect(state.snacks).toBe(10);
     expect(world.storyVariable(state.ink, "sanctuary_visited")).toBe(true);
     expect(world.storyVariable(state.ink, "sanctuary_reward_3")).toBe(true);
     expect(world.storyVariable(state.ink, "sanctuary_reward_8")).toBe(true);

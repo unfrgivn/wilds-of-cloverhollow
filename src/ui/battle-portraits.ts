@@ -57,17 +57,21 @@ export function evaluateBattlePortraits(input: {
     if (!fighters.includes(id)) fighters.push(id);
   }
   const members = ["fae", ...fighters];
+  const fallbackActorId =
+    members[((battle.actorIndex ?? 0) % members.length + members.length) % members.length] ?? "fae";
 
   let selectedActorId: string | null = null;
   if (battle.phase === "command") {
-    if (battle.treatMenu === true) {
-      selectedActorId = "fae";
-    } else {
-      const highlighted = view?.commands[battle.selected]?.id ?? null;
-      selectedActorId = actorForCommand(highlighted, fighters, partyCommands);
-    }
+    selectedActorId = view?.activeActor?.id ?? fallbackActorId;
   } else if (battle.phase === "check" || battle.phase === "result") {
-    selectedActorId = actorForCommand(battle.command, fighters, partyCommands);
+    if (battle.command === "recover" || battle.command === "snack") {
+      selectedActorId = view?.activeActor?.id ?? fallbackActorId;
+    } else {
+      selectedActorId =
+        actorForCommand(battle.command, fighters, partyCommands) ??
+        view?.activeActor?.id ??
+        null;
+    }
   }
 
   const togetherActive =

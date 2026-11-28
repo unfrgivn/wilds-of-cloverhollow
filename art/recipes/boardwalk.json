@@ -1,0 +1,21 @@
+{
+  "asset": "boardwalk",
+  "date": "2026-11-27",
+  "summary": "Salt-Marsh Boardwalk, a 2520x1080 (21:9 4K, 5040x2160 at pxPerUnit 2) panoramic watercolor coastal marsh where a sandy trail joins a sweeping S-curve timber boardwalk over lavender-green wetland tide pools and opens onto the golden beach leading into Bubblegum Bay. Tiled into three 1680x2160 WebP tiles (paper #fcf9f5).",
+  "model": "gemini-3-pro-image-preview",
+  "source": "art/source/areas/boardwalk/boardwalk-final.png",
+  "painting": "art/source/areas/boardwalk/painting/ground.json",
+  "references": [
+    "art/source/areas/hills/hills-final.png",
+    "art/source/areas/bay/bay-raw.png"
+  ],
+  "commands": [
+    "generate 21:9 4K panoramic painting -> 5040x2160",
+    "tile into three 1680x2160 WebP tiles (ground_0_0.webp, ground_1_0.webp, ground_2_0.webp)"
+  ],
+  "kept": {
+    "painting": "art/source/areas/boardwalk/painting/ground.json",
+    "tiles": "public/assets/areas/boardwalk/ground.json",
+    "review": "art/review/east-road-boardwalk.jpg"
+  }
+}

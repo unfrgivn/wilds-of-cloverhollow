@@ -1,0 +1,296 @@
+{
+  "id": "lane",
+  "name": "Sunberry Lane",
+  "land": "cloverhollow",
+  "width": 2520,
+  "height": 1080,
+  "ground": "lane",
+  "ambient": [
+    {
+      "id": "lane-pink-west",
+      "animation": "butterfly_pink",
+      "path": [
+        [
+          380,
+          620
+        ],
+        [
+          620,
+          580
+        ],
+        [
+          690,
+          730
+        ],
+        [
+          420,
+          760
+        ]
+      ],
+      "loopTicks": 460,
+      "phase": 0,
+      "frameTicks": 9,
+      "size": 19
+    },
+    {
+      "id": "lane-blue-mid",
+      "animation": "butterfly_blue",
+      "path": [
+        [
+          1120,
+          640
+        ],
+        [
+          1420,
+          610
+        ],
+        [
+          1480,
+          760
+        ],
+        [
+          1180,
+          790
+        ]
+      ],
+      "loopTicks": 520,
+      "phase": 170,
+      "frameTicks": 10,
+      "size": 20
+    },
+    {
+      "id": "lane-pink-east",
+      "animation": "butterfly_pink",
+      "path": [
+        [
+          1960,
+          390
+        ],
+        [
+          2200,
+          370
+        ],
+        [
+          2250,
+          500
+        ],
+        [
+          2010,
+          520
+        ]
+      ],
+      "loopTicks": 480,
+      "phase": 310,
+      "frameTicks": 10,
+      "size": 18
+    }
+  ],
+  "walkable": [
+    [
+      0,
+      350
+    ],
+    [
+      600,
+      340
+    ],
+    [
+      1050,
+      360
+    ],
+    [
+      1650,
+      360
+    ],
+    [
+      2100,
+      340
+    ],
+    [
+      2520,
+      430
+    ],
+    [
+      2520,
+      725
+    ],
+    [
+      2100,
+      810
+    ],
+    [
+      1600,
+      980
+    ],
+    [
+      220,
+      980
+    ],
+    [
+      0,
+      650
+    ]
+  ],
+  "blockers": [
+    [
+      [
+        1185,
+        315
+      ],
+      [
+        1385,
+        315
+      ],
+      [
+        1385,
+        485
+      ],
+      [
+        1185,
+        485
+      ]
+    ],
+    [
+      [
+        1480,
+        465
+      ],
+      [
+        1570,
+        465
+      ],
+      [
+        1570,
+        540
+      ],
+      [
+        1480,
+        540
+      ]
+    ]
+  ],
+  "triggers": [
+    {
+      "id": "plaza",
+      "polygon": [
+        [
+          0,
+          410
+        ],
+        [
+          65,
+          410
+        ],
+        [
+          65,
+          570
+        ],
+        [
+          0,
+          570
+        ]
+      ],
+      "target": {
+        "area": "plaza",
+        "spawn": "bay-road"
+      }
+    },
+    {
+      "id": "crossing",
+      "polygon": [
+        [
+          2455,
+          475
+        ],
+        [
+          2520,
+          475
+        ],
+        [
+          2520,
+          680
+        ],
+        [
+          2455,
+          680
+        ]
+      ],
+      "target": {
+        "area": "crossing",
+        "spawn": "lane"
+      }
+    }
+  ],
+  "interactables": [
+    {
+      "id": "lane-bench",
+      "knot": "lane_bench",
+      "point": {
+        "x": 1285,
+        "y": 500
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "lane-signpost",
+      "knot": "lane_signpost",
+      "point": {
+        "x": 1525,
+        "y": 555
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "lane-berries",
+      "knot": "lane_berries",
+      "point": {
+        "x": 650,
+        "y": 780
+      },
+      "prompt": "Look"
+    }
+  ],
+  "critters": [],
+  "recurring": {
+    "dens": [
+      {
+        "point": {
+          "x": 820,
+          "y": 740
+        },
+        "radius": 110,
+        "kinds": [
+          "bunny",
+          "frog",
+          "pup"
+        ]
+      },
+      {
+        "point": {
+          "x": 1850,
+          "y": 480
+        },
+        "radius": 110,
+        "kinds": [
+          "bunny",
+          "frog",
+          "pup"
+        ]
+      }
+    ]
+  },
+  "npcs": [],
+  "spawns": {
+    "plaza": {
+      "x": 140,
+      "y": 490,
+      "facing": "right"
+    },
+    "crossing": {
+      "x": 2380,
+      "y": 575,
+      "facing": "left"
+    }
+  },
+  "props": []
+}

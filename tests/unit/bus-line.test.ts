@@ -14,16 +14,12 @@ import {
   everyPropFootprint,
 } from "../../src/core";
 import { loadContent } from "../../src/content/load";
-import { parseScript } from "../../src/content/script";
 
-// Contract for Milestone 24 (the bus line and the map). The bus now stops in
-// all three towns: Cloverhollow's plaza, Bubblegum Bay (by the welcome sign,
-// where the road from town comes in), and Pinecone Pass. From any stop it goes
-// to any other the story has opened: the bay once the east road is open
-// (`club_open`), the pass once the bluebird has pointed Fae toward the
-// mountains (riding there counts as the first ride, `rode_bus`). Every area
-// belongs to one of the six lands on the journal's painted map, which marks
-// where Fae is.
+// Contract for Milestone 24 (the bus line and the map), updated for discover-on-foot
+// travel. The bus stops in all three towns: Cloverhollow's plaza, Bubblegum Bay
+// (by the welcome sign), and Pinecone Pass. From any stop it goes to any other
+// town Fae has already reached on foot (`visited_bay` / `sue_joined` for the bay,
+// `visited_pass` / `rode_bus` for the pass), and always home to Cloverhollow.
 
 const content = loadContent();
 const world = content.world;
@@ -46,34 +42,26 @@ function standable(area: Area, point: Point): boolean {
   );
 }
 
-// The story at the end of chapter one: the tree house club is open, so the
-// east road to the bay is too.
-function chapterOneInk(): State["ink"] {
-  const fixture = content.fixtures["new-game"];
-  if (fixture === undefined) throw new Error("new-game fixture missing");
-  const path = "tests/sim/scripts/new-game/chapter-one.json";
-  const script = parseScript(JSON.parse(readFileSync(path, "utf8")), path);
-  let state = createState(world, fixture);
-  for (const segment of script)
-    for (let tick = 0; tick < segment.ticks; tick += 1)
-      state = step(world, state, segment.frame).state;
-  if (world.storyVariable(state.ink, "club_open") !== true) throw new Error("club not open");
-  return state.ink;
-}
-
-// Fae in front of an area's bus stop, facing it, with the stickers of the
-// species she has calmed (the story asks calmed() of a species).
-function atStop(area: string, stickers: string[], ink?: State["ink"]): State {
+// Fae in front of an area's bus stop, facing it, with optional Ink variables.
+function atStop(
+  area: string,
+  stickers: string[],
+  options?: { ink?: State["ink"]; variables?: Record<string, boolean> },
+): State {
   const spawn = areaFor(area).spawns[area === "pass" ? "bus" : "bus-stop"];
   if (spawn === undefined) throw new Error(`no bus spawn in ${area}`);
-  const start = createState(world, { area, spawn: area === "pass" ? "bus" : "bus-stop" });
+  const start = createState(world, {
+    area,
+    spawn: area === "pass" ? "bus" : "bus-stop",
+    ...(options?.variables === undefined ? {} : { variables: options.variables }),
+  });
   const feet = area === "pass" ? { x: 1017, y: 975 } : { x: spawn.x, y: spawn.y };
   return {
     ...start,
     player: feet,
     facing: "up",
     stickers,
-    ...(ink === undefined ? {} : { ink }),
+    ...(options?.ink === undefined ? {} : { ink: options.ink }),
   };
 }
 
@@ -117,6 +105,7 @@ describe("the lands", () => {
       "east-hall": "cloverhollow", "art-room": "cloverhollow", music: "cloverhollow",
       gym: "cloverhollow", field: "cloverhollow", clubhouse: "forest", lodge: "pass",
       plaza: "cloverhollow", park: "cloverhollow", school: "cloverhollow", woods: "forest",
+      lane: "cloverhollow", crossing: "hills", boardwalk: "trail",
       "milo-house": "cloverhollow", "rosie-cottage": "cloverhollow",
       bay: "bay", island: "bay", "sue-cottage": "bay", pass: "pass", summit: "pass",
       "jordan-cabin": "pass",
@@ -161,23 +150,29 @@ describe("the bus line", () => {
     expect(stop.visibleWhile).toBeUndefined();
   });
 
-  it("goes from the plaza to the pass, and to the bay once the east road is open", () => {
-    const before = ride(atStop("plaza", calm), 1);
-    expect(before.choices).toEqual(["Pinecone Pass!", "Not yet."]);
+  it("goes from the plaza only to towns discovered on foot", () => {
+    const before = ride(atStop("plaza", calm, { variables: { club_open: true } }), 0);
+    expect(before.choices).toEqual([]);
     expect(before.state.transition).toBeNull();
-    const after = ride(atStop("plaza", calm, chapterOneInk()), 1);
-    expect(after.choices).toEqual(["Pinecone Pass!", "Bubblegum Bay!", "Not yet."]);
-    expect(after.state.transition?.target).toEqual({ area: "bay", spawn: "bus-stop" });
+    const bayOnly = ride(atStop("plaza", calm, { variables: { visited_bay: true } }), 0);
+    expect(bayOnly.choices).toEqual(["Bubblegum Bay!", "Not yet."]);
+    expect(bayOnly.state.transition?.target).toEqual({ area: "bay", spawn: "bus-stop" });
+    const both = ride(
+      atStop("plaza", calm, { variables: { visited_bay: true, visited_pass: true } }),
+      1,
+    );
+    expect(both.choices).toEqual(["Pinecone Pass!", "Bubblegum Bay!", "Not yet."]);
+    expect(both.state.transition?.target).toEqual({ area: "bay", spawn: "bus-stop" });
   });
 
   it("goes from the bay home to the plaza any time", () => {
-    const { choices, state } = ride(atStop("bay", bluebirdFizzy, chapterOneInk()), 0);
+    const { choices, state } = ride(atStop("bay", bluebirdFizzy), 0);
     expect(choices).toEqual(["Cloverhollow!", "Not yet."]);
     expect(state.transition?.target).toEqual({ area: "plaza", spawn: "bus-stop" });
   });
 
-  it("goes from the bay up to the pass once the bluebird is calm: the first ride", () => {
-    const start = atStop("bay", calm, chapterOneInk());
+  it("goes from the bay up to the pass once Pinecone Pass has been discovered", () => {
+    const start = atStop("bay", calm, { variables: { visited_bay: true, visited_pass: true } });
     expect(world.storyVariable(start.ink, "rode_bus")).toBe(false);
     const { choices, state } = ride(start, 1);
     expect(choices).toEqual(["Cloverhollow!", "Pinecone Pass!", "Not yet."]);
@@ -185,22 +180,25 @@ describe("the bus line", () => {
     expect(world.storyVariable(state.ink, "rode_bus")).toBe(true);
   });
 
-  it("goes from the pass home to the plaza or down to the bay", () => {
-    const home = ride(atStop("pass", calm, chapterOneInk()), 0);
+  it("goes from the pass home to the plaza or down to the bay once discovered", () => {
+    const vars = { visited_bay: true, visited_pass: true };
+    const home = ride(atStop("pass", calm, { variables: vars }), 0);
     expect(home.choices).toEqual(["Cloverhollow!", "Bubblegum Bay!", "Not yet."]);
     expect(home.state.transition?.target).toEqual({ area: "plaza", spawn: "bus-stop" });
-    const beach = ride(atStop("pass", calm, chapterOneInk()), 1);
+    const beach = ride(atStop("pass", calm, { variables: vars }), 1);
     expect(beach.state.transition?.target).toEqual({ area: "bay", spawn: "bus-stop" });
   });
 
   it("offers the same rides on every visit, however often Fae rides", () => {
     // Ink choices are once-only unless sticky; the stops' were once-only
     // until Milestone 28, so each ride could be taken only once a game.
-    let ink = chapterOneInk();
+    let ink = atStop("plaza", calm, {
+      variables: { visited_bay: true, visited_pass: true },
+    }).ink;
     for (let trip = 0; trip < 3; trip += 1) {
-      const up = ride(atStop("plaza", calm, ink), 0);
+      const up = ride(atStop("plaza", calm, { ink }), 0);
       expect(up.choices, `trip ${trip}`).toEqual(["Pinecone Pass!", "Bubblegum Bay!", "Not yet."]);
-      const down = ride(atStop("pass", calm, up.state.ink), 0);
+      const down = ride(atStop("pass", calm, { ink: up.state.ink }), 0);
       expect(down.choices, `trip ${trip}`)
         .toEqual(["Cloverhollow!", "Bubblegum Bay!", "Not yet."]);
       ink = down.state.ink;

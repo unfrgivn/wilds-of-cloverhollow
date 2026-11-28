@@ -45,8 +45,13 @@ function before(
   feet: { x: number; y: number },
   facing: State["facing"],
   stickers: string[],
+  variables?: Record<string, boolean>,
 ): State {
-  const start = createState(world, { area, spawn: Object.keys(areaFor(area).spawns)[0] ?? "" });
+  const start = createState(world, {
+    area,
+    spawn: Object.keys(areaFor(area).spawns)[0] ?? "",
+    ...(variables === undefined ? {} : { variables }),
+  });
   return { ...start, player: feet, facing, stickers };
 }
 
@@ -91,7 +96,7 @@ describe("the town's bus stop", () => {
     expect(arrival).toEqual({ x: 878, y: 985, facing: "down" });
   });
 
-  it("goes nowhere before the bluebird is calm", () => {
+  it("goes nowhere before discovering another town on foot", () => {
     const state = before("plaza", { x: 878, y: 985 }, "up", ["fountain-frog", "pond-pup"]);
     expect(targetInteractable(world, state)?.id).toBe("npc:bus-stop");
     const { state: after, lines } = talk(state, 0);
@@ -100,14 +105,14 @@ describe("the town's bus stop", () => {
   });
 
   it("stays in town when Fae says not yet", () => {
-    const state = before("plaza", { x: 878, y: 985 }, "up", allCalm);
+    const state = before("plaza", { x: 878, y: 985 }, "up", allCalm, { visited_pass: true });
     const { state: after } = talk(state, 1);
     expect(after.transition).toBeNull();
     expect(settle(after).area).toBe("plaza");
   });
 
-  it("rides up to Pinecone Pass, party and all", () => {
-    let state = before("plaza", { x: 878, y: 985 }, "up", allCalm);
+  it("rides up to Pinecone Pass, party and all, once discovered on foot", () => {
+    let state = before("plaza", { x: 878, y: 985 }, "up", allCalm, { visited_pass: true });
     state = { ...state, party: createState(world, { ...fixtureFor("plaza-party") }).party };
     const { state: after } = talk(state, 0);
     expect(after.transition?.target).toEqual({ area: "pass", spawn: "bus" });
@@ -115,7 +120,7 @@ describe("the town's bus stop", () => {
     const pass = areaFor("pass");
     expect(state.area).toBe("pass");
     expect(state.player).toEqual({ x: pass.spawns["bus"]?.x, y: pass.spawns["bus"]?.y });
-    expect(state.party.map((member) => member.id)).toEqual(["maddie", "sue"]);
+    expect(state.party.map((member) => member.id)).toEqual(["sue", "maddie"]);
     expect(state.safeSpot).toEqual({ area: "pass", spawn: "bus" });
     expect(world.storyVariable(state.ink, "rode_bus")).toBe(true);
   });
@@ -153,12 +158,13 @@ describe("story travel", () => {
 });
 
 describe("the journal", () => {
-  it("points to the bus once the bluebird is calm, and to the pass once Fae rides it", () => {
-    let state = before("plaza", { x: 878, y: 985 }, "up", allCalm);
-    expect(journalNotes(world, state)[0]).toBe(
-      "The bus at the plaza's star sign goes up into the mountains, to Pinecone Pass!");
-    state = settle(talk(state, 0).state);
-    expect(journalNotes(world, state)[0]).toMatch(/Pinecone Pass/);
-    expect(journalNotes(world, state)[0]).not.toMatch(/bus/i);
-  });
+  it("points to the mountain trails once the bluebird is calm, and to the pass once visited",
+    () => {
+      const beforePass = before("plaza", { x: 878, y: 985 }, "up", allCalm);
+      expect(journalNotes(world, beforePass)[0]).toMatch(/Cliffside Trail.*Pinecone Pass/);
+      const visited = before("plaza", { x: 878, y: 985 }, "up", allCalm, { visited_pass: true });
+      const ridden = settle(talk(visited, 0).state);
+      expect(journalNotes(world, ridden)[0]).toMatch(/Pinecone Pass/);
+      expect(journalNotes(world, ridden)[0]).not.toMatch(/bus/i);
+    });
 });

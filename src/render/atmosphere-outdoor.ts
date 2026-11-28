@@ -307,7 +307,7 @@ export function evaluateOutdoorAtmosphere(
     return out;
   }
 
-  if (areaId === "bay" || areaId === "trail") {
+  if (areaId === "bay" || areaId === "trail" || areaId === "boardwalk") {
     // 14 shimmering aqua/warm-white water glints dancing across the sea areas.
     for (let i = 0; i < 14; i += 1) {
       const h0 = hash01(seed + i * 23 + 1);
@@ -322,6 +322,17 @@ export function evaluateOutdoorAtmosphere(
         } else {
           x = 1160 + h0 * 550;
           y = 250 + h1 * 340;
+        }
+      } else if (areaId === "boardwalk") {
+        if (i < 5) {
+          x = 760 + h0 * 440;
+          y = 140 + h1 * 230;
+        } else if (i < 9) {
+          x = 1320 + h0 * 640;
+          y = 45 + h1 * 145;
+        } else {
+          x = 1980 + h0 * 480;
+          y = 650 + h1 * 360;
         }
       } else if (i < 4) {
         x = 1240 + h0 * 470;

@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   createState,
+  distanceToPolygon,
   npcFacing,
+  pointInPolygon,
   step,
   targetInteractable,
   type ActionFrame,
@@ -60,9 +62,15 @@ describe("people in areas", () => {
     expect(state.dialogue?.knot).toBe("mom");
     expect(state.dialogue?.speaker).toBe("Mom");
     let walker = inKitchen(mom.point.x + 45, mom.point.y, "left");
-    for (let tick = 0; tick < 30; tick += 1)
+    for (let tick = 0; tick < 30; tick += 1) {
       walker = step(world, walker, { ...none, move: { x: -1, y: 0 } }).state;
-    expect(walker.player.x, "stopped by her footprint").toBeGreaterThanOrEqual(645);
+      expect(pointInPolygon(walker.player, mom.footprint)).toBe(false);
+      expect(distanceToPolygon(walker.player, mom.footprint)).toBeGreaterThanOrEqual(
+        world.tunables.playerRadius - 0.01,
+      );
+    }
+    expect(Math.abs(walker.player.y - mom.point.y), "deflected around her footprint")
+      .toBeGreaterThan(10);
   });
 
   it("has a story knot for every person, and Mom remembers breakfast", () => {

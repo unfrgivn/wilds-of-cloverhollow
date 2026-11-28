@@ -1,0 +1,20 @@
+{
+  "asset": "lane",
+  "date": "2026-11-27",
+  "summary": "Sunberry Lane, a 2520x1080 (21:9 4K, 5040x2160 at pxPerUnit 2) panoramic watercolor lane winding east from Cloverhollow Town Square past wild berry bushes, clover meadows, a wooden bench, and a trail signpost toward Willowbrook Crossing. Tiled into three 1680x2160 WebP tiles (paper #fef9f6).",
+  "model": "gemini-3-pro-image-preview",
+  "source": "art/source/areas/lane/lane-final.png",
+  "painting": "art/source/areas/lane/painting/ground.json",
+  "references": [
+    "art/source/areas/hills/hills-final.png"
+  ],
+  "commands": [
+    "generate 21:9 4K panoramic painting -> 5040x2160",
+    "tile into three 1680x2160 WebP tiles (ground_0_0.webp, ground_1_0.webp, ground_2_0.webp)"
+  ],
+  "kept": {
+    "painting": "art/source/areas/lane/painting/ground.json",
+    "tiles": "public/assets/areas/lane/ground.json",
+    "review": "art/review/east-road-lane.jpg"
+  }
+}

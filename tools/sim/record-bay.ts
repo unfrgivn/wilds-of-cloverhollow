@@ -17,7 +17,7 @@ play.talk("npc:sue", [0]);
 play.meet("bluebird");
 play.battle(["cast"]);
 const end = play.state();
-if (end.party.map((member) => member.id).join(",") !== "maddie,sue" ||
+if (end.party.map((member) => member.id).join(",") !== "sue,maddie" ||
   !end.stickers.includes("bay-bluebird"))
   throw new Error("the bay run didn't end with Sue and a calm bluebird");
 console.error(`bay: ${end.tick} ticks, ${play.script.length} segments`);

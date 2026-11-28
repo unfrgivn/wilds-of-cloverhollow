@@ -29,9 +29,9 @@ function replay(path: string): State {
 describe("the Milo's Sketch Loft & Rosie's Flower Cottage recording", () => {
   it("visits both Meadow Park neighborhood homes with Rosie talk and blacklight secrets", () => {
     const state = replay("tests/sim/scripts/new-game/milo-rosie.json");
-    expect(state.tick).toBe(12730);
+    expect(state.tick).toBe(15042);
     expect(state.area).toBe("park");
-    expect(state.coins).toBe(127);
+    expect(state.coins).toBe(150);
     expect(state.snacks).toBe(3);
     expect(state.lantern).toBe(false);
     expect(world.storyVariable(state.ink, "milo_loft_visited")).toBe(true);

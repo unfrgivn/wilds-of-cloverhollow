@@ -4,27 +4,41 @@ import { bunHash, longFlowTimeout, openHarness, playAfter, readHash, readState,
 
 test.describe.configure({ timeout: longFlowTimeout });
 
-async function settle(page: Page): Promise<void> {
-  await page.evaluate(async () => {
+async function settle(page: Page, afterResize = false): Promise<void> {
+  await page.evaluate(async (resized) => {
     await Promise.all(
       document
         .getAnimations()
         .filter((item) => item.effect?.getComputedTiming().iterations !== Infinity)
         .map((item) => item.finished.catch(() => undefined)),
     );
+    if (resized) {
+      // WebKit's ImageQualityController drops resized CSS background images
+      // (.sticker-portrait-img shrinking from 60px to 50px under @media
+      // (max-height: 500px)) to low-quality aliased interpolation until a
+      // deferred repaint timer fires. Recreating its render object clears the
+      // cached pre-resize size so WebKit paints at full anti-aliased quality
+      // immediately (matching a page opened directly at 874x402).
+      for (const img of document.querySelectorAll<HTMLElement>(".sticker-portrait-img")) {
+        img.style.display = "none";
+        void img.offsetWidth;
+        img.style.display = "";
+      }
+    }
     await new Promise<void>((resolve) => {
       window.requestAnimationFrame(() => window.requestAnimationFrame(() => resolve()));
     });
-  });
+  }, afterResize);
 }
 
 async function shoot(page: Page, name: string): Promise<void> {
   await settle(page);
   await expect(page).toHaveScreenshot(`${name}-1280.png`);
   await page.setViewportSize({ width: 874, height: 402 });
-  await settle(page);
+  await settle(page, true);
   await expect(page).toHaveScreenshot(`${name}-874.png`);
   await page.setViewportSize({ width: 1280, height: 720 });
+  await settle(page, true);
 }
 
 test("real keys: paint under the door, Trace, and the open art room", { tag: "@smoke" },

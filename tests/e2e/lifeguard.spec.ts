@@ -13,11 +13,35 @@ import { parseScript } from "../../src/content/script";
 
 test.describe.configure({ timeout: longFlowTimeout });
 
+async function settle(page: Page, afterResize = false): Promise<void> {
+  await page.evaluate(async (resized) => {
+    await Promise.all(
+      document
+        .getAnimations()
+        .filter((item) => item.effect?.getComputedTiming().iterations !== Infinity)
+        .map((item) => item.finished.catch(() => undefined)),
+    );
+    if (resized) {
+      for (const img of document.querySelectorAll<HTMLElement>(".sticker-portrait-img")) {
+        img.style.display = "none";
+        void img.offsetWidth;
+        img.style.display = "";
+      }
+    }
+    await new Promise<void>((resolve) => {
+      window.requestAnimationFrame(() => window.requestAnimationFrame(() => resolve()));
+    });
+  }, afterResize);
+}
+
 async function shoot(page: Page, name: string): Promise<void> {
+  await settle(page);
   await expect(page).toHaveScreenshot(`${name}-1280.png`);
   await page.setViewportSize({ width: 874, height: 402 });
+  await settle(page, true);
   await expect(page).toHaveScreenshot(`${name}-874.png`);
   await page.setViewportSize({ width: 1280, height: 720 });
+  await settle(page, true);
 }
 
 test("real keys: the lifeguard returns, throws beach balls, and shares watermelon",

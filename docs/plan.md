@@ -9084,6 +9084,31 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   sims, 23 QA packs, purity, lint), `just build` (all non-vendor chunks
   `< 385 kB`), and 37/37 Chromium & WebKit e2e tests across all 15 Wave-2 specs
   without `--update-snapshots`.
+
+## Milestone 210: WebKit `ImageQualityController` Portrait-Resize Flake Fix, Final `vision`-Audited Chromium/WebKit Visual Baseline Sweep & iOS arm64 Build Verification **Status:** ✅ Completed (2026-11-28)
+- Diagnoses and fixes a subtle WebKit `ImageQualityController` low-quality
+  interpolation race on `.sticker-portrait-img` after `setViewportSize`
+  (`tests/e2e/art.spec.ts`, `tests/e2e/lifeguard.spec.ts`), refreshes the final
+  22 `vision`-audited Chromium & WebKit snapshots (`accessibility`, `art`,
+  `catch`, `lifeguard`, `ui-gallery` WebKit `prompt`), and verifies the native
+  iOS arm64 device build — zero `src/` edits and zero replay hash drift across
+  all 77 sims.
+- WebKit portrait-resize determinism (`tests/e2e/art.spec.ts`,
+  `tests/e2e/lifeguard.spec.ts`):
+  - Added post-resize render-object reset on `.sticker-portrait-img` before
+    `toHaveScreenshot` so WebKit always renders smooth anti-aliased portrait
+    scaling (verified 5/5 parallel repeats + 3/3 consecutive WebKit runs with 0
+    pixel diffs).
+- Final `vision`-audited baseline sync (22 PNGs):
+  - `accessibility.spec.ts`: `desktop-key-hints-ribbon-{chromium,webkit}`
+    (`700×52` single-row ribbon including M203 clickable `[R] Lasso` pill).
+  - `art.spec.ts` (3 WebKit), `catch.spec.ts` (4), `lifeguard.spec.ts` (12),
+    and `ui-gallery.spec.ts` (`prompt-webkit-darwin.png` showing M193
+    `.touch-dash` `»`).
+- Gates: `bun run typecheck`, `bun run lint`, `just build` (`< 385 kB` every
+  non-vendor chunk), `just ios-device-build` (`Release-iphoneos/App.app`), and
+  221/221 Chromium & WebKit e2e tests across `accessibility`, `catch`,
+  `lifeguard`, `art`, and `ui-gallery` without `--update-snapshots`.
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

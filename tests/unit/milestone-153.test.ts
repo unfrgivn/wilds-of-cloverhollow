@@ -78,6 +78,7 @@ const ALL_PLAYABLE_TRACKS: readonly PlayableTrack[] = [
   "enchanted-calm",
   "battle",
   "boss",
+  "encore",
   "talk",
   "hearts",
   "morning",
@@ -88,6 +89,7 @@ const EXPECTED_FRESH_TRACKS: readonly PlayableTrack[] = [
   "taco",
   "battle",
   "boss",
+  "encore",
   "talk",
   "hearts",
   "morning",
@@ -106,9 +108,9 @@ function tonalFrequencies(segments: readonly AudioSegment[]): number[] {
 }
 
 describe("Milestone 152: Complete 24-Track World Soundtrack", () => {
-  it("lists 32 unique jukebox tracks in album order with titles, scores, and scales", () => {
-    expect(jukeboxTracks).toHaveLength(32);
-    expect(new Set(jukeboxTracks).size).toBe(32);
+  it("lists 33 unique jukebox tracks in album order with titles, scores, and scales", () => {
+    expect(jukeboxTracks).toHaveLength(33);
+    expect(new Set(jukeboxTracks).size).toBe(33);
 
     expect(jukeboxTracks.indexOf("market")).toBe(jukeboxTracks.indexOf("cafe") + 1);
     expect(jukeboxTracks.indexOf("parlor")).toBe(jukeboxTracks.indexOf("market") + 1);
@@ -132,13 +134,14 @@ describe("Milestone 152: Complete 24-Track World Soundtrack", () => {
         expect(scale[i] ?? 0, `${id} ascending scale`).toBeGreaterThan(scale[i - 1] ?? 0);
       }
     }
-    expect(seenTitles.size).toBe(32);
+    expect(seenTitles.size).toBe(33);
   });
 
-  it("gives market, parlor, cottage, cabin, and hearts bespoke 16-bar chamber scores", () => {
+  it("gives market, parlor, cottage, cabin, hearts, and encore bespoke 16-bar scores", () => {
     expect(Object.keys(interiorScores).sort()).toEqual([
       "cabin",
       "cottage",
+      "encore",
       "hearts",
       "market",
       "parlor",

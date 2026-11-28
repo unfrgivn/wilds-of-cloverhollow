@@ -252,6 +252,9 @@ test.describe("Track E18A: Dream Memory Shrine / Boss Encore", () => {
       await expect.poll(async () => (await readState(page)).battle !== null).toBe(true);
       await expect(page.locator(".encore-battle-banner")).toContainText("Brisk Breeze");
       await expect(page.locator(".encore-battle-banner")).toContainText("Pure Heart");
+      await expect
+        .poll(() => page.evaluate(() => window.__cloverhollow?.sound.music()))
+        .toMatchObject({ track: "encore", title: "Starlight Encore!", duck: false });
 
       // Advance intro -> turn 1 command menu and verify Pure Heart disables Snack.
       await step(page, 1);

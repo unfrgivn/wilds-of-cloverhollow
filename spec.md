@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 196)
+Last updated: 2026-11-28 (Milestone 197)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -75,13 +75,17 @@ reference material only.
   real shapes and narrowing with type guards.
 - Tooling: Vite 8 / Rolldown (dev server and production/harness builds with
   `build.rolldownOptions.output.codeSplitting` into `vendor-pixi`, `vendor-ink`,
-  `area-content`, `audio-scores`, `render-engine`
-  (`includeDependenciesRecursively: false`, including
+  `area-content`, `critter-content` (`content/critters/*` & `content/fixtures/*`,
+  priority 19), `audio-scores` (`scores*.ts`, `audio-recipes.ts`, `voices.ts`,
+  `ambience.ts`, `includeDependenciesRecursively: false`, priority 18),
+  `ui-overlays` (`src/ui/*`, `includeDependenciesRecursively: false`, priority
+  17), `render-engine` (`includeDependenciesRecursively: false`, including
   `src/platform/reduced-motion.ts` so `render-engine` never forms a circular
-  chunk dependency with the `index`/`game` entry chunk), `world-content`, and
-  `index`/`game` app chunks, keeping all non-vendor app and content chunks
-  under 500 kB, enforced automatically on production builds by
-  `tools/check-dist.ts` via `just build`, Milestones 154 & 177), Bun (package
+  chunk dependency with the `index`/`game` entry chunk, priority 16),
+  `world-content` (`includeDependenciesRecursively: false`, priority 15), and
+  `index`/`game` app chunks, keeping every non-vendor production JS chunk under
+  350 kB and enforced under 500 kB by `tools/check-dist.ts` via `just build`,
+  Milestones 154, 177 & 195), Bun (package
   manager and script runner), Node 24 LTS for Node-based tools (`.nvmrc`),
   `just` for tasks. Compiled Ink story JSON lives out of the static JS bundle as
   a runtime-fetched asset at `public/assets/story/main.ink.json` (fetched via
@@ -282,13 +286,18 @@ ios/            Capacitor iOS project (from Milestone 4).
   safely on unsupported browsers or during synthetic harness steps.
   Projected via `hapticForTick` (`src/shell/feedback.ts`) with strict priority
   `"celebrate"` > `"medium"` > `"light"`:
-  `"celebrate"` on Golden Chef (`goldenCooked`), `soothed` transition,
-  `battle-together`, `prize-won`, `fish-catch`, `level-up`, `sticker`,
-  `skee-hundred`, and `taco-order`; `"medium"` on `GREAT!` `battle-hit`,
-  `comet-bump`, `lasso-twirl`, `cook-ding`, `taco-oops`, and `battle-faint`;
-  and `"light"` on `battle-recover`, `claw-grab`, `mole-boop`, `taco-top`, `fish-bite`,
+  `"celebrate"` on Golden Chef (`goldenCooked`), `soothed` transition, Spatial
+  Puzzle solve (`puzzleArea.lastSolved` transition), new Boss Encore Star Trophy
+  (`encore.trophies.length` increase), `battle-together`, `prize-won`,
+  `fish-catch`, `level-up`, `sticker`, `skee-hundred`, and `taco-order`;
+  `"medium"` on `GREAT!` `battle-hit`, `comet-bump`, `lasso-twirl`, `cook-ding`,
+  `taco-oops`, and `battle-faint`; and `"light"` on Prism Mirror rotation
+  (`puzzleArea.mirrors` change), Pressure Plate hold/release
+  (`puzzleArea.heldPlates` change), Overworld Rainbow Lasso grapple launch
+  (`puzzleArea.lasso.tick === 0`), Harmony Flute chime (`puzzleArea.recentChime`
+  change), `battle-recover`, `claw-grab`, `mole-boop`, `taco-top`, `fish-bite`,
   `skee-score`, `comet-star`, `flute`, `lantern-on`, `coin`, `item`, and
-  companion pet.
+  companion pet (Milestones 122, 142, 165 & 195).
 
 ### 3.2 Input
 - Devices produce one `ActionFrame` per tick: a `move` vector (x and y in
@@ -500,18 +509,22 @@ ios/            Capacitor iOS project (from Milestone 4).
   opens), `enchanted` ("Misty Dream"), `enchanted-calm` ("Ancient Tree's Song",
   once `forest_fizzy` is false), `battle` ("Fizzy Calm-Down!"), `boss` ("The
   Purple Hood", for wind-up mini-bosses, Talk battles, or non-runnable
-  battles), `talk` ("Listening Heart", once Talk opens or calm reaches
+  battles), `encore` ("Starlight Encore!", 132 BPM 4/4 E minor / G major 16-bar
+  6-voice sunlit heroic chamber-boss remix across `harp`, `marimba`, `flute`,
+  `celesta`, `bass`, and `shaker` for Dream Memory Shrine Boss Encore rematches
+  when `state.battle.encore !== undefined`, yielding to `"talk"` during Talk
+  climax, Milestone 195), `talk` ("Listening Heart", once Talk opens or calm reaches
   `talkAt`), `hearts` ("Warm Hearth Hearts", 84 BPM 3/4 E-flat major 16-bar
   5-voice chamber waltz across `harp`, `piano`, `flute`, `celesta`, and `pad`,
   softly ducked over the area's active ambience bed whenever a Party
   Heart-to-Heart `h2h_*` dialogue knot is active outside battles/arcade,
   Milestone 191), `morning` ("Waking Up", during the morning and credits
-  finale), and `silent` ("Quiet", for `harness`). `jukeboxTracks` exports all 32
+  finale), and `silent` ("Quiet", for `harness`). `jukeboxTracks` exports all 33
   non-silent themes in story/album order (`title`, `home`, `cafe`, `market`,
   `parlor`, `loft`, `bloom`, `school`, `bay`, `fishing`, `cottage`, `island`,
   `pass`, `lodge`, `cabin`, `summit`, `cavern`, `woods`, `clubhouse`, `hills`,
   `road`, `sanctuary`, `festival`, `arcade`, `taco`, `enchanted`,
-  `enchanted-calm`, `battle`, `boss`, `talk`, `hearts`, `morning`) for the
+  `enchanted-calm`, `battle`, `boss`, `encore`, `talk`, `hearts`, `morning`) for the
   Journal OPTIONS Music Box (shell-only
   override, never saved, plays unducked while the journal is open and returns
   smoothly to the live area theme on close, title, or reset). Ambience beds
@@ -524,7 +537,7 @@ ios/            Capacitor iOS project (from Milestone 4).
 - `src/platform/audio.ts` creates a single AudioContext first thing at boot,
   before anything awaits, and resumes it at every chance: right away, on each
   key, pointer, or touch, and whenever a cue plays while it isn't running.
-  Its master chain routes SFX, music (`src/platform/music.ts` over the 32
+  Its master chain routes SFX, music (`src/platform/music.ts` over the 33
   multi-voice scores split across `src/platform/scores-helpers.ts`,
   `src/platform/scores-town.ts`, `src/platform/scores-wilds.ts`,
   `src/platform/scores-interiors.ts`, and `src/platform/scores-expansion.ts`,
@@ -553,13 +566,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   `trackScaleMidi(track)` in `[79, 93]` while Fae's blacklight lantern is on in
   the overworld; and latching a bar-quantized rhythmic percussion/energy lift
   via `nextBarAdaptiveState` + `battleTensionNotes` + `TENSION_PERCUSSION_BOOST`
-  on Wind-Up or `>= 50%` Calm in mini-boss/finale battles outside `talk`/calm
+  on Wind-Up or `>= 50%` Calm in mini-boss/finale/encore battles outside `talk`/calm
   phases, surfaced read-only in `MusicDebugInfo.adaptive`), resumes
   exploration themes on the nearest bar downbeat after battles or shop visits
   via `resumeBarStep` (preserving `stepsPerBar` alignment across 4/4 and 3/4
   waltz scores while `FRESH_START_TRACKS` (`title`, `taco`, `battle`, `boss`,
-  `talk`, `hearts`, and `morning`) always start fresh at step 0, Milestones
-  152, 160 & 191),
+  `encore`, `talk`, `hearts`, and `morning`) always start fresh at step 0, Milestones
+  152, 160, 191 & 195),
   and pauses cleanly on `visibilitychange` when backgrounded; when returning
   visible on `visibilitychange` or `pageshow` (Milestone 132), pure
   `shouldResumeAudioOnVisible(hidden, state)` (`src/platform/audio.ts`)
@@ -596,8 +609,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   bit-identical on `neutral`/omitted, pausing blips cleanly during `{pause:N}`
   dramatic beats via `buildSoundContext`), and pitch `choice-move`,
   `battle-command`, and `choice-select` clicks to the active soundtrack's
-  pentatonic scale (across all 32 tracks + `silent`, with `hearts` tuned to
-  `EB_MAJOR_WARM`).
+  pentatonic scale (across all 33 tracks + `silent`, with `hearts` tuned to
+  `EB_MAJOR_WARM` and `encore` tuned to `G_MAJOR`).
   Browsers hold the context (`suspended`, or WebKit's `interrupted`) until a
   key, click, or tap; a gamepad press is not a user activation in any browser,
   so a pad-only player on the web hears nothing until one. The iOS app's web
@@ -3637,7 +3650,8 @@ trunks keep its two exits.
     `src/ui/battle.css`, `src/ui/journal.css`, `src/ui/sticker.css`,
     `src/ui/touch-controls.css`, `src/ui/credits.css`, `src/ui/claw.css`,
     `src/ui/skee.css`, `src/ui/mole.css`, `src/ui/comet.css`, `src/ui/cook.css`,
-    `src/ui/fish.css`, and `src/ui/taco.css` declare
+    `src/ui/fish.css`, `src/ui/taco.css`, `src/ui/encore-shrine.css`, and
+    `src/ui/flute-wheel.css` declare
     `user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;`
     so rapid taps and long-presses on Safari/WebKit and iOS never trigger
     accidental text selection or link callouts, while keeping dev QA console

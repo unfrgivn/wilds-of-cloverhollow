@@ -391,7 +391,7 @@ describe("E15 Adaptive Music Mix: Bar Quantization & Vertical Note Generators", 
     expect(hzToMidi(523.25)).toBe(72);
     expect(hzToMidi(880)).toBe(81);
 
-    expect(jukeboxTracks).toHaveLength(32);
+    expect(jukeboxTracks).toHaveLength(33);
     for (const track of jukeboxTracks) {
       const hzScale = trackScaleNotes(track);
       const midiScale = trackScaleMidi(track);

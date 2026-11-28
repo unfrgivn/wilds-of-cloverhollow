@@ -45,9 +45,9 @@ function withDialogue(area: string, knot: string, vars?: Record<string, boolean>
 }
 
 describe("Milestone 191: 32nd OST Theme Warm Hearth Hearts (hearts)", () => {
-  it("lists 32 unique jukebox tracks with hearts right after talk", () => {
-    expect(jukeboxTracks).toHaveLength(32);
-    expect(new Set(jukeboxTracks).size).toBe(32);
+  it("lists 33 unique jukebox tracks with hearts right after talk", () => {
+    expect(jukeboxTracks).toHaveLength(33);
+    expect(new Set(jukeboxTracks).size).toBe(33);
     expect(jukeboxTracks.indexOf("hearts")).toBe(jukeboxTracks.indexOf("talk") + 1);
     expect(trackTitles.hearts).toBe("Warm Hearth Hearts");
     expect(scores.hearts).toBe(interiorScores.hearts);
@@ -237,7 +237,7 @@ describe("Milestone 191: Heart-to-Heart Scrapbook Metadata, View Model & SVG Hyg
       readFileSync(file, "utf8").trimEnd().split("\n").length;
     expect(lineCount("src/ui/journal-hearts.ts")).toBeLessThan(260);
     expect(lineCount("src/core/heart-to-hearts.ts")).toBeLessThan(380);
-    expect(lineCount("src/platform/scores-interiors.ts")).toBeLessThan(720);
+    expect(lineCount("src/platform/scores-interiors.ts")).toBeLessThan(830);
     expect(lineCount("src/ui/journal-field-note.ts")).toBeLessThan(650);
   });
 });

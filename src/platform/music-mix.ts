@@ -94,7 +94,7 @@ export function projectMusicMix(
     !options.titleOpen &&
     !options.jukeboxActive &&
     state.battle !== null &&
-    (options.track === "battle" || options.track === "boss") &&
+    (options.track === "battle" || options.track === "boss" || options.track === "encore") &&
     !TENSION_CALM_PHASES.has(state.battle.phase)
   ) {
     if (state.battle.windUp !== null) {
@@ -185,7 +185,7 @@ export function battleTensionNotes(
   stepsPerBar: number,
   barIndex: number,
 ): readonly VerticalNote[] {
-  if (track !== "battle" && track !== "boss") return [];
+  if (track !== "battle" && track !== "boss" && track !== "encore") return [];
 
   const notes: VerticalNote[] = [];
   const isWaltz = stepsPerBar === 12;
@@ -222,7 +222,7 @@ export function battleTensionNotes(
     });
   }
 
-  if (track === "boss" && (stepInBar === 0 || stepInBar === 8)) {
+  if ((track === "boss" || track === "encore") && (stepInBar === 0 || stepInBar === 8)) {
     const tonic = trackScaleMidi(track)[0] ?? 86;
     let bassMidi = tonic - 36;
     while (bassMidi < BOSS_BASS_MIN_MIDI) bassMidi += 12;

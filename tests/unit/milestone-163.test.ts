@@ -50,9 +50,9 @@ function makeMemoryRecords(
 }
 
 describe("Milestone 163: 30th OST Theme — Cloverhollow Jubilee (festival)", () => {
-  it("lists 32 unique jukebox tracks with festival right after sanctuary", () => {
-    expect(jukeboxTracks).toHaveLength(32);
-    expect(new Set(jukeboxTracks).size).toBe(32);
+  it("lists 33 unique jukebox tracks with festival right after sanctuary", () => {
+    expect(jukeboxTracks).toHaveLength(33);
+    expect(new Set(jukeboxTracks).size).toBe(33);
     expect(jukeboxTracks.indexOf("festival")).toBe(jukeboxTracks.indexOf("sanctuary") + 1);
     expect(trackTitles.festival).toBe("Cloverhollow Jubilee");
     expect(scores.festival).toBe(expansionScores.festival);

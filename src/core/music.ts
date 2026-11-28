@@ -30,6 +30,7 @@ export type MusicTrack =
   | "enchanted-calm"
   | "battle"
   | "boss"
+  | "encore"
   | "talk"
   | "hearts"
   | "morning"
@@ -67,6 +68,7 @@ export const jukeboxTracks: readonly JukeboxTrack[] = [
   "enchanted-calm",
   "battle",
   "boss",
+  "encore",
   "talk",
   "hearts",
   "morning",
@@ -121,6 +123,7 @@ export const trackTitles: Record<MusicTrack, string> = {
   "enchanted-calm": "Ancient Tree's Song",
   battle: "Fizzy Calm-Down!",
   boss: "The Purple Hood",
+  encore: "Starlight Encore!",
   talk: "Listening Heart",
   hearts: "Warm Hearth Hearts",
   morning: "Waking Up",
@@ -227,10 +230,17 @@ export function soundtrackFor(
     const talkActive =
       (state.battle.talk !== null && state.battle.talk !== undefined) ||
       (critterTalk !== null && state.battle.calm >= critterTalk.talkAt);
+    const isEncore = state.battle.encore !== undefined;
     const isBoss =
       critter !== undefined &&
       (critter.windUp !== null || critterTalk !== null || !critter.canRun);
-    const track: MusicTrack = talkActive ? "talk" : isBoss ? "boss" : "battle";
+    const track: MusicTrack = talkActive
+      ? "talk"
+      : isEncore
+        ? "encore"
+        : isBoss
+          ? "boss"
+          : "battle";
     return makeSoundtrack(
       track,
       "none",

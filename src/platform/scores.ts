@@ -41,6 +41,7 @@ export const scores: Record<PlayableTrack, Score> = {
   "enchanted-calm": wildsScores["enchanted-calm"],
   battle: wildsScores.battle,
   boss: wildsScores.boss,
+  encore: interiorScores.encore,
   talk: townScores.talk,
   hearts: interiorScores.hearts,
   morning: townScores.morning,

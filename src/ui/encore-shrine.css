@@ -139,6 +139,9 @@
   font: 900 22px/1 var(--sticker-font);
   cursor: pointer;
   touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   transition: transform 110ms ease-out;
 }
 
@@ -242,6 +245,9 @@
   text-align: center;
   cursor: pointer;
   touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   transition: transform 110ms ease-out, border-color 110ms ease-out, background 110ms ease-out;
 }
 
@@ -469,6 +475,9 @@
   text-align: left;
   cursor: pointer;
   touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   transition: transform 110ms ease-out, background 110ms ease-out;
 }
 
@@ -568,6 +577,9 @@
   letter-spacing: 0.02em;
   cursor: pointer;
   touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   transition: transform 110ms ease-out;
 }
 
@@ -623,6 +635,9 @@
   font: 900 11.5px/1.2 var(--sticker-font);
   white-space: nowrap;
   pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 @media (max-height: 520px), (max-width: 900px) {

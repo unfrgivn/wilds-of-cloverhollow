@@ -11,14 +11,31 @@ export const chunkGroups: ChunkGroup[] = [
   { name: "vendor-pixi", test: /node_modules\/pixi\.js\//, priority: 30 },
   { name: "vendor-ink", test: /node_modules\/inkjs\//, priority: 25 },
   { name: "area-content", test: /\/content\/(areas|props)\//, priority: 20 },
-  { name: "audio-scores", test: /\/src\/platform\/scores(-[a-z]+)?\.ts/, priority: 18 },
+  { name: "critter-content", test: /\/content\/(critters|fixtures)\//, priority: 19 },
+  {
+    name: "audio-scores",
+    test: /\/src\/platform\/(scores(-[a-z]+)?|audio-recipes|voices|ambience)\.ts/,
+    priority: 18,
+    includeDependenciesRecursively: false,
+  },
+  {
+    name: "ui-overlays",
+    test: /\/src\/ui\//,
+    priority: 17,
+    includeDependenciesRecursively: false,
+  },
   {
     name: "render-engine",
     test: /\/src\/render\/|\/src\/platform\/reduced-motion\.ts/,
     priority: 16,
     includeDependenciesRecursively: false,
   },
-  { name: "world-content", test: /\/content\/(?!qa\/)/, priority: 15 },
+  {
+    name: "world-content",
+    test: /\/content\/(?!qa\/)/,
+    priority: 15,
+    includeDependenciesRecursively: false,
+  },
 ];
 
 export default defineConfig(({ mode }) => ({

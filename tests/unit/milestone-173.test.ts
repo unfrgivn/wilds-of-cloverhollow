@@ -260,9 +260,9 @@ describe("Milestone 172: Bespoke battle-recover Sound Cue, Recipe & Haptic", () 
 });
 
 describe("Milestone 172: 31st OST Theme — Sunberry Road (road)", () => {
-  it("lists 32 unique jukebox tracks with road right after hills", () => {
-    expect(jukeboxTracks).toHaveLength(32);
-    expect(new Set(jukeboxTracks).size).toBe(32);
+  it("lists 33 unique jukebox tracks with road right after hills", () => {
+    expect(jukeboxTracks).toHaveLength(33);
+    expect(new Set(jukeboxTracks).size).toBe(33);
     expect(jukeboxTracks.indexOf("road")).toBe(jukeboxTracks.indexOf("hills") + 1);
     expect(trackTitles.road).toBe("Sunberry Road");
     expect(scores.road).toBe(expansionScores.road);

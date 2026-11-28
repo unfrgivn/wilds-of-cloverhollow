@@ -68,7 +68,9 @@ describe("Milestone 154: Vite Chunk-Budget Future-Proofing & Check-Dist Gate", (
     expect(routeModule("/repo/src/platform/scores-interiors.ts")).toBe("audio-scores");
     expect(routeModule("/repo/src/platform/scores-expansion.ts")).toBe("audio-scores");
     expect(routeModule("/repo/src/render/view.ts")).toBe("render-engine");
-    expect(routeModule("/repo/content/critters/fountain-frog.json")).toBe("world-content");
+    expect(routeModule("/repo/src/ui/encore-shrine.ts")).toBe("ui-overlays");
+    expect(routeModule("/repo/content/critters/fountain-frog.json")).toBe("critter-content");
+    expect(routeModule("/repo/content/fixtures/new-game.json")).toBe("critter-content");
     expect(routeModule("/repo/content/npc-profiles.json")).toBe("world-content");
     expect(routeModule("/repo/content/tunables.json")).toBe("world-content");
   });
@@ -90,8 +92,10 @@ describe("Milestone 154: Vite Chunk-Budget Future-Proofing & Check-Dist Gate", (
     };
     expect(priorityOf("vendor-pixi")).toBeGreaterThan(priorityOf("vendor-ink"));
     expect(priorityOf("vendor-ink")).toBeGreaterThan(priorityOf("area-content"));
-    expect(priorityOf("area-content")).toBeGreaterThan(priorityOf("audio-scores"));
-    expect(priorityOf("audio-scores")).toBeGreaterThan(priorityOf("render-engine"));
+    expect(priorityOf("area-content")).toBeGreaterThan(priorityOf("critter-content"));
+    expect(priorityOf("critter-content")).toBeGreaterThan(priorityOf("audio-scores"));
+    expect(priorityOf("audio-scores")).toBeGreaterThan(priorityOf("ui-overlays"));
+    expect(priorityOf("ui-overlays")).toBeGreaterThan(priorityOf("render-engine"));
     expect(priorityOf("render-engine")).toBeGreaterThan(priorityOf("world-content"));
   });
 

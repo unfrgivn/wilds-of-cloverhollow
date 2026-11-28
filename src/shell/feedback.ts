@@ -85,17 +85,45 @@ const LIGHT_HAPTIC_CUES: ReadonlySet<SoundCue> = new Set<SoundCue>([
   "item",
 ]);
 
+function recordChanged(
+  previous: Readonly<Record<string, string>> | undefined,
+  next: Readonly<Record<string, string>> | undefined,
+): boolean {
+  if (previous === next) return false;
+  const prevKeys = previous === undefined ? [] : Object.keys(previous);
+  const nextKeys = next === undefined ? [] : Object.keys(next);
+  if (prevKeys.length !== nextKeys.length) return true;
+  for (const key of nextKeys) {
+    if (previous?.[key] !== next?.[key]) return true;
+  }
+  return false;
+}
+
 /** Projects a simulation tick's transitions and sound cues to a tactile haptic kind. */
 export function hapticForTick(
-  previous: Pick<State, "battle">,
-  next: Pick<State, "battle">,
+  previous: Pick<State, "battle"> & Partial<Pick<State, "area" | "puzzleArea" | "encore">>,
+  next: Pick<State, "battle"> & Partial<Pick<State, "area" | "puzzleArea" | "encore">>,
   cues: readonly SoundCue[],
   options?: { goldenCooked?: boolean },
 ): HapticKind | null {
+  const sameArea =
+    previous.area === undefined || next.area === undefined || previous.area === next.area;
+  const prevSolved = previous.puzzleArea?.lastSolved;
+  const nextSolved = next.puzzleArea?.lastSolved;
+  const puzzleSolvedNow =
+    sameArea &&
+    nextSolved !== undefined &&
+    (prevSolved === undefined ||
+      prevSolved.id !== nextSolved.id ||
+      prevSolved.tick !== nextSolved.tick);
+  const encoreTrophyEarned =
+    (next.encore?.trophies.length ?? 0) > (previous.encore?.trophies.length ?? 0);
   const soothedNow = previous.battle?.phase !== "soothed" && next.battle?.phase === "soothed";
   if (
     options?.goldenCooked === true ||
     soothedNow ||
+    puzzleSolvedNow ||
+    encoreTrophyEarned ||
     cues.some((cue) => CELEBRATE_HAPTIC_CUES.has(cue))
   ) {
     return "celebrate";
@@ -106,7 +134,32 @@ export function hapticForTick(
   ) {
     return "medium";
   }
-  if (cues.some((cue) => LIGHT_HAPTIC_CUES.has(cue))) {
+  const mirrorRotated =
+    sameArea &&
+    next.puzzleArea?.mirrors !== undefined &&
+    recordChanged(previous.puzzleArea?.mirrors, next.puzzleArea.mirrors);
+  const plateChanged =
+    sameArea && recordChanged(previous.puzzleArea?.heldPlates, next.puzzleArea?.heldPlates);
+  const lassoFired =
+    sameArea &&
+    next.puzzleArea?.lasso !== undefined &&
+    next.puzzleArea.lasso.tick === 0 &&
+    (previous.puzzleArea?.lasso === undefined || previous.puzzleArea.lasso.tick !== 0);
+  const prevChime = previous.puzzleArea?.recentChime;
+  const nextChime = next.puzzleArea?.recentChime;
+  const fluteChimed =
+    sameArea &&
+    nextChime !== undefined &&
+    (prevChime === undefined ||
+      prevChime.note !== nextChime.note ||
+      prevChime.tick !== nextChime.tick);
+  if (
+    mirrorRotated ||
+    plateChanged ||
+    lassoFired ||
+    fluteChimed ||
+    cues.some((cue) => LIGHT_HAPTIC_CUES.has(cue))
+  ) {
     return "light";
   }
   return null;

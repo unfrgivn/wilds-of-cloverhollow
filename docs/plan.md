@@ -8675,6 +8675,45 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   `art/review/{battle-checks-v2-sheet,e7-bay-duo-formation-desktop,e7-dual-combo-menu-desktop,e7-spin-snag-check,e7-woods-duo-phone,e7-which-one-cups,e7-whack-tickets,e7-boss-phase2-pip}.jpg`.
 - **Gates:** `just check`, `just build` (`< 500 kB` every non-vendor chunk, zero
   hook leak), and Chromium + WebKit Playwright e2e verification.
+
+## Milestone 197: 33rd OST Theme `"Starlight Encore!"` (Boss Encore Score), Spatial Puzzle & Encore Haptics, iOS Tap Hygiene & `< 350 kB` Production Chunk Relief **Status:** ✅ Completed (2026-11-28)
+- Gives Dream Memory Shrine Boss Encore rematches their own heroic 33rd original
+  soundtrack theme (`"encore"` — `"Starlight Encore!"`) with E15 vertical
+  Phase-2/Wind-Up percussion mix, adds tactile haptic feedback across all
+  Spatial Puzzles & Boss Encore trophies, completes `-webkit-touch-callout: none`
+  iOS hygiene on `encore-shrine.css`, and future-proofs production JS bundle
+  headroom (`world-content` `448 -> 176 kB`, `index` `430 -> 324 kB`) — zero
+  `src/core/sim.ts` changes, zero save-version bumps, and zero replay hash drift
+  across all 74 recorded sims + `encore` + `e11`.
+- 33rd Original Soundtrack Theme `"encore"` (`"Starlight Encore!"`)
+  (`src/core/music.ts`, `src/platform/scores-interiors.ts`,
+  `src/platform/scores.ts`, `src/platform/voices.ts`, `src/platform/music.ts`,
+  `src/platform/music-mix.ts`):
+  - Composed `encoreScore` (132 BPM, 4/4, 16-bar E minor / G major heroic
+    6-voice chamber-boss remix: `harp`, `marimba`, `flute`, `celesta`, `bass`,
+    `shaker`), expanded `jukeboxTracks` to **33 composed themes**, routed
+    `soundtrackFor` to `"encore"` when `state.battle.encore !== undefined`
+    (preserving `"talk"` climax priority), added `encore: G_MAJOR` in
+    `TRACK_SCALES`, added `"encore"` to `FRESH_START_TRACKS`, and enabled E15
+    vertical boss tension layers on `"encore"`.
+- Spatial Puzzle & Boss Encore tactile haptics (`src/shell/feedback.ts`):
+  - Extended `hapticForTick` cleanly (zero `src/core/sound.ts` edits) with
+    `"celebrate"` on spatial puzzle solves (`lastSolved`) and Boss Encore
+    trophies, and `"light"` on prism mirrors, pressure plates, overworld lasso
+    grapples, and harmony flute chimes.
+- iOS tap hygiene & Vite production chunk relief (`src/ui/encore-shrine.css`,
+  `vite.config.ts`):
+  - Completed `-webkit-touch-callout: none` across all interactive Shrine
+    buttons/cards.
+  - Added `critter-content` (`77.48 kB`), `ui-overlays` (`265.59 kB`), and
+    pure audio synthesis grouping in `audio-scores` (`108.08 kB`), reducing
+    every non-vendor production JS chunk below `325 kB` with zero circular chunk
+    warnings.
+- Evidence: `tests/unit/milestone-197.test.ts` plus updated `encore-shrine`,
+  `soundtrack`, `lasso-jukebox`, and `milestone-116` e2e specs.
+- Gates: `just check` (264 unit files / 1,973 tests, all 74 sims + `encore` +
+  `e11`, 23 QA packs, purity, lint), `just build` (every non-vendor JS chunk
+  `< 350 kB`), and 25/25 targeted Chromium & WebKit e2e tests.
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

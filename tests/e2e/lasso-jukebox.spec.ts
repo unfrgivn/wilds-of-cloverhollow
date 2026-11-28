@@ -167,7 +167,7 @@ test(
     expect((await readMusic(page)).duck).toBe(false);
     await expect(nowPlaying).toHaveText("♫ Cinnamon Waltz");
 
-    // Step backward: cafe -> home -> title -> morning (wraps cleanly around all 32 themes).
+    // Step backward: cafe -> home -> title -> morning (wraps cleanly around all 33 themes).
     const prevBtn = page.locator(".journal-jukebox-prev");
     await prevBtn.click();
     await expect.poll(async () => (await readMusic(page)).track).toBe("home");

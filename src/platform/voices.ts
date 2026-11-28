@@ -860,6 +860,7 @@ const TRACK_SCALES: Record<MusicTrack, readonly number[]> = {
   market: G_MAJOR,
   fishing: G_MAJOR,
   summit: G_MAJOR,
+  encore: G_MAJOR,
   bay: D_MAJOR,
   island: D_MAJOR,
   sanctuary: D_MAJOR,

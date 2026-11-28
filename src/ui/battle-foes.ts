@@ -177,6 +177,8 @@ export function createPhase2Banner(hud: HTMLElement): {
 } {
   const banner = element("div", "battle-phase2-banner");
   banner.setAttribute("role", "status");
+  banner.setAttribute("aria-live", "polite");
+  banner.setAttribute("aria-atomic", "true");
   banner.hidden = true;
   const crest = element("div", "battle-phase2-crest");
   const line = element("div", "battle-phase2-line");

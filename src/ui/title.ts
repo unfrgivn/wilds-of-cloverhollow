@@ -143,10 +143,15 @@ export function createTitleScreen(root: HTMLElement): {
   const confirm = element("section", "title-confirm");
   confirm.hidden = true;
   confirm.setAttribute("role", "alertdialog");
+  confirm.setAttribute("aria-modal", "true");
   const card = element("div", "title-confirm-card");
   const confirmText = element("p", "title-confirm-text");
+  confirmText.id = "title-confirm-text";
   confirmText.textContent = "Start a new game? Your saved game will be replaced.";
-  confirm.setAttribute("aria-label", confirmText.textContent);
+  confirm.setAttribute("aria-labelledby", "title-confirm-text");
+  confirm.addEventListener("click", (event) => {
+    if (event.target === confirm) chooseLater("confirm-no");
+  });
   const buttons = element("div", "title-confirm-buttons");
   const yes = optionButton("title-confirm-button", "confirm-yes", "Yes, start over", null,
     chooseLater);

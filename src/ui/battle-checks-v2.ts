@@ -157,6 +157,9 @@ export function createBattleChecksV2(
   whichLayer.style.display = "none";
   const whichHead = element("div", "battle-which-one-head");
   const whichPhase = element("span", "battle-which-one-phase");
+  whichPhase.setAttribute("role", "status");
+  whichPhase.setAttribute("aria-live", "polite");
+  whichPhase.setAttribute("aria-atomic", "true");
   const whichTimer = element("div", "battle-which-one-timer");
   const whichTimeFill = element("div", "battle-which-one-time-fill");
   whichTimer.append(whichTimeFill);

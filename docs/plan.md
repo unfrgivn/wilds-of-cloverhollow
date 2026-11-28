@@ -9648,6 +9648,42 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
 - Gates: `just check` (293 unit files / 2,105 tests, all 77 sims + all sim
   scripts, 23 QA packs, purity, lint), `just build` (`index` `392.52 kB < 500 kB`),
   32/32 Chromium & WebKit e2e, and 99/99 Chromium `ui-gallery` tests.
+
+## Milestone 227: Complete Battle-Phase & Title Screen WCAG 4.1.3 / VoiceOver Live-Region Parity + Title Confirm Backdrop Cancel + `audio-cue-recipes.ts` & `minigame-parsers.ts` Modular Splits (Elevation Track E19P) **Status:** ✅ Completed (2026-11-28)
+- Complete Battle-Phase & Title Screen WCAG 4.1.3 / VoiceOver Live-Region Parity
+  (`src/ui/{battle-checks,battle-checks-v2,battle-overlays,battle-foes,title}.ts`):
+  - Adds `role="status"`, `aria-live="polite"`, `aria-atomic="true"` to
+    `.battle-grade`, `.battle-peekaboo-status`, `.battle-echo-phase`,
+    `.battle-which-one-phase`, and `.battle-phase2-banner`, and adds
+    `aria-live="polite"`, `aria-atomic="true"` to `.battle-check-hint` and
+    `.battle-turn-header` with zero CSS or layout changes.
+  - Upgrades `.title-confirm` (`role="alertdialog"`) with `aria-modal="true"` and
+    `aria-labelledby="title-confirm-text"` (targeting `#title-confirm-text`), and
+    adds dimmed backdrop click-to-cancel (`confirm-no`) matching every other modal
+    backdrop in the game without wiping the save.
+- Modular `src/platform/audio-cue-recipes.ts` extraction
+  (`src/platform/audio-recipes.ts` `690 -> 21` lines,
+  `src/platform/audio-cue-recipes.ts` `410` lines):
+  - Extracts the declarative `soundCueRecipes` table into
+    `src/platform/audio-cue-recipes.ts` (type-only import of `AudioRecipe`, zero
+    circular runtime dependency) and re-exports `soundCueRecipes` identically from
+    `src/platform/audio-recipes.ts`.
+- Modular `src/content/minigame-parsers.ts` extraction
+  (`src/content/arcade-parsers.ts` `663 -> 414` lines,
+  `src/content/minigame-parsers.ts` `261` lines):
+  - Extracts the standalone world minigame content & calibration parsers
+    (`parseCook`, `parseFish`, `parseTaco`, `parseCookCalibration`,
+    `parseFishCalibration`, `parseTacoCalibration`) into
+    `src/content/minigame-parsers.ts` and re-exports every extracted parser
+    identically from `src/content/arcade-parsers.ts`.
+- Evidence: `tests/unit/milestone-227.test.ts` and `tests/e2e/milestone-227.spec.ts`
+  (`@smoke`, Chromium & WebKit).
+- Gates: `just check` (295 unit files / 2,110 tests, all 77 recorded + 7
+  headless sims with zero hash shifts, 23 QA packs, purity, lint), `just build`
+  (largest non-vendor chunk `< 420 kB`, hook leak + runtime story + harness
+  checks green), 14/14 Chromium & WebKit (`milestone-227`, `title`), 115/115
+  Chromium (`title-gallery` 16/16 + `ui-gallery` 99/99 with 0 visual diffs), and
+  66/66 Chromium (`shows exactly its parts`).
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

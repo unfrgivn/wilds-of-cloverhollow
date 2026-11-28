@@ -1,64 +1,25 @@
 import { applyAtlasCrop } from "./atlas";
 import { element, setAttribute, setText, svgElement } from "./dom";
 import {
-  adaptHintForInputMode,
-  chainIcon,
-  clamp01,
-  echoChimeMeta,
-  GRADE_GAP,
-  gradeLabels,
-  peekabooEyesIcon,
-  peekabooLabels,
-  peekabooStarIcon,
-  PUFF_GAP,
-  PUFF_SPACING,
-  renderGrade,
-  resolveCheckPointerDirection,
-  starIcon,
-  SWOOSH_CYCLES,
-  swooshIcon,
-  tracePathData,
-  type BattleCheckView,
-  type TimingGrade,
+  adaptHintForInputMode, chainIcon, clamp01, echoChimeMeta, GRADE_GAP, gradeLabels,
+  peekabooEyesIcon, peekabooLabels, peekabooStarIcon, PUFF_GAP, PUFF_SPACING, renderGrade,
+  resolveCheckPointerDirection, starIcon, SWOOSH_CYCLES, swooshIcon, tracePathData,
+  type BattleCheckView, type TimingGrade,
 } from "./battle-checks-helpers";
 import {
-  createBattleChecksV2,
-  spinSnagButtonLabel,
-  whackKeyCap,
-  type BattleCheckV2View,
+  createBattleChecksV2, spinSnagButtonLabel, whackKeyCap, type BattleCheckV2View,
 } from "./battle-checks-v2";
 import type { HudInputMode } from "./hud-hints";
 import {
-  bindPointerHold,
-  bindPointerMoveHold,
-  isConfirmCheckKind,
-  isDirectionalCheckKind,
+  bindPointerHold, bindPointerMoveHold, isConfirmCheckKind, isDirectionalCheckKind,
 } from "./pointer-hold";
 import type { ChainLook, EchoNote, Point } from "../core";
 
 export {
-  adaptHintForInputMode,
-  chainIcon,
-  clamp01,
-  echoChimeMeta,
-  GRADE_GAP,
-  gradeLabels,
-  peekabooEyesIcon,
-  peekabooLabels,
-  peekabooStarIcon,
-  PUFF_GAP,
-  PUFF_SPACING,
-  renderGrade,
-  resolveCheckPointerDirection,
-  spinSnagButtonLabel,
-  starIcon,
-  SWOOSH_CYCLES,
-  swooshIcon,
-  tracePathData,
-  whackKeyCap,
-  type BattleCheckV2View,
-  type BattleCheckView,
-  type TimingGrade,
+  adaptHintForInputMode, chainIcon, clamp01, echoChimeMeta, GRADE_GAP, gradeLabels,
+  peekabooEyesIcon, peekabooLabels, peekabooStarIcon, PUFF_GAP, PUFF_SPACING, renderGrade,
+  resolveCheckPointerDirection, spinSnagButtonLabel, starIcon, SWOOSH_CYCLES, swooshIcon,
+  tracePathData, whackKeyCap, type BattleCheckV2View, type BattleCheckView, type TimingGrade,
 };
 
 /** The complete check overlay, kept in one fixed DOM layer above the scene. */
@@ -129,6 +90,9 @@ export function createBattleCheck(root: HTMLElement): {
   const peekabooBadge = element("div", "battle-peekaboo-badge");
   const peekabooEyes = peekabooEyesIcon();
   const peekabooStatusLabel = element("span", "battle-peekaboo-status");
+  peekabooStatusLabel.setAttribute("role", "status");
+  peekabooStatusLabel.setAttribute("aria-live", "polite");
+  peekabooStatusLabel.setAttribute("aria-atomic", "true");
   peekabooBadge.append(peekabooEyes, peekabooStatusLabel);
   const peekabooTrack = element("div", "battle-peekaboo-track");
   const peekabooFill = element("div", "battle-peekaboo-fill");
@@ -156,6 +120,9 @@ export function createBattleCheck(root: HTMLElement): {
   const echoHead = element("div", "battle-echo-head");
   const echoDots = element("div", "battle-echo-dots");
   const echoPhase = element("span", "battle-echo-phase");
+  echoPhase.setAttribute("role", "status");
+  echoPhase.setAttribute("aria-live", "polite");
+  echoPhase.setAttribute("aria-atomic", "true");
   echoHead.append(echoDots, echoPhase);
   const echoTimer = element("div", "battle-echo-timer");
   const echoTimeFill = element("div", "battle-echo-time-fill");
@@ -188,8 +155,12 @@ export function createBattleCheck(root: HTMLElement): {
     onSpinPointer: (phase, event) => spinPointerHandler(phase, event),
   });
   const hint = element("div", "battle-check-hint");
+  hint.setAttribute("aria-live", "polite");
+  hint.setAttribute("aria-atomic", "true");
   const grade = element("div", "battle-grade");
   grade.setAttribute("role", "status");
+  grade.setAttribute("aria-live", "polite");
+  grade.setAttribute("aria-atomic", "true");
   grade.hidden = true;
   root.append(
     ring,

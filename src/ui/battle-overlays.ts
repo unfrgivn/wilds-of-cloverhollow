@@ -221,6 +221,8 @@ export function createCommandMenu(root: HTMLElement): {
   menu.setAttribute("aria-label", "Battle commands");
   menu.hidden = true;
   const turnHeader = element("div", "battle-turn-header");
+  turnHeader.setAttribute("aria-live", "polite");
+  turnHeader.setAttribute("aria-atomic", "true");
   turnHeader.hidden = true;
   menu.append(turnHeader);
   const tray = element("div", "battle-treat-tray");

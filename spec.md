@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 226)
+Last updated: 2026-11-28 (Milestone 227)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -756,14 +756,18 @@ ios/            Capacitor iOS project (from Milestone 4).
   7-note celebratory RPG arpeggio (C5→D5→E5→G5→A5→C6→E6 over a C4 bass root +
   C7 shimmer, ~0.55 s); and `AudioController.playEffect` adds `"camera-shutter"`
   (dual-transient mechanical click + soft lowpass lens whirr, ~0.12 s). Pure
-  static cue recipe tables (`soundCueRecipes`, `soundCueRecipe`, `AudioSegment`,
-  `AudioRecipe`) live in `src/platform/audio-recipes.ts` (Milestone 114), while
-  the 22 shell companion, UI & overworld micro-delight foley recipes
-  (`CompanionAudioEffect`, `effectRecipes`, `effectRecipe`) live in modular
-  `src/platform/audio-effects.ts` (Milestones 172, 180 & 184, type-only import
-  of `AudioRecipe` from `./audio-recipes`, zero circular runtime dependency) and
-  are re-exported identically from `src/platform/audio-recipes.ts` and
-  `src/platform/audio.ts` for backwards-compatible unit verification.
+  static cue recipe tables (`soundCueRecipes`) live in modular
+  `src/platform/audio-cue-recipes.ts` (Milestone 227 / Track E19P, type-only
+  import of `AudioRecipe` from `./audio-recipes`, zero circular runtime
+  dependency), while `AudioSegment`, `AudioRecipe`, and `soundCueRecipe` live in
+  `src/platform/audio-recipes.ts` (Milestone 114, re-exporting `soundCueRecipes`
+  identically), and the 22 shell companion, UI & overworld micro-delight foley
+  recipes (`CompanionAudioEffect`, `effectRecipes`, `effectRecipe`) live in
+  modular `src/platform/audio-effects.ts` (Milestones 172, 180 & 184, type-only
+  import of `AudioRecipe` from `./audio-recipes`, zero circular runtime
+  dependency) and are re-exported identically from
+  `src/platform/audio-recipes.ts` and `src/platform/audio.ts` for
+  backwards-compatible unit verification.
   Milestone 188 (Elevation Track E16) adds five gentle (`<= 0.08` gain, zero
   square waves, smooth attacks) tactile world foley recipes: `"beach-ball-boop"`
   (hollow rubber pop), `"pebble-skip"` (3-skip watery plink-plink-plonk + soft
@@ -1181,8 +1185,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   previous residency eviction in `AreaAssetManager` (`src/render/view-loader.ts`,
   Milestone 190), reusable
   primitive/geometry JSON validators in
-  `src/content/parsers.ts`, Milestone 97, arcade/minigame content &
-  calibration parsers in `src/content/arcade-parsers.ts`, Milestone 110, and
+  `src/content/parsers.ts`, Milestone 97, arcade content & calibration parsers
+  in `src/content/arcade-parsers.ts` (Milestone 110) and standalone world
+  minigame content & calibration parsers (`parseCook`, `parseFish`, `parseTaco`,
+  `parseCookCalibration`, `parseFishCalibration`, `parseTacoCalibration`) in
+  `src/content/minigame-parsers.ts` (re-exported identically through
+  `src/content/arcade-parsers.ts`, Milestone 227 / Track E19P), and
   battle/critter/feeling parsers & validators in
   `src/content/battle-parsers.ts` (Milestone 121), party/sticker/level/treat/
   encore/gift-basket parsers & validators in `src/content/progression-parsers.ts`
@@ -3368,7 +3376,11 @@ trunks keep its two exits.
   has, then New game), and `confirm` (choosing New game over a save asks
   "Start a new game? Your saved game will be replaced." with "Yes, start over"
   and "No, go back", No selected by default, on a stitched parchment modal card
-  over a soft dim, with matching `::before` selection pip).
+  over a soft dim, with matching `::before` selection pip). The `.title-confirm`
+  modal declares `role="alertdialog"`, `aria-modal="true"`, and
+  `aria-labelledby="title-confirm-text"` (targeting `.title-confirm-text`), and
+  clicking the dimmed backdrop outside `.title-confirm-card` cancels cleanly via
+  `confirm-no` without wiping the save (Milestone 227 / Track E19P).
 - `data-title="open"` on the root hides the touch controls; the option and
   confirm stickers take taps directly, and keys move the selection.
 
@@ -4428,6 +4440,17 @@ trunks keep its two exits.
   `radius * (1 - progress)` and the dashed target's is `radius * (1 - target)`.
   The grade sticker (GREAT! green, GOOD! teal, MISS cream) sits centred 6 px
   above the target circle.
+- **Battle-Phase WCAG 4.1.3 / VoiceOver Live-Region Parity
+  (`src/ui/{battle-checks,battle-checks-v2,battle-overlays,battle-foes}.ts`,
+  Milestone 227 / Track E19P):** Dynamic battle check and phase callouts declare
+  polite atomic live regions (`aria-live="polite"`, `aria-atomic="true"`) with
+  zero CSS or layout changes: `.battle-grade`, `.battle-peekaboo-status`,
+  `.battle-echo-phase`, `.battle-which-one-phase`, and `.battle-phase2-banner`
+  pair `role="status"` with `aria-live="polite"` + `aria-atomic="true"`, while
+  `.battle-check-hint` and `.battle-turn-header` declare `aria-live="polite"` +
+  `aria-atomic="true"` so timing grades, check prompts, phase transitions,
+  boss Phase-2 callouts, and per-member turn headers announce cleanly to desktop
+  screen readers and iOS VoiceOver.
 - Charge meter (Milestone 40): a cream sticker capsule with a warm-brown ink
   outline; the fill rises from the bottom as Sue winds up, over a teal good
   band and a green great band (the GOOD!/GREAT! colours) with a tick at the

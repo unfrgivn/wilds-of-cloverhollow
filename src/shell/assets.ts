@@ -246,6 +246,7 @@ export type ShellAssets = {
     isStillOpen: () => boolean,
   ) => void;
   warmBattlePortraits: (snapshot: State) => Promise<void>;
+  warmEncoreArt: (bossIds: readonly string[]) => Promise<void>;
   renderOverlays: (
     arcadeState: ArcadeView | null,
     record?: ArcadeRecordBadge | null,
@@ -618,6 +619,15 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
     );
   };
 
+  const warmEncoreArt = async (bossIds: readonly string[]): Promise<void> => {
+    const atlases = new Set<string>();
+    for (const id of bossIds) {
+      const critter = world.critters[id];
+      if (critter !== undefined) atlases.add(critter.atlas);
+    }
+    await Promise.all([...atlases].map((atlas) => decodeAtlasImage(atlas)));
+  };
+
   const renderOverlays = (
     arcadeState: ArcadeView | null,
     record: ArcadeRecordBadge | null = null,
@@ -706,6 +716,7 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
     warmJournalAssets,
     warmJournalOnRender,
     warmBattlePortraits,
+    warmEncoreArt,
     renderOverlays,
     overlayInfo,
   };

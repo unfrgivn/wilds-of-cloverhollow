@@ -1,3 +1,4 @@
+import { isEncoreModifierId, ENCORE_MODIFIER_IDS } from "../core/encore";
 import { runInk, storyHasKnot } from "../core/ink";
 import {
   array,
@@ -24,6 +25,9 @@ import type {
   BattleContent,
   Critter,
   Den,
+  EncoreBossSpec,
+  EncoreContent,
+  EncoreModifierSpec,
   FeelingId,
   FriendCommand,
   Grade,
@@ -715,4 +719,66 @@ export function parseTreats(
       favouriteLine: nonEmptyString(item, "favouriteLine", file, `${label}.favouriteLine`),
     };
   });
+}
+
+export function parseEncoreContent(
+  value: unknown,
+  file: string,
+  critters: Record<string, Critter>,
+): EncoreContent {
+  field(record(value), file, "object");
+  const baseCoins = integerIn(value, "baseCoins", 0, file, "baseCoins");
+  const coinsPerStar = integerIn(value, "coinsPerStar", 0, file, "coinsPerStar");
+  const pureHeartFeelingBonus = integerIn(
+    value, "pureHeartFeelingBonus", 1, file, "pureHeartFeelingBonus",
+  );
+  const rawModifiers = value.modifiers;
+  field(
+    array(rawModifiers) && rawModifiers.length === ENCORE_MODIFIER_IDS.length,
+    file,
+    "modifiers",
+  );
+  const seenMod = new Set<string>();
+  const modifiers: EncoreModifierSpec[] = rawModifiers.map((item, index) => {
+    const label = `modifiers[${index}]`;
+    field(record(item), file, label);
+    const id = item.id;
+    field(isEncoreModifierId(id), file, `${label}.id`);
+    field(!seenMod.has(id), file, `${label}.id (duplicate ${id})`);
+    seenMod.add(id);
+    return {
+      id,
+      name: nonEmptyString(item, "name", file, `${label}.name`),
+      shortLabel: nonEmptyString(item, "shortLabel", file, `${label}.shortLabel`),
+      description: nonEmptyString(item, "description", file, `${label}.description`),
+    };
+  });
+  const rawBosses = value.bosses;
+  field(array(rawBosses) && rawBosses.length > 0, file, "bosses");
+  const seenBoss = new Set<string>();
+  const seenTrophy = new Set<string>();
+  const bosses: EncoreBossSpec[] = rawBosses.map((item, index) => {
+    const label = `bosses[${index}]`;
+    field(record(item), file, label);
+    const critterId = nonEmptyString(item, "critterId", file, `${label}.critterId`);
+    field(critters[critterId] !== undefined, file, `${label}.critterId (unknown ${critterId})`);
+    field(!seenBoss.has(critterId), file, `${label}.critterId (duplicate ${critterId})`);
+    seenBoss.add(critterId);
+    const trophyId = nonEmptyString(item, "trophyId", file, `${label}.trophyId`);
+    field(/^[a-z][a-z0-9-]*$/.test(trophyId), file, `${label}.trophyId`);
+    field(!seenTrophy.has(trophyId), file, `${label}.trophyId (duplicate ${trophyId})`);
+    seenTrophy.add(trophyId);
+    return {
+      critterId,
+      title: nonEmptyString(item, "title", file, `${label}.title`),
+      calmTitle: nonEmptyString(item, "calmTitle", file, `${label}.calmTitle`),
+      region: nonEmptyString(item, "region", file, `${label}.region`),
+      blurb: nonEmptyString(item, "blurb", file, `${label}.blurb`),
+      encoreIntro: nonEmptyString(item, "encoreIntro", file, `${label}.encoreIntro`),
+      trophyId,
+      trophyName: nonEmptyString(item, "trophyName", file, `${label}.trophyName`),
+      isFinale: boolean(item, "isFinale", file, `${label}.isFinale`),
+    };
+  });
+  return { baseCoins, coinsPerStar, pureHeartFeelingBonus, modifiers, bosses };
 }

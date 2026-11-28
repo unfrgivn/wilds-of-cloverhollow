@@ -1,6 +1,7 @@
 {
   "atlases": [
-    "assets/areas/sanctuary/props-0.json"
+    "assets/areas/sanctuary/props-0.json",
+    "assets/props/encore-shrine/encore-shrine.json"
   ],
   "props": {
     "bulletin-board": {
@@ -589,6 +590,64 @@
               "-59 -9",
               "-55 -13",
               "-51 -32"
+            ]
+          }
+        }
+      }
+    },
+    "dream-shrine": {
+      "canopy": false,
+      "painted": false,
+      "home": [
+        770,
+        390
+      ],
+      "states": {
+        "default": {
+          "frame": "dream-shrine",
+          "shadow": null,
+          "footprint": [
+            [
+              [
+                -26,
+                -20
+              ],
+              [
+                26,
+                -20
+              ],
+              [
+                28,
+                2
+              ],
+              [
+                -28,
+                2
+              ]
+            ]
+          ],
+          "silhouette": {
+            "left": -45,
+            "step": 5,
+            "columns": [
+              "",
+              "",
+              "-92 -89",
+              "-94 -82",
+              "-95 -80 -64 -55 -15 -5",
+              "-99 -52 -21 -2",
+              "-103 -43 -41 0",
+              "-113 -109 -105 2",
+              "-116 2",
+              "-116 2",
+              "-112 -107 -106 2",
+              "-103 1",
+              "-100 -52 -22 -1",
+              "-95 -80 -65 -55 -20 -2",
+              "-93 -82 -19 -13",
+              "-93 -88",
+              "",
+              ""
             ]
           }
         }

@@ -1,3 +1,4 @@
+import { hasEncoreModifier } from "./encore";
 import { battleParty } from "./party";
 import type { Critter, FeelingId, State, WindUp, World } from "./types";
 
@@ -20,7 +21,9 @@ export function feelingsOn(world: World, state: State): boolean {
 /** Whether Fae has the command that answers a feeling now (and a snack to give). */
 function answerable(world: World, state: State, answer: string): boolean {
   if (answer === "soothe") return true;
-  if (answer === "snack") return state.snacks > 0;
+  if (answer === "snack") {
+    return state.snacks > 0 && !hasEncoreModifier(state.battle, "pure-heart");
+  }
   return battleParty(world, state.party)
     .some((member) => world.party[member.id]?.command?.id === answer);
 }

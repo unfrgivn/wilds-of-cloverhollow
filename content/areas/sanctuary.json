@@ -403,6 +403,15 @@
         "y": 352
       },
       "prompt": "Look"
+    },
+    {
+      "id": "dream-shrine",
+      "knot": "dream_shrine",
+      "point": {
+        "x": 770,
+        "y": 395
+      },
+      "prompt": "Look"
     }
   ],
   "critters": [],
@@ -1094,6 +1103,12 @@
       "prop": "picnic-basket",
       "x": 1086,
       "y": 914
+    },
+    {
+      "id": "dream-shrine",
+      "prop": "dream-shrine",
+      "x": 770,
+      "y": 390
     }
   ]
 }

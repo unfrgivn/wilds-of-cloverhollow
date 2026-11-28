@@ -215,7 +215,9 @@ const TOWN_SPEAKERS = new Set([
   "mrs. marigold",
   "marigold",
 ]);
-const FAIRY_SPEAKERS = new Set(["lavender", "mint", "sky", "peach"]);
+const FAIRY_SPEAKERS = new Set([
+  "lavender", "mint", "sky", "peach", "dream memory shrine",
+]);
 const MYSTERY_SPEAKERS = new Set([
   "hooded kid",
   "fizzy kid",
@@ -430,6 +432,13 @@ export function speakerPortraitSource(
   }
   if (key === "fae") {
     return { atlas: "assets/characters/fae/fae.json", frame: "down_idle_01", cropMode: "kid" };
+  }
+  if (key === "dream memory shrine") {
+    return {
+      atlas: "assets/props/encore-shrine/encore-shrine.json",
+      frame: "star-trophy",
+      cropMode: "bust",
+    };
   }
   if (key === "maddie") {
     return partySource(world, "maddie", "down_idle_01", "critter");

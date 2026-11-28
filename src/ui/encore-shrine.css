@@ -1,0 +1,845 @@
+.sticker-ui.encore-shrine[hidden],
+.sticker-ui.encore-battle-banner[hidden] {
+  display: none;
+}
+
+:root[data-encore-shrine="open"] .area-banner,
+:root[data-encore-shrine="open"] .hud-hints,
+:root[data-encore-shrine="open"] .touch-controls,
+:root[data-encore-shrine="open"] .sticker-prompt,
+:root[data-encore-shrine="open"] .notice-marks,
+:root[data-encore-shrine="open"] .save-toast {
+  display: none;
+}
+
+.sticker-ui.encore-shrine {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: calc(16px + var(--safe-top)) calc(20px + var(--safe-right))
+    calc(16px + var(--safe-bottom)) calc(20px + var(--safe-left));
+  background: rgb(56 41 31 / 0.48);
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.encore-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(920px, 100%);
+  max-height: 100%;
+  box-sizing: border-box;
+  padding: 14px 16px 14px;
+  border: 6px solid var(--sticker-rim);
+  border-radius: 24px 26px 22px 25px;
+  outline: 2.5px solid var(--sticker-ink);
+  background: linear-gradient(180deg, #fcf7ea 0%, #f6ebd1 100%);
+  box-shadow:
+    0 12px 0 #47321f1c,
+    0 18px 36px #47321f2b,
+    inset 0 0 0 2px var(--sticker-border);
+  color: var(--sticker-ink);
+  font-family: var(--sticker-font);
+  overflow: hidden;
+}
+
+.encore-card::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1.5px dashed var(--sticker-ink);
+  border-radius: 17px 19px 15px 18px;
+  opacity: 0.22;
+  pointer-events: none;
+}
+
+.encore-head {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.encore-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.encore-trophy-icon {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 0 #47321f26);
+}
+
+.encore-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  line-height: 1.1;
+  color: var(--sticker-ink);
+}
+
+.encore-stats {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.encore-stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fffdf4 0%, #f8e6b4 100%);
+  box-shadow: inset 0 0 0 1.5px #fffdf7;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.encore-stat-pill.is-stars {
+  background: linear-gradient(180deg, #fffdf6 0%, #eae3fa 100%);
+}
+
+.encore-close {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 3px solid var(--sticker-rim);
+  border-radius: 999px;
+  outline: 2px solid var(--sticker-ink);
+  background: linear-gradient(180deg, #fffdf6 0%, #f3e4c3 100%);
+  box-shadow: 0 2px 0 #47321f29;
+  color: var(--sticker-ink);
+  font: 900 22px/1 var(--sticker-font);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 110ms ease-out;
+}
+
+.encore-close:hover {
+  transform: translateY(-1px);
+}
+
+.encore-close:active {
+  transform: translateY(1px);
+}
+
+.encore-body {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.18fr) minmax(270px, 0.92fr);
+  gap: 12px;
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+
+.encore-roster-pane {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 2px 4px 4px 2px;
+}
+
+.encore-shelf-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 11px;
+  border: 2px dashed var(--sticker-ink);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fffdf6 0%, #f5e8c8 100%);
+  font-size: 11.5px;
+  font-weight: 900;
+  color: #5b4128;
+}
+
+.encore-shelf-pips {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.encore-shelf-pip {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1.5px dashed #8c6e4e;
+  background: #fbf3de;
+}
+
+.encore-shelf-pip.is-earned {
+  border-style: solid;
+  border-color: #c78b1d;
+  background: #fff3b0;
+}
+
+.encore-shelf-pip img {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+
+.encore-roster-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.encore-boss-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  min-width: 44px;
+  min-height: 112px;
+  padding: 8px 6px 7px;
+  box-sizing: border-box;
+  border: 2.5px solid var(--sticker-ink);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fffef8 0%, #f8eed4 100%);
+  box-shadow:
+    inset 0 0 0 2px #fffdf8,
+    0 3px 0 #47321f24;
+  color: var(--sticker-ink);
+  font-family: var(--sticker-font);
+  text-align: center;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 110ms ease-out, border-color 110ms ease-out, background 110ms ease-out;
+}
+
+.encore-boss-card:hover {
+  transform: translateY(-1px);
+}
+
+.encore-boss-card.is-selected {
+  border-color: #6b4b28;
+  background: linear-gradient(180deg, #fffbe4 0%, #f9e49e 100%);
+  box-shadow:
+    inset 0 0 0 2px #fffdf7,
+    0 0 0 2.5px #d99d29,
+    0 3px 0 #47321f2e;
+}
+
+.encore-boss-card.is-locked {
+  background: linear-gradient(180deg, #f3ebda 0%, #e8dec8 100%);
+  border-style: dashed;
+  color: #775d45;
+}
+
+.encore-boss-card.is-finale:not(.is-locked) {
+  background: linear-gradient(180deg, #faf4ff 0%, #ebe0fa 100%);
+}
+
+.encore-boss-card.is-finale.is-selected {
+  background: linear-gradient(180deg, #fff9df 0%, #eed9fb 100%);
+}
+
+.encore-boss-art {
+  width: 56px;
+  height: 56px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.encore-boss-sprite {
+  max-width: 100%;
+  max-height: 100%;
+  width: 54px;
+  height: 54px;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 2px 0 #47321f22);
+}
+
+.encore-boss-lock {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: 2px dashed #8a7054;
+  border-radius: 999px;
+  background: #f9f3e4;
+  font-size: 20px;
+  font-weight: 900;
+  color: #8a7054;
+}
+
+.encore-boss-name {
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.encore-boss-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.encore-star-svg {
+  width: 15px;
+  height: 15px;
+  display: block;
+}
+
+.encore-boss-trophy-dot {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 0 #47321f38);
+}
+
+.encore-detail-pane {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 10px 12px;
+  box-sizing: border-box;
+  border: 2.5px solid var(--sticker-ink);
+  border-radius: 18px;
+  background: linear-gradient(180deg, #fffdf6 0%, #f7edd4 100%);
+  box-shadow: inset 0 0 0 2px #fffdf8;
+}
+
+.encore-spotlight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.encore-spotlight-art {
+  width: 68px;
+  height: 68px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 16px;
+  background: radial-gradient(circle at 50% 42%, #fffef8 0%, #f3e5c3 100%);
+}
+
+.encore-spotlight-sprite {
+  width: 60px;
+  height: 60px;
+  background-repeat: no-repeat;
+}
+
+.encore-spotlight-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.encore-spotlight-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.encore-spotlight-region {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #7c5e42;
+  line-height: 1.2;
+}
+
+.encore-spotlight-blurb {
+  margin: 2px 0 0;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #5a422b;
+}
+
+.encore-trophy-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 9px;
+  border: 2px dashed var(--sticker-ink);
+  border-radius: 12px;
+  background: #fbf4e1;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.encore-trophy-label {
+  text-wrap: balance;
+}
+
+.encore-trophy-strip.is-earned {
+  border-style: solid;
+  border-color: #c78b1d;
+  background: linear-gradient(180deg, #fff9d6 0%, #f8e196 100%);
+}
+
+.encore-trophy-mini {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+
+.encore-modifiers {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.encore-mod-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.encore-section-label {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #7a5c3f;
+}
+
+.encore-mod-pill {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 10px;
+  box-sizing: border-box;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 14px;
+  background: #fffdf6;
+  box-shadow: 0 2px 0 #47321f1f;
+  color: var(--sticker-ink);
+  font-family: var(--sticker-font);
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 110ms ease-out, background 110ms ease-out;
+}
+
+.encore-mod-pill.is-active {
+  background: linear-gradient(180deg, #fff6c9 0%, #f7da78 100%);
+  box-shadow:
+    inset 0 0 0 1.5px #fffdf5,
+    0 2px 0 #47321f2b;
+}
+
+.encore-mod-check {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: #fbf3de;
+}
+
+.encore-mod-pill.is-active .encore-mod-check {
+  background: #5c9148;
+  color: #fffdf7;
+}
+
+.encore-mod-pill.is-active .encore-star-svg path {
+  fill: #fff7bf;
+  stroke: #3c2918;
+}
+
+.encore-mod-copy {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.encore-mod-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.encore-mod-name {
+  font-size: 12.5px;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.encore-mod-tag {
+  font-size: 10.5px;
+  font-weight: 900;
+  color: #6b5138;
+  white-space: nowrap;
+}
+
+.encore-mod-desc {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.22;
+  color: #5c432c;
+}
+
+.encore-launch-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.encore-reward-preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 900;
+  color: #5b4128;
+}
+
+.encore-launch {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  box-sizing: border-box;
+  border: 2.5px solid var(--sticker-ink);
+  border-radius: 15px;
+  background: linear-gradient(180deg, #bce6a0 0%, #86c169 100%);
+  box-shadow:
+    inset 0 0 0 2px #eefbe4,
+    0 3px 0 #47321f33;
+  color: var(--sticker-ink);
+  font: 900 15px/1.15 var(--sticker-font);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 110ms ease-out;
+}
+
+.encore-launch:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.encore-launch:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.encore-launch:disabled {
+  background: linear-gradient(180deg, #e7decb 0%, #d8ccb4 100%);
+  box-shadow: none;
+  color: #7b634b;
+  cursor: not-allowed;
+}
+
+.encore-boss-card:focus-visible,
+.encore-mod-pill:focus-visible,
+.encore-launch:focus-visible,
+.encore-close:focus-visible {
+  outline: 3px solid #6b9e56;
+  outline-offset: 2px;
+}
+
+.encore-foot-hint {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-size: 11px;
+  font-weight: 800;
+  color: #765a3e;
+  text-align: center;
+}
+
+.sticker-ui.encore-battle-banner {
+  position: fixed;
+  top: calc(30px + var(--safe-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 36;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border: 3px solid var(--sticker-rim);
+  border-radius: 999px;
+  outline: 2px solid var(--sticker-ink);
+  background: linear-gradient(180deg, #fff9de 0%, #f6df8d 100%);
+  box-shadow: 0 3px 0 #47321f26;
+  color: var(--sticker-ink);
+  font: 900 11.5px/1.2 var(--sticker-font);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+@media (max-height: 520px), (max-width: 900px) {
+  .sticker-ui.encore-shrine {
+    padding: calc(6px + var(--safe-top)) calc(8px + var(--safe-right))
+      calc(6px + var(--safe-bottom)) calc(8px + var(--safe-left));
+  }
+
+  .encore-card {
+    gap: 5px;
+    padding: 7px 10px;
+    border-width: 4px;
+    border-radius: 18px;
+  }
+
+  .encore-trophy-icon {
+    width: 26px;
+    height: 26px;
+  }
+
+  .encore-title {
+    font-size: 14.5px;
+  }
+
+  .encore-stat-pill {
+    font-size: 10.5px;
+    padding: 2px 7px;
+  }
+
+  .encore-body {
+    grid-template-columns: minmax(0, 1.04fr) minmax(290px, 0.96fr);
+    gap: 8px;
+  }
+
+  .encore-roster-grid {
+    gap: 5px;
+  }
+
+  .encore-shelf-bar {
+    padding: 4px 8px;
+    font-size: 10px;
+    border-radius: 10px;
+  }
+
+  .encore-shelf-pip {
+    width: 14px;
+    height: 14px;
+  }
+
+  .encore-shelf-pip img {
+    width: 11px;
+    height: 11px;
+  }
+
+  .encore-boss-card {
+    min-height: 70px;
+    padding: 4px 4px;
+    border-radius: 11px;
+    gap: 2px;
+  }
+
+  .encore-boss-art {
+    width: 34px;
+    height: 34px;
+  }
+
+  .encore-boss-sprite {
+    width: 32px;
+    height: 32px;
+  }
+
+  .encore-boss-lock {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+  }
+
+  .encore-boss-name {
+    font-size: 10px;
+  }
+
+  .encore-star-svg {
+    width: 11px;
+    height: 11px;
+  }
+
+  .encore-detail-pane {
+    padding: 7px 9px;
+    gap: 5px;
+    border-radius: 14px;
+    overflow-y: hidden;
+  }
+
+  .encore-spotlight {
+    gap: 8px;
+  }
+
+  .encore-spotlight-art {
+    width: 44px;
+    height: 44px;
+    border-radius: 11px;
+  }
+
+  .encore-spotlight-sprite {
+    width: 40px;
+    height: 40px;
+  }
+
+  .encore-spotlight-title {
+    font-size: 13px;
+  }
+
+  .encore-spotlight-region {
+    font-size: 10.5px;
+  }
+
+  .encore-spotlight-blurb {
+    font-size: 10.5px;
+    line-height: 1.2;
+  }
+
+  .encore-trophy-strip {
+    padding: 4px 7px;
+    gap: 6px;
+    font-size: 10.5px;
+  }
+
+  .encore-trophy-mini {
+    width: 18px;
+    height: 18px;
+  }
+
+  .encore-modifiers {
+    gap: 4px;
+  }
+
+  .encore-section-label {
+    font-size: 10px;
+  }
+
+  .encore-mod-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 5px;
+  }
+
+  .encore-mod-pill {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-height: 48px;
+    padding: 4px 5px;
+    border-radius: 11px;
+    text-align: center;
+  }
+
+  .encore-mod-check {
+    width: 18px;
+    height: 18px;
+  }
+
+  .encore-mod-copy {
+    align-items: center;
+  }
+
+  .encore-mod-head {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .encore-mod-name {
+    font-size: 10px;
+    line-height: 1.1;
+  }
+
+  .encore-mod-tag {
+    font-size: 9.5px;
+  }
+
+  .encore-mod-desc {
+    display: none;
+  }
+
+  .encore-launch-box {
+    flex: 0 0 auto;
+    gap: 4px;
+  }
+
+  .encore-reward-preview {
+    font-size: 11px;
+  }
+
+  .encore-launch {
+    min-height: 44px;
+    padding: 7px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+  }
+
+  .encore-foot-hint {
+    display: none;
+  }
+}
+
+:root[data-reduced-motion="on"] .encore-boss-card,
+:root[data-reduced-motion="on"] .encore-mod-pill,
+:root[data-reduced-motion="on"] .encore-launch,
+:root[data-reduced-motion="on"] .encore-close {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .encore-boss-card,
+  .encore-mod-pill,
+  .encore-launch,
+  .encore-close {
+    transition: none;
+  }
+}

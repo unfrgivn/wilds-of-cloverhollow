@@ -175,6 +175,7 @@ import moonOwlData from "../../content/critters/moon-owl.json";
 import tacoChefData from "../../content/critters/taco-chef.json";
 import charactersData from "../../content/characters.json";
 import battleData from "../../content/battle.json";
+import encoreData from "../../content/encore.json";
 import levelsData from "../../content/levels.json";
 import treatsData from "../../content/treats.json";
 import npcProfilesData from "../../content/npc-profiles.json";
@@ -198,8 +199,8 @@ import {
 } from "./area-parsers";
 import { parseArcade } from "./arcade-parsers";
 import {
-  critterErrors, feelingErrors, parseBattleContent, parseCritter, parseLevels, parsePartyMember,
-  parseStickers, parseTreats, partyErrors, partyJoinErrors, talkErrors,
+  critterErrors, feelingErrors, parseBattleContent, parseCritter, parseEncoreContent, parseLevels,
+  parsePartyMember, parseStickers, parseTreats, partyErrors, partyJoinErrors, talkErrors,
 } from "./battle-parsers";
 import { npcScheduleErrors, parseNpcProfiles } from "./npc-parsers";
 import { parseCutscene } from "./cutscene-parsers";
@@ -217,8 +218,8 @@ export {
   parseLands, parseMapCentres, parseTunables,
 } from "./area-parsers";
 export {
-  critterErrors, feelingErrors, parseBattleContent, parseCritter, parseLevels, parsePartyMember,
-  parseStickers, parseTreats, partyErrors, partyJoinErrors, talkErrors,
+  critterErrors, feelingErrors, parseBattleContent, parseCritter, parseEncoreContent, parseLevels,
+  parsePartyMember, parseStickers, parseTreats, partyErrors, partyJoinErrors, talkErrors,
 } from "./battle-parsers";
 export { npcScheduleErrors, parseNpcProfiles, parseNpcStroll } from "./npc-parsers";
 export { parseCutscene, type CutsceneValidationContext } from "./cutscene-parsers";
@@ -406,14 +407,10 @@ export function loadContent(options?: {
   }
   const storyVariable = createStoryReader(story);
   const initialInk = createInkState(story, 1);
-  const joinProblems = partyJoinErrors(party, (name) =>
-    storyVariable(initialInk, name),
-  );
-  if (joinProblems.length > 0)
-    throw new Error(`content/party: ${joinProblems.join("; ")}`);
+  const joinProblems = partyJoinErrors(party, (name) => storyVariable(initialInk, name));
+  if (joinProblems.length > 0) throw new Error(`content/party: ${joinProblems.join("; ")}`);
   const partyProblems = [...partyErrors(party, critters), ...feelingErrors(battle, party)];
-  if (partyProblems.length > 0)
-    throw new Error(`content/party: ${partyProblems.join("; ")}`);
+  if (partyProblems.length > 0) throw new Error(`content/party: ${partyProblems.join("; ")}`);
   const loadFixture = (data: unknown, name: string): Fixture =>
     parseFixture(data, `content/fixtures/${name}.json`);
   const fixtures = {
@@ -593,6 +590,7 @@ export function loadContent(options?: {
       partyBanter: parsedProfiles.partyBanter ?? [],
       toolEvents: parsedProfiles.toolEvents ?? [],
       cutscenes,
+      encore: parseEncoreContent(encoreData, "content/encore.json", critters),
     },
     fixtures,
   };

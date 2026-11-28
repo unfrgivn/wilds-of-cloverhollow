@@ -16,6 +16,7 @@ export type OverlayGateContext = {
   qaConsoleOpen: boolean;
   qaBlocked: boolean;
   photoMode: boolean;
+  shrineOpen?: boolean;
   loading?: boolean;
 };
 
@@ -69,6 +70,15 @@ export type ShortcutQaControl = {
   openConsole: (options?: { allowFromMenu?: boolean }) => void;
 };
 
+export type ShortcutEncoreControl = {
+  isOpen: () => boolean;
+  close: () => void;
+  stepNav: (dx: number, dy: number) => void;
+  cycleModifier: (delta: -1 | 1) => void;
+  activateLaunch: () => void;
+  handleKeydown: (event: ShortcutKeyEvent) => boolean;
+};
+
 export type InputShortcutsDeps = {
   getContext: () => OverlayGateContext;
   getBattlePeekOpen: () => boolean;
@@ -76,6 +86,7 @@ export type InputShortcutsDeps = {
   setPhotoMode: (open: boolean) => void;
   snapPostcard: () => void;
   journal: ShortcutJournalControl;
+  encoreShrine?: ShortcutEncoreControl;
   gamepad: ShortcutGamepadSource;
   clearKeyboardTaps: () => void;
   swallow: (button: "confirm" | "cancel" | "menu") => void;
@@ -112,6 +123,7 @@ export function canPhotoMode(ctx: Omit<OverlayGateContext, "photoMode">): boolea
     !ctx.qaMenuOpen &&
     !ctx.qaConsoleOpen &&
     !ctx.qaBlocked &&
+    ctx.shrineOpen !== true &&
     ctx.state.dialogue === null &&
     ctx.state.battle === null &&
     ctx.state.arcade === null &&
@@ -128,6 +140,7 @@ export function canPhotoFromJournal(ctx: Omit<OverlayGateContext, "photoMode">):
     !ctx.qaMenuOpen &&
     !ctx.qaConsoleOpen &&
     !ctx.qaBlocked &&
+    ctx.shrineOpen !== true &&
     ctx.loading !== true &&
     ctx.state.dialogue === null &&
     ctx.state.battle === null &&
@@ -145,6 +158,7 @@ export function canBattlePeek(ctx: Omit<OverlayGateContext, "photoMode">): boole
     !ctx.qaMenuOpen &&
     !ctx.qaConsoleOpen &&
     !ctx.qaBlocked &&
+    ctx.shrineOpen !== true &&
     !ctx.state.journalOpen &&
     ctx.state.battle !== null &&
     ctx.state.battle.phase === "command" &&
@@ -160,6 +174,7 @@ export function canOverworldSteer(ctx: OverlayGateContext): boolean {
     !ctx.qaConsoleOpen &&
     !ctx.qaBlocked &&
     !ctx.photoMode &&
+    ctx.shrineOpen !== true &&
     ctx.state.dialogue === null &&
     ctx.state.battle === null &&
     ctx.state.arcade === null &&
@@ -172,13 +187,17 @@ export function canOverworldSteer(ctx: OverlayGateContext): boolean {
 
 /** Returns true when journal keyboard/gamepad navigation and page-flip shortcuts are active. */
 export function isJournalShortcutActive(
-  ctx: Pick<OverlayGateContext, "state" | "titleMode" | "qaMenuOpen" | "qaConsoleOpen">,
+  ctx: Pick<
+    OverlayGateContext,
+    "state" | "titleMode" | "qaMenuOpen" | "qaConsoleOpen" | "shrineOpen"
+  >,
 ): boolean {
   return (
     ctx.state.journalOpen &&
     ctx.titleMode === null &&
     !ctx.qaMenuOpen &&
-    !ctx.qaConsoleOpen
+    !ctx.qaConsoleOpen &&
+    ctx.shrineOpen !== true
   );
 }
 
@@ -192,6 +211,7 @@ export function isOverworldFree(
     !ctx.qaMenuOpen &&
     !ctx.qaConsoleOpen &&
     !ctx.qaBlocked &&
+    ctx.shrineOpen !== true &&
     ctx.state.dialogue === null &&
     ctx.state.battle === null &&
     ctx.state.arcade === null &&
@@ -204,7 +224,10 @@ export function isOverworldFree(
 
 /** Returns true when area-arrival banners may be displayed over the viewport. */
 export function isBannerEligible(
-  ctx: Pick<OverlayGateContext, "titleMode" | "qaMenuOpen" | "qaConsoleOpen" | "qaBlocked">,
+  ctx: Pick<
+    OverlayGateContext,
+    "titleMode" | "qaMenuOpen" | "qaConsoleOpen" | "qaBlocked" | "shrineOpen"
+  >,
   hasLevelUpNotice: boolean,
 ): boolean {
   return (
@@ -212,6 +235,7 @@ export function isBannerEligible(
     !ctx.qaMenuOpen &&
     !ctx.qaConsoleOpen &&
     !ctx.qaBlocked &&
+    ctx.shrineOpen !== true &&
     !hasLevelUpNotice
   );
 }
@@ -262,6 +286,13 @@ export function createInputShortcuts(
       deps.invalidate();
     }
     const ctx = deps.getContext();
+    if (deps.encoreShrine?.isOpen() === true) {
+      if (!event.repeat && deps.encoreShrine.handleKeydown(event)) {
+        deps.clearKeyboardTaps();
+        deps.invalidate();
+      }
+      return;
+    }
     const journalActive = isJournalShortcutActive(ctx);
     if (journalActive && !deps.journal.hasOpenOverlay()) {
       const inSlider = matchesClosest(
@@ -430,6 +461,32 @@ export function createInputShortcuts(
     const bumperStep = deps.gamepad.consumeBumperStep();
     const navStep = deps.gamepad.consumeNavStep();
     const journalConfirmEdge = deps.gamepad.consumeConfirmEdge();
+    if (deps.encoreShrine?.isOpen() === true) {
+      if (photoAction === "exit") {
+        deps.encoreShrine.close();
+        deps.swallow("cancel");
+        deps.gamepad.clearTaps();
+        deps.invalidate();
+        return;
+      }
+      if (bumperStep !== 0) {
+        deps.encoreShrine.cycleModifier(bumperStep);
+        deps.invalidate();
+      }
+      if (navStep !== null) {
+        const dx = navStep === "left" ? -1 : navStep === "right" ? 1 : 0;
+        const dy = navStep === "up" ? -1 : navStep === "down" ? 1 : 0;
+        deps.encoreShrine.stepNav(dx, dy);
+        deps.invalidate();
+      }
+      if (journalConfirmEdge) {
+        deps.swallow("confirm");
+        deps.gamepad.clearTaps();
+        deps.encoreShrine.activateLaunch();
+        deps.invalidate();
+      }
+      return;
+    }
     const journalActive = isJournalShortcutActive(ctx);
     if (bumperStep !== 0 && journalActive) {
       deps.journal.stepPage(bumperStep);
@@ -460,6 +517,12 @@ export function createInputShortcuts(
 
   const handleCancelEdge: InputShortcutsController["handleCancelEdge"] = (cancelSwallowed) => {
     if (cancelSwallowed) return "none";
+    if (deps.encoreShrine?.isOpen() === true) {
+      deps.encoreShrine.close();
+      deps.swallow("cancel");
+      deps.invalidate();
+      return "consume-tick";
+    }
     const ctx = deps.getContext();
     if (ctx.state.journalOpen && deps.journal.hasOpenOverlay()) {
       deps.journal.dismissOverlay();

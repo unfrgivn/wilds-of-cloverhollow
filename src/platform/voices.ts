@@ -240,6 +240,13 @@ const NAMED_VOICES: Record<string, VoiceProfile> = {
     duration: 0.05,
     gain: 0.054,
   },
+  "dream memory shrine": {
+    wave: "sine",
+    notes: [659, 784, 988, 1175],
+    duration: 0.054,
+    gain: 0.044,
+    harmonic: 1.5,
+  },
   "ms. clover": {
     wave: "sine",
     notes: [370, 415, 440, 415],

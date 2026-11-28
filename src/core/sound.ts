@@ -103,6 +103,9 @@ export function soundCues(
       treatCount(next.treats) > treatCount(previous.treats))
     cues.push("item");
   if (next.stickers.length > previous.stickers.length) cues.push("sticker");
+  if ((next.encore?.trophies.length ?? 0) > (previous.encore?.trophies.length ?? 0)) {
+    cues.push("prize-won");
+  }
   if (levelForXp(world.levels, next.xp) > levelForXp(world.levels, previous.xp) ||
       next.party.some((member) => {
         const old = previous.party.find((candidate) => candidate.id === member.id);

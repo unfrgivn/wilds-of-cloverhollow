@@ -55,10 +55,10 @@ function makeGateContext(
 }
 
 describe("Milestone 154: Vite Chunk-Budget Future-Proofing & Check-Dist Gate", () => {
-  it("routes vendor, story, area, audio-score, and world modules cleanly", () => {
+  it("routes vendor, area, audio-score, render-engine, and world modules cleanly", () => {
     expect(routeModule("/repo/node_modules/pixi.js/lib/index.mjs")).toBe("vendor-pixi");
     expect(routeModule("/repo/node_modules/inkjs/dist/ink.mjs")).toBe("vendor-ink");
-    expect(routeModule("/repo/content/story/main.ink.json")).toBe("story-content");
+    expect(chunkGroups.some((group) => group.name === "story-content")).toBe(false);
     expect(routeModule("/repo/content/areas/summit.json")).toBe("area-content");
     expect(routeModule("/repo/content/props/island.json")).toBe("area-content");
     expect(routeModule("/repo/src/platform/scores.ts")).toBe("audio-scores");
@@ -67,6 +67,7 @@ describe("Milestone 154: Vite Chunk-Budget Future-Proofing & Check-Dist Gate", (
     expect(routeModule("/repo/src/platform/scores-wilds.ts")).toBe("audio-scores");
     expect(routeModule("/repo/src/platform/scores-interiors.ts")).toBe("audio-scores");
     expect(routeModule("/repo/src/platform/scores-expansion.ts")).toBe("audio-scores");
+    expect(routeModule("/repo/src/render/view.ts")).toBe("render-engine");
     expect(routeModule("/repo/content/critters/fountain-frog.json")).toBe("world-content");
     expect(routeModule("/repo/content/npc-profiles.json")).toBe("world-content");
     expect(routeModule("/repo/content/tunables.json")).toBe("world-content");
@@ -88,10 +89,10 @@ describe("Milestone 154: Vite Chunk-Budget Future-Proofing & Check-Dist Gate", (
       return group.priority;
     };
     expect(priorityOf("vendor-pixi")).toBeGreaterThan(priorityOf("vendor-ink"));
-    expect(priorityOf("vendor-ink")).toBeGreaterThan(priorityOf("story-content"));
-    expect(priorityOf("story-content")).toBeGreaterThan(priorityOf("area-content"));
+    expect(priorityOf("vendor-ink")).toBeGreaterThan(priorityOf("area-content"));
     expect(priorityOf("area-content")).toBeGreaterThan(priorityOf("audio-scores"));
-    expect(priorityOf("audio-scores")).toBeGreaterThan(priorityOf("world-content"));
+    expect(priorityOf("audio-scores")).toBeGreaterThan(priorityOf("render-engine"));
+    expect(priorityOf("render-engine")).toBeGreaterThan(priorityOf("world-content"));
   });
 
   it("oversizedAppChunks exempts vendor chunks and non-JS assets while gating app chunks", () => {

@@ -1,4 +1,3 @@
-import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   blankInput,
@@ -12,6 +11,7 @@ import {
   type State,
 } from "../../src/core";
 import { loadContent } from "../../src/content/load";
+import { readStorySources } from "../../tools/ink/compile";
 
 // Contract for Milestone 20 (the bus to Pinecone Pass). A story line tagged
 // `travel: <area>.<spawn>` takes Fae there when the conversation closes, with
@@ -144,7 +144,7 @@ describe("the bus home", () => {
 
 describe("story travel", () => {
   it("only ever sends Fae to a place that exists", () => {
-    const source = readFileSync("content/story/main.ink", "utf8");
+    const source = readStorySources();
     const targets = [...source.matchAll(/#\s*travel:\s*([^\s#]+)/g)].map((match) => match[1] ?? "");
     expect([...new Set(targets)].sort()).toEqual([
       "bay.boats", "bay.bus-stop", "field.east-bank", "island.pier", "mist.stones", "pass.bus",

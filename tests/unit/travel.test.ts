@@ -1,5 +1,4 @@
 import { readFileSync } from "node:fs";
-import { Compiler } from "inkjs/full";
 import { describe, expect, it } from "vitest";
 import {
   blankInput,
@@ -11,6 +10,7 @@ import {
   type World,
 } from "../../src/core";
 import { loadContent } from "../../src/content/load";
+import { compileStorySource } from "../../tools/ink/compile";
 
 // Story travel (spec 7): the target of a `# travel:` line is kept until the
 // conversation closes, even when more lines follow it.
@@ -18,18 +18,9 @@ import { loadContent } from "../../src/content/load";
 const content = loadContent();
 const press = (frame: Partial<ActionFrame>): ActionFrame => ({ ...blankInput(), ...frame });
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
 function worldWith(knot: string): World {
-  const compiler = new Compiler(`${readFileSync("content/story/main.ink", "utf8")}\n${knot}\n`);
-  compiler.Compile();
-  if ((compiler.errors ?? []).length > 0) throw new Error((compiler.errors ?? []).join("\n"));
-  const json = compiler.runtimeStory?.ToJson();
-  if (typeof json !== "string") throw new Error("no story");
-  const story: unknown = JSON.parse(json);
-  if (!isRecord(story)) throw new Error("story is not an object");
+  const source = `${readFileSync("content/story/main.ink", "utf8")}\n${knot}\n`;
+  const story = compileStorySource(source).story;
   return { ...content.world, story, storyVariable: createStoryReader(story) };
 }
 

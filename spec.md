@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 176)
+Last updated: 2026-11-27 (Milestone 177)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -75,16 +75,23 @@ reference material only.
   real shapes and narrowing with type guards.
 - Tooling: Vite 8 / Rolldown (dev server and production/harness builds with
   `build.rolldownOptions.output.codeSplitting` into `vendor-pixi`, `vendor-ink`,
-  `story-content`, `area-content`, `audio-scores`, `render-engine`
-  (`includeDependenciesRecursively: false`), `world-content`, and
+  `area-content`, `audio-scores`, `render-engine`
+  (`includeDependenciesRecursively: false`, including
+  `src/platform/reduced-motion.ts` so `render-engine` never forms a circular
+  chunk dependency with the `index`/`game` entry chunk), `world-content`, and
   `index`/`game` app chunks, keeping all non-vendor app and content chunks
   under 500 kB, enforced automatically on production builds by
-  `tools/check-dist.ts` via `just build`, Milestone 154), Bun (package manager
-  and script runner), Node 24 LTS for Node-based tools (`.nvmrc`), `just` for
-  tasks. Owner-approved (2026-11-27): compiled Ink story JSON may move out of
-  the static JS bundle to a runtime-fetched asset at
-  `public/assets/story/main.ink.json` (read directly from disk in Bun/Vitest/sim
-  loaders) with `tools/ink/compile.ts` supporting Ink `INCLUDE` modules.
+  `tools/check-dist.ts` via `just build`, Milestones 154 & 177), Bun (package
+  manager and script runner), Node 24 LTS for Node-based tools (`.nvmrc`),
+  `just` for tasks. Compiled Ink story JSON lives out of the static JS bundle as
+  a runtime-fetched asset at `public/assets/story/main.ink.json` (fetched via
+  `loadBrowserContent()` / `fetchStoryJson()` respecting Vite `BASE_URL` and iOS
+  Capacitor `./` paths in browser builds, read synchronously from disk via
+  `loadStoryFromDisk()` in Bun/Vitest/sim loaders, and checked in `dist` and
+  `dist-harness` by `tools/check-dist.ts` alongside linked entry stylesheet
+  integrity and zero bundled `story-content*.js` chunks; `tools/ink/compile.ts`
+  compiles modular Ink `INCLUDE` files deterministically, Milestone 177 /
+  Track E0).
 - Approved npm dependencies. Anything else needs the owner's approval first,
   then an update to this list:
   - Runtime: `pixi.js` 8, `inkjs` 2, `@capacitor/core` 8, `@capacitor/ios` 8,
@@ -104,7 +111,7 @@ src/platform/   Input devices, storage, audio, Capacitor glue.
 src/dev/        Dev-only harness hook (section 11). Excluded from production builds.
 src/main.ts     Composition root that wires core, render, ui, and platform.
 content/        Areas, critters, party, fixtures, tunables (JSON); story (Ink).
-public/assets/  Runtime art and audio, loaded by URL.
+public/assets/  Runtime art, audio, and compiled story JSON, loaded by URL.
 art/            Generation recipes and selected source images (never loaded at runtime).
 tools/          Bun scripts: art pipeline, headless sim runner.
 tests/          unit/ (Vitest), sim/ (headless scripted runs), e2e/ (Playwright).
@@ -2505,8 +2512,17 @@ trunks keep its two exits.
   targeted during a door transition or while dialogue is open.
 - A confirm press (down this tick, up the previous tick) on a target starts
   its Ink knot.
-- Dialogue is Ink (`content/story/*.ink`), compiled to committed JSON by
-  `tools/ink/compile.ts`. inkjs runs inside the core through `src/core/ink.ts`:
+- Dialogue is modular Ink (`content/story/main.ink` `INCLUDE`ing focused files
+  under `content/story/{systems,chapters,party,town}/*.ink`), compiled by
+  `tools/ink/compile.ts` with a deterministic disk `fileHandler` anchored at
+  `content/story/` (rejecting missing/recursive/escaping includes, orphan `.ink`
+  files, and native `POW`) to committed JSON at
+  `public/assets/story/main.ink.json` (Milestone 177 / Track E0). Browser boots
+  (`src/main.ts`, `src/dev/ui-gallery.ts`) fetch `assets/story/main.ink.json`
+  through `loadBrowserContent()` (respecting Vite `BASE_URL` and iOS Capacitor
+  `./` asset paths) before creating state; Bun, Vitest, and headless sims load
+  the same file synchronously from disk through `loadContent()` /
+  `loadStoryFromDisk()`. inkjs runs inside the core through `src/core/ink.ts`:
   each command (start a knot, next line, choose) loads the saved Ink state,
   runs once, and saves it again; `storySeed` comes from the game seed. Ink
   variables are the canonical story flags; there is no separate flag system.

@@ -7446,11 +7446,12 @@ PRs rebased onto `origin/main` and squash-merged. Each PR claims the next open
 Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
 
 ### Phase 0: Narrative Infrastructure
-- **Track E0 (Ink Modularization & Runtime Story Asset Pipeline):** Add a disk
-  `fileHandler` to `tools/ink/compile.ts` for Ink `INCLUDE`, split `main.ink`
-  into modular chapter/party/town/system `.ink` files, and serve compiled
-  `main.ink.json` from `public/assets/story/main.ink.json` (fetched at boot in
-  browser, loaded from disk in Bun/Vitest/sim). Hash-safe, save `v10`.
+- **Track E0 (Ink Modularization & Runtime Story Asset Pipeline):** ✅ Completed
+  (Milestone 177, 2026-11-27). Deterministic disk `fileHandler` in
+  `tools/ink/compile.ts` for Ink `INCLUDE`, 16 modular `.ink` files across
+  `systems/`, `chapters/`, `party/`, and `town/`, and runtime-fetched
+  `public/assets/story/main.ink.json` (fetched at boot in browser, loaded
+  synchronously from disk in Bun/Vitest/sim). Hash-safe, save `v10`.
 
 ### Phase 1: Living Canvas, Expressive Sprites & Storybook Dialogue (Hash-Safe)
 - **Track E1 (Camera Director & Living Ground Reactivity):** Dialogue partner
@@ -7623,6 +7624,58 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   `vision`-verified review captures.
 - **Gates:** `just check`, `just build` (`< 500 kB` every non-vendor chunk),
   and Chromium/WebKit e2e verification.
+
+## Milestone 177: Ink Modularization (`INCLUDE`) & Runtime Story Asset Pipeline (Elevation Track E0) **Status:** ✅ Completed (2026-11-27)
+- Unblocks large-scale story expansion (Tracks E10 to E12) with zero
+  `src/core` changes, zero Save `v10` changes, and zero replay hash drift across
+  all recorded sims and QA packs.
+- **Deterministic Ink `INCLUDE` Compiler (`tools/ink/compile.ts`):**
+  - Added and exported `createStoryFileHandler` (`ResolveInkFilename`,
+    `LoadInkFileContents`) anchored strictly at `content/story/`, rejecting empty
+    paths, backslashes, absolute paths, and path traversal, normalizing CRLF to
+    LF, and tracking included files deterministically.
+  - Exported `compileStorySource`, `compileStoryFile`, `listStoryInkFiles`, and
+    `readStorySources`; surfaced real `compiler.errors`/`warnings` when
+    compilation fails, rejected native `POW`, verified zero orphan `.ink` files,
+    and failed `bun run ink:check` if `public/assets/story/main.ink.json` is
+    missing/stale or legacy `content/story/main.ink.json` exists.
+- **16-File Modular Ink Split (`content/story/` -> `public/assets/story/main.ink.json`):**
+  - Split the monolithic 5,127-line `content/story/main.ink` into 16 focused
+    `.ink` modules included from `content/story/main.ink`:
+    `systems/{variables,journal,travel,gems_and_lasso,arcade}.ink`,
+    `chapters/{act1_morning,act1_school,act2_bay,act3_pass,act4_forest}.ink`,
+    `party/{companions,homes}.ink`, and
+    `town/{shops,sanctuary,living_npcs_valley,living_npcs_wilds}.ink`.
+  - Preserved all 173 `VAR`/`EXTERNAL` declarations in exact original order;
+    verified 294/294 `root[2]` entries (293 knots/functions plus `global decl`),
+    `inkVersion`, `listDefs`, `root[1]`, and `createInkState` byte-for-byte
+    identical against pre-split `content/story/main.ink.json`, then deleted the
+    legacy JSON file cleanly.
+- **Runtime Story Asset Pipeline & Chunk Hygiene (`src/content/load.ts`,
+  `src/main.ts`, `src/dev/ui-gallery.ts`, `vite.config.ts`, `tools/check-dist.ts`):**
+  - Removed the static JSON import from `src/content/load.ts`; added
+    `storyAssetUrl` (respecting Vite `BASE_URL` and Capacitor `./` paths),
+    `fetchStoryJson`, `loadBrowserContent`, and synchronous Node/Bun
+    `loadStoryFromDisk` (via runtime-guarded `process.getBuiltinModule` with
+    zero top-level `node:*` imports).
+  - Updated `src/main.ts` (946 lines, `< 950`) to call `loadBrowserContent()` in
+    parallel with `app.init()` after synchronous `createAudio()`, and updated
+    `src/dev/ui-gallery.ts` to await `loadBrowserContent()` before mounting DOM.
+  - Retired the 392 kB `story-content` JS chunk in `vite.config.ts`, included
+    `src/platform/reduced-motion.ts` in `render-engine` to break a circular
+    `render-engine <-> game` chunk import that triggered Vite 8.3.2's
+    `getCssFilesForChunk` cache-poisoning bug in multi-entry harness builds, and
+    added `bundledStoryChunks`, `verifyRuntimeStoryAsset`, and
+    `verifyEntryStylesheets` checks to `tools/check-dist.ts`.
+- **Evidence:** `tests/unit/ink-modular.test.ts` (14 real unit tests covering
+  compiler includes, cycles, traversal, `POW`, zero orphans, byte-for-byte JSON
+  match, browser/disk loader parity, and dist guards), updated story callers in
+  `tools/sim/sue-join.ts` and `tests/unit/{bus,bus-line,milestone-154,sue,travel}.test.ts`,
+  `tests/e2e/ink-modular.spec.ts` (`@smoke` Chromium + WebKit verifying HTTP 200
+  fetch of `assets/story/main.ink.json`, zero `story-content*.js` requests, and
+  real-key modular dialogue/journal playback), and `vision`-verified live render.
+- **Gates:** `just check`, `just build` (every non-vendor JS chunk `<= 370 kB`,
+  zero `story-content` chunk), and Chromium/WebKit Playwright e2e verification.
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.

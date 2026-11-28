@@ -1,6 +1,5 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { Compiler } from "inkjs/full";
 import { describe, expect, it } from "vitest";
 import {
   blankInput,
@@ -29,6 +28,7 @@ import {
 } from "../../src/core";
 import { loadContent } from "../../src/content/load";
 import { parseScript } from "../../src/content/script";
+import { compileStorySource } from "../../tools/ink/compile";
 
 // Contract for Milestone 18 (Sue). Sue joins the roster: she isn't in the
 // party at a new game, she joins when the story sets `sue_joined`, and she
@@ -69,22 +69,8 @@ function validFollowerPoint(world: World, state: State, point: Point): boolean {
   );
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
 function compileStory(source: string): Record<string, unknown> {
-  const compiler = new Compiler(source);
-  compiler.Compile();
-  const errors = compiler.errors ?? [];
-  if (errors.length > 0) throw new Error(errors.join("\n"));
-  const runtime = compiler.runtimeStory;
-  if (runtime === null) throw new Error("no story");
-  const json = runtime.ToJson();
-  if (typeof json !== "string") throw new Error("story did not serialize");
-  const parsed: unknown = JSON.parse(json);
-  if (!isRecord(parsed)) throw new Error("story is not an object");
-  return parsed;
+  return compileStorySource(source).story;
 }
 
 describe("Sue in the roster", () => {

@@ -1,5 +1,4 @@
 import { readFileSync } from "node:fs";
-import { Compiler } from "inkjs/full";
 import {
   blankInput,
   createState,
@@ -13,6 +12,7 @@ import {
   type World,
 } from "../../src/core";
 import { loadContent } from "../../src/content/load";
+import { compileStorySource } from "../ink/compile";
 
 const testKnot = [
   "=== sue_sim ===",
@@ -21,13 +21,7 @@ const testKnot = [
   "-> DONE",
 ].join("\n");
 const source = `${readFileSync("content/story/main.ink", "utf8")}\n${testKnot}\n`;
-const compiler = new Compiler(source);
-compiler.Compile();
-if (compiler.errors.length > 0) throw new Error(compiler.errors.join("\n"));
-const serialized = compiler.runtimeStory?.ToJson();
-if (serialized === undefined || serialized === null) throw new Error("story did not compile");
-const parsed: unknown = JSON.parse(serialized);
-if (!record(parsed)) throw new Error("compiled story is not an object");
+const parsed = compileStorySource(source).story;
 
 const content = loadContent();
 const harness = content.world.areas.harness;
@@ -77,7 +71,3 @@ for (let tick = 0; tick < 330; tick += 1) {
   }
 }
 console.log(`sue-join: tick ${state.tick} ok, ${state.party.map((member) => member.id).join(",")}`);
-
-function record(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}

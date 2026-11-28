@@ -29,6 +29,8 @@ import {
   type PostcardCapture,
   type PostcardDeliveryResult,
 } from "../ui/postcard";
+import { parseRichText, resolveRichTextProgress } from "../ui/rich-text";
+import { extractInkExpression } from "./view-models";
 
 export type ArcadeRecordsStore = Pick<MinigameRecordsController, "submit" | "bestOf">;
 
@@ -107,16 +109,24 @@ export function hapticForTick(
 
 /** Extracts active dialogue or battle speaker and cursor context for voice/choice synthesis. */
 export function buildSoundContext(
-  state: Pick<State, "dialogue" | "battle">,
+  state: Pick<State, "dialogue" | "battle"> & Partial<Pick<State, "ink">>,
 ): SoundPlayContext {
   const activeTalk = state.dialogue ?? state.battle?.talk ?? null;
   const choiceIndex =
     state.dialogue?.selected ?? state.battle?.talk?.selected ?? state.battle?.selected ?? 0;
+  if (activeTalk === null) {
+    return { speaker: null, text: undefined, revealed: undefined, choiceIndex };
+  }
+  const parsed = parseRichText(activeTalk.text);
+  const progress = resolveRichTextProgress(parsed, activeTalk.revealed);
+  const expression = extractInkExpression(state.ink);
   return {
-    speaker: activeTalk?.speaker ?? null,
-    text: activeTalk?.text,
-    revealed: activeTalk?.revealed,
+    speaker: activeTalk.speaker,
+    text: parsed.plain,
+    revealed: parsed.hasMarkup ? progress.visibleChars : activeTalk.revealed,
     choiceIndex,
+    ...(expression === "neutral" ? {} : { expression }),
+    ...(progress.inPause ? { inPause: true } : {}),
   };
 }
 

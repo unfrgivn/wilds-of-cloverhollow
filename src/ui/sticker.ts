@@ -1,6 +1,14 @@
 import "./sticker.css";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
-import type { SpeakerAccent } from "./portraits";
+import type { PortraitExpression, SpeakerAccent } from "./portraits";
+import {
+  createRichTextRenderer,
+  parseRichText,
+  resolveRichTextProgress,
+  type ParsedRichText,
+} from "./rich-text";
+
+export type SpeakerSide = "left" | "right" | "center";
 
 export type DialogueView = {
   speaker: string | null;
@@ -12,6 +20,8 @@ export type DialogueView = {
   canAdvance: boolean;
   portrait?: AtlasImage | null;
   accent?: SpeakerAccent;
+  expression?: PortraitExpression;
+  speakerSide?: SpeakerSide | null;
 };
 
 export type DialogueClickState = Pick<
@@ -29,6 +39,28 @@ export function shouldAdvanceDialogueClick(view: DialogueClickState): boolean {
 
 type ChoiceCallback = (index: number) => void;
 
+function createSpeechTail(): SVGSVGElement {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.classList.add("sticker-tail");
+  svg.setAttribute("viewBox", "0 0 38 22");
+  svg.setAttribute("aria-hidden", "true");
+  svg.setAttribute("focusable", "false");
+  // Outer warm-brown ink contour (no pale outer halo outside the ink).
+  const outer = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  outer.classList.add("sticker-tail-outer");
+  outer.setAttribute("d", "M 3 19 C 11 16 15 10 19 2 C 23 10 27 16 35 19 L 35 22 L 3 22 Z");
+  // Inner die-cut cream rim matching the card's 6px rim border.
+  const rim = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  rim.classList.add("sticker-tail-rim");
+  rim.setAttribute("d", "M 5 20 C 12 17 16 11 19 4.5 C 22 11 26 17 33 20 L 33 22 L 5 22 Z");
+  // Warm parchment interior blending seamlessly into the dialogue card paper.
+  const fill = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  fill.classList.add("sticker-tail-fill");
+  fill.setAttribute("d", "M 9 22 C 14 18 17 14 19 9 C 21 14 24 18 29 22 Z");
+  svg.append(outer, rim, fill);
+  return svg;
+}
+
 export function createDialogueBox(root: HTMLElement): {
   render: (view: DialogueView) => void;
   onChoose: (callback: ChoiceCallback) => void;
@@ -38,6 +70,8 @@ export function createDialogueBox(root: HTMLElement): {
   const box = document.createElement("section");
   box.className = "sticker-ui sticker-dialogue";
   box.setAttribute("aria-label", "Dialogue");
+  const tail = createSpeechTail();
+  tail.style.display = "none";
   const portrait = document.createElement("span");
   portrait.className = "sticker-portrait";
   portrait.setAttribute("role", "img");
@@ -56,6 +90,7 @@ export function createDialogueBox(root: HTMLElement): {
   const revealed = document.createElement("span");
   revealed.className = "sticker-text-revealed";
   text.append(full, revealed);
+  const richText = createRichTextRenderer(full, revealed);
   const subtitle = document.createElement("div");
   subtitle.className = "sticker-subtitle";
   subtitle.hidden = true;
@@ -72,7 +107,7 @@ export function createDialogueBox(root: HTMLElement): {
   choices.className = "sticker-choices";
   choices.setAttribute("role", "listbox");
   choices.setAttribute("aria-label", "Choices");
-  box.append(portrait, speaker, text, subtitle, live, choiceLive, advance, choices);
+  box.append(tail, portrait, speaker, text, subtitle, live, choiceLive, advance, choices);
   root.append(box);
   let choose: ChoiceCallback = () => undefined;
   let advanceHandler: () => void = () => undefined;
@@ -81,6 +116,10 @@ export function createDialogueBox(root: HTMLElement): {
   let announcedChoice = "";
   let lastPortraitKey = "";
   let lastAccent = "";
+  let lastExpression = "";
+  let lastTailSide: SpeakerSide | null = null;
+  let lastRawText = "";
+  let cachedParsed: ParsedRichText = parseRichText("");
 
   box.addEventListener("click", (event) => {
     if (box.hidden || !canClickAdvance) return;
@@ -97,6 +136,11 @@ export function createDialogueBox(root: HTMLElement): {
   const onAdvance = (callback: () => void): void => { advanceHandler = callback; };
   const render = (view: DialogueView): void => {
     box.hidden = false;
+    if (view.text !== lastRawText) {
+      lastRawText = view.text;
+      cachedParsed = parseRichText(view.text);
+    }
+    const progress = resolveRichTextProgress(cachedParsed, view.revealed);
     const nextClickable = shouldAdvanceDialogueClick({ ...view, visible: true });
     if (nextClickable !== canClickAdvance) {
       canClickAdvance = nextClickable;
@@ -106,13 +150,38 @@ export function createDialogueBox(root: HTMLElement): {
     if (accent !== lastAccent) {
       speaker.dataset.accent = accent;
       portrait.dataset.accent = accent;
+      box.dataset.accent = accent;
       lastAccent = accent;
+    }
+    const expression = view.expression ?? "neutral";
+    if (expression !== lastExpression) {
+      portrait.dataset.expression = expression;
+      box.dataset.expression = expression;
+      lastExpression = expression;
+    }
+    const tailSide: SpeakerSide | null =
+      view.speaker !== null && (view.speakerSide === "left" || view.speakerSide === "right" ||
+        view.speakerSide === "center")
+        ? view.speakerSide
+        : null;
+    if (tailSide !== lastTailSide) {
+      lastTailSide = tailSide;
+      if (tailSide === null) {
+        tail.style.display = "none";
+        delete box.dataset.tail;
+      } else {
+        tail.style.display = "";
+        box.dataset.tail = tailSide;
+      }
     }
     const portraitImage = view.portrait ?? null;
     const showPortrait = portraitImage !== null && view.speaker !== null;
     portrait.hidden = !showPortrait;
     box.classList.toggle("has-portrait", showPortrait);
-    portrait.classList.toggle("is-talking", showPortrait && view.revealed < view.text.length);
+    portrait.classList.toggle(
+      "is-talking",
+      showPortrait && !progress.complete && !progress.inPause,
+    );
     if (showPortrait) {
       const key =
         `${portraitImage.src}#${portraitImage.frame.x},${portraitImage.frame.y},` +
@@ -124,23 +193,22 @@ export function createDialogueBox(root: HTMLElement): {
     } else {
       lastPortraitKey = "";
     }
-    speaker.textContent = view.speaker ?? "";
+    const nextSpeaker = view.speaker ?? "";
+    if (speaker.textContent !== nextSpeaker) speaker.textContent = nextSpeaker;
     speaker.hidden = view.speaker === null;
-    full.textContent = view.text;
-    revealed.textContent = view.text.slice(0, Math.max(0, view.revealed));
+    richText.render(cachedParsed, progress.visibleChars);
     const subtitleText = view.subtitle ?? null;
     const showSubtitle = subtitleText !== null && subtitleText !== "";
     subtitle.hidden = !showSubtitle;
     box.classList.toggle("has-subtitle", showSubtitle);
     const nextSubtitle = subtitleText ?? "";
     if (subtitle.textContent !== nextSubtitle) subtitle.textContent = nextSubtitle;
-    const line = `${view.speaker ?? ""}: ${view.text}`;
+    const line = `${view.speaker ?? ""}: ${cachedParsed.plain}`;
     if (line !== announcedLine) {
       live.textContent = line;
       announcedLine = line;
     }
-    advance.classList.toggle("is-visible", view.canAdvance &&
-      view.revealed >= view.text.length);
+    advance.classList.toggle("is-visible", view.canAdvance && progress.complete);
     while (choices.children.length > view.choices.length) {
       choices.lastElementChild?.remove();
     }
@@ -157,8 +225,11 @@ export function createDialogueBox(root: HTMLElement): {
         element.addEventListener("click", () => choose(index));
         choices.append(element);
       }
-      element.textContent = choice.text;
-      element.setAttribute("aria-selected", String(index === view.selected));
+      if (element.textContent !== choice.text) element.textContent = choice.text;
+      const selectedAttr = String(index === view.selected);
+      if (element.getAttribute("aria-selected") !== selectedAttr) {
+        element.setAttribute("aria-selected", selectedAttr);
+      }
     });
     const selected = view.choices[view.selected];
     const selectedText = selected === undefined ? "" : `Selected: ${selected.text}`;

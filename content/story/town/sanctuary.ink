@@ -251,3 +251,53 @@ Gem Mole polishes a tiny sparkling meadow pebble with its paws and holds it up f
 === pet_crab ===
 Click-clack! Sandy Crab does a cheerful sideways shuffle along the warm sunlit footpath and waves both claws! # speaker: Sandy Crab # sound: chime-yellow
 -> DONE
+
+=== function encore_boss_count() ===
+~ temp total = 0
+{calmed("gull"):
+    ~ total = total + 1
+}
+{calmed("arcade-keeper"):
+    ~ total = total + 1
+}
+{calmed("lifeguard"):
+    ~ total = total + 1
+}
+{calmed("lodge-keeper"):
+    ~ total = total + 1
+}
+{calmed("art-teacher"):
+    ~ total = total + 1
+}
+{calmed("principal"):
+    ~ total = total + 1
+}
+{calmed("moon-owl"):
+    ~ total = total + 1
+}
+{calmed("taco-chef"):
+    ~ total = total + 1
+}
+{calmed("hooded-kid"):
+    ~ total = total + 1
+}
+~ return total
+
+=== dream_shrine ===
+~ temp bosses = encore_boss_count()
+{bosses == 0 and not milo_revealed:
+    A carved limestone lantern rests among the clover, glowing with warm starlight. # speaker: Dream Memory Shrine
+    Once you calm one of Cloverhollow's fizzy troublemakers, their dream memory will shimmer here for a cozy rematch! # speaker: Dream Memory Shrine
+    -> DONE
+}
+{milo_revealed:
+    The Dream Memory Shrine shimmers with golden starlight! Every valley calm-down memory is ready to replay. # speaker: Dream Memory Shrine # sound: chime-yellow
+- else:
+    The Dream Memory Shrine glows warmly among the clover! {bosses} of 9 calm-down memories are ready to replay. # speaker: Dream Memory Shrine # sound: chime-yellow
+}
++ [Open Dream Memory Shrine]
+    Pick a memory and optional Star Challenges for a cozy rematch! # speaker: Dream Memory Shrine # shrine: encore
+    -> DONE
++ [Step back]
+    The lantern's gentle starlight waits in the meadow whenever you're ready. # speaker: Fae
+    -> DONE

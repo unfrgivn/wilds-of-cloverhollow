@@ -112,6 +112,9 @@ export function storyTagErrors(
       return match !== null && isArcadeGameId(match[1] ?? "")
         ? [] : [`invalid play tag "${tag}"`];
     }
+    if (tag.startsWith("shrine:")) {
+      return /^shrine:\s*encore$/.test(tag) ? [] : [`invalid shrine tag "${tag}"`];
+    }
     if (tag.startsWith("trade:")) {
       const match = /^trade:\s*([a-z][a-z0-9-]*)\s+(\d+)$/.exec(tag);
       const price = match === null ? undefined : prices[match[1] ?? ""];

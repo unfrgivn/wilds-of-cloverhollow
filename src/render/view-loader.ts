@@ -132,6 +132,16 @@ export class AreaAssetManager {
     ]).catch(() => {});
   }
 
+  /** Loads a battle critter's spritesheet on demand (used by Sanctuary Dream Memory Encore). */
+  async ensureCritterAtlas(critterId: string): Promise<void> {
+    const atlas = this.world.critters[critterId]?.atlas;
+    if (atlas === undefined || Assets.get<Spritesheet | undefined>(atlas) !== undefined) return;
+    await mipmapSheet(atlas, assetUrl(atlas));
+    if (!this.currentEntityAliases.includes(atlas)) {
+      this.currentEntityAliases = [...this.currentEntityAliases, atlas];
+    }
+  }
+
   /** Reports area ground and prop texture URLs currently resident in Pixi's Assets cache. */
   cachedAreaTextures(): string[] {
     return [...this.areaTextureUrls].filter((url) => Assets.cache.has(url));

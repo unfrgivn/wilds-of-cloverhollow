@@ -282,11 +282,16 @@ function dialogueState(
   carried?: { area: string; spawn: string },
   carriedPlay?: { game: ArcadeGameId; price: number },
   carriedPartnerPoint?: Point,
+  carriedShrine?: "encore",
 ): State["dialogue"] {
   const tag = result.line?.tags.find((item) => item.startsWith("travel:"));
   const play = result.line?.tags.map((item) =>
     /^play:\s*([a-z][a-z0-9-]*)\s+(\d+)$/.exec(item.trim())).find((item) => item !== null);
   let playValue = carriedPlay;
+  const shrine: "encore" | undefined = result.line?.tags.some((item) =>
+    /^shrine:\s*encore$/.test(item.trim()))
+    ? "encore"
+    : carriedShrine;
   const ending = result.line?.tags.includes("ending") || false;
   const credits = result.line?.tags.includes("credits") || false;
   const game = play?.[1];
@@ -307,6 +312,7 @@ function dialogueState(
     ...(result.line?.sound === undefined ? {} : { sound: result.line.sound }),
     ...(travel === undefined ? {} : { travel }),
     ...(playValue === undefined ? {} : { play: playValue }),
+    ...(shrine === undefined ? {} : { shrine }),
     ...(ending ? { ending: true } : {}),
     ...(credits ? { credits: true } : {}),
     ...(carriedPartnerPoint === undefined ? {} : { partnerPoint: carriedPartnerPoint }),
@@ -463,6 +469,12 @@ function closeDialogue(
   }
   if (dialogue.credits === true)
     return { state: { ...state, dialogue: null, finale: "credits" }, events: [] };
+  if (dialogue.shrine === "encore") {
+    return {
+      state: { ...opened, dialogue: null },
+      events: [{ type: "open-encore-shrine" }],
+    };
+  }
   return { state: {
     ...opened,
     dialogue: null,
@@ -524,6 +536,7 @@ function dialogueStep(
           dialogue.travel,
           dialogue.play,
           dialogue.partnerPoint,
+          dialogue.shrine,
         );
     const advanced = applyItemTags({ ...next, ink: result.ink }, result.line?.tags ?? []);
     return following === null
@@ -553,6 +566,7 @@ function dialogueStep(
           dialogue.travel,
           dialogue.play,
           dialogue.partnerPoint,
+          dialogue.shrine,
         );
     const advanced = applyItemTags({ ...next, ink: result.ink }, result.line?.tags ?? []);
     return following === null

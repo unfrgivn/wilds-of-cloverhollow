@@ -1,0 +1,126 @@
+{
+  "baseCoins": 15,
+  "coinsPerStar": 10,
+  "pureHeartFeelingBonus": 10,
+  "modifiers": [
+    {
+      "id": "brisk-breeze",
+      "name": "Brisk Breeze",
+      "shortLabel": "Brisk Breeze",
+      "description": "Slightly tighter timing windows for lively calm-downs (stays cozy with Gentle Timing)."
+    },
+    {
+      "id": "windup-surge",
+      "name": "Wind-Up Surge",
+      "shortLabel": "Wind-Up Surge",
+      "description": "Bosses puff up with wind-up bubbles earlier and faster each rematch."
+    },
+    {
+      "id": "pure-heart",
+      "name": "Pure Heart",
+      "shortLabel": "Pure Heart",
+      "description": "No snacks allowed, with +10 bonus calm whenever you match a feeling!"
+    }
+  ],
+  "bosses": [
+    {
+      "critterId": "gull",
+      "title": "Grumpy Gull",
+      "calmTitle": "Lookout Gull",
+      "region": "Cliffside Trail",
+      "blurb": "Lean into brisk coastal gusts on the sunlit lookout bench!",
+      "encoreIntro": "Dream Memory: Grumpy Gull puffs up on the sunlit cliffside lookout!",
+      "trophyId": "gull-weathervane",
+      "trophyName": "Lookout Weathervane Trophy",
+      "isFinale": false
+    },
+    {
+      "critterId": "arcade-keeper",
+      "title": "Mr. Pip",
+      "calmTitle": "Mr. Pip",
+      "region": "Cloverhollow Arcade",
+      "blurb": "Catch flying tokens and tickets in a playful high-score flurry!",
+      "encoreIntro": "Dream Memory: Mr. Pip spins past the glowing cabinets with starry fizz!",
+      "trophyId": "pip-star-token",
+      "trophyName": "Golden Star Token Trophy",
+      "isFinale": false
+    },
+    {
+      "critterId": "lifeguard",
+      "title": "Ms. Coral",
+      "calmTitle": "Ms. Coral",
+      "region": "Bubblegum Bay",
+      "blurb": "Catch bouncing beach balls along the breezy harbor shore!",
+      "encoreIntro": "Dream Memory: Ms. Coral blows her whistle over a sunny beach-ball volley!",
+      "trophyId": "coral-shell-whistle",
+      "trophyName": "Sunlit Shell Whistle Trophy",
+      "isFinale": false
+    },
+    {
+      "critterId": "lodge-keeper",
+      "title": "Mrs. Flurry",
+      "calmTitle": "Mrs. Flurry",
+      "region": "Pinecone Pass",
+      "blurb": "Catch shimmering alpine snowballs outside Pinecone Lodge!",
+      "encoreIntro": "Dream Memory: Mrs. Flurry scoops up sparkling snowballs in the mountain breeze!",
+      "trophyId": "flurry-cocoa-cup",
+      "trophyName": "Hearth Cocoa Cup Trophy",
+      "isFinale": false
+    },
+    {
+      "critterId": "art-teacher",
+      "title": "Ms. Rowan",
+      "calmTitle": "Ms. Rowan",
+      "region": "Cloverhollow School",
+      "blurb": "Trace glowing watercolor shapes across the bright art room!",
+      "encoreIntro": "Dream Memory: Ms. Rowan flourishes her brush in a swirl of purple paint!",
+      "trophyId": "rowan-palette-star",
+      "trophyName": "Watercolor Palette Trophy",
+      "isFinale": false
+    },
+    {
+      "critterId": "principal",
+      "title": "Mr. Bell",
+      "calmTitle": "Mr. Bell",
+      "region": "Cloverhollow School",
+      "blurb": "Trace gleaming stars through booming hallway announcements!",
+      "encoreIntro": "Dream Memory: Principal Bell clears his throat with a booming school chime!",
+      "trophyId": "bell-morning-chime",
+      "trophyName": "Morning Chime Bell Trophy",
+      "isFinale": false
+    },
+    {
+      "critterId": "moon-owl",
+      "title": "Starey Owl",
+      "calmTitle": "Starry Owl",
+      "region": "Clover Hills",
+      "blurb": "Tiptoe through moonlit peekaboo watches in the quiet meadow!",
+      "encoreIntro": "Dream Memory: Starey Owl blinks wide golden eyes beneath the quiet pines!",
+      "trophyId": "owl-crescent-lantern",
+      "trophyName": "Starry Crescent Trophy",
+      "isFinale": false
+    },
+    {
+      "critterId": "taco-chef",
+      "title": "Chef Mateo",
+      "calmTitle": "Chef Mateo",
+      "region": "Clover Hills",
+      "blurb": "Fan away zesty taco clouds and share Cloverhollow favorites!",
+      "encoreIntro": "Dream Memory: Chef Mateo waves his wooden spoon in a cloud of fiesta spice!",
+      "trophyId": "mateo-golden-spoon",
+      "trophyName": "Fiesta Golden Spoon Trophy",
+      "isFinale": false
+    },
+    {
+      "critterId": "hooded-kid",
+      "title": "Ancient Tree Finale",
+      "calmTitle": "Ancient Tree Finale",
+      "region": "Enchanted Forest",
+      "blurb": "Paint the purple scribbles back and reach a friend's heart!",
+      "encoreIntro": "Dream Memory: Beneath the Ancient Tree, purple scribbles dance on the breeze!",
+      "trophyId": "ancient-tree-prism",
+      "trophyName": "Ancient Tree Dream Prism",
+      "isFinale": true
+    }
+  ]
+}

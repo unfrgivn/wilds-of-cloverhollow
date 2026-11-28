@@ -35101,6 +35101,510 @@
         "done",
         null
       ],
+      "encore_boss_count": [
+        "ev",
+        0,
+        "/ev",
+        {
+          "temp=": "total"
+        },
+        "ev",
+        "str",
+        "^gull",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "ev",
+              {
+                "VAR?": "total"
+              },
+              1,
+              "+",
+              "/ev",
+              {
+                "temp=": "total",
+                "re": true
+              },
+              {
+                "->": ".^.^.^.11"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        "str",
+        "^arcade-keeper",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "ev",
+              {
+                "VAR?": "total"
+              },
+              1,
+              "+",
+              "/ev",
+              {
+                "temp=": "total",
+                "re": true
+              },
+              {
+                "->": ".^.^.^.20"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        "str",
+        "^lifeguard",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "ev",
+              {
+                "VAR?": "total"
+              },
+              1,
+              "+",
+              "/ev",
+              {
+                "temp=": "total",
+                "re": true
+              },
+              {
+                "->": ".^.^.^.29"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        "str",
+        "^lodge-keeper",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "ev",
+              {
+                "VAR?": "total"
+              },
+              1,
+              "+",
+              "/ev",
+              {
+                "temp=": "total",
+                "re": true
+              },
+              {
+                "->": ".^.^.^.38"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        "str",
+        "^art-teacher",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "ev",
+              {
+                "VAR?": "total"
+              },
+              1,
+              "+",
+              "/ev",
+              {
+                "temp=": "total",
+                "re": true
+              },
+              {
+                "->": ".^.^.^.47"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        "str",
+        "^principal",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "ev",
+              {
+                "VAR?": "total"
+              },
+              1,
+              "+",
+              "/ev",
+              {
+                "temp=": "total",
+                "re": true
+              },
+              {
+                "->": ".^.^.^.56"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        "str",
+        "^moon-owl",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "ev",
+              {
+                "VAR?": "total"
+              },
+              1,
+              "+",
+              "/ev",
+              {
+                "temp=": "total",
+                "re": true
+              },
+              {
+                "->": ".^.^.^.65"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        "str",
+        "^taco-chef",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "ev",
+              {
+                "VAR?": "total"
+              },
+              1,
+              "+",
+              "/ev",
+              {
+                "temp=": "total",
+                "re": true
+              },
+              {
+                "->": ".^.^.^.74"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        "str",
+        "^hooded-kid",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "ev",
+              {
+                "VAR?": "total"
+              },
+              1,
+              "+",
+              "/ev",
+              {
+                "temp=": "total",
+                "re": true
+              },
+              {
+                "->": ".^.^.^.83"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        {
+          "VAR?": "total"
+        },
+        "/ev",
+        "~ret",
+        null
+      ],
+      "dream_shrine": [
+        [
+          "ev",
+          {
+            "f()": "encore_boss_count"
+          },
+          "/ev",
+          {
+            "temp=": "bosses"
+          },
+          "\n",
+          "ev",
+          {
+            "VAR?": "bosses"
+          },
+          0,
+          "==",
+          {
+            "VAR?": "milo_revealed"
+          },
+          "!",
+          "&&",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^A carved limestone lantern rests among the clover, glowing with warm starlight. ",
+                "#",
+                "^speaker: Dream Memory Shrine",
+                "/#",
+                "\n",
+                "^Once you calm one of Cloverhollow's fizzy troublemakers, their dream memory will shimmer here for a cozy rematch! ",
+                "#",
+                "^speaker: Dream Memory Shrine",
+                "/#",
+                "\n",
+                "done",
+                {
+                  "->": ".^.^.^.14"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          {
+            "VAR?": "milo_revealed"
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^The Dream Memory Shrine shimmers with golden starlight! Every valley calm-down memory is ready to replay. ",
+                "#",
+                "^speaker: Dream Memory Shrine ",
+                "/#",
+                "#",
+                "^sound: chime-yellow",
+                "/#",
+                "\n",
+                {
+                  "->": ".^.^.^.21"
+                },
+                null
+              ]
+            }
+          ],
+          [
+            {
+              "->": ".^.b"
+            },
+            {
+              "b": [
+                "\n",
+                "^The Dream Memory Shrine glows warmly among the clover! ",
+                "ev",
+                {
+                  "VAR?": "bosses"
+                },
+                "out",
+                "/ev",
+                "^ of 9 calm-down memories are ready to replay. ",
+                "#",
+                "^speaker: Dream Memory Shrine ",
+                "/#",
+                "#",
+                "^sound: chime-yellow",
+                "/#",
+                "\n",
+                {
+                  "->": ".^.^.^.21"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          "str",
+          "^Open Dream Memory Shrine",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 4
+          },
+          "ev",
+          "str",
+          "^Step back",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 4
+          },
+          {
+            "c-0": [
+              "\n",
+              "^Pick a memory and optional Star Challenges for a cozy rematch! ",
+              "#",
+              "^speaker: Dream Memory Shrine ",
+              "/#",
+              "#",
+              "^shrine: encore",
+              "/#",
+              "\n",
+              "done",
+              null
+            ],
+            "c-1": [
+              "\n",
+              "^The lantern's gentle starlight waits in the meadow whenever you're ready. ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "done",
+              null
+            ]
+          }
+        ],
+        null
+      ],
       "npc_flora": [
         [
           "ev",

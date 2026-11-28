@@ -1,0 +1,42 @@
+{
+  "asset": "encore-shrine",
+  "date": "2026-11-27",
+  "summary": "Elevation Track E18A — Pastel watercolor Dream Memory Shrine carved limestone lantern prop (180x256 @ 2px/unit, 118 logical units tall matching the Wildlife Sanctuary birdbath scale) plus golden Star Trophy emblem (128x128), packed into public/assets/props/encore-shrine/encore-shrine.webp (19.3 KB, PSNR 48.28 dB, lossless alpha) and standalone star-trophy.webp (6.8 KB, PSNR 45.58 dB).",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 3,
+  "rejectedCalls": 1,
+  "references": [
+    "art/source/areas/sanctuary/kit/birdbath/iso-1.jpg",
+    "docs/art/concepts/props/park_props.png",
+    "docs/art/concepts/collectibles/collectibles_candy_gems.png"
+  ],
+  "selectedRawSources": [
+    "art/source/props/encore-shrine/dream-shrine-raw.png (call 1, 1795844008661)",
+    "art/source/props/encore-shrine/star-trophy-raw.png (call 3, 1795844117778; call 2 rejected for UI text leakage from UI kit ref)"
+  ],
+  "prompts": {
+    "dreamShrine": "Single centered 2D hand-painted watercolor-and-ink cozy RPG overworld prop: a charming storybook carved stone lantern shrine (Dream Memory Shrine) seen from a 3/4 overhead angle (about 40 degrees from above), matching the pale warm-grey limestone, soft cool blue-grey underside shadows, gentle upper-left daylight, and thin warm sepia-brown (#5B3530) ink outlines of the Wildlife Sanctuary stone birdbath. Compact rounded pedestal base with tiny sage-green moss tufts and two small butter-yellow wildflowers, carved four-point star motif, warm honey-amber and butter-yellow glowing lantern chamber, curved stone roof with star finial. Flat pure magenta #FF00FF background, zero pink/magenta on subject, zero ground shadow, zero text.",
+    "starTrophy": "Single centered 2D hand-painted watercolor-and-ink cozy storybook collectible icon: a cute golden Star Trophy cup in butter-yellow and honey-gold watercolor washes with cream highlights, thin warm sepia-brown (#5B3530) ink outlines closing every edge from rim to solid rounded base, two looped handles, raised four-point star emblem on cup front, and soft periwinkle-blue ribbon bow on stem. Flat pure bright green #00FF00 background corner-to-corner, zero green inside trophy, zero text, zero drop shadow."
+  },
+  "processing": [
+    "dream-shrine: tools/art/key-alpha.ts --key #FF00FF --fuzz 22% --holes --despill none -> tools/art/despill-edge.ts --key magenta --band 4 -> tools/art/drop-islands.ts --min 180 -> trim, Lanczos scale to 236 px height, center on 180x256 RGBA canvas (8 px bottom margin, anchor 0.5 / 0.953125).",
+    "star-trophy: tools/art/key-alpha.ts --key #00FF00 --fuzz 22% --holes --despill none -> tools/art/despill-edge.ts --key green --band 4 -> tools/art/drop-islands.ts --min 180 -> trim, Lanczos scale into 112x112, center on 128x128 RGBA canvas.",
+    "Pack 320x256 spritesheet (dream-shrine at 0,0; star-trophy at 184,0) and encode with cwebp -q 92 -alpha_q 100 -m 6."
+  ],
+  "outputs": [
+    "public/assets/props/encore-shrine/encore-shrine.webp",
+    "public/assets/props/encore-shrine/encore-shrine.json",
+    "public/assets/props/encore-shrine/star-trophy.webp"
+  ],
+  "placement": {
+    "area": "sanctuary",
+    "propId": "dream-shrine",
+    "home": [770, 390],
+    "interactablePoint": [770, 395],
+    "notes": "Open sunlit central-north meadow grass beside the northern dirt loop, 113+ units clear of all NPCs and 64+ units clear of all recorded sanctuary/festival footsteps."
+  },
+  "review": [
+    "art/review/encore-shrine-cream.jpg",
+    "art/review/encore-shrine-dark.jpg"
+  ]
+}

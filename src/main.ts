@@ -49,6 +49,7 @@ import { createMinigameRecords } from "./platform/minigame-records";
 import type { ArcadeRecordBadge } from "./ui/arcade-popups";
 import { createAreaBanner } from "./ui/area-banner";
 import { createTravelOverlay } from "./ui/travel-overlay";
+import { mountEncoreShrineSession, type EncoreShrineSession } from "./ui/encore-shrine";
 import { createHudHints } from "./ui/hud-hints";
 import { createSaveToast } from "./ui/save-toast";
 import { createPhotoToast, createPhotoTouchBar, createShutterFlash } from "./ui/postcard";
@@ -191,6 +192,7 @@ async function boot(): Promise<void> {
   let photoMode = false;
   let qa: QaSession | null = null;
   let titleMode: TitleMode | null = null;
+  let encoreShrine: EncoreShrineSession | null = null;
   const saveSession = createSaveSession({
     store: saveStore, world: content.world, fresh, getState: () => state,
     isDocumentHidden: () => document.hidden, isPaused: () => paused,
@@ -246,7 +248,7 @@ async function boot(): Promise<void> {
   const resetTransient = (): void => {
     saveSession.clearDirty(); bannerTracker.clear(); saveToast.hide();
     jukeboxTrack = null; battlePeekOpen = false; activeArcadeRecord = null;
-    fishStreak = 0; levelUpNotices.length = 0; toolEventChime.reset();
+    fishStreak = 0; levelUpNotices.length = 0; toolEventChime.reset(); encoreShrine?.closeSilent();
     setPhotoMode(false, true); releasePointer();
     areaLoader.reset(); void areaLoader.ensureArea(true);
     void assets.warmJournalAssets(state); invalidate();
@@ -318,11 +320,9 @@ async function boot(): Promise<void> {
   let wasBattleOpen = false;
   document.documentElement.dataset.photo = "off";
   const overlayContext = (): OverlayGateContext => ({
-    state, titleMode, photoMode,
-    qaMenuOpen: qa?.isMenuOpen() ?? false,
-    qaConsoleOpen: qa?.isConsoleOpen() ?? false,
-    qaBlocked: qa?.isBlocked() ?? false,
-    loading: areaLoader.isLoading(),
+    state, titleMode, photoMode, shrineOpen: encoreShrine?.isOpen() ?? false,
+    qaMenuOpen: qa?.isMenuOpen() ?? false, qaConsoleOpen: qa?.isConsoleOpen() ?? false,
+    qaBlocked: qa?.isBlocked() ?? false, loading: areaLoader.isLoading(),
   });
   const setPhotoMode = (on: boolean, silent = false): void => {
     const next = on && canPhotoMode(overlayContext());
@@ -396,28 +396,31 @@ async function boot(): Promise<void> {
     onPhotoExit: () => setPhotoMode(false),
   });
   const releasePointer = (): void => { overworldPointer.release(); navFollower.clear(); };
+  encoreShrine = mountEncoreShrineSession({
+    uiRoot, world: content.world, getState: () => state,
+    setState: (next) => { state = next; previousState = next; },
+    stickerArt: assets.stickerArt, warmEncoreArt: assets.warmEncoreArt,
+    warmBattlePortraits: assets.warmBattlePortraits,
+    ensureCritterAtlas: (id) => view.ensureCritterAtlas(id),
+    textSpeed: gameSettings.textSpeed, playEffect: (effect) => sound.playEffect(effect),
+    playCue: (cue, tickAt) => { sound.play(cue, tickAt); }, lightHaptic,
+    swallow: (button) => swallowed.add(button),
+    clearTaps: () => { keyboard.clearTaps(); gamepad.clearTaps(); },
+    releasePointer, invalidate,
+  });
   const input = createInputSource(() => {
     overworldPointer.sync();
     return mergeNavSteerInput(
       combineInputFrames(keyboard.frame(), touch.sample(), gamepad.frame()),
-      overworldPointer.isActive(),
-      canOverworldSteer(overlayContext()),
-      navFollower,
-      state,
+      overworldPointer.isActive(), canOverworldSteer(overlayContext()), navFollower, state,
     );
   });
   const inputShortcuts = createInputShortcuts({
-    getContext: overlayContext,
-    getBattlePeekOpen: () => battlePeekOpen,
-    setBattlePeek,
-    setPhotoMode,
-    snapPostcard: () => { void snapPostcard({ download: true }); },
-    journal,
-    gamepad,
-    clearKeyboardTaps: () => keyboard.clearTaps(),
-    swallow: (button) => swallowed.add(button),
-    playChoiceMove: () => { sound.play("choice-move", state.tick); },
-    invalidate,
+    getContext: overlayContext, getBattlePeekOpen: () => battlePeekOpen,
+    setBattlePeek, setPhotoMode, snapPostcard: () => { void snapPostcard({ download: true }); },
+    journal, encoreShrine: encoreShrine.shortcuts(), gamepad,
+    clearKeyboardTaps: () => keyboard.clearTaps(), swallow: (button) => swallowed.add(button),
+    playChoiceMove: () => { sound.play("choice-move", state.tick); }, invalidate,
     ...(qa !== null ? { qa: qa.shortcuts() } : {}),
   });
   const areaLoader = createAreaLoader({
@@ -541,10 +544,12 @@ async function boot(): Promise<void> {
     }));
     if (
       photoMode || titleMode !== null || activeBattle ||
-      state.journalOpen || creditsOpen || state.cutscene !== undefined
+      state.journalOpen || creditsOpen || state.cutscene !== undefined ||
+      (encoreShrine?.isOpen() ?? false)
     ) {
       saveToast.hide();
     }
+    encoreShrine?.render(state);
     credits.render(buildCreditsView(content.world, state, assets));
     devLog?.logTitle(titleMode);
     syncOpenFlag("title", titleMode !== null); syncOpenFlag("credits", creditsOpen);
@@ -553,15 +558,9 @@ async function boot(): Promise<void> {
     const checkKind = state.battle?.phase === "check" ? state.battle.check?.kind : undefined;
     if (checkKind !== undefined) document.documentElement.dataset.check = checkKind;
     else delete document.documentElement.dataset.check;
-    if (
-      checkKind !== "catch" &&
-      checkKind !== "lean" &&
-      checkKind !== "echo" &&
-      state.arcade?.game !== "mole" &&
-      state.arcade?.game !== "comet" &&
-      state.arcade?.game !== "taco" &&
-      !overworldPointer.isActive()
-    ) {
+    if (checkKind !== "catch" && checkKind !== "lean" && checkKind !== "echo" &&
+        state.arcade?.game !== "mole" && state.arcade?.game !== "comet" &&
+        state.arcade?.game !== "taco" && !overworldPointer.isActive()) {
       touch.releaseArrows();
     }
     if (activeBattle && !wasBattleOpen) void assets.warmBattlePortraits(state).then(invalidate);
@@ -579,13 +578,11 @@ async function boot(): Promise<void> {
     const feelingAt = view.battleFeelingAnchor(state, window.innerWidth, window.innerHeight);
     feelingBubble.render(
       battlePeekOpen || battle === null || battle.feelings === null || feelingAt === null
-        ? null
-        : { ...battle.feelings, ...feelingAt },
+        ? null : { ...battle.feelings, ...feelingAt },
     );
     windUpBubbles.render(
       battlePeekOpen || battle === null || battle.windUp === null || feelingAt === null
-        ? null
-        : { ...battle.windUp, ...feelingAt },
+        ? null : { ...battle.windUp, ...feelingAt },
     );
     devLog?.logBattleButtons(activeBattle, state);
     const geometry = view.battleCheckGeometry(state, window.innerWidth, window.innerHeight);
@@ -646,6 +643,7 @@ async function boot(): Promise<void> {
     if (cancelEdge && inputShortcuts.handleCancelEdge(swallowed.has("cancel")) === "consume-tick") {
       return;
     }
+    if (encoreShrine?.isOpen() === true) return;
     const input: ActionFrame = {
       ...frame,
       confirm: frame.confirm && !swallowed.has("confirm"),
@@ -730,6 +728,8 @@ async function boot(): Promise<void> {
       if (event.type === "ending-save") {
         endingSnapshot = event.state;
         if (!(qa?.isRestricted() ?? false)) void saveSession.saveState(event.state);
+      } else if (event.type === "open-encore-shrine") {
+        encoreShrine?.open();
       }
     }
     const soundContext = buildSoundContext(state);
@@ -817,7 +817,7 @@ async function boot(): Promise<void> {
     const resetTransientUi = (): void => {
       titleMode = null; jukeboxTrack = null; battlePeekOpen = false; activeArcadeRecord = null;
       fishStreak = 0; toolEventChime.reset(); setPhotoMode(false, true);
-      levelUpNotices.length = 0; swallowed.clear();
+      encoreShrine?.closeSilent(); levelUpNotices.length = 0; swallowed.clear();
     };
     const { installShellHook } = await import("./dev/hook");
     installShellHook({

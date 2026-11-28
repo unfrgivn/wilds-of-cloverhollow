@@ -7564,8 +7564,9 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   (sunshowers + rainbows, soft snow flurries, twilight fireflies) with subtle
   critter/fish/garden interactions.
 - **Track E18 (Cozy Replay Shrine / Boss Encore & Valley Merit Ribbons, §13 Unlocks):**
-  Post-finale Sanctuary Dream Memory Shrine with remixed Star Challenges and
-  Clubhouse trophies + hand-stitched Journal Merit Ribbons page.
+  ✅ Completed (Track E18B Milestone 178, 2026-11-27; Track E18A Milestone 191,
+  2026-11-28) — Post-finale Sanctuary Dream Memory Shrine with remixed Star
+  Challenges and Clubhouse trophies + hand-stitched Journal Merit Ribbons page.
 - **Track E19 (Full-Game Balance, Accessibility, Memory Diet & iOS Device Sign-Off):**
   End-to-end balance tuning (`tools/sim/balance.ts`), Gentle Timing / Reduced
   Motion / 44 px touch audit, `< 500 kB` chunk audit, full Chromium/WebKit e2e,
@@ -8304,6 +8305,64 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
 - Gates: `just check`, `just build` (all non-vendor chunks `< 500 kB`, hook
   leak + runtime story + harness checks green), and Chromium + WebKit e2e
   verification.
+
+## Milestone 191: Cozy Replay Shrine / Boss Encore (Elevation Track E18A, §13 Unlock) **Status:** ✅ Completed (2026-11-28)
+- Delivers post-finale boss replayability via the Wildlife Sanctuary **Dream
+  Memory Shrine** with optional remixed **Star Challenge** modifiers and
+  exclusive **Clubhouse Encore Trophies**, keeping Save `v10` and all 74
+  existing recorded sims 100% bit-identical:
+  - **Pure Boss Encore Engine (`src/core/encore.ts`, `content/encore.json`,
+    `src/content/battle-parsers.ts`, `src/content/story-checks.ts`,
+    `src/core/battle.ts`, `src/core/battle-view.ts`, `src/core/feelings.ts`,
+    `src/core/sim.ts`, `src/core/save.ts`, `src/core/sound.ts`):**
+    - Covers all 9 canonical `BOSS_SET_PIECES` bosses (`gull`, `arcade-keeper`,
+      `lifeguard`, `lodge-keeper`, `art-teacher`, `principal`, `moon-owl`,
+      `taco-chef`, `hooded-kid`; note Coach Ash is an ally NPC rather than a
+      boss encounter, whereas Starey Owl `moon-owl` is the canonical 8th
+      mini-boss). Unlocks once any mini-boss is calmed (individual calmed bosses
+      only, keeping `hooded-kid` spoiler-free), with full 9-boss roster unlocked
+      post-finale (`milo_revealed` or `hooded-kid` calmed).
+    - Implements all 3 optional Star Challenge modifiers (`brisk-breeze` across
+      all 8 check kinds with Gentle Timing grace, `windup-surge` starting
+      wind-up bubbles on Turn 1 and recurring faster with up to 3 bubbles, and
+      `pure-heart` disabling `Snack`, excluding `"hungry"` feelings/wind-ups,
+      and adding `+10` calm per feeling match).
+    - Preserves all story flags (`state.ink`, `critters`, `wild`, `calms`,
+      `stickers`, `safeSpot`) non-destructively across win, run (always enabled
+      as `"Exit dream"`), and faint (smooth Sanctuary return without dark fade),
+      running Talk phases (`taco-chef`, `hooded-kid`) on sandboxed
+      `battle.encore.talkInk` so once-only Ink choices never exhaust.
+    - Tracks clears, best stars, cleared modifiers, and unlocked Trophy IDs in
+      optional `state.encore?: EncoreRecord` (omitted when empty; validated in
+      `src/core/save.ts` at version 10), awarding `15 + 10 * stars` bonus coins
+      and triggering `prize-won` celebratory audio/haptics on trophy unlock.
+  - **Watercolor Prop & Emblem Art (`art/recipes/encore-shrine.json`,
+    `public/assets/props/encore-shrine/`):**
+    - Painted carved limestone `dream-shrine` lantern prop (180×256 @ 2x, 118u
+      tall matching the Sanctuary birdbath) and golden `star-trophy` emblem
+      (128×128), packed into lossless-alpha WebP (`19.3 KB`, PSNR `48.28 dB`) +
+      `star-trophy.webp` (`6.8 KB`, PSNR `45.58 dB`) from 3 Gemini calls,
+      placed at `(770, 390)` in `content/areas/sanctuary.json` &
+      `content/props/sanctuary.json` with `dream_shrine` Ink knot (`# shrine:
+      encore`) in `content/story/town/sanctuary.ink`.
+  - **Tactile Storybook Shrine UI & Shell Wiring (`src/ui/encore-shrine.ts`,
+    `src/ui/encore-shrine.css`, `src/render/view.ts`, `src/shell/assets.ts`,
+    `src/shell/input-shortcuts.ts`, `src/main.ts`):**
+    - Die-cut 3×3 boss sticker roster, Clubhouse Trophy Shelf pips, spotlight
+      card, 3 Star Challenge toggle pills (3-column horizontal row on phone
+      landscape so all controls stay `>= 44 CSS px` and 100% unclipped on
+      `874x402`), on-demand Pixi boss atlas loading (`ensureCritterAtlas`),
+      keyboard/gamepad/touch support, and floating `.encore-battle-banner`.
+- Evidence: `tests/unit/encore.test.ts` (6 comprehensive real-state tests),
+  `tests/unit/sanctuary.test.ts` (Sanctuary geometry/prop/hidden checks),
+  `tools/sim/encore.ts` (deterministic headless 3-Star Gull rematch sim wired
+  into `bun run sim`), `tests/e2e/encore-shrine.spec.ts` (`@smoke` Chromium &
+  WebKit real-keys walkthrough on `1280x720` & `874x402`), and 7 `vision`-
+  verified review images (`art/review/encore-shrine-{cream,dark}.jpg`,
+  `art/review/e18a-{shrine-sanctuary-1280,shrine-menu-1280,shrine-menu-874,encore-battle-1280,shrine-trophy-1280}.jpg`),
+  logged in `docs/review-queue.md`.
+- Gates: `just check`, `just build` (`< 500 kB` every non-vendor chunk), and
+  Chromium + WebKit e2e verification.
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.

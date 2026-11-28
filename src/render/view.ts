@@ -291,28 +291,24 @@ export class GameView {
   }
   invalidateBackdrop(): void { this.battleView.invalidateBackdrop(); }
   loadedAreaId(): string { return this.areaView?.area.id ?? ""; }
+  async ensureCritterAtlas(critterId: string): Promise<void> {
+    await this.assets.ensureCritterAtlas(critterId);
+  }
   setPhotoMode(on: boolean): void {
-    this.photoMode = on;
-    if (this.label !== undefined) this.label.visible = !on;
+    this.photoMode = on; if (this.label !== undefined) this.label.visible = !on;
   }
   isPhotoMode(): boolean { return this.photoMode; }
 
   private syncFadeGraphics(width: number, height: number, paper: number, dark: boolean): void {
     const color = dark ? 0x0f0b18 : paper;
-    if (
-      width === this.staticWidth &&
-      height === this.staticHeight &&
-      color === this.staticFadeColor &&
-      dark === this.staticFadeFull
-    ) return;
-    if (dark) {
-      this.fade.clear().rect(0, 0, width, height).fill(color);
-    } else {
+    if (width === this.staticWidth && height === this.staticHeight &&
+        color === this.staticFadeColor && dark === this.staticFadeFull) return;
+    if (dark) this.fade.clear().rect(0, 0, width, height).fill(color);
+    else {
       const { x, y, width: viewW, height: viewH } = this.viewportRect;
       this.fade.clear().rect(x, y, viewW, viewH).fill(color);
     }
-    this.staticFadeColor = color;
-    this.staticFadeFull = dark;
+    this.staticFadeColor = color; this.staticFadeFull = dark;
   }
 
   private drawStatic(width: number, height: number, paper: number, dark: boolean): void {

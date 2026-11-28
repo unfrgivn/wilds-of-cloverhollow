@@ -10,6 +10,7 @@ import type {
   World,
 } from "./types";
 import { checkHint, viewCheck } from "./checks";
+import { encoreFeelingBonus, hasEncoreModifier } from "./encore";
 import { answers, bubbleAnswered } from "./feelings";
 import type { runInk } from "./ink";
 import { calmExperience, levelForXp, statsForCommand } from "./levels";
@@ -101,7 +102,7 @@ export function togetherCalm(world: World, state: State, result: Grade): number 
       levelForXp(world.levels, member.xp),
     ).power;
   }
-  if (result === "great") return teamPower + world.battle.feelingBonus;
+  if (result === "great") return teamPower + encoreFeelingBonus(world, state.battle);
   if (result === "good") return Math.round(teamPower * 0.75);
   return Math.round(teamPower * 0.5);
 }
@@ -283,6 +284,8 @@ export function battleCommands(
         };
       })();
   const totalSnacks = state.snacks + totalTreatCount(state.treats);
+  const pureHeart = hasEncoreModifier(battle, "pure-heart");
+  const canRun = critter.canRun || battle.encore !== undefined;
   return [
     primary,
     {
@@ -295,14 +298,16 @@ export function battleCommands(
     {
       id: "snack",
       label: world.battle.commands.snack.label,
-      detail: world.battle.commands.snack.snackDetail.replace("N", String(totalSnacks)),
-      disabled: totalSnacks === 0,
-      feeling: feeling("snack"),
+      detail: pureHeart
+        ? "Pure Heart"
+        : world.battle.commands.snack.snackDetail.replace("N", String(totalSnacks)),
+      disabled: pureHeart || totalSnacks === 0,
+      feeling: pureHeart ? null : feeling("snack"),
     },
-    ...(critter.canRun ? [{
+    ...(canRun ? [{
       id: "run",
       label: world.battle.commands.run.label,
-      detail: null,
+      detail: battle.encore !== undefined ? "Exit dream" : null,
       disabled: false,
       feeling: null,
     }] : []),
@@ -452,5 +457,8 @@ export function battleView(world: World, state: State): BattleView | null {
     lassoAssist: lassoAssistView(world, state, battle, critter),
     lassoSteady: battle.lassoSteady === true,
     treatTray,
+    ...(battle.encore === undefined
+      ? {}
+      : { encore: { bossId: battle.encore.bossId, modifiers: battle.encore.modifiers } }),
   };
 }

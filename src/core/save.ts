@@ -1,4 +1,5 @@
 import type { State, Wild } from "./types";
+import { validEncoreRecord } from "./encore";
 import { levelForXp } from "./levels";
 
 export type SaveData = { version: 10; state: State };
@@ -138,7 +139,8 @@ function isState(value: unknown, template: State): value is State {
       sameShape(wildShape, item) && record(item) && validOptionalPoint(item.home)) &&
     validCounts(value.treats, 99) &&
     validCounts(value.caughtFish, 9999) &&
-    validCutscenesSeen(value.cutscenesSeen);
+    validCutscenesSeen(value.cutscenesSeen) &&
+    validEncoreRecord(value.encore);
 }
 
 export function serializeSave(state: State): string {

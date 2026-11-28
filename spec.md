@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 189)
+Last updated: 2026-11-28 (Milestone 191)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -3824,6 +3824,46 @@ trunks keep its two exits.
   as `{ id, kind, frame, x, y }`, `id` its key (section 6.1).
   `renderInfo().battle.talk` is null outside Talk, otherwise
   `{ speaker, text, revealed, choices, selected }`.
+- **Dream Memory Shrine / Boss Encore** (Elevation Track E18A, Milestone 191,
+  Owner §13 Unlock; `src/core/encore.ts`, `content/encore.json`,
+  `src/ui/encore-shrine.ts`, `src/ui/encore-shrine.css`,
+  `art/recipes/encore-shrine.json`, `public/assets/props/encore-shrine/`):
+  - Carved limestone Dream Memory Shrine lantern prop (`dream-shrine`,
+    `painted: false`, 118 logical units tall) placed at `(770, 390)` in the
+    Wildlife Sanctuary (`content/areas/sanctuary.json`,
+    `content/props/sanctuary.json`, `dream_shrine` knot in
+    `content/story/town/sanctuary.ink` tagged `# shrine: encore`, emitting
+    `{ type: "open-encore-shrine" }`). Locked with a cozy teaser until at least
+    one boss is calmed; calming a mini-boss unlocks that boss memory, and
+    calming the Ancient Tree finale (`milo_revealed` or `hooded-kid` calm)
+    unlocks all 9 canonical `BOSS_SET_PIECES` bosses (`gull`, `arcade-keeper`,
+    `lifeguard`, `lodge-keeper`, `art-teacher`, `principal`, `moon-owl`,
+    `taco-chef`, `hooded-kid`, keeping `hooded-kid` spoiler-free prior to the
+    finale).
+  - Three optional toggleable **Star Challenge** modifiers (`ENCORE_MODIFIER_IDS`):
+    `brisk-breeze` (`applyEncoreCheckSpec` tightens timing check windows across
+    all 8 check kinds while preserving Gentle Timing grace so Gentle Timing
+    never goes tighter than standard), `windup-surge` (`encoreWindUpSpec` starts
+    wind-up bubbles on Turn 1 and recurs faster with up to 3 bubbles), and
+    `pure-heart` (disables `Snack`, excludes `"hungry"` feelings/wind-ups, and
+    adds `+10` `pureHeartFeelingBonus` calm on every feeling match).
+  - Non-destructive rematch lifecycle: `startEncoreBattle` attaches
+    `battle.encore` (with sandboxed `talkInk` for Talk-phase bosses `taco-chef`
+    and `hooded-kid` so story `state.ink` and once-only Talk choices are never
+    mutated or exhausted), always enables `Run` (`"Exit dream"`), wakes smoothly
+    beside the Shrine on faint (`rest`) without darkening back to `safeSpot`,
+    and on victory skips `on_calm` / `critters` / `wild` / `calms` / `stickers`
+    mutations while awarding bonus coins (`15 + 10 * stars`, capped at `999`),
+    updating `state.encore` (`clears`, `bestStars`, `modifiersCleared`), and
+    unlocking each boss's exclusive Clubhouse Encore Trophy on any 1+ Star
+    Challenge win (`prize-won` fanfare + `"celebrate"` haptic).
+  - Tactile die-cut Shrine modal (`createEncoreShrine` /
+    `mountEncoreShrineSession`) renders the 3×3 boss sticker grid, Clubhouse
+    Trophy Shelf pips, spotlight preview, 3 Star Challenge toggle pills (3-column
+    horizontal layout on phone `<= 520px` height so the `>= 44 px` launch button
+    stays 100% visible with zero clipping), full keyboard/gamepad/touch support,
+    on-demand boss atlas loading (`GameView.ensureCritterAtlas`), and a floating
+    `.encore-battle-banner` during active Encore rematches.
 
 ### 8.1 Battle UI layout
 - Battle UI is the sticker DOM layer (`src/ui/battle.ts`): a HUD, a command
@@ -5269,6 +5309,10 @@ trunks keep its two exits.
   outside active cutscenes and `parseSave` refuses any mid-cutscene save, while
   optional `state.cutscenesSeen` (kebab-case cutscene IDs, omitted when empty)
   round-trips cleanly at version 10 without bumping `SaveData.version`.
+  Optional `state.encore` (`EncoreRecord`: `{ bosses, trophies }`, omitted when
+  empty, validated by `validEncoreRecord` in `src/core/encore.ts` /
+  `src/core/save.ts`, Milestone 191) likewise round-trips at version 10 while
+  keeping existing saves and recorded sims bit-identical.
 - Autosave (the shell, never blocking a frame) when Fae arrives in an area,
   a battle, arcade game, or cutscene ends, a dialogue closes, or the journal
   closes. The trigger is a pure function of the previous and next state

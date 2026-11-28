@@ -1,6 +1,12 @@
 import type { StorySound } from "./sound";
 import type { SurfaceMap } from "./surfaces";
 import type { ArcadeGame, ArcadeGameId } from "./arcade";
+import type {
+  BattleEncore,
+  EncoreContent,
+  EncoreModifierId,
+  EncoreRecord,
+} from "./encore";
 import type { MoleHole } from "./mole";
 import type { TacoTopping } from "./taco";
 
@@ -479,6 +485,7 @@ export type World = {
   partyBanter: NpcPartyBanter[];
   toolEvents: NpcToolEvent[];
   cutscenes: Record<string, CutsceneScript>;
+  encore?: EncoreContent;
 };
 export type TreatItem = {
   id: string;
@@ -1168,6 +1175,7 @@ export type Battle = {
   lassoSteady?: boolean;
   treatMenu?: boolean;
   treatSelected?: number;
+  encore?: BattleEncore;
 };
 export type BattleCheckView =
   | { kind: "ring"; side: CheckSide; progress: number; target: number }
@@ -1294,6 +1302,7 @@ export type BattleView = {
   lassoAssist: { available: boolean; windUp: boolean } | null;
   lassoSteady: boolean;
   treatTray: TreatTrayView | null;
+  encore?: { bossId: string; modifiers: EncoreModifierId[] };
 };
 // `party` overrides who starts in the party (test fixtures); the default is
 // every roster member with `start: true`, in roster order.
@@ -1342,6 +1351,7 @@ export type State = {
     sound?: StorySound;
     travel?: { area: string; spawn: string };
     play?: { game: ArcadeGameId; price: number };
+    shrine?: "encore";
     ending?: true;
     credits?: true;
     partnerPoint?: Point;
@@ -1364,6 +1374,7 @@ export type State = {
   snacks: number;
   treats?: Record<string, number>;
   caughtFish?: Record<string, number>;
+  encore?: EncoreRecord;
   finale: "morning" | "credits" | null;
   backLink?: { area: string; direction: Direction };
   cutscene?: CutsceneState;
@@ -1416,4 +1427,5 @@ export type Event =
   | { type: "button"; button: "confirm" | "cancel" | "menu" }
   | { type: "level-up"; member: string; from: number; to: number;
       deltas: { power: number; magic: number; life: number; guard: number } }
-  | { type: "ending-save"; state: State };
+  | { type: "ending-save"; state: State }
+  | { type: "open-encore-shrine" };

@@ -234,19 +234,25 @@ export function createNpcChatter(root: HTMLElement): {
     setStyle(bubble, "left", "0px");
     setStyle(bubble, "top", "0px");
     const insets = currentInsets();
+    const qx = Math.round(view.x * 2) / 2;
+    const qy = Math.round(view.y * 2) / 2;
     const pos = clampChatterPosition(
-      view.x,
-      view.y,
+      qx,
+      qy,
       bubble.offsetWidth,
       bubble.offsetHeight,
       window.innerWidth,
       window.innerHeight,
       insets,
     );
+    const halfW = bubble.offsetWidth / 2;
+    const halfH = pos.placement === "top" ? bubble.offsetHeight : bubble.offsetHeight / 2;
+    const snapX = Math.round(pos.x - halfW) + halfW;
+    const snapY = Math.round(pos.y - halfH) + halfH;
     setAttribute(bubble, "data-side", pos.placement);
-    setStyle(bubble, "left", `${pos.x.toFixed(1)}px`);
-    setStyle(bubble, "top", `${pos.y.toFixed(1)}px`);
-    setStyle(bubble, "--tail-offset", `${pos.tailOffset.toFixed(1)}px`);
+    setStyle(bubble, "left", `${snapX}px`);
+    setStyle(bubble, "top", `${snapY}px`);
+    setStyle(bubble, "--tail-offset", `${Math.round(pos.tailOffset)}px`);
     setStyle(bubble, "opacity", Math.max(0, Math.min(1, view.alpha)).toFixed(3));
   };
 

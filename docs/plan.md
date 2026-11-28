@@ -7084,6 +7084,51 @@ the old trail, the owl, and the clubhouse claim.
 - Gates: `just check` (227 unit files / 1,657 tests, all 74 sims, 23 QA packs,
   purity, lint), `just build` (all non-vendor chunks `< 400 kB`), and 29/29
   Chromium & WebKit e2e tests.
+## Milestone 165: World-Expansion Playtest, Owner Art Review Audit & Release Readiness Pass **Status:** ✅ Completed (2026-11-27)
+- Completed a full end-to-end release readiness, playtest, and owner art
+  review pass across all 32 playable areas, 36 fixtures, 74 deterministic
+  sims, 7 playable minigames, and 1,264 Chromium + WebKit Playwright checks:
+  - **Automated Release & World Integrity Gate (`tests/unit/release-audit.test.ts`)**:
+    locks in zero `areaConnectionErrors`, `propDrawingErrors`,
+    `propBlockerErrors`, and `hiddenPositions` across all 32 playable areas,
+    100% Cozy Resting coverage (33 spots across 32/32 areas), 100% surface /
+    soundtrack / ambience coverage, clean initialization of all 36 fixtures,
+    existence of all 21 world-expansion art recipes & review JPEGs on disk,
+    and `< 1,000` line ceiling across every implementation file in `src/`.
+  - **Live Multi-Area Release Playtest (`tests/e2e/release-playtest.spec.ts`, `@smoke`)**:
+    boots and verifies all 5 world-expansion destinations (`milo-house`,
+    `rosie-cottage`, `summit`, `island`, `festival` Sanctuary) + Journal +
+    Photo Showcase Mode at both `1280×720` and `874×402` on Chromium & WebKit
+    with zero `console.error`, zero `pageerror`, and zero HTTP `>= 400`
+    asset loads.
+  - **Post-`adb707f5` E2E Stabilization & `.npc-chatter` Subpixel Determinism (`src/ui/npc-chatter.ts`, `tests/e2e/milestone-158.spec.ts` + 5 visually-audited baselines)**:
+    quantized `apply()` inputs to match `key` (`qx`/`qy`) and snapped `.npc-chatter`'s
+    translated top-left box corner to exact integer pixels across all three
+    placements (`top`, `left`, `right`), eliminating Skia/Chromium's half-pixel
+    glyph antialiasing oscillation (verified 36/36 across 3 consecutive parallel
+    runs of `kits.spec`, `trail.spec`, and `woods.spec`); updated
+    `milestone-158.spec.ts` for the re-recorded `golden-flute.json` (`16049`) &
+    `bay.json` (`1024`) ticks, dynamic `lamb` roamer lookup, and wild-owl
+    interception safety on the Whispering Woods path to `moon-perch`;
+    independently inspected and refreshed 5 stale baselines (`ending-kitchen`,
+    `gamepad-lantern`, `kit-school-behind`, `trail-bridge`,
+    `woods-clubhouse-lantern`) so Chromium and WebKit suites reach 100% green.
+  - **`src/main.ts` Modularity Hygiene (`1,000 -> 944` lines)**: deduplicated
+    the QA session transient reset path (`resetTransient`) and tightened dev
+    hook wiring with zero behavioral change, restoring `src/main.ts` cleanly
+    below the `< 950`-line Milestone 138 budget (verified by all 34 Chromium &
+    WebKit tests in `tests/e2e/qa.spec.ts`).
+  - **Owner Art Review Showcase (`art/review/world-expansion-showcase.jpg`, `docs/review-queue.md`)**:
+    assembled and `vision`-verified a 6-panel, 100% HUD-free showcase montage
+    spanning Milo's Sketch Loft, Rosie's Flower Cottage, Alpine Summit
+    Overlook, Starlight Island, Chef Mateo's Taco Truck Kitchen, and the
+    Post-Finale Sunny Cloverhollow Sanctuary Festival.
+- Gates: `just check` (228 unit files / 1,670 tests, 74 sims, 23 QA packs,
+  purity, lint), `just build` (`index.js` 326.8 kB, `< 500 kB` chunk budget,
+  production & harness hook checks), and Chromium + WebKit Playwright e2e
+  (60/60 across `release-playtest`, `milestone-158`, `ending`, `gamepad`,
+  `kits`, `trail`, `woods`, `qa`, plus 36/36 across 3 consecutive parallel
+  runs of `kits`, `trail`, `woods`).
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.

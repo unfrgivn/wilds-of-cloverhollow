@@ -295,63 +295,35 @@ async function boot(): Promise<void> {
   // Buttons held when the title closed stay hidden from the game until they're
   // released, so the press that starts the game can't also act in it.
   const swallowed = new Set<"confirm" | "cancel" | "menu">();
+  const resetTransient = (): void => {
+    saveSession.clearDirty(); bannerTracker.clear(); saveToast.hide();
+    jukeboxTrack = null; battlePeekOpen = false; activeArcadeRecord = null;
+    fishStreak = 0; levelUpNotices.length = 0; toolEventChime.reset();
+    setPhotoMode(false, true); overworldPointer.release();
+    areaLoader.reset(); void areaLoader.ensureArea(true);
+    void assets.warmJournalAssets(state); invalidate();
+  };
   qa = qaModule === null || qaBoot === null
     ? null
     : qaModule.createQaSession(qaBoot, {
-      uiRoot,
-      world: content.world,
+      uiRoot, world: content.world,
       initialReturnMode: restored === null ? "fresh" : "continue",
       getState: () => state,
-      setState: (next) => {
-        state = next;
-        previousState = next;
-      },
+      setState: (next) => { state = next; previousState = next; },
       parseSave: saveSession.parse,
       getTitleMode: () => titleMode,
       setTitleMode: (mode) => { titleMode = mode; },
-      onPickPack: () => {
-        saveSession.clearDirty(); bannerTracker.clear(); saveToast.hide();
-        jukeboxTrack = null; battlePeekOpen = false; activeArcadeRecord = null;
-        fishStreak = 0; levelUpNotices.length = 0; toolEventChime.reset();
-        setPhotoMode(false, true); overworldPointer.release(); swallowed.add("confirm");
-        areaLoader.reset(); void areaLoader.ensureArea(true);
-        void assets.warmJournalAssets(state); invalidate();
-      },
+      onPickPack: () => { swallowed.add("confirm"); resetTransient(); },
       onEnterSandbox: () => { saveSession.clearDirty(); },
       onResetGame: () => {
         state = createState(content.world, initialFixture);
-        previousState = state;
-        titleMode = null;
-        bannerTracker.clear();
-        toolEventChime.reset();
-        saveToast.hide();
-        jukeboxTrack = null;
-        battlePeekOpen = false;
-        activeArcadeRecord = null;
-        fishStreak = 0;
-        levelUpNotices.length = 0;
-        endingSnapshot = null;
-        creditsTicks = 0;
-        lastFinale = null;
-        cancelDown = false;
-        setPhotoMode(false, true);
-        overworldPointer.release();
-        keyboard.clearTaps();
-        gamepad.clearTaps();
-        touch.releaseArrows();
-        swallowed.clear();
-        saveSession.clearDirty();
-        saveSession.clear();
-        view.invalidateBackdrop();
-        areaLoader.reset();
-        void areaLoader.ensureArea(true);
-        void assets.warmJournalAssets(state);
-        invalidate();
+        previousState = state; titleMode = null; endingSnapshot = null;
+        creditsTicks = 0; lastFinale = null; cancelDown = false;
+        keyboard.clearTaps(); gamepad.clearTaps(); touch.releaseArrows();
+        swallowed.clear(); saveSession.clear(); view.invalidateBackdrop();
+        resetTransient();
       },
-      onConsoleApplied: () => {
-        bannerTracker.clear();
-        invalidate();
-      },
+      onConsoleApplied: () => { bannerTracker.clear(); invalidate(); },
       onReleasePointer: () => overworldPointer.release(),
       invalidate,
       settings: {
@@ -932,61 +904,33 @@ async function boot(): Promise<void> {
     };
     const { installShellHook } = await import("./dev/hook");
     installShellHook({
-      world: content.world,
-      fixtures: content.fixtures,
-      fresh,
-      speciesXp: saveSession.speciesXp,
-      input,
-      get: () => state,
-      tick,
-      ensureArea: areaLoader.ensureArea,
-      render: () => render(),
-      invalidate,
-      paused: () => paused,
-      setPaused: (value) => { paused = value; },
+      world: content.world, fixtures: content.fixtures, fresh,
+      speciesXp: saveSession.speciesXp, input, get: () => state, tick,
+      ensureArea: areaLoader.ensureArea, render: () => render(), invalidate,
+      paused: () => paused, setPaused: (value) => { paused = value; },
       setStepping: (value) => { harnessStepping = value; },
       applyResetState: async (next) => {
-        keyboard.clearTaps();
-        gamepad.clearTaps();
-        overworldPointer.release();
-        saveSession.setSuppressed(true);
-        saveSession.clearDirty();
-        state = next;
-        previousState = state;
-        bannerTracker.clear();
-        saveToast.hide();
-        saveSession.setSuppressed(false);
+        keyboard.clearTaps(); gamepad.clearTaps(); overworldPointer.release();
+        saveSession.setSuppressed(true); saveSession.clearDirty();
+        state = next; previousState = state;
+        bannerTracker.clear(); saveToast.hide(); saveSession.setSuppressed(false);
         areaLoader.reset();
         await Promise.all([areaLoader.ensureArea(), assets.warmJournalAssets(state)]);
-        resetTransientUi();
-        qa?.reset();
-        sound.clearEffects();
-        inputShortcuts.resetInputMode();
-        cancelDown = false;
+        resetTransientUi(); qa?.reset(); sound.clearEffects();
+        inputShortcuts.resetInputMode(); cancelDown = false;
       },
       renderInfo: () => ({ ...view.renderInfo(state), arcade: assets.overlayInfo() }),
       qa: { active: () => qa?.isActive() ?? false, packs: () => qa?.packs() ?? [] },
       isQaRestricted: () => qa?.isRestricted() ?? false,
-      saveStore,
-      clearSaveDirty: saveSession.clearDirty,
+      saveStore, clearSaveDirty: saveSession.clearDirty,
       applyImportedSave: async (imported) => {
-        state = imported;
-        previousState = state;
-        saveSession.clearDirty();
-        bannerTracker.clear();
-        saveToast.hide();
-        areaLoader.reset();
-        resetTransientUi();
+        state = imported; previousState = state; saveSession.clearDirty();
+        bannerTracker.clear(); saveToast.hide(); areaLoader.reset(); resetTransientUi();
         await Promise.all([areaLoader.ensureArea(true), assets.warmJournalAssets(state)]);
-        render();
-        invalidate();
+        render(); invalidate();
       },
-      sound,
-      gameSettings,
-      photoMode: () => photoMode,
-      setPhotoMode: (on) => setPhotoMode(on),
-      snapPostcard,
-      minigameRecords: () => minigameRecords.records(),
+      sound, gameSettings, photoMode: () => photoMode, setPhotoMode: (on) => setPhotoMode(on),
+      snapPostcard, minigameRecords: () => minigameRecords.records(),
       boot: { title: () => titleMode },
     });
   }

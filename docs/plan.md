@@ -9048,6 +9048,21 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
   scripts, 23 QA packs, purity, lint), `just build` (`index` `375.50 kB < 500 kB`),
   26/26 Chromium & WebKit target e2e, 99/99 Chromium + WebKit `ui-gallery`, and
   38/38 Chromium & WebKit `ui-gallery-checks` Journal tests.
+
+## Milestone 208: `vision`-Audited Post-Elevation Visual Baseline Sync — Wave 1 (Minigames & Battle Checks) **Status:** ✅ Completed (2026-11-28)
+- Completes Wave 1 of the post-Elevation visual baseline sync across all 7
+  playable minigame specs (`arcade`, `claw`, `comet`, `fish`, `mole`, `skee`,
+  `taco`) and 4 battle-check specs (`feelings`, `lean`, `windup`,
+  `m81-festival`) — zero `src/` edits and zero replay hash drift across all 77
+  sims.
+- Vision-audited baseline sync (69 PNGs: 63 Chromium, 6 WebKit):
+  - Audited pre-update diffs and rendered frames across every spec via `vision`,
+    confirming M163 Taco Best badges, M184 sprite poses, M185 storybook
+    dialogue cards, PR `#14` right-facing battle staging, and M158/M199 VFX
+    render crisply with zero broken textures, alpha fringes, or clipping.
+- Gates: `bun run lint`, `just build` (all non-vendor chunks `< 385 kB`), and
+  32/32 Chromium & WebKit e2e tests across all 11 Wave-1 specs without
+  `--update-snapshots`.
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

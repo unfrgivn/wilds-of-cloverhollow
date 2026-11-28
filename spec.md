@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 165)
+Last updated: 2026-11-27 (Milestone 166)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -878,7 +878,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   `src/render/npc-life.ts`, `src/ui/npc-chatter.ts`, `src/render/motion.ts`):
   - Twenty-eight additional blinking 4-direction hand-painted watercolor NPCs
     (`tools/art/build-living-npcs.ts`, `art/recipes/living-npcs.json`; lossless
-    WebP atlases, 15 adults at default scale `0.5` and 13 kids at `scale: 0.47`)
+    WebP atlases, 15 adults mass-calibrated in `[0.44, 0.50]` and 13 kids
+    mass-calibrated in `[0.42, 0.47]`, Milestone 159)
     populate Cloverhollow's plaza, grocery market, ice cream parlor, park,
     arcade, school east hall, playing field, art room, Bubblegum Bay, Cliffside
     Trail, Pinecone Pass, Mountain Lodge, Crystal Cavern, Whispering Woods,
@@ -886,10 +887,14 @@ ios/            Capacitor iOS project (from Milestone 4).
     `hazel`, `leo`, `maya`, `theo`, `bert`, `sal`, `kai`, `nora`, `lark`,
     `bramble`, `mina`, `tuck`, `otis`, `clara`, `pebble`, `gemma`, `moss`,
     `wren`, `sunny`, `bram`, `sage`, `marigold` (`market` at `(520, 640)`,
-    facing `right`, knot `npc_marigold`), and `danny` (`parlor` at `(540, 700)`,
-    facing `up`, knot `npc_danny`), each with bespoke voice profiles
+    facing `right`, knot `npc_marigold`), and `danny` (`parlor` at `(360, 450)`,
+    facing `right`, knot `npc_danny`), each with bespoke voice profiles
     (`src/platform/voices.ts`) and circular die-cut dialogue portraits
-    (`src/ui/portraits.ts`).
+    (`src/ui/portraits.ts`). Every Living NPC placement across all 16 inhabited
+    areas maintains `>= 220` units separation outdoors and `>= 190` units indoors
+    (across all strolling waypoints too), bans flat `Δy = 0` mannequin lineups
+    (`|Δy| >= 40` or distance `>= 300`), and stays `0%` occluded and clear of
+    all recorded simulation trails (Milestone 159).
   - Dynamic story relocations via optional NPC schedule fields (`hiddenWhile`,
     `visibleAfterCalm`, `hiddenAfterCalm`, validated in
     `src/content/npc-parsers.ts`): Sammy moves from `plaza` into `arcade`

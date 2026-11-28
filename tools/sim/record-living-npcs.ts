@@ -48,46 +48,68 @@ const shooNear = (npcId: string): void => {
   }
 };
 
-// Bubblegum Bay: Captain Sal (Sue interjection + 2 harbor snacks), Kai, Nora.
-play.approach("npc:sal");
-play.talk("npc:sal");
-
-play.approach("npc:kai");
-play.talk("npc:kai", [0]);
-
+// Bubblegum Bay: Nora, Captain Sal (Sue interjection + 2 harbor snacks), Kai.
+shooNear("nora");
 play.approach("npc:nora");
 play.talk("npc:nora", [0]);
 
+play.hold({ x: 0, y: -1 }, 170);
+play.hold({ x: -1, y: 0 }, 110);
+play.hold({ x: 0, y: -1 }, 35);
+shooNear("sal");
+play.approach("npc:sal");
+play.talk("npc:sal");
+
+play.hold({ x: -1, y: 1 }, 30);
+play.hold({ x: 0, y: 1 }, 130);
+shooNear("kai");
+play.approach("npc:kai");
+play.talk("npc:kai", [0]);
+
 // Star Bus back to Cloverhollow Plaza.
+play.hold({ x: -1, y: 0 }, 30);
+play.hold({ x: 0, y: -1 }, 80);
 shooNear("bus-stop");
 play.approach("npc:bus-stop");
 play.talk("npc:bus-stop", [0]);
 play.idle(60);
 if (play.state().area !== "plaza") throw new Error("bus didn't return to plaza");
 
-// Cloverhollow Plaza: Flora (Sue tulip interjection), Mailman Gus, Sammy.
-shooNear("flora");
-play.approach("npc:flora");
-play.talk("npc:flora", [0]);
-
+// Cloverhollow Plaza: Mailman Gus, Sammy, Flora (Sue tulip interjection).
+play.hold({ x: 1, y: 0 }, 80);
 shooNear("gus");
 play.approach("npc:gus");
 play.talk("npc:gus", [0]);
 
+play.hold({ x: 1, y: 0 }, 85);
+play.hold({ x: 0, y: -1 }, 20);
 shooNear("sammy");
 play.approach("npc:sammy");
 play.talk("npc:sammy", [0]);
 
+play.hold({ x: -1, y: 0 }, 55);
+play.hold({ x: 0, y: -1 }, 175);
+play.hold({ x: -1, y: 0 }, 240);
+shooNear("flora");
+play.approach("npc:flora");
+play.talk("npc:flora", [0]);
+
 // Walk down park-path into Meadow Park.
+play.hold({ x: 1, y: 0 }, 235);
+play.hold({ x: 0, y: 1 }, 155);
+play.hold({ x: 1, y: 0 }, 40);
 play.navigate(spawnOf("plaza", "park-path"), 8);
 play.leave({ x: 0, y: 1 }, "park");
 if (play.state().area !== "park") throw new Error("didn't enter Meadow Park");
 
 // Meadow Park: Pippa (solve park critter riddle for 5 coins + 1 snack) and Grandma Hazel.
+play.hold({ x: 1, y: 0 }, 75);
+play.hold({ x: 0, y: -1 }, 20);
 shooNear("pippa");
 play.approach("npc:pippa");
 play.talk("npc:pippa", [0, 0]);
 
+play.hold({ x: -1, y: -1 }, 72);
 shooNear("hazel");
 play.approach("npc:hazel");
 play.talk("npc:hazel");

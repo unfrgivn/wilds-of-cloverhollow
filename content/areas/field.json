@@ -1806,28 +1806,28 @@
     {
       "id": "maya",
       "point": {
-        "x": 220,
-        "y": 520
+        "x": 560,
+        "y": 690
       },
-      "facing": "right",
+      "facing": "up",
       "knot": "npc_maya_field",
       "prompt": "Talk",
       "footprint": [
         [
-          205,
-          510
+          545,
+          680
         ],
         [
-          235,
-          510
+          575,
+          680
         ],
         [
-          235,
-          530
+          575,
+          700
         ],
         [
-          205,
-          530
+          545,
+          700
         ]
       ],
       "visibleWhile": "recess",

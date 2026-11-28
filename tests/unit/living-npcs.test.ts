@@ -1980,3 +1980,100 @@ describe("Kinetic Strolling NPCs & Alpine Summit Living Support (Milestone 151)"
     expect(lanternTurn1.chatter?.text).toBe("Like a purple ribbon right across the peaks!");
   });
 });
+
+describe("Living NPC Scale Calibration & Spatial Dispersion Polish (Milestone 159)", () => {
+  const livingKids = [
+    "nora", "pippa", "sunny", "poppy", "wren", "maya",
+    "sammy", "gemma", "kai", "leo", "danny", "tuck", "theo",
+  ] as const;
+  const livingAdults = [
+    "sage", "marigold", "sal", "clara", "lark", "flora", "moss",
+    "otis", "bramble", "bert", "bram", "gus", "pebble", "hazel", "mina",
+  ] as const;
+  const livingIds = new Set<string>([...livingKids, ...livingAdults]);
+  const indoorAreas = new Set<string>([
+    "bedroom", "kitchen", "school", "classroom", "gym", "east-hall", "music",
+    "art-room", "arcade", "cafe", "market", "parlor", "lodge", "clubhouse",
+    "sue-cottage", "jordan-cabin", "milo-house", "rosie-cottage", "cavern",
+  ]);
+
+  it("enforces spatial dispersion and bans flat mannequin lineups across all Living NPC areas",
+    () => {
+      for (const [areaId, area] of Object.entries(world.areas)) {
+        const hasLiving = area.npcs.some((npc) => livingIds.has(npc.id));
+        if (!hasLiving) continue;
+
+        const minGap = indoorAreas.has(areaId) ? 190 : 220;
+        const actors = [
+          ...area.npcs.map((npc) => ({
+            id: npc.id,
+            living: livingIds.has(npc.id),
+            points: npc.stroll?.waypoints ?? [npc.point],
+          })),
+          ...area.critters.map((critter) => ({
+            id: critter.id,
+            living: false,
+            points: [critter.point],
+          })),
+        ];
+
+        for (let i = 0; i < actors.length; i += 1) {
+          const first = actors[i];
+          if (first === undefined) continue;
+          for (let j = i + 1; j < actors.length; j += 1) {
+            const second = actors[j];
+            if (second === undefined) continue;
+            if (!first.living && !second.living) continue;
+
+            let closest = Infinity;
+            for (const pA of first.points) {
+              for (const pB of second.points) {
+                const gap = Math.hypot(pA.x - pB.x, pA.y - pB.y);
+                if (gap < closest) closest = gap;
+              }
+            }
+            const requiredGap =
+              first.living && second.living
+                ? minGap
+                : Math.min(minGap, 120);
+            expect(
+              closest,
+              `${areaId}: ${first.id} <-> ${second.id} gap ${closest.toFixed(1)} < ${requiredGap}`,
+            ).toBeGreaterThanOrEqual(requiredGap);
+
+            if (first.living && second.living) {
+              const homeA = first.points[0];
+              const homeB = second.points[0];
+              if (homeA !== undefined && homeB !== undefined) {
+                const dy = Math.abs(homeA.y - homeB.y);
+                const homeGap = Math.hypot(homeA.x - homeB.x, homeA.y - homeB.y);
+                expect(
+                  dy >= 40 || homeGap >= 300,
+                  `${areaId}: flat lineup ${first.id} <-> ${second.id} ` +
+                    `(dy=${dy}, dist=${homeGap.toFixed(1)})`,
+                ).toBe(true);
+              }
+            }
+          }
+        }
+      }
+    });
+
+  it("keeps every Living NPC character scale calibrated within kid and adult bands", () => {
+    expect(livingKids.length + livingAdults.length).toBe(28);
+    for (const id of livingKids) {
+      const entry = world.characters[id];
+      expect(entry, `missing character ${id}`).toBeDefined();
+      const scale = entry?.scale ?? 0.5;
+      expect(scale, `kid ${id} scale ${scale}`).toBeGreaterThanOrEqual(0.42);
+      expect(scale, `kid ${id} scale ${scale}`).toBeLessThanOrEqual(0.47);
+    }
+    for (const id of livingAdults) {
+      const entry = world.characters[id];
+      expect(entry, `missing character ${id}`).toBeDefined();
+      const scale = entry?.scale ?? 0.5;
+      expect(scale, `adult ${id} scale ${scale}`).toBeGreaterThanOrEqual(0.44);
+      expect(scale, `adult ${id} scale ${scale}`).toBeLessThanOrEqual(0.50);
+    }
+  });
+});

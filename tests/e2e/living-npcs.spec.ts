@@ -257,9 +257,9 @@ test(
     // 2. Chatter bubble, neighbor banter, >= 8.5:1 contrast, safe-area clamping & journal hiding.
     await openQaPaused(page, "flute");
     expect((await readState(page)).area).toBe("park");
-    await walk(page, "x", 455);
-    await walk(page, "y", 535);
-    await walk(page, "x", 375);
+    await walk(page, "x", 800);
+    await walk(page, "x", 1200);
+    await walk(page, "y", 445);
 
     const banter = await stepUntilChatter(
       page,
@@ -301,11 +301,10 @@ test(
     await assertChatterContrast(page);
 
     // Walk into TALK range of Pippa -> .sticker-prompt appears and .npc-chatter yields!
-    await walk(page, "y", 520);
-    await walk(page, "x", 352);
-    await page.keyboard.down("ArrowLeft");
+    await walk(page, "y", 390);
+    await page.keyboard.down("ArrowUp");
     await step(page, 2);
-    await page.keyboard.up("ArrowLeft");
+    await page.keyboard.up("ArrowUp");
     await step(page, 2);
     await expect(page.locator(".sticker-prompt")).toBeVisible();
     await expect(page.locator(".npc-chatter")).toBeHidden();
@@ -319,9 +318,9 @@ test(
     await expect(page.locator(".sticker-portrait")).toBeVisible();
     await finishDialogue(page, "Ask what she spotted in the park");
 
-    // Step back out of TALK range and switch lantern OFF.
-    await walk(page, "x", 375);
-    await walk(page, "y", 535);
+    // Step between Pippa & Hazel (within both flute ranges) and switch lantern OFF.
+    await walk(page, "x", 550);
+    await walk(page, "y", 620);
     await page.keyboard.press("l");
     await step(page, 4);
     expect((await readState(page)).lantern).toBe(false);
@@ -331,7 +330,7 @@ test(
     await step(page, 4);
     expect((await readState(page)).dialogue?.knot).toBe("flute");
     await finishDialogue(page, "Just play");
-    await step(page, 16);
+    await step(page, 24);
 
     const musicInfo = await renderInfo(page);
     const pippaMusic = musicInfo.npcLife.npcs.find((npc) => npc.id === "pippa");
@@ -345,7 +344,7 @@ test(
     await assertChatterContrast(page);
 
     // 5. Dynamic relocation (after calming Mr. Pip): walk from Park -> Plaza -> Arcade.
-    await walk(page, "y", 850);
+    await openQaPaused(page, "flute");
     await walk(page, "x", 300);
     await holdThroughDoor(page, "ArrowDown", "plaza");
     expect((await readState(page)).area).toBe("plaza");
@@ -441,7 +440,7 @@ test(
     const beforeSnack = await readState(page);
     expect(beforeSnack.snacks).toBeGreaterThan(0);
 
-    await walk(page, "x", 600);
+    await walk(page, "x", 710);
     await walk(page, "y", 645);
     await page.keyboard.down("ArrowDown");
     await step(page, 2);
@@ -497,12 +496,12 @@ test(
     expect((await readState(page)).area).toBe("plaza");
 
     // 1. Start Mailman Gus's Postal Chain & verify Fae's Journal NOTES records it cleanly.
-    await walk(page, "x", 600);
-    await walk(page, "y", 390);
-    await walk(page, "x", 495);
-    await page.keyboard.down("ArrowUp");
+    await walk(page, "y", 900);
+    await walk(page, "x", 1200);
+    await walk(page, "y", 955);
+    await page.keyboard.down("ArrowDown");
     await step(page, 2);
-    await page.keyboard.up("ArrowUp");
+    await page.keyboard.up("ArrowDown");
     await step(page, 2);
     await page.keyboard.press("z");
     await step(page, 4);
@@ -518,6 +517,8 @@ test(
     await step(page, 2);
 
     // 2. Enter Cloverhollow Grocery Market: verify Marigold + Pippin banter & gift.
+    await walk(page, "y", 900);
+    await walk(page, "x", 580);
     await walk(page, "y", 400);
     await walk(page, "x", 700);
     await holdThroughDoor(page, "ArrowUp", "market");
@@ -576,11 +577,11 @@ test(
     await assertChatterInViewport(page, 1280, 720);
 
     const coinsBeforeDanny = (await readState(page)).coins;
-    await walk(page, "y", 695);
-    await walk(page, "x", 488);
-    await page.keyboard.down("ArrowRight");
+    await walk(page, "x", 360);
+    await walk(page, "y", 492);
+    await page.keyboard.down("ArrowUp");
     await step(page, 2);
-    await page.keyboard.up("ArrowRight");
+    await page.keyboard.up("ArrowUp");
     await step(page, 2);
     await page.keyboard.press("z");
     await step(page, 4);
@@ -594,8 +595,8 @@ test(
     expect(afterDanny.treats?.["berry-cone"]).toBe(1);
 
     // 4. Post-finale celebration pass (forest_calm): festive banter, warm chatter & emotes.
-    await walk(page, "x", 360);
     await walk(page, "y", 600);
+    await walk(page, "x", 440);
     const finaleBackup = await page.evaluate(() => {
       const raw = window.__cloverhollow?.save.exportBackup?.();
       if (raw === undefined) return null;
@@ -634,12 +635,12 @@ test(
     expect(["Danny", "Scooper Penny"]).toContain(finaleBanter.speakerName);
 
     // Walk within Danny's greet/celebration range & verify warm finale chatter + sparkle emote.
-    await walk(page, "y", 700);
-    await walk(page, "x", 420);
+    await walk(page, "y", 505);
+    await walk(page, "x", 320);
     const finaleWarm = await stepUntilChatter(
       page,
       (bubble) => bubble.tone === "warm" && bubble.npcId === "danny",
-      480,
+      760,
     );
     expect(finaleWarm.text).toContain("Victory Rainbow Sundae");
     await expect(page.locator(".npc-chatter")).toHaveAttribute("data-tone", "warm");
@@ -684,15 +685,15 @@ test(
     // 2. Meadow Park Flute Concert micro-event (?qa=flute -> F -> "Just play").
     await openQaPaused(page, "flute");
     expect((await readState(page)).area).toBe("park");
-    await walk(page, "x", 455);
-    await walk(page, "y", 535);
-    await walk(page, "x", 375);
+    await walk(page, "y", 560);
+    await walk(page, "x", 820);
+    await walk(page, "y", 420);
 
     await page.keyboard.press("f");
     await step(page, 4);
     expect((await readState(page)).dialogue?.knot).toBe("flute");
     await finishDialogue(page, "Just play");
-    await step(page, 22);
+    await step(page, 30);
 
     const parkInfo = await renderInfo(page);
     expect(parkInfo.npcLife.activeToolEventId).toBe("park-flute-concert");

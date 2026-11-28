@@ -4360,7 +4360,7 @@
       "id": "park-flute-concert",
       "area": "park",
       "trigger": "flute",
-      "radius": 380,
+      "radius": 440,
       "tone": "music",
       "turns": [
         {

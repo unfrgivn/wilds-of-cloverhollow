@@ -1,5 +1,26 @@
-import { applyAtlasCrop, type AtlasImage } from "./atlas";
+import { applyAtlasCrop } from "./atlas";
 import { element, setAttribute, setText, svgElement } from "./dom";
+import {
+  adaptHintForInputMode,
+  chainIcon,
+  clamp01,
+  echoChimeMeta,
+  GRADE_GAP,
+  gradeLabels,
+  peekabooEyesIcon,
+  peekabooLabels,
+  peekabooStarIcon,
+  PUFF_GAP,
+  PUFF_SPACING,
+  renderGrade,
+  resolveCheckPointerDirection,
+  starIcon,
+  SWOOSH_CYCLES,
+  swooshIcon,
+  tracePathData,
+  type BattleCheckView,
+  type TimingGrade,
+} from "./battle-checks-helpers";
 import {
   createBattleChecksV2,
   spinSnagButtonLabel,
@@ -12,173 +33,33 @@ import {
   bindPointerMoveHold,
   isConfirmCheckKind,
   isDirectionalCheckKind,
-  resolveCatchDirection,
-  resolveLeanDirection,
 } from "./pointer-hold";
-import type { ChainLook, EchoNote, PeekabooStatus, Point } from "../core";
+import type { ChainLook, EchoNote, Point } from "../core";
 
-export type TimingGrade = "great" | "good" | "miss";
-export { spinSnagButtonLabel, whackKeyCap, type BattleCheckV2View };
-
-export type BattleCheckView =
-  | {
-      kind: "ring";
-      x: number;
-      y: number;
-      radius: number;
-      progress: number;
-      target: number;
-      grade: TimingGrade | null;
-      hint: string | null;
-      // The top centre of the hint sticker.
-      hintAt: { x: number; y: number };
-    }
-  | {
-      kind: "charge";
-      x: number;
-      y: number;
-      width: number;
-      height: number;
-      fill: number;
-      great: [number, number];
-      good: [number, number];
-      grade: TimingGrade | null;
-      hint: string | null;
-      // The top centre of the hint sticker.
-      hintAt: { x: number; y: number };
-    }
-  | {
-      kind: "chain";
-      from: { x: number; y: number };
-      to: { x: number; y: number };
-      radius: number;
-      beats: {
-        appeared: boolean;
-        progress: number;
-        result: "pending" | "hit" | "miss";
-      }[];
-      look: ChainLook;
-      grade: TimingGrade | null;
-      hint: string | null;
-      // The top centre of the hint sticker.
-      hintAt: { x: number; y: number };
-    }
-  | {
-      kind: "catch";
-      // The three lanes' heights, high to low.
-      lanes: [number, number, number];
-      fromX: number;
-      catcherX: number;
-      radius: number;
-      // The lane the catch is in now.
-      catcher: number;
-      toys: {
-        appeared: boolean;
-        progress: number;
-        lane: number;
-        result: "pending" | "hit" | "miss";
-        // The toy's crop and its size in CSS px; null if the atlas isn't in.
-        image: AtlasImage | null;
-        width: number;
-        height: number;
-      }[];
-      grade: TimingGrade | null;
-      hint: string | null;
-      // The top centre of the hint sticker.
-      hintAt: { x: number; y: number };
-    }
-  | {
-      kind: "lean";
-      // The balance track's centre and size, and Fae's balance on it: -1
-      // blown over backward (left), 1 leaned over forward (right).
-      track: { x: number; y: number; width: number; height: number };
-      balance: number;
-      // Where each swoosh sets out, one height per row, and its length.
-      wind: { x: number; rows: number[]; length: number };
-      puffs: {
-        blowing: boolean;
-        progress: number;
-        // How hard it pushes next to Fae's lean, 0..1.
-        force: number;
-        result: "pending" | "hit" | "miss";
-      }[];
-      grade: TimingGrade | null;
-      hint: string | null;
-      // The top centre of the hint sticker.
-      hintAt: { x: number; y: number };
-    }
-  | {
-      kind: "trace";
-      rect: { x: number; y: number; width: number; height: number };
-      brush: { x: number; y: number };
-      points: { x: number; y: number }[];
-      checkpoint: number;
-      dry: number;
-      results: ("pending" | "hit" | "miss")[];
-      grade: TimingGrade | null;
-      hint: string | null;
-      hintAt: { x: number; y: number };
-    }
-  | {
-      kind: "peekaboo";
-      track: { x: number; y: number; width: number; height: number };
-      progress: number;
-      status: PeekabooStatus;
-      peeks: ("pending" | "cleared" | "spotted")[];
-      grade: TimingGrade | null;
-      hint: string | null;
-      hintAt: { x: number; y: number };
-    }
-  | {
-      kind: "echo";
-      x: number;
-      y: number;
-      phase: "demo" | "input";
-      sequence: EchoNote[];
-      results: ("pending" | "hit" | "miss")[];
-      litNote: EchoNote | null;
-      demoIndex: number;
-      entered: number;
-      time: number;
-      grade: TimingGrade | null;
-      hint: string | null;
-      hintAt: { x: number; y: number };
-    }
-  | BattleCheckV2View;
-
-const gradeGap = 6;
-// A lean's puff dots: their spacing, and how far over the track they sit.
-const puffSpacing = 18;
-const puffGap = 10;
-// How many times each swoosh drifts in over one puff.
-const swooshCycles = 3;
-const gradeLabels: Record<TimingGrade, string> = {
-  great: "GREAT!",
-  good: "GOOD!",
-  miss: "MISS",
+export {
+  adaptHintForInputMode,
+  chainIcon,
+  clamp01,
+  echoChimeMeta,
+  GRADE_GAP,
+  gradeLabels,
+  peekabooEyesIcon,
+  peekabooLabels,
+  peekabooStarIcon,
+  PUFF_GAP,
+  PUFF_SPACING,
+  renderGrade,
+  resolveCheckPointerDirection,
+  spinSnagButtonLabel,
+  starIcon,
+  SWOOSH_CYCLES,
+  swooshIcon,
+  tracePathData,
+  whackKeyCap,
+  type BattleCheckV2View,
+  type BattleCheckView,
+  type TimingGrade,
 };
-const peekabooLabels: Record<PeekabooStatus, string> = {
-  safe: "LOOKING AWAY · HOLD!",
-  warning: "TURN SOON...",
-  watching: "WATCHING · FREEZE!",
-};
-
-const echoChimeMeta: readonly {
-  note: EchoNote;
-  key: string;
-  label: string;
-  arrow: string;
-  dir: string;
-}[] = [
-  { note: 0, key: "red", label: "Red", arrow: "↑", dir: "Up" },
-  { note: 1, key: "yellow", label: "Yellow", arrow: "→", dir: "Right" },
-  { note: 2, key: "green", label: "Green", arrow: "↓", dir: "Down" },
-  { note: 3, key: "blue", label: "Blue", arrow: "←", dir: "Left" },
-];
-
-function clamp01(value: number): number {
-  return Math.min(1, Math.max(0, value));
-}
 
 /** The complete check overlay, kept in one fixed DOM layer above the scene. */
 export function createBattleCheck(root: HTMLElement): {
@@ -266,21 +147,7 @@ export function createBattleCheck(root: HTMLElement): {
   const dirHold = bindPointerMoveHold(
     tapStage,
     (dir) => directionHoldHandler(dir),
-    (clientX, clientY) => {
-      if (activeView === null) return { x: 0, y: 0 };
-      if (activeView.kind === "catch") {
-        return resolveCatchDirection(
-          clientY,
-          activeView.lanes[0],
-          activeView.lanes[2],
-          activeView.lanes.length,
-        );
-      }
-      if (activeView.kind === "lean") {
-        return resolveLeanDirection(clientX, activeView.track.x);
-      }
-      return { x: 0, y: 0 };
-    },
+    (clientX, clientY) => resolveCheckPointerDirection(activeView, clientX, clientY),
     () => directionalActive,
   );
   // Echo chime board: note progress dots, phase pill, timer bar, and four
@@ -394,7 +261,7 @@ export function createBattleCheck(root: HTMLElement): {
         return;
       }
       if (view.hint !== null) {
-        setText(hint, view.hint);
+        setText(hint, adaptHintForInputMode(view.hint, inputMode));
         hint.style.left = `${view.hintAt.x}px`;
         hint.style.top = `${view.hintAt.y}px`;
       }
@@ -426,7 +293,7 @@ export function createBattleCheck(root: HTMLElement): {
           grade,
           view.grade,
           view.x,
-          view.y - view.radius * (1 - view.target) - gradeGap,
+          view.y - view.radius * (1 - view.target) - GRADE_GAP,
         );
       } else if (view.kind === "charge") {
         meter.style.left = `${view.x}px`;
@@ -443,7 +310,7 @@ export function createBattleCheck(root: HTMLElement): {
           grade,
           view.grade,
           view.x + view.width / 2,
-          view.y - gradeGap,
+          view.y - GRADE_GAP,
         );
       } else if (view.kind === "catch") {
         const laneY = (lane: number): number => view.lanes[lane] ?? view.lanes[1];
@@ -483,7 +350,7 @@ export function createBattleCheck(root: HTMLElement): {
           grade,
           view.grade,
           view.catcherX,
-          laneY(view.catcher) - view.radius - gradeGap,
+          laneY(view.catcher) - view.radius - GRADE_GAP,
         );
       } else if (view.kind === "lean") {
         const { x, y, width, height } = view.track;
@@ -507,8 +374,8 @@ export function createBattleCheck(root: HTMLElement): {
           dot.classList.toggle("is-blowing", puff.blowing);
           dot.classList.toggle("is-hit", puff.result === "hit");
           dot.classList.toggle("is-miss", puff.result === "miss");
-          dot.style.left = `${x + (index - (view.puffs.length - 1) / 2) * puffSpacing}px`;
-          dot.style.top = `${y - height / 2 - puffGap}px`;
+          dot.style.left = `${x + (index - (view.puffs.length - 1) / 2) * PUFF_SPACING}px`;
+          dot.style.top = `${y - height / 2 - PUFF_GAP}px`;
         });
         // The puff blowing now: three swooshes, four when it pushes harder,
         // each drifting its length in toward Fae and fading as it goes.
@@ -518,7 +385,7 @@ export function createBattleCheck(root: HTMLElement): {
           const rowY = view.wind.rows[row];
           hide(swoosh, blowing === undefined || row >= rows || rowY === undefined);
           if (blowing === undefined || rowY === undefined) return;
-          const phase = (blowing.progress * swooshCycles + row * 0.29) % 1;
+          const phase = (blowing.progress * SWOOSH_CYCLES + row * 0.29) % 1;
           setAttribute(swoosh, "width", String(view.wind.length));
           setAttribute(swoosh, "height", String(view.wind.length / 3));
           swoosh.style.left = `${view.wind.x - phase * view.wind.length}px`;
@@ -534,13 +401,9 @@ export function createBattleCheck(root: HTMLElement): {
         traceLayer.style.width = `${rect.width}px`;
         traceLayer.style.height = `${rect.height}px`;
         traceSvg.setAttribute("viewBox", "0 0 1000 1000");
-        const pathData = (points: { x: number; y: number }[]): string =>
-          points.map((point, index) => `${index === 0 ? "M" : "L"}${point.x} ${point.y}`)
-            .join(" ");
-        const d = pathData(view.points);
-        tracePath.setAttribute("d", d);
+        tracePath.setAttribute("d", tracePathData(view.points));
         // Painted from the start through every point reached, up to the brush.
-        const painted = pathData([
+        const painted = tracePathData([
           ...view.points.slice(0, Math.max(1, view.checkpoint)),
           view.brush,
         ]);
@@ -593,7 +456,7 @@ export function createBattleCheck(root: HTMLElement): {
           if (state === undefined) return;
           dot.classList.toggle("is-cleared", state === "cleared");
           dot.classList.toggle("is-spotted", state === "spotted");
-          dot.style.left = `${x + (index - (view.peeks.length - 1) / 2) * puffSpacing}px`;
+          dot.style.left = `${x + (index - (view.peeks.length - 1) / 2) * PUFF_SPACING}px`;
           dot.style.top = `${y + height / 2 + 8}px`;
         });
         renderGrade(grade, view.grade, x, y + height / 2 + 54);
@@ -662,158 +525,9 @@ export function createBattleCheck(root: HTMLElement): {
           grade,
           view.grade,
           view.to.x,
-          view.to.y - view.radius - gradeGap,
+          view.to.y - view.radius - GRADE_GAP,
         );
       }
     },
   };
-}
-
-function renderGrade(
-  node: HTMLElement,
-  value: TimingGrade | null,
-  x: number,
-  y: number,
-): void {
-  node.hidden = value === null;
-  if (value === null) return;
-  node.style.left = `${x}px`;
-  node.style.top = `${y}px`;
-  setAttribute(node, "class", `battle-grade battle-grade-${value}`);
-  setText(node, gradeLabels[value]);
-}
-
-// A chain beat's icon, drawn in code in the sticker style: a round pink
-// bubble with a shine (like the frog's own), a pinecone with ink scale marks,
-// a butter-gold star for Together!, or a puff of dust with motion dashes.
-function chainIcon(look: ChainLook): SVGSVGElement {
-  const svg = svgElement("svg", `battle-icon battle-icon-${look}`);
-  svg.setAttribute("viewBox", "0 0 32 32");
-  svg.setAttribute("aria-hidden", "true");
-  const part = <K extends "circle" | "ellipse" | "path">(
-    tag: K,
-    className: string,
-    attributes: Record<string, string>,
-  ): void => {
-    const node = svgElement(tag, className);
-    for (const [name, value] of Object.entries(attributes)) node.setAttribute(name, value);
-    svg.append(node);
-  };
-  if (look === "bubble") {
-    part("circle", "battle-icon-fill", { cx: "16", cy: "16", r: "13" });
-    part("ellipse", "battle-icon-shine", {
-      cx: "11.5",
-      cy: "10.5",
-      rx: "4",
-      ry: "2.6",
-      transform: "rotate(-35 11.5 10.5)",
-    });
-    part("circle", "battle-icon-shine", { cx: "20.5", cy: "8.5", r: "1.4" });
-  } else if (look === "pinecone") {
-    part("path", "battle-icon-mark", { d: "M16 5 L17.5 1.5" });
-    part("ellipse", "battle-icon-fill", { cx: "16", cy: "17.5", rx: "9", ry: "12.5" });
-    part("path", "battle-icon-mark", {
-      d: "M9 12 Q16 16 23 12 M8 18 Q16 22.5 24 18 M10 24 Q16 27.5 22 24 " +
-        "M13 6.5 Q12 17 14.5 29 M19 6.5 Q20 17 17.5 29",
-    });
-  } else if (look === "star") {
-    part("path", "battle-icon-fill", {
-      d: "M16 2.5 L19.8 11.2 L29.2 12 L22 18.2 L24.2 27.5 L16 22.4 L7.8 27.5 " +
-        "L10 18.2 L2.8 12 L12.2 11.2 Z",
-    });
-    part("circle", "battle-icon-shine", { cx: "13.5", cy: "13", r: "2.2" });
-    part("circle", "battle-icon-shine", { cx: "17.8", cy: "10.5", r: "1.1" });
-  } else {
-    part("path", "battle-icon-fill", {
-      d: "M7 24 C2 23 2 16 8 15.5 C8 9 16 7 19 12 C23 9 30 12 28 18.5 " +
-        "C32 22 28 27 24 25.5 C21 29 11 29 7 24 Z",
-    });
-    part("path", "battle-icon-mark", { d: "M3 9 L8 11 M5 4 L10 7.5" });
-  }
-  return svg;
-}
-
-// A lean's star, drawn in code in the sticker style: butter yellow with an
-// ink edge, on a cream rim.
-function starIcon(): SVGSVGElement {
-  const svg = svgElement("svg", "battle-lean-star");
-  svg.setAttribute("viewBox", "0 0 24 24");
-  svg.setAttribute("aria-hidden", "true");
-  const shape = "M12 1.6 L14.8 8.7 L22.5 9.2 L16.6 14.1 L18.5 21.5 L12 17.4 L5.5 21.5 " +
-    "L7.4 14.1 L1.5 9.2 L9.2 8.7 Z";
-  for (const className of ["battle-lean-star-rim", "battle-lean-star-fill"]) {
-    const path = svgElement("path", className);
-    path.setAttribute("d", shape);
-    svg.append(path);
-  }
-  return svg;
-}
-
-// A swoosh of wind: a streak that curls up at its leading end, ink on a
-// cream rim.
-function swooshIcon(): SVGSVGElement {
-  const svg = svgElement("svg", "battle-lean-swoosh");
-  svg.setAttribute("viewBox", "0 0 60 20");
-  svg.setAttribute("aria-hidden", "true");
-  for (const className of ["battle-lean-swoosh-rim", "battle-lean-swoosh-ink"]) {
-    const path = svgElement("path", className);
-    path.setAttribute("d", "M58 15 H25 C12 15 4 8 9 3.5 C13 0 21 2 19.5 8.5");
-    svg.append(path);
-  }
-  return svg;
-}
-
-// Peekaboo status eyes (Milestone 81): all three states pre-mounted in one
-// SVG and toggled by CSS on `[data-status]` so renders never churn DOM nodes.
-function peekabooEyesIcon(): SVGSVGElement {
-  const svg = svgElement("svg", "battle-peekaboo-eyes");
-  svg.setAttribute("viewBox", "0 0 36 18");
-  svg.setAttribute("aria-hidden", "true");
-  const add = <K extends "path" | "circle" | "ellipse">(
-    parent: Element,
-    tag: K,
-    className: string,
-    attributes: Record<string, string>,
-  ): void => {
-    const node = svgElement(tag, className);
-    for (const [name, value] of Object.entries(attributes)) node.setAttribute(name, value);
-    parent.append(node);
-  };
-  // Safe: closed cozy crescent eyes looking away.
-  const safeGroup = svgElement("g", "battle-peekaboo-eyes-safe");
-  add(safeGroup, "path", "battle-peekaboo-lid", { d: "M4 11 Q10 6 16 11" });
-  add(safeGroup, "path", "battle-peekaboo-lid", { d: "M20 11 Q26 6 32 11" });
-  // Warning: half-open blinking eyes peeking over.
-  const warnGroup = svgElement("g", "battle-peekaboo-eyes-warning");
-  add(warnGroup, "ellipse", "battle-peekaboo-sclera", { cx: "10", cy: "10", rx: "6", ry: "3.4" });
-  add(warnGroup, "ellipse", "battle-peekaboo-sclera", { cx: "26", cy: "10", rx: "6", ry: "3.4" });
-  add(warnGroup, "circle", "battle-peekaboo-pupil", { cx: "10", cy: "10.5", r: "2" });
-  add(warnGroup, "circle", "battle-peekaboo-pupil", { cx: "26", cy: "10.5", r: "2" });
-  add(warnGroup, "path", "battle-peekaboo-lid", { d: "M4 8.5 Q10 6.5 16 8.5" });
-  add(warnGroup, "path", "battle-peekaboo-lid", { d: "M20 8.5 Q26 6.5 32 8.5" });
-  // Watching: wide starry eyes with bright sparkle pupils.
-  const watchGroup = svgElement("g", "battle-peekaboo-eyes-watching");
-  add(watchGroup, "circle", "battle-peekaboo-sclera", { cx: "10", cy: "9", r: "6.4" });
-  add(watchGroup, "circle", "battle-peekaboo-sclera", { cx: "26", cy: "9", r: "6.4" });
-  add(watchGroup, "circle", "battle-peekaboo-pupil", { cx: "10", cy: "9", r: "3.5" });
-  add(watchGroup, "circle", "battle-peekaboo-pupil", { cx: "26", cy: "9", r: "3.5" });
-  add(watchGroup, "circle", "battle-peekaboo-spark", { cx: "8.5", cy: "7.5", r: "1.4" });
-  add(watchGroup, "circle", "battle-peekaboo-spark", { cx: "24.5", cy: "7.5", r: "1.4" });
-  svg.append(safeGroup, warnGroup, watchGroup);
-  return svg;
-}
-
-// Peekaboo's goal star at the end of the progress track: butter gold on cream rim.
-function peekabooStarIcon(): SVGSVGElement {
-  const svg = svgElement("svg", "battle-peekaboo-star");
-  svg.setAttribute("viewBox", "0 0 24 24");
-  svg.setAttribute("aria-hidden", "true");
-  const shape = "M12 1.6 L14.8 8.7 L22.5 9.2 L16.6 14.1 L18.5 21.5 L12 17.4 L5.5 21.5 " +
-    "L7.4 14.1 L1.5 9.2 L9.2 8.7 Z";
-  for (const className of ["battle-lean-star-rim", "battle-lean-star-fill"]) {
-    const path = svgElement("path", className);
-    path.setAttribute("d", shape);
-    svg.append(path);
-  }
-  return svg;
 }

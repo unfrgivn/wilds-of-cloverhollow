@@ -9351,6 +9351,48 @@ Milestone number in `docs/plan.md` at rebase time to avoid numbering collisions.
 - Gates: `just check` (283 unit files / 2,075 tests, all 77 sims + all sim
   scripts, 23 QA packs, purity, lint), `just build` (`index` `390.47 kB < 500 kB`),
   and 23/23 Chromium & WebKit battle/weather e2e tests.
+
+## Milestone 218: Adaptive Gamepad Hint Copy Across Fishing, Taco Truck & Battle Checks + `battle-checks-helpers.ts` & `atmosphere-biomes.ts` Modular Splits + Live iOS 27 Sign-Off (Elevation Track E19K) **Status:** ✅ Completed (2026-11-28)
+- Adaptive Steam Deck / Gamepad Hint Copy (`src/ui/battle-checks-helpers.ts`,
+  `src/ui/battle-checks.ts`, `src/ui/fish.ts`, `src/ui/taco.ts`,
+  `src/shell/assets.ts`, `src/ui/arcade.ts`):
+  - Exports pure `adaptHintForInputMode(hint, inputMode = "keyboard")` in
+    `src/ui/battle-checks-helpers.ts` (re-exported identically from
+    `src/ui/battle-checks.ts`), returning `hint` 100% unchanged on keyboard /
+    touch while replacing whole-word `"Confirm"` / `"confirm"` with `"A"` and
+    `"Up Beans · Right Cheese · Down Salsa · Left Avocado."` with
+    `"D-Pad ↑ Beans · → Cheese · ↓ Salsa · ← Avocado."` on `"gamepad"`.
+  - Wires `inputMode` into `createFish().render(view, record, inputMode)` (from
+    `src/shell/assets.ts` and `src/ui/arcade.ts`), passes `inputMode` into
+    `createTaco()`'s `draw()` for non-touch serving/ready captions, and formats
+    `.battle-check-hint` in `src/ui/battle-checks.ts` via
+    `adaptHintForInputMode`.
+- Modular Extraction of `src/ui/battle-checks-helpers.ts`
+  (`src/ui/battle-checks.ts` `819 -> 533` lines,
+  `src/ui/battle-checks-helpers.ts` `326` lines):
+  - Extracts `adaptHintForInputMode`, view/grade types, check constants,
+    pointer/trace helpers, `renderGrade`, and SVG icon builders into
+    `src/ui/battle-checks-helpers.ts` and re-exports every symbol identically
+    through `src/ui/battle-checks.ts`.
+- Modular Extraction of Pixi-Free `src/render/atmosphere-biomes.ts`
+  (`src/render/atmosphere-outdoor.ts` `813 -> 454` lines,
+  `src/render/atmosphere-biomes.ts` `393` lines):
+  - Extracts alpine, twilight, and cavern wilds biome recipes (`pass`, `summit`,
+    `mist`, `enchanted`, `cavern`) into Pixi-free, DOM-free
+    `src/render/atmosphere-biomes.ts` and re-exports `WILDS_BIOME_AREAS` and
+    `evaluateWildsBiomeAtmosphere` identically through
+    `src/render/atmosphere-outdoor.ts`.
+- Evidence: `tests/unit/milestone-218.test.ts`,
+  `tests/e2e/milestone-218.spec.ts` (`@smoke`, Chromium + WebKit), and live
+  iOS 27 Simulator + arm64 release sign-off.
+- Gates: `just check` (286 unit files / 2,084 tests, all 77 recorded + 7
+  headless sims with zero hash shifts, 23 QA packs, purity, lint), `just build`
+  (largest non-vendor chunk `< 400 kB`, hook leak + runtime story + harness
+  checks green), Chromium & WebKit e2e (`milestone-218`, `milestone-217`,
+  `milestone-200`, `fish`, `taco`, `e7-multifoe-combos`, `ui-gallery` 99/99 with
+  0 snapshot diffs), `just ios-device-build` (unsigned arm64
+  `Release-iphoneos/App.app`), and `just ios-smoke` (passed end-to-end on
+  iPhone 17 / iOS 27.0 Simulator).
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

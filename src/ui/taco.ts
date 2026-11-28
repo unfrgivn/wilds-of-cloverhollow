@@ -6,6 +6,7 @@ import {
   type ArcadeRecordBadge,
 } from "./arcade-popups";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
+import { adaptHintForInputMode } from "./battle-checks-helpers";
 import { element, measure, pixels, place, setStyle, setText, type Box } from "./dom";
 import type { HudInputMode } from "./hud-hints";
 import { bindPointerHold } from "./pointer-hold";
@@ -170,6 +171,7 @@ export function createTaco(
   let lastFrontKey = "";
   let lastLayout: TacoLayout | null = null;
   let lastRecord: ArcadeRecordBadge | null = null;
+  let lastInputMode: HudInputMode = "keyboard";
   let prevPhase: string | null = null;
   let prevScore: number | null = null;
 
@@ -177,6 +179,7 @@ export function createTaco(
     view: TacoView,
     layout: TacoLayout,
     record: ArcadeRecordBadge | null,
+    inputMode: HudInputMode,
   ): void => {
     place(stage, { x: 0, y: 0, width: layout.width, height: layout.height });
     setStyle(stage, "border-radius", `${layout.radius}px`);
@@ -350,7 +353,7 @@ export function createTaco(
     // Bottom counter caption bar (hidden during result when dialogue takes over).
     const frontHint = touchOn && view.phase === "serving" && view.oopsTicks === 0
       ? "Tap the matching topping bowl to build each taco!"
-      : view.hint;
+      : adaptHintForInputMode(view.hint, inputMode);
     front.hidden = view.phase === "result" || frontHint === "";
     place(front, layout.front);
     setText(frontText, frontHint);
@@ -373,7 +376,9 @@ export function createTaco(
 
   document.fonts.addEventListener("loadingdone", () => {
     lastFrontKey = "";
-    if (lastView !== null && lastLayout !== null) draw(lastView, lastLayout, lastRecord);
+    if (lastView !== null && lastLayout !== null) {
+      draw(lastView, lastLayout, lastRecord, lastInputMode);
+    }
   });
 
   return {
@@ -381,6 +386,7 @@ export function createTaco(
       overlay.hidden = view === null;
       lastView = view;
       lastRecord = record;
+      lastInputMode = inputMode;
       if (view === null) {
         pointerHold.release();
         lastKey = "";
@@ -408,7 +414,7 @@ export function createTaco(
         Math.min(width / calibration.size.w, height / calibration.size.h),
       );
       lastLayout = layoutTaco(view, calibration, scale, inputMode);
-      draw(view, lastLayout, record);
+      draw(view, lastLayout, record, inputMode);
     },
     info: () => {
       if (lastView === null || lastLayout === null) return null;

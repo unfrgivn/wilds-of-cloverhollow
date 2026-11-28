@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-28 (Milestone 217)
+Last updated: 2026-11-28 (Milestone 218)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -246,7 +246,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   and the eight active battle timing-check DOM overlays (`ring`, `charge`,
   `chain`, `catch`, `lean`, `trace`, `peekaboo`, `echo`) live in
   `src/ui/battle-checks.ts` (re-exported through `src/ui/battle.ts`, Milestone
-  105), while the secondary battle DOM overlays (`createCommandMenu`,
+  105; with pure hint adaptation `adaptHintForInputMode`, shared view types,
+  constants, SVG icon builders, and pointer/trace helpers extracted into
+  `src/ui/battle-checks-helpers.ts` and re-exported identically through
+  `src/ui/battle-checks.ts`, Milestone 218 / Track E19K), while the secondary battle DOM overlays (`createCommandMenu`,
   `createFeelingBubble`, `createWindUpBubbles`, `createRewardSticker`, and
   `battleCommandPreview`) live in `src/ui/battle-overlays.ts` (re-exported
   identically through `src/ui/battle.ts`, Milestone 134).
@@ -883,6 +886,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   with pure stateless zero-Pixi particle recipes modularized across
   `src/render/atmosphere-shared.ts`,
   `src/render/atmosphere-outdoor.ts`,
+  `src/render/atmosphere-biomes.ts` (`pass`, `summit`, `mist`, `enchanted`, and
+  `cavern` wilds biome recipes re-exported identically through
+  `atmosphere-outdoor.ts`, Milestone 218 / Track E19K),
   `src/render/atmosphere-indoor.ts`, and the `< 120`-line dispatcher barrel
   `src/render/atmosphere-recipes.ts`, re-exported from `atmosphere.ts`,
   Milestones 118 and 136; zero `Math.random()`) adds per-biome water glints, lamp pools, drifting
@@ -4691,7 +4697,13 @@ trunks keep its two exits.
       Confirm or tap `SNAG!` as the golden ring meets the dashed target.
       Adaptive action label helper `spinSnagButtonLabel(snagReady, inputMode)`
       renders `"SNAG!"` on keyboard and `"SNAG! [A]"` on gamepad when snag-ready
-      (and `"SPIN!"` while spinning, Milestone 200 / Track E19B).
+      (and `"SPIN!"` while spinning, Milestone 200 / Track E19B). Across all
+      battle checks (including Dual-Friend Synergy Combos), `.battle-check-hint`
+      formats through `adaptHintForInputMode(hint, inputMode)`
+      (`src/ui/battle-checks-helpers.ts`, re-exported from
+      `src/ui/battle-checks.ts`, Milestone 218 / Track E19K), keeping keyboard
+      and touch copy byte-identical while replacing `"Confirm"` / `"confirm"`
+      with `"A"` on gamepad.
 
 ### 8.2 Arcade games (Milestones 44 to 46, and 59) and the clubhouse microwave (52)
 - The claw machine, skee-ball, Boop-a-Mole, and Comet Cruise, once Mr. Pip
@@ -5116,7 +5128,11 @@ trunks keep its two exits.
   wooden fishing rod, quadratic Bezier line, cork bobber, water ripples, and
   submerged fish shadow, plus the top-left Bubblegum Bay Catch Book (`N / 6`),
   touch-aware pack-up pill, Cast Power Gauge, Watercolor Reel-In Meter,
-  `! BITE !` sticker, and 2-column Catch Reveal card. Its gallery states
+  `! BITE !` sticker, and 2-column Catch Reveal card; its bottom caption bar
+  accepts `inputMode` (`render(view, record, inputMode)`) and formats via
+  `adaptHintForInputMode` so Steam Deck / Gamepad shows `"Press A"` / `"Hold or
+  tap A"` live while leaving keyboard/touch copy untouched (Milestone 218 /
+  Track E19K). Its gallery states
   (`src/dev/fish-gallery.ts`) are `arcade-fish-aim`, `arcade-fish-reeling`, and
   `arcade-fish-catch`.
 - Chef Mateo's Taco Truck Kitchen (`taco_chef_calm.mateo_shop` in
@@ -5154,7 +5170,11 @@ trunks keep its two exits.
   during `ready`), center live layered taco assembly on the woven placemat with
   star-lime garnish and `ORDER UP! ★` ribbon on clear, four direct-click /
   direct-tap painted topping bowls (`onPickTopping` via
-  `createTacoToppingHandler`), and the bottom counter caption bar. Its gallery
+  `createTacoToppingHandler`), and the bottom counter caption bar (formatting
+  through `adaptHintForInputMode` on gamepad so `"Press Confirm"` becomes
+  `"Press A"` and `"Up Beans · Right Cheese · Down Salsa · Left Avocado."`
+  becomes `"D-Pad ↑ Beans · → Cheese · ↓ Salsa · ← Avocado."` live while leaving
+  keyboard and touch copy untouched, Milestone 218 / Track E19K). Its gallery
   states (`src/dev/taco-gallery.ts`) are `arcade-taco-serving` and
   `arcade-taco-clear`; `renderInfo().arcade` reports `TacoInfo` (`game: "taco"`,
   `phase`, `stage`, `ticket`, `hud`, `shell`, `bowls`, `orderBanner`, `served`,

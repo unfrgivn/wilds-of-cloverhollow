@@ -104,7 +104,11 @@ export function createArcade(
         view?.game === "cook" ? view : null,
         view?.game === "cook" ? record : null,
       );
-      fishUp.render(view?.game === "fish" ? view : null, view?.game === "fish" ? record : null);
+      fishUp.render(
+        view?.game === "fish" ? view : null,
+        view?.game === "fish" ? record : null,
+        inputMode,
+      );
       tacoUp?.render(
         view?.game === "taco" ? view : null,
         view?.game === "taco" ? record : null,

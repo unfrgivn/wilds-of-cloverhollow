@@ -252,22 +252,13 @@ type RecordOverlay<V, I> = {
   info: () => I | null;
 };
 
-type MoleOverlay = {
+type InputModeOverlay<V, I> = {
   render: (
-    view: MoleView | null,
+    view: V | null,
     record?: ArcadeRecordBadge | null,
     inputMode?: HudInputMode,
   ) => void;
-  info: () => MoleInfo | null;
-};
-
-type TacoOverlay = {
-  render: (
-    view: TacoView | null,
-    record?: ArcadeRecordBadge | null,
-    inputMode?: HudInputMode,
-  ) => void;
-  info: () => TacoInfo | null;
+  info: () => I | null;
 };
 
 export type ShellAssetsOptions = {
@@ -544,7 +535,7 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
     return skeeLoad;
   };
 
-  let moleOverlay: MoleOverlay | null = null;
+  let moleOverlay: InputModeOverlay<MoleView, MoleInfo> | null = null;
   let moleLoad: Promise<void> | undefined;
   const ensureMoleOverlay = (): Promise<void> => {
     if (moleOverlay !== null) return Promise.resolve();
@@ -613,7 +604,7 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
     return cookLoad;
   };
 
-  let fishOverlay: RecordOverlay<FishView, FishInfo> | null = null;
+  let fishOverlay: InputModeOverlay<FishView, FishInfo> | null = null;
   let fishLoad: Promise<void> | undefined;
   const ensureFishOverlay = (): Promise<void> => {
     if (fishOverlay !== null) return Promise.resolve();
@@ -633,7 +624,7 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
     return fishLoad;
   };
 
-  let tacoOverlay: TacoOverlay | null = null;
+  let tacoOverlay: InputModeOverlay<TacoView, TacoInfo> | null = null;
   let tacoLoad: Promise<void> | undefined;
   const ensureTacoOverlay = (): Promise<void> => {
     if (tacoOverlay !== null) return Promise.resolve();
@@ -756,6 +747,7 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
     fishOverlay?.render(
       arcadeState?.game === "fish" ? arcadeState : null,
       arcadeState?.game === "fish" ? record : null,
+      inputMode,
     );
     tacoOverlay?.render(
       arcadeState?.game === "taco" ? arcadeState : null,

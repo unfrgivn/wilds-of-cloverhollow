@@ -6,8 +6,10 @@ import {
   type ArcadeRecordBadge,
 } from "./arcade-popups";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
+import { adaptHintForInputMode } from "./battle-checks-helpers";
 import { element, measure, pixels, place, setStyle, setText, type Box } from "./dom";
 import { layoutFish, type FishLayout } from "./fish-layout";
+import type { HudInputMode } from "./hud-hints";
 import { bindPointerHold } from "./pointer-hold";
 import type { FishCalibration, FishPhase, FishView } from "../core";
 
@@ -50,7 +52,11 @@ export function createFish(
   image: string,
   onConfirmHold: (held: boolean) => void = () => undefined,
 ): {
-  render: (view: FishView | null, record?: ArcadeRecordBadge | null) => void;
+  render: (
+    view: FishView | null,
+    record?: ArcadeRecordBadge | null,
+    inputMode?: HudInputMode,
+  ) => void;
   info: () => FishInfo | null;
 } {
   const overlay = element("section", "fish-overlay", root);
@@ -254,12 +260,14 @@ export function createFish(
   let lastView: FishView | null = null;
   let lastLayout: FishLayout | null = null;
   let lastRecord: ArcadeRecordBadge | null = null;
+  let lastInputMode: HudInputMode = "keyboard";
   let prevPhase: string | null = null;
 
   const draw = (
     view: FishView,
     layout: FishLayout,
     record: ArcadeRecordBadge | null,
+    inputMode: HudInputMode,
   ): void => {
     place(stage, { x: 0, y: 0, width: layout.width, height: layout.height });
     setStyle(stage, "border-radius", `${layout.radius}px`);
@@ -473,10 +481,11 @@ export function createFish(
     }
 
     // Bottom wooden dock caption bar (hidden during result when dialogue takes over).
-    front.hidden = view.phase === "result" || view.hint === "";
+    const frontHint = adaptHintForInputMode(view.hint, inputMode);
+    front.hidden = view.phase === "result" || frontHint === "";
     place(front, layout.front);
-    setText(frontText, view.hint);
-    const frontKey = `${view.hint}|${layout.front.width}|${layout.front.height}`;
+    setText(frontText, frontHint);
+    const frontKey = `${frontHint}|${layout.front.width}|${layout.front.height}`;
     if (!front.hidden && frontKey !== lastFrontKey) {
       lastFrontKey = frontKey;
       const tall = Math.max(10, Math.floor(layout.front.height * 0.4));
@@ -489,14 +498,17 @@ export function createFish(
 
   document.fonts.addEventListener("loadingdone", () => {
     lastFrontKey = "";
-    if (lastView !== null && lastLayout !== null) draw(lastView, lastLayout, lastRecord);
+    if (lastView !== null && lastLayout !== null) {
+      draw(lastView, lastLayout, lastRecord, lastInputMode);
+    }
   });
 
   return {
-    render: (view, record = null) => {
+    render: (view, record = null, inputMode = "keyboard") => {
       overlay.hidden = view === null;
       lastView = view;
       lastRecord = record;
+      lastInputMode = inputMode;
       if (view === null) {
         pointerHold.release();
         lastKey = "";
@@ -518,7 +530,7 @@ export function createFish(
       const height = overlay.clientHeight - pixels(style.paddingTop) - pixels(style.paddingBottom);
       const touch = document.documentElement.dataset.touch === "on" ? "1" : "0";
       const recordKey = record === null ? "" : `${record.best}:${record.isNewBest ? 1 : 0}`;
-      const key = `${width}x${height} ${touch} ${recordKey} ${JSON.stringify(view)}`;
+      const key = `${width}x${height} ${touch} ${inputMode} ${recordKey} ${JSON.stringify(view)}`;
       if (key === lastKey) return;
       lastKey = key;
       const scale = Math.max(
@@ -526,7 +538,7 @@ export function createFish(
         Math.min(width / calibration.size.w, height / calibration.size.h),
       );
       lastLayout = layoutFish(view, calibration, scale);
-      draw(view, lastLayout, record);
+      draw(view, lastLayout, record, inputMode);
     },
     info: () => {
       if (lastView === null || lastLayout === null) return null;
